@@ -1,0 +1,2561 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.CodeAnalysis.FlowAnalysis.Utilities</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider">
+            <summary>
+            Provides and caches well known types in a compilation for <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.Exception">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Exception"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.Contract">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for 'System.Diagnostics.Contracts.Contract' type. />
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.IDisposable">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.IDisposable"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.Task">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Threading.Tasks.Task"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.GenericTask">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Threading.Tasks.Task`1"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.Monitor">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Threading.Monitor"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.Interlocked">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Threading.Interlocked"/>
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.SerializationInfo">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for 'System.Runtime.Serialization.SerializationInfo' type />
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.GenericIEquatable">
+            <summary>
+            <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.IEquatable`1"/>
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider._fullNameToTypeMap">
+            <summary>
+            Mapping of full name to <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.TryGetTypeByMetadataName(System.String,Microsoft.CodeAnalysis.INamedTypeSymbol@)">
+            <summary>
+            Attempts to get the type by the full type name.
+            </summary>
+            <param name="fullTypeName">Namespace + type name, e.g. "System.Exception".</param>
+            <param name="namedTypeSymbol">Named type symbol, if any.</param>
+            <returns>True if found in the compilation, false otherwise.</returns>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.CollectionTypes">
+            <summary>
+            Set containing following named types, if not null:
+            1. <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Collections.ICollection"/>
+            2. <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Collections.Generic.ICollection`1"/>
+            3. <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> for <see cref="T:System.Collections.Generic.IReadOnlyCollection`1"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.WellKnownTypeProvider.IsTaskOfType(Microsoft.CodeAnalysis.ITypeSymbol,System.Func{Microsoft.CodeAnalysis.ITypeSymbol,System.Boolean})">
+            <summary>
+            Determines if <paramref name="typeSymbol"/> is a <see cref="T:System.Threading.Tasks.Task`1"/> with its type
+            argument satisfying <paramref name="typeArgumentPredicate"/>.
+            </summary>
+            <param name="typeSymbol">Type potentially representing a <see cref="T:System.Threading.Tasks.Task`1"/>.</param>
+            <param name="typeArgumentPredicate">Predicate to check the <paramref name="typeSymbol"/>'s type argument.</param>
+            <returns>True if <paramref name="typeSymbol"/> is a <see cref="T:System.Threading.Tasks.Task`1"/> with its
+            type argument satisfying <paramref name="typeArgumentPredicate"/>, false otherwise.</returns>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis">
+            <summary>
+            Dataflow analysis to track <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same value.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis.SetCopyAbstractValuePredicateKind">
+            <summary>
+            Predicate kind for <see cref="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis.CopyDataFlowOperationVisitor.SetAbstractValue(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysisData,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue,System.Func{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue},System.Nullable{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis.SetCopyAbstractValuePredicateKind},System.Boolean)"/>
+            to indicte if the copy equality check for the SetAbstractValue call is a reference compare or a value compare operation.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis.CopyAbstractValueDomain">
+            <summary>
+            Abstract value domain for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis"/> to merge and compare <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue"/> values.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis.CopyDataFlowOperationVisitor">
+            <summary>
+            Operation visitor to flow the copy values across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis.CoreCopyAnalysisDataDomain">
+            <summary>
+            An abstract analysis domain implementation for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData`2"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.AddressSharedEntitiesProvider`4">
+            <summary>
+            Generates and stores the default <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue"/> for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances generated for member and element reference operations.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.AddressSharedEntitiesProvider`4._addressSharedEntitiesBuilder">
+            <summary>
+            Map builder from entity to set of entities that share the same instance location.
+            Primarily used for ref arguments for context sensitive interprocedural analysis
+            to ensure that PointsTo value updates to any of the mapped entities is reflected in the others in the set.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue">
+            <summary>
+            Abstract copy value shared by a set of one of more <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValueKind">
+            <summary>
+            Kind for the <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValueKind.NotApplicable">
+            <summary>
+            Not applicable.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValueKind.KnownReferenceCopy">
+            <summary>
+            Copy of a reference shared by one or more <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValueKind.KnownValueCopy">
+            <summary>
+            Copy of a value shared by one or more <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValueKind.Unknown">
+            <summary>
+            Copy may or may not be shared by other <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValueKind.Invalid">
+            <summary>
+            Invalid state for an unreachable path from predicate analysis.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysisData">
+            <summary>
+            Aggregated copy analysis data tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis"/>.
+            Contains the <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData`2"/> for entity copy values and
+            the predicated copy values based on true/false runtime values of predicated entities.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysisData.SetAbstactValueForEntities(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity)">
+            <summary>
+            Updates the the copy values for all entities that are part of the given <paramref name="copyValue"/> set,
+            i.e. <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue.AnalysisEntities"/>.
+            We do not support the <see cref="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysisData.SetAbstractValue(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue)"/> overload
+            that updates copy value for each individual entity.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyBlockAnalysisResult">
+            <summary>
+            Result from execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis"/> on a basic block.
+            It store copy values for each <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> at the start and end of the basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysisContext">
+            <summary>
+            Analysis context for execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysisResult">
+            <summary>
+            Analysis result from execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.TrackedEntitiesBuilder">
+            <summary>
+            Stores all the entities that got tracked during points to analysis
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysisContext">
+            <summary>
+            Analysis context for execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.DefaultPointsToValueGenerator">
+            <summary>
+            Generates and stores the default <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue"/> for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances generated for member and element reference operations.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.NullAbstractValue">
+            <summary>
+            Abstract null value for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue">
+            <summary>
+            Abstract PointsTo value for an <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/>.
+            It contains the set of possible <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation"/>s that the entity or the operation can point to and the <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue.Kind"/> of the location(s).
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind">
+            <summary>
+            Kind for the <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.Invalid">
+            <summary>
+            Invalid value based on predicate analysis.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.Undefined">
+            <summary>
+            Undefined value.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.KnownLocations">
+            <summary>
+            Points to one or more known possible locations.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.KnownLValueCaptures">
+            <summary>
+            Points to one or more known possible l-values.
+            Used for pointers, ref expressions and l-value flow captures.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.UnknownNull">
+            <summary>
+            Points to unknown set of locations, which is known to be null.
+            Note that this value kind is theoretically not needed, as the underlying
+            value is null, but it has been added to ensure monotonicity of value merge.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.UnknownNotNull">
+            <summary>
+            Points to unknown set of locations, which is known to be non-null.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValueKind.Unknown">
+            <summary>
+            Points to unknown set of locations, which may or may not be null.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis">
+            <summary>
+            Dataflow analysis to track locations pointed to by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> and <see cref="T:Microsoft.CodeAnalysis.IOperation"/> instances.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.CorePointsToAnalysisDataDomain">
+            <summary>
+            An abstract analysis domain implementation for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData`2"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.NullAbstractValueDomain">
+            <summary>
+            Abstract value domain to merge and compare <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.NullAbstractValue"/> values.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.PointsToAbstractValueDomain">
+            <summary>
+            Abstract value domain for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/> to merge and compare <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue"/> values.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.PointsToAnalysisDomain">
+            <summary>
+            An abstract analysis domain implementation for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysisData"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.PointsToDataFlowOperationVisitor">
+            <summary>
+            Operation visitor to flow the PointsTo values across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.PointsToDataFlowOperationVisitor.IsSpecialFactoryMethod(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Returns true if this special static factory method whose name starts with "Create", such that 
+            method's containing type is static OR a special type OR derives from or is same as the type of the field/property/method return.
+            For example: class SomeType { static SomeType CreateXXX(...); }
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis.PointsToDataFlowOperationVisitor.IsSpecialEmptyMember(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Returns true if this special member symbol named "Empty", such that one of the following is true:
+             1. It is a static method with no parameters or
+             2. It is a static readonly property or
+             3. It is static readonly field
+            and symbol's containing type is a special type or derives from or is same as the type of the field/property/method return.
+            For example:
+             1. class SomeType { static readonly SomeType Empty; }
+             2. class SomeType { static readonly SomeType Empty { get; } }
+             3. class SomeType { static SomeType Empty(); }
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysisData">
+            <summary>
+            Aggregated PointsTo analysis data tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/>.
+            Contains the <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData`2"/> for entity PointsTo values and
+            the predicated values based on true/false runtime values of predicated entities.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToBlockAnalysisResult">
+            <summary>
+            Result from execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/> on a basic block.
+            It stores the PointsTo value for each <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> at the start and end of the basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysisContext">
+            <summary>
+            Analysis context for execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValue">
+            <summary>
+            Abstract dispose data tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis"/>.
+            It contains the set of <see cref="T:Microsoft.CodeAnalysis.IOperation"/>s that dispose an associated disposable <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation"/> and
+            the dispose <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValue.Kind"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind">
+            <summary>
+            Abstract dispose value for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.NotDisposable">
+            <summary>
+            Indicates locations that are not disposable, e.g. value types, constants, etc.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.Invalid">
+            <summary>
+            Indicates a value for disposable locations that are not feasible on the given program path.
+            For example,
+            <code>
+                var x = flag ? new Disposable() : null;
+                if (x == null)
+                {
+                    // Disposable allocation above cannot exist on this code path.
+                }
+            </code>
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.NotDisposed">
+            <summary>
+            Indicates disposable locations that are not disposed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.Escaped">
+            <summary>
+            Indicates disposable locations that have escaped the declaring method's scope.
+            For example, a disposable allocation assigned to a field/property or
+            escped as a return value for a function, or assigned to a ref or out parameter, etc.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.NotDisposedOrEscaped">
+            <summary>
+            Indicates disposable locations that are either not disposed or escaped.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.Disposed">
+            <summary>
+            Indicates disposable locations that are disposed.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.MaybeDisposed">
+            <summary>
+            Indicates disposable locations that may be disposed on some program path(s).
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValueKind.Unknown">
+            <summary>
+            Indicates disposable locations whose dispose state is unknown.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis">
+            <summary>
+            Dataflow analysis to track dispose state of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> instances.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis.DisposeAbstractValueDomain">
+            <summary>
+            Abstract value domain for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis"/> to merge and compare <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAbstractValue"/> values.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis.DisposeDataFlowOperationVisitor">
+            <summary>
+            Operation visitor to flow the dispose values across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeBlockAnalysisResult">
+            <summary>
+            Result from execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis"/> on a basic block.
+            It store dispose values for each <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation"/> at the start and end of the basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysisResult">
+            <summary>
+            Analysis result from execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DisposeAnalysis.DisposeAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysisContext">
+            <summary>
+            Analysis context for execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis">
+            <summary>
+            Dataflow analysis to track value content of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis.ValueContentAnalysisDomain">
+            <summary>
+            An abstract analysis domain implementation for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysisData"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis.CoreAnalysisDataDomain">
+            <summary>
+            An abstract analysis domain implementation for core analysis data tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis.ValueContentAbstractValueDomain">
+            <summary>
+            Abstract value domain for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/> to merge and compare <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue"/> values.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis.ValueContentDataFlowOperationVisitor">
+            <summary>
+            Operation visitor to flow the data values across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContainsNonLiteralState">
+            <summary>
+            Value state for presence of non-literal values for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/>.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContainsNonLiteralState.Invalid">
+            <summary>The variable state is invalid due to predicate analysis.</summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContainsNonLiteralState.Undefined">
+            <summary>State is undefined.</summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContainsNonLiteralState.No">
+            <summary>The variable does not contain any instances of a non-literal.</summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContainsNonLiteralState.Maybe">
+            <summary>The variable may or may not contain instances of a non-literal.</summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue">
+            <summary>
+            Abstract value content data value for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue.NonLiteralState">
+            <summary>
+            Indicates if this variable contains non literal operands or not.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue.LiteralValues">
+            <summary>
+            Gets a collection of the literals that could possibly make up the contents of this abstract value.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue.Merge(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue)">
+            <summary>
+            Performs the union of this state and the other state 
+            and returns a new <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue"/> with the result.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue.TryGetSingleNonNullLiteral``1(``0@)">
+            <summary>
+            For super simple cases: If this abstract value is a single non-null literal, then get that literal value.
+            </summary>
+            <typeparam name="T">Type of the expected literal value.</typeparam>
+            <param name="literalValue">Literal value, or its default if not a single non-null literal value.</param>
+            <returns>True if a non-null literal value was found, false otherwise.</returns>
+            <remarks>If you're looking for null, you should be looking at <see cref="N:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis"/>.</remarks>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue.MergeBinaryOperation(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue,Microsoft.CodeAnalysis.Operations.BinaryOperatorKind,Microsoft.CodeAnalysis.ITypeSymbol,Microsoft.CodeAnalysis.ITypeSymbol,Microsoft.CodeAnalysis.ITypeSymbol)">
+            <summary>
+            Performs the union of this state and the other state for a Binary operation
+            and returns a new <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue"/> with the result.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysisData">
+            <summary>
+            Aggregated value content analysis data tracked by <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/>.
+            Contains the <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData`2"/> for entity data values and
+            the predicated values based on true/false runtime values of predicated entities.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentBlockAnalysisResult">
+            <summary>
+            Result from execution of <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAnalysis"/> on a basic block.
+            It stores data values for each <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> at the start and end of the basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractAnalysisDomain`1">
+            <summary>
+            Abstract analysis domain for a <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> to merge and compare analysis data.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractAnalysisDomain`1.Clone(`0)">
+            <summary>
+            Creates a clone of the analysis data.
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractAnalysisDomain`1.Merge(`0,`0)">
+            <summary>
+            Returns a value that is greater than <paramref name="value1"/> and <paramref name="value2"/>.
+            </summary>
+            <param name="value1">A value to be merged</param>
+            <param name="value2">A value to be merged</param>
+            <returns>A value that is greater than <paramref name="value1"/> and <paramref name="value2"/></returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractAnalysisDomain`1.Compare(`0,`0)">
+             <summary>
+             Compares <paramref name="oldValue"/> with <paramref name="newValue"/>
+             and returns a value indicating whether one value is less than,
+             equal to, or greater than the other.
+             </summary>
+             <param name="oldValue">A value to compare</param>
+             <param name="newValue">A value to compare</param>
+             <returns>A signed integer that indicates the relative values of
+             <paramref name="oldValue"/> and <paramref name="newValue"/>.
+             <para>Less than zero: <paramref name="oldValue"/> is less than <paramref name="newValue"/>.</para>
+             <para>Zero: <paramref name="oldValue"/> equals <paramref name="newValue"/>.</para>
+             <para>Greater than zero: <paramref name="oldValue"/> is greater than <paramref name="newValue"/>.</para>
+            </returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractAnalysisDomain`1.Equals(`0,`0)">
+            <summary>
+            Indicates if <paramref name="value1"/> with <paramref name="value2"/> are equal.
+            </summary>
+            <param name="value1">A value to compare</param>
+            <param name="value2">A value to compare</param>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractBlockAnalysisResult">
+            <summary>
+            Result from execution of a <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> on a basic block.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisPredicate">
+            <summary>
+            Interprocedural analysis predicate to decide whether interprocedural analysis can be skipped.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisConfiguration">
+            <summary>
+            Interprocedural analysis configuration parameters.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisConfiguration.DefaultMaxInterproceduralMethodCallChain">
+            <summary>
+            Defines the max length for method call chain (call stack size) for interprocedural analysis.
+            This is done for performance reasons for analyzing methods with extremely large call trees.
+            https://github.com/dotnet/roslyn-analyzers/issues/1809 tracks improving this heuristic.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisConfiguration.DefaultMaxInterproceduralLambdaOrLocalFunctionCallChain">
+            <summary>
+            Defines the max length for lambda/local function method call chain (call stack size) for interprocedural analysis.
+            This is done for performance reasons for analyzing methods with extremely large call trees.
+            https://github.com/dotnet/roslyn-analyzers/issues/1809 tracks improving this heuristic.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ConversionInference">
+            <summary>
+            Conversion inference result.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralCaptureId">
+            <summary>
+            Unique flow capture Id across interprocedural flow graph.
+            This type essentially wraps each <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.CaptureId"/>, which is unique for each control flow graph,
+            with its owning <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralCaptureId.ControlFlowGraph"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ArgumentInfo`1">
+            <summary>
+            Contains information about an argument passed to interprocedural analysis.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisKind">
+            <summary>
+            Determines the kind of interprocedural dataflow analysis to perform for method invocations.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisKind.None">
+            <summary>
+            Skip interprocedural analysis for source method invocations, except for lambda and location function invocations,
+            which are always analyzed in a context sensitive fashion.
+            All the analysis data for invocation receiver and arguments is conservatively reset at call sites.
+            Produces least precise results from amongst the possible interprocedural modes, but is the most performant mode.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisKind.ContextSensitive">
+            <summary>
+            Performs context sensitive interprocedural analysis for all source method invocations,
+            including lambda and location function invocations.
+            Context sensitive interprocedural analysis analyzes invoked method at each call site by considering the calling context,
+            i.e. the argument values and instance receiver, hence is the most precise analysis mode.
+            This mode is also the most performance intensive mode.
+            Note that we apply a max threshold to the length of interprocedural call chain to analyze in
+            a context sensitive fashion to avoid infinite computation for huge call graphs.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisData`3">
+            <summary>
+            Contains the caller's analysis context data passed to context sensitive interprocedural analysis, <see cref="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisKind.ContextSensitive"/>.
+            This includes the following:
+            1. Caller's tracked analysis data at the call site, which is the initial analysis data for callee.
+            2. Information about the invocation instance on which the method is invoked.
+            3. Information about arguments for the invocation.
+            4. Captured variables (for lambda/local function invocations).
+            5. Information about ref/out parameter entities that share address with callee's parameters.
+            6. Operation call stack for the current interprocedural analysis.
+            7. Set of analysis contexts currently being analyzed.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.IDataFlowAnalysisResult`1">
+            <summary>
+            Marker interface for analysis results from execution of <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> on a control flow graph.
+            Primarily exists for specifying constraints on analysis result type parameters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.IDataFlowAnalysisContext">
+            <summary>
+            Marker interface for analysis contexts for execution of <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> on a control flow graph.
+            Primarily exists for specifying constraints on analysis context type parameters.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractDataFlowAnalysisContext`4">
+            <summary>
+            Base type for analysis contexts for execution of <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> on a control flow graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractDomain`1">
+            <summary>
+            Abstract domain for a <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> to merge and compare values.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractDomain`1.Bottom">
+            <summary>
+            Returns the minor value of the domain.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractDomain`1.Merge(`0,`0)">
+            <summary>
+            Returns a value that is greater than <paramref name="value1"/> and <paramref name="value2"/>.
+            </summary>
+            <param name="value1">A value to be merged</param>
+            <param name="value2">A value to be merged</param>
+            <returns>A value that is greater than <paramref name="value1"/> and <paramref name="value2"/></returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractDomain`1.Compare(`0,`0)">
+             <summary>
+             Compares <paramref name="oldValue"/> with <paramref name="newValue"/>
+             and returns a value indicating whether one value is less than,
+             equal to, or greater than the other.
+             </summary>
+             <param name="oldValue">A value to compare</param>
+             <param name="newValue">A value to compare</param>
+             <returns>A signed integer that indicates the relative values of
+             <paramref name="oldValue"/> and <paramref name="newValue"/>.
+             <para>Less than zero: <paramref name="oldValue"/> is less than <paramref name="newValue"/>.</para>
+             <para>Zero: <paramref name="oldValue"/> equals <paramref name="newValue"/>.</para>
+             <para>Greater than zero: <paramref name="oldValue"/> is greater than <paramref name="newValue"/>.</para>
+            </returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractDomain`1.Equals(`0,`0)">
+            <summary>
+            Indicates if <paramref name="value1"/> and <paramref name="value2"/> are equal.
+            </summary>
+            <param name="value1">A value to compare</param>
+            <param name="value2">A value to compare</param>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CacheBasedEquatable`1">
+            <summary>
+            Abstract cache based equatable implementation for objects that are compared frequently and hence need a performance optimization of using a cached hash code.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractIndex">
+            <summary>
+            Represents an abstract index into a location.
+            It is used by an <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> for operations such as an <see cref="T:Microsoft.CodeAnalysis.Operations.IArrayElementReferenceOperation"/>, index access <see cref="T:Microsoft.CodeAnalysis.Operations.IPropertyReferenceOperation"/>, etc.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation">
+            <summary>
+            <para>
+            Represents an abstract analysis location.
+            This is may be used to represent a location where an <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> resides, i.e. <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/> or
+            a location that is pointed to by a reference type variable, and tracked with <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysis"/>.
+            </para>
+            <para>
+            An analysis location can be created for one of the following cases:
+                1. An allocation or an object creation operation (<see cref="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreateAllocationLocation(Microsoft.CodeAnalysis.IOperation,Microsoft.CodeAnalysis.ITypeSymbol,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysisContext)"/>).
+                2. Location for the implicit 'this' or 'Me' instance being analyzed (<see cref="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreateThisOrMeLocation(Microsoft.CodeAnalysis.INamedTypeSymbol,System.Collections.Immutable.ImmutableStack{Microsoft.CodeAnalysis.IOperation})"/>).
+                3. Location created for certain symbols which do not have a declaration in executable code, i.e. no <see cref="T:Microsoft.CodeAnalysis.IOperation"/> for declaration (such as parameter symbols, member symbols, etc. - <see cref="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreateSymbolLocation(Microsoft.CodeAnalysis.ISymbol,System.Collections.Immutable.ImmutableStack{Microsoft.CodeAnalysis.IOperation})"/>/>).
+                4. Location created for flow capture entities, i.e. for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralCaptureId"/> created for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.IFlowCaptureOperation"/> or <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.IFlowCaptureReferenceOperation"/>.
+                   See <see cref="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreateFlowCaptureLocation(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralCaptureId,Microsoft.CodeAnalysis.ITypeSymbol,System.Collections.Immutable.ImmutableStack{Microsoft.CodeAnalysis.IOperation})"/>
+            </para>
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.GetTopOfCreationCallStackOrCreation">
+            <summary>
+            Returns the top of <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreationCallStack"/> if this location was created through an interprocedural method invocation, i.e. <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreationCallStack"/> is non-empty.
+            Otherwise, returns <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.CreationOpt"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.IsAnalysisEntityDefaultLocation">
+            <summary>
+            Indicates this represents the initial unknown but distinct location for an analysis entity.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation.TryGetNodeToReportDiagnostic(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAnalysisResult)">
+            <summary>
+            Attempts to get the syntax node to report diagnostic for this abstract location 
+            Returns null if the location is owned by another method invoked through interprocedural analysis.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocationDataFlowOperationVisitor`4">
+            <summary>
+            Operation visitor to flow the abstract dataflow analysis values for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation"/>s across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocationDataFlowOperationVisitor`4.ResetAnalysisData(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation,`3})">
+            <summary>
+            Helper method to reset analysis data for analysis locations.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractValueDomain`1">
+            <summary>
+            Abstract value domain for a <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> to merge and compare values.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractValueDomain`1.UnknownOrMayBeValue">
+            <summary>
+            Returns the major Unknown or MayBe top value of the domain.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity">
+            <summary>
+            <para>
+            Primary entity for which analysis data is tracked by <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/>.
+            </para>
+            <para>
+            The entity is based on one or more of the following:
+                1. An <see cref="T:Microsoft.CodeAnalysis.ISymbol"/>.
+                2. One or more <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractIndex"/> indices to index into the parent key.
+                3. "this" or "Me" instance.
+                4. An allocation or an object creation.
+            </para>
+            <para>
+            Each entity has:
+                1. An associated non-null <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.Type"/> and
+                2. A non-null <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/> indicating the abstract location at which the entity is located and
+                3. An optional parent key if this key has the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/> as the parent (i.e. parent is a value type).
+            </para>
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityBasedPredicateAnalysisData`1">
+            <summary>
+            Base class for all the aggregate analysis data with predicated analysis data,
+            whose <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityBasedPredicateAnalysisData`1.CoreAnalysisData"/> is keyed by an <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityDataFlowOperationVisitor`4">
+            <summary>
+            Operation visitor to flow the abstract dataflow analysis values for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityDataFlowOperationVisitor`4.ResetAnalysisData(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,`3})">
+            <summary>
+            Helper method to reset analysis data for analysis entities.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityDataFlowOperationVisitor`4.ResetValueTypeInstanceAnalysisData(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity)">
+            <summary>
+            Resets all the analysis data for all <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/>
+            as the given <paramref name="analysisEntity"/>.
+            </summary>
+            <param name="analysisEntity"></param>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityDataFlowOperationVisitor`4.ResetInstanceAnalysisDataCore(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity})">
+            <summary>
+            Resets the analysis data for the given <paramref name="dependantAnalysisEntities"/>.
+            </summary>
+            <param name="dependantAnalysisEntities"></param>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityDataFlowOperationVisitor`4.TransferValueTypeInstanceAnalysisDataForAssignment(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Transfers the analysis data rooted from <paramref name="valueAnalysisEntityOpt"/> or <paramref name="assignedValueOperationOpt"/> to <paramref name="targetAnalysisEntity"/>, for a value type assignment operation.
+            This involves transfer of data for of all <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/> as <paramref name="valueAnalysisEntityOpt"/> or allocation for the <paramref name="assignedValueOperationOpt"/>
+            to all <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/> as <paramref name="targetAnalysisEntity"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityDataFlowOperationVisitor`4.GetTrimmedCurrentAnalysisData(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity})">
+            <summary>
+            Returns a cloned CurrentAnalysisData, trimmed down to only have key-value pairs for the given <paramref name="withEntities"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityFactory">
+            <summary>
+            Factory to create <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> objects for operations, symbol declarations, etc.
+            This factory also tracks analysis entities that share the same instance location (e.g. value type members).
+            NOTE: This factory must only be used from within an <see cref="T:Microsoft.CodeAnalysis.Operations.OperationVisitor"/>, as it is tied to the visitor's state tracking via <see cref="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityFactory._getIsInsideAnonymousObjectInitializer"/> delegate.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityMapAbstractDomain`1">
+            <summary>
+            An abstract domain implementation for analyses that store dictionary typed data.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowAnalysis`5">
+            <summary>
+            Subtype for all dataflow analyses on a control flow graph.
+            It performs a worklist based approach to flow abstract data values for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>/<see cref="T:Microsoft.CodeAnalysis.IOperation"/> across the basic blocks until a fix point is reached.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowAnalysisResult`2">
+            <summary>
+            Result from execution of a <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> on a control flow graph.
+            It stores:
+             (1) Analysis values for all operations in the graph and
+             (2) <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractBlockAnalysisResult"/> for every basic block in the graph.
+             (3) Merged analysis state for all the unhandled throw operations in the graph.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowAnalysisResultBuilder`1">
+            <summary>
+            Used by <see cref="T:Microsoft.CodeAnalysis.DataFlowAnalysis"/> to store intermediate dataflow results while executing data flow analysis
+            and also to compute the final <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowAnalysisResult`2"/> exposed as the result.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4">
+            <summary>
+            Operation visitor to flow the abstract dataflow analysis values across a given statement in a basic block.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.MaxInterproceduralMethodCallChain">
+            <summary>
+            Defines the max length for method call chain (call stack size) for interprocedural analysis.
+            This is done for performance reasons for analyzing methods with extremely large call trees.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.MaxInterproceduralLambdaOrLocalFunctionCallChain">
+            <summary>
+            Defines the max length for lambda/local function method call chain (call stack size) for interprocedural analysis.
+            This is done for performance reasons for analyzing methods with extremely large call trees.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4._addressSharedEntitiesProvider">
+            <summary>
+            Stores a map from entity to set of entities that share the same instance location.
+            Primarily used for ref arguments for context sensitive interprocedural analysis
+            to ensure that PointsTo value updates to any of the mapped entities is reflected in the others in the set.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4._interproceduralCallStack">
+            <summary>
+            Current interprocedural operation call stack.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4._interproceduralResultsBuilder">
+            <summary>
+            Dictionary storing context sensitive interprocedural analysis results for each callsite.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4._interproceduralMethodToCfgMapOpt">
+            <summary>
+            Dictionary from interprocedural method symbols invoked to their corresponding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowGraph"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.TaskWrappedValuesMapOpt">
+            <summary>
+            Optional map from points to values of tasks to the underlying abstract value returned by the task.
+            Awaiting the task produces the task wrapped value from this map.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.PessimisticAnalysis">
+            <summary>
+            This boolean field determines if the caller requires an optimistic OR a pessimistic analysis for such cases.
+            For example, invoking an instance method may likely invalidate all the instance field analysis state, i.e.
+            reference type fields might be re-assigned to point to different objects in the called method.
+            An optimistic points to analysis assumes that the points to values of instance fields don't change on invoking an instance method.
+            A pessimistic points to analysis resets all the instance state and assumes the instance field might point to any object, hence has unknown state.
+            </summary>
+            <remarks>
+            For dispose analysis, we want to perform an optimistic points to analysis as we assume a disposable field is not likely to be re-assigned to a separate object in helper method invocations in Dispose.
+            For value content analysis, we want to perform a pessimistic points to analysis to be conservative and avoid missing out true violations.
+            </remarks>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.PredicateAnalysis">
+            <summary>
+            Indicates if we this visitor needs to analyze predicates of conditions.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.IsInsideAnonymousObjectInitializer">
+            <summary>
+            PERF: Track if we are within an <see cref="T:Microsoft.CodeAnalysis.Operations.IAnonymousObjectCreationOperation"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.Flow(Microsoft.CodeAnalysis.IOperation,Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,`0)">
+            <summary>
+            Primary method that flows analysis data through the given statement.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.UpdateValuesForAnalysisData(`0)">
+            <summary>
+            Updates values for existing entries in <paramref name="targetAnalysisData"/> with newer values from CurrentAnalysisData.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.UpdateValuesForAnalysisData``1(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData{``0,`3},Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData{``0,`3})">
+            <summary>
+            Helper method to update analysis data for existing entries in <paramref name="targetAnalysisData"/>
+            with newer values from <paramref name="newAnalysisData"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.FlowBranch(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.BranchWithInfo,`0)">
+            <summary>
+            Primary method that flows analysis data through the given flow edge/branch.
+            Returns false if the branch is conditional and the branch value always evaluates to false.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.GetAbstractValueForImplicitWrappingTaskCreation(Microsoft.CodeAnalysis.IOperation,`3,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue)">
+            <summary>
+            Get analysis value for an implicitly created completed task wrapping a returned value in an async method.
+            For example, "return 0;" in an async method returning "Task(Of int)".
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.ResetValueTypeInstanceAnalysisData(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity)">
+            <summary>
+            Resets all the analysis data for all <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/>
+            as the given <paramref name="analysisEntity"/>.
+            </summary>
+            <param name="analysisEntity"></param>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.ResetReferenceTypeInstanceAnalysisData(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue)">
+            <summary>
+            Resets all the analysis data for all <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/>
+            as the given <paramref name="pointsToAbstractValue"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.ResetReferenceTypeInstanceAnalysisData(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Resets all the analysis data for all <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> instances that share the same <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity.InstanceLocation"/>
+            as pointed to by given reference type <paramref name="operation"/>.
+            </summary>
+            <param name="operation"></param>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.ResetInstanceAnalysisData(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Reset all the instance analysis data if <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.HasPointsToAnalysisResult"/> is true and <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.PessimisticAnalysis"/> is also true.
+            If we are using or performing points to analysis, certain operations can invalidate all the analysis data off the containing instance.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.GetInitialInterproceduralAnalysisData(Microsoft.CodeAnalysis.IMethodSymbol,System.Nullable{System.ValueTuple{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue}},System.Nullable{System.ValueTuple{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue}},System.Collections.Immutable.ImmutableDictionary{Microsoft.CodeAnalysis.IParameterSymbol,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ArgumentInfo{`3}},System.Collections.Generic.IDictionary{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PointsToAnalysis.PointsToAbstractValue},System.Collections.Generic.IDictionary{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.CopyAnalysis.CopyAbstractValue},System.Collections.Generic.IDictionary{Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity,Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ValueContentAnalysis.ValueContentAbstractValue},System.Boolean,System.Boolean)">
+            <summary>
+            Gets a new instance of analysis data that should be passed as initial analysis data
+            for interprocedural analysis.
+            The default implementation returns cloned CurrentAnalysisData.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.ApplyInterproceduralAnalysisResult(`0,System.Boolean,System.Boolean,`2)">
+            <summary>
+            Apply the result data from interprocedural analysis to CurrentAnalysisData.
+            Default implementation is designed for the default implementation of GetInitialInterproceduralAnalysisData.
+            and overwrites the CurrentAnalysisData with the given <paramref name="resultData"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.PostProcessArgument(Microsoft.CodeAnalysis.Operations.IArgumentOperation,System.Boolean)">
+            <summary>
+            Invoked after the parent invocation/creation operation of the given argument has been visited.
+            </summary>
+            <param name="operation">Argument to be post-processed.</param>
+            <param name="isEscaped">Boolean flag indicating if the argument was escaped due to lack of interprocedural analysis or not.</param>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.PostProcessEscapedArgument(Microsoft.CodeAnalysis.Operations.IArgumentOperation)">
+            <summary>
+            Post process argument which needs to be escaped/reset after being passed to an invocation/creation target
+            without interprocedural analysis.
+            This method resets the analysis data for an object instance passed around as an <see cref="T:Microsoft.CodeAnalysis.Operations.IArgumentOperation"/>
+            and also handles resetting the argument value for ref/out parmater.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.VisitInvocation_NonLambdaOrDelegateOrLocalFunction(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.IOperation,System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.Operations.IArgumentOperation},System.Boolean,Microsoft.CodeAnalysis.IOperation,`3)">
+            <summary>
+            Visits an invocation, either as a direct method call, or intermediately through a delegate.
+            </summary>
+            <param name="method">Method that is invoked.</param>
+            <param name="visitedInstance">Instance that that the method is invoked on, if any.</param>
+            <param name="visitedArguments">Arguments to the invoked method.</param>
+            <param name="invokedAsDelegate">Indicates that invocation is a delegate invocation.</param>
+            <param name="originalOperation">Original invocation operation, which may be a delegate invocation.</param>
+            <param name="defaultValue">Default abstract value to return.</param>
+            <returns>Abstract value of return value.</returns>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.ResetThisOrMeInstanceAnalysisData">
+            <summary>
+            Reset all the instance analysis data for <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntityFactory.ThisOrMeInstance"/> if <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.HasPointsToAnalysisResult"/> is true and <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4.PessimisticAnalysis"/> is also true.
+            If we are using or performing points to analysis, certain operations can invalidate all the analysis data off the containing instance.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ForwardDataFlowAnalysis`5">
+            <summary>
+            Subtype for all forward dataflow analyses.
+            These analyses operate on the control flow graph starting from the entry block,
+            flowing the dataflow values forward to the successor blocks until a fix point is reached.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.LValueFlowCapturesProvider">
+            <summary>
+            Helper class to detect <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.IFlowCaptureOperation"/>s that are l-value captures.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.MapAbstractDomain`2">
+            <summary>
+            An abstract domain implementation for analyses that store dictionary typed data.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.MapAbstractDomain`2.Compare(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData{`0,`1},Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DictionaryAnalysisData{`0,`1})">
+            <summary>
+            Compares if the abstract dataflow values in <paramref name="oldValue"/> against the values in <paramref name="newValue"/> to ensure
+            dataflow function is a monotically increasing function. See https://en.wikipedia.org/wiki/Monotonic_function for understanding monotonic functions.
+            </summary>
+            <returns>
+            1) 0, if both the dictionaries are identical.
+            2) -1, if dictionaries are not identical and for every key in <paramref name="oldValue"/>, the corresponding key exists in <paramref name="newValue"/> and
+               the value of each such key in <paramref name="oldValue"/> is lesser than or equals the value in <paramref name="newValue"/>.
+            3) 1, otherwise.
+            </returns>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2">
+            <summary>
+            Base class for all the predicated analysis data.
+            It tracks <see cref="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2._lazyPredicateDataMap"/>, which contains the true/false <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData"/> for every predicated <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>, and
+            <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.IsReachableBlockData"/>, which tracks if the current data is for a reachable code path based on the predicate analysis.
+            Predicate analysis data is used to improve the preciseness of analysis when we can apply the <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData.TruePredicatedData"/> or <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData.FalsePredicatedData"/>
+            on the control flow paths where the corresonding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> is known to have <code>true</code> or <code>false</code> value respectively.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData">
+            <summary>
+            Analysis data predicated by true/false value of an <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/>.
+            Used to improve the preciseness of analysis when we can apply the <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData.TruePredicatedData"/> or <see cref="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData.FalsePredicatedData"/>
+            on the control flow paths where the corresonding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> is known to have <code>true</code> or <code>false</code> value respectively.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData.TruePredicatedData">
+            <summary>
+            Analysis data for <code>true</code> value of the corresponding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> on which this data is predicated.
+            <code>null</code> value indicates the corresponding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> can never be <code>true</code>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisData`2.PerEntityPredicatedAnalysisData.FalsePredicatedData">
+            <summary>
+            Analysis data for <code>false</code> value of the corresponding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> on which this data is predicated.
+            <code>null</code> value indicates the corresponding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AnalysisEntity"/> can never be <code>false</code>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicatedAnalysisDataDomain`2">
+            <summary>
+            An abstract domain implementation for analyses that store dictionary typed data along with predicated data.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicateValueKind.AlwaysTrue">
+            <summary>
+            Predicate always evaluates to true.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicateValueKind.AlwaysFalse">
+            <summary>
+            Predicate always evaluates to false.
+            </summary>
+        </member>
+        <member name="F:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.PredicateValueKind.Unknown">
+            <summary>
+            Predicate might evaluate to true or false.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.StackGuard">
+            <summary>
+            Stack guard for <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.DataFlowOperationVisitor`4"/> to ensure sufficient stack while recursively visiting the operation tree.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ThrownExceptionInfo.BasicBlockOrdinal">
+            <summary>
+            Ordinal of the basic block where this exception is thrown.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ThrownExceptionInfo.HandlingCatchRegionOpt">
+            <summary>
+            Optional catch handler that handles this exception.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.ThrownExceptionInfo.ContainingFinallyRegionOpt">
+            <summary>
+            If the exception happens within a finally region, this points to that finally.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.FlowAnalysis.BranchWithInfo">
+            <summary>
+            Contains aggregated information about a control flow branch.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.IsContainedInRegionOfKind(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegionKind)">
+            <summary>
+            Returns true if the given <paramref name="basicBlock"/> is contained in a control flow region with the given <paramref name="regionKind"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.GetContainingRegionOfKind(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegionKind)">
+            <summary>
+            Returns the innermost control flow region of the given <paramref name="regionKind"/> that contains the given <paramref name="basicBlock"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.IsFirstBlockOfFinally(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegion@)">
+            <summary>
+            Returns true if the given basic block is the first block of a finally region.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.IsLastBlockOfFinally(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegion@)">
+            <summary>
+            Returns true if the given basic block is the last block of a finally region.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.IsFirstBlockOfRegionKind(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegionKind,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegion@)">
+            <summary>
+            Returns true if the given basic block is the first block of a region of the given regionKind.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.IsLastBlockOfRegionKind(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegionKind,Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowRegion@)">
+            <summary>
+            Returns true if the given basic block is the last block of a region of the given regionKind.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.FlowAnalysis.BasicBlockExtensions.GetMaxSuccessorOrdinal(Microsoft.CodeAnalysis.FlowAnalysis.BasicBlock)">
+            <summary>
+            Gets the maximum ordinal of a conditional or fall through successor of the given basic block.
+            Returns -1 if the block has no conditional or fall through successor,
+            for example, if the block only has a structured exception handling branch for throw operation.
+            </summary>
+            <param name="basicBlock"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData">
+            <summary>
+            Code analysis metrics data.
+            See https://docs.microsoft.com/visualstudio/code-quality/code-metrics-values for more details
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.Symbol">
+            <summary>
+            Symbol corresponding to the metric data.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.MaintainabilityIndex">
+            <summary>
+            Indicates an index value between 0 and 100 that represents the relative ease of maintaining the code.
+            A high value means better maintainability.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.CoupledNamedTypes">
+            <summary>
+            Indicates the coupling to unique named types through parameters, local variables, return types, method calls,
+            generic or template instantiations, base classes, interface implementations, fields defined on external types, and attribute decoration.
+            Good software design dictates that types and methods should have high cohesion and low coupling.
+            High coupling indicates a design that is difficult to reuse and maintain because of its many interdependencies on other types.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.SourceLines">
+            <summary>
+            Indicates the exact number of lines in source code file.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.ExecutableLines">
+            <summary>
+            Indicates the approximate number of executable statements/lines in code.
+            The count is based on the executable <see cref="T:Microsoft.CodeAnalysis.IOperation"/>s in code and is therefore not the exact number of lines in the source code file.
+            A high count might indicate that a type or method is trying to do too much work and should be split up.
+            It might also indicate that the type or method might be hard to maintain.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.CyclomaticComplexity">
+            <summary>
+            Measures the structural complexity of the code.
+            It is created by calculating the number of different code paths in the flow of the program.
+            A program that has complex control flow requires more tests to achieve good code coverage and is less maintainable.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.DepthOfInheritance">
+            <summary>
+            Indicates the number of different classes that inherit from one another, all the way back to the base class.
+            Depth of Inheritance is similar to class coupling in that a change in a base class can affect any of its inherited classes.
+            The higher this number, the deeper the inheritance and the higher the potential for base class modifications to result in a breaking change.
+            For Depth of Inheritance, a low value is good and a high value is bad.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.Children">
+            <summary>
+            Array of code metrics data for symbolic children of <see cref="P:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.Symbol"/>, if any.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.ToString">
+            <summary>
+            Computes string representation of metrics data.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.ComputeAsync(Microsoft.CodeAnalysis.Compilation,System.Threading.CancellationToken)">
+            <summary>
+            Computes <see cref="T:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData"/> for the given <paramref name="compilation"/>.
+            </summary>
+        </member>
+        <member name="M:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData.ComputeAsync(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.Compilation,System.Threading.CancellationToken)">
+            <summary>
+            Computes <see cref="T:Microsoft.CodeAnalysis.CodeMetrics.CodeAnalysisMetricData"/> for the given <paramref name="symbol"/> from the given <paramref name="compilation"/>.
+            </summary>
+        </member>
+        <member name="T:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics">
+            <summary>
+            Calculates computational complexity metrics based on the number 
+            of operators and operands found in the code.
+            </summary>
+            <remarks>This metric is based off of the Halstead metric.</remarks>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics.DistinctOperators">
+            <summary>The number of unique operators found.</summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics.DistinctOperands">
+            <summary>The number of unique operands found.</summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics.TotalOperators">
+            <summary>The total number of operator usages found.</summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics.TotalOperands">
+            <summary>The total number of operand usages found.</summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics.ExecutableLines">
+            <summary>
+            Count of executable lines of code, i.e. basically IOperations parented by IBlockOperation.
+            </summary>
+        </member>
+        <member name="P:Microsoft.CodeAnalysis.CodeMetrics.ComputationalComplexityMetrics.EffectiveLinesOfCode">
+            <summary>
+            Count of effective lines of code for computation of maintainability index.
+            </summary>
+        </member>
+        <member name="M:System.Collections.Immutable.ImmutableArrayExtensions.Count``1(System.Collections.Immutable.ImmutableArray{``0})">
+            <summary>
+            Returns the number of elements in a sequence.
+            </summary>
+            <typeparam name="TSource">he type of the elements of <paramref name="source"/>.</typeparam>
+            <param name="source">A sequence that contains elements to be counted.</param>
+            <returns>The number of elements in the input sequence.</returns>
+        </member>
+        <member name="M:System.Collections.Immutable.ImmutableArrayExtensions.HasExactly``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32)">
+            <summary>
+            Determines whether a sequence contains, exactly, <paramref name="count"/> elements.
+            </summary>
+            <typeparam name="TSource">The type of the elements of source.</typeparam>
+            <param name="source">The <see cref="T:System.Collections.Immutable.ImmutableArray`1"/> to check for cardinality.</param>
+            <param name="count">The number of elements to ensure exists.</param>
+            <returns><see langword="true" /> the source sequence contains, exactly, <paramref name="count"/> elements; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:System.Collections.Immutable.ImmutableArrayExtensions.HasMoreThan``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32)">
+            <summary>
+            Determines whether a sequence containsmore than <paramref name="count"/> elements.
+            </summary>
+            <typeparam name="TSource">The type of the elements of source.</typeparam>
+            <param name="source">The <see cref="T:System.Collections.Immutable.ImmutableArray`1"/> to check for cardinality.</param>
+            <param name="count">The number of elements to ensure exists.</param>
+            <returns><see langword="true" /> the source sequence contains more than <paramref name="count"/> elements; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="M:System.Collections.Immutable.ImmutableArrayExtensions.HasFewerThan``1(System.Collections.Immutable.ImmutableArray{``0},System.Int32)">
+            <summary>
+            Determines whether a sequence contains fewer than <paramref name="count"/> elements.
+            </summary>
+            <typeparam name="TSource">The type of the elements of source.</typeparam>
+            <param name="source">The <see cref="T:System.Collections.Immutable.ImmutableArray`1"/> to check for cardinality.</param>
+            <param name="count">The number of elements to ensure exists.</param>
+            <returns><see langword="true" /> the source sequence contains less then <paramref name="count"/> elements; otherwise, <see langword="false" />.</returns>
+        </member>
+        <member name="T:Analyzer.Utilities.PooledObjects.ArrayBuilder`1.Enumerator">
+            <summary>
+            struct enumerator used in foreach.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ArrayBuilder`1.ToImmutable">
+            <summary>
+            Realizes the array.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ArrayBuilder`1.SetItem(System.Int32,`0)">
+            <summary>
+            Write <paramref name="value"/> to slot <paramref name="index"/>. 
+            Fills in unallocated slots preceding the <paramref name="index"/>, if any.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ArrayBuilder`1.ToImmutableOrNull">
+            <summary>
+            Realizes the array.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ArrayBuilder`1.ToDowncastedImmutable``1">
+            <summary>
+            Realizes the array, downcasting each element to a derived type.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ArrayBuilder`1.ToImmutableAndFree">
+            <summary>
+            Realizes the array and disposes the builder in one operation.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.PooledObjects.ObjectPool`1">
+            <summary>
+            Generic implementation of object pooling pattern with predefined pool size limit. The main
+            purpose is that limited number of frequently used objects can be kept in the pool for
+            further recycling.
+            
+            Notes: 
+            1) it is not the goal to keep all returned objects. Pool is not meant for storage. If there
+               is no space in the pool, extra returned objects will be dropped.
+            
+            2) it is implied that if object was obtained from a pool, the caller will return it back in
+               a relatively short time. Keeping checked out objects for long durations is ok, but 
+               reduces usefulness of pooling. Just new up your own.
+            
+            Not returning objects to the pool in not detrimental to the pool's work, but is a bad practice. 
+            Rationale: 
+               If there is no intent for reusing the object, do not use pool - just use "new". 
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.PooledObjects.ObjectPool`1.Factory">
+            <remarks>
+            Not using System.Func{T} because this file is linked into the (debugger) Formatter,
+            which does not have that type (since it compiles against .NET 2.0).
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ObjectPool`1.Allocate">
+            <summary>
+            Produces an instance.
+            </summary>
+            <remarks>
+            Search strategy is a simple linear probing which is chosen for it cache-friendliness.
+            Note that Free will try to store recycled objects close to the start thus statistically 
+            reducing how far we will typically search.
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ObjectPool`1.Free(`0)">
+            <summary>
+            Returns objects to the pool.
+            </summary>
+            <remarks>
+            Search strategy is a simple linear probing which is chosen for it cache-friendliness.
+            Note that Free will try to store recycled objects close to the start thus statistically 
+            reducing how far we will typically search in Allocate.
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.PooledObjects.ObjectPool`1.ForgetTrackedObject(`0,`0)">
+            <summary>
+            Removes an object from leak tracking.  
+            
+            This is called when an object is returned to the pool.  It may also be explicitly 
+            called if an object allocated from the pool is intentionally not being returned
+            to the pool.  This can be of use with pooled arrays if the consumer wants to 
+            return a larger array to the pool than was originally allocated.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.BoundedCacheWithFactory`2">
+            <summary>
+            Provides bounded cache for analyzers.
+            Acts as a good alternative to <see cref="T:System.Runtime.CompilerServices.ConditionalWeakTable`2"/>
+            when the cached value has a cyclic reference to the key preventing early garbage collection of entries.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.DoNotCatchGeneralUnlessRethrownAnalyzer.DisallowGeneralCatchUnlessRethrowWalker">
+            <summary>
+            Walks an IOperation tree to find catch blocks that handle general types without rethrowing them.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.Extensions.CompilationExtensions">
+            <summary>
+            Provides extensions to <see cref="T:Microsoft.CodeAnalysis.Compilation"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.CompilationExtensions.GetVisibleTypeByMetadataName(Microsoft.CodeAnalysis.Compilation,System.String)">
+            <summary>
+            Gets the type within the compilation's assembly using its canonical CLR metadata name. If not found, gets the first public type from all referenced assemblies. If not found, gets the first type from all referenced assemblies.
+            </summary>
+            <param name="compilation">The compilation.</param>
+            <param name="fullyQualifiedMetadataName">The fully qualified metadata name.</param>
+            <returns>A <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> if found; <see langword="null"/> otherwise.</returns>
+        </member>
+        <member name="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunctionValueAssertion1">
+            <summary>
+            This will only compile if <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunction"/> and <see cref="F:Microsoft.CodeAnalysis.MethodKind.LocalFunction"/> have the
+            same value.
+            </summary>
+            <remarks>
+            <para>The subtraction in <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunctionValueAssertion1"/> will overflow if <see cref="F:Microsoft.CodeAnalysis.MethodKind.LocalFunction"/> is greater, and the conversion
+            to an unsigned value after negation in <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunctionValueAssertion2"/> will overflow if <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunction"/> is greater.</para>
+            </remarks>
+        </member>
+        <member name="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunctionValueAssertion2">
+            <summary>
+            This will only compile if <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunction"/> and <see cref="F:Microsoft.CodeAnalysis.MethodKind.LocalFunction"/> have the
+            same value.
+            </summary>
+            <remarks>
+            <para>The subtraction in <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunctionValueAssertion1"/> will overflow if <see cref="F:Microsoft.CodeAnalysis.MethodKind.LocalFunction"/> is greater, and the conversion
+            to an unsigned value after negation in <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunctionValueAssertion2"/> will overflow if <see cref="F:Analyzer.Utilities.Extensions.MethodKindEx.LocalFunction"/> is greater.</para>
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableExtensions.HasExactly``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+            <summary>
+            Determines whether a sequence contains, exactly, <paramref name="count"/> elements.
+            </summary>
+            <typeparam name="TSource">The type of the elements of source.</typeparam>
+            <param name="source">The <see cref="T:System.Collections.Generic.IEnumerable`1"/> to check for cardinality.</param>
+            <param name="count">The number of elements to ensure exists.</param>
+            <returns><see langword="true" /> the source sequence contains, exactly, <paramref name="count"/> elements; otherwise, <see langword="false" />.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableExtensions.HasMoreThan``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+            <summary>
+            Determines whether a sequence contains more than <paramref name="count"/> elements.
+            </summary>
+            <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+            <param name="source">The <see cref="T:System.Collections.Generic.IEnumerable`1"/> to check for cardinality.</param>
+            <param name="count">The number of elements to ensure exists.</param>
+            <returns><see langword="true" /> the source sequence contains more than <paramref name="count"/> elements; otherwise, <see langword="false" />.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableExtensions.HasFewerThan``1(System.Collections.Generic.IEnumerable{``0},System.Int32)">
+            <summary>
+            Determines whether a sequence contains fewer than <paramref name="count"/> elements.
+            </summary>
+            <typeparam name="TSource">The type of the elements of <paramref name="source"/>.</typeparam>
+            <param name="source">The <see cref="T:System.Collections.Generic.IEnumerable`1"/> to check for cardinality.</param>
+            <param name="count">The number of elements to ensure exists.</param>
+            <returns><see langword="true" /> the source sequence contains less than <paramref name="count"/> elements; otherwise, <see langword="false" />.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null.</exception>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableOfIMethodSymbolExtensions.WhereMethodDoesNotContainAttribute(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IMethodSymbol},Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Excludes <paramref name="methods"/> that have an attribute that precisely matches <paramref name="attributeType"/>.
+            </summary>
+            <param name="methods">List of <see cref="T:Microsoft.CodeAnalysis.IMethodSymbol"/> to filter.</param>
+            <param name="attributeType">The <see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> of the attribute class to search.</param>
+            <returns>A filtered list of methods.</returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableOfIMethodSymbolExtensions.GetMethodOverloadsWithDesiredParameterAtLeadingOrTrailing(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IMethodSymbol},Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol,System.Boolean)">
+            <summary>
+            Returns a list of method symbols from a given list of the method symbols, which has its parameter type as
+            expectedParameterType as its first parameter or the last parameter in addition to matching all the other 
+            parameter types of the selectedOverload method symbol
+            </summary>
+            <param name="methods">List of <see cref="T:Microsoft.CodeAnalysis.IMethodSymbol"/> to scan for possible overloads</param>
+            <param name="selectedOverload"><see cref="T:Microsoft.CodeAnalysis.IMethodSymbol"/> that is currently picked by the user</param>
+            <param name="expectedParameterType"><see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> type of the leading parameter or the trailing parameter</param>
+            <param name="trailingOnly"><see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> If the expected parameter should appear at the trailing position of the parameter list of the method overload</param>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableOfIMethodSymbolExtensions.GetMethodOverloadsWithDesiredParameterAtTrailing(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IMethodSymbol},Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns a list of method symbols from a given list of the method symbols, which has its parameter type as
+            expectedParameterType as its last parameter in addition to matching all the other parameter types of the 
+            selectedOverload method symbol
+            </summary>
+            <param name="methods">List of <see cref="T:Microsoft.CodeAnalysis.IMethodSymbol"/> to scan for possible overloads</param>
+            <param name="selectedOverload"><see cref="T:Microsoft.CodeAnalysis.IMethodSymbol"/> that is currently picked by the user</param>
+            <param name="expectedTrailingParameterType"><see cref="T:Microsoft.CodeAnalysis.INamedTypeSymbol"/> type of the leading parameter or the trailing parameter</param>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IEnumerableOfIMethodSymbolExtensions.GetFirstOrDefaultMemberWithParameterInfos(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IMethodSymbol},Analyzer.Utilities.Extensions.ParameterInfo[])">
+            <summary>
+            Given a <see cref="T:System.Collections.Generic.IEnumerable`1"/>, this method returns the method symbol which 
+            matches the expectedParameterTypesInOrder parameter requirement
+            </summary>
+            <param name="members"></param>
+            <param name="expectedParameterTypesInOrder"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsObjectEqualsOverride(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method overrides <see cref="M:System.Object.Equals(System.Object)"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsObjectEquals(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method is <see cref="M:System.Object.Equals(System.Object)"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsStaticObjectEqualsOrReferenceEquals(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given <paramref name="method"/> is <see cref="M:System.Object.Equals(System.Object,System.Object)"/> or <see cref="M:System.Object.ReferenceEquals(System.Object,System.Object)"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsGetHashCodeOverride(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method overrides Object.GetHashCode.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsToStringOverride(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method overrides Object.ToString.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsObjectMethodOverride(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method overrides a method from System.Object
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsFinalizer(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method is a Finalizer implementation.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsImplementationOfInterfaceMethod(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.ITypeSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol,System.String)">
+            <summary>
+            Checks if the given method is an implementation of the given interface method 
+            Substituted with the given typeargument.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsDisposeImplementation(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.Compilation)">
+            <summary>
+            Checks if the given method implements IDisposable.Dispose()
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsDisposeImplementation(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Checks if the given method implements <see cref="M:System.IDisposable.Dispose"/> or overrides an implementation of <see cref="M:System.IDisposable.Dispose"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.HasDisposeMethodSignature(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method has the signature "void Dispose()".
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.HasDisposeBoolMethodSignature(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method has the signature "void Dispose(bool)".
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.HasDisposeCloseMethodSignature(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the given method has the signature "void Close()".
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.HasDisposeAsyncMethodSignature(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Checks if the given method has the signature "Task DisposeAsync()".
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.HasOverriddenDisposeCoreAsyncMethodSignature(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Checks if the given method has the signature "override Task DisposeCoreAsync(bool)".
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.GetDisposeMethodKind(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.Compilation)">
+            <summary>
+            Gets the <see cref="T:Analyzer.Utilities.DisposeMethodKind"/> for the given method.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.GetDisposeMethodKind(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Gets the <see cref="T:Analyzer.Utilities.DisposeMethodKind"/> for the given method.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsOnDeserializationImplementation(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Checks if the given method implements 'System.Runtime.Serialization.IDeserializationCallback.OnDeserialization' or overrides an implementation of 'System.Runtime.Serialization.IDeserializationCallback.OnDeserialization'/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsPropertyGetter(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the method is a property getter.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsIndexerGetter(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the method is the getter for an indexer.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsPropertyAccessor(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the method is an accessor for a property.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsEventAccessor(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Checks if the method is an accessor for an event.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsCollectionAddMethod(Microsoft.CodeAnalysis.IMethodSymbol,System.Collections.Immutable.ImmutableHashSet{Microsoft.CodeAnalysis.INamedTypeSymbol})">
+            <summary>
+            Determine if the specific method is an Add method that adds to a collection.
+            </summary>
+            <param name="method">The method to test.</param>
+            <param name="iCollectionTypes">Collection types.</param>
+            <returns>'true' if <paramref name="method"/> is believed to be the add method of a collection.</returns>
+            <remarks>
+            The current heuristic is that we consider a method to be an add method if its name begins with "Add" and its
+            enclosing type derives from ICollection or any instantiation of ICollection&lt;T&gt;.
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsTaskFromResultMethod(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Determine if the specific method is a Task.FromResult method that wraps a result in a task.
+            </summary>
+            <param name="method">The method to test.</param>
+            <param name="taskType">Task type.</param>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsTaskConfigureAwaitMethod(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Determine if the specific method is a Task.ConfigureAwait(bool) method.
+            </summary>
+            <param name="method">The method to test.</param>
+            <param name="genericTaskType">Generic task type.</param>
+        </member>
+        <member name="F:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.s_methodToTopmostOperationBlockCache">
+            <summary>
+            PERF: Cache from method symbols to their topmost block operations to enable interprocedural flow analysis
+            across analyzers and analyzer callbacks to re-use the operations, semanticModel and control flow graph.
+            </summary>
+            <remarks>Also see <see cref="F:Analyzer.Utilities.Extensions.IOperationExtensions.s_operationToCfgCache"/></remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.GetTopmostOperationBlock(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.Compilation,System.Threading.CancellationToken)">
+            <summary>
+            Returns the topmost <see cref="T:Microsoft.CodeAnalysis.Operations.IBlockOperation"/> for given <paramref name="method"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.HasEventHandlerSignature(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns true for void returning methods with two parameters, where
+            the first parameter is of <see cref="T:System.Object"/> type and the second
+            parameter inherits from or equals <see cref="T:System.EventArgs"/> type.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsOverrideOrVirtualMethodOf(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Find out if the method overrides from target virtual method of a certain type
+            or it is the virtual method itself.
+            </summary>
+            <param name="methodSymbol">The method</param>
+            <param name="typeSymbol">The type has virtual method</param>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.IsArgumentNullCheckMethod(Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Returns true if this is a bool returning static method whose name starts with "IsNull"
+            with a single parameter whose type is not a value type.
+            For example, "static bool string.IsNullOrEmpty()"
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.DerivesFromOrImplementsAnyConstructionOf(Microsoft.CodeAnalysis.INamedTypeSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns a value indicating whether <paramref name="type"/> derives from, or implements
+            any generic construction of, the type defined by <paramref name="parentType"/>.
+            </summary>
+            <remarks>
+            This method only works when <paramref name="parentType"/> is a definition,
+            not a constructed type.
+            </remarks>
+            <example>
+            <para>
+            If <paramref name="parentType"/> is the class <code>Stack&gt;T></code>, then this
+            method will return <code>true</code> when called on <code>Stack&gt;int></code>
+            or any type derived it, because <code>Stack&gt;int></code> is constructed from
+            <code>Stack&gt;T></code>.
+            </para>
+            <para>
+            Similarly, if <paramref name="parentType"/> is the interface <code>IList&gt;T></code>, 
+            then this method will return <code>true</code> for <code>List&gt;int></code>
+            or any other class that extends <code>IList&gt;></code> or an class that implements it,
+            because <code>IList&gt;int></code> is constructed from <code>IList&gt;T></code>.
+            </para>
+            </example>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.ImplementsEqualityOperators(Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns a value indicating whether the specified type implements both the
+            equality and inequality operators.
+            </summary>
+            <param name="symbol">
+            A symbols specifying the type to examine.
+            </param>
+            <returns>
+            true if the type specified by <paramref name="symbol"/> implements both the
+            equality and inequality operators, otherwise false.
+            </returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.ImplementsComparisonOperators(Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns a value indicating whether the specified type implements the comparison
+            operators.
+            </summary>
+            <param name="symbol">
+            A symbols specifying the type to examine.
+            </param>
+            <returns>
+            true if the type specified by <paramref name="symbol"/> implements the comparison
+            operators (which includes the equality and inequality operators), otherwise false.
+            </returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.IsStaticHolderType(Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns a value indicating whether the specified symbol is a static
+            holder type.
+            </summary>
+            <param name="symbol">
+            The symbol being examined.
+            </param>
+            <returns>
+            <c>true</c> if <paramref name="symbol"/> is a static holder type;
+            otherwise <c>false</c>.
+            </returns>
+            <remarks>
+            A symbol is a static holder type if it is a class with at least one
+            "qualifying member" (<see cref="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.IsQualifyingMember(Microsoft.CodeAnalysis.ISymbol)"/>) and no
+            "disqualifying members" (<see cref="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.IsDisqualifyingMember(Microsoft.CodeAnalysis.ISymbol)"/>).
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.IsQualifyingMember(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Returns a value indicating whether the specified symbol qualifies as a
+            member of a static holder class.
+            </summary>
+            <param name="member">
+            The member being examined.
+            </param>
+            <returns>
+            <c>true</c> if <paramref name="member"/> qualifies as a member of
+            a static holder class; otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.INamedTypeSymbolExtensions.IsDisqualifyingMember(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Returns a value indicating whether the presence of the specified symbol
+            disqualifies a class from being considered a static holder class.
+            </summary>
+            <param name="member">
+            The member being examined.
+            </param>
+            <returns>
+            <c>true</c> if the presence of <paramref name="member"/> disqualifies the
+            current type as a static holder class; otherwise <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetReceiverType(Microsoft.CodeAnalysis.Operations.IInvocationOperation,Microsoft.CodeAnalysis.Compilation,System.Boolean,System.Threading.CancellationToken)">
+            <summary>
+            Gets the receiver type for an invocation expression (i.e. type of 'A' in invocation 'A.B()')
+            If the invocation actually involves a conversion from A to some other type, say 'C', on which B is invoked,
+            then this method returns type A if <paramref name="beforeConversion"/> is true, and C if false.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.WithoutFullyImplicitOperations(System.Collections.Immutable.ImmutableArray{Microsoft.CodeAnalysis.IOperation})">
+            <summary>
+            Filters out operations that are implicit and have no explicit descendant with a constant value or a non-null type.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetTopmostExplicitDescendants(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Gets explicit descendants or self of the given <paramref name="operation"/> that have no explicit ancestor in
+            the operation tree rooted at <paramref name="operation"/>.
+            </summary>
+            <param name="operation">Operation</param>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.IsOperationNoneRoot(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            True if this operation has no IOperation API support, i.e. <see cref="F:Microsoft.CodeAnalysis.OperationKind.None"/> and
+            is the root operation, i.e. <see cref="P:Microsoft.CodeAnalysis.Operation.Parent"/> is null.
+            For example, this returns true for attribute operations.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetTopmostParentBlock(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Returns the topmost <see cref="T:Microsoft.CodeAnalysis.Operations.IBlockOperation"/> containing the given <paramref name="operation"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetAncestor``1(Microsoft.CodeAnalysis.IOperation,Microsoft.CodeAnalysis.OperationKind,System.Func{``0,System.Boolean})">
+            <summary>
+            Gets the first ancestor of this operation with:
+             1. Specified OperationKind
+             2. If <paramref name="predicateOpt"/> is non-null, it succeeds for the ancestor.
+            Returns null if there is no such ancestor.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetInstance(Microsoft.CodeAnalysis.Operations.IInstanceReferenceOperation,System.Boolean)">
+            <summary>
+            Gets the operation for the object being created that is being referenced by <paramref name="operation"/>.
+            If the operation is referencing an implicit or an explicit this/base/Me/MyBase/MyClass instance, then we return "null".
+            </summary>
+            <param name="operation"></param>
+            <param name="isInsideAnonymousObjectInitializer">Flag to indicate if the operation is a descendant of an <see cref="T:Microsoft.CodeAnalysis.Operations.IAnonymousObjectCreationOperation"/>.</param>
+            <remarks>
+            PERF: Note that the parameter <paramref name="isInsideAnonymousObjectInitializer"/> is to improve performance by avoiding walking the entire IOperation parent for non-initializer cases.
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetAnonymousObjectCreation(Microsoft.CodeAnalysis.Operations.IPropertyReferenceOperation)">
+            <summary>
+            Workaround for https://github.com/dotnet/roslyn/issues/22736 (IPropertyReferenceExpressions in IAnonymousObjectCreationExpression are missing a receiver).
+            Gets the instance for the anonymous object being created that is being referenced by <paramref name="operation"/>.
+            Otherwise, returns null
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.IsComparisonOperator(Microsoft.CodeAnalysis.Operations.IBinaryOperation)">
+            <summary>
+            Indicates if the given <paramref name="binaryOperation"/> is a predicate operation used in a condition.
+            </summary>
+            <param name="binaryOperation"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Analyzer.Utilities.Extensions.IOperationExtensions.s_operationToCfgCache">
+            <summary>
+            PERF: Cache from operation roots to their corresponding <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.ControlFlowGraph"/> to enable interprocedural flow analysis
+            across analyzers and analyzer callbacks to re-use the control flow graph.
+            </summary>
+            <remarks>Also see <see cref="F:Analyzer.Utilities.Extensions.IMethodSymbolExtensions.s_methodToTopmostOperationBlockCache"/></remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.GetCaptures(Microsoft.CodeAnalysis.IOperation,Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Gets the symbols captured from the enclosing function(s) by the given lambda or local function.
+            </summary>
+            <param name="operation">Operation representing the lambda or local function.</param>
+            <param name="lambdaOrLocalFunction">Method symbol for the lambda or local function.</param>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.TryGetParentTupleOperation(Microsoft.CodeAnalysis.Operations.ITupleOperation,Microsoft.CodeAnalysis.Operations.ITupleOperation@,Microsoft.CodeAnalysis.IOperation@)">
+            <summary>
+            If the given <paramref name="tupleOperation"/> is a nested tuple,
+            gets the parenting tuple operation and the tuple element of that parenting tuple
+            which contains the given tupleOperation as a descendant operation.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.WalkDownParenthesis(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Walks down consequtive parenthesized operations until an operand is reached that isn't a parenthesized operation.
+            </summary>
+            <param name="operation">The starting operation.</param>
+            <returns>The inner non parenthesized operation or the starting operation if it wasn't a parenthesized operation.</returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.WalkUpParenthesis(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Walks up consequtive parenthesized operations until a parent is reached that isn't a parenthesized operation.
+            </summary>
+            <param name="operation">The starting operation.</param>
+            <returns>The outer non parenthesized operation or the starting operation if it wasn't a parenthesized operation.</returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.WalkDownConversion(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Walks down consequtive conversion operations until an operand is reached that isn't a conversion operation.
+            </summary>
+            <param name="operation">The starting operation.</param>
+            <returns>The inner non conversion operation or the starting operation if it wasn't a conversion operation.</returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.IOperationExtensions.WalkUpConversion(Microsoft.CodeAnalysis.IOperation)">
+            <summary>
+            Walks up consequtive conversion operations until a parent is reached that isn't a conversion operation.
+            </summary>
+            <param name="operation">The starting operation.</param>
+            <returns>The outer non conversion operation or the starting operation if it wasn't a conversion operation.</returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.MatchesConfiguredVisibility(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.Diagnostics.AnalyzerOptions,Microsoft.CodeAnalysis.DiagnosticDescriptor,System.Threading.CancellationToken,Analyzer.Utilities.SymbolVisibilityGroup)">
+            <summary>
+            Returns true if the given symbol has required visibility based on options:
+              1. If user has explicitly configured candidate <see cref="T:Analyzer.Utilities.SymbolVisibilityGroup"/> in editor config options and
+                 given symbol's visibility is one of the candidate visibilites.
+              2. Otherwise, if user has not configured visibility, and given symbol's visibility
+                 matches the given default symbol visibility.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsConfiguredToSkipAnalysis(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.Diagnostics.AnalyzerOptions,Microsoft.CodeAnalysis.DiagnosticDescriptor,Microsoft.CodeAnalysis.Compilation,System.Threading.CancellationToken)">
+            <summary>
+            Returns true if the given symbol has been configured to be excluded from analysis by options.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.MatchesConfiguredModifiers(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.Diagnostics.AnalyzerOptions,Microsoft.CodeAnalysis.DiagnosticDescriptor,System.Threading.CancellationToken,Analyzer.Utilities.SymbolModifiers)">
+            <summary>
+            Returns true if the given symbol has required symbol modifiers based on options:
+              1. If user has explicitly configured candidate <see cref="T:Analyzer.Utilities.SymbolModifiers"/> in editor config options and
+                 given symbol has all the required modifiers.
+              2. Otherwise, if user has not configured modifiers.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsExternallyVisible(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            True if the symbol is externally visible outside this assembly.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.FormatMemberName(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Format member names in a way consistent with FxCop's display format.
+            </summary>
+            <param name="member"></param>
+            <returns>
+            A string representing the name of the member in a format consistent with FxCop.
+            </returns>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.ContainsParameterOfType(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IParameterSymbol},Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Check whether given parameters contains any parameter with given type.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.GetParametersOfType(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IParameterSymbol},Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Get parameters which type is the given type
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.HasOverloadWithParameterOfType(System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IMethodSymbol},Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol,System.Threading.CancellationToken)">
+            <summary>
+            Check whether given overloads has any overload whose parameters has the given type as its parameter type.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.GetParameterIndices(Microsoft.CodeAnalysis.IMethodSymbol,System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IParameterSymbol},System.Threading.CancellationToken)">
+            <summary>
+            Convert given parameters to the indices to the given method's parameter list.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.ParametersAreSame(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Check whether parameter count and parameter types of the given methods are same.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.ParameterTypesAreSame(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.IMethodSymbol,System.Collections.Generic.IEnumerable{System.Int32},System.Threading.CancellationToken)">
+            <summary>
+            Check whether parameter types of the given methods are same for given parameter indices.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.ReturnTypeAndParametersAreSame(Microsoft.CodeAnalysis.IMethodSymbol,Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Check whether return type, parameters count and parameter types are same for the given methods.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsFromMscorlib(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.Compilation)">
+            <summary>
+            Check whether given symbol is from mscorlib
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.GetMatchingOverload(Microsoft.CodeAnalysis.IMethodSymbol,System.Collections.Generic.IEnumerable{Microsoft.CodeAnalysis.IMethodSymbol},System.Int32,Microsoft.CodeAnalysis.INamedTypeSymbol,System.Threading.CancellationToken)">
+            <summary>
+            Get overload from the given overloads that matches given method signature + given parameter
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsImplementationOfAnyInterfaceMember(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Checks if a given symbol implements an interface member implicitly or explicitly
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsImplementationOfAnyImplicitInterfaceMember``1(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Checks if a given symbol implements an interface member implicitly
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsOverrideOrImplementationOfInterfaceMember(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Checks if a given symbol implements an interface member or overrides an implementation of an interface member.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.GetOverriddenMember(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Gets the symbol overridden by the given <paramref name="symbol"/>.
+            </summary>
+            <remarks>Requires that <see cref="P:Microsoft.CodeAnalysis.ISymbol.IsOverride"/> is true for the given <paramref name="symbol"/>.</remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsImplementationOfAnyExplicitInterfaceMember(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Checks if a given symbol implements an interface member explicitly
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.HasAttribute(Microsoft.CodeAnalysis.ISymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Returns a value indicating whether the specified symbol has the specified
+            attribute.
+            </summary>
+            <param name="symbol">
+            The symbol being examined.
+            </param>
+            <param name="attribute">
+            The attribute in question.
+            </param>
+            <returns>
+            <c>true</c> if <paramref name="symbol"/> has an attribute of type
+            <paramref name="attribute"/>; otherwise <c>false</c>.
+            </returns>
+            <remarks>
+            If <paramref name="symbol"/> is a type, this method does not find attributes
+            on its base types.
+            </remarks>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsInSource(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Indicates if a symbol has at least one location in source.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ISymbolExtensions.IsSymbolWithSpecialDiscardName(Microsoft.CodeAnalysis.ISymbol)">
+            <summary>
+            Returns true for symbols whose name starts with an underscore and
+            are optionally followed by an integer, such as '_', '_1', '_2', etc.
+            These symbols can be treated as special discard symbol names.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ITypeSymbolExtensions.ImplementsIDisposable(Microsoft.CodeAnalysis.ITypeSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Indicates if the given <paramref name="type"/> implements <paramref name="iDisposable"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ITypeSymbolExtensions.IsDisposable(Microsoft.CodeAnalysis.ITypeSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Indicates if the given <paramref name="type"/> is a reference type that implements <paramref name="iDisposable"/> or is <see cref="T:System.IDisposable"/> type itself.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.ITypeSymbolExtensions.GetApplicableAttributes(Microsoft.CodeAnalysis.INamedTypeSymbol,Microsoft.CodeAnalysis.INamedTypeSymbol)">
+            <summary>
+            Gets all attributes directly applied to the type or inherited from a base type.
+            </summary>
+            <param name="type">The type symbol.</param>
+            <param name="attributeUsageAttribute">The compilation symbol for <see cref="T:System.AttributeUsageAttribute"/>.</param>
+        </member>
+        <member name="T:Analyzer.Utilities.Extensions.SymbolVisibilityExtensions">
+            <summary>
+            Extensions for <see cref="T:Analyzer.Utilities.Extensions.SymbolVisibility"/>.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.Extensions.SymbolVisibilityExtensions.IsAtLeastAsVisibleAs(Analyzer.Utilities.Extensions.SymbolVisibility,Analyzer.Utilities.Extensions.SymbolVisibility)">
+            <summary>
+            Determines whether <paramref name="typeVisibility"/> is at least as visible as <paramref name="comparisonVisibility"/>.
+            </summary>
+            <param name="typeVisibility">The visibility to compare against.</param>
+            <param name="comparisonVisibility">The visibility to compare with.</param>
+            <returns>True if one can say that <paramref name="typeVisibility"/> is at least as visible as <paramref name="comparisonVisibility"/>.</returns>
+            <remarks>
+            For example, <see cref="F:Analyzer.Utilities.Extensions.SymbolVisibility.Public"/> is at least as visible as <see cref="F:Analyzer.Utilities.Extensions.SymbolVisibility.Internal"/>, but <see cref="F:Analyzer.Utilities.Extensions.SymbolVisibility.Private"/> is not as visible as <see cref="F:Analyzer.Utilities.Extensions.SymbolVisibility.Public"/>.
+            </remarks>
+        </member>
+        <member name="T:Analyzer.Utilities.DisposeMethodKind">
+            <summary>
+            Describes different kinds of Dispose-like methods.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeMethodKind.None">
+            <summary>
+            Not a dispose-like method.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeMethodKind.Dispose">
+            <summary>
+            An override of <see cref="M:System.IDisposable.Dispose"/>.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeMethodKind.DisposeBool">
+            <summary>
+            A virtual method named Dispose that takes a single Boolean parameter, as
+            is used when implementing the standard Dispose pattern.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeMethodKind.DisposeAsync">
+            <summary>
+            A method named DisposeAsync that has no parameters and returns Task.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeMethodKind.DisposeCoreAsync">
+            <summary>
+            An overridden method named DisposeCoreAsync that takes a single Boolean parameter and returns Task, as
+            is used when implementing the standard DisposeAsync pattern.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeMethodKind.Close">
+            <summary>
+            A method named Close on a type that implements <see cref="T:System.IDisposable"/>.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.SymbolModifiers">
+            <summary>
+            Describes a group of modifiers for symbol declaration.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.EditorConfigOptionNames">
+            <summary>
+            Option names to configure analyzer execution through an .editorconfig file.
+            </summary>
+            <summary>
+            Option names to configure analyzer execution through an .editorconfig file.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.ApiSurface">
+            <summary>
+            Option to configure analyzed API surface.
+            Allowed option values: One or more fields of flags enum <see cref="T:Analyzer.Utilities.SymbolVisibilityGroup"/> as a comma separated list.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.RequiredModifiers">
+            <summary>
+            Option to configure required modifiers for analyzed APIs.
+            Allowed option values: One or more fields of flags enum <see cref="T:Analyzer.Utilities.SymbolModifiers"/> as a comma separated list.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.ExcludeAsyncVoidMethods">
+            <summary>
+            Boolean option to exclude analysis of async void methods.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.OutputKind">
+            <summary>
+            Option to configure analyzed output kinds, i.e. <see cref="P:Microsoft.CodeAnalysis.CompilationOptions.OutputKind"/> of the compilation.
+            Allowed option values: One or more fields of <see cref="P:Microsoft.CodeAnalysis.CompilationOptions.OutputKind"/> as a comma separated list.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.ExcludeSingleLetterTypeParameters">
+            <summary>
+            Boolean option to configure if single letter type parameter names are not flagged for CA1715 (https://docs.microsoft.com/visualstudio/code-quality/ca1715-identifiers-should-have-correct-prefix).
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.SufficientIterationCountForWeakKDFAlgorithm">
+            <summary>
+            Integral option to configure sufficient IterationCount when using weak KDF algorithm.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.ExcludeExtensionMethodThisParameter">
+            <summary>
+            Boolean option to exclude analysis of 'this' parameter for extension methods.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.NullCheckValidationMethods">
+            <summary>
+            String option to configure names of null check validation methods (separated by '|') that validate arguments passed to the method are non-null for CA1062 (https://docs.microsoft.com/visualstudio/code-quality/ca1062-validate-arguments-of-public-methods).
+            Allowed method name formats:
+              1. Method name only (includes all methods with the name, regardless of the containing type or namespace)
+              2. Fully qualified names in the symbol's documentation ID format: https://github.com/dotnet/csharplang/blob/master/spec/documentation-comments.md#id-string-format
+                 with an optional "M:" prefix.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.AdditionalStringFormattingMethods">
+            <summary>
+            String option to configure names of additional string formatting methods (separated by '|') for CA2241 (https://docs.microsoft.com/visualstudio/code-quality/ca2241-provide-correct-arguments-to-formatting-methods).
+            Allowed method name formats:
+              1. Method name only (includes all methods with the name, regardless of the containing type or namespace)
+              2. Fully qualified names in the symbol's documentation ID format: https://github.com/dotnet/csharplang/blob/master/spec/documentation-comments.md#id-string-format
+                 with an optional "M:" prefix.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.ExcludedSymbolNames">
+            <summary>
+            String option to configure names of symbols (separated by '|') that are excluded for analysis.
+            Configurable rules: CA1303 (https://docs.microsoft.com/visualstudio/code-quality/ca1303-do-not-pass-literals-as-localized-parameters).
+            Allowed method name formats:
+              1. Symbol name only (includes all symbols with the name, regardless of the containing type or namespace)
+              2. Fully qualified names in the symbol's documentation ID format: https://github.com/dotnet/csharplang/blob/master/spec/documentation-comments.md#id-string-format.
+                 Note that each symbol name requires a symbol kind prefix, such as "M:" prefix for methods, "T:" prefix for types, "N:" prefix for namespaces, etc.
+              3. ".ctor" for constructors and ".cctor" for static constructors
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.ExcludedTypeNamesWithDerivedTypes">
+            <summary>
+            String option to configure names of types (separated by '|'), so that the type and all its derived types are excluded for analysis.
+            Configurable rules: CA1303 (https://docs.microsoft.com/visualstudio/code-quality/ca1303-do-not-pass-literals-as-localized-parameters).
+            Allowed method name formats:
+              1. Type name only (includes all types with the name, regardless of the containing type or namespace)
+              2. Fully qualified names in the symbol's documentation ID format: https://github.com/dotnet/csharplang/blob/master/spec/documentation-comments.md#id-string-format
+                 with an optional "T:" prefix.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.DisallowedSymbolNames">
+            <summary>
+            String option to configure names of symbols (separated by '|') that are disallowed in analysis.
+            Configurable rules: CA1031 (https://docs.microsoft.com/visualstudio/code-quality/ca1031-do-not-catch-general-exception-types).
+            Allowed method name formats:
+              1. Symbol name only (includes all symbols with the name, regardless of the containing type or namespace)
+              2. Fully qualified names in the symbol's documentation ID format: https://github.com/dotnet/csharplang/blob/master/spec/documentation-comments.md#id-string-format.
+                 Note that each symbol name requires a symbol kind prefix, such as "M:" prefix for methods, "T:" prefix for types, "N:" prefix for namespaces, etc.
+              3. ".ctor" for constructors and ".cctor" for static constructors
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.UnsafeDllImportSearchPathBits">
+            <summary>
+            Enumeration option to configure unsafe DllImportSearchPath bits when using DefaultDllImportSearchPaths attribute.
+            Do not use the OR operator to represent the bitwise combination of its member values, use the integeral value directly.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.InterproceduralAnalysisKind">
+            <summary>
+            Option to configure interprocedural dataflow analysis kind, i.e. <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisKind"/>.
+            Allowed option values: Fields from <see cref="T:Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.InterproceduralAnalysisKind"/>.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.MaxInterproceduralMethodCallChain">
+            <summary>
+            Integral option to configure maximum method call chain for interprocedural dataflow analysis.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.MaxInterproceduralLambdaOrLocalFunctionCallChain">
+            <summary>
+            Integral option to configure maximum lambda or local function call chain for interprocedural dataflow analysis.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.DisposeAnalysisKind">
+            <summary>
+            String option to configure dispose analysis kind, primarily for CA2000 (DisposeObjectsBeforeLosingScope).
+            Allowed option values: Fields from DisposeAnalysisKind enum.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.DisposeOwnershipTransferAtConstructor">
+            <summary>
+            Boolean option to configure if passing a disposable object as a constructor argument should be considered
+            as a dispose ownership transfer, primarily for CA2000 (DisposeObjectsBeforeLosingScope).
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.DisposeOwnershipTransferAtMethodCall">
+            <summary>
+            Boolean option to configure if passing a disposable object as an argument to a method invocation should be considered
+            as a dispose ownership transfer to the caller, primarily for CA2000 (DisposeObjectsBeforeLosingScope)
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigOptionNames.CopyAnalysis">
+            <summary>
+            Option to configure whether copy analysis should be executed during dataflow analysis.
+            Copy analysis tracks value and reference copies. For example,
+            <code>
+                void M(string str1, string str2)
+                {
+                    if (str1 != null)
+                    {
+                        if (str1 == str2)
+                        {
+                            if (str2 != null) // This is redundant as 'str1' and 'str2' are value copies on this code path. This requires copy analysis.
+                            {
+                            }
+                        }
+                    }
+                }
+            </code>
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.SymbolVisibilityGroup">
+            <summary>
+            Describes a group of effective <see cref="T:Analyzer.Utilities.Extensions.SymbolVisibility"/> for symbols.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.CategorizedAnalyzerConfigOptions">
+            <summary>
+            Analyzer configuration options from an .editorconfig file that are parsed into general
+            and specific configuration options.
+            
+            .editorconfig format:
+             1) General configuration option:
+                (a) "dotnet_code_quality.OptionName = OptionValue"
+             2) Specific configuration option:
+                (a) "dotnet_code_quality.RuleId.OptionName = OptionValue"
+                (b) "dotnet_code_quality.RuleCategory.OptionName = OptionValue"
+               
+            .editorconfig examples to configure API surface analyzed by analyzers:
+             1) General configuration option:
+                (a) "dotnet_code_quality.api_surface = all"
+             2) Specific configuration option:
+                (a) "dotnet_code_quality.CA1040.api_surface = public, internal"
+                (b) "dotnet_code_quality.Naming.api_surface = public"
+             See <see cref="T:Analyzer.Utilities.SymbolVisibilityGroup"/> for allowed symbol visibility value combinations.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.EditorConfigParser">
+            <summary>
+            Parses a given .editorconfig source text into <see cref="T:Analyzer.Utilities.CategorizedAnalyzerConfigOptions"/>.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigParser.s_reservedKeys">
+            <summary>
+            A set of keys that are reserved for special interpretation for the editorconfig specification.
+            All values corresponding to reserved keys in a (key,value) property pair are always lowercased
+            during parsing.
+            </summary>
+            <remarks>
+            This list was retrieved from https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties
+            at 2018-04-21 19:37:05Z. New keys may be added to this list in newer versions, but old ones will
+            not be removed.
+            </remarks>
+        </member>
+        <member name="F:Analyzer.Utilities.EditorConfigParser.s_reservedValues">
+            <summary>
+            A set of values that are reserved for special use for the editorconfig specification
+            and will always be lower-cased by the parser.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.UnusedValue">
+            <summary>
+            A placeholder value type for <see cref="T:System.Collections.Concurrent.ConcurrentDictionary`2"/> used as a set.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.BoundedCache`2">
+            <summary>
+            Provides bounded cache for analyzers.
+            Acts as a good alternative to <see cref="T:System.Runtime.CompilerServices.ConditionalWeakTable`2"/>
+            when the cached value has a cyclic reference to the key preventing early garbage collection of entries.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.WordParser">
+            <summary>
+                Provides <see langword="static"/> methods for parsing words from text.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.#ctor(System.String,Analyzer.Utilities.WordParserOptions)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Analyzer.Utilities.WordParser"/> class with the specified text and options.
+            </summary>
+            <param name="text">
+                A <see cref="T:System.String"/> containing the text to parse.
+            </param>
+            <param name="options">
+                One or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> specifying parsing and delimiting options.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="text"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="options"/> is not one or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> values.
+            </exception>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.#ctor(System.String,Analyzer.Utilities.WordParserOptions,System.Char)">
+            <summary>
+                Initializes a new instance of the <see cref="T:Analyzer.Utilities.WordParser"/> class with the specified text, options and prefix.
+            </summary>
+            <param name="text">
+                A <see cref="T:System.String"/> containing the text to parse.
+            </param>
+            <param name="options">
+                One or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> specifying parsing and delimiting options.
+            </param>
+            <param name="prefix">
+                A <see cref="T:System.Char"/> representing an optional prefix of <paramref name="text"/>, that if present,
+                will be returned as a separate token.
+            </param>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="text"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="options"/> is not one or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> values.
+            </exception>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.Parse(System.String,Analyzer.Utilities.WordParserOptions)">
+            <summary>
+                Returns the words contained in the specified text, delimiting based on the specified options.
+            </summary>
+            <param name="text">
+                A <see cref="T:System.String"/> containing the text to parse.
+            </param>
+            <param name="options">
+                One or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> specifying parsing and delimiting options.
+            </param>
+            <returns>
+                A <see cref="T:System.Collections.ObjectModel.Collection`1"/> of strings containing the words contained in <paramref name="text"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="text"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="options"/> is not one or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> values.
+            </exception>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.Parse(System.String,Analyzer.Utilities.WordParserOptions,System.Char)">
+            <summary>
+                Returns the words contained in the specified text, delimiting based on the specified options.
+            </summary>
+            <param name="text">
+                A <see cref="T:System.String"/> containing the text to parse.
+            </param>
+            <param name="options">
+                One or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> specifying parsing and delimiting options.
+            </param>
+            <param name="prefix">
+                A <see cref="T:System.Char"/> representing an optional prefix of <paramref name="text"/>, that if present,
+                will be returned as a separate token.
+            </param>
+            <returns>
+                A <see cref="T:System.Collections.ObjectModel.Collection`1"/> of strings containing the words contained in <paramref name="text"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="text"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="options"/> is not one or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> values.
+            </exception>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.ContainsWord(System.String,Analyzer.Utilities.WordParserOptions,System.Collections.Immutable.ImmutableArray{System.String})">
+            <summary>
+                Returns a value indicating whether at least one of the specified words occurs, using a case-insensitive ordinal comparison, within the specified text.
+            </summary>
+            <param name="text">
+                A <see cref="T:System.String"/> containing the text to check.
+            </param>    
+            <param name="options">
+                One or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> specifying parsing and delimiting options.
+            </param>
+            <param name="words">
+                A <see cref="T:System.String"/> array containing the words to seek.
+            </param>
+            <returns>
+                <see langword="true"/> if at least one of the elements within <paramref name="words"/> occurs within <paramref name="text"/>, otherwise, <see langword="false"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="text"/> is <see langword="null"/>.
+                <para>
+                 -or-  
+                </para>
+                <paramref name="words"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="options"/> is not one or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> values.
+            </exception>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.ContainsWord(System.String,Analyzer.Utilities.WordParserOptions,System.Char,System.Collections.Immutable.ImmutableArray{System.String})">
+            <summary>
+                Returns a value indicating whether at least one of the specified words occurs, using a case-insensitive ordinal comparison, within the specified text.
+            </summary>
+            <param name="text">
+                A <see cref="T:System.String"/> containing the text to check.
+            </param>    
+            <param name="options">
+                One or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> specifying parsing and delimiting options.
+            </param>
+            <param name="prefix">
+                A <see cref="T:System.Char"/> representing an optional prefix of <paramref name="text"/>, that if present,
+                will be returned as a separate token.
+            </param>
+            <param name="words">
+                A <see cref="T:System.String"/> array containing the words to seek.
+            </param>
+            <returns>
+                <see langword="true"/> if at least one of the elements within <paramref name="words"/> occurs within <paramref name="text"/>, otherwise, <see langword="false"/>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+                <paramref name="text"/> is <see langword="null"/>.
+                <para>
+                 -or-  
+                </para>
+                <paramref name="words"/> is <see langword="null"/>.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+                <paramref name="options"/> is not one or more of the <see cref="T:Analyzer.Utilities.WordParserOptions"/> values.
+            </exception>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.NextWord">
+            <summary>
+                Returns the next word in the text.
+            </summary>
+            <returns>
+                A <see cref="T:System.String"/> containing the next word or <see langword="null"/> if there are no more words.
+            </returns>
+        </member>
+        <member name="M:Analyzer.Utilities.WordParser.PeekWord">
+            <summary>
+                Returns the next word in the text without consuming it.
+            </summary>
+            <returns>
+                A <see cref="T:System.String"/> containing the next word or <see langword="null"/> if there are no more words.
+            </returns>
+        </member>
+        <member name="T:Analyzer.Utilities.WordParserOptions">
+            <summary>
+              Defines the word parsing and delimiting options for use with <see cref="M:Analyzer.Utilities.WordParser.Parse(System.String,Analyzer.Utilities.WordParserOptions)"/>.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.WordParserOptions.None">
+            <summary>
+              Indicates the default options for word parsing.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.WordParserOptions.IgnoreMnemonicsIndicators">
+            <summary>
+              Indicates that <see cref="M:Analyzer.Utilities.WordParser.Parse(System.String,Analyzer.Utilities.WordParserOptions)"/> should ignore the mnemonic indicator characters (&amp;) embedded within words.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.WordParserOptions.SplitCompoundWords">
+            <summary>
+              Indicates that <see cref="M:Analyzer.Utilities.WordParser.Parse(System.String,Analyzer.Utilities.WordParserOptions)"/> should split compound words.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.DisposeAnalysisHelper">
+            <summary>
+            Helper for DisposeAnalysis.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.DisposeAnalysisHelper.IsDisposableCreationOrDisposeOwnershipTransfer(Microsoft.CodeAnalysis.FlowAnalysis.DataFlow.AbstractLocation,Microsoft.CodeAnalysis.IMethodSymbol)">
+            <summary>
+            Returns true if the given <paramref name="location"/> was created for an allocation in the <paramref name="containingMethod"/>
+            or represents a location created for a constructor parameter whose type indicates dispose ownership transfer.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.DisposeAnalysisKind">
+            <summary>
+            Describes a group of effective <see cref="T:Analyzer.Utilities.Extensions.SymbolVisibility"/> for symbols.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeAnalysisKind.AllPaths">
+            <summary>
+            Track and report missing dispose violations on all paths (non-exception and exception paths).
+            Additionally, also flag use of non-recommended dispose patterns that may cause
+            potential dispose leaks.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeAnalysisKind.AllPathsOnlyNotDisposed">
+            <summary>
+            Track and report missing dispose violations on all paths (non-exception and exception paths).
+            Do not flag use of non-recommended dispose patterns that may cause
+            potential dispose leaks.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeAnalysisKind.NonExceptionPaths">
+            <summary>
+            Track and report missing dispose violations only on non-exception program paths.
+            Additionally, also flag use of non-recommended dispose patterns that may cause
+            potential dispose leaks.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.DisposeAnalysisKind.NonExceptionPathsOnlyNotDisposed">
+            <summary>
+            Track and report missing dispose violations only on non-exception program paths.
+            Do not flag use of non-recommended dispose patterns that may cause
+            potential dispose leaks.
+            </summary>
+        </member>
+        <member name="T:Analyzer.Utilities.SingleThreadedConcurrentDictionary`2">
+            <summary>
+            Like ConcurrentDictionary, but single threaded valueFactory execution in GetOrAdd.
+            </summary>
+            <remarks>Useful for long running valueFactory functions, like say performing 
+            dataflow analysis.  This way DFA is invoked only once per key, even if multiple
+            threads simultaneously request the same key.</remarks>
+        </member>
+        <member name="T:Analyzer.Utilities.SingleThreadedConcurrentDictionary`2.Entry">
+            <summary>
+            An Entry itself serves a lock object, and contains the real value.
+            </summary>
+        </member>
+        <member name="F:Analyzer.Utilities.SingleThreadedConcurrentDictionary`2.BackingDictionary">
+            <summary>
+            Holds entries, which contain the actual values.
+            </summary>
+        </member>
+        <member name="M:Analyzer.Utilities.SingleThreadedConcurrentDictionary`2.GetOrAdd(`0,System.Func{`0,`1})">
+            <summary>
+            Adds a key/value pair using the specified function if the key does not already exist.  Returns the new value, or the existing value if the key exists.
+            </summary>
+            <param name="key">Key to add.</param>
+            <param name="valueFactory">Function to be invoked to generate the key, if necessary.</param>
+            <returns>Value of the key, which will either be the existing value, or new value if the key was not in the dictionary.</returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,973 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>System.Reflection.MetadataLoadContext</name>
+    </assembly>
+    <members>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.ConstructorPolicies">
+            <summary>
+            Policies for constructors
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.EventPolicies">
+            <summary>
+            Policies for events.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.FieldPolicies">
+            <summary>
+            Policies for fields.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.MemberPolicies`1">
+            <summary>
+            This class encapsulates the minimum set of arcane .NET Framework CLR policies needed to implement the Get*(BindingFlags) apis.
+            In particular, it encapsulates behaviors such as what exactly determines the "visibility" of a property and event, and
+            what determines whether and how they are overridden.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.MethodPolicies">
+            <summary>
+            Policies for methods.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.NestedTypePolicies">
+             <summary>
+             Policies for nested types.
+            
+             Nested types enumerate a little differently than other members:
+                Base classes are never searched, regardless of BindingFlags.DeclaredOnly value.
+                Public|NonPublic|IgnoreCase are the only relevant BindingFlags. The apis ignore any other bits.
+                There is no such thing as a "static" or "instanced" nested type. For enumeration purposes,
+                we'll arbitrarily denote all nested types as "static."
+             </summary>
+        </member>
+        <member name="T:System.Reflection.Runtime.BindingFlagSupport.PropertyPolicies">
+            <summary>
+            Policies for properties.
+            </summary>
+        </member>
+        <member name="P:System.Reflection.Runtime.BindingFlagSupport.QueriedMemberList`1.TotalCount">
+            <summary>
+            Returns the # of candidates for a non-DeclaredOnly search. Caution: Can throw MissingMetadataException. Use DeclaredOnlyCount if you don't want to search base classes.
+            </summary>
+        </member>
+        <member name="P:System.Reflection.Runtime.BindingFlagSupport.QueriedMemberList`1.DeclaredOnlyCount">
+            <summary>
+            Returns the # of candidates for a DeclaredOnly search
+            </summary>
+        </member>
+        <member name="P:System.Reflection.Runtime.BindingFlagSupport.QueryResult`1.Count">
+            <summary>
+            Returns the number of matching results.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Runtime.BindingFlagSupport.QueryResult`1.ToArray">
+            <summary>
+            Copies the results to a freshly allocated array. Use this at api boundary points.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Runtime.BindingFlagSupport.QueryResult`1.CopyTo(System.Reflection.MemberInfo[],System.Int32)">
+            <summary>
+            Copies the results into an existing array.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.Runtime.BindingFlagSupport.QueryResult`1.Disambiguate">
+            <summary>
+            Returns a single member, null or throws AmbigousMatchException, for the Type.Get*(string name,...) family of apis.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaAssembly">
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeHelpers.ToTrueCustomAttributes(System.Reflection.Metadata.CustomAttributeHandleCollection,System.Reflection.TypeLoading.Ecma.EcmaModule)">
+            <summary>
+            Converts ECMA-encoded custom attributes into a freshly allocated CustomAttributeData object suitable for direct return
+            from the CustomAttributes api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeHelpers.ToApiForm(System.Collections.Generic.IList{System.Reflection.Metadata.CustomAttributeTypedArgument{System.Reflection.TypeLoading.RoType}})">
+            <summary>
+            Converts a list of System.Reflection.Metadata CustomAttributeTypedArgument&lt;&gt; into a freshly allocated CustomAttributeTypedArgument
+            list suitable for direct return from the CustomAttributes api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeHelpers.ToApiForm(System.Reflection.Metadata.CustomAttributeTypedArgument{System.Reflection.TypeLoading.RoType})">
+            <summary>
+            Converts a System.Reflection.Metadata CustomAttributeTypedArgument&lt;&gt; into a freshly allocated CustomAttributeTypedArgument
+            object suitable for direct return from the CustomAttributes api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeHelpers.ToApiForm(System.Collections.Generic.IList{System.Reflection.Metadata.CustomAttributeNamedArgument{System.Reflection.TypeLoading.RoType}},System.Type)">
+            <summary>
+            Converts a list of System.Reflection.Metadata CustomAttributeNamedArgument&lt;&gt; into a freshly allocated CustomAttributeNamedArgument
+            list suitable for direct return from the CustomAttributes api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaCustomAttributeHelpers.ToApiForm(System.Reflection.Metadata.CustomAttributeNamedArgument{System.Reflection.TypeLoading.RoType},System.Type)">
+            <summary>
+            Converts a System.Reflection.Metadata CustomAttributeNamedArgument&lt;&gt; into a freshly allocated CustomAttributeNamedArgument
+            object suitable for direct return from the CustomAttributes api.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaEvent">
+            <summary>
+            Base class for all EventInfo objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaField">
+            <summary>
+            Base class for all FieldInfo objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaHelpers.ToRoAssemblyName(System.Reflection.Metadata.AssemblyReferenceHandle,System.Reflection.Metadata.MetadataReader)">
+            <summary>
+            Returns a RoAssemblyName corresponding to the assembly reference.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaResolver">
+            <summary>
+            These are the official entrypoints that code should use to resolve metadata tokens.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaToStringHelpers">
+             <summary>
+             Helpers to generate ToString() output for Type objects that occur as part of MemberInfo objects. Not used to generate ToString() for
+             System.Type itself.
+            
+             Though this may seem like something that belongs at the format-agnostic layer, it is not acceptable for ToString() to
+             trigger resolving. Thus, ToString() must be built up using only the raw data in the metadata and without creating or
+             resolving Type objects.
+             </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.MetadataTable`2">
+             <summary>
+             Thread-safe interning table for objects that map 1-1 with ECMA tokens.
+            
+             The key type is hard-coded to EntityHandle.
+             The "T" type is the value type (e.g. RoTypeDefinition objects)
+             The "C" type is an optional context value passed through the factory methods (so we don't to allocate a closure each time.)
+             </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.MetadataTable`2.EnumerateValues(System.Int32)">
+            <summary>
+            Return a read-only enumeration of the table (safe to hand back to app code.)
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.MetadataTable`2.ToArray``1(System.Int32)">
+            <summary>
+            Return a newly allocated array containing the contents (safe to hand back to app code.)
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaModule">
+            <summary>
+            Base class for all Module objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+            <summary>
+            Base class for all Module objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+            <summary>
+            Base class for all Module objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Ecma.EcmaModule.GetTypeCoreNoCache(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte},System.Exception@)">
+             <summary>
+             Helper routine for the more general Module.GetType() family of apis. Also used in typeRef resolution.
+            
+             Resolves top-level named types only. No nested types. No constructed types. The input name must not be escaped.
+            
+             If a type is not contained or forwarded from the assembly, this method returns null (does not throw.)
+             This supports the "throwOnError: false" behavior of Module.GetType(string, bool).
+             </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaFatMethodParameter">
+            <summary>
+            Base class for all RoParameter's returned by MethodBase.GetParameters() that have an entry in the Param table
+            and get their metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaProperty">
+            <summary>
+            Base class for all PropertyInfo objects created by a MetadataLoadContext and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaDefinitionType">
+            <summary>
+            RoTypes that return true for IsTypeDefinition and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaGenericMethodParameterType">
+            <summary>
+            RoTypes that return true for IsGenericMethodParameter and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaGenericParameterType">
+            <summary>
+            RoTypes that return true for IsGenericParameter and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.Ecma.EcmaGenericTypeParameterType">
+            <summary>
+            RoTypes that return true for IsGenericTypeParameter and get its metadata from a PEReader.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoAssembly">
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext.
+            </summary>
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext.
+            </summary>
+            <summary>
+            Base class for all Assembly objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.RoAssembly.GetTypeCore(System.String,System.String,System.Boolean,System.Exception@)">
+             <summary>
+             Helper routine for the more general Assembly.GetType() family of apis. Also used in typeRef resolution.
+            
+             Resolves top-level named types only. No nested types. No constructed types. The input name must not be escaped.
+            
+             If a type is not contained or forwarded from the assembly, this method returns null (does not throw.)
+             This supports the "throwOnError: false" behavior of Assembly.GetType(string, bool).
+             </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoAssembly.TypeForwardHandler">
+            <summary>
+            Intentionally excludes forwards to nested types.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoExceptionAssembly">
+            <summary>
+            This "assembly" holds an exception resulting from a failure to bind an assembly name. It can be stored in bind caches and assembly ref
+            memoization tables.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoConstructor">
+            <summary>
+            Base class for all ConstructorInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoDefinitionConstructor`1">
+            <summary>
+            Class for all RoConstructor objects created by a MetadataLoadContext that has a MethodDef token associated with it.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoSyntheticConstructor">
+            <summary>
+            Base class for all RoConstructors objects created by a MetadataLoadContext that appear on arrays.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.CustomAttributeHelpers.ToCustomAttributeNamedArgument(System.Type,System.String,System.Type,System.Object)">
+            <summary>
+            Helper for creating a CustomAttributeNamedArgument.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.CustomAttributeHelpers.CloneForApiReturn(System.Collections.Generic.IList{System.Reflection.CustomAttributeTypedArgument})">
+            <summary>
+            Clones a cached CustomAttributeTypedArgument list into a freshly allocated one suitable for direct return through an api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.CustomAttributeHelpers.CloneForApiReturn(System.Collections.Generic.IList{System.Reflection.CustomAttributeNamedArgument})">
+            <summary>
+            Clones a cached CustomAttributeNamedArgument list into a freshly allocated one suitable for direct return through an api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.CustomAttributeHelpers.CloneForApiReturn(System.Reflection.CustomAttributeTypedArgument)">
+            <summary>
+            Clones a cached CustomAttributeTypedArgument into a freshly allocated one suitable for direct return through an api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.CustomAttributeHelpers.CloneForApiReturn(System.Reflection.CustomAttributeNamedArgument)">
+            <summary>
+            Clones a cached CustomAttributeNamedArgument into a freshly allocated one suitable for direct return through an api.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.CustomAttributeHelpers.TryComputeMarshalAsCustomAttributeData(System.Func{System.Runtime.InteropServices.MarshalAsAttribute},System.Reflection.MetadataLoadContext)">
+            <summary>
+            Convert MarshalAsAttribute data into CustomAttributeData form. Returns null if the core assembly cannot be loaded or if the necessary
+            types aren't in the core assembly.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoCustomAttributeData">
+            <summary>
+            Base class for all CustomAttributeData objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoEvent">
+            <summary>
+            Base class for all EventInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoField">
+            <summary>
+            Base class for all FieldInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.CoreType">
+             <summary>
+             Enumerates all the system types that MetadataLoadContexts may need to fish out of the core assembly.
+             Note that the enum values are often cast to "int" and used as indices into a table so the
+             enum values should be left contiguous.
+            
+             If you add a member to this enum, you must also add a switch case for it in CoreTypeHelpers.GetFullName();
+             </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.CoreTypes">
+            <summary>
+            A convenience class that holds the palette of core types that were successfully loaded (or the reason they were not.)
+            </summary>
+        </member>
+        <member name="P:System.Reflection.TypeLoading.CoreTypes.Item(System.Reflection.TypeLoading.CoreType)">
+            <summary>
+            Returns null if the specific core type did not exist or could not be loaded. Call GetException(coreType) to get detailed info.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.Helpers.AdjustForUnspecifiedVersionComponents(System.Version)">
+            <summary>
+            For AssemblyReferences, convert "unspecified" components from the ECMA format (0xffff) to the in-memory System.Version format (0xffffffff).
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.LeveledTypeInfo">
+            <summary>
+            Another layer of base types. For NetCore, these base types are empty. For NetStandard, these base types add the NetCore apis to NetStandard
+            so code interacting with "RoTypes" and friends can happily code to the full NetCore surface area.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoConstructedGenericMethod">
+            <summary>
+            Class for all RoMethod objects created by a MetadataLoadContext for which IsConstructedGenericMethod returns true.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoDefinitionMethod">
+            <summary>
+            Base class for all RoMethod objects created by a MetadataLoadContext that has a MethodDef token associated with it
+            and for which IsConstructedGenericMethod returns false.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoDefinitionMethod`1">
+            <summary>
+            Class for all RoMethod objects created by a MetadataLoadContext that has a MethodDef token associated with it
+            and for which IsConstructedGenericMethod returns false.
+            </summary>
+            <summary>
+            Class for all RoMethod objects created by a MetadataLoadContext that has a MethodDef token associated with it
+            and for which IsConstructedGenericMethod returns false.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoMethod">
+            <summary>
+            Base class for all MethodInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoSyntheticMethod">
+            <summary>
+            Base class for all RoMethod objects created by a MetadataLoadContext that appear on arrays.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoModule">
+            <summary>
+            Base class for all Module objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.TypeLoading.RoModule.GetTypeCore(System.ReadOnlySpan{System.Byte},System.ReadOnlySpan{System.Byte},System.Boolean,System.Exception@)">
+             <summary>
+             Helper routine for the more general Module.GetType() family of apis. Also used in typeRef resolution.
+            
+             Resolves top-level named types only. No nested types. No constructed types. The input name must not be escaped.
+            
+             If a type is not contained or forwarded from the module, this method returns null (does not throw.)
+             This supports the "throwOnError: false" behavior of Module.GetType(string, bool).
+             </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoResourceModule">
+            <summary>
+            Resource-only modules created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoFatMethodParameter">
+            <summary>
+            Base class for all RoParameter's returned by MethodBase.GetParameters() that have an entry in the Param table.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoMethodParameter">
+            <summary>
+            Base class for all RoParameter's returned by MethodBase.GetParameters().
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoParameter">
+            <summary>
+            Base class for all ParameterInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoPropertyIndexParameter">
+            <summary>
+            Base class for all RoParameter's returned by PropertyInfo.GetParameters(). These are identical to the associated
+            getter's ParameterInfo's except for the Member property returning a property.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoThinMethodParameter">
+            <summary>
+            Base class for all RoParameter's returned by MethodBase.GetParameters() that don't have an entry in the Param table.
+            (in practice, these are return value "parameters.") These parameters have no name, custom attributes or default values.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoProperty">
+            <summary>
+            Base class for all PropertyInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoType">
+            <summary>
+            Base class for all Type and TypeInfo objects created by a MetadataLoadContext.
+            </summary>
+            <summary>
+            Base class for all Type and TypeInfo objects created by a MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoType.TypeComponentsCache">
+             <summary>
+             TypeComponentsCache objects are allocated on-demand on a per-Type basis to cache hot data for key scenarios.
+             To maximize throughput once the cache is created, the object creates all of its internal caches up front
+             and holds entries strongly (and relying on the fact that Types themselves are held weakly to avoid immortality.)
+            
+             Note that it is possible that two threads racing to query the same TypeInfo may allocate and query two different
+             cache objects. Thus, this object must not be relied upon to preserve object identity.
+             </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoArrayType">
+            <summary>
+            All RoTypes that return true for IsArray. This includes both SZArrays and multi-dim arrays.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoByRefType">
+            <summary>
+            All RoTypes that return true for IsByRef.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoConstructedGenericType">
+            <summary>
+            All RoTypes that return true for IsConstructedGenericType.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoDefinitionType">
+            <summary>
+            Base type for all RoTypes that return true for IsTypeDefinition.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoExceptionType">
+            <summary>
+            This class exists only to stash Exceptions inside GetTypeCore caches.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoGenericParameterType">
+            <summary>
+            Base type for all RoTypes that return true for IsGenericParameter. This can a generic parameter defined on a type or a method.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoHasElementType">
+            <summary>
+            Base type for all RoTypes that return true for HasElementType.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoInstantiationProviderType">
+            <summary>
+            Base type for RoDefinitionType and RoConstructedGenericType. These are the two types that can declare members backed by metadata.
+            (Though Array types "declare" members too, those are not backed by actual metadata so there will never be a typespec that has to be resolved
+            which is what an instantiation is for in the first place.)
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoModifiedType">
+            <summary>
+            This is used to represent a ModifiedType. It is quite ill-behaved so the only time it is created is by the EcmaModifiedTypeProvider.
+            It is only used to implement the GetCustomModifiers apis.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoPinnedType">
+            <summary>
+            This is used to represent a PinnedType. It is quite ill-behaved so the only time it is created is by the EcmaPinnedTypeProvider.
+            It is only used to implement the MethodBody.LocalVariables property.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoPointerType">
+            <summary>
+            All RoTypes that return true for IsPointer.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.TypeLoading.RoWrappedType">
+            <summary>
+            Base type for RoModifiedType and RoPinnedType. These types are very ill-behaved so they are only produced in very specific circumstances
+            and quickly peeled away once their usefulness has ended.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.MetadataAssemblyResolver">
+            <summary>
+            The base class for binding algorithms used by <see cref="T:System.Reflection.MetadataLoadContext"/>.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataAssemblyResolver.Resolve(System.Reflection.MetadataLoadContext,System.Reflection.AssemblyName)">
+             <summary>
+             The binding algorithm. This method is called when an Assembly is to be returned from a given AssemblyName.
+             This occurs when MetadataLoadContext.LoadAssemblyByName() is called or when a Type from one assembly has a
+             dependency on another assembly.
+            
+             It should use MetadataLoadContext.LoadFromStream(), LoadFromAssemblyPath()
+             or LoadFromByteArray() to load the requested assembly and return it.
+             </summary>
+            <remarks>
+             To indicate the failure to find an assembly, the handler should return null rather than throwing an exception. Returning null commits
+             the failure so that future attempts to load that name will fail without re-invoking the handler.
+            
+             If the handler throws an exception, the exception will be passed through to the application that invoked the operation that triggered
+             the binding. The MetadataLoadContext will not catch it and no binding will occur.
+            
+             The handler will generally not be called more than once for the same name, unless two threads race to load the same assembly.
+             Even in that case, one result will win and be atomically bound to the name.
+            
+             The MetadataLoadContext intentionally performs no ref-def matching on the returned assembly as what constitutes a ref-def match is a policy.
+             It is also the kind of arbitrary restriction that MetadataLoadContext strives to avoid.
+            
+             The MetadataLoadContext cannot consume assemblies from other MetadataLoadContexts or other type providers (such as the underlying runtime's own Reflection system.)
+             If a handler returns such an assembly, the MetadataLoadContext throws a FileLoadException.
+             </remarks>
+        </member>
+        <member name="T:System.Reflection.MetadataLoadContext">
+             <summary>
+             A MetadataLoadContext represents a closed universe of Type objects loaded for inspection-only purposes.
+             Each MetadataLoadContext can have its own binding rules and is isolated from all other MetadataLoadContexts.
+            
+             A MetadataLoadContext serves as a dictionary that binds assembly names to Assembly instances that were previously
+             loaded into the context or need to be loaded.
+            
+             Assemblies are treated strictly as metadata. There are no restrictions on loading assemblies based
+             on target platform, CPU architecture or pointer size. There are no restrictions on the assembly designated
+             as the core assembly ("mscorlib").
+             </summary>
+             <remarks>
+             Also, as long as the metadata is "syntactically correct", the MetadataLoadContext strives to report it "as is" (as long it
+             can do so in a way that can be distinguished from valid data) and refrains from judging whether it's "executable."
+             This is both for performance reasons (checks cost time) and its intended role as metadata inspection tool.
+             Examples of things that MetadataLoadContexts let go unchecked include creating generic instances that violate generic
+             parameter constraints, and loading type hierachies that would be unloadable in an actual runtime (deriving from sealed classes,
+             overriding members that don't exist in the ancestor classes, failing to implement all abstract methods, etc.)
+            
+             You cannot invoke methods, set or get field or property values or instantiate objects using
+             the Type objects from a MetadataLoadContext. You can however, use FieldInfo.GetRawConstantValue(),
+             ParameterInfo.RawDefaultValue and PropertyInfo.GetRawConstantValue(). You can retrieve custom attributes
+             in CustomAttributeData format but not as instantiated custom attributes. The CustomAttributeExtensions
+             extension api will not work with these Types nor will the IsDefined() family of api.
+            
+             There is no default binding policy. You must use a MetadataAssemblyResolver-derived class to load dependencies as needed.
+             The MetadataLoadContext strives to avoid loading dependencies unless needed.
+             Therefore, it is possible to do useful analysis of an assembly even
+             in the absence of dependencies. For example, retrieving an assembly's name and the names of its (direct)
+             dependencies can be done without having any of those dependencies on hand.
+            
+             To bind assemblies, the MetadataLoadContext calls the Resolve method on the correspding MetadataAssemblyResolver.
+             That method should load the requested assembly and return it.
+             To do this, it can use LoadFromAssemblyPath() or one of its variants (LoadFromStream(), LoadFromByteArray()).
+            
+             Once an assembly has been bound, no assembly with the same assembly name identity
+             can be bound again from a different location unless the Mvids are identical.
+            
+             Once loaded, the underlying file may be locked for the duration of the MetadataLoadContext's lifetime. You can
+             release the locks by disposing the MetadataLoadContext object. The behavior of any Type, Assembly or other reflection
+             objects handed out by the MetadataLoadContext is undefined after disposal. Though objects provided by the MetadataLoadContext
+             strive to throw an ObjectDisposedException, this is not guaranteed. Some apis may return fixed or previously
+             cached data. Accessing objects *during* a Dispose may result in a unmanaged access violation and failfast.
+            
+             Comparing Type, Member and Assembly objects:
+               The right way to compare two Reflection objects dispensed by the MetadataLoadContext are:
+                   m1 == m2
+                   m1.Equals(m2)
+               but not
+                   object.ReferenceEquals(m1, m2)   /// WRONG
+                   (object)m1 == (object)m2         /// WRONG
+            
+               Note that the following descriptions are not literal descriptions of how Equals() is implemented. The MetadataLoadContext
+               reserves the right to implement Equals() as "object.ReferenceEquals()" and intern the associated objects in such
+               a way that Equals() works "as if" it were comparing those things.
+            
+             - Each MetadataLoadContext permits only one Assembly instance per assembly identity so equality of assemblies is the same as the
+               equality of their assembly identity.
+            
+             - Modules are compared by comparing their containing assemblies and their row indices in the assembly's manifest file table.
+            
+             - Defined types are compared by comparing their containing modules and their row indices in the module's TypeDefinition table.
+            
+             - Constructed types (arrays, byrefs, pointers, generic instances) are compared by comparing all of their component types.
+            
+             - Generic parameter types are compared by comparing their containing Modules and their row indices in the module's GenericParameter table.
+            
+             - Constructors, methods, fields, events and properties are compared by comparing their declaring types, their row indices in their respective
+               token tables and their ReflectedType property.
+            
+             - Parameters are compared by comparing their declaring member and their position index.
+            
+             Multithreading:
+               The MetadataLoadContext and the reflection objects it hands out are all multithread-safe and logically immutable,
+               except that no Loads or inspections of reflection objects can be done during or after disposing the owning MetadataLoadContext.
+            
+             Support for NetCore Reflection apis:
+               .NETCore added a number of apis (IsSZArray, IsVariableBoundArray, IsTypeDefinition, IsGenericTypeParameter, IsGenericMethodParameter,
+                  HasSameMetadataDefinitionAs, to name a few.) to the Reflection surface area.
+            
+               The Reflection objects dispensed by MetadataLoadContexts support all the new apis *provided* that you are using the netcore build of System.Reflection.MetadataLoadContext.dll.
+            
+               If you are using the netstandard build of System.Reflection.MetadataLoadContext.dll, the NetCore-specific apis are not supported. Attempting to invoke
+               them will generate a NotImplementedException or NullReferenceException (unfortunately, we can't improve the exceptions thrown because
+               they are being thrown by code this library doesn't control.)
+             </remarks>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.#ctor(System.Reflection.MetadataAssemblyResolver,System.String)">
+            <summary>
+            Create a new MetadataLoadContext object.
+            </summary>
+            <param name="resolver">A <see cref="T:System.Reflection.MetadataAssemblyResolver"/> instance.</param>
+            <param name="coreAssemblyName">
+            The name of the assembly that contains the core types such as System.Object. Typically, this would be "mscorlib".
+            </param>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.LoadFromAssemblyPath(System.String)">
+            <summary>
+            Loads an assembly from a specific path on the disk and binds its assembly name to it in the MetadataLoadContext. If a prior
+            assembly with the same name was already loaded into the MetadataLoadContext, the prior assembly will be returned. If the
+            two assemblies do not have the same Mvid, this method throws a FileLoadException.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.LoadFromByteArray(System.Byte[])">
+            <summary>
+            Loads an assembly from a byte array and binds its assembly name to it in the MetadataLoadContext. If a prior
+            assembly with the same name was already loaded into the MetadataLoadContext, the prior assembly will be returned. If the
+            two assemblies do not have the same Mvid, this method throws a FileLoadException.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.LoadFromStream(System.IO.Stream)">
+             <summary>
+             Loads an assembly from a stream and binds its assembly name to it in the MetadataLoadContext. If a prior
+             assembly with the same name was already loaded into the MetadataLoadContext, the prior assembly will be returned. If the
+             two assemblies do not have the same Mvid, this method throws a FileLoadException.
+            
+             The MetadataLoadContext takes ownership of the Stream passed into this method. The original owner must not mutate its position, dispose the Stream or
+             assume that its position will stay unchanged.
+             </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.LoadFromAssemblyName(System.String)">
+             <summary>
+             Resolves the supplied assembly name to an assembly. If an assembly was previously bound by to this name, that assembly is returned.
+             Otherwise, the MetadataLoadContext calls the specified MetadataAssemblyResolver. If the resolver returns null, this method throws a FileNotFoundException.
+            
+             Note that this behavior matches the behavior of AssemblyLoadContext.LoadFromAssemblyName() but does not match the behavior of
+             Assembly.ReflectionOnlyLoad(). (the latter gives up without raising its resolve event.)
+             </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.LoadFromAssemblyName(System.Reflection.AssemblyName)">
+             <summary>
+             Resolves the supplied assembly name to an assembly. If an assembly was previously bound by to this name, that assembly is returned.
+             Otherwise, the MetadataLoadContext calls the specified MetadataAssemblyResolver. If the resolver returns null, this method throws a FileNotFoundException.
+            
+             Note that this behavior matches the behavior of AssemblyLoadContext.LoadFromAssemblyName() resolve event but does not match the behavior of
+             Assembly.ReflectionOnlyLoad(). (the latter gives up without raising its resolve event.)
+             </summary>
+        </member>
+        <member name="P:System.Reflection.MetadataLoadContext.CoreAssembly">
+             <summary>
+             Returns the assembly that denotes the "system assembly" that houses the well-known types such as System.Int32.
+             The core assembly is treated differently than other assemblies because references to these well-known types do
+             not include the assembly reference, unlike normal types.
+            
+             Typically, this assembly is named "mscorlib", or "netstandard". If the core assembly cannot be found, the value will be
+             null and many other reflection methods, including those that parse method signatures, will throw.
+            
+             The CoreAssembly is determined by passing the coreAssemblyName parameter passed to the MetadataAssemblyResolver constructor
+             to the MetadataAssemblyResolver's Resolve method.
+             If no coreAssemblyName argument was specified in the constructor of MetadataLoadContext, then default values are used
+             including "mscorlib", "System.Runtime" and "netstandard".
+            
+             The designated core assembly does not need to contain the core types directly. It can type forward them to other assemblies.
+             Thus, it is perfectly permissible to use the mscorlib facade as the designated core assembly.
+            
+             Note that "System.Runtime" is not an ideal core assembly as it excludes some of the interop-related pseudo-custom attribute types
+             such as DllImportAttribute. However, it can serve if you have no interest in those attributes. The CustomAttributes api
+             will skip those attributes if the core assembly does not include the necessary types.
+            
+             The CoreAssembly is not loaded until necessary. These APIs do not trigger the search for the core assembly:
+                MetadataLoadContext.LoadFromStream(), LoadFromAssemblyPath(), LoadFromByteArray()
+                Assembly.GetName(), Assembly.FullName, Assembly.GetReferencedAssemblies()
+                Assembly.GetTypes(), Assembly.DefinedTypes, Assembly.GetExportedTypes(), Assembly.GetForwardedTypes()
+                Assembly.GetType(string, bool, bool)
+                Type.Name, Type.FullName, Type.AssemblyQualifiedName
+            
+             If a core assembly cannot be found or if the core assembly is missing types, this will affect the behavior of the MetadataLoadContext as follows:
+            
+             - Apis that need to parse signatures or typespecs and return the results as Types will throw. For example,
+               MethodBase.ReturnType, MethodBase.GetParameters(), Type.BaseType, Type.GetInterfaces().
+            
+             - Apis that need to compare types to well known core types will not throw and the comparison will evaluate to "false."
+               For example, if you do not specify a core assembly, Type.IsPrimitive will return false for everything,
+               even types named "System.Int32". Similarly, Type.GetTypeCode() will return TypeCode.Object for everything.
+            
+             - If a metadata entity sets flags that surface as a pseudo-custom attribute, and the core assembly does not contain the pseudo-custom attribute
+               type, the necessary constructor or any of the parameter types of the constructor, the MetadataLoadContext will not throw. It will omit the pseudo-custom
+               attribute from the list of returned attributes.
+             </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.GetAssemblies">
+            <summary>
+            Return an atomic snapshot of the assemblies that have been loaded into the MetadataLoadContext.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.Dispose">
+            <summary>
+            Releases any native resources (such as file locks on assembly files.) After disposal, it is not safe to use
+            any Assembly objects dispensed by the MetadataLoadContext, nor any Reflection objects dispensed by those Assembly objects.
+            Though objects provided by the MetadataLoadContext strive to throw an ObjectDisposedException, this is not guaranteed.
+            Some apis may return fixed or previously cached data. Accessing objects *during* a Dispose may result in an
+            unmanaged access violation and failfast.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.GetCoreType(System.Reflection.TypeLoading.CoreType)">
+            <summary>
+            Returns a lazily created and cached Type instance corresponding to the indicated core type. This method throws
+            if the core assembly name wasn't supplied, the core assembly could not be loaded for some reason or if the specified
+            type does not exist in the core assembly.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.TryGetCoreType(System.Reflection.TypeLoading.CoreType)">
+            <summary>
+            Returns a lazily created and cached Type instance corresponding to the indicated core type. This method returns null
+            if the core assembly name wasn't supplied, the core assembly could not be loaded for some reason or if the specified
+            type does not exist in the core assembly.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.GetAllFoundCoreTypes">
+            <summary>
+            Returns a cached array containing the resolved CoreTypes, indexed by the CoreType enum cast to an int.
+            If the core assembly was not specified, not locatable or if one or more core types aren't present in the core assembly,
+            the corresponding elements will be null.
+            </summary>
+        </member>
+        <member name="M:System.Reflection.MetadataLoadContext.RegisterForDisposal(System.IDisposable)">
+            <summary>
+            Adds an object to an internal list of objects to be disposed when the MetadataLoadContext is disposed.
+            </summary>
+        </member>
+        <member name="T:System.Reflection.PathAssemblyResolver">
+            <summary>
+            An assembly resolver that uses paths to every assembly that may be loaded.
+            The file name is expected to be the same as the assembly's simple name.
+            Multiple assemblies can exist on disk with the same name but in different directories.
+            A single instance of PathAssemblyResolver can be used with multiple MetadataAssemblyResolver instances.
+            </summary>
+            <remarks>
+            In order for an AssemblyName to match to a loaded assembly, AssemblyName.Name must be equal (casing ignored).
+            - If AssemblyName.PublicKeyToken is specified, it must be equal.
+            - If AssemblyName.PublicKeyToken is not specified, assemblies with no PublicKeyToken are selected over those with a PublicKeyToken.
+            - If more than one assembly matches, the assembly with the highest Version is returned.
+            - CultureName is ignored.
+            </remarks>
+        </member>
+        <member name="M:System.Reflection.PathAssemblyResolver.#ctor(System.Collections.Generic.IEnumerable{System.String})">
+            <summary>
+            Initializes a new instance of the <see cref="T:System.Reflection.PathAssemblyResolver"/> class.
+            </summary>
+            <exception cref="T:System.ArgumentNullException">Thrown when assemblyPaths is null.</exception>
+            <exception cref="T:System.ArgumentException">Thrown when a path is invalid.</exception>
+        </member>
+        <member name="M:System.Reflection.SignatureTypeExtensions.MatchesParameterTypeExactly(System.Type,System.Reflection.ParameterInfo)">
+             <summary>
+             This is semantically identical to
+            
+                  parameter.ParameterType == pattern.TryResolveAgainstGenericMethod(parameter.Member)
+            
+             but without the allocation overhead of TryResolve.
+             </summary>
+        </member>
+        <member name="M:System.Reflection.SignatureTypeExtensions.MatchesExactly(System.Type,System.Type)">
+             <summary>
+             This is semantically identical to
+            
+                  actual == pattern.TryResolveAgainstGenericMethod(parameterMember)
+            
+             but without the allocation overhead of TryResolve.
+             </summary>
+        </member>
+        <member name="M:System.Reflection.SignatureTypeExtensions.TryResolveAgainstGenericMethod(System.Type,System.Reflection.MethodInfo)">
+             <summary>
+             Translates a SignatureType into its equivalent resolved Type by recursively substituting all generic parameter references
+             with its corresponding generic parameter definition. This is slow so MatchesExactly or MatchesParameterTypeExactly should be
+             substituted instead whenever possible. This is only used by the DefaultBinder when its fast-path checks have been exhausted and
+             it needs to call non-trivial methods like IsAssignableFrom which SignatureTypes will never support.
+            
+             Because this method is used to eliminate method candidates in a GetMethod() lookup, it is entirely possible that the Type
+             might not be creatable due to conflicting generic constraints. Since this merely implies that this candidate is not
+             the method we're looking for, we return null rather than let the TypeLoadException bubble up. The DefaultBinder will catch
+             the null and continue its search for a better candidate.
+             </summary>
+        </member>
+        <member name="P:System.SR.Argument_GenericArgsCount">
+            <summary>The number of generic arguments provided does not match the number of generic parameters.</summary>
+        </member>
+        <member name="P:System.SR.Argument_HasToBeArrayClass">
+            <summary>Must be an array type.</summary>
+        </member>
+        <member name="P:System.SR.Argument_InvalidEnum">
+            <summary>The enum type should contain one and only one instance field.</summary>
+        </member>
+        <member name="P:System.SR.Arg_AmbiguousMatchException">
+            <summary>Ambiguous match found.</summary>
+        </member>
+        <member name="P:System.SR.Arg_EmptyArray">
+            <summary>Array may not be empty.</summary>
+        </member>
+        <member name="P:System.SR.Arg_EnumLitValueNotFound">
+            <summary>Literal value was not found.</summary>
+        </member>
+        <member name="P:System.SR.Arg_HTCapacityOverflow">
+            <summary>Hashtable's capacity overflowed and went negative. Check load factor, capacity and the current size of the table.</summary>
+        </member>
+        <member name="P:System.SR.Arg_MustBeEnum">
+            <summary>Type provided must be an enum.</summary>
+        </member>
+        <member name="P:System.SR.Arg_MustBeType">
+            <summary>Type must be a type provided by the MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.Arg_NotGenericMethodDefinition">
+            <summary>{0} is not a GenericMethodDefinition. MakeGenericMethod may only be called on a method for which MethodBase.IsGenericMethodDefinition is true.</summary>
+        </member>
+        <member name="P:System.SR.Arg_NotGenericParameter">
+            <summary>Method may only be called on a type for which Type.IsGenericParameter is true.</summary>
+        </member>
+        <member name="P:System.SR.Arg_NotGenericTypeDefinition">
+            <summary>{0} is not a GenericTypeDefinition. MakeGenericType may only be called on a type for which Type.IsGenericTypeDefinition is true.</summary>
+        </member>
+        <member name="P:System.SR.Arg_ReflectionOnlyCA">
+            <summary>The requested operation cannot be used on objects loaded by a MetadataLoadContext. Use CustomAttributeData instead.</summary>
+        </member>
+        <member name="P:System.SR.Arg_InvalidOperation_Reflection">
+            <summary>The requested operation cannot be used on objects loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.Arg_ReflectionOnlyInvoke">
+            <summary>Cannot invoke a method on objects loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.Arg_ReflectionOnlyParameterDefaultValue">
+            <summary>It is illegal to request the default value on a ParameterInfo loaded by a MetadataLoadContext. Use RawDefaultValue instead.</summary>
+        </member>
+        <member name="P:System.SR.BadImageFormat_TypeRefBadScopeType">
+            <summary>Assembly '{0}' contains a type reference '{1}' that contains an invalid scope token.</summary>
+        </member>
+        <member name="P:System.SR.BadImageFormat_TypeRefModuleNotInManifest">
+            <summary>Assembly '{0}' contains a type reference '{1}' that references a module not in the manifest.</summary>
+        </member>
+        <member name="P:System.SR.CoreTypeNotFound">
+            <summary>Could not find core type '{0}'</summary>
+        </member>
+        <member name="P:System.SR.ExternalAssemblyReturnedByMetadataAssemblyResolver">
+            <summary>An assembly that was not created by this MetadataLoadContext object was returned from its MetadataAssemblyResolver.</summary>
+        </member>
+        <member name="P:System.SR.FileLoadDuplicateAssemblies">
+            <summary>The assembly '{0}' has already loaded been loaded into this MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.FileNotFoundAssembly">
+            <summary>Could not find assembly '{0}'. Either explicitly load this assembly using a method such as LoadFromAssemblyPath() or use a MetadataAssemblyResolver that returns a valid assembly.</summary>
+        </member>
+        <member name="P:System.SR.FileNotFoundModule">
+            <summary>Could not find the module file for '{0}'.</summary>
+        </member>
+        <member name="P:System.SR.GenericMethodParamIndexOutOfRange">
+            <summary>A type specification contained an out of range index for a generic method parameter '{0}'.</summary>
+        </member>
+        <member name="P:System.SR.GenericTypeParamIndexOutOfRange">
+            <summary>A type specification contained an out of range index for a generic type parameter '{0}'.</summary>
+        </member>
+        <member name="P:System.SR.InvalidOperation_IsSecurity">
+            <summary>This property is not supported on assemblies loaded by a MetadataLoadContext as there is no trust level to evaluate these against.</summary>
+        </member>
+        <member name="P:System.SR.InvalidOperation_NotGenericType">
+            <summary>This operation is only valid on generic types.</summary>
+        </member>
+        <member name="P:System.SR.MakeGenericType_NotLoadedByMetadataLoadContext">
+            <summary>This type '{0}' was not loaded by the MetadataLoadContext that loaded the generic type or method.</summary>
+        </member>
+        <member name="P:System.SR.ManifestResourceInfoReferencedBadModule">
+            <summary>A manifest resource entry specified a filename that does not appear in the assembly manifest: '{0}'.</summary>
+        </member>
+        <member name="P:System.SR.MetadataLoadContextDisposed">
+            <summary>This object is no longer valid because the MetadataLoadContext that created it has been disposed.</summary>
+        </member>
+        <member name="P:System.SR.MissingCustomAttributeConstructor">
+            <summary>The constructor invoked by a custom attribute cannot be found on type '{0}'.</summary>
+        </member>
+        <member name="P:System.SR.ModuleResolveEventReturnedExternalModule">
+            <summary>ModuleResolve handlers may only return Modules loaded by the MetadataLoadContext that loaded the parent assembly.</summary>
+        </member>
+        <member name="P:System.SR.NoInvokeMember">
+            <summary>Types loaded by a MetadataLoadContext cannot pass any of these BindingFlags: InvokeMethod, CreateInstance, GetProperty, SetProperty.</summary>
+        </member>
+        <member name="P:System.SR.NoMetadataInPeImage">
+            <summary>This PE image is not a managed executable.</summary>
+        </member>
+        <member name="P:System.SR.NotAClause">
+            <summary>This ExceptionHandlingClause is not a clause.</summary>
+        </member>
+        <member name="P:System.SR.NotAFilter">
+            <summary>This ExceptionHandlingClause is not a filter.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_AssemblyCodeBase">
+            <summary>The CodeBase property is not supported on assemblies loaded by a MetadataLoadContext. Use Assembly.Location to find the origin of an Assembly.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_CaseInsensitive">
+            <summary>Passing true for ignoreCase is not supported on assemblies loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_FunctionPointers">
+            <summary>Parsing function pointer types in signatures is not supported.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_GetBaseDefinition">
+            <summary>GetBaseDefinition() is not supported on assemblies loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_InterfaceMapping">
+            <summary>InterfaceMapping is not supported on assemblies loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_MakeGenericType_SignatureTypes">
+            <summary>Passing signature types to this implementation of MakeGenericType() is not supported.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_MDStreamVersion">
+            <summary>MDStreamVersion is not supported on assemblies loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_ResolvingTokens">
+            <summary>Resolving tokens is not supported on assemblies loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.ResourceOnlyModule">
+            <summary>The requested operation cannot be used on a module that returns true for IsResource().</summary>
+        </member>
+        <member name="P:System.SR.SpecifiedFileNameInvalid">
+            <summary>The module or file name '{0}' is not specified in the assembly's manifest.</summary>
+        </member>
+        <member name="P:System.SR.NotSupported_SatelliteAssembly">
+            <summary>Satellite assemblies are not supported on assemblies loaded by a MetadataLoadContext.</summary>
+        </member>
+        <member name="P:System.SR.TypeNotFound">
+            <summary>Could not find type '{0}' in assembly '{1}'.</summary>
+        </member>
+        <member name="P:System.SR.UnexpectedUnderlyingEnumType">
+            <summary>Enum '{0}' has invalid underlying type '{1}'.</summary>
+        </member>
+        <member name="P:System.SR.UnableToDetermineCoreAssembly">
+            <summary>Could not find core assembly. Either specify a valid core assembly name in the MetadataLoadContext constructor or provide a MetadataAssemblyResolver that can load the core assembly.</summary>
+        </member>
+        <member name="P:System.SR.Arg_InvalidPath">
+            <summary>The path '{0}' is not valid.</summary>
+        </member>
+    </members>
+</doc>

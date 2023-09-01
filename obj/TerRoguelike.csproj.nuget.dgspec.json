@@ -1,0 +1,69 @@
+{
+  "format": 1,
+  "restore": {
+    "C:\\Users\\Mike\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\TerRoguelike\\TerRoguelike.csproj": {}
+  },
+  "projects": {
+    "C:\\Users\\Mike\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\TerRoguelike\\TerRoguelike.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Mike\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\TerRoguelike\\TerRoguelike.csproj",
+        "projectName": "TerRoguelike",
+        "projectPath": "C:\\Users\\Mike\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\TerRoguelike\\TerRoguelike.csproj",
+        "packagesPath": "C:\\Users\\Mike\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Mike\\Documents\\My Games\\Terraria\\tModLoader\\ModSources\\TerRoguelike\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Mike\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "dependencies": {
+            "tModLoader.CodeAssist": {
+              "target": "Package",
+              "version": "[0.1.*, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
