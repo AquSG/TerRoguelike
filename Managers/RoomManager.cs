@@ -53,7 +53,7 @@ namespace TerRoguelike.Managers
                 string mapKey = selectedRoom.Key;
                 var schematic = TileMaps[mapKey];
 
-                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X), (int)previousRoom.RoomPosition.Y);
+                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)previousRoom.RoomPosition.Y);
                 Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
                 SchematicAnchor anchorType = SchematicAnchor.TopLeft;
 
@@ -70,7 +70,7 @@ namespace TerRoguelike.Managers
                 string mapKey = selectedRoom.Key;
                 var schematic = TileMaps[mapKey];
 
-                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X), (int)previousRoom.RoomPosition.Y);
+                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)previousRoom.RoomPosition.Y);
                 Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
                 SchematicAnchor anchorType = SchematicAnchor.TopLeft;
 

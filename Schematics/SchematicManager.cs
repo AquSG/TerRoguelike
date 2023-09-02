@@ -30,6 +30,7 @@ namespace TerRoguelike.Schematics
                 [RoomID[0].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[0].Filename),
                 [RoomID[1].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[1].Filename),
                 [RoomID[2].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[2].Filename),
+                [RoomID[5].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[5].Filename),
             };
         }
         internal static void Unload()
