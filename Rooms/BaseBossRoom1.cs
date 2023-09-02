@@ -11,18 +11,14 @@ using Terraria.ID;
 
 namespace TerRoguelike.Rooms
 {
-    public class DefaultRoom : Room
+    public class BaseBossRoom1 : Room
     {
-        public override int ID => 0;
+        public override int ID => 5;
         public override string Key => "DefaultRoom";
         public override string Filename => "Schematics/RoomSchematics/DefaultRoom.csch";
         public override void InitializeRoom()
         {
-            active = false;
-        }
-        public override void Update()
-        {
-            active = false;
+            AddRoomNPC(0, new Vector2(320, (RoomDimensions.Y * 16f) - 32f), NPCID.Paladin, 60, 120, 0.9f);
         }
     }
 }

@@ -17,9 +17,10 @@ namespace TerRoguelike.Managers
 {
     public class RoomManager
     {
-        public static List<Room> BaseRooms = new List<Room>();
+        public static List<Room> BaseRooms;
         public static void GenerateRoomStructure()
         {
+            BaseRooms = new List<Room>();
             SetBaseRoomIDs();
             int roomCount = 5;
             string mapKey = RoomID[0].Key;
@@ -46,28 +47,47 @@ namespace TerRoguelike.Managers
         {
             roomCount--;
             if (roomCount == 0)
-                return;
+            {
+                var selectedRoom = RoomID[5];
+                string mapKey = selectedRoom.Key;
+                var schematic = TileMaps[mapKey];
 
-            var selectedRoom = BaseRooms[Main.rand.Next(BaseRooms.Count)];
-            string mapKey = selectedRoom.Key;
-            var schematic = TileMaps[mapKey];
+                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X), (int)previousRoom.RoomPosition.Y);
+                Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+                SchematicAnchor anchorType = SchematicAnchor.TopLeft;
 
-            Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X), (int)previousRoom.RoomPosition.Y);
-            Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
-            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
+                selectedRoom.RoomPosition = placementPoint.ToVector2();
+                selectedRoom.RoomDimensions = schematicSize;
+                RoomSystem.NewRoom(selectedRoom);
 
-            selectedRoom.RoomPosition = placementPoint.ToVector2();
-            selectedRoom.RoomDimensions = schematicSize;
-            RoomSystem.NewRoom(selectedRoom);
+                PlaceSchematic(mapKey, placementPoint, anchorType);
+            }
+            else
+            {
+                var selectedRoom = BaseRooms[Main.rand.Next(BaseRooms.Count)];
+                BaseRooms.Remove(selectedRoom);
+                string mapKey = selectedRoom.Key;
+                var schematic = TileMaps[mapKey];
 
-            PlaceSchematic(mapKey, placementPoint, anchorType);
+                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X), (int)previousRoom.RoomPosition.Y);
+                Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+                SchematicAnchor anchorType = SchematicAnchor.TopLeft;
 
-            PlaceRoomRight(roomCount, selectedRoom);
+                selectedRoom.RoomPosition = placementPoint.ToVector2();
+                selectedRoom.RoomDimensions = schematicSize;
+                RoomSystem.NewRoom(selectedRoom);
+
+                PlaceSchematic(mapKey, placementPoint, anchorType);
+
+                PlaceRoomRight(roomCount, selectedRoom);
+            }
         }
         public static void SetBaseRoomIDs()
         {
             BaseRooms.Add(RoomID[1]);
             BaseRooms.Add(RoomID[2]);
+            BaseRooms.Add(RoomID[3]);
+            BaseRooms.Add(RoomID[4]);
         }
     }
 }
