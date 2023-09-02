@@ -20,6 +20,7 @@ namespace TerRoguelike.Managers
         public static List<Room> BaseRooms;
         public static void GenerateRoomStructure()
         {
+            RoomSystem.RoomList = new List<Room>();
             BaseRooms = new List<Room>();
             SetBaseRoomIDs();
             int roomCount = 5;

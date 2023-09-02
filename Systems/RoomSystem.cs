@@ -17,13 +17,19 @@ namespace TerRoguelike.Systems
 {
     public class RoomSystem : ModSystem
     {
-        public static List<Room> RoomList = new List<Room>();
+        public static List<Room> RoomList;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
         }
         public override void PostUpdateWorld()
         {
+            if (RoomList == null)
+                return;
+
+            if (!RoomList.Any())
+                return;
+
             foreach (Room room in RoomList)
             {
                 if (room == null)
@@ -40,6 +46,9 @@ namespace TerRoguelike.Systems
         }
         public override void SaveWorldData(TagCompound tag)
         {
+            if (RoomList == null)
+                return;
+
             var roomIDs = new List<int>();
             var roomPositions = new List<Vector2>();
 
@@ -53,10 +62,11 @@ namespace TerRoguelike.Systems
             }
             tag["roomIDs"] = roomIDs;
             tag["roomPositions"] = roomPositions;
-            RoomList.Clear();
+            RoomList = null;
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            RoomList = new List<Room>();
             int loopcount = 0;
             var roomIDs = tag.GetList<int>("roomIDs");
             var roomPositions = tag.GetList<Vector2>("roomPositions");

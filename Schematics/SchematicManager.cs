@@ -36,6 +36,7 @@ namespace TerRoguelike.Schematics
         {
             TileMaps = null;
             PilePlacementMaps = null;
+            RoomID = null;
         }
         #endregion
 
