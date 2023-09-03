@@ -12,9 +12,9 @@ namespace TerRoguelike.Managers
 {
     public class SpawnManager
     {
-        public static void SpawnEnemy(int npcType, Vector2 position, int telegraphDuration, float telegraphSize = 1f)
+        public static void SpawnEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 1f)
         {
-            Projectile.NewProjectile(Projectile.GetSource_NaturalSpawn(), position, Vector2.Zero, ModContent.ProjectileType<EnemySpawningProjectile>(), 0, 0f, -1, telegraphDuration, telegraphSize, npcType);
+            Projectile.NewProjectile(Projectile.GetSource_NaturalSpawn(), position, Vector2.Zero, ModContent.ProjectileType<EnemySpawningProjectile>(), 0, (float)roomListID, -1, telegraphDuration, telegraphSize, npcType);
         }
     }
 }

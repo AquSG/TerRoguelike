@@ -5,8 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
+using TerRoguelike.NPCs;
+using Terraria.Chat;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.Managers
 {
@@ -15,6 +19,7 @@ namespace TerRoguelike.Managers
         public virtual string Key => null;
         public virtual string Filename => null;
         public virtual int ID => -1;
+        public int myRoom;
         public bool initialized = false;
         public bool awake = false;
         public bool active = true;
@@ -27,6 +32,10 @@ namespace TerRoguelike.Managers
         public int[] TimeUntilSpawn = new int[RoomSpawnCap];
         public int[] TelegraphDuration = new int[RoomSpawnCap];
         public float[] TelegraphSize = new float[RoomSpawnCap];
+        public bool[] NotSpawned = new bool[RoomSpawnCap];
+        public bool anyAlive = true;
+        public int roomClearGraceTime = -1;
+        public int lastTelegraphDuration;
         public virtual void AddRoomNPC(int arrayLocation, Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0)
         {
             NPCSpawnPosition[arrayLocation] = npcSpawnPosition + (RoomPosition * 16f);
@@ -36,6 +45,7 @@ namespace TerRoguelike.Managers
             if (telegraphSize == 0)
                 telegraphSize = 1f;
             TelegraphSize[arrayLocation] = telegraphSize;
+            NotSpawned[arrayLocation] = true;
         }
         public virtual void Update()
         {
@@ -45,18 +55,73 @@ namespace TerRoguelike.Managers
             if (!initialized)
                 InitializeRoom();
 
+
             roomTime++;
             for (int i = 0; i < RoomSpawnCap; i++)
             {
                 if (TimeUntilSpawn[i] - roomTime == 0)
-                    SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], TelegraphDuration[i], TelegraphSize[i]);
+                {
+                    SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
+                    lastTelegraphDuration = TelegraphDuration[i];
+                    NotSpawned[i] = false;
+                } 
             }
-            if (roomTime > 7200)
+            bool cancontinue = true;
+            for (int i = 0; i < RoomSpawnCap; i++)
+            {
+                if (NotSpawned[i] == true)
+                {
+                    if (TimeUntilSpawn[i] - roomTime <= 0)
+                    {
+                        NotSpawned[i] = false;
+                        continue;
+                    } 
+                    cancontinue = false;
+                    break;
+                }
+            }
+
+            if (cancontinue)
+            {
+                if (roomClearGraceTime == -1)
+                {
+                    roomClearGraceTime += lastTelegraphDuration + 60;
+                }
+                if (roomClearGraceTime > 0)
+                    roomClearGraceTime--;
+
+                anyAlive = false;
+                for (int npc = 0; npc < Main.maxNPCs; npc++)
+                {
+                    if (Main.npc[npc] == null)
+                        continue;
+                    if (!Main.npc[npc].active)
+                        continue;
+
+                    if (!Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC)
+                        continue;
+
+                    if (Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID == myRoom)
+                    {
+                        anyAlive = true;
+                        break;
+                    }
+                }
+            }
+            if (!anyAlive && roomClearGraceTime == 0)
+            {
                 active = false;
+                Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)RoomPosition.X * 16, (int)RoomPosition.Y * 16, (int)RoomDimensions.X * 16, (int)RoomDimensions.Y * 16), ItemID.Confetti);
+                Main.NewText("roomListID " + myRoom.ToString() + " completed!");
+            }
         }
         public virtual void InitializeRoom()
         {
             initialized = true;
+            for (int i = 0; i < NotSpawned.Length; i++)
+            {
+                NotSpawned[i] = false;
+            }
         }
     }
 }

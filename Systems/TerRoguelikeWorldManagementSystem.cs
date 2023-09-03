@@ -26,7 +26,6 @@ namespace TerRoguelike.Systems
         }
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
-            //tasks.Clear();
             tasks.Add(new PassLegacy("Building the Map", (progress, config) =>
             {
                 progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
@@ -34,13 +33,6 @@ namespace TerRoguelike.Systems
                 Main.spawnTileX = (Main.maxTilesX / 2) + 12;
                 Main.spawnTileY = (Main.maxTilesY / 2) + 12;
             }));
-            //tasks.Insert(taskCounter, new PassLegacy("Building the Map", (progress, config) =>
-            //{
-                //progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
-                //RoomManager.GenerateRoomStructure();
-               // Main.spawnTileX = (Main.maxTilesX / 2) + 12;
-               // Main.spawnTileY = (Main.maxTilesY / 2) + 12;
-            //}));
         }
     }
 }

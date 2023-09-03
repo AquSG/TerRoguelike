@@ -11,6 +11,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using Terraria.ModLoader.IO;
 using Microsoft.Xna.Framework;
+using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Systems
@@ -30,9 +31,13 @@ namespace TerRoguelike.Systems
             if (!RoomList.Any())
                 return;
 
+            int loopCount = -1;
             foreach (Room room in RoomList)
             {
+                loopCount++;
                 if (room == null)
+                    continue;
+                if (!room.active)
                     continue;
 
                 bool roomXcheck = Main.player[Main.myPlayer].Center.X > room.RoomPosition.X * 16f && Main.player[Main.myPlayer].Center.X < (room.RoomPosition.X + room.RoomDimensions.X) * 16f;
@@ -40,9 +45,12 @@ namespace TerRoguelike.Systems
                 if (roomXcheck && roomYcheck)
                     room.awake = true;
 
+                room.myRoom = loopCount;
                 room.Update();
+
             }
-            RoomList.RemoveAll(room => !room.active);
+            //RoomList.RemoveAll(room => !room.active);
+
         }
         public override void SaveWorldData(TagCompound tag)
         {

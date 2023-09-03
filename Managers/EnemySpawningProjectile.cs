@@ -7,6 +7,10 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerRoguelike.NPCs;
+using TerRoguelike.Systems;
+using TerRoguelike.Managers;
+using Terraria.Chat;
 
 namespace TerRoguelike.Managers
 {
@@ -31,7 +35,9 @@ namespace TerRoguelike.Managers
             if (telegraphDuration == 0)
             {
                 effectScale *= 2f;
-                NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.position.X, (int)Projectile.position.Y, (int)npc);
+                int spawnedNpc = NPC.NewNPC(Projectile.GetSource_FromThis(), (int)Projectile.position.X, (int)Projectile.position.Y, (int)npc);
+                Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
+                Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = (int)Projectile.knockBack;
                 for (int i = 0; i < 15; i++)
                 {
                     Dust dust = Dust.NewDustDirect(Projectile.position - new Vector2(15f * effectScale, 15f * effectScale), (int)(30 * effectScale), (int)(30 * effectScale), DustID.CrystalPulse, Scale: 1f);
@@ -40,5 +46,7 @@ namespace TerRoguelike.Managers
                 Projectile.Kill();
             }
         }
+
+        public override bool? CanDamage() => false;
     }
 }
