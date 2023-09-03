@@ -11,6 +11,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.NPCs;
 using Terraria.Chat;
 using TerRoguelike.Systems;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Managers
 {
@@ -36,6 +37,7 @@ namespace TerRoguelike.Managers
         public bool anyAlive = true;
         public int roomClearGraceTime = -1;
         public int lastTelegraphDuration;
+        public bool wallActive = false;
         public virtual void AddRoomNPC(int arrayLocation, Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0)
         {
             NPCSpawnPosition[arrayLocation] = npcSpawnPosition + (RoomPosition * 16f);
@@ -55,6 +57,7 @@ namespace TerRoguelike.Managers
             if (!initialized)
                 InitializeRoom();
 
+            wallActive = true;
             WallUpdate();
 
             roomTime++;
@@ -114,6 +117,7 @@ namespace TerRoguelike.Managers
                 active = false;
                 Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)RoomPosition.X * 16, (int)RoomPosition.Y * 16, (int)RoomDimensions.X * 16, (int)RoomDimensions.Y * 16), ItemID.Confetti);
                 Main.NewText("roomListID " + myRoom.ToString() + " completed!");
+                wallActive = false;
             }
         }
         public virtual void InitializeRoom()
@@ -152,6 +156,44 @@ namespace TerRoguelike.Managers
                 {
                     player.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - (float)player.height;
                     player.velocity.Y = 0;
+                }
+
+            }
+            for(int npcID = 0; npcID < Main.maxNPCs; npcID++)
+            {
+                var npc = Main.npc[npcID];
+                if (npc == null)
+                    continue;
+                if (!npc.active)
+                    continue;
+                if (!npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC)
+                    continue;
+                if (npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID != myRoom)
+                    continue;
+
+                bool boundLeft = (npc.position.X + npc.velocity.X) < (RoomPosition.X + 1f) * 16f;
+                bool boundRight = (npc.position.X + (float)npc.width + npc.velocity.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
+                bool boundTop = (npc.position.Y + npc.velocity.Y) < (RoomPosition.Y + 1f) * 16f;
+                bool boundBottom = (npc.position.Y + (float)npc.height + npc.velocity.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
+                if (boundLeft)
+                {
+                    npc.position.X = (RoomPosition.X + 1f) * 16f;
+                    npc.velocity.X = 0;
+                }
+                if (boundRight)
+                {
+                    npc.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f) - (float)npc.width;
+                    npc.velocity.X = 0;
+                }
+                if (boundTop)
+                {
+                    npc.position.Y = (RoomPosition.Y + 1f) * 16f;
+                    npc.velocity.Y = 0;
+                }
+                if (boundBottom)
+                {
+                    npc.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - (float)npc.height;
+                    npc.velocity.Y = 0;
                 }
             }
         }

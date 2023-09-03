@@ -13,6 +13,7 @@ using Terraria.ModLoader.IO;
 using Microsoft.Xna.Framework;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Systems
 {
@@ -104,6 +105,50 @@ namespace TerRoguelike.Systems
             RoomID[id].NotSpawned = new bool[Room.RoomSpawnCap];
             RoomID[id].anyAlive = true;
             RoomID[id].roomClearGraceTime = -1;
+            RoomID[id].wallActive = false;
+        }
+        public override void PostDrawTiles()
+        {
+            /*
+            Texture2D lightTexture = ModContent.Request<Texture2D>("TerRoguelike/Tiles/TemporaryBlock").Value;
+            foreach (Room room in RoomList)
+            {
+                if (room == null)
+                    continue;
+
+                if (!room.active)
+                    continue;
+
+                if (room.wallActive)
+                {
+                    for (float side = 0; side < 2; side++)
+                    {
+                        for (float i = 0; i < room.RoomDimensions.X; i++)
+                        {
+                            Vector2 drawPosition = (room.RoomPosition + new Vector2(i, side * room.RoomDimensions.Y)) * 16f + new Vector2(8f, 8f);
+                            float rotation = MathHelper.Pi + (MathHelper.Pi * side);
+
+                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, Color.White, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+
+                            Main.spriteBatch.End();
+                        }
+                        for (float i = 0; i < room.RoomDimensions.Y; i++)
+                        {
+                            Vector2 drawPosition = (room.RoomPosition + new Vector2(side * room.RoomDimensions.X, i)) * 16f + new Vector2(8f, 8f);
+                            float rotation = MathHelper.PiOver2 + (MathHelper.Pi * side);
+
+                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, Color.White, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+
+                            Main.spriteBatch.End();
+                        }
+                    }
+                }
+            }
+            */
         }
     }
 }
