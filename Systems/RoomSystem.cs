@@ -47,7 +47,6 @@ namespace TerRoguelike.Systems
 
                 room.myRoom = loopCount;
                 room.Update();
-
             }
             if (RoomList.All(check => !check.active))
                 RoomList.RemoveAll(room => !room.active);
@@ -105,6 +104,6 @@ namespace TerRoguelike.Systems
             RoomID[id].NotSpawned = new bool[Room.RoomSpawnCap];
             RoomID[id].anyAlive = true;
             RoomID[id].roomClearGraceTime = -1;
-    }
+        }
     }
 }

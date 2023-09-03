@@ -55,6 +55,7 @@ namespace TerRoguelike.Managers
             if (!initialized)
                 InitializeRoom();
 
+            WallUpdate();
 
             roomTime++;
             for (int i = 0; i < RoomSpawnCap; i++)
@@ -121,6 +122,37 @@ namespace TerRoguelike.Managers
             for (int i = 0; i < NotSpawned.Length; i++)
             {
                 NotSpawned[i] = false;
+            }
+        }
+        public void WallUpdate()
+        {
+            for (int playerID = 0; playerID < Main.maxPlayers; playerID++)
+            {
+                var player = Main.player[playerID];
+                bool boundLeft = (player.position.X + player.velocity.X) < (RoomPosition.X + 1f) * 16f;
+                bool boundRight = (player.position.X + (float)player.width + player.velocity.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
+                bool boundTop = (player.position.Y + player.velocity.Y) < (RoomPosition.Y + 1f) * 16f;
+                bool boundBottom = (player.position.Y + (float)player.height + player.velocity.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
+                if (boundLeft)
+                {
+                    player.position.X = (RoomPosition.X + 1f) * 16f;
+                    player.velocity.X = 0;
+                }
+                if (boundRight)
+                {
+                    player.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f) - (float)player.width;
+                    player.velocity.X = 0;
+                }
+                if (boundTop)
+                {
+                    player.position.Y = (RoomPosition.Y + 1f) * 16f;
+                    player.velocity.Y = 0;
+                }
+                if (boundBottom)
+                {
+                    player.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - (float)player.height;
+                    player.velocity.Y = 0;
+                }
             }
         }
     }
