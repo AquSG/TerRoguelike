@@ -166,6 +166,12 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new BaseEnemyRoom4());
             RoomID.Add(new BaseBossRoom1());
         }
+
+        public static void ReloadRoomIDs()
+        {
+            RoomID.Clear();
+            LoadRoomIDs();
+        }
         #endregion
     }
 }

@@ -49,7 +49,8 @@ namespace TerRoguelike.Systems
                 room.Update();
 
             }
-            //RoomList.RemoveAll(room => !room.active);
+            if (RoomList.All(check => !check.active))
+                RoomList.RemoveAll(room => !room.active);
 
         }
         public override void SaveWorldData(TagCompound tag)
@@ -74,6 +75,7 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            //ReloadRoomIDs();
             RoomList = new List<Room>();
             int loopcount = 0;
             var roomIDs = tag.GetList<int>("roomIDs");
@@ -85,8 +87,24 @@ namespace TerRoguelike.Systems
                 
                 RoomList.Add(RoomID[id]);
                 RoomList[loopcount].RoomPosition = roomPositions[loopcount];
+                ResetRoomID(id);
                 loopcount++;
             }
         }
+        public static void ResetRoomID(int id)
+        {
+            RoomID[id].active = true;
+            RoomID[id].initialized = false;
+            RoomID[id].awake = false;
+            RoomID[id].roomTime = 0;
+            RoomID[id].NPCSpawnPosition = new Vector2[Room.RoomSpawnCap];
+            RoomID[id].NPCToSpawn = new int[Room.RoomSpawnCap];
+            RoomID[id].TimeUntilSpawn = new int[Room.RoomSpawnCap];
+            RoomID[id].TelegraphDuration = new int[Room.RoomSpawnCap];
+            RoomID[id].TelegraphSize = new float[Room.RoomSpawnCap];
+            RoomID[id].NotSpawned = new bool[Room.RoomSpawnCap];
+            RoomID[id].anyAlive = true;
+            RoomID[id].roomClearGraceTime = -1;
+    }
     }
 }
