@@ -26,6 +26,7 @@ namespace TerRoguelike.Managers
         public bool active = true;
         public Vector2 RoomDimensions;
         public int roomTime;
+        public int closedTime;
         public const int RoomSpawnCap = 200;
         public Vector2 RoomPosition;
         public Vector2[] NPCSpawnPosition = new Vector2[RoomSpawnCap];
@@ -57,7 +58,15 @@ namespace TerRoguelike.Managers
             if (!initialized)
                 InitializeRoom();
 
-            wallActive = true;
+            if (closedTime <= 60)
+                wallActive = true;
+
+            if (!active)
+            {
+                closedTime++;
+                return;
+            }
+                
             WallUpdate();
 
             roomTime++;
@@ -116,8 +125,6 @@ namespace TerRoguelike.Managers
             {
                 active = false;
                 Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)RoomPosition.X * 16, (int)RoomPosition.Y * 16, (int)RoomDimensions.X * 16, (int)RoomDimensions.Y * 16), ItemID.Confetti);
-                Main.NewText("roomListID " + myRoom.ToString() + " completed!");
-                wallActive = false;
             }
         }
         public virtual void InitializeRoom()
