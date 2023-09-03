@@ -40,8 +40,8 @@ namespace TerRoguelike.Systems
                 if (!room.active)
                     continue;
 
-                bool roomXcheck = Main.player[Main.myPlayer].Center.X > room.RoomPosition.X * 16f && Main.player[Main.myPlayer].Center.X < (room.RoomPosition.X + room.RoomDimensions.X) * 16f;
-                bool roomYcheck = Main.player[Main.myPlayer].Center.Y > room.RoomPosition.Y * 16f && Main.player[Main.myPlayer].Center.Y < (room.RoomPosition.Y + room.RoomDimensions.Y) * 16f;
+                bool roomXcheck = Main.player[Main.myPlayer].Center.X - (Main.player[Main.myPlayer].width / 2f) > (room.RoomPosition.X + 1f) * 16f && Main.player[Main.myPlayer].Center.X + (Main.player[Main.myPlayer].width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f;
+                bool roomYcheck = Main.player[Main.myPlayer].Center.Y - (Main.player[Main.myPlayer].height / 2f) > (room.RoomPosition.Y + 1f) * 16f && Main.player[Main.myPlayer].Center.Y + (Main.player[Main.myPlayer].height / 2f) < (room.RoomPosition.Y - (15f/16f) + room.RoomDimensions.Y) * 16f;
                 if (roomXcheck && roomYcheck)
                     room.awake = true;
 
