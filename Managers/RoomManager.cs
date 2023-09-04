@@ -81,7 +81,7 @@ namespace TerRoguelike.Managers
                 {
                     if (oldRoomDirections.Count > 2)
                     {
-                        if (oldRoomDirections[oldRoomDirections.Count - 2] != 1)
+                        if (oldRoomDirections[oldRoomDirections.Count - 3] != 2)
                             directionsAvailable.Add(1);
                     }
                     else
@@ -92,7 +92,7 @@ namespace TerRoguelike.Managers
                 {
                     if (oldRoomDirections.Count > 2)
                     {
-                        if (oldRoomDirections[oldRoomDirections.Count - 2] != 2)
+                        if (oldRoomDirections[oldRoomDirections.Count - 3] != 1)
                             directionsAvailable.Add(2);
                     }
                     else
