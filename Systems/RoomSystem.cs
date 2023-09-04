@@ -40,8 +40,10 @@ namespace TerRoguelike.Systems
                 if (room == null)
                     continue;
 
-                bool roomXcheck = Main.player[Main.myPlayer].Center.X - (Main.player[Main.myPlayer].width / 2f) > (room.RoomPosition.X + 1f) * 16f && Main.player[Main.myPlayer].Center.X + (Main.player[Main.myPlayer].width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f;
-                bool roomYcheck = Main.player[Main.myPlayer].Center.Y - (Main.player[Main.myPlayer].height / 2f) > (room.RoomPosition.Y + 1f) * 16f && Main.player[Main.myPlayer].Center.Y + (Main.player[Main.myPlayer].height / 2f) < (room.RoomPosition.Y - (15f/16f) + room.RoomDimensions.Y) * 16f;
+                var player = Main.player[Main.myPlayer];
+
+                bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f;
+                bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f/16f) + room.RoomDimensions.Y) * 16f;
                 if (roomXcheck && roomYcheck)
                     room.awake = true;
 
@@ -108,7 +110,9 @@ namespace TerRoguelike.Systems
         }
         public override void PostDrawTiles()
         {
-            
+            if (RoomList == null)
+                return;
+
             Texture2D lightTexture = ModContent.Request<Texture2D>("TerRoguelike/Tiles/TemporaryBlock").Value;
             foreach (Room room in RoomList)
             {

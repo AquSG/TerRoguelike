@@ -16,6 +16,8 @@ namespace TerRoguelike.Rooms
         public override int ID => 0;
         public override string Key => "DefaultRoom";
         public override string Filename => "Schematics/RoomSchematics/DefaultRoom.csch";
+        public override bool CanExitRight => true;
+        public override bool CanExitDown => true;
         public override void InitializeRoom()
         {
             active = false;

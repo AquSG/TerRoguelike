@@ -11,11 +11,11 @@ using Terraria.ID;
 
 namespace TerRoguelike.Rooms
 {
-    public class BaseEnemyRoom4 : Room
+    public class BaseEnemyRoom4Up : Room
     {
-        public override int ID => 7;
-        public override string Key => "BaseEnemyRoom4";
-        public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom4.csch";
+        public override int ID => 9;
+        public override string Key => "BaseEnemyRoom4Up";
+        public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom4Up.csch";
         public override bool CanExitRight => true;
         public override bool CanExitDown => true;
         public override bool CanExitUp => true;

@@ -31,6 +31,13 @@ namespace TerRoguelike.Schematics
                 [RoomID[1].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[1].Filename),
                 [RoomID[2].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[2].Filename),
                 [RoomID[5].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[5].Filename),
+                [RoomID[6].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[6].Filename),
+                [RoomID[7].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[7].Filename),
+                [RoomID[8].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[8].Filename),
+                [RoomID[9].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[9].Filename),
+                [RoomID[10].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[10].Filename),
+                [RoomID[11].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[11].Filename),
+                [RoomID[12].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[12].Filename),
             };
         }
         internal static void Unload()
@@ -162,15 +169,16 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new DefaultRoom());
             RoomID.Add(new BaseEnemyRoom1());
             RoomID.Add(new BaseEnemyRoom2());
-            RoomID.Add(new BaseEnemyRoom3());
-            RoomID.Add(new BaseEnemyRoom4());
+            RoomID.Add(new BaseEnemyRoom1Var1());
+            RoomID.Add(new BaseEnemyRoom2Var1());
             RoomID.Add(new BaseBossRoom1());
-        }
-
-        public static void ReloadRoomIDs()
-        {
-            RoomID.Clear();
-            LoadRoomIDs();
+            RoomID.Add(new BaseEnemyRoom3Up());
+            RoomID.Add(new BaseEnemyRoom4());
+            RoomID.Add(new BaseEnemyRoom4Down());
+            RoomID.Add(new BaseEnemyRoom4Up());
+            RoomID.Add(new BaseEnemyRoom5());
+            RoomID.Add(new BaseEnemyRoom5Down());
+            RoomID.Add(new BaseEnemyRoom5Up());
         }
         #endregion
     }
