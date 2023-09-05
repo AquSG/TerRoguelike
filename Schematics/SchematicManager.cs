@@ -38,6 +38,9 @@ namespace TerRoguelike.Schematics
                 [RoomID[10].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[10].Filename),
                 [RoomID[11].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[11].Filename),
                 [RoomID[12].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[12].Filename),
+                [RoomID[13].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[13].Filename),
+                [RoomID[14].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[14].Filename),
+                [RoomID[15].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[15].Filename),
             };
         }
         internal static void Unload()
@@ -179,6 +182,9 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new BaseEnemyRoom5());
             RoomID.Add(new BaseEnemyRoom5Down());
             RoomID.Add(new BaseEnemyRoom5Up());
+            RoomID.Add(new BaseEnemyRoom6());
+            RoomID.Add(new BaseEnemyRoom6Down());
+            RoomID.Add(new BaseEnemyRoom6Up());
         }
         #endregion
     }

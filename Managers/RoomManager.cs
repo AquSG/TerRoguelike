@@ -27,7 +27,7 @@ namespace TerRoguelike.Managers
             oldRoomDirections = new List<int>();
             SetAllBaseRoomIDs();
 
-            int roomCount = 9;
+            int roomCount = 8;
             string mapKey = RoomID[0].Key;
             var schematic = TileMaps[mapKey];
 
@@ -130,12 +130,14 @@ namespace TerRoguelike.Managers
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
 
-            Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)previousRoom.RoomPosition.Y);
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+            selectedRoom.RoomDimensions = schematicSize;
+
+            Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y));
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;
 
             selectedRoom.RoomPosition = placementPoint.ToVector2();
-            selectedRoom.RoomDimensions = schematicSize;
+            
             RoomSystem.NewRoom(selectedRoom);
 
             PlaceSchematic(mapKey, placementPoint, anchorType);
@@ -149,12 +151,16 @@ namespace TerRoguelike.Managers
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
 
-            Point placementPoint = new Point((int)previousRoom.RoomPosition.X, (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - 1));
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
-            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
-
-            selectedRoom.RoomPosition = placementPoint.ToVector2();
             selectedRoom.RoomDimensions = schematicSize;
+
+            Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - selectedRoom.RoomDimensions.X), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - 1));
+            if (placementPoint.X < (int)previousRoom.RoomPosition.X)
+                placementPoint.X = (int)previousRoom.RoomPosition.X;
+
+            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
+            selectedRoom.RoomPosition = placementPoint.ToVector2();
+            
             RoomSystem.NewRoom(selectedRoom);
 
             PlaceSchematic(mapKey, placementPoint, anchorType);
@@ -168,12 +174,16 @@ namespace TerRoguelike.Managers
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
 
-            Point placementPoint = new Point((int)previousRoom.RoomPosition.X, (int)(previousRoom.RoomPosition.Y - previousRoom.RoomDimensions.Y + 1));
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
-            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
-
-            selectedRoom.RoomPosition = placementPoint.ToVector2();
             selectedRoom.RoomDimensions = schematicSize;
+
+            Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - selectedRoom.RoomDimensions.X), (int)(previousRoom.RoomPosition.Y - selectedRoom.RoomDimensions.Y + 1));
+            if (placementPoint.X < (int)previousRoom.RoomPosition.X)
+                placementPoint.X = (int)previousRoom.RoomPosition.X;
+
+            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
+            selectedRoom.RoomPosition = placementPoint.ToVector2();
+            
             RoomSystem.NewRoom(selectedRoom);
 
             PlaceSchematic(mapKey, placementPoint, anchorType);
@@ -197,17 +207,20 @@ namespace TerRoguelike.Managers
             BaseRoomRight.Add(RoomID[4]);
             BaseRoomRight.Add(RoomID[7]);
             BaseRoomRight.Add(RoomID[10]);
+            BaseRoomRight.Add(RoomID[13]);
         }
         public static void SetBaseRoomDownIDs()
         {
             BaseRoomDown.Add(RoomID[8]);
             BaseRoomDown.Add(RoomID[11]);
+            BaseRoomDown.Add(RoomID[14]);
         }
         public static void SetBaseRoomUpIDs()
         {
             BaseRoomUp.Add(RoomID[6]);
             BaseRoomUp.Add(RoomID[9]);
             BaseRoomUp.Add(RoomID[12]);
+            BaseRoomUp.Add(RoomID[15]);
         }
     }
 }

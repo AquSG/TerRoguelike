@@ -18,7 +18,6 @@ namespace TerRoguelike.Rooms
         public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom5Down.csch";
         public override bool CanExitRight => true;
         public override bool CanExitDown => true;
-        public override bool CanExitUp => true;
         public override void InitializeRoom()
         {
             AddRoomNPC(0, new Vector2(48f, 72f), NPCID.BoneLee, 60, 120, 0.45f);
