@@ -18,6 +18,7 @@ namespace TerRoguelike.Rooms
         public override string Filename => "Schematics/RoomSchematics/BaseBossRoom1.csch";
         public override void InitializeRoom()
         {
+            base.InitializeRoom();
             AddRoomNPC(0, new Vector2(320, (RoomDimensions.Y * 16f) - 32f), NPCID.Paladin, 60, 120, 0.9f);
         }
     }

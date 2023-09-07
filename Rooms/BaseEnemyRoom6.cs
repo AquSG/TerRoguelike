@@ -21,6 +21,7 @@ namespace TerRoguelike.Rooms
         public override bool CanExitUp => true;
         public override void InitializeRoom()
         {
+            base.InitializeRoom();
             AddRoomNPC(0, new Vector2((RoomDimensions.X * 16f / 2f) - 48, 48f), NPCID.GiantBat, 60, 120, 0.45f);
             AddRoomNPC(1, new Vector2((RoomDimensions.X * 16f / 2f) + 48, 48f), NPCID.GiantBat, 60, 120, 0.45f);
             AddRoomNPC(2, new Vector2((RoomDimensions.X * 16f / 4f), 48f), NPCID.GiantBat, 240, 120, 0.45f);

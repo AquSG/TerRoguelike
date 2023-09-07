@@ -87,11 +87,6 @@ namespace TerRoguelike.Managers
             {
                 if (NotSpawned[i] == true)
                 {
-                    if (TimeUntilSpawn[i] - roomTime <= 0)
-                    {
-                        NotSpawned[i] = false;
-                        continue;
-                    } 
                     cancontinue = false;
                     break;
                 }
