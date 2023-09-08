@@ -16,6 +16,7 @@ namespace TerRoguelike.Rooms
         public override int ID => 5;
         public override string Key => "BaseBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/BaseBossRoom1.csch";
+        public override bool IsBossRoom => true;
         public override void InitializeRoom()
         {
             base.InitializeRoom();

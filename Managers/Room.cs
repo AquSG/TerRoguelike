@@ -23,6 +23,7 @@ namespace TerRoguelike.Managers
         public virtual bool CanExitRight => false;
         public virtual bool CanExitDown => false;
         public virtual bool CanExitUp => false;
+        public virtual bool IsBossRoom => false;
         public int myRoom;
         public bool initialized = false;
         public bool awake = false;

@@ -118,9 +118,55 @@ namespace TerRoguelike.Systems
             {
                 if (room == null)
                     continue;
-
-                if (!room.awake || room.closedTime > 60)
+                if (!room.awake)
                     continue;
+
+                if (room.closedTime > 60)
+                {
+                    if (room.IsBossRoom)
+                    {
+                        bool canDraw = false;
+                        for (int i = 0; i < Main.maxPlayers; i++)
+                        {
+                            if (Vector2.Distance(Main.player[i].Center, (room.RoomPosition + new Vector2(room.RoomDimensions.X, 0)) * 16f) < 2500f)
+                            {
+                                canDraw = true;
+                                break;
+                            }
+                        }
+                        if (!canDraw)
+                            continue;
+
+                        for (float i = 0; i < room.RoomDimensions.Y; i++)
+                        {
+                            Vector2 targetBlock = room.RoomPosition + new Vector2(room.RoomDimensions.X - 2, i);
+                            if (Main.tile[targetBlock.ToPoint()].TileType != TileID.Platforms)
+                            {
+                                if (Main.tile[targetBlock.ToPoint()].HasTile)
+                                    continue;
+                            }
+
+                            Color color = Color.Cyan;
+
+                            color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255, (room.closedTime - 120) / 60f), 0, 255);
+
+                            Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(0, -16f);
+                            float rotation = MathHelper.PiOver2;
+
+                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+
+                            Main.spriteBatch.End();
+
+                            float scale = MathHelper.Clamp(MathHelper.Lerp(0.85f, 0.75f, (room.closedTime - 120f) / 60f), 0.75f, 0.85f);
+
+                            if (Main.rand.NextBool((int)MathHelper.Clamp(MathHelper.Lerp(30f, 8f, (room.closedTime - 60f) / 120f), 8f, 20f)))
+                                Dust.NewDustDirect((targetBlock * 16f) + new Vector2(10f, 0), 2, 16, 206, Scale: scale);
+                        }
+                    }
+                    continue;
+                }
 
                 if (room.wallActive)
                 {
