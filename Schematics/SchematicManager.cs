@@ -41,7 +41,54 @@ namespace TerRoguelike.Schematics
                 [RoomID[13].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[13].Filename),
                 [RoomID[14].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[14].Filename),
                 [RoomID[15].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[15].Filename),
+                [RoomID[16].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[16].Filename),
+                [RoomID[17].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[17].Filename),
+                [RoomID[18].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[18].Filename),
+                [RoomID[19].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[19].Filename),
+                [RoomID[20].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[20].Filename),
+                [RoomID[21].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[21].Filename),
+                [RoomID[22].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[22].Filename),
+                [RoomID[23].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[23].Filename),
+                [RoomID[24].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[24].Filename),
+                [RoomID[25].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[25].Filename),
+                [RoomID[26].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[26].Filename),
+                [RoomID[27].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[27].Filename),
+                [RoomID[28].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[28].Filename),
+                [RoomID[29].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[29].Filename),
             };
+        }
+        public static void LoadRoomIDs()
+        {
+            RoomID.Add(new DefaultRoom());
+            RoomID.Add(new BaseEnemyRoom1());
+            RoomID.Add(new BaseEnemyRoom2());
+            RoomID.Add(new BaseEnemyRoom1Var1());
+            RoomID.Add(new BaseEnemyRoom2Var1());
+            RoomID.Add(new BaseBossRoom1());
+            RoomID.Add(new BaseEnemyRoom3Up());
+            RoomID.Add(new BaseEnemyRoom4());
+            RoomID.Add(new BaseEnemyRoom4Down());
+            RoomID.Add(new BaseEnemyRoom4Up());
+            RoomID.Add(new BaseEnemyRoom5());
+            RoomID.Add(new BaseEnemyRoom5Down());
+            RoomID.Add(new BaseEnemyRoom5Up());
+            RoomID.Add(new BaseEnemyRoom6());
+            RoomID.Add(new BaseEnemyRoom6Down());
+            RoomID.Add(new BaseEnemyRoom6Up());
+            RoomID.Add(new CrimsonStartRoom());
+            RoomID.Add(new CrimsonEnemyRoom1());
+            RoomID.Add(new CrimsonEnemyRoom2());
+            RoomID.Add(new CrimsonEnemyRoom2Up());
+            RoomID.Add(new CrimsonEnemyRoom3Down());
+            RoomID.Add(new CrimsonEnemyRoom3Up());
+            RoomID.Add(new CrimsonEnemyRoom4());
+            RoomID.Add(new CrimsonEnemyRoom4Up());
+            RoomID.Add(new CrimsonEnemyRoom5());
+            RoomID.Add(new CrimsonEnemyRoom5Down());
+            RoomID.Add(new CrimsonEnemyRoom5Up());
+            RoomID.Add(new CrimsonEnemyRoom6Down());
+            RoomID.Add(new CrimsonEnemyRoom7());
+            RoomID.Add(new CrimsonBossRoom1());
         }
         internal static void Unload()
         {
@@ -166,25 +213,6 @@ namespace TerRoguelike.Schematics
                     Rectangle placeInArea = new Rectangle(x, y, width, height);
                     pilePlacementFunction?.Invoke(x + cornerX, y + cornerY, placeInArea);
                 }
-        }
-        public static void LoadRoomIDs()
-        {
-            RoomID.Add(new DefaultRoom());
-            RoomID.Add(new BaseEnemyRoom1());
-            RoomID.Add(new BaseEnemyRoom2());
-            RoomID.Add(new BaseEnemyRoom1Var1());
-            RoomID.Add(new BaseEnemyRoom2Var1());
-            RoomID.Add(new BaseBossRoom1());
-            RoomID.Add(new BaseEnemyRoom3Up());
-            RoomID.Add(new BaseEnemyRoom4());
-            RoomID.Add(new BaseEnemyRoom4Down());
-            RoomID.Add(new BaseEnemyRoom4Up());
-            RoomID.Add(new BaseEnemyRoom5());
-            RoomID.Add(new BaseEnemyRoom5Down());
-            RoomID.Add(new BaseEnemyRoom5Up());
-            RoomID.Add(new BaseEnemyRoom6());
-            RoomID.Add(new BaseEnemyRoom6Down());
-            RoomID.Add(new BaseEnemyRoom6Up());
         }
         #endregion
     }

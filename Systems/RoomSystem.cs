@@ -75,7 +75,6 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
-            //ReloadRoomIDs();
             RoomList = new List<Room>();
             int loopcount = 0;
             var roomIDs = tag.GetList<int>("roomIDs");
