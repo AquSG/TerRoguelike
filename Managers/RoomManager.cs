@@ -150,6 +150,9 @@ namespace TerRoguelike.Managers
                         directionsAvailable.Add(2);
                 }
 
+                if (!directionsAvailable.Any())
+                    PlaceRoom(roomCount + 1, previousRoom);
+
                 int chosenDirection = directionsAvailable[Main.rand.Next(directionsAvailable.Count)];
 
                 if (chosenDirection == 1)
@@ -297,7 +300,7 @@ namespace TerRoguelike.Managers
             string mapKey = floorStartingRoom.Key;
             var schematic = TileMaps[mapKey];
 
-            Point placementPoint = new Point((int)previousRoom.RoomPosition.X + 200, (int)StartRoomIDs[0].RoomPosition.Y);
+            Point placementPoint = new Point((int)previousRoom.RoomPosition.X + 200, Main.maxTilesY / 2);
 
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;

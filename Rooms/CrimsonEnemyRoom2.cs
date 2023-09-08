@@ -22,9 +22,14 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(0, new Vector2(64f, 72f), NPCID.BlueArmoredBones, 60, 120, 0.45f);
-            AddRoomNPC(1, new Vector2((RoomDimensions.X * 16f) - 64f, 72f), NPCID.BlueArmoredBones, 60, 120, 0.45f);
-            AddRoomNPC(2, new Vector2((RoomDimensions.X * 16f) - 32f, (RoomDimensions.Y * 16f) - 32f), NPCID.TacticalSkeleton, 360, 120, 0.45f);
+            AddRoomNPC(0, new Vector2((RoomDimensions.X * 16f) / 3f, (RoomDimensions.Y * 16f) - 32f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
+            AddRoomNPC(1, new Vector2((RoomDimensions.X * 16f) - 64f, (RoomDimensions.Y * 16f) - 32f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
+            AddRoomNPC(2, new Vector2((RoomDimensions.X * 16f) - 128f, (RoomDimensions.Y * 16f) - 32f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
+            AddRoomNPC(3, new Vector2(72f, 32f), NPCID.IchorSticker, 60, 120, 0.45f);
+            AddRoomNPC(4, new Vector2((RoomDimensions.X * 16f / 2f) - 48f, (RoomDimensions.Y * 16f) / 4f), NPCID.Crimera, 60, 120, 0.45f);
+            AddRoomNPC(5, new Vector2((RoomDimensions.X * 16f / 2f) - 96f, (RoomDimensions.Y * 16f / 4f) + 20f), NPCID.Crimera, 60, 120, 0.45f);
+            AddRoomNPC(6, new Vector2((RoomDimensions.X * 16f / 2f), (RoomDimensions.Y * 16f / 4f) - 20f), NPCID.Crimera, 60, 120, 0.45f);
+            AddRoomNPC(7, new Vector2((RoomDimensions.X * 16f / 2f), (RoomDimensions.Y * 16f / 2f)), NPCID.CrimsonAxe, 60, 120, 0.6f);
         }
     }
 }

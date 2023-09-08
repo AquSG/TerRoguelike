@@ -41,11 +41,18 @@ namespace TerRoguelike.Systems
                     continue;
 
                 var player = Main.player[Main.myPlayer];
-
+                
                 bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f;
                 bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f/16f) + room.RoomDimensions.Y) * 16f;
                 if (roomXcheck && roomYcheck)
+                {
                     room.awake = true;
+                    bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
+                    if (teleportCheck)
+                    {
+                        player.position = new Vector2(player.position.X + (178 * 16f), (Main.maxTilesY * 16f / 2f) + 72f);
+                    }
+                }
 
                 room.myRoom = loopCount;
                 room.Update();
