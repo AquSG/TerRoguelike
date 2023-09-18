@@ -32,6 +32,7 @@ namespace TerRoguelike.Systems
                 RoomManager.GenerateRoomStructure();
                 Main.spawnTileX = (Main.maxTilesX / 8) + 12;
                 Main.spawnTileY = (Main.maxTilesY / 2) + 12;
+                ItemManager.RoomRewardCooldown = 0;
             }));
         }
     }

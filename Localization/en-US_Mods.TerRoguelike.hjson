@@ -1,1 +1,87 @@
-Projectiles.EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile
+Projectiles: {
+	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile
+	ItemSpawningProjectile.DisplayName: Item Spawning Projectile
+}
+
+Items: {
+	CommonCombatItem: {
+		DisplayName: Common Combat Item
+		Tooltip:
+			'''
+			5% increased damage
+			Extra copies of this item also grant 5% increased damage
+			'''
+	}
+
+	CommonHealingItem: {
+		DisplayName: Common Healing Item
+		Tooltip:
+			'''
+			+0.5 HP/s
+			Extra copies of this item also grant +0.5 HP/s
+			'''
+	}
+
+	CommonUtilityItem: {
+		DisplayName: Common Utility Item
+		Tooltip:
+			'''
+			5% increased movement speed
+			Extra copies of this item also grant 5% increased movement speed
+			'''
+	}
+
+	RareCombatItem: {
+		DisplayName: Rare Combat Item
+		Tooltip:
+			'''
+			60% increased damage
+			Extra copies of this item also grant 60% increased damage
+			'''
+	}
+
+	RareHealingItem: {
+		DisplayName: Rare Healing Item
+		Tooltip:
+			'''
+			+6 HP/s
+			Extra copies of this item also grant +6 HP/s
+			'''
+	}
+
+	RareUtilityItem: {
+		DisplayName: Rare Utility Item
+		Tooltip:
+			'''
+			60% increased movement speed
+			Extra copies of this item also grant 60% increased movement speed
+			'''
+	}
+
+	UncommonCombatItem: {
+		DisplayName: Uncommon Combat Item
+		Tooltip:
+			'''
+			15% increased damage
+			Extra copies of this item also grant 15% increased damage
+			'''
+	}
+
+	UncommonHealingItem: {
+		DisplayName: Uncommon Healing Item
+		Tooltip:
+			'''
+			+1.5 HP/s
+			Extra copies of this item also grant +1.5 HP/s
+			'''
+	}
+
+	UncommonUtilityItem: {
+		DisplayName: Uncommon Utility Item
+		Tooltip:
+			'''
+			15% increased damage
+			Extra copies of this item also grant 15% increased damage
+			'''
+	}
+}

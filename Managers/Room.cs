@@ -123,7 +123,7 @@ namespace TerRoguelike.Managers
             if (!anyAlive && roomClearGraceTime == 0)
             {
                 active = false;
-                Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)RoomPosition.X * 16, (int)RoomPosition.Y * 16, (int)RoomDimensions.X * 16, (int)RoomDimensions.Y * 16), ItemID.Confetti);
+                RoomClearReward();
             }
         }
         public virtual void InitializeRoom()
@@ -165,7 +165,7 @@ namespace TerRoguelike.Managers
                 }
 
             }
-            for(int npcID = 0; npcID < Main.maxNPCs; npcID++)
+            for (int npcID = 0; npcID < Main.maxNPCs; npcID++)
             {
                 var npc = Main.npc[npcID];
                 if (npc == null)
@@ -202,6 +202,51 @@ namespace TerRoguelike.Managers
                     npc.velocity.Y = 0;
                 }
             }
+        }
+        public void RoomClearReward()
+        {
+            int chance = Main.rand.Next(1, 101);
+            int itemType;
+            int itemTier;
+
+            if (IsBossRoom)
+            {
+                if (chance <= 80)
+                {
+                    itemType = ItemManager.GiveUncommon(false);
+                    itemTier = 1;
+                }
+                else
+                {
+                    itemType = ItemManager.GiveRare(false);
+                    itemTier = 2;
+                }
+                Projectile.NewProjectile(Projectile.GetSource_NaturalSpawn(), (RoomPosition + (RoomDimensions / 2f)) * 16f, Vector2.Zero, ModContent.ProjectileType<ItemSpawningProjectile>(), 0, itemTier, ai0: 75f, ai1: 0.5f, ai2: itemType);
+                return;
+            }
+
+            if (ItemManager.RoomRewardCooldown > 0)
+            {
+                ItemManager.RoomRewardCooldown--;
+                return;
+            }
+                
+            if (chance <= 80)
+            {
+                itemType = ItemManager.GiveCommon();
+                itemTier = 0;
+            }
+            else if (chance <= 98)
+            {
+                itemType = ItemManager.GiveUncommon();
+                itemTier = 1;
+            }
+            else
+            {
+                itemType = ItemManager.GiveRare();
+                itemTier = 2;
+            }
+            Projectile.NewProjectile(Projectile.GetSource_NaturalSpawn(), (RoomPosition + (RoomDimensions / 2f)) * 16f, Vector2.Zero, ModContent.ProjectileType<ItemSpawningProjectile>(), 0, itemTier, ai0: 75f, ai1: 0.5f, ai2: itemType);
         }
     }
 }

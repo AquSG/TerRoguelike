@@ -58,8 +58,10 @@ namespace TerRoguelike.Systems
                 room.Update();
             }
             if (RoomList.All(check => !check.active && check.closedTime > 60))
+            {
+                Main.NewText("oh fuck roomlist cleared");
                 RoomList.RemoveAll(room => !room.active);
-
+            }
         }
         public override void SaveWorldData(TagCompound tag)
         {
@@ -79,13 +81,16 @@ namespace TerRoguelike.Systems
             }
             tag["roomIDs"] = roomIDs;
             tag["roomPositions"] = roomPositions;
+            tag["roomRewardCooldown"] = ItemManager.RoomRewardCooldown;
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            ItemManager.PastRoomRewardCategories = new List<int>();
             RoomList = new List<Room>();
             int loopcount = 0;
             var roomIDs = tag.GetList<int>("roomIDs");
             var roomPositions = tag.GetList<Vector2>("roomPositions");
+            ItemManager.RoomRewardCooldown = tag.GetInt("roomRewardCooldown");
             foreach (int id in roomIDs)
             {
                 if (id == -1)

@@ -5,6 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Core;
+using Terraria.GameContent.ItemDropRules;
+using Terraria.ID;
+using TerRoguelike;
 
 namespace TerRoguelike.NPCs
 {
@@ -14,5 +18,23 @@ namespace TerRoguelike.NPCs
         public int sourceRoomListID = -1;
 
         public override bool InstancePerEntity => true;
+        public override bool PreKill(NPC npc)
+        {
+            if (!isRoomNPC)
+                return true;
+
+            var AllLoadedItemIDs = new int[ItemLoader.ItemCount];
+            for (int i = 0; i < ItemLoader.ItemCount; i++)
+            {
+                AllLoadedItemIDs[i] = i;
+            }
+            foreach (int itemID in AllLoadedItemIDs)
+            {
+                NPCLoader.blockLoot.Add(itemID);
+            }
+            npc.value = 0;
+            
+            return true;
+        }
     }
 }
