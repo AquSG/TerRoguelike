@@ -34,16 +34,13 @@ namespace TerRoguelike.Managers
             currentFloor = 0;
             RoomSystem.RoomList = new List<Room>();
             oldRoomDirections = new List<int>();
-            SetStartRoomIDs();
-            SetBossRoomIDs();
-            SetAllBaseRoomIDs();
-            SetAllCrimsonRoomIDs();
+            SetAllRoomIDs();
 
             int roomCount = 8;
             string mapKey = RoomID[0].Key;
             var schematic = TileMaps[mapKey];
 
-            int startpositionX = Main.maxTilesX / 8;
+            int startpositionX = Main.maxTilesX / 32;
             int startpositionY = Main.maxTilesY / 2;
 
             Point placementPoint = new Point(startpositionX, startpositionY);
@@ -151,7 +148,7 @@ namespace TerRoguelike.Managers
                 }
 
                 if (!directionsAvailable.Any())
-                    PlaceRoom(roomCount + 1, previousRoom);
+                    PlaceRoom(1, previousRoom);
 
                 int chosenDirection = directionsAvailable[Main.rand.Next(directionsAvailable.Count)];
 
@@ -313,6 +310,13 @@ namespace TerRoguelike.Managers
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
             PlaceRoom(roomCount, floorStartingRoom);
+        }
+        public static void SetAllRoomIDs()
+        {
+            SetStartRoomIDs();
+            SetBossRoomIDs();
+            SetAllBaseRoomIDs();
+            SetAllCrimsonRoomIDs();
         }
         public static void SetStartRoomIDs()
         {

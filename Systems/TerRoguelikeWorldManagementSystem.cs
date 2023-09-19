@@ -30,7 +30,7 @@ namespace TerRoguelike.Systems
             {
                 progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
                 RoomManager.GenerateRoomStructure();
-                Main.spawnTileX = (Main.maxTilesX / 8) + 12;
+                Main.spawnTileX = (Main.maxTilesX / 32) + 12;
                 Main.spawnTileY = (Main.maxTilesY / 2) + 12;
                 ItemManager.RoomRewardCooldown = 0;
             }));

@@ -57,11 +57,6 @@ namespace TerRoguelike.Systems
                 room.myRoom = loopCount;
                 room.Update();
             }
-            if (RoomList.All(check => !check.active && check.closedTime > 60))
-            {
-                Main.NewText("oh fuck roomlist cleared");
-                RoomList.RemoveAll(room => !room.active);
-            }
         }
         public override void SaveWorldData(TagCompound tag)
         {
@@ -70,6 +65,7 @@ namespace TerRoguelike.Systems
 
             var roomIDs = new List<int>();
             var roomPositions = new List<Vector2>();
+            var roomDimensions = new List<Vector2>();
 
             foreach (Room room in RoomList)
             {
@@ -78,19 +74,19 @@ namespace TerRoguelike.Systems
 
                 roomIDs.Add(room.ID);
                 roomPositions.Add(room.RoomPosition);
+                roomDimensions.Add(room.RoomDimensions);
             }
             tag["roomIDs"] = roomIDs;
             tag["roomPositions"] = roomPositions;
-            tag["roomRewardCooldown"] = ItemManager.RoomRewardCooldown;
+            tag["roomDimensions"] = roomDimensions;
         }
         public override void LoadWorldData(TagCompound tag)
         {
-            ItemManager.PastRoomRewardCategories = new List<int>();
             RoomList = new List<Room>();
             int loopcount = 0;
             var roomIDs = tag.GetList<int>("roomIDs");
             var roomPositions = tag.GetList<Vector2>("roomPositions");
-            ItemManager.RoomRewardCooldown = tag.GetInt("roomRewardCooldown");
+            var roomDimensions = tag.GetList<Vector2>("roomDimensions");
             foreach (int id in roomIDs)
             {
                 if (id == -1)
@@ -98,6 +94,7 @@ namespace TerRoguelike.Systems
                 
                 RoomList.Add(RoomID[id]);
                 RoomList[loopcount].RoomPosition = roomPositions[loopcount];
+                RoomList[loopcount].RoomDimensions = roomDimensions[loopcount];
                 ResetRoomID(id);
                 loopcount++;
             }
