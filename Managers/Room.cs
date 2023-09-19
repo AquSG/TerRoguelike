@@ -221,7 +221,7 @@ namespace TerRoguelike.Managers
                     itemType = ItemManager.GiveRare(false);
                     itemTier = 2;
                 }
-                Projectile.NewProjectile(Projectile.GetSource_NaturalSpawn(), (RoomPosition + (RoomDimensions / 2f)) * 16f, Vector2.Zero, ModContent.ProjectileType<ItemSpawningProjectile>(), 0, itemTier, ai0: 75f, ai1: 0.5f, ai2: itemType);
+                SpawnManager.SpawnItem(itemType, (RoomPosition + (RoomDimensions / 2f)) * 16f, itemTier, 75, 0.5f);
                 return;
             }
 
@@ -246,7 +246,7 @@ namespace TerRoguelike.Managers
                 itemType = ItemManager.GiveRare();
                 itemTier = 2;
             }
-            Projectile.NewProjectile(Projectile.GetSource_NaturalSpawn(), (RoomPosition + (RoomDimensions / 2f)) * 16f, Vector2.Zero, ModContent.ProjectileType<ItemSpawningProjectile>(), 0, itemTier, ai0: 75f, ai1: 0.5f, ai2: itemType);
+            SpawnManager.SpawnItem(itemType, (RoomPosition + (RoomDimensions / 2f)) * 16f, itemTier, 75, 0.5f);
         }
     }
 }

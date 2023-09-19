@@ -27,6 +27,8 @@ namespace TerRoguelike.Systems
         }
         public override void PostUpdateWorld()
         {
+            SpawnManager.UpdateSpawnManager();
+
             if (RoomList == null)
                 return;
 
@@ -82,6 +84,16 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            if (SpawnManager.pendingEnemies != null)
+                SpawnManager.pendingEnemies.Clear();
+            else
+                SpawnManager.pendingEnemies = new List<PendingEnemy>();
+
+            if (SpawnManager.pendingItems != null)
+                SpawnManager.pendingItems.Clear();
+            else
+                SpawnManager.pendingItems = new List<PendingItem>();
+
             RoomList = new List<Room>();
             int loopcount = 0;
             var roomIDs = tag.GetList<int>("roomIDs");

@@ -1,5 +1,7 @@
 using Terraria.ModLoader;
 using TerRoguelike.Schematics;
+using static TerRoguelike.Managers.SpawnManager;
+using static TerRoguelike.Systems.RoomSystem;
 
 namespace TerRoguelike
 {
@@ -15,6 +17,9 @@ namespace TerRoguelike
         {
             Instance = null;
             SchematicManager.Unload();
+            RoomList = null;
+            pendingEnemies = null;
+            pendingItems = null;
         }
     }
 }
