@@ -9,6 +9,8 @@ using Terraria.ID;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.Rooms;
+using Microsoft.Xna.Framework;
+using TerRoguelike.Projectiles;
 
 namespace TerRoguelike.Player
 {
@@ -16,6 +18,7 @@ namespace TerRoguelike.Player
     {
         #region Variables
         public int commonCombatItem;
+        public int clingyGrenade;
         public int commonHealingItem;
         public int commonUtilityItem;
         public int uncommonCombatItem;
@@ -28,6 +31,7 @@ namespace TerRoguelike.Player
         public override void PreUpdate()
         {
             commonCombatItem = 0;
+            clingyGrenade = 0;
             commonHealingItem = 0;
             commonUtilityItem = 0;
             uncommonCombatItem = 0;
@@ -85,6 +89,37 @@ namespace TerRoguelike.Player
             {
                 float speedIncrease = rareUtilityItem * 0.60f;
                 Player.moveSpeed += speedIncrease;
+            }
+        }
+
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (clingyGrenade > 0 && !proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously)
+            {
+                int chance;
+                chance = clingyGrenade * 5;
+                if (chance > Main.rand.Next(1, 101))
+                {
+                    float radius;
+                    if (target.width < target.height)
+                        radius = (float)target.width;
+                    else
+                        radius = (float)target.height;
+
+                    radius *= 0.4f;
+
+                    Vector2 direction = (proj.Center - target.Center).SafeNormalize(Vector2.UnitY);
+                    Vector2 spawnPosition = (direction * radius) + target.Center;
+                    int damage = (int)(hit.Damage * 1.5f);
+                    if (hit.Crit)
+                        damage /= 2;
+
+                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_None(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<ClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
+                    if (hit.Crit)
+                        Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously = true;
+                    Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously = true;
+
+                }
             }
         }
     }

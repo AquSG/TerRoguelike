@@ -1,6 +1,8 @@
 Projectiles: {
 	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile
 	ItemSpawningProjectile.DisplayName: Item Spawning Projectile
+	ClingyGrenade.DisplayName: Clingy Grenade
+	ClingyGrenadeExplosion.DisplayName: Clingy Grenade Explosion
 }
 
 Items: {
@@ -82,6 +84,16 @@ Items: {
 			'''
 			15% increased damage
 			Extra copies of this item also grant 15% increased damage
+			'''
+	}
+
+	ClingyGrenade: {
+		DisplayName: Clingy Grenade
+		Tooltip:
+			'''
+			5% chance upon hitting an enemy to stick a clingy grenade to them
+			Clingy grenades explode in a small area for 150% total damage after a short delay
+			Extra copies of this item further increase the chance by 5%
 			'''
 	}
 }
