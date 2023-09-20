@@ -13,12 +13,17 @@ namespace TerRoguelike.Projectiles
     {
         public override bool InstancePerEntity => true;
 
+        public bool originalHit = true;
         public bool critPreviously = false;
         public bool clingyGrenadePreviously = false;
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
             if (critPreviously)
                 modifiers.SetCrit();
+            else if (!originalHit)
+            {
+                modifiers.DisableCrit();
+            }
         }
     }
 }

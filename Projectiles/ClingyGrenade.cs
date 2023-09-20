@@ -80,6 +80,7 @@ namespace TerRoguelike.Projectiles
             if (Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously)
                 Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously = true;
             Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously = true;
+            Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().originalHit = false;
 
             SoundEngine.PlaySound(SoundID.Item110, Projectile.Center);
             return true;

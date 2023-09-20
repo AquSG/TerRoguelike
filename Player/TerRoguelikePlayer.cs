@@ -118,6 +118,7 @@ namespace TerRoguelike.Player
                     if (hit.Crit)
                         Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously = true;
                     Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously = true;
+                    Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().originalHit = false;
 
                 }
             }
