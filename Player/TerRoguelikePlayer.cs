@@ -46,6 +46,7 @@ namespace TerRoguelike.Player
         public override void UpdateEquips()
         {
             Player.noFallDmg = true;
+            Player.GetCritChance(DamageClass.Generic) -= 3f;
 
             if (commonCombatItem > 0)
             {

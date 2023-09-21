@@ -3,6 +3,7 @@ Projectiles: {
 	ItemSpawningProjectile.DisplayName: Item Spawning Projectile
 	ClingyGrenade.DisplayName: Clingy Grenade
 	ClingyGrenadeExplosion.DisplayName: Clingy Grenade Explosion
+	AdaptiveGunHoldout.DisplayName: Adaptive Gun Holdout
 }
 
 Items: {
@@ -103,6 +104,15 @@ Items: {
 			'''
 			10% increased critical strike chance
 			Extra copies of this item also grant 10% increased critical strike chance
+			'''
+	}
+
+	AdaptiveGun: {
+		DisplayName: Adaptive Gun
+		Tooltip:
+			'''
+			Your trusty gun for this journey
+			Can be messed with in countless ways by the items you may find
 			'''
 	}
 }

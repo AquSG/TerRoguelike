@@ -89,19 +89,19 @@ namespace TerRoguelike.Managers
             }
             else
             {
-                if ((float)PastRoomRewardCategories.FindAll(x => x == 0).Count() / (float)PastRoomRewardCategories.Count() > 1f / 6f)
+                if ((float)PastRoomRewardCategories.FindAll(x => x == 0).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
                     combatChance = 50;
                     healingChance = 25;
                     utilityChance = 25;
                 }
-                else if ((float)PastRoomRewardCategories.FindAll(x => x == 1).Count() / (float)PastRoomRewardCategories.Count() > 1f / 6f)
+                else if ((float)PastRoomRewardCategories.FindAll(x => x == 1).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
                     combatChance = 25;
                     healingChance = 50;
                     utilityChance = 25;
                 }
-                else if ((float)PastRoomRewardCategories.FindAll(x => x == 2).Count() / (float)PastRoomRewardCategories.Count() > 1f / 6f)
+                else if ((float)PastRoomRewardCategories.FindAll(x => x == 2).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
                     combatChance = 25;
                     healingChance = 25;
