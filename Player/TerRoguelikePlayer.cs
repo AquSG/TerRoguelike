@@ -19,6 +19,7 @@ namespace TerRoguelike.Player
         #region Variables
         public int commonCombatItem;
         public int clingyGrenade;
+        public int criticalSights;
         public int commonHealingItem;
         public int commonUtilityItem;
         public int uncommonCombatItem;
@@ -32,6 +33,7 @@ namespace TerRoguelike.Player
         {
             commonCombatItem = 0;
             clingyGrenade = 0;
+            criticalSights = 0;
             commonHealingItem = 0;
             commonUtilityItem = 0;
             uncommonCombatItem = 0;
@@ -49,6 +51,11 @@ namespace TerRoguelike.Player
             {
                 float damageIncrease = commonCombatItem * 0.05f;
                 Player.GetDamage(DamageClass.Generic) += damageIncrease;
+            }
+            if (criticalSights > 0)
+            {
+                float critIncrease = criticalSights * 10f;
+                Player.GetCritChance(DamageClass.Generic) += critIncrease;
             }
             if (commonHealingItem > 0)
             {

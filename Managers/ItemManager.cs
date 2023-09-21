@@ -28,11 +28,11 @@ namespace TerRoguelike.Managers
             int chosenItem;
             int category = ChooseCategory();
             if (category == 0)
-                chosenItem = CommonCombatItems[Main.rand.Next(CommonCombatItems.Count - 1)];
+                chosenItem = CommonCombatItems[Main.rand.Next(CommonCombatItems.Count)];
             else if (category == 1)
-                chosenItem = CommonHealingItems[Main.rand.Next(CommonHealingItems.Count - 1)];
+                chosenItem = CommonHealingItems[Main.rand.Next(CommonHealingItems.Count)];
             else
-                chosenItem = CommonUtilityItems[Main.rand.Next(CommonUtilityItems.Count - 1)];
+                chosenItem = CommonUtilityItems[Main.rand.Next(CommonUtilityItems.Count)];
 
             return chosenItem;
         }
@@ -44,11 +44,11 @@ namespace TerRoguelike.Managers
             int chosenItem;
             int category = ChooseCategory();
             if (category == 0)
-                chosenItem = UncommonCombatItems[Main.rand.Next(UncommonCombatItems.Count - 1)];
+                chosenItem = UncommonCombatItems[Main.rand.Next(UncommonCombatItems.Count)];
             else if (category == 1)
-                chosenItem = UncommonHealingItems[Main.rand.Next(UncommonHealingItems.Count - 1)];
+                chosenItem = UncommonHealingItems[Main.rand.Next(UncommonHealingItems.Count)];
             else
-                chosenItem = UncommonUtilityItems[Main.rand.Next(UncommonUtilityItems.Count - 1)];
+                chosenItem = UncommonUtilityItems[Main.rand.Next(UncommonUtilityItems.Count)];
 
             return chosenItem;
         }
@@ -60,11 +60,11 @@ namespace TerRoguelike.Managers
             int chosenItem;
             int category = ChooseCategory();
             if (category == 0)
-                chosenItem = RareCombatItems[Main.rand.Next(RareCombatItems.Count - 1)];
+                chosenItem = RareCombatItems[Main.rand.Next(RareCombatItems.Count)];
             else if (category == 1)
-                chosenItem = RareHealingItems[Main.rand.Next(RareHealingItems.Count - 1)];
+                chosenItem = RareHealingItems[Main.rand.Next(RareHealingItems.Count)];
             else
-                chosenItem = RareUtilityItems[Main.rand.Next(RareUtilityItems.Count - 1)];
+                chosenItem = RareUtilityItems[Main.rand.Next(RareUtilityItems.Count)];
 
             return chosenItem;
         }
@@ -126,7 +126,7 @@ namespace TerRoguelike.Managers
         public static List<int> CommonCombatItems = new List<int>()
         {
             ModContent.ItemType<ClingyGrenade>(),
-            ModContent.ItemType<ClingyGrenade>()
+            ModContent.ItemType<CriticalSights>()
         };
         public static List<int> CommonHealingItems = new List<int>()
         {

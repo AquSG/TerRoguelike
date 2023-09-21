@@ -96,4 +96,13 @@ Items: {
 			Extra copies of this item further increase the chance by 5%
 			'''
 	}
+
+	CriticalSights: {
+		DisplayName: Critical Sights
+		Tooltip:
+			'''
+			10% increased critical strike chance
+			Extra copies of this item also grant 10% increased critical strike chance
+			'''
+	}
 }
