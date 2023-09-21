@@ -20,6 +20,7 @@ namespace TerRoguelike.Projectiles
         public ref float Charge => ref Projectile.ai[0];
 
         public Terraria.Player Owner => Main.player[Projectile.owner];
+        public int bulletsspawnedthisframe = 0;
 
 
 
@@ -75,7 +76,7 @@ namespace TerRoguelike.Projectiles
             float mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
             Vector2 direction = (mainAngle).ToRotationVector2();
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
-            Charge = -20f;
+            Charge += -20f;
             if (Charge > 0f)
                 ShootBullet();
         }

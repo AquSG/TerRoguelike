@@ -78,16 +78,20 @@ namespace TerRoguelike.Player
                 Player.GetDamage(DamageClass.Generic) += damageIncrease;
             }
 
-            if (evilEye > 0 && evilEyeStacks.Any())
+            if (evilEye > 0)
             {
-                for (int i = 0; i < evilEyeStacks.Count; i++)
+                Player.GetCritChance(DamageClass.Generic) += 5;
+                if (evilEyeStacks.Any())
                 {
-                    evilEyeStacks[i]--;
+                    for (int i = 0; i < evilEyeStacks.Count; i++)
+                    {
+                        evilEyeStacks[i]--;
+                    }
+
+                    evilEyeStacks.RemoveAll(time => time <= 0);
+
+                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
                 }
-
-                evilEyeStacks.RemoveAll(time => time <= 0);
-
-                Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
             }
             else if (evilEyeStacks.Any())
                 evilEyeStacks.Clear();
