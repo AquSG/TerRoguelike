@@ -18,6 +18,8 @@ namespace TerRoguelike.Projectiles
         public bool clingyGrenadePreviously = false;
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
+            modifiers.DamageVariationScale *= 0;
+
             if (critPreviously)
                 modifiers.SetCrit();
             else if (!originalHit)

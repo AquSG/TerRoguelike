@@ -4,6 +4,7 @@ Projectiles: {
 	ClingyGrenade.DisplayName: Clingy Grenade
 	ClingyGrenadeExplosion.DisplayName: Clingy Grenade Explosion
 	AdaptiveGunHoldout.DisplayName: Adaptive Gun Holdout
+	AdaptiveGunBullet.DisplayName: Adaptive Gun Bullet
 }
 
 Items: {

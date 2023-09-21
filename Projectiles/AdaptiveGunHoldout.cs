@@ -62,7 +62,7 @@ namespace TerRoguelike.Projectiles
                 SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
                 float mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
                 Vector2 direction = (mainAngle).ToRotationVector2();
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 10f, ProjectileID.Bullet, Projectile.damage, 1f, Owner.whoAmI);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
                 Charge = -20f;
             }
 
