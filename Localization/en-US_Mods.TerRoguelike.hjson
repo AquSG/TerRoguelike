@@ -12,8 +12,8 @@ Items: {
 		DisplayName: Common Combat Item
 		Tooltip:
 			'''
-			5% increased damage
-			Extra copies of this item also grant 5% increased damage
+			5% increased attack speed
+			Extra copies of this item also grant 5% increased attack speed
 			'''
 	}
 
@@ -114,6 +114,17 @@ Items: {
 			'''
 			Your trusty gun for this journey
 			Can be messed with in countless ways by the items you may find
+			'''
+	}
+
+	EvilEye: {
+		DisplayName: Evil Eye
+		Tooltip:
+			'''
+			Critically striking an enemy grants you a stackable attack speed buff
+			Each stack lasts 3 seconds and grants 10% increased attack speed
+			However, the amount of stacks one can have is capped at 5
+			Extra copies of this item increase the stack cap by 2, and grant an extra 10% increased attack speed for every stack
 			'''
 	}
 }

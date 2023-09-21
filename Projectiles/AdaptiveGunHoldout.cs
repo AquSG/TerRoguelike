@@ -49,7 +49,11 @@ namespace TerRoguelike.Projectiles
             {
                 Projectile.timeLeft = 2;
                 Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
+                if (Owner.itemTime < 2)
+                    Owner.itemTime = 2;
                 Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
+                if (Owner.itemAnimation < 2)
+                    Owner.itemAnimation = 2;
                 Owner.heldProj = Projectile.whoAmI;
             }
 
@@ -59,14 +63,21 @@ namespace TerRoguelike.Projectiles
             
             if (Charge > 0f)
             {
-                SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
-                float mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
-                Vector2 direction = (mainAngle).ToRotationVector2();
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
-                Charge = -20f;
+                ShootBullet();
             }
 
             Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
+        }
+
+        public void ShootBullet()
+        {
+            SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
+            float mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
+            Vector2 direction = (mainAngle).ToRotationVector2();
+            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+            Charge = -20f;
+            if (Charge > 0f)
+                ShootBullet();
         }
     }
 }

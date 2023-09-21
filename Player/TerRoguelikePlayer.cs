@@ -23,11 +23,13 @@ namespace TerRoguelike.Player
         public int commonHealingItem;
         public int commonUtilityItem;
         public int uncommonCombatItem;
+        public int evilEye;
         public int uncommonHealingItem;
         public int uncommonUtilityItem;
         public int rareCombatItem;
         public int rareHealingItem;
         public int rareUtilityItem;
+        public List<int> evilEyeStacks = new List<int>();
         #endregion
         public override void PreUpdate()
         {
@@ -37,6 +39,7 @@ namespace TerRoguelike.Player
             commonHealingItem = 0;
             commonUtilityItem = 0;
             uncommonCombatItem = 0;
+            evilEye = 0;
             uncommonHealingItem = 0;
             uncommonUtilityItem = 0;
             rareCombatItem = 0;
@@ -51,7 +54,8 @@ namespace TerRoguelike.Player
             if (commonCombatItem > 0)
             {
                 float damageIncrease = commonCombatItem * 0.05f;
-                Player.GetDamage(DamageClass.Generic) += damageIncrease;
+                //Player.GetDamage(DamageClass.Generic) += damageIncrease;
+                Player.GetAttackSpeed(DamageClass.Generic) += damageIncrease;
             }
             if (criticalSights > 0)
             {
@@ -73,6 +77,21 @@ namespace TerRoguelike.Player
                 float damageIncrease = uncommonCombatItem * 0.15f;
                 Player.GetDamage(DamageClass.Generic) += damageIncrease;
             }
+
+            if (evilEye > 0 && evilEyeStacks.Any())
+            {
+                for (int i = 0; i < evilEyeStacks.Count; i++)
+                {
+                    evilEyeStacks[i]--;
+                }
+
+                evilEyeStacks.RemoveAll(time => time <= 0);
+
+                Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
+            }
+            else if (evilEyeStacks.Any())
+                evilEyeStacks.Clear();
+
             if (uncommonHealingItem > 0)
             {
                 int regenIncrease = uncommonHealingItem * 3;
@@ -129,6 +148,13 @@ namespace TerRoguelike.Player
                     Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().originalHit = false;
 
                 }
+            }
+            if (evilEye > 0 && hit.Crit)
+            {
+                if (evilEyeStacks == null)
+                    evilEyeStacks = new List<int>();
+
+                evilEyeStacks.Add(180);
             }
         }
     }

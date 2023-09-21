@@ -143,8 +143,8 @@ namespace TerRoguelike.Managers
         #region Uncommon Item Lists
         public static List<int> UncommonCombatItems = new List<int>()
         {
-            ModContent.ItemType<UncommonCombatItem>(),
-            ModContent.ItemType<UncommonCombatItem>()
+            ModContent.ItemType<EvilEye>(),
+            ModContent.ItemType<EvilEye>()
         };
         public static List<int> UncommonHealingItems = new List<int>()
         {

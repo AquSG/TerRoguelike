@@ -33,6 +33,8 @@ namespace TerRoguelike.Projectiles
             Projectile.extraUpdates = 29;
             Projectile.timeLeft = 3000;
             Projectile.penetrate = 2;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
         }
 
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
@@ -40,8 +42,12 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             if (Projectile.timeLeft <= 60)
+            {
+                ableToHit = false;
+                Projectile.velocity = Vector2.Zero;
                 return;
-
+            }
+                
             Projectile.rotation = Projectile.velocity.ToRotation();
         }
         public override bool PreDraw(ref Color lightColor)
@@ -49,9 +55,6 @@ namespace TerRoguelike.Projectiles
             Texture2D lightTexture = ModContent.Request<Texture2D>(Texture).Value;
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
-                //if (!ableToHit && i + Projectile.timeLeft >= 60);
-                    //continue;
-
                 Color color = Color.Lerp(Color.Yellow, Color.White, (float)i / (Projectile.oldPos.Length / 2));
                 Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f) - Main.screenPosition;
                 
