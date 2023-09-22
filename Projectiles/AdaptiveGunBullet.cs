@@ -38,6 +38,14 @@ namespace TerRoguelike.Projectiles
         }
 
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
+        public override bool? CanHitNPC(NPC target)
+        {
+            if (Projectile.penetrate == 1)
+                return false;
+            else if (Projectile.penetrate != 2)
+                Main.NewText("HOW THE FUCK");
+            return true;
+        }
 
         public override void AI()
         {
@@ -64,7 +72,7 @@ namespace TerRoguelike.Projectiles
             }
             return false;
         }
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
             Projectile.timeLeft = 60;
             ableToHit = false;

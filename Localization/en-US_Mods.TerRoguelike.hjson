@@ -5,6 +5,7 @@ Projectiles: {
 	ClingyGrenadeExplosion.DisplayName: Clingy Grenade Explosion
 	AdaptiveGunHoldout.DisplayName: Adaptive Gun Holdout
 	AdaptiveGunBullet.DisplayName: Adaptive Gun Bullet
+	SoulstealHealingOrb.DisplayName: Soulsteal Healing Orb
 }
 
 Items: {
@@ -126,6 +127,16 @@ Items: {
 			Each stack lasts 3 seconds and grants 10% increased attack speed
 			However, the amount of stacks is capped at 5
 			Extra copies of this item increase the stack cap by 2, and grant an extra 10% increased attack speed for every crit stack
+			'''
+	}
+
+	SoulstealCoating: {
+		DisplayName: Soulsteal Coating
+		Tooltip:
+			'''
+			Enemies drop their soul as a healing orb on kill
+			The orb homes in towards the soul stealer and heals for 10% max life on contact
+			Extra copies of this item increase the healing amount by another 10% max life
 			'''
 	}
 }

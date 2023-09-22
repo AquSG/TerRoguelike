@@ -14,9 +14,13 @@ namespace TerRoguelike.NPCs
 {
     public class TerRoguelikeGlobalNPC : GlobalNPC
     {
+        #region Variables
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
 
+        public bool activatedSoulstealCoating = false;
+
+        #endregion
         public override bool InstancePerEntity => true;
         public override bool PreKill(NPC npc)
         {

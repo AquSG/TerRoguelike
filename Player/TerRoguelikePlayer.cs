@@ -11,6 +11,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.Rooms;
 using Microsoft.Xna.Framework;
 using TerRoguelike.Projectiles;
+using TerRoguelike.NPCs;
 
 namespace TerRoguelike.Player
 {
@@ -21,6 +22,7 @@ namespace TerRoguelike.Player
         public int clingyGrenade;
         public int criticalSights;
         public int commonHealingItem;
+        public int soulstealCoating;
         public int commonUtilityItem;
         public int uncommonCombatItem;
         public int evilEye;
@@ -37,6 +39,7 @@ namespace TerRoguelike.Player
             clingyGrenade = 0;
             criticalSights = 0;
             commonHealingItem = 0;
+            soulstealCoating = 0;
             commonUtilityItem = 0;
             uncommonCombatItem = 0;
             evilEye = 0;
@@ -125,6 +128,9 @@ namespace TerRoguelike.Player
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if (target.life <= 0)
+                OnKillEffects(proj, target, hit, damageDone);
+
             if (clingyGrenade > 0 && !proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously)
             {
                 int chance;
@@ -159,6 +165,15 @@ namespace TerRoguelike.Player
                     evilEyeStacks = new List<int>();
 
                 evilEyeStacks.Add(180);
+            }
+        }
+        public void OnKillEffects(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (soulstealCoating > 0 && !target.GetGlobalNPC<TerRoguelikeGlobalNPC>().activatedSoulstealCoating)
+            {
+                int healingAmt = (int)(Main.player[proj.owner].statLifeMax2 * soulstealCoating * 0.1f);
+                Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI, healingAmt);
+                target.GetGlobalNPC<TerRoguelikeGlobalNPC>().activatedSoulstealCoating = true;
             }
         }
     }
