@@ -12,6 +12,7 @@ using TerRoguelike.Rooms;
 using Microsoft.Xna.Framework;
 using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Player
 {
@@ -32,6 +33,7 @@ namespace TerRoguelike.Player
         public int rareHealingItem;
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
+        public Floor currentFloor;
         #endregion
         public override void PreUpdate()
         {

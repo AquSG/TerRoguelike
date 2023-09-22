@@ -20,10 +20,12 @@ namespace TerRoguelike.Managers
         public virtual string Key => null;
         public virtual string Filename => null;
         public virtual int ID => -1;
+        public virtual int AssociatedFloor => -1;
         public virtual bool CanExitRight => false;
         public virtual bool CanExitDown => false;
         public virtual bool CanExitUp => false;
         public virtual bool IsBossRoom => false;
+        public virtual bool IsStartRoom => false;
         public int myRoom;
         public bool initialized = false;
         public bool awake = false;

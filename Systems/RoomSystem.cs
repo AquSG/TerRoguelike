@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria;
 using TerRoguelike.Managers;
+using TerRoguelike.Player;
 using Terraria.ID;
 using TerRoguelike.Systems;
 using Terraria.ModLoader.IO;
@@ -48,11 +49,17 @@ namespace TerRoguelike.Systems
                 bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f/16f) + room.RoomDimensions.Y) * 16f;
                 if (roomXcheck && roomYcheck)
                 {
+                    if (room.AssociatedFloor != -1)
+                        player.GetModPlayer<TerRoguelikePlayer>().currentFloor = FloorID[room.AssociatedFloor];
+
                     room.awake = true;
                     bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
                     if (teleportCheck)
                     {
-                        player.position = new Vector2(player.position.X + (178 * 16f), (Main.maxTilesY * 16f / 2f) + 72f);
+                        var nextFloor = FloorID[RoomManager.FloorIDsInPlay[player.GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage + 1]];
+                        var targetRoom = RoomID[nextFloor.StartRoomID];
+                        player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
+                        player.GetModPlayer<TerRoguelikePlayer>().currentFloor = nextFloor;
                     }
                 }
 
@@ -68,6 +75,7 @@ namespace TerRoguelike.Systems
             var roomIDs = new List<int>();
             var roomPositions = new List<Vector2>();
             var roomDimensions = new List<Vector2>();
+            var floorIDsInPlay = RoomManager.FloorIDsInPlay;
 
             foreach (Room room in RoomList)
             {
@@ -81,6 +89,7 @@ namespace TerRoguelike.Systems
             tag["roomIDs"] = roomIDs;
             tag["roomPositions"] = roomPositions;
             tag["roomDimensions"] = roomDimensions;
+            tag["floorIDsInPlay"] = floorIDsInPlay;
         }
         public override void LoadWorldData(TagCompound tag)
         {
@@ -99,6 +108,7 @@ namespace TerRoguelike.Systems
             var roomIDs = tag.GetList<int>("roomIDs");
             var roomPositions = tag.GetList<Vector2>("roomPositions");
             var roomDimensions = tag.GetList<Vector2>("roomDimensions");
+            var floorIDsInPlay = tag.GetList<int>("floorIDsInPlay");
             foreach (int id in roomIDs)
             {
                 if (id == -1)
@@ -109,6 +119,10 @@ namespace TerRoguelike.Systems
                 RoomList[loopcount].RoomDimensions = roomDimensions[loopcount];
                 ResetRoomID(id);
                 loopcount++;
+            }
+            foreach (int floorID in floorIDsInPlay)
+            {
+                RoomManager.FloorIDsInPlay.Add(floorID);
             }
         }
         public static void ResetRoomID(int id)

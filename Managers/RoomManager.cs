@@ -17,6 +17,7 @@ namespace TerRoguelike.Managers
 {
     public class RoomManager
     {
+        public static List<int> FloorIDsInPlay;
         public static List<Room> StartRoomIDs;
         public static List<Room> BossRoomIDs;
         public static List<int> oldRoomDirections;
@@ -32,6 +33,7 @@ namespace TerRoguelike.Managers
         public static void GenerateRoomStructure()
         {
             currentFloor = 0;
+            FloorIDsInPlay = new List<int>();
             RoomSystem.RoomList = new List<Room>();
             oldRoomDirections = new List<int>();
             SetAllRoomIDs();
@@ -81,6 +83,7 @@ namespace TerRoguelike.Managers
 
                 PlaceSchematic(mapKey, placementPoint, anchorType);
 
+                FloorIDsInPlay.Add(currentFloor);
                 switch (currentFloor)
                 {
                     case 0:
@@ -147,7 +150,7 @@ namespace TerRoguelike.Managers
                         directionsAvailable.Add(2);
                 }
 
-                if (!directionsAvailable.Any())
+                if (!directionsAvailable.Any() || directionsAvailable.Count == 0)
                     PlaceRoom(1, previousRoom);
 
                 int chosenDirection = directionsAvailable[Main.rand.Next(directionsAvailable.Count)];

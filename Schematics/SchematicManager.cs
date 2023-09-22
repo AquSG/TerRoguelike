@@ -8,6 +8,7 @@ using Terraria;
 using Microsoft.Xna.Framework;
 using TerRoguelike.Rooms;
 using TerRoguelike.Managers;
+using TerRoguelike.Floors;
 
 namespace TerRoguelike.Schematics
 {
@@ -15,6 +16,7 @@ namespace TerRoguelike.Schematics
     public static class SchematicManager
     {
         public static List<Room> RoomID = new List<Room>();
+        public static List<Floor> FloorID = new List<Floor>();
 
         internal static Dictionary<string, SchematicMetaTile[,]> TileMaps;
         internal static Dictionary<string, PilePlacementFunction> PilePlacementMaps;
@@ -24,6 +26,7 @@ namespace TerRoguelike.Schematics
         internal static void Load()
         {
             LoadRoomIDs();
+            LoadFloorIDs();
             PilePlacementMaps = new Dictionary<string, PilePlacementFunction>();
             TileMaps = new Dictionary<string, SchematicMetaTile[,]>
             {
@@ -90,11 +93,17 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new CrimsonEnemyRoom7());
             RoomID.Add(new CrimsonBossRoom1());
         }
+        public static void LoadFloorIDs()
+        {
+            FloorID.Add(new BaseFloor());
+            FloorID.Add(new CrimsonFloor());
+        }
         internal static void Unload()
         {
             TileMaps = null;
             PilePlacementMaps = null;
             RoomID = null;
+            FloorID = null;
         }
         #endregion
 
