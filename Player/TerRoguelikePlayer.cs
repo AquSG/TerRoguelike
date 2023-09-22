@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework;
 using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
 using TerRoguelike.World;
+using TerRoguelike.Items.Weapons;
 using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Player
@@ -56,6 +57,14 @@ namespace TerRoguelike.Player
             rareHealingItem = 0;
             rareUtilityItem = 0;
             shotsToFire = 1;
+        }
+        public override void OnEnterWorld()
+        {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                if (Player.armor[3].type == ItemID.CreativeWings)
+                    Player.armor[3] = new Item();
+            }
         }
         public override void UpdateEquips()
         {
@@ -212,6 +221,26 @@ namespace TerRoguelike.Player
                 Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI, healingAmt);
                 target.GetGlobalNPC<TerRoguelikeGlobalNPC>().activatedSoulstealCoating = true;
             }
+        }
+        public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
+        {
+            static Item createItem(int type)
+            {
+                Item i = new Item();
+                i.SetDefaults(type);
+                return i;
+            }
+
+            IEnumerable<Item> items = new List<Item>()
+            {
+                createItem(ModContent.ItemType<AdaptiveGun>())
+            };
+            
+            return items; 
+        }
+        public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod, bool mediumCoreDeath)
+        {
+            itemsByMod["Terraria"].Clear();
         }
     }
 }
