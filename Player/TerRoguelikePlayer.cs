@@ -27,13 +27,16 @@ namespace TerRoguelike.Player
         public int commonUtilityItem;
         public int uncommonCombatItem;
         public int evilEye;
+        public int spentShell;
         public int uncommonHealingItem;
         public int uncommonUtilityItem;
         public int rareCombatItem;
         public int rareHealingItem;
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
+
         public Floor currentFloor;
+        public int shotsToFire = 1;
         #endregion
         public override void PreUpdate()
         {
@@ -45,11 +48,13 @@ namespace TerRoguelike.Player
             commonUtilityItem = 0;
             uncommonCombatItem = 0;
             evilEye = 0;
+            spentShell = 0;
             uncommonHealingItem = 0;
             uncommonUtilityItem = 0;
             rareCombatItem = 0;
             rareHealingItem = 0;
             rareUtilityItem = 0;
+            shotsToFire = 1;
         }
         public override void UpdateEquips()
         {
@@ -101,6 +106,10 @@ namespace TerRoguelike.Player
             else if (evilEyeStacks.Any())
                 evilEyeStacks.Clear();
 
+            if (spentShell > 0)
+            {
+                shotsToFire += spentShell;
+            }
             if (uncommonHealingItem > 0)
             {
                 int regenIncrease = uncommonHealingItem * 3;
@@ -127,7 +136,18 @@ namespace TerRoguelike.Player
                 Player.moveSpeed += speedIncrease;
             }
         }
-
+        public override void PostUpdateEquips()
+        {
+            if (spentShell > 0)
+            {
+                float finalAttackSpeedMultiplier = 1f;
+                for (int i = 0; i < spentShell; i++)
+                {
+                    finalAttackSpeedMultiplier *= 1 - (1f / (2f + (float)spentShell));
+                }
+                Player.GetAttackSpeed(DamageClass.Generic) *=  finalAttackSpeedMultiplier;
+            }
+        }
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();

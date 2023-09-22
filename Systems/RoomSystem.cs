@@ -15,7 +15,6 @@ using Terraria.ModLoader.IO;
 using Microsoft.Xna.Framework;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
-using static TerRoguelike.Managers.SpawnManager;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.Bestiary;
 

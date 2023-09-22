@@ -72,10 +72,28 @@ namespace TerRoguelike.Projectiles
 
         public void ShootBullet()
         {
+            int shotsToFire = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>().shotsToFire;
             SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
-            float mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
-            Vector2 direction = (mainAngle).ToRotationVector2();
-            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+            for (int i = 0; i < shotsToFire; i++)
+            {
+                float mainAngle;
+                float spread = 64f;
+                if (shotsToFire == 1)
+                {
+                    mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
+                }
+                else if (shotsToFire % 2 == 0)
+                {
+                    mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() - ((float)((shotsToFire - 1) * 2) * MathHelper.Pi/(spread * 4f)) + ((float)i * MathHelper.Pi/spread);
+                }
+                else
+                {
+                    mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() - ((float)((shotsToFire - 1) / 2) * MathHelper.Pi/spread) + ((float)i * MathHelper.Pi / spread);
+                }
+                    
+                Vector2 direction = (mainAngle).ToRotationVector2();
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+            }
             Charge += -20f;
             if (Charge > 0f)
                 ShootBullet();

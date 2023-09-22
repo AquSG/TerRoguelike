@@ -139,4 +139,14 @@ Items: {
 			Extra copies of this item increase the healing amount by another 10% max life
 			'''
 	}
+
+	SpentShell: {
+		DisplayName: Spent Shell
+		Tooltip:
+			'''
+			+1 projectile per attack
+			Attack speed is decreased by a multiplier to somewhat compensate
+			Extra copies of this item also grant +1 projectile per attack
+			'''
+	}
 }
