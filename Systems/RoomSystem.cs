@@ -15,7 +15,9 @@ using Terraria.ModLoader.IO;
 using Microsoft.Xna.Framework;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.SpawnManager;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.GameContent.Bestiary;
 
 namespace TerRoguelike.Systems
 {
@@ -44,9 +46,9 @@ namespace TerRoguelike.Systems
                     continue;
 
                 var player = Main.player[Main.myPlayer];
-                
+
                 bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f;
-                bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f/16f) + room.RoomDimensions.Y) * 16f;
+                bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
                 if (roomXcheck && roomYcheck)
                 {
                     if (room.AssociatedFloor != -1)
@@ -113,13 +115,14 @@ namespace TerRoguelike.Systems
             {
                 if (id == -1)
                     continue;
-                
+
                 RoomList.Add(RoomID[id]);
                 RoomList[loopcount].RoomPosition = roomPositions[loopcount];
                 RoomList[loopcount].RoomDimensions = roomDimensions[loopcount];
                 ResetRoomID(id);
                 loopcount++;
             }
+            RoomManager.FloorIDsInPlay = new List<int>();
             foreach (int floorID in floorIDsInPlay)
             {
                 RoomManager.FloorIDsInPlay.Add(floorID);
@@ -171,6 +174,7 @@ namespace TerRoguelike.Systems
                         if (!canDraw)
                             continue;
 
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(room.RoomDimensions.X - 2, i);
@@ -187,23 +191,21 @@ namespace TerRoguelike.Systems
                             Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(0, -16f);
                             float rotation = MathHelper.PiOver2;
 
-                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
                             Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-
-                            Main.spriteBatch.End();
 
                             float scale = MathHelper.Clamp(MathHelper.Lerp(0.85f, 0.75f, (room.closedTime - 120f) / 60f), 0.75f, 0.85f);
 
                             if (Main.rand.NextBool((int)MathHelper.Clamp(MathHelper.Lerp(30f, 8f, (room.closedTime - 60f) / 120f), 8f, 20f)))
                                 Dust.NewDustDirect((targetBlock * 16f) + new Vector2(10f, 0), 2, 16, 206, Scale: scale);
                         }
+                        Main.spriteBatch.End();
                     }
                     continue;
                 }
 
                 if (room.wallActive)
                 {
+                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                     for (float side = 0; side < 2; side++)
                     {
                         for (float i = 0; i < room.RoomDimensions.X; i++)
@@ -226,11 +228,7 @@ namespace TerRoguelike.Systems
                             Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, -16f * side);
                             float rotation = MathHelper.Pi + (MathHelper.Pi * side);
 
-                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
                             Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-
-                            Main.spriteBatch.End();
                         }
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
@@ -251,16 +249,12 @@ namespace TerRoguelike.Systems
                             Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, (16f) * (side - 1f));
                             float rotation = MathHelper.PiOver2 + (MathHelper.Pi * side);
 
-                            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
                             Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-
-                            Main.spriteBatch.End();
                         }
                     }
+                    Main.spriteBatch.End();
                 }
             }
-            
         }
     }
 }
