@@ -42,8 +42,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.penetrate == 1)
                 return false;
-            else if (Projectile.penetrate != 2)
-                Main.NewText("HOW THE FUCK");
+
             return true;
         }
 

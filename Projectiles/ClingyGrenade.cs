@@ -77,10 +77,7 @@ namespace TerRoguelike.Projectiles
         public override bool PreKill(int timeLeft)
         {
             int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<ClingyGrenadeExplosion>(), Projectile.damage, 0f, Projectile.owner);
-            if (Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously)
-                Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously = true;
-            Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously = true;
-            Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().originalHit = false;
+            Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools;
 
             SoundEngine.PlaySound(SoundID.Item110, Projectile.Center);
             return true;

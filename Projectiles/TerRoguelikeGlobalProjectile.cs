@@ -12,20 +12,23 @@ namespace TerRoguelike.Projectiles
     public class TerRoguelikeGlobalProjectile : GlobalProjectile
     {
         public override bool InstancePerEntity => true;
-
-        public bool originalHit = true;
-        public bool critPreviously = false;
-        public bool clingyGrenadePreviously = false;
+        public ProcChainBools procChainBools = new ProcChainBools();
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
             modifiers.DamageVariationScale *= 0;
 
-            if (critPreviously)
+            if (procChainBools.critPreviously)
                 modifiers.SetCrit();
-            else if (!originalHit)
+            else if (!procChainBools.originalHit)
             {
                 modifiers.DisableCrit();
             }
         }
+    }
+    public class ProcChainBools
+    {
+        public bool originalHit = true;
+        public bool critPreviously = false;
+        public bool clinglyGrenadePreviously = false;
     }
 }

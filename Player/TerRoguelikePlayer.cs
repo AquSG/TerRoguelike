@@ -128,10 +128,12 @@ namespace TerRoguelike.Player
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
+            TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+
             if (target.life <= 0)
                 OnKillEffects(proj, target, hit, damageDone);
 
-            if (clingyGrenade > 0 && !proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously)
+            if (clingyGrenade > 0 && !modProj.procChainBools.clinglyGrenadePreviously)
             {
                 int chance;
                 chance = clingyGrenade * 5;
@@ -152,11 +154,13 @@ namespace TerRoguelike.Player
                         damage /= 2;
 
                     int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_None(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<ClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
-                    if (hit.Crit)
-                        Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().critPreviously = true;
-                    Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().clingyGrenadePreviously = true;
-                    Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().originalHit = false;
+                    TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
 
+                    spawnedModProj.procChainBools = modProj.procChainBools;
+                    spawnedModProj.procChainBools.originalHit = false;
+                    spawnedModProj.procChainBools.clinglyGrenadePreviously = true;
+                    if (hit.Crit)
+                        spawnedModProj.procChainBools.critPreviously = true;
                 }
             }
             if (evilEye > 0 && hit.Crit)
