@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.GameContent.ItemDropRules;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Projectiles
 {
@@ -15,7 +16,10 @@ namespace TerRoguelike.Projectiles
         public ProcChainBools procChainBools = new ProcChainBools();
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
-            modifiers.DamageVariationScale *= 0;
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                modifiers.DamageVariationScale *= 0;
+            }
 
             if (procChainBools.critPreviously)
                 modifiers.SetCrit();

@@ -14,6 +14,7 @@ using static tModPorter.ProgressUpdate;
 using Terraria.GameContent.Generation;
 using tModPorter;
 using Terraria.Localization;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Systems
 {
@@ -33,6 +34,7 @@ namespace TerRoguelike.Systems
                 Main.spawnTileX = (Main.maxTilesX / 32) + 12;
                 Main.spawnTileY = (Main.maxTilesY / 2) + 12;
                 ItemManager.RoomRewardCooldown = 0;
+                TerRoguelikeWorld.IsTerRoguelikeWorld = true;
             }));
         }
     }

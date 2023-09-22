@@ -9,6 +9,7 @@ using Terraria.ModLoader;
 using Terraria;
 using TerRoguelike.Managers;
 using TerRoguelike.Player;
+using TerRoguelike.World;
 using Terraria.ID;
 using TerRoguelike.Systems;
 using Terraria.ModLoader.IO;
@@ -70,6 +71,9 @@ namespace TerRoguelike.Systems
         }
         public override void SaveWorldData(TagCompound tag)
         {
+            var isTerRoguelikeWorld = TerRoguelikeWorld.IsTerRoguelikeWorld;
+            tag["isTerRoguelikeWorld"] = isTerRoguelikeWorld;
+
             if (RoomList == null)
                 return;
 
@@ -110,6 +114,7 @@ namespace TerRoguelike.Systems
             var roomPositions = tag.GetList<Vector2>("roomPositions");
             var roomDimensions = tag.GetList<Vector2>("roomDimensions");
             var floorIDsInPlay = tag.GetList<int>("floorIDsInPlay");
+            var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             foreach (int id in roomIDs)
             {
                 if (id == -1)
@@ -126,6 +131,7 @@ namespace TerRoguelike.Systems
             {
                 RoomManager.FloorIDsInPlay.Add(floorID);
             }
+            TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
         }
         public static void ResetRoomID(int id)
         {

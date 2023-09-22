@@ -12,6 +12,7 @@ using TerRoguelike.Rooms;
 using Microsoft.Xna.Framework;
 using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
+using TerRoguelike.World;
 using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Player
@@ -58,9 +59,14 @@ namespace TerRoguelike.Player
         }
         public override void UpdateEquips()
         {
-            Player.noFallDmg = true;
-            Player.GetCritChance(DamageClass.Generic) -= 3f;
-
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                Player.noFallDmg = true;
+                Player.GetCritChance(DamageClass.Generic) -= 3f;
+                Player.hasMagiluminescence = true;
+                Player.hasJumpOption_Cloud = true;
+            }
+            
             if (commonCombatItem > 0)
             {
                 float damageIncrease = commonCombatItem * 0.05f;
@@ -146,6 +152,11 @@ namespace TerRoguelike.Player
                     finalAttackSpeedMultiplier *= 1 - (1f / (2f + (float)spentShell));
                 }
                 Player.GetAttackSpeed(DamageClass.Generic) *=  finalAttackSpeedMultiplier;
+            }
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                Player.moveSpeed *= 1.30f;
+                Player.maxRunSpeed *= 1.30f;
             }
         }
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)

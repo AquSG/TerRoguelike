@@ -9,6 +9,7 @@ using Terraria.ModLoader.Core;
 using Terraria.GameContent.ItemDropRules;
 using Terraria.ID;
 using TerRoguelike;
+using TerRoguelike.World;
 
 namespace TerRoguelike.NPCs
 {
@@ -42,7 +43,10 @@ namespace TerRoguelike.NPCs
         }
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
-            modifiers.DefenseEffectiveness *= 0f;
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                modifiers.DefenseEffectiveness *= 0f;
+            }
         }
     }
 }
