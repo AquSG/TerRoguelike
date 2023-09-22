@@ -18,7 +18,6 @@ namespace TerRoguelike.Managers
     public class Floor
     {
         public virtual int FloorID => 0;
-        public virtual List<int> PotentialNextFloors => new List<int>();
         public virtual int StartRoomID => -1;
         public virtual int Stage => -1;
     }

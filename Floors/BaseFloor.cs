@@ -14,7 +14,6 @@ namespace TerRoguelike.Floors
     public class BaseFloor : Floor
     {
         public override int FloorID => 0;
-        public override List<int> PotentialNextFloors => new List<int>() { 1 };
         public override int StartRoomID => 0;
         public override int Stage => 0;
     }
