@@ -18,12 +18,12 @@ Items: {
 			'''
 	}
 
-	CommonHealingItem: {
-		DisplayName: Common Healing Item
+	RegenerationCrystal: {
+		DisplayName: Regeneration Crystal
 		Tooltip:
 			'''
-			+0.5 HP/s
-			Extra copies of this item also grant +0.5 HP/s
+			+2 HP/s
+			Extra copies of this item also grant +2 HP/s
 			'''
 	}
 

@@ -21,7 +21,7 @@ namespace TerRoguelike.Player
         public int commonCombatItem;
         public int clingyGrenade;
         public int criticalSights;
-        public int commonHealingItem;
+        public int regenerationCrystal;
         public int soulstealCoating;
         public int commonUtilityItem;
         public int uncommonCombatItem;
@@ -38,7 +38,7 @@ namespace TerRoguelike.Player
             commonCombatItem = 0;
             clingyGrenade = 0;
             criticalSights = 0;
-            commonHealingItem = 0;
+            regenerationCrystal = 0;
             soulstealCoating = 0;
             commonUtilityItem = 0;
             uncommonCombatItem = 0;
@@ -65,9 +65,9 @@ namespace TerRoguelike.Player
                 float critIncrease = criticalSights * 10f;
                 Player.GetCritChance(DamageClass.Generic) += critIncrease;
             }
-            if (commonHealingItem > 0)
+            if (regenerationCrystal > 0)
             {
-                int regenIncrease = commonHealingItem;
+                int regenIncrease = regenerationCrystal * 4;
                 Player.lifeRegen += regenIncrease;
             }
             if (commonUtilityItem > 0)

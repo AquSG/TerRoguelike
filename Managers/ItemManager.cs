@@ -130,7 +130,7 @@ namespace TerRoguelike.Managers
         };
         public static List<int> CommonHealingItems = new List<int>()
         {
-            ModContent.ItemType<SoulstealCoating>(),
+            ModContent.ItemType<RegenerationCrystal>(),
             ModContent.ItemType<SoulstealCoating>()
         };
         public static List<int> CommonUtilityItems = new List<int>()

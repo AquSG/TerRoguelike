@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Common
 {
-    public class CommonHealingItem : BaseRoguelikeItem, ILocalizedModType
+    public class RegenerationCrystal : BaseRoguelikeItem, ILocalizedModType
     {
         public override bool HealingItem => true;
         public override int itemTier => 0;
@@ -24,7 +24,7 @@ namespace TerRoguelike.Items.Common
         }
         public override void ItemEffects(Terraria.Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().commonHealingItem += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().regenerationCrystal += Item.stack;
         }
     }
 }

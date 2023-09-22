@@ -40,5 +40,9 @@ namespace TerRoguelike.NPCs
             
             return true;
         }
+        public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
+        {
+            modifiers.DefenseEffectiveness *= 0f;
+        }
     }
 }
