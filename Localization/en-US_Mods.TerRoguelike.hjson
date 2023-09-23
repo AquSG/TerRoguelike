@@ -149,4 +149,13 @@ Items: {
 			Extra copies of this item also grant +1 projectile per attack
 			'''
 	}
+
+	RunningShoe: {
+		DisplayName: Running Shoe
+		Tooltip: 
+			'''
+			8% increased movement speed
+			Extra copies of this item also grant 8% increased movement speed
+			'''
+	}
 }

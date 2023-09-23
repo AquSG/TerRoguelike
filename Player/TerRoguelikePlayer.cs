@@ -28,6 +28,7 @@ namespace TerRoguelike.Player
         public int soulstealCoating;
         public int commonUtilityItem;
         public int uncommonCombatItem;
+        public int runningShoe;
         public int evilEye;
         public int spentShell;
         public int uncommonHealingItem;
@@ -48,6 +49,7 @@ namespace TerRoguelike.Player
             regenerationCrystal = 0;
             soulstealCoating = 0;
             commonUtilityItem = 0;
+            runningShoe = 0;
             uncommonCombatItem = 0;
             evilEye = 0;
             spentShell = 0;
@@ -95,6 +97,11 @@ namespace TerRoguelike.Player
             if (commonUtilityItem > 0)
             {
                 float speedIncrease = commonUtilityItem * 0.05f;
+                Player.moveSpeed += speedIncrease;
+            }
+            if (runningShoe > 0)
+            {
+                float speedIncrease = runningShoe * 0.08f;
                 Player.moveSpeed += speedIncrease;
             }
             if (uncommonCombatItem > 0)
