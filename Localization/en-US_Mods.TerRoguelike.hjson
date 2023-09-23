@@ -18,15 +18,6 @@ Items: {
 			'''
 	}
 
-	RegenerationCrystal: {
-		DisplayName: Regeneration Crystal
-		Tooltip:
-			'''
-			+2 HP/s
-			Extra copies of this item also grant +2 HP/s
-			'''
-	}
-
 	CommonUtilityItem: {
 		DisplayName: Common Utility Item
 		Tooltip:
@@ -165,6 +156,15 @@ Items: {
 			'''
 			12% increased jump speed
 			Extra copies of this item also grant 12% increased jump speed
+			'''
+	}
+
+	LivingCrystal: {
+		DisplayName: Living Crystal
+		Tooltip:
+			'''
+			+2 HP/s
+			Extra copies of this item also grant +2 HP/s
 			'''
 	}
 }

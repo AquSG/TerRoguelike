@@ -11,20 +11,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Common
 {
-    public class RegenerationCrystal : BaseRoguelikeItem, ILocalizedModType
+    public class LivingCrystal : BaseRoguelikeItem, ILocalizedModType
     {
         public override bool HealingItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()
         {
-            Item.width = 18;
-            Item.height = 24;
+            Item.width = 32;
+            Item.height = 42;
             Item.rare = ItemRarityID.Blue;
             Item.maxStack = Item.CommonMaxStack;
         }
         public override void ItemEffects(Terraria.Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().regenerationCrystal += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().livingCrystal += Item.stack;
         }
     }
 }
