@@ -17,8 +17,8 @@ namespace TerRoguelike.Items.Common
         public override int itemTier => 0;
         public override void SetDefaults()
         {
-            Item.width = 26;
-            Item.height = 34;
+            Item.width = 24;
+            Item.height = 58;
             Item.rare = ItemRarityID.Blue;
             Item.maxStack = Item.CommonMaxStack;
         }

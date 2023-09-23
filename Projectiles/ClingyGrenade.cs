@@ -19,12 +19,14 @@ namespace TerRoguelike.Projectiles
         public Vector2 stuckPosition = Vector2.Zero;
         public override void SetDefaults()
         {
-            Projectile.width = 14;
-            Projectile.height = 20;
+            Projectile.width = 26;
+            Projectile.height = 28;
             Projectile.timeLeft = 120;
             Projectile.rotation = Main.rand.NextFloatDirection();
             Projectile.friendly = true;
             Projectile.hostile = false;
+            Projectile.scale = 0.85f;
+            Projectile.spriteDirection = Main.rand.NextBool() ? -1 : 1;
         }
 
         public override void AI()
