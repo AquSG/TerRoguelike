@@ -152,10 +152,19 @@ Items: {
 
 	RunningShoe: {
 		DisplayName: Running Shoe
-		Tooltip: 
+		Tooltip:
 			'''
 			8% increased movement speed
 			Extra copies of this item also grant 8% increased movement speed
+			'''
+	}
+
+	BunnyHopper: {
+		DisplayName: Bunny Hopper
+		Tooltip:
+			'''
+			12% increased jump speed
+			Extra copies of this item also grant 12% increased jump speed
 			'''
 	}
 }

@@ -136,7 +136,7 @@ namespace TerRoguelike.Managers
         public static List<int> CommonUtilityItems = new List<int>()
         {
             ModContent.ItemType<RunningShoe>(),
-            ModContent.ItemType<RunningShoe>()
+            ModContent.ItemType<BunnyHopper>()
         };
         #endregion
 

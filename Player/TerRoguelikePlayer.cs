@@ -29,6 +29,7 @@ namespace TerRoguelike.Player
         public int commonUtilityItem;
         public int uncommonCombatItem;
         public int runningShoe;
+        public int bunnyHopper;
         public int evilEye;
         public int spentShell;
         public int uncommonHealingItem;
@@ -37,6 +38,7 @@ namespace TerRoguelike.Player
         public int rareHealingItem;
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
+        public float jumpSpeedMultiplier;
 
         public Floor currentFloor;
         public int shotsToFire = 1;
@@ -50,6 +52,7 @@ namespace TerRoguelike.Player
             soulstealCoating = 0;
             commonUtilityItem = 0;
             runningShoe = 0;
+            bunnyHopper = 0;
             uncommonCombatItem = 0;
             evilEye = 0;
             spentShell = 0;
@@ -59,6 +62,7 @@ namespace TerRoguelike.Player
             rareHealingItem = 0;
             rareUtilityItem = 0;
             shotsToFire = 1;
+            jumpSpeedMultiplier = 0f;
         }
         public override void OnEnterWorld()
         {
@@ -103,6 +107,11 @@ namespace TerRoguelike.Player
             {
                 float speedIncrease = runningShoe * 0.08f;
                 Player.moveSpeed += speedIncrease;
+            }
+            if (bunnyHopper > 0)
+            {
+                float jumpSpeedIncrease = bunnyHopper * 0.12f;
+                jumpSpeedMultiplier += jumpSpeedIncrease;
             }
             if (uncommonCombatItem > 0)
             {
@@ -174,6 +183,7 @@ namespace TerRoguelike.Player
                 Player.moveSpeed *= 1.30f;
                 Player.maxRunSpeed *= 1.30f;
             }
+            Player.jumpSpeedBoost += 5f * jumpSpeedMultiplier;
         }
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
