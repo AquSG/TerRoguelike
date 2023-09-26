@@ -16,6 +16,9 @@ namespace TerRoguelike.Projectiles
     public class AdaptiveGunBullet : ModProjectile, ILocalizedModType
     {
         public bool ableToHit = true;
+        public TerRoguelikeGlobalProjectile modProj;
+        TerRoguelikePlayer modPlayer;
+        public int setTimeLeft;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
@@ -31,10 +34,11 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = true;
             Projectile.rotation = Projectile.velocity.ToRotation();
             Projectile.extraUpdates = 29;
-            Projectile.timeLeft = 3000;
+            Projectile.timeLeft = setTimeLeft;
             Projectile.penetrate = 2;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
+            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
         }
 
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
@@ -48,8 +52,8 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
-            TerRoguelikeGlobalProjectile modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
-            TerRoguelikePlayer modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+            if (modPlayer == null)
+                modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
 
             if (modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / 25000f);
@@ -85,10 +89,30 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (Projectile.timeLeft > 60)
-                Projectile.timeLeft = 60;
-            ableToHit = false;
-            Projectile.velocity = Vector2.Zero;
+            modProj.bounceCount++;
+            if (modProj.bounceCount == 1 + modProj.extraBounces)
+            {
+                if (Projectile.timeLeft > 60)
+                    Projectile.timeLeft = 60;
+                ableToHit = false;
+                Projectile.velocity = Vector2.Zero;
+
+            }
+            else
+            {
+                // If the projectile hits the left or right side of the tile, reverse the X velocity
+                if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
+                {
+                    Projectile.velocity.X = -oldVelocity.X;
+                    Projectile.timeLeft = setTimeLeft;
+                }
+                // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
+                if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
+                {
+                    Projectile.velocity.Y = -oldVelocity.Y;
+                    Projectile.timeLeft = setTimeLeft;
+                }
+            }
             return false;
         }
     }

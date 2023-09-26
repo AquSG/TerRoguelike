@@ -16,6 +16,9 @@ namespace TerRoguelike.Projectiles
         public override bool InstancePerEntity => true;
         public ProcChainBools procChainBools = new ProcChainBools();
         public int homingTarget = -1;
+        public int extraBounces = 0;
+        public int bounceCount = 0;
+        public int homingCheckCooldown = 0;
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -33,6 +36,12 @@ namespace TerRoguelike.Projectiles
 
         public void HomingAI(Projectile projectile, float homingStrength)
         {
+            if (homingCheckCooldown > 0)
+            {
+                homingCheckCooldown--;
+                return;
+            }
+
             if (projectile.velocity == Vector2.Zero)
                 return;
 
@@ -51,9 +60,9 @@ namespace TerRoguelike.Projectiles
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (npc.CanBeChasedBy(null, false))
+                    if (!npc.CanBeChasedBy(null, false))
                     {
-                        npcHomingRating[i] = -1;
+                        npcHomingRating[i] = -10;
                         continue;
                     }
                     Vector2 distanceVect = npc.Center - projectile.Center;
@@ -68,11 +77,14 @@ namespace TerRoguelike.Projectiles
                         npcHomingRating[i] += 1f - (distance / 1000);
                     }
                 }
-                if (npcHomingRating.All(x => x == -1f))
+                homingCheckCooldown = 10;
+
+                if (npcHomingRating.All(x => x == -10f))
                     return;
 
                 homingTarget = npcHomingRating.FindIndex(x => x == npcHomingRating.Max());
 
+                Main.NewText(Main.npc[homingTarget].FullName);
                 if (!Main.npc[homingTarget].CanBeChasedBy(null, false))
                 {
                     homingTarget = -1;
