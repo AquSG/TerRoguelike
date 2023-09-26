@@ -91,8 +91,8 @@ Items: {
 			'''
 	}
 
-	CriticalSights: {
-		DisplayName: Critical Sights
+	PocketSpotter: {
+		DisplayName: Pocket Spotter
 		Tooltip:
 			'''
 			10% increased critical strike chance
@@ -170,7 +170,7 @@ Items: {
 
 	HeatSeekingChip: {
 		DisplayName: Heat Seeking Chip
-		Tooltip: 
+		Tooltip:
 			'''
 			Projectiles gain slight homing capabilities
 			Extra copies of this item increase the strength of the homing capabilities

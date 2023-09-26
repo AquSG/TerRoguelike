@@ -126,7 +126,7 @@ namespace TerRoguelike.Managers
         public static List<int> CommonCombatItems = new List<int>()
         {
             ModContent.ItemType<ClingyGrenade>(),
-            ModContent.ItemType<CriticalSights>()
+            ModContent.ItemType<PocketSpotter>()
         };
         public static List<int> CommonHealingItems = new List<int>()
         {

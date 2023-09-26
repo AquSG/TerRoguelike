@@ -51,7 +51,7 @@ namespace TerRoguelike.Projectiles
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (!npc.active || npc.townNPC || npc.CountsAsACritter || npc.isLikeATownNPC || npc.life <= 0)
+                    if (npc.CanBeChasedBy(null, false))
                     {
                         npcHomingRating[i] = -1;
                         continue;
@@ -72,6 +72,12 @@ namespace TerRoguelike.Projectiles
                     return;
 
                 homingTarget = npcHomingRating.FindIndex(x => x == npcHomingRating.Max());
+
+                if (!Main.npc[homingTarget].CanBeChasedBy(null, false))
+                {
+                    homingTarget = -1;
+                    return;
+                }
             }
 
             Vector2 realDistanceVect = Main.npc[homingTarget].Center - projectile.Center;

@@ -11,20 +11,20 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Common
 {
-    public class CriticalSights : BaseRoguelikeItem, ILocalizedModType
+    public class PocketSpotter : BaseRoguelikeItem, ILocalizedModType
     {
         public override bool CombatItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()
         {
-            Item.width = 18;
-            Item.height = 24;
+            Item.width = 32;
+            Item.height = 56;
             Item.rare = ItemRarityID.Blue;
             Item.maxStack = Item.CommonMaxStack;
         }
         public override void ItemEffects(Terraria.Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().criticalSights += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().pocketSpotter += Item.stack;
         }
     }
 }

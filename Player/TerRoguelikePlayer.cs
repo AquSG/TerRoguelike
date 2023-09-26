@@ -23,7 +23,7 @@ namespace TerRoguelike.Player
         #region Variables
         public int commonCombatItem;
         public int clingyGrenade;
-        public int criticalSights;
+        public int pocketSpotter;
         public int livingCrystal;
         public int soulstealCoating;
         public int commonUtilityItem;
@@ -48,7 +48,7 @@ namespace TerRoguelike.Player
         {
             commonCombatItem = 0;
             clingyGrenade = 0;
-            criticalSights = 0;
+            pocketSpotter = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             commonUtilityItem = 0;
@@ -90,9 +90,9 @@ namespace TerRoguelike.Player
                 //Player.GetDamage(DamageClass.Generic) += damageIncrease;
                 Player.GetAttackSpeed(DamageClass.Generic) += damageIncrease;
             }
-            if (criticalSights > 0)
+            if (pocketSpotter > 0)
             {
-                float critIncrease = criticalSights * 10f;
+                float critIncrease = pocketSpotter * 10f;
                 Player.GetCritChance(DamageClass.Generic) += critIncrease;
             }
             if (livingCrystal > 0)
