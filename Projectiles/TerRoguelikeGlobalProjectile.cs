@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.GameContent.ItemDropRules;
 using TerRoguelike.World;
+using Microsoft.Xna.Framework;
 
 namespace TerRoguelike.Projectiles
 {
@@ -14,6 +15,7 @@ namespace TerRoguelike.Projectiles
     {
         public override bool InstancePerEntity => true;
         public ProcChainBools procChainBools = new ProcChainBools();
+        public int homingTarget = -1;
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -27,6 +29,68 @@ namespace TerRoguelike.Projectiles
             {
                 modifiers.DisableCrit();
             }
+        }
+
+        public void HomingAI(Projectile projectile, float homingStrength)
+        {
+            if (projectile.velocity == Vector2.Zero)
+                return;
+
+            int projIndex = projectile.whoAmI;
+            
+
+            if (homingTarget != -1)
+            {
+                if (!Main.npc[homingTarget].active)
+                    homingTarget = -1;
+            }
+            if (homingTarget == -1)
+            {
+                float prefferedDistance = 160f;
+                List<float> npcHomingRating = new List<float>(new float[Main.maxNPCs]);
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.townNPC || npc.CountsAsACritter || npc.isLikeATownNPC || npc.life <= 0)
+                    {
+                        npcHomingRating[i] = -1;
+                        continue;
+                    }
+                    Vector2 distanceVect = npc.Center - projectile.Center;
+                    float distance = distanceVect.Length();
+                    npcHomingRating[i] += Vector2.Dot(Vector2.Normalize(projectile.velocity), Vector2.Normalize(distanceVect));
+                    if (distance < prefferedDistance)
+                    {
+                        npcHomingRating[i] += 1f;
+                    }
+                    else
+                    {
+                        npcHomingRating[i] += 1f - (distance / 1000);
+                    }
+                }
+                if (npcHomingRating.All(x => x == -1f))
+                    return;
+
+                homingTarget = npcHomingRating.FindIndex(x => x == npcHomingRating.Max());
+            }
+
+            Vector2 realDistanceVect = Main.npc[homingTarget].Center - projectile.Center;
+            float targetAngle = Math.Abs(projectile.velocity.ToRotation() - realDistanceVect.ToRotation());
+            float setAngle = homingStrength * MathHelper.TwoPi;
+
+            if (setAngle > targetAngle)
+                setAngle = targetAngle;
+
+
+            if (Vector2.Dot(Vector2.Normalize(projectile.velocity).RotatedBy(MathHelper.PiOver2), Vector2.Normalize(realDistanceVect)) < 0)
+                setAngle *= -1;
+
+            setAngle += projectile.velocity.ToRotation();
+
+            Vector2 setVelocity = setAngle.ToRotationVector2() * projectile.velocity.Length();
+
+
+            Main.projectile[projIndex].velocity = setVelocity;
         }
     }
     public class ProcChainBools

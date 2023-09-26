@@ -144,7 +144,8 @@ namespace TerRoguelike.Managers
         public static List<int> UncommonCombatItems = new List<int>()
         {
             ModContent.ItemType<EvilEye>(),
-            ModContent.ItemType<SpentShell>()
+            ModContent.ItemType<SpentShell>(),
+            ModContent.ItemType<HeatSeekingChip>()
         };
         public static List<int> UncommonHealingItems = new List<int>()
         {

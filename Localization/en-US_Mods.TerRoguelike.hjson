@@ -167,4 +167,13 @@ Items: {
 			Extra copies of this item also grant +2 HP/s
 			'''
 	}
+
+	HeatSeekingChip: {
+		DisplayName: Heat Seeking Chip
+		Tooltip: 
+			'''
+			Projectiles gain slight homing capabilities
+			Extra copies of this item increase the strength of the homing capabilities
+			'''
+	}
 }

@@ -43,11 +43,17 @@ namespace TerRoguelike.Projectiles
             if (Projectile.penetrate == 1)
                 return false;
 
-            return true;
+            return (bool?)null;
         }
 
         public override void AI()
         {
+            TerRoguelikeGlobalProjectile modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            TerRoguelikePlayer modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+
+            if (modPlayer.heatSeekingChip > 0)
+                modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / 25000f);
+
             if (Projectile.timeLeft <= 60)
             {
                 ableToHit = false;

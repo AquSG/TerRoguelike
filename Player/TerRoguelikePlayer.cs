@@ -27,11 +27,12 @@ namespace TerRoguelike.Player
         public int livingCrystal;
         public int soulstealCoating;
         public int commonUtilityItem;
-        public int uncommonCombatItem;
         public int runningShoe;
         public int bunnyHopper;
+        public int uncommonCombatItem;
         public int evilEye;
         public int spentShell;
+        public int heatSeekingChip;
         public int uncommonHealingItem;
         public int uncommonUtilityItem;
         public int rareCombatItem;
@@ -56,6 +57,7 @@ namespace TerRoguelike.Player
             uncommonCombatItem = 0;
             evilEye = 0;
             spentShell = 0;
+            heatSeekingChip = 0;
             uncommonHealingItem = 0;
             uncommonUtilityItem = 0;
             rareCombatItem = 0;
