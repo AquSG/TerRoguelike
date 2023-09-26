@@ -154,8 +154,8 @@ namespace TerRoguelike.Managers
         };
         public static List<int> UncommonUtilityItems = new List<int>()
         {
-            ModContent.ItemType<UncommonUtilityItem>(),
-            ModContent.ItemType<UncommonUtilityItem>()
+            ModContent.ItemType<BouncyBall>(),
+            ModContent.ItemType<BouncyBall>()
         };
         #endregion
 

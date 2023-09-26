@@ -10,6 +10,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.Player;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
+using System.Reflection;
 
 namespace TerRoguelike.Projectiles
 {
@@ -72,7 +73,8 @@ namespace TerRoguelike.Projectiles
 
         public void ShootBullet()
         {
-            int shotsToFire = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>().shotsToFire;
+            float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
+            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
             SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
             for (int i = 0; i < shotsToFire; i++)
             {
@@ -90,9 +92,10 @@ namespace TerRoguelike.Projectiles
                 {
                     mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() - ((float)((shotsToFire - 1) / 2) * MathHelper.Pi/spread) + ((float)i * MathHelper.Pi / spread);
                 }
-                    
+
+                
                 Vector2 direction = (mainAngle).ToRotationVector2();
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 30f), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
             }
             Charge += -20f;
             if (Charge > 0f)

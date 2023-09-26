@@ -19,6 +19,11 @@ namespace TerRoguelike.Projectiles
         public int extraBounces = 0;
         public int bounceCount = 0;
         public int homingCheckCooldown = 0;
+        public override bool PreAI(Projectile projectile)
+        {
+            extraBounces = 0;
+            return true;
+        }
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -84,7 +89,6 @@ namespace TerRoguelike.Projectiles
 
                 homingTarget = npcHomingRating.FindIndex(x => x == npcHomingRating.Max());
 
-                Main.NewText(Main.npc[homingTarget].FullName);
                 if (!Main.npc[homingTarget].CanBeChasedBy(null, false))
                 {
                     homingTarget = -1;

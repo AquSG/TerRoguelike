@@ -18,7 +18,7 @@ namespace TerRoguelike.Projectiles
         public bool ableToHit = true;
         public TerRoguelikeGlobalProjectile modProj;
         TerRoguelikePlayer modPlayer;
-        public int setTimeLeft;
+        public int setTimeLeft = 3000;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
@@ -58,6 +58,9 @@ namespace TerRoguelike.Projectiles
             if (modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / 25000f);
 
+            if (modPlayer.bouncyBall > 0)
+                modProj.extraBounces += modPlayer.bouncyBall;
+
             if (Projectile.timeLeft <= 60)
             {
                 ableToHit = false;
@@ -90,7 +93,7 @@ namespace TerRoguelike.Projectiles
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             modProj.bounceCount++;
-            if (modProj.bounceCount == 1 + modProj.extraBounces)
+            if (modProj.bounceCount >= 1 + modProj.extraBounces)
             {
                 if (Projectile.timeLeft > 60)
                     Projectile.timeLeft = 60;

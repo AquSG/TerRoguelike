@@ -34,7 +34,7 @@ namespace TerRoguelike.Player
         public int spentShell;
         public int heatSeekingChip;
         public int uncommonHealingItem;
-        public int uncommonUtilityItem;
+        public int bouncyBall;
         public int rareCombatItem;
         public int rareHealingItem;
         public int rareUtilityItem;
@@ -59,7 +59,7 @@ namespace TerRoguelike.Player
             spentShell = 0;
             heatSeekingChip = 0;
             uncommonHealingItem = 0;
-            uncommonUtilityItem = 0;
+            bouncyBall = 0;
             rareCombatItem = 0;
             rareHealingItem = 0;
             rareUtilityItem = 0;
@@ -147,11 +147,6 @@ namespace TerRoguelike.Player
             {
                 int regenIncrease = uncommonHealingItem * 3;
                 Player.lifeRegen += regenIncrease;
-            }
-            if (uncommonUtilityItem > 0)
-            {
-                float speedIncrease = uncommonUtilityItem * 0.15f;
-                Player.moveSpeed += speedIncrease;
             }
             if (rareCombatItem > 0)
             {
