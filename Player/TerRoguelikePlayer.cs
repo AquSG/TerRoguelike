@@ -16,6 +16,7 @@ using TerRoguelike.World;
 using TerRoguelike.Items.Weapons;
 using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.Items.Uncommon;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Player
 {
@@ -139,12 +140,13 @@ namespace TerRoguelike.Player
                     Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
                 }
             }
+            else if (evilEyeStacks.Any())
+                evilEyeStacks.Clear();
+
             if (enchantingEye > 0)
             {
                 Player.GetCritChance(DamageClass.Generic) += 5;
             }
-            else if (evilEyeStacks.Any())
-                evilEyeStacks.Clear();
 
             if (spentShell > 0)
             {
