@@ -15,6 +15,7 @@ using TerRoguelike.NPCs;
 using TerRoguelike.World;
 using TerRoguelike.Items.Weapons;
 using static TerRoguelike.Schematics.SchematicManager;
+using TerRoguelike.Items.Uncommon;
 
 namespace TerRoguelike.Player
 {
@@ -34,6 +35,7 @@ namespace TerRoguelike.Player
         public int spentShell;
         public int heatSeekingChip;
         public int repurposedSiphon;
+        public int enchantingEye;
         public int bouncyBall;
         public int rareCombatItem;
         public int rareHealingItem;
@@ -59,6 +61,7 @@ namespace TerRoguelike.Player
             spentShell = 0;
             heatSeekingChip = 0;
             repurposedSiphon = 0;
+            enchantingEye = 0;
             bouncyBall = 0;
             rareCombatItem = 0;
             rareHealingItem = 0;
@@ -135,6 +138,10 @@ namespace TerRoguelike.Player
 
                     Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
                 }
+            }
+            if (enchantingEye > 0)
+            {
+                Player.GetCritChance(DamageClass.Generic) += 5;
             }
             else if (evilEyeStacks.Any())
                 evilEyeStacks.Clear();
@@ -224,6 +231,11 @@ namespace TerRoguelike.Player
             if (repurposedSiphon > 0)
             {
                 int healAmt = repurposedSiphon;
+                Player.Heal(healAmt);
+            }
+            if (enchantingEye > 0 && hit.Crit)
+            {
+                int healAmt = enchantingEye * 8;
                 Player.Heal(healAmt);
             }
         }

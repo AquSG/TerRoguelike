@@ -150,7 +150,7 @@ namespace TerRoguelike.Managers
         public static List<int> UncommonHealingItems = new List<int>()
         {
             ModContent.ItemType<RepurposedSiphon>(),
-            ModContent.ItemType<RepurposedSiphon>()
+            ModContent.ItemType<EnchantingEye>()
         };
         public static List<int> UncommonUtilityItems = new List<int>()
         {
