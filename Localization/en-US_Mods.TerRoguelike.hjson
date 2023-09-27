@@ -170,7 +170,7 @@ Items: {
 
 	BouncyBall: {
 		DisplayName: Bouncy Ball
-		Tooltip: 
+		Tooltip:
 			'''
 			+1 bounce for projectiles
 			Extra copies of this item also grant +1 bounce
