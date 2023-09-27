@@ -17,6 +17,8 @@ using TerRoguelike.Items.Weapons;
 using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.Items.Uncommon;
 using Terraria.DataStructures;
+using static Terraria.ModLoader.PlayerDrawLayer;
+using Terraria.Graphics.Shaders;
 
 namespace TerRoguelike.Player
 {
@@ -269,6 +271,159 @@ namespace TerRoguelike.Player
         public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod, bool mediumCoreDeath)
         {
             itemsByMod["Terraria"].Clear();
+        }
+        public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
+        {
+            if (evilEye > 0)
+                EvilEyePlayerEffect();
+
+            if (enchantingEye > 0)
+                EnchantingEyePlayerEffect();
+
+        }
+        public void EvilEyePlayerEffect()
+        {
+            int num = 0;
+            num += Player.bodyFrame.Y / 56;
+            if (num >= Main.OffsetsPlayerHeadgear.Length)
+            {
+                num = 0;
+            }
+            Vector2 vector = Main.OffsetsPlayerHeadgear[num];
+            vector *= Player.Directions;
+            Vector2 vector2 = new Vector2((float)(Player.width / 2), (float)(Player.height / 2)) + vector + (Player.MountedCenter - base.Player.Center);
+            Player.sitting.GetSittingOffsetInfo(Player, out var posOffset, out var seatAdjustment);
+            vector2 += posOffset + new Vector2(0f, seatAdjustment);
+            if (Player.face == 19)
+            {
+                vector2.Y -= 5f * Player.gravDir;
+            }
+            if (Player.head == 276)
+            {
+                vector2.X += 2.5f * (float)Player.direction;
+            }
+            if (Player.mount.Active && Player.mount.Type == 52)
+            {
+                vector2.X += 14f * (float)Player.direction;
+                vector2.Y -= 2f * Player.gravDir;
+            }
+            float y = -11.5f * Player.gravDir;
+            int eyeDistance = Player.direction == 1 ? 7 : 3;
+            Vector2 vector3 = new Vector2((float)(eyeDistance * Player.direction - ((Player.direction == 1) ? 1 : 0)), y) + Vector2.UnitY * Player.gfxOffY + vector2;
+            Vector2 vector4 = new Vector2((float)(eyeDistance * Player.shadowDirection[1] - ((Player.direction == 1) ? 1 : 0)), y) + vector2;
+            Vector2 vector5 = Vector2.Zero;
+            if (Player.mount.Active && Player.mount.Cart)
+            {
+                int num2 = Math.Sign(Player.velocity.X);
+                if (num2 == 0)
+                {
+                    num2 = Player.direction;
+                }
+                vector5 = Utils.RotatedBy(new Vector2(MathHelper.Lerp(0f, -8f, Player.fullRotation / ((float)Math.PI / 4f)), MathHelper.Lerp(0f, 2f, Math.Abs(Player.fullRotation / ((float)Math.PI / 4f)))), (double)Player.fullRotation, default(Vector2));
+                if (num2 == Math.Sign(Player.fullRotation))
+                {
+                    vector5 *= MathHelper.Lerp(1f, 0.6f, Math.Abs(Player.fullRotation / ((float)Math.PI / 4f)));
+                }
+            }
+            if (Player.fullRotation != 0f)
+            {
+                vector3 = vector3.RotatedBy(Player.fullRotation, Player.fullRotationOrigin);
+                vector4 = vector4.RotatedBy(Player.fullRotation, Player.fullRotationOrigin);
+            }
+            float num3 = 0f;
+            Vector2 vector6 = Player.position + vector3 + vector5;
+            Vector2 vector7 = Player.oldPosition + vector4 + vector5;
+            vector7.Y -= num3 / 2f;
+            vector6.Y -= num3 / 2f;
+            float num4 = 0.58f;
+            int num5 = (int)Vector2.Distance(vector6, vector7) / 3 + 1;
+            if (Vector2.Distance(vector6, vector7) % 3f != 0f)
+            {
+                num5++;
+            }
+            for (float num6 = 1f; num6 <= (float)num5; num6 += 1f)
+            {
+                Dust[] dust = Main.dust;
+                Vector2 center = base.Player.Center;
+                Color newColor = default(Color);
+                Dust obj = dust[Dust.NewDust(center, 0, 0, 182, 0f, 0f, 0, newColor)];
+                obj.position = Vector2.Lerp(vector7, vector6, num6 / (float)num5);
+                obj.noGravity = true;
+                obj.velocity = Vector2.Zero;
+                obj.scale = num4;
+            }
+        }
+        public void EnchantingEyePlayerEffect()
+        {
+            int num = 0;
+            num += Player.bodyFrame.Y / 56;
+            if (num >= Main.OffsetsPlayerHeadgear.Length)
+            {
+                num = 0;
+            }
+            Vector2 vector = Main.OffsetsPlayerHeadgear[num];
+            vector *= Player.Directions;
+            Vector2 vector2 = new Vector2((float)(Player.width / 2), (float)(Player.height / 2)) + vector + (Player.MountedCenter - base.Player.Center);
+            Player.sitting.GetSittingOffsetInfo(Player, out var posOffset, out var seatAdjustment);
+            vector2 += posOffset + new Vector2(0f, seatAdjustment);
+            if (Player.face == 19)
+            {
+                vector2.Y -= 5f * Player.gravDir;
+            }
+            if (Player.head == 276)
+            {
+                vector2.X += 2.5f * (float)Player.direction;
+            }
+            if (Player.mount.Active && Player.mount.Type == 52)
+            {
+                vector2.X += 14f * (float)Player.direction;
+                vector2.Y -= 2f * Player.gravDir;
+            }
+            float y = -11.5f * Player.gravDir;
+            int eyeDistance = Player.direction == 1 ? 3 : 7;
+            Vector2 vector3 = new Vector2((float)(eyeDistance * Player.direction - ((Player.direction == 1) ? 1 : 0)), y) + Vector2.UnitY * Player.gfxOffY + vector2;
+            Vector2 vector4 = new Vector2((float)(eyeDistance * Player.shadowDirection[1] - ((Player.direction == 1) ? 1 : 0)), y) + vector2;
+            Vector2 vector5 = Vector2.Zero;
+            if (Player.mount.Active && Player.mount.Cart)
+            {
+                int num2 = Math.Sign(Player.velocity.X);
+                if (num2 == 0)
+                {
+                    num2 = Player.direction;
+                }
+                vector5 = Utils.RotatedBy(new Vector2(MathHelper.Lerp(0f, -8f, Player.fullRotation / ((float)Math.PI / 4f)), MathHelper.Lerp(0f, 2f, Math.Abs(Player.fullRotation / ((float)Math.PI / 4f)))), (double)Player.fullRotation, default(Vector2));
+                if (num2 == Math.Sign(Player.fullRotation))
+                {
+                    vector5 *= MathHelper.Lerp(1f, 0.6f, Math.Abs(Player.fullRotation / ((float)Math.PI / 4f)));
+                }
+            }
+            if (Player.fullRotation != 0f)
+            {
+                vector3 = vector3.RotatedBy(Player.fullRotation, Player.fullRotationOrigin);
+                vector4 = vector4.RotatedBy(Player.fullRotation, Player.fullRotationOrigin);
+            }
+            float num3 = 0f;
+            Vector2 vector6 = Player.position + vector3 + vector5;
+            Vector2 vector7 = Player.oldPosition + vector4 + vector5;
+            vector7.Y -= num3 / 2f;
+            vector6.Y -= num3 / 2f;
+            float num4 = 0.6f;
+            int num5 = (int)Vector2.Distance(vector6, vector7) / 3 + 1;
+            if (Vector2.Distance(vector6, vector7) % 3f != 0f)
+            {
+                num5++;
+            }
+            for (float num6 = 1f; num6 <= (float)num5; num6 += 1f)
+            {
+                Dust[] dust = Main.dust;
+                Vector2 center = base.Player.Center;
+                Color newColor = default(Color);
+                Dust obj = dust[Dust.NewDust(center, 0, 0, 180, 0f, 0f, 0, newColor)];
+                obj.position = Vector2.Lerp(vector7, vector6, num6 / (float)num5);
+                obj.noGravity = true;
+                obj.velocity = Vector2.Zero;
+                obj.scale = num4;
+            }
         }
     }
 }
