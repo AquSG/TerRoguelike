@@ -63,15 +63,6 @@ Items: {
 			'''
 	}
 
-	UncommonHealingItem: {
-		DisplayName: Uncommon Healing Item
-		Tooltip:
-			'''
-			+1.5 HP/s
-			Extra copies of this item also grant +1.5 HP/s
-			'''
-	}
-
 	ClingyGrenade: {
 		DisplayName: Clingy Grenade
 		Tooltip:
@@ -174,6 +165,15 @@ Items: {
 			'''
 			+1 bounce for projectiles
 			Extra copies of this item also grant +1 bounce
+			'''
+	}
+
+	RepurposedSiphon: {
+		DisplayName: Repurposed Siphon
+		Tooltip:
+			'''
+			+1 HP upon hitting enemies
+			Extra copies of this item increase the healing amount by 1
 			'''
 	}
 }

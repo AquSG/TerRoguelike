@@ -33,7 +33,7 @@ namespace TerRoguelike.Player
         public int evilEye;
         public int spentShell;
         public int heatSeekingChip;
-        public int uncommonHealingItem;
+        public int repurposedSiphon;
         public int bouncyBall;
         public int rareCombatItem;
         public int rareHealingItem;
@@ -58,7 +58,7 @@ namespace TerRoguelike.Player
             evilEye = 0;
             spentShell = 0;
             heatSeekingChip = 0;
-            uncommonHealingItem = 0;
+            repurposedSiphon = 0;
             bouncyBall = 0;
             rareCombatItem = 0;
             rareHealingItem = 0;
@@ -143,11 +143,6 @@ namespace TerRoguelike.Player
             {
                 shotsToFire += spentShell;
             }
-            if (uncommonHealingItem > 0)
-            {
-                int regenIncrease = uncommonHealingItem * 3;
-                Player.lifeRegen += regenIncrease;
-            }
             if (rareCombatItem > 0)
             {
                 float damageIncrease = rareCombatItem * 0.60f;
@@ -225,6 +220,11 @@ namespace TerRoguelike.Player
                     evilEyeStacks = new List<int>();
 
                 evilEyeStacks.Add(180);
+            }
+            if (repurposedSiphon > 0)
+            {
+                int healAmt = repurposedSiphon;
+                Player.Heal(healAmt);
             }
         }
         public void OnKillEffects(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
