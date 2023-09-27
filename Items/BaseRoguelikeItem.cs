@@ -18,6 +18,11 @@ namespace TerRoguelike.Items
         public virtual bool HealingItem => false;
         public virtual bool UtilityItem => false;
         public virtual int itemTier => 0;
+        public override void SetDefaults()
+        {
+            Item.width = 20;
+            Item.height = 20;
+        }
         public virtual void ItemEffects(Terraria.Player player)
         {
 
@@ -30,7 +35,7 @@ namespace TerRoguelike.Items
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f - 2f);
-            spriteBatch.Draw(texture, Item.Center - Main.screenPosition, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
+            spriteBatch.Draw(texture, new Vector2 (Item.Center.X, Item.Bottom.Y - (texture.Size().Y / 2f)) - Main.screenPosition, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
             return false;
         }
     }
