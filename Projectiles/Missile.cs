@@ -13,8 +13,10 @@ using Terraria.Graphics.Renderers;
 
 namespace TerRoguelike.Projectiles
 {
-    public class AdaptiveGunBullet : ModProjectile, ILocalizedModType
+    public class Missile : ModProjectile, ILocalizedModType
     {
+        public override string Texture => "TerRoguelike/Projectiles/AdaptiveGunBullet";
+        public float rotationOffset = 0;
         public bool ableToHit = true;
         public TerRoguelikeGlobalProjectile modProj;
         TerRoguelikePlayer modPlayer;
@@ -29,11 +31,11 @@ namespace TerRoguelike.Projectiles
             Projectile.width = 4;
             Projectile.height = 4;
             Projectile.friendly = true;
-            Projectile.DamageType = DamageClass.Ranged;
+            Projectile.DamageType = DamageClass.Generic;
             Projectile.ignoreWater = false;
-            Projectile.tileCollide = true;
+            Projectile.tileCollide = false;
             Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.extraUpdates = 29;
+            Projectile.extraUpdates = 7;
             Projectile.timeLeft = setTimeLeft;
             Projectile.penetrate = 2;
             Projectile.usesLocalNPCImmunity = true;
@@ -52,14 +54,21 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
+            Projectile.localAI[1]++;
+
             if (modPlayer == null)
                 modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
 
-            if (modPlayer.heatSeekingChip > 0)
-                modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / 25000f);
+            if (modProj.homingTarget == -1)
+                modProj.homingTarget = (int)Projectile.ai[0];
 
-            if (modPlayer.bouncyBall > 0)
-                modProj.extraBounces += modPlayer.bouncyBall;
+            if (Projectile.localAI[1] > 90)
+                modProj.HomingAI(Projectile, 0.001128f * 2.9f, true);
+            else
+            {
+                rotationOffset += Main.rand.Next(-1, 2) * (MathHelper.Pi / 72f);
+                Projectile.velocity = (Projectile.velocity.Length() * -Vector2.UnitY).RotatedBy(rotationOffset);
+            }
 
             if (Projectile.timeLeft <= 60)
             {
@@ -75,24 +84,21 @@ namespace TerRoguelike.Projectiles
             Texture2D lightTexture = ModContent.Request<Texture2D>(Texture).Value;
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
-                if (Projectile.timeLeft <= 60 && i + Projectile.timeLeft < 45)
+                if (Projectile.timeLeft <= 60 && i + Projectile.timeLeft <= 60)
                     continue;
 
                 Color color = Color.Lerp(Color.Yellow, Color.White, (float)i / (Projectile.oldPos.Length / 2));
                 Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f) - Main.screenPosition;
                 
                 // Become smaller the futher along the old positions we are.
-                Vector2 scale = new Vector2(1f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
+                Vector2 scale = new Vector2(2.2f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
-            if (modPlayer != null)
+            if (Projectile.velocity != Vector2.Zero)
             {
-                if (modPlayer.volatileRocket > 0 && Projectile.velocity != Vector2.Zero)
-                {
-                    Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/VolatileRocket").Value;
-                    Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-                    Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
-                }
+                Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Missile").Value;
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+                Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
             }
             return false;
         }
@@ -101,34 +107,6 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 60;
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;
-        }
-        public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            modProj.bounceCount++;
-            if (modProj.bounceCount >= 1 + modProj.extraBounces)
-            {
-                if (Projectile.timeLeft > 60)
-                    Projectile.timeLeft = 60;
-                ableToHit = false;
-                Projectile.velocity = Vector2.Zero;
-
-            }
-            else
-            {
-                // If the projectile hits the left or right side of the tile, reverse the X velocity
-                if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
-                {
-                    Projectile.velocity.X = -oldVelocity.X;
-                    Projectile.timeLeft = setTimeLeft;
-                }
-                // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
-                if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-                {
-                    Projectile.velocity.Y = -oldVelocity.Y;
-                    Projectile.timeLeft = setTimeLeft;
-                }
-            }
-            return false;
         }
     }
 }

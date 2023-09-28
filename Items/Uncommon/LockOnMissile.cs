@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Uncommon
 {
-    public class UncommonCombatItem : BaseRoguelikeItem, ILocalizedModType
+    public class LockOnMissile : BaseRoguelikeItem, ILocalizedModType
     {
         public override bool CombatItem => true;
         public override int itemTier => 1;
@@ -23,7 +23,7 @@ namespace TerRoguelike.Items.Uncommon
         }
         public override void ItemEffects(Terraria.Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().uncommonCombatItem += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().lockOnMissile += Item.stack;
         }
     }
 }

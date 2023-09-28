@@ -15,7 +15,7 @@ namespace TerRoguelike.Items.Rare
     {
         public override bool CombatItem => true;
         public override int itemTier => 2;
-        public override int animationTicksPerFrame => 7;
+        public override int animationTicksPerFrame => 6;
         public override int animationFrameCount => 4;
         public override void SetDefaults()
         {

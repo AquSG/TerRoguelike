@@ -34,7 +34,7 @@ namespace TerRoguelike.Player
         public int commonUtilityItem;
         public int runningShoe;
         public int bunnyHopper;
-        public int uncommonCombatItem;
+        public int lockOnMissile;
         public int evilEye;
         public int spentShell;
         public int heatSeekingChip;
@@ -65,7 +65,7 @@ namespace TerRoguelike.Player
             commonUtilityItem = 0;
             runningShoe = 0;
             bunnyHopper = 0;
-            uncommonCombatItem = 0;
+            lockOnMissile = 0;
             evilEye = 0;
             spentShell = 0;
             heatSeekingChip = 0;
@@ -130,11 +130,6 @@ namespace TerRoguelike.Player
             {
                 float jumpSpeedIncrease = bunnyHopper * 0.12f;
                 jumpSpeedMultiplier += jumpSpeedIncrease;
-            }
-            if (uncommonCombatItem > 0)
-            {
-                float damageIncrease = uncommonCombatItem * 0.15f;
-                Player.GetDamage(DamageClass.Generic) += damageIncrease;
             }
 
             if (evilEye > 0)
@@ -233,12 +228,33 @@ namespace TerRoguelike.Player
                     if (hit.Crit)
                         damage /= 2;
 
-                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_None(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<ClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
+                    int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<ClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
                     TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
 
                     spawnedModProj.procChainBools = new ProcChainBools(modProj.procChainBools);
                     spawnedModProj.procChainBools.originalHit = false;
                     spawnedModProj.procChainBools.clinglyGrenadePreviously = true;
+                    if (hit.Crit)
+                        spawnedModProj.procChainBools.critPreviously = true;
+                }
+            }
+            if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
+            {
+                float chance = 0.1f;
+                if(ChanceRollWithLuck(chance, procLuck))
+                {
+                    Vector2 spawnPosition = Main.player[proj.owner].Top;
+                    Vector2 direction = -Vector2.UnitY;
+                    int damage = (int)(hit.Damage * 3f * lockOnMissile);
+                    if (hit.Crit)
+                        damage /= 2;
+
+                    int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, direction * 2.2f, ModContent.ProjectileType<Missile>(), damage, 0f, proj.owner, target.whoAmI);
+                    TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+
+                    spawnedModProj.procChainBools = new ProcChainBools(modProj.procChainBools);
+                    spawnedModProj.procChainBools.originalHit = false;
+                    spawnedModProj.procChainBools.lockOnMissilePreviously = true;
                     if (hit.Crit)
                         spawnedModProj.procChainBools.critPreviously = true;
                 }

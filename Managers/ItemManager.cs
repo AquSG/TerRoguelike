@@ -145,7 +145,8 @@ namespace TerRoguelike.Managers
         {
             ModContent.ItemType<EvilEye>(),
             ModContent.ItemType<SpentShell>(),
-            ModContent.ItemType<HeatSeekingChip>()
+            ModContent.ItemType<HeatSeekingChip>(),
+            ModContent.ItemType<LockOnMissile>()
         };
         public static List<int> UncommonHealingItems = new List<int>()
         {
@@ -163,7 +164,7 @@ namespace TerRoguelike.Managers
         public static List<int> RareCombatItems = new List<int>()
         {
             ModContent.ItemType<VolatileRocket>(),
-            ModContent.ItemType<VolatileRocket>()
+            ModContent.ItemType<TheDreamsoul>()
         };
         public static List<int> RareHealingItems = new List<int>()
         {

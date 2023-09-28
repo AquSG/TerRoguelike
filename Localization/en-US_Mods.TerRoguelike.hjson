@@ -7,6 +7,7 @@ Projectiles: {
 	AdaptiveGunBullet.DisplayName: Adaptive Gun Bullet
 	SoulstealHealingOrb.DisplayName: Soulsteal Healing Orb
 	Explosion.DisplayName: Explosion
+	Missile.DisplayName: Missile
 }
 
 Items: {
@@ -212,6 +213,16 @@ Items: {
 			'''
 			Failed chance rolls are rerolled 1 time for a potential positive outcome
 			Extra copies of this item add 1 more reroll attempt
+			'''
+	}
+
+	LockOnMissile: {
+		DisplayName: Lock-On Missile
+		Tooltip:
+			'''
+			10% chance upon hitting an enemy to fire a lock-on missile at them
+			Lock-on missiles home in on enemies and strike them for 300% total damage
+			Extra copies of this item increase the total damage by 300%
 			'''
 	}
 }

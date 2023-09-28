@@ -46,8 +46,9 @@ namespace TerRoguelike.Items
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)
             {
-                Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f - 2f);
-                spriteBatch.Draw(texture, new Vector2(Item.Center.X, Item.Bottom.Y + (Main.itemAnimations[Item.type].GetFrame(texture).Height) + 2) - Main.screenPosition, Main.itemAnimations[Item.type].GetFrame(texture), Color.White, 0f, origin, 1f, SpriteEffects.None, 0f);
+                Rectangle drawRect = Main.itemAnimations[Item.type].GetFrame(texture);
+                Vector2 origin = new Vector2(texture.Width / 2f, drawRect.Height * 0.5f - 2f);
+                spriteBatch.Draw(texture, new Vector2(Item.Center.X, Item.Bottom.Y - (drawRect.Height * 0.5f)) - Main.screenPosition, drawRect, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
             }
             else
             {

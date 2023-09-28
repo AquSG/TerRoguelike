@@ -88,25 +88,30 @@ namespace TerRoguelike.Projectiles
 
             SoundEngine.PlaySound(SoundID.Item14 with { Volume = SoundID.Item41.Volume * 0.5f }, projectile.Center);
         }
-        public void HomingAI(Projectile projectile, float homingStrength)
+        public void HomingAI(Projectile projectile, float homingStrength, bool idleSpin = false)
         {
+            if (projectile.velocity == Vector2.Zero)
+                return;
+
+            int projIndex = projectile.whoAmI;
+            
+            if (homingTarget != -1)
+            {
+                if (!Main.npc[homingTarget].active)
+                    homingTarget = -1;
+            }
+
+            if (homingTarget == -1 && idleSpin)
+            {
+                projectile.velocity = projectile.velocity.RotatedBy(homingStrength * MathHelper.TwoPi);
+            }
+
             if (homingCheckCooldown > 0)
             {
                 homingCheckCooldown--;
                 return;
             }
 
-            if (projectile.velocity == Vector2.Zero)
-                return;
-
-            int projIndex = projectile.whoAmI;
-            
-
-            if (homingTarget != -1)
-            {
-                if (!Main.npc[homingTarget].active)
-                    homingTarget = -1;
-            }
             if (homingTarget == -1)
             {
                 float prefferedDistance = 160f;
@@ -172,10 +177,12 @@ namespace TerRoguelike.Projectiles
             originalHit = procChainBools.originalHit;
             critPreviously = procChainBools.critPreviously;
             clinglyGrenadePreviously = procChainBools.clinglyGrenadePreviously;
+            lockOnMissilePreviously = procChainBools.lockOnMissilePreviously;
         }
         public bool originalHit = true;
         public bool critPreviously = false;
         public bool clinglyGrenadePreviously = false;
+        public bool lockOnMissilePreviously = false;
         
     }
 }
