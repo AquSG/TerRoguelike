@@ -86,5 +86,21 @@ namespace TerRoguelike.Utilities
 
             return Main.tile[x, y];
         }
+        /// <summary>
+        /// Returns whether a proc should occur or not with the given chance.
+        /// </summary>
+        /// <param name="chance">The chance of the proc occurring, 0f is 0%, 1f is 100%</param>
+        /// <param name="procLuck">The amount of times the chance is checked again upon failure</param>
+        public static bool ChanceRollWithLuck(float chance, int procLuck)
+        {
+            for (int i = 0; i < procLuck + 1; i++)
+            {
+                if (Main.rand.NextFloat(1f + float.Epsilon) < chance)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

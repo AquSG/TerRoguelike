@@ -14,7 +14,7 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
 using TerRoguelike.World;
 using TerRoguelike.Items.Weapons;
-using TerRoguelike.Utilities;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.Items.Uncommon;
 using Terraria.DataStructures;
@@ -43,6 +43,7 @@ namespace TerRoguelike.Player
         public int bouncyBall;
         public int airCanister;
         public int volatileRocket;
+        public int theDreamsoul;
         public int rareHealingItem;
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
@@ -52,6 +53,7 @@ namespace TerRoguelike.Player
         public int shotsToFire = 1;
         public int extraDoubleJumps = 0;
         public int timesDoubleJumped = 0;
+        public int procLuck = 0;
         #endregion
         public override void PreUpdate()
         {
@@ -72,11 +74,13 @@ namespace TerRoguelike.Player
             bouncyBall = 0;
             airCanister = 0;
             volatileRocket = 0;
+            theDreamsoul = 0;
             rareHealingItem = 0;
             rareUtilityItem = 0;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
+            procLuck = 0;
         }
         public override void OnEnterWorld()
         {
@@ -163,6 +167,11 @@ namespace TerRoguelike.Player
             {
                 extraDoubleJumps += airCanister;
             }
+            if (theDreamsoul > 0)
+            {
+                int luckIncrease = theDreamsoul;
+                procLuck += luckIncrease;
+            }
             if (rareHealingItem > 0)
             {
                 int regenIncrease = rareHealingItem * 12;
@@ -207,9 +216,9 @@ namespace TerRoguelike.Player
 
             if (clingyGrenade > 0 && !modProj.procChainBools.clinglyGrenadePreviously)
             {
-                int chance;
-                chance = clingyGrenade * 5;
-                if (chance > Main.rand.Next(1, 101))
+                float chance;
+                chance = clingyGrenade * 0.05f;
+                if (ChanceRollWithLuck(chance, procLuck))
                 {
                     float radius;
                     if (target.width < target.height)
@@ -295,7 +304,7 @@ namespace TerRoguelike.Player
             if (Player.carpet)
                 carpetCheck = Player.carpetTime <= 0 && Player.canCarpet;
             bool wingCheck = Player.wingTime == Player.wingTimeMax || Player.autoJump;
-            Tile tileBelow = TerRoguelikeUtils.ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)(Player.Bottom.Y / 16f));
+            Tile tileBelow = ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)(Player.Bottom.Y / 16f));
 
             if (Player.position.Y == Player.oldPosition.Y && wingCheck && mountCheck && carpetCheck && tileBelow.IsTileSolidGround())
             {

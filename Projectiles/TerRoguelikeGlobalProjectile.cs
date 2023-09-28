@@ -12,6 +12,7 @@ using TerRoguelike.Items.Rare;
 using TerRoguelike.Player;
 using Terraria.Audio;
 using Terraria.ID;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -30,16 +31,32 @@ namespace TerRoguelike.Projectiles
         }
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
+            Terraria.Player player = Main.player[projectile.owner];
+            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 modifiers.DamageVariationScale *= 0;
             }
 
+            
             if (procChainBools.critPreviously)
                 modifiers.SetCrit();
             else if (!procChainBools.originalHit)
             {
                 modifiers.DisableCrit();
+            }
+            else
+            {
+                float critChance = projectile.CritChance * 0.01f;
+                if (ChanceRollWithLuck(critChance, modPlayer.procLuck))
+                {
+                    modifiers.SetCrit();
+                }
+                else
+                {
+                    modifiers.DisableCrit();
+                }
             }
         }
         public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)

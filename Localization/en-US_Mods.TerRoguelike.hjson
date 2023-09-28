@@ -205,4 +205,13 @@ Items: {
 			Extra copies of this item increase the size of the explosion by 100%
 			'''
 	}
+
+	TheDreamsoul: {
+		DisplayName: The Dreamsoul
+		Tooltip:
+			'''
+			Failed chance rolls are rerolled 1 time for a potential positive outcome
+			Extra copies of this item add 1 more reroll attempt
+			'''
+	}
 }

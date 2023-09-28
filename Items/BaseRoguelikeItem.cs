@@ -18,6 +18,16 @@ namespace TerRoguelike.Items
         public virtual bool HealingItem => false;
         public virtual bool UtilityItem => false;
         public virtual int itemTier => 0;
+        public virtual int animationTicksPerFrame => 0;
+        public virtual int animationFrameCount => 0;
+        public override void SetStaticDefaults()
+        {
+            if (animationTicksPerFrame > 0 && animationFrameCount > 0)
+            {
+                Main.RegisterItemAnimation(Item.type, new DrawAnimationVertical(animationTicksPerFrame, animationFrameCount));
+                ItemID.Sets.AnimatesAsSoul[Type] = true;
+            }
+        }
         public override void SetDefaults()
         {
             Item.width = 20;
@@ -34,8 +44,16 @@ namespace TerRoguelike.Items
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
-            Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f - 2f);
-            spriteBatch.Draw(texture, new Vector2 (Item.Center.X, Item.Bottom.Y - (texture.Size().Y / 2f)) - Main.screenPosition, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
+            if (animationTicksPerFrame > 0 && animationFrameCount > 0)
+            {
+                Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f - 2f);
+                spriteBatch.Draw(texture, new Vector2(Item.Center.X, Item.Bottom.Y + (Main.itemAnimations[Item.type].GetFrame(texture).Height) + 2) - Main.screenPosition, Main.itemAnimations[Item.type].GetFrame(texture), Color.White, 0f, origin, 1f, SpriteEffects.None, 0f);
+            }
+            else
+            {
+                Vector2 origin = new Vector2(texture.Width / 2f, texture.Height / 2f - 2f);
+                spriteBatch.Draw(texture, new Vector2(Item.Center.X, Item.Bottom.Y - (texture.Size().Y * 0.5f)) - Main.screenPosition, null, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
+            }
             return false;
         }
     }
