@@ -36,7 +36,12 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             if (MaxScale == -1f)
+            {
                 MaxScale = Projectile.scale;
+                Projectile.position = Projectile.Center + new Vector2(-25 * MaxScale, -25 * MaxScale);
+                Projectile.width = (int)(50 * MaxScale);
+                Projectile.height = (int)(50 * MaxScale);
+            }
 
             if (Projectile.localAI[0] != 1)
             {
@@ -51,10 +56,6 @@ namespace TerRoguelike.Projectiles
             Projectile.frame = Projectile.frameCounter / 4 % Main.projFrames[Projectile.type];
             Projectile.frameCounter++;
         }
-        public override Color? GetAlpha(Color lightColor)
-        {
-            return Color.White;
-        }
         public override void Kill(int timeLeft)
         {
             for (int i = 0; i < 8; i++)
@@ -63,5 +64,12 @@ namespace TerRoguelike.Projectiles
             }
         }
         public override bool? CanDamage() => Projectile.timeLeft == 20 ? (bool?)null : false;
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+            int frameHeight = texture.Height / Main.projFrames[Projectile.type];
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.White, 0f, new Vector2(texture.Width / 2f, (frameHeight / 2f)), Projectile.scale, SpriteEffects.None);
+            return false;
+        }
     }
 }
