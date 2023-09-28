@@ -67,7 +67,7 @@ namespace TerRoguelike.Projectiles
                 SpawnExplosion(projectile, modPlayer, crit: hit.Crit);
             }
         }
-        public override void Kill(Projectile projectile, int timeLeft)
+        public override void OnKill(Projectile projectile, int timeLeft)
         {
             TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
             if (modPlayer.volatileRocket > 0 && projectile.penetrate > 1 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())

@@ -97,7 +97,7 @@ namespace TerRoguelike.Player
                 Player.noFallDmg = true;
                 Player.GetCritChance(DamageClass.Generic) -= 3f;
                 Player.hasMagiluminescence = true;
-                Player.hasJumpOption_Cloud = true;
+                Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
             }
 
             if (commonCombatItem > 0)
@@ -185,7 +185,6 @@ namespace TerRoguelike.Player
         }
         public override void PostUpdateEquips()
         {
-            RefreshDoubleJumps();
             if (spentShell > 0)
             {
                 float finalAttackSpeedMultiplier = 1f;
@@ -195,9 +194,9 @@ namespace TerRoguelike.Player
                 }
                 Player.GetAttackSpeed(DamageClass.Generic) *=  finalAttackSpeedMultiplier;
             }
-            if (!Player.canJumpAgain_Cloud && timesDoubleJumped < extraDoubleJumps)
+            if (!Player.GetJumpState(ExtraJump.CloudInABottle).Available && timesDoubleJumped < extraDoubleJumps)
             {
-                Player.canJumpAgain_Cloud = true;
+                Player.GetJumpState(ExtraJump.CloudInABottle).Available = true;
                 timesDoubleJumped++;
             }
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -292,24 +291,9 @@ namespace TerRoguelike.Player
         {
             itemsByMod["Terraria"].Clear();
         }
-        public void RefreshDoubleJumps()
+        public override void OnExtraJumpRefreshed(ExtraJump jump)
         {
-            if (Player.sliding || (Player.autoJump && Player.justJumped) || Main.projectile.Count(proj => Main.projHook[proj.type] && proj.ai[0] == 2f && proj.active && proj.owner == Main.myPlayer) > 0)
-                timesDoubleJumped = 0;
-
-            bool mountCheck = true;
-            if (Player.mount != null && Player.mount.Active)
-                mountCheck = Player.mount.BlockExtraJumps;
-            bool carpetCheck = true;
-            if (Player.carpet)
-                carpetCheck = Player.carpetTime <= 0 && Player.canCarpet;
-            bool wingCheck = Player.wingTime == Player.wingTimeMax || Player.autoJump;
-            Tile tileBelow = ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)(Player.Bottom.Y / 16f));
-
-            if (Player.position.Y == Player.oldPosition.Y && wingCheck && mountCheck && carpetCheck && tileBelow.IsTileSolidGround())
-            {
-                timesDoubleJumped = 0;
-            }
+            timesDoubleJumped = 0;
         }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {

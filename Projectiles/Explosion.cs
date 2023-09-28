@@ -56,7 +56,7 @@ namespace TerRoguelike.Projectiles
             Projectile.frame = Projectile.frameCounter / 4 % Main.projFrames[Projectile.type];
             Projectile.frameCounter++;
         }
-        public override void Kill(int timeLeft)
+        public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 8; i++)
             {
