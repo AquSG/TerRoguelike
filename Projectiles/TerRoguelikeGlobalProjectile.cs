@@ -8,6 +8,10 @@ using Terraria.ModLoader;
 using Terraria.GameContent.ItemDropRules;
 using TerRoguelike.World;
 using Microsoft.Xna.Framework;
+using TerRoguelike.Items.Rare;
+using TerRoguelike.Player;
+using Terraria.Audio;
+using Terraria.ID;
 
 namespace TerRoguelike.Projectiles
 {
@@ -38,7 +42,35 @@ namespace TerRoguelike.Projectiles
                 modifiers.DisableCrit();
             }
         }
+        public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+            if (modPlayer.volatileRocket > 0 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
+            {
+                SpawnExplosion(projectile, modPlayer, crit: hit.Crit);
+            }
+        }
+        public override void Kill(Projectile projectile, int timeLeft)
+        {
+            TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+            if (modPlayer.volatileRocket > 0 && projectile.penetrate > 1 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
+            {
+                SpawnExplosion(projectile, modPlayer, true);
+            }
+        }
+        public void SpawnExplosion(Projectile projectile, TerRoguelikePlayer modPlayer, bool originalHit = false, bool crit = false)
+        {
+            int spawnedProjectile = Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center, Vector2.Zero, ModContent.ProjectileType<Explosion>(), (int)(projectile.damage * 0.6f), 0f, projectile.owner);
+            Main.projectile[spawnedProjectile].scale = 1f * modPlayer.volatileRocket;
+            TerRoguelikeGlobalProjectile modProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj.procChainBools = new ProcChainBools(projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools);
+            if (!originalHit)
+                modProj.procChainBools.originalHit = false;
+            if (crit)
+                modProj.procChainBools.critPreviously = true;
 
+            SoundEngine.PlaySound(SoundID.Item14 with { Volume = SoundID.Item41.Volume * 0.5f }, projectile.Center);
+        }
         public void HomingAI(Projectile projectile, float homingStrength)
         {
             if (homingCheckCooldown > 0)
@@ -117,8 +149,16 @@ namespace TerRoguelike.Projectiles
     }
     public class ProcChainBools
     {
+        public ProcChainBools() { }
+        public ProcChainBools(ProcChainBools procChainBools)
+        {
+            originalHit = procChainBools.originalHit;
+            critPreviously = procChainBools.critPreviously;
+            clinglyGrenadePreviously = procChainBools.clinglyGrenadePreviously;
+        }
         public bool originalHit = true;
         public bool critPreviously = false;
         public bool clinglyGrenadePreviously = false;
+        
     }
 }

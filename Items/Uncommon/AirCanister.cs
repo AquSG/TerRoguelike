@@ -9,21 +9,21 @@ using TerRoguelike.Systems;
 using TerRoguelike.Player;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace TerRoguelike.Items.Rare
+namespace TerRoguelike.Items.Uncommon
 {
-    public class RareCombatItem : BaseRoguelikeItem, ILocalizedModType
+    public class AirCanister : BaseRoguelikeItem, ILocalizedModType
     {
-        public override bool CombatItem => true;
-        public override int itemTier => 2;
+        public override bool UtilityItem => true;
+        public override int itemTier => 1;
         public override void SetDefaults()
         {
             base.SetDefaults();
-            Item.rare = ItemRarityID.Red;
+            Item.rare = ItemRarityID.Green;
             Item.maxStack = Item.CommonMaxStack;
         }
         public override void ItemEffects(Terraria.Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().rareCombatItem += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().airCanister += Item.stack;
         }
     }
 }

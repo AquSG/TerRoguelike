@@ -82,6 +82,15 @@ namespace TerRoguelike.Projectiles
                 Vector2 scale = new Vector2(1f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
+            if (modPlayer != null)
+            {
+                if (modPlayer.volatileRocket > 0 && Projectile.velocity != Vector2.Zero)
+                {
+                    Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/VolatileRocket").Value;
+                    Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+                    Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
+                }
+            }
             return false;
         }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)

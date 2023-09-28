@@ -151,8 +151,11 @@ namespace TerRoguelike.Managers
                 }
 
                 if (!directionsAvailable.Any() || directionsAvailable.Count == 0)
+                {
                     PlaceRoom(1, previousRoom);
-
+                    return;
+                }
+                    
                 int chosenDirection = directionsAvailable[Main.rand.Next(directionsAvailable.Count)];
 
                 if (chosenDirection == 1)

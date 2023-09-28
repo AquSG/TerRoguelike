@@ -6,6 +6,7 @@ Projectiles: {
 	AdaptiveGunHoldout.DisplayName: Adaptive Gun Holdout
 	AdaptiveGunBullet.DisplayName: Adaptive Gun Bullet
 	SoulstealHealingOrb.DisplayName: Soulsteal Healing Orb
+	Explosion.DisplayName: Explosion
 }
 
 Items: {
@@ -184,6 +185,24 @@ Items: {
 			5% increased critical strike chance
 			+8 HP upon critically striking enemies
 			Extra copies of this item increase the healing amount by 8
+			'''
+	}
+
+	AirCanister: {
+		DisplayName: Air Canister
+		Tooltip:
+			'''
+			+1 double jump
+			Extra copies of this item also grant +1 double jump
+			'''
+	}
+
+	VolatileRocket: {
+		DisplayName: Volatile Rocket
+		Tooltip:
+			'''
+			Main attacks explode for 60% total damage
+			Extra copies of this item increase the size of the explosion by 100%
 			'''
 	}
 }

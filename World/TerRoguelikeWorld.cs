@@ -9,6 +9,7 @@ using Terraria.ModLoader;
 using TerRoguelike;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
+using TerRoguelike.Projectiles;
 
 namespace TerRoguelike.World
 {

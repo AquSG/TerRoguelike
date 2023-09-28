@@ -12,9 +12,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Projectiles
 {
-    public class ClingyGrenadeExplosion : ModProjectile, ILocalizedModType
+    public class Explosion : ModProjectile, ILocalizedModType
     {
         public override string Texture => "TerRoguelike/Projectiles/Explosion";
+        public float MaxScale = -1f;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 5;
@@ -34,6 +35,9 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
+            if (MaxScale == -1f)
+                MaxScale = Projectile.scale;
+
             if (Projectile.localAI[0] != 1)
             {
                 for (int i = 0; i < 15; i++)
@@ -43,7 +47,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.localAI[0] = 1;
             }
 
-            Projectile.scale = 0.5f + (0.5f * Projectile.timeLeft / 20f);
+            Projectile.scale = (0.5f + (0.5f * Projectile.timeLeft / 20f)) * MaxScale;
             Projectile.frame = Projectile.frameCounter / 4 % Main.projFrames[Projectile.type];
             Projectile.frameCounter++;
         }

@@ -72,5 +72,19 @@ namespace TerRoguelike.Utilities
 
             player.itemLocation = finalPosition;
         }
+
+        /// <summary>
+        /// Determines if a tile is solid ground based on whether it's active and not actuated or if the tile is solid in any way, including just the top.
+        /// </summary>
+        /// <param name="tile">The tile to check.</param>
+        public static bool IsTileSolidGround(this Tile tile) => tile != null && tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]);
+
+        public static Tile ParanoidTileRetrieval(int x, int y)
+        {
+            if (!WorldGen.InWorld(x, y))
+                return new Tile();
+
+            return Main.tile[x, y];
+        }
     }
 }

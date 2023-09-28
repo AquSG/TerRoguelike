@@ -155,15 +155,15 @@ namespace TerRoguelike.Managers
         public static List<int> UncommonUtilityItems = new List<int>()
         {
             ModContent.ItemType<BouncyBall>(),
-            ModContent.ItemType<BouncyBall>()
+            ModContent.ItemType<AirCanister>()
         };
         #endregion
 
         #region Rare Item Lists
         public static List<int> RareCombatItems = new List<int>()
         {
-            ModContent.ItemType<RareCombatItem>(),
-            ModContent.ItemType<RareCombatItem>()
+            ModContent.ItemType<VolatileRocket>(),
+            ModContent.ItemType<VolatileRocket>()
         };
         public static List<int> RareHealingItems = new List<int>()
         {

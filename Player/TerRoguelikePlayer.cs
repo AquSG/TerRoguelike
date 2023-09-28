@@ -14,6 +14,7 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
 using TerRoguelike.World;
 using TerRoguelike.Items.Weapons;
+using TerRoguelike.Utilities;
 using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.Items.Uncommon;
 using Terraria.DataStructures;
@@ -40,7 +41,8 @@ namespace TerRoguelike.Player
         public int repurposedSiphon;
         public int enchantingEye;
         public int bouncyBall;
-        public int rareCombatItem;
+        public int airCanister;
+        public int volatileRocket;
         public int rareHealingItem;
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
@@ -48,6 +50,8 @@ namespace TerRoguelike.Player
 
         public Floor currentFloor;
         public int shotsToFire = 1;
+        public int extraDoubleJumps = 0;
+        public int timesDoubleJumped = 0;
         #endregion
         public override void PreUpdate()
         {
@@ -66,11 +70,13 @@ namespace TerRoguelike.Player
             repurposedSiphon = 0;
             enchantingEye = 0;
             bouncyBall = 0;
-            rareCombatItem = 0;
+            airCanister = 0;
+            volatileRocket = 0;
             rareHealingItem = 0;
             rareUtilityItem = 0;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
+            extraDoubleJumps = 0;
         }
         public override void OnEnterWorld()
         {
@@ -89,7 +95,7 @@ namespace TerRoguelike.Player
                 Player.hasMagiluminescence = true;
                 Player.hasJumpOption_Cloud = true;
             }
-            
+
             if (commonCombatItem > 0)
             {
                 float damageIncrease = commonCombatItem * 0.05f;
@@ -149,15 +155,13 @@ namespace TerRoguelike.Player
             {
                 Player.GetCritChance(DamageClass.Generic) += 5;
             }
-
             if (spentShell > 0)
             {
                 shotsToFire += spentShell;
             }
-            if (rareCombatItem > 0)
+            if (airCanister > 0)
             {
-                float damageIncrease = rareCombatItem * 0.60f;
-                Player.GetDamage(DamageClass.Generic) += damageIncrease;
+                extraDoubleJumps += airCanister;
             }
             if (rareHealingItem > 0)
             {
@@ -172,6 +176,7 @@ namespace TerRoguelike.Player
         }
         public override void PostUpdateEquips()
         {
+            RefreshDoubleJumps();
             if (spentShell > 0)
             {
                 float finalAttackSpeedMultiplier = 1f;
@@ -180,6 +185,11 @@ namespace TerRoguelike.Player
                     finalAttackSpeedMultiplier *= 1 - (1f / (2f + (float)spentShell));
                 }
                 Player.GetAttackSpeed(DamageClass.Generic) *=  finalAttackSpeedMultiplier;
+            }
+            if (!Player.canJumpAgain_Cloud && timesDoubleJumped < extraDoubleJumps)
+            {
+                Player.canJumpAgain_Cloud = true;
+                timesDoubleJumped++;
             }
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
@@ -218,7 +228,7 @@ namespace TerRoguelike.Player
                     int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_None(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<ClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
                     TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
 
-                    spawnedModProj.procChainBools = modProj.procChainBools;
+                    spawnedModProj.procChainBools = new ProcChainBools(modProj.procChainBools);
                     spawnedModProj.procChainBools.originalHit = false;
                     spawnedModProj.procChainBools.clinglyGrenadePreviously = true;
                     if (hit.Crit)
@@ -245,11 +255,12 @@ namespace TerRoguelike.Player
         }
         public void OnKillEffects(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if (soulstealCoating > 0 && !target.GetGlobalNPC<TerRoguelikeGlobalNPC>().activatedSoulstealCoating)
+            TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+            if (soulstealCoating > 0 && !modTarget.activatedSoulstealCoating)
             {
                 int healingAmt = (int)(Main.player[proj.owner].statLifeMax2 * soulstealCoating * 0.1f);
                 Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI, healingAmt);
-                target.GetGlobalNPC<TerRoguelikeGlobalNPC>().activatedSoulstealCoating = true;
+                modTarget.activatedSoulstealCoating = true;
             }
         }
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
@@ -272,15 +283,36 @@ namespace TerRoguelike.Player
         {
             itemsByMod["Terraria"].Clear();
         }
+        public void RefreshDoubleJumps()
+        {
+            if (Player.sliding || (Player.autoJump && Player.justJumped) || Main.projectile.Count(proj => Main.projHook[proj.type] && proj.ai[0] == 2f && proj.active && proj.owner == Main.myPlayer) > 0)
+                timesDoubleJumped = 0;
+
+            bool mountCheck = true;
+            if (Player.mount != null && Player.mount.Active)
+                mountCheck = Player.mount.BlockExtraJumps;
+            bool carpetCheck = true;
+            if (Player.carpet)
+                carpetCheck = Player.carpetTime <= 0 && Player.canCarpet;
+            bool wingCheck = Player.wingTime == Player.wingTimeMax || Player.autoJump;
+            Tile tileBelow = TerRoguelikeUtils.ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)(Player.Bottom.Y / 16f));
+
+            if (Player.position.Y == Player.oldPosition.Y && wingCheck && mountCheck && carpetCheck && tileBelow.IsTileSolidGround())
+            {
+                timesDoubleJumped = 0;
+            }
+        }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
+            return;
+
             if (evilEye > 0)
                 EvilEyePlayerEffect();
 
             if (enchantingEye > 0)
                 EnchantingEyePlayerEffect();
-
         }
+        #region Item Drawing on Player
         public void EvilEyePlayerEffect()
         {
             int num = 0;
@@ -425,5 +457,6 @@ namespace TerRoguelike.Player
                 obj.scale = num4;
             }
         }
+        #endregion
     }
 }
