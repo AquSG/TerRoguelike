@@ -14,22 +14,21 @@ using System.Reflection;
 
 namespace TerRoguelike.Projectiles
 {
-    public class AdaptiveGunHoldout : ModProjectile, ILocalizedModType
+    public class AdaptiveBladeHoldout : ModProjectile, ILocalizedModType
     {
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
 
         public ref float Charge => ref Projectile.ai[0];
 
         public Terraria.Player Owner => Main.player[Projectile.owner];
-
-
+        public TerRoguelikePlayer modPlayer;
 
         public override void SetDefaults()
         {
             Projectile.width = 30;
             Projectile.height = 30;
             Projectile.friendly = true;
-            Projectile.DamageType = DamageClass.Ranged;
+            Projectile.DamageType = DamageClass.Melee;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
         }
@@ -46,39 +45,53 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
+            if (modPlayer == null)
+                modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
+
+            if (Charge >= 60)
+            {
+                Charge = 60;
+                
+            }
+
             if (Owner.channel)
             {
                 Projectile.timeLeft = 2;
-                Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
+                Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 1;
                 if (Owner.itemTime < 2)
                     Owner.itemTime = 2;
-                Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
+                Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 1;
                 if (Owner.itemAnimation < 2)
                     Owner.itemAnimation = 2;
                 Owner.heldProj = Projectile.whoAmI;
             }
+            else
+                ReleaseSword();
 
             float pointingRotation = (Main.MouseWorld - Owner.MountedCenter).ToRotation();
-            Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 40f;
+            Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 16f;
 
-            
-            if (Charge > 0f)
+            if (Charge < 60)
             {
-                ShootBullet();
+                Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
+                if (Charge >= 60)
+                {
+                    modPlayer.weaponFlashTime = 15;
+                }
             }
-
-            Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
+                
         }
 
-        public void ShootBullet()
+        public void ReleaseSword()
         {
-            float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
+            modPlayer.swingAnimCompletion += 0.00001f;
             int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
-            SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
+            int damage = Charge == 60 ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 3f)));
+            SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
             for (int i = 0; i < shotsToFire; i++)
             {
                 float mainAngle;
-                float spread = 64f;
+                float spread = 6f;
                 if (shotsToFire == 1)
                 {
                     mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
@@ -94,11 +107,10 @@ namespace TerRoguelike.Projectiles
 
                 
                 Vector2 direction = (mainAngle).ToRotationVector2();
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), Vector2.Zero, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
+                Main.projectile[spawnedProjectile].rotation = direction.ToRotation();
+                Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().swingDirection = Owner.direction;
             }
-            Charge += -20f;
-            if (Charge > 0f)
-                ShootBullet();
         }
     }
 }

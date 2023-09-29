@@ -8,6 +8,8 @@ Projectiles: {
 	SoulstealHealingOrb.DisplayName: Soulsteal Healing Orb
 	Explosion.DisplayName: Explosion
 	Missile.DisplayName: Missile
+	AdaptiveBladeHoldout.DisplayName: Adaptive Blade Holdout
+	AdaptiveBladeSlash.DisplayName: Adaptive Blade Slash
 }
 
 Items: {
@@ -224,5 +226,10 @@ Items: {
 			Lock-on missiles home in on enemies and strike them for 300% total damage
 			Extra copies of this item increase the total damage by 300%
 			'''
+	}
+
+	AdaptiveBlade: {
+		DisplayName: Adaptive Blade
+		Tooltip: ""
 	}
 }

@@ -24,6 +24,7 @@ namespace TerRoguelike.Projectiles
         public int extraBounces = 0;
         public int bounceCount = 0;
         public int homingCheckCooldown = 0;
+        public int swingDirection = 0;
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0;

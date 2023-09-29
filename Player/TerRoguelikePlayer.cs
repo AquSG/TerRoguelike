@@ -54,6 +54,8 @@ namespace TerRoguelike.Player
         public int extraDoubleJumps = 0;
         public int timesDoubleJumped = 0;
         public int procLuck = 0;
+        public float swingAnimCompletion = 0;
+        public int weaponFlashTime = 0;
         #endregion
         public override void PreUpdate()
         {
@@ -177,6 +179,12 @@ namespace TerRoguelike.Player
                 float speedIncrease = rareUtilityItem * 0.60f;
                 Player.moveSpeed += speedIncrease;
             }
+
+            if (weaponFlashTime > 0)
+            {
+                Player.HeldItem.color = Color.White;
+                weaponFlashTime--;
+            }
         }
         public override void PostUpdateEquips()
         {
@@ -298,7 +306,8 @@ namespace TerRoguelike.Player
 
             IEnumerable<Item> items = new List<Item>()
             {
-                createItem(ModContent.ItemType<AdaptiveGun>())
+                createItem(ModContent.ItemType<AdaptiveGun>()),
+                createItem(ModContent.ItemType<AdaptiveBlade>())
             };
             
             return items; 
