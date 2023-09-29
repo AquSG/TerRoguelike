@@ -11,7 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Common
 {
-    public class CommonCombatItem : BaseRoguelikeItem, ILocalizedModType
+    public class CoolantCanister : BaseRoguelikeItem, ILocalizedModType
     {
         public override bool CombatItem => true;
         public override int itemTier => 0;
@@ -23,7 +23,7 @@ namespace TerRoguelike.Items.Common
         }
         public override void ItemEffects(Terraria.Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().commonCombatItem += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().coolantCanister += Item.stack;
         }
     }
 }

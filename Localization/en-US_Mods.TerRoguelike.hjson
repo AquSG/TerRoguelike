@@ -13,15 +13,6 @@ Projectiles: {
 }
 
 Items: {
-	CommonCombatItem: {
-		DisplayName: Common Combat Item
-		Tooltip:
-			'''
-			5% increased attack speed
-			Extra copies of this item also grant 5% increased attack speed
-			'''
-	}
-
 	CommonUtilityItem: {
 		DisplayName: Common Utility Item
 		Tooltip:
@@ -231,5 +222,14 @@ Items: {
 	AdaptiveBlade: {
 		DisplayName: Adaptive Blade
 		Tooltip: ""
+	}
+
+	CoolantCanister: {
+		DisplayName: Coolant Canister
+		Tooltip:
+			'''
+			10% increased attack speed
+			Extra copies of this item also grant 10% increased attack speed
+			'''
 	}
 }

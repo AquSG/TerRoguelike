@@ -27,7 +27,7 @@ namespace TerRoguelike.Player
     public class TerRoguelikePlayer : ModPlayer
     {
         #region Variables
-        public int commonCombatItem;
+        public int coolantCanister;
         public int clingyGrenade;
         public int pocketSpotter;
         public int livingCrystal;
@@ -61,7 +61,7 @@ namespace TerRoguelike.Player
         #endregion
         public override void PreUpdate()
         {
-            commonCombatItem = 0;
+            coolantCanister = 0;
             clingyGrenade = 0;
             pocketSpotter = 0;
             livingCrystal = 0;
@@ -112,11 +112,10 @@ namespace TerRoguelike.Player
                 }
             }
 
-            if (commonCombatItem > 0)
+            if (coolantCanister > 0)
             {
-                float damageIncrease = commonCombatItem * 0.05f;
-                //Player.GetDamage(DamageClass.Generic) += damageIncrease;
-                Player.GetAttackSpeed(DamageClass.Generic) += damageIncrease;
+                float attackSpeedIncrease = coolantCanister * 0.10f;
+                Player.GetAttackSpeed(DamageClass.Generic) += attackSpeedIncrease;
             }
             if (pocketSpotter > 0)
             {

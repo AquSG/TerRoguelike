@@ -88,7 +88,7 @@ namespace TerRoguelike.Projectiles
                 else
                     autoRelease = false;
 
-                Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
+                Charge += chargeAmt;
                 if (Charge >= 60f)
                 {
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.085f }, Owner.Center);
@@ -101,6 +101,7 @@ namespace TerRoguelike.Projectiles
         {
             if ((Charge <= 60f || (Owner.channel && autoRelease)) && modPlayer.swingAnimCompletion == 0)
                 modPlayer.swingAnimCompletion += 0.00001f;
+
             int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
             int damage = Charge >= 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
             SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
