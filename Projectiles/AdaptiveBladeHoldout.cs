@@ -79,7 +79,10 @@ namespace TerRoguelike.Projectiles
             {
                 Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
                 if (Charge >= 60)
+                {
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.12f }, Owner.Center);
+                    modPlayer.bladeFlashTime = 15;
+                }
             }
                 
         }

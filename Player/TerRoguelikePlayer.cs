@@ -56,6 +56,7 @@ namespace TerRoguelike.Player
         public int timesDoubleJumped = 0;
         public int procLuck = 0;
         public float swingAnimCompletion = 0;
+        public int bladeFlashTime = 0;
         #endregion
         public override void PreUpdate()
         {
@@ -100,6 +101,10 @@ namespace TerRoguelike.Player
                 Player.GetCritChance(DamageClass.Generic) -= 3f;
                 Player.hasMagiluminescence = true;
                 Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
+                if (Player.controlDown)
+                {
+                    Player.gravity *= 1.5f;
+                }
             }
 
             if (commonCombatItem > 0)
@@ -316,6 +321,12 @@ namespace TerRoguelike.Player
         }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
+            if (bladeFlashTime > 0)
+            {
+                drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 30f);
+                bladeFlashTime--;
+            }
+            
             return;
 
             if (evilEye > 0)
