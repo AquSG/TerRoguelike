@@ -48,11 +48,14 @@ namespace TerRoguelike.Projectiles
             if (modPlayer == null)
                 modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
 
-            if (Charge >= 60)
+            if (Charge >= 60f)
             {
-                Charge = 60;
+                Charge = 60f;
                 
             }
+
+            float pointingRotation = (Main.MouseWorld - Owner.MountedCenter).ToRotation();
+            Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 16f;
 
             if (Owner.channel)
             {
@@ -66,11 +69,12 @@ namespace TerRoguelike.Projectiles
                 Owner.heldProj = Projectile.whoAmI;
             }
             else
+            {
                 ReleaseSword();
-
-            float pointingRotation = (Main.MouseWorld - Owner.MountedCenter).ToRotation();
-            Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 16f;
-
+                return;
+            }
+                
+            
             if (Charge < 60)
             {
                 Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
@@ -84,7 +88,7 @@ namespace TerRoguelike.Projectiles
         {
             modPlayer.swingAnimCompletion += 0.00001f;
             int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
-            int damage = Charge == 60 ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 3f)));
+            int damage = Charge == 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
             SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
             for (int i = 0; i < shotsToFire; i++)
             {
