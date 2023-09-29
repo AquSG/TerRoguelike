@@ -65,7 +65,7 @@ namespace TerRoguelike.Projectiles
             TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
             if (modPlayer.volatileRocket > 0 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
-                SpawnExplosion(projectile, modPlayer, crit: hit.Crit);
+                SpawnExplosion(projectile, modPlayer, target, crit: hit.Crit);
             }
         }
         public override void OnKill(Projectile projectile, int timeLeft)
@@ -73,12 +73,17 @@ namespace TerRoguelike.Projectiles
             TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
             if (modPlayer.volatileRocket > 0 && projectile.penetrate > 1 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
-                SpawnExplosion(projectile, modPlayer, true);
+                SpawnExplosion(projectile, modPlayer, originalHit: true);
             }
         }
-        public void SpawnExplosion(Projectile projectile, TerRoguelikePlayer modPlayer, bool originalHit = false, bool crit = false)
+        public void SpawnExplosion(Projectile projectile, TerRoguelikePlayer modPlayer, NPC target = null, bool originalHit = false, bool crit = false)
         {
-            int spawnedProjectile = Projectile.NewProjectile(projectile.GetSource_FromThis(), projectile.Center, Vector2.Zero, ModContent.ProjectileType<Explosion>(), (int)(projectile.damage * 0.6f), 0f, projectile.owner);
+            Vector2 position = projectile.Center;
+            if (target != null)
+            {
+                position = target.getRect().ClosestPointInRect(projectile.Center);
+            }
+            int spawnedProjectile = Projectile.NewProjectile(projectile.GetSource_FromThis(), position, Vector2.Zero, ModContent.ProjectileType<Explosion>(), (int)(projectile.damage * 0.6f), 0f, projectile.owner);
             Main.projectile[spawnedProjectile].scale = 1f * modPlayer.volatileRocket;
             TerRoguelikeGlobalProjectile modProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
             modProj.procChainBools = new ProcChainBools(projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools);

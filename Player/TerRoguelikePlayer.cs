@@ -20,6 +20,7 @@ using TerRoguelike.Items.Uncommon;
 using Terraria.DataStructures;
 using static Terraria.ModLoader.PlayerDrawLayer;
 using Terraria.Graphics.Shaders;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Player
 {
@@ -55,7 +56,6 @@ namespace TerRoguelike.Player
         public int timesDoubleJumped = 0;
         public int procLuck = 0;
         public float swingAnimCompletion = 0;
-        public int weaponFlashTime = 0;
         #endregion
         public override void PreUpdate()
         {
@@ -178,12 +178,6 @@ namespace TerRoguelike.Player
             {
                 float speedIncrease = rareUtilityItem * 0.60f;
                 Player.moveSpeed += speedIncrease;
-            }
-
-            if (weaponFlashTime > 0)
-            {
-                Player.HeldItem.color = Color.White;
-                weaponFlashTime--;
             }
         }
         public override void PostUpdateEquips()
