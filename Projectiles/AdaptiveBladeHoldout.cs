@@ -126,7 +126,7 @@ namespace TerRoguelike.Projectiles
                 Vector2 direction = (mainAngle).ToRotationVector2();
                 int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), Vector2.Zero, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
                 Main.projectile[spawnedProjectile].rotation = direction.ToRotation();
-                Main.projectile[spawnedProjectile].scale = 1f;
+                Main.projectile[spawnedProjectile].scale = modPlayer.scaleMultiplier;
                 Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().swingDirection = Owner.direction;
             }
             Charge -= 60f;

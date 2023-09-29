@@ -149,7 +149,7 @@ Items: {
 		DisplayName: Heat Seeking Chip
 		Tooltip:
 			'''
-			Projectiles gain slight homing capabilities
+			Main projectiles gain slight homing capabilities
 			Extra copies of this item increase the strength of the homing capabilities
 			'''
 	}
@@ -158,7 +158,7 @@ Items: {
 		DisplayName: Bouncy Ball
 		Tooltip:
 			'''
-			+1 bounce for projectiles
+			+1 bounce for main projectiles
 			Extra copies of this item also grant +1 bounce
 			'''
 	}
@@ -221,7 +221,16 @@ Items: {
 
 	AdaptiveBlade: {
 		DisplayName: Adaptive Blade
-		Tooltip: ""
+		Tooltip:
+			'''
+			Your trusty blade for this journey
+			Can be messed with in countless ways by the items you may find
+			Hold attack to charge up the blade for potential damage
+			Releasing when fully charged deals the most damage
+			Damage multiplier before fully charged: 1x - 3x
+			Damage multiplier when fully charged: 4x
+			Gains auto-swing capabilities at 3x attack speed or more
+			'''
 	}
 
 	CoolantCanister: {
@@ -230,6 +239,15 @@ Items: {
 			'''
 			10% increased attack speed
 			Extra copies of this item also grant 10% increased attack speed
+			'''
+	}
+
+	AntiqueLens: {
+		DisplayName: Antique Lens
+		Tooltip:
+			'''
+			10% increased main attack size
+			Extra copies of this item also grant 10% increased main attack size
 			'''
 	}
 }

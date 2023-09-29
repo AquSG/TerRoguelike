@@ -127,7 +127,8 @@ namespace TerRoguelike.Managers
         {
             ModContent.ItemType<ClingyGrenade>(),
             ModContent.ItemType<PocketSpotter>(),
-            ModContent.ItemType<CoolantCanister>()
+            ModContent.ItemType<CoolantCanister>(),
+            ModContent.ItemType<AntiqueLens>()
         };
         public static List<int> CommonHealingItems = new List<int>()
         {

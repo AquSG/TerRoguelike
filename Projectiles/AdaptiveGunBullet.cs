@@ -52,6 +52,14 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
+            if (Projectile.localAI[0] == 0)
+            {
+                Projectile.position = Projectile.Center + new Vector2(-2 * Projectile.scale, -2 * Projectile.scale);
+                Projectile.width = (int)(4 * Projectile.scale);
+                Projectile.height = (int)(4 * Projectile.scale);
+                Projectile.localAI[0]++;
+            }
+
             if (modPlayer == null)
                 modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
 
@@ -79,11 +87,11 @@ namespace TerRoguelike.Projectiles
                     continue;
 
                 Color color = Color.Lerp(Color.Yellow, Color.White, (float)i / (Projectile.oldPos.Length / 2));
-                Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f) - Main.screenPosition;
+                Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f * Projectile.scale) - Main.screenPosition;
                 
                 // Become smaller the futher along the old positions we are.
                 Vector2 scale = new Vector2(1f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale * Projectile.scale, SpriteEffects.None, 0);
             }
             if (modPlayer != null)
             {
@@ -91,7 +99,7 @@ namespace TerRoguelike.Projectiles
                 {
                     Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/VolatileRocket").Value;
                     Vector2 drawPosition = Projectile.Center - Main.screenPosition;
-                    Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
                 }
             }
             return false;

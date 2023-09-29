@@ -30,6 +30,7 @@ namespace TerRoguelike.Player
         public int coolantCanister;
         public int clingyGrenade;
         public int pocketSpotter;
+        public int antiqueLens;
         public int livingCrystal;
         public int soulstealCoating;
         public int commonUtilityItem;
@@ -49,6 +50,7 @@ namespace TerRoguelike.Player
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
         public float jumpSpeedMultiplier;
+        public float scaleMultiplier;
 
         public Floor currentFloor;
         public int shotsToFire = 1;
@@ -64,6 +66,7 @@ namespace TerRoguelike.Player
             coolantCanister = 0;
             clingyGrenade = 0;
             pocketSpotter = 0;
+            antiqueLens = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             commonUtilityItem = 0;
@@ -85,6 +88,7 @@ namespace TerRoguelike.Player
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
             procLuck = 0;
+            scaleMultiplier = 1f;
         }
         public override void OnEnterWorld()
         {
@@ -121,6 +125,11 @@ namespace TerRoguelike.Player
             {
                 float critIncrease = pocketSpotter * 10f;
                 Player.GetCritChance(DamageClass.Generic) += critIncrease;
+            }
+            if (antiqueLens > 0)
+            {
+                float scaleIncrease = antiqueLens * 0.1f;
+                scaleMultiplier += scaleIncrease;
             }
             if (livingCrystal > 0)
             {
