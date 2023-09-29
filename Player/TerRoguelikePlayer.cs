@@ -57,6 +57,7 @@ namespace TerRoguelike.Player
         public int procLuck = 0;
         public float swingAnimCompletion = 0;
         public int bladeFlashTime = 0;
+        public Vector2 playerToCursor = Vector2.Zero;
         #endregion
         public override void PreUpdate()
         {
@@ -92,6 +93,10 @@ namespace TerRoguelike.Player
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
             }
+        }
+        public override bool PreItemCheck()
+        {
+            return true;
         }
         public override void UpdateEquips()
         {
@@ -323,7 +328,7 @@ namespace TerRoguelike.Player
         {
             if (bladeFlashTime > 0)
             {
-                drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 30f);
+                drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 23f);
                 bladeFlashTime--;
             }
             

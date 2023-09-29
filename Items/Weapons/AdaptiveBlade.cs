@@ -18,7 +18,6 @@ namespace TerRoguelike.Items.Weapons
 {
     public class AdaptiveBlade : ModItem, ILocalizedModType
     {
-        public Vector2 playerToCursor = Vector2.Zero;
         public override void SetDefaults()
         {
             Item.damage = 100;
@@ -46,19 +45,26 @@ namespace TerRoguelike.Items.Weapons
         {
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
             //Calculate the dirction in which the players arms should be pointing at.
-            if (modPlayer.swingAnimCompletion <= 0 || playerToCursor == Vector2.Zero)
-                 playerToCursor = (Main.MouseWorld - player.Center).SafeNormalize(Vector2.UnitX);
-            float armPointingDirection = (playerToCursor.ToRotation() - (MathHelper.Pi * player.direction / 3f));
+            if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
+                modPlayer.playerToCursor = (Main.MouseWorld - player.Center).SafeNormalize(Vector2.UnitX);
+            float armPointingDirection = (modPlayer.playerToCursor.ToRotation() - (MathHelper.Pi * player.direction / 3f));
             if (modPlayer.swingAnimCompletion > 0)
             {
                 modPlayer.swingAnimCompletion += 1f / (20f / player.GetAttackSpeed(DamageClass.Generic));
-                armPointingDirection += MathHelper.Lerp(0f, MathHelper.TwoPi * 2f / 3f, modPlayer.swingAnimCompletion) * player.direction;
                 if (modPlayer.swingAnimCompletion > 1f)
+                    modPlayer.swingAnimCompletion = 1f;
+                armPointingDirection += MathHelper.Lerp(0f, MathHelper.TwoPi * 9f / 16f, modPlayer.swingAnimCompletion) * player.direction;
+                if (modPlayer.swingAnimCompletion >= 1f)
                 {
-                    modPlayer.swingAnimCompletion = 0f;
-                    player.attackCD = 1;
+                    modPlayer.swingAnimCompletion = 0;
+                    modPlayer.playerToCursor = Vector2.Zero;
                 }
                     
+            }
+            if (player.itemTime == 1)
+            {
+                modPlayer.swingAnimCompletion = 0;
+                modPlayer.playerToCursor = Vector2.Zero;
             }
             player.SetCompositeArmFront(true, Terraria.Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             TerRoguelikeUtils.CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(38, 38), new Vector2(-14, 14));

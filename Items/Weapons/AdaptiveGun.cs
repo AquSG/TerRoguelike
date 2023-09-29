@@ -48,6 +48,7 @@ namespace TerRoguelike.Items.Weapons
 
             player.SetCompositeArmBack(true, Terraria.Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             player.SetCompositeArmFront(true, Terraria.Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
+            TerRoguelikeUtils.CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(42, 30), new Vector2(-12, -4));
         }
 
         public override void UseStyle(Terraria.Player player, Rectangle heldItemFrame)
@@ -61,7 +62,6 @@ namespace TerRoguelike.Items.Weapons
                 player.ChangeDir(-1);
             }
 
-            TerRoguelikeUtils.CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(42, 30), new Vector2(-12, -4));
         }
     }
 }

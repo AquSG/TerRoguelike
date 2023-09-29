@@ -10,6 +10,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.Player;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Projectiles
 {
@@ -25,7 +26,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void SetDefaults()
         {
-            Projectile.width = 68;
+            Projectile.width = 40;
             Projectile.height = 68;
             Projectile.friendly = true;
             Projectile.DamageType = DamageClass.Melee;
@@ -41,6 +42,13 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
+            if (Projectile.localAI[0] == 0)
+            {
+                Projectile.position = Projectile.Center + new Vector2(-34 * Projectile.scale, -34 * Projectile.scale);
+                Projectile.width = (int)(68 * Projectile.scale);
+                Projectile.height = (int)(68 * Projectile.scale);
+            }
+
             if (player == null)
                 player = Main.player[Projectile.owner];
             if (modPlayer == null)
@@ -58,13 +66,14 @@ namespace TerRoguelike.Projectiles
                 Projectile.Kill();
             }
         }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.rotation.ToRotationVector2(), backCutoff: 0.3f);
         public override bool? CanDamage() => Projectile.frame <= 3 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             int frameHeight = texture.Height / Main.projFrames[Projectile.type];
             SpriteEffects spriteEffects = modProj.swingDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
-            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.White, Projectile.rotation + (MathHelper.Pi * modProj.swingDirection / 12f), new Vector2(texture.Width / 2f, (frameHeight / 2f)), Projectile.scale, spriteEffects);
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.Lerp(lightColor, Color.White, 0.5f), Projectile.rotation + (MathHelper.Pi * modProj.swingDirection / 12f), new Vector2(texture.Width / 2f, (frameHeight / 2f)), Projectile.scale, spriteEffects);
             return false;
         }
     }

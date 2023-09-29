@@ -23,7 +23,6 @@ namespace TerRoguelike.Projectiles
         public Terraria.Player Owner => Main.player[Projectile.owner];
 
 
-
         public override void SetDefaults()
         {
             Projectile.width = 30;
@@ -96,9 +95,10 @@ namespace TerRoguelike.Projectiles
                 Vector2 direction = (mainAngle).ToRotationVector2();
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
             }
-            Charge += -20f;
+            Charge -= 20f;
             if (Charge > 0f)
                 ShootBullet();
+
         }
     }
 }

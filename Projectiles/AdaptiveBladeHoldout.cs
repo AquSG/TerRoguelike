@@ -20,6 +20,7 @@ namespace TerRoguelike.Projectiles
 
         public ref float Charge => ref Projectile.ai[0];
 
+        public bool autoRelease = false;
         public Terraria.Player Owner => Main.player[Projectile.owner];
         public TerRoguelikePlayer modPlayer;
 
@@ -48,7 +49,7 @@ namespace TerRoguelike.Projectiles
             if (modPlayer == null)
                 modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
 
-            if (Charge >= 60f)
+            if (Charge >= 60f && !autoRelease)
             {
                 Charge = 60f;
                 
@@ -60,10 +61,10 @@ namespace TerRoguelike.Projectiles
             if (Owner.channel)
             {
                 Projectile.timeLeft = 2;
-                Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 1;
+                Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 2;
                 if (Owner.itemTime < 2)
                     Owner.itemTime = 2;
-                Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 1;
+                Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 2;
                 if (Owner.itemAnimation < 2)
                     Owner.itemAnimation = 2;
                 Owner.heldProj = Projectile.whoAmI;
@@ -73,30 +74,40 @@ namespace TerRoguelike.Projectiles
                 ReleaseSword();
                 return;
             }
+            if (autoRelease && Charge >= 60f)
+            {
+                ReleaseSword();
+            }
                 
             
-            if (Charge < 60)
+            if (Charge < 60 || autoRelease)
             {
+                float chargeAmt = 1f * Owner.GetAttackSpeed(DamageClass.Generic);
+                if (chargeAmt >= 3f)
+                    autoRelease = true;
+                else
+                    autoRelease = false;
+
                 Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
-                if (Charge >= 60)
+                if (Charge >= 60f)
                 {
-                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.12f }, Owner.Center);
+                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.085f }, Owner.Center);
                     modPlayer.bladeFlashTime = 15;
                 }
             }
-                
         }
 
         public void ReleaseSword()
         {
-            modPlayer.swingAnimCompletion += 0.00001f;
+            if ((Charge <= 60f || (Owner.channel && autoRelease)) && modPlayer.swingAnimCompletion == 0)
+                modPlayer.swingAnimCompletion += 0.00001f;
             int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
-            int damage = Charge == 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
+            int damage = Charge >= 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
             SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
             for (int i = 0; i < shotsToFire; i++)
             {
                 float mainAngle;
-                float spread = 6f;
+                float spread = 12f;
                 if (shotsToFire == 1)
                 {
                     mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
@@ -114,7 +125,13 @@ namespace TerRoguelike.Projectiles
                 Vector2 direction = (mainAngle).ToRotationVector2();
                 int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), Vector2.Zero, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
                 Main.projectile[spawnedProjectile].rotation = direction.ToRotation();
+                Main.projectile[spawnedProjectile].scale = 1f;
                 Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().swingDirection = Owner.direction;
+            }
+            Charge -= 60f;
+            if (Charge > 60f)
+            {
+                ReleaseSword();
             }
         }
     }
