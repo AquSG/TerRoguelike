@@ -63,6 +63,11 @@ namespace TerRoguelike.Systems
                         player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                         player.GetModPlayer<TerRoguelikePlayer>().currentFloor = nextFloor;
                     }
+
+                    if (room.closedTime == 1)
+                    {
+                        player.statLife = player.statLifeMax2;
+                    }
                 }
 
                 room.myRoom = loopCount;
