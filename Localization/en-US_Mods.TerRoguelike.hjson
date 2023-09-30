@@ -112,9 +112,9 @@ Items: {
 		DisplayName: Spent Shell
 		Tooltip:
 			'''
-			+1 projectile per attack
+			+1 projectile per weapon use
 			Attack speed is decreased by a multiplier to somewhat compensate
-			Extra copies of this item also grant +1 projectile per attack
+			Extra copies of this item also grant +1 projectile per weapon use
 			'''
 	}
 
