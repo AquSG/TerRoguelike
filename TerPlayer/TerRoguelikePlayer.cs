@@ -14,7 +14,7 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
-namespace TerRoguelike.Player
+namespace TerRoguelike.TerPlayer
 {
     public class TerRoguelikePlayer : ModPlayer
     {
@@ -294,7 +294,7 @@ namespace TerRoguelike.Player
                 modTarget.activatedSoulstealCoating = true;
             }
         }
-        public override bool FreeDodge(Terraria.Player.HurtInfo info)
+        public override bool FreeDodge(Player.HurtInfo info)
         {
             if (timesHaveBeenTougher > 0)
             {

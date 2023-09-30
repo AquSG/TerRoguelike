@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items
@@ -33,11 +33,11 @@ namespace TerRoguelike.Items
             Item.width = 20;
             Item.height = 20;
         }
-        public virtual void ItemEffects(Terraria.Player player)
+        public virtual void ItemEffects(Player player)
         {
 
         }
-        public override void UpdateInventory(Terraria.Player player)
+        public override void UpdateInventory(Player player)
         {
             ItemEffects(player);
         }

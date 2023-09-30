@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Projectiles
@@ -35,7 +35,7 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
-            Terraria.Player player = Main.player[Projectile.owner];
+            Player player = Main.player[Projectile.owner];
 
             if (player.dead || !player.active)
             {

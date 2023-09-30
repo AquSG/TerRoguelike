@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using TerRoguelike.Utilities;
@@ -18,7 +18,7 @@ namespace TerRoguelike.Projectiles
     {
         public TerRoguelikeGlobalProjectile modProj;
         TerRoguelikePlayer modPlayer;
-        public Terraria.Player player;
+        public Player player;
         public Vector2 stuckPosition = Vector2.Zero;
         public override void SetStaticDefaults()
         {

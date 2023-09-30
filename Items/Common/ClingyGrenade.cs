@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Common
@@ -21,7 +21,7 @@ namespace TerRoguelike.Items.Common
             Item.rare = ItemRarityID.Blue;
             Item.maxStack = Item.CommonMaxStack;
         }
-        public override void ItemEffects(Terraria.Player player)
+        public override void ItemEffects(Player player)
         {
             player.GetModPlayer<TerRoguelikePlayer>().clingyGrenade += Item.stack;
         }

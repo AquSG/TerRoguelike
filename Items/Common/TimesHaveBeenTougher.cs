@@ -1,7 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Items.Common
 {
@@ -15,7 +15,7 @@ namespace TerRoguelike.Items.Common
             Item.rare = ItemRarityID.Blue;
             Item.maxStack = Item.CommonMaxStack;
         }
-        public override void ItemEffects(Terraria.Player player)
+        public override void ItemEffects(Player player)
         {
             player.GetModPlayer<TerRoguelikePlayer>().timesHaveBeenTougher += Item.stack;
         }

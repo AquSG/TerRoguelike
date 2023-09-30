@@ -9,7 +9,7 @@ using Terraria.GameContent.ItemDropRules;
 using TerRoguelike.World;
 using Microsoft.Xna.Framework;
 using TerRoguelike.Items.Rare;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Terraria.Audio;
 using Terraria.ID;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
@@ -32,7 +32,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
-            Terraria.Player player = Main.player[projectile.owner];
+            Player player = Main.player[projectile.owner];
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
 
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)

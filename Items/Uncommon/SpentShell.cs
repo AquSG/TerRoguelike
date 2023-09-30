@@ -6,7 +6,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Uncommon
@@ -21,7 +21,7 @@ namespace TerRoguelike.Items.Uncommon
             Item.rare = ItemRarityID.Green;
             Item.maxStack = Item.CommonMaxStack;
         }
-        public override void ItemEffects(Terraria.Player player)
+        public override void ItemEffects(Player player)
         {
             player.GetModPlayer<TerRoguelikePlayer>().spentShell += Item.stack;
         }

@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 using TerRoguelike.Utilities;
@@ -35,23 +35,23 @@ namespace TerRoguelike.Items.Weapons
             Item.shootSpeed = 16f;
         }
 
-        public override bool CanUseItem(Terraria.Player player)
+        public override bool CanUseItem(Player player)
         {
             return !Main.projectile.Any(n => n.active && n.owner == player.whoAmI && n.type == ModContent.ProjectileType<AdaptiveGunHoldout>());
         }
 
-        public override void UseItemFrame(Terraria.Player player)
+        public override void UseItemFrame(Player player)
         {
             //Calculate the dirction in which the players arms should be pointing at.
             Vector2 playerToCursor = (Main.MouseWorld - player.Center).SafeNormalize(Vector2.UnitX);
             float armPointingDirection = (playerToCursor.ToRotation());
 
-            player.SetCompositeArmBack(true, Terraria.Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
-            player.SetCompositeArmFront(true, Terraria.Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
+            player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
+            player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             TerRoguelikeUtils.CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(42, 30), new Vector2(-12, -4));
         }
 
-        public override void UseStyle(Terraria.Player player, Rectangle heldItemFrame)
+        public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
             if (Main.MouseWorld.X > player.Center.X)
             {

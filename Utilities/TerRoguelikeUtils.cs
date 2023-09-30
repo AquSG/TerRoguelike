@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Utilities
 {
@@ -26,7 +26,7 @@ namespace TerRoguelike.Utilities
         /// <param name="noSandstorm">Should the swirly effect from the sandstorm jump be disabled</param>
         /// <param name="flipAngle">Should the angle get flipped with the player, or should it be rotated by 180 degrees</param>
         /// <param name="stepDisplace">Should the item get displaced with the player's height during the walk anim? </param>
-        public static void CleanHoldStyle(Terraria.Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
+        public static void CleanHoldStyle(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
         {
             if (noSandstorm)
                 player.sandStorm = false;

@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using System.Reflection;
@@ -20,7 +20,7 @@ namespace TerRoguelike.Projectiles
 
         public ref float Charge => ref Projectile.ai[0];
 
-        public Terraria.Player Owner => Main.player[Projectile.owner];
+        public Player Owner => Main.player[Projectile.owner];
         public TerRoguelikePlayer modPlayer;
 
 

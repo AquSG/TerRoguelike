@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria;
 using TerRoguelike.Managers;
-using TerRoguelike.Player;
+using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
 using Terraria.ID;
 using TerRoguelike.Systems;
