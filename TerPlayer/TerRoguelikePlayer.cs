@@ -298,9 +298,9 @@ namespace TerRoguelike.TerPlayer
         {
             if (timesHaveBeenTougher > 0)
             {
-                float chance = (float)Math.Log((double)(timesHaveBeenTougher + 1), 256d);
-                if (chance > 0.999f)
-                    chance = 0.999f;
+                float chance = (0.15f * timesHaveBeenTougher) / (0.15f * timesHaveBeenTougher + 1);
+
+                Main.NewText(chance.ToString());
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.075f }, Player.Center);
