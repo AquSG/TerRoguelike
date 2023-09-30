@@ -108,7 +108,7 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < shotsToFire; i++)
             {
                 float mainAngle;
-                float spread = 12f;
+                float spread = 20f;
                 if (shotsToFire == 1)
                 {
                     mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation();
