@@ -13,15 +13,6 @@ Projectiles: {
 }
 
 Items: {
-	CommonUtilityItem: {
-		DisplayName: Common Utility Item
-		Tooltip:
-			'''
-			5% increased movement speed
-			Extra copies of this item also grant 5% increased movement speed
-			'''
-	}
-
 	RareCombatItem: {
 		DisplayName: Rare Combat Item
 		Tooltip:
@@ -248,6 +239,15 @@ Items: {
 			'''
 			10% increased main attack size
 			Extra copies of this item also grant 10% increased main attack size
+			'''
+	}
+
+	TimesHaveBeenTougher: {
+		DisplayName: Times Have Been Tougher
+		Tooltip:
+			'''
+			13% chance to block an incoming attack
+			Extra copies of this item increase block chance by a diminishing amount
 			'''
 	}
 }

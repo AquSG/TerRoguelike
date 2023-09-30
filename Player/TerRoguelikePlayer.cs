@@ -1,26 +1,18 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.ModLoader;
-using Terraria.ID;
-using TerRoguelike.Managers;
-using TerRoguelike.Systems;
-using TerRoguelike.Rooms;
-using Microsoft.Xna.Framework;
-using TerRoguelike.Projectiles;
-using TerRoguelike.NPCs;
-using TerRoguelike.World;
-using TerRoguelike.Items.Weapons;
-using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using static TerRoguelike.Schematics.SchematicManager;
-using TerRoguelike.Items.Uncommon;
+using Terraria.Audio;
 using Terraria.DataStructures;
-using static Terraria.ModLoader.PlayerDrawLayer;
-using Terraria.Graphics.Shaders;
-using Microsoft.Xna.Framework.Graphics;
+using Terraria.ID;
+using Terraria.ModLoader;
+using TerRoguelike.Items.Weapons;
+using TerRoguelike.Managers;
+using TerRoguelike.NPCs;
+using TerRoguelike.Projectiles;
+using TerRoguelike.World;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Player
 {
@@ -33,9 +25,9 @@ namespace TerRoguelike.Player
         public int antiqueLens;
         public int livingCrystal;
         public int soulstealCoating;
-        public int commonUtilityItem;
         public int runningShoe;
         public int bunnyHopper;
+        public int timesHaveBeenTougher;
         public int lockOnMissile;
         public int evilEye;
         public int spentShell;
@@ -69,9 +61,9 @@ namespace TerRoguelike.Player
             antiqueLens = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
-            commonUtilityItem = 0;
             runningShoe = 0;
             bunnyHopper = 0;
+            timesHaveBeenTougher = 0;
             lockOnMissile = 0;
             evilEye = 0;
             spentShell = 0;
@@ -135,11 +127,6 @@ namespace TerRoguelike.Player
             {
                 int regenIncrease = livingCrystal * 4;
                 Player.lifeRegen += regenIncrease;
-            }
-            if (commonUtilityItem > 0)
-            {
-                float speedIncrease = commonUtilityItem * 0.05f;
-                Player.moveSpeed += speedIncrease;
             }
             if (runningShoe > 0)
             {
@@ -207,7 +194,7 @@ namespace TerRoguelike.Player
                 {
                     finalAttackSpeedMultiplier *= 1 - (1f / (2f + (float)spentShell));
                 }
-                Player.GetAttackSpeed(DamageClass.Generic) *=  finalAttackSpeedMultiplier;
+                Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
             }
             if (!Player.GetJumpState(ExtraJump.CloudInABottle).Available && timesDoubleJumped < extraDoubleJumps)
             {
@@ -261,7 +248,7 @@ namespace TerRoguelike.Player
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
             {
                 float chance = 0.1f;
-                if(ChanceRollWithLuck(chance, procLuck))
+                if (ChanceRollWithLuck(chance, procLuck))
                 {
                     Vector2 spawnPosition = Main.player[proj.owner].Top;
                     Vector2 direction = -Vector2.UnitY;
@@ -307,6 +294,24 @@ namespace TerRoguelike.Player
                 modTarget.activatedSoulstealCoating = true;
             }
         }
+        public override bool FreeDodge(Terraria.Player.HurtInfo info)
+        {
+            if (timesHaveBeenTougher > 0)
+            {
+                float chance = (float)Math.Log((double)(timesHaveBeenTougher + 1), 256d);
+                if (chance > 0.999f)
+                    chance = 0.999f;
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.075f }, Player.Center);
+                    CombatText.NewText(Player.getRect(), Color.LightGray, "blocked!");
+                    Player.immuneTime += 45;
+                    Player.immune = true;
+                    return true;
+                }
+            }
+            return false;
+        }
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {
             static Item createItem(int type)
@@ -321,8 +326,8 @@ namespace TerRoguelike.Player
                 createItem(ModContent.ItemType<AdaptiveGun>()),
                 createItem(ModContent.ItemType<AdaptiveBlade>())
             };
-            
-            return items; 
+
+            return items;
         }
         public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod, bool mediumCoreDeath)
         {
@@ -339,7 +344,7 @@ namespace TerRoguelike.Player
                 drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 23f);
                 bladeFlashTime--;
             }
-            
+
             return;
 
             if (evilEye > 0)
