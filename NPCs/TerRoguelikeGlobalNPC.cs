@@ -20,6 +20,7 @@ namespace TerRoguelike.NPCs
         public int sourceRoomListID = -1;
 
         public bool activatedSoulstealCoating = false;
+        public bool activatedAmberBead = false;
 
         #endregion
         public override bool InstancePerEntity => true;

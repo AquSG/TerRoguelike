@@ -139,7 +139,9 @@ namespace TerRoguelike.Managers
         {
             ModContent.ItemType<RunningShoe>(),
             ModContent.ItemType<BunnyHopper>(),
-            ModContent.ItemType<TimesHaveBeenTougher>()
+            ModContent.ItemType<TimesHaveBeenTougher>(),
+            ModContent.ItemType<RustedShield>(),
+            ModContent.ItemType<AmberBead>()
         };
         #endregion
 

@@ -43,7 +43,7 @@ namespace TerRoguelike.UI
         public static void Draw(SpriteBatch spriteBatch, Player player)
         {
 
-            Vector2 barrierScreenRatioPos = new Vector2(((float)Main.screenWidth - (Main.UIScale * 360f)), (Main.UIScale * 32f));
+            Vector2 barrierScreenRatioPos = new Vector2(((float)Main.screenWidth - (Main.UIScale * 361f)), (Main.UIScale * 32f));
             // Convert the screen ratio position to an absolute position in pixels
             // Cast to integer to prevent blurriness which results from decimal pixel positions
             Vector2 barrierScreenPos = barrierScreenRatioPos;

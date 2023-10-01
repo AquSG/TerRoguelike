@@ -30,6 +30,8 @@ namespace TerRoguelike.TerPlayer
         public int runningShoe;
         public int bunnyHopper;
         public int timesHaveBeenTougher;
+        public int rustedShield;
+        public int amberBead;
         public int lockOnMissile;
         public int evilEye;
         public int spentShell;
@@ -56,6 +58,9 @@ namespace TerRoguelike.TerPlayer
         public Vector2 playerToCursor = Vector2.Zero;
         public float barrierHealth = 0;
         public bool barrierFullAbsorbHit = false;
+        public float barrierFloor = 0;
+        public int outOfDangerTime = 600;
+        public bool dodgeAttack = false;
         #endregion
         public override void PreUpdate()
         {
@@ -68,6 +73,8 @@ namespace TerRoguelike.TerPlayer
             runningShoe = 0;
             bunnyHopper = 0;
             timesHaveBeenTougher = 0;
+            rustedShield = 0;
+            amberBead = 0;
             lockOnMissile = 0;
             evilEye = 0;
             spentShell = 0;
@@ -86,10 +93,7 @@ namespace TerRoguelike.TerPlayer
             procLuck = 0;
             scaleMultiplier = 1f;
 
-            if (barrierHealth > 0)
-            {
-                barrierHealth -= Player.statLifeMax2 * (0.04f * 0.0166f);
-            }
+            barrierFloor = 0;
             barrierFullAbsorbHit = false;
         }
         public override void OnEnterWorld()
@@ -113,6 +117,26 @@ namespace TerRoguelike.TerPlayer
                 {
                     Player.gravity *= 1.5f;
                 }
+            }
+            outOfDangerTime++;
+
+            if (rustedShield > 0)
+            {
+                float addedBarrier = 0.08f * Player.statLifeMax2 * rustedShield;
+                barrierFloor += addedBarrier;
+            }
+            if (barrierFloor > Player.statLifeMax2)
+                barrierFloor = Player.statLifeMax2;
+
+            if (barrierHealth < barrierFloor && outOfDangerTime >= 420 && barrierFloor != 0)
+            {
+                barrierHealth += barrierFloor * 0.0083334f;
+            }
+            if (barrierHealth > barrierFloor)
+            {
+                barrierHealth -= Player.statLifeMax2 * (0.04f * 0.0166f);
+                if (barrierHealth < barrierFloor)
+                    barrierHealth = barrierFloor;
             }
 
             if (coolantCanister > 0)
@@ -224,12 +248,17 @@ namespace TerRoguelike.TerPlayer
             if (barrierHealth < 0)
                 barrierHealth = 0;
         }
+        public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            if (target.life <= 0)
+                OnKillEffects(target, hit, damageDone);
+        }
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
 
             if (target.life <= 0)
-                OnKillEffects(proj, target, hit, damageDone);
+                OnKillEffects(target, hit, damageDone);
 
             if (clingyGrenade > 0 && !modProj.procChainBools.clinglyGrenadePreviously)
             {
@@ -300,30 +329,34 @@ namespace TerRoguelike.TerPlayer
                 Player.Heal(healAmt);
             }
         }
-        public void OnKillEffects(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
+        public void OnKillEffects(NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
             if (soulstealCoating > 0 && !modTarget.activatedSoulstealCoating)
             {
-                int healingAmt = (int)(Main.player[proj.owner].statLifeMax2 * soulstealCoating * 0.1f);
+                int healingAmt = (int)(Player.statLifeMax2 * soulstealCoating * 0.1f);
                 Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI, healingAmt);
                 modTarget.activatedSoulstealCoating = true;
             }
+            if (amberBead > 0 && !modTarget.activatedAmberBead)
+            {
+                int barrierGainAmt = amberBead * 15;
+                barrierHealth += barrierGainAmt;
+                modTarget.activatedAmberBead = true;
+                if (barrierHealth > Player.statLifeMax2)
+                    barrierHealth = Player.statLifeMax2;
+            }
+        }
+        public override void OnHurt(Player.HurtInfo info)
+        {
+            outOfDangerTime = 0;
         }
         public override bool FreeDodge(Player.HurtInfo info)
         {
-            if (timesHaveBeenTougher > 0)
+            if (dodgeAttack)
             {
-                float chance = (0.15f * timesHaveBeenTougher) / (0.15f * timesHaveBeenTougher + 1);
-
-                if (ChanceRollWithLuck(chance, procLuck))
-                {
-                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.075f }, Player.Center);
-                    CombatText.NewText(Player.getRect(), Color.LightGray, "blocked!");
-                    Player.immuneTime += 45;
-                    Player.immune = true;
-                    return true;
-                }
+                dodgeAttack = false;
+                return true;
             }
 
             if (barrierHealth > 1 && info.Damage <= (int)barrierHealth && !barrierFullAbsorbHit)
@@ -336,6 +369,21 @@ namespace TerRoguelike.TerPlayer
         }
         public override void ModifyHurt(ref Player.HurtModifiers modifiers)
         {
+            if (timesHaveBeenTougher > 0)
+            {
+                float chance = (0.15f * timesHaveBeenTougher) / (0.15f * timesHaveBeenTougher + 1);
+
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.075f }, Player.Center);
+                    CombatText.NewText(Player.getRect(), Color.LightGray, "blocked!");
+                    Player.immuneTime += 45;
+                    Player.immune = true;
+                    dodgeAttack = true;
+                    return;
+                }
+            }
+
             modifiers.ModifyHurtInfo += ModifyHurtInfo_TerRoguelike;
         }
         private void ModifyHurtInfo_TerRoguelike(ref Player.HurtInfo info)
@@ -355,6 +403,7 @@ namespace TerRoguelike.TerPlayer
             barrierHealth -= damage;
             Player.immuneTime += 45;
             Player.immune = true;
+            outOfDangerTime = 0;
         }
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {

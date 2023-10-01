@@ -250,4 +250,24 @@ Items: {
 			Extra copies of this item increase block chance by a diminishing amount
 			'''
 	}
+
+	RustedShield: {
+		DisplayName: Rusted Shield
+		Tooltip:
+			'''
+			Barrier floor becomes 8% of max barrier
+			Barrier cannot naturally decay below the barrier floor
+			After not being hit for 7 seconds, barrier quickly recharges up to the barrier floor
+			Extra copies of this item increase the barrier floor by another 8% of max barrier
+			'''
+	}
+
+	AmberBead: {
+		DisplayName: Amber Bead
+		Tooltip:
+			'''
+			Gain 15 barrier on kill
+			Extra copies of this item grant 15 more barrier on kill
+			'''
+	}
 }
