@@ -2,6 +2,7 @@ using Terraria.ModLoader;
 using TerRoguelike.Schematics;
 using static TerRoguelike.Managers.SpawnManager;
 using static TerRoguelike.Systems.RoomSystem;
+using TerRoguelike.UI;
 
 namespace TerRoguelike
 {
@@ -12,6 +13,7 @@ namespace TerRoguelike
         {
             Instance = this;
             SchematicManager.Load();
+            BarrierUI.Load();
         }
         public override void Unload()
         {
@@ -20,6 +22,7 @@ namespace TerRoguelike
             RoomList = null;
             pendingEnemies = null;
             pendingItems = null;
+            BarrierUI.Unload();
         }
     }
 }

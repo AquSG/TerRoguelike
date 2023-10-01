@@ -12,7 +12,9 @@ using TerRoguelike.Managers;
 using TerRoguelike.NPCs;
 using TerRoguelike.Projectiles;
 using TerRoguelike.World;
+using Terraria.ModLoader.Assets;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -52,6 +54,8 @@ namespace TerRoguelike.TerPlayer
         public float swingAnimCompletion = 0;
         public int bladeFlashTime = 0;
         public Vector2 playerToCursor = Vector2.Zero;
+        public float barrierHealth = 0;
+        public bool barrierFullAbsorbHit = false;
         #endregion
         public override void PreUpdate()
         {
@@ -81,6 +85,12 @@ namespace TerRoguelike.TerPlayer
             extraDoubleJumps = 0;
             procLuck = 0;
             scaleMultiplier = 1f;
+
+            if (barrierHealth > 0)
+            {
+                barrierHealth -= Player.statLifeMax2 * (0.04f * 0.0166f);
+            }
+            barrierFullAbsorbHit = false;
         }
         public override void OnEnterWorld()
         {
@@ -90,15 +100,12 @@ namespace TerRoguelike.TerPlayer
                     Player.armor[3] = new Item();
             }
         }
-        public override bool PreItemCheck()
-        {
-            return true;
-        }
         public override void UpdateEquips()
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 Player.noFallDmg = true;
+                Player.noKnockback = true;
                 Player.GetCritChance(DamageClass.Generic) -= 3f;
                 Player.hasMagiluminescence = true;
                 Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
@@ -206,7 +213,16 @@ namespace TerRoguelike.TerPlayer
                 Player.moveSpeed *= 1.30f;
                 Player.maxRunSpeed *= 1.30f;
             }
+
             Player.jumpSpeedBoost += 5f * jumpSpeedMultiplier;
+
+            if (barrierHealth > 0)
+            {
+                if (barrierHealth > Player.statLifeMax2)
+                    barrierHealth = Player.statLifeMax2;
+            }
+            if (barrierHealth < 0)
+                barrierHealth = 0;
         }
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -309,7 +325,36 @@ namespace TerRoguelike.TerPlayer
                     return true;
                 }
             }
+
+            if (barrierHealth > 1 && info.Damage <= (int)barrierHealth && !barrierFullAbsorbHit)
+            {
+                BarrierHitEffect(info.Damage);
+                return true;
+            }
+
             return false;
+        }
+        public override void ModifyHurt(ref Player.HurtModifiers modifiers)
+        {
+            modifiers.ModifyHurtInfo += ModifyHurtInfo_TerRoguelike;
+        }
+        private void ModifyHurtInfo_TerRoguelike(ref Player.HurtInfo info)
+        {
+            if (barrierHealth > 1 && info.Damage > (int)barrierHealth)
+            {
+                info.Damage -= (int)barrierHealth;
+                BarrierHitEffect(info.Damage + (int)barrierHealth);
+                barrierFullAbsorbHit = true;
+            }
+        }
+        public void BarrierHitEffect(int damage)
+        {
+            CombatText.NewText(Player.getRect(), Color.Gold, damage > (int)barrierHealth ? -(int)barrierHealth : -damage);
+            SoundStyle soundStyle = damage < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
+            SoundEngine.PlaySound(soundStyle, Player.Center);
+            barrierHealth -= damage;
+            Player.immuneTime += 45;
+            Player.immune = true;
         }
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {
@@ -352,6 +397,7 @@ namespace TerRoguelike.TerPlayer
             if (enchantingEye > 0)
                 EnchantingEyePlayerEffect();
         }
+
         #region Item Drawing on Player
         public void EvilEyePlayerEffect()
         {
@@ -498,5 +544,45 @@ namespace TerRoguelike.TerPlayer
             }
         }
         #endregion
+
+        public class BarrierDrawLayer : PlayerDrawLayer
+        {
+            public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.LastVanillaLayer);
+
+            public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
+            {
+                Player drawPlayer = drawInfo.drawPlayer;
+                if (drawInfo.shadow != 0f || drawPlayer.dead || (drawPlayer.immuneAlpha > 120))
+                    return false;
+
+                return drawInfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().barrierHealth > 1f;
+            }
+
+            protected override void Draw(ref PlayerDrawSet drawInfo)
+            {
+                int itemTypeCache = drawInfo.heldItem.type;
+                Player drawPlayer = drawInfo.drawPlayer;
+                TerRoguelikePlayer modPLayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
+                drawInfo.heldItem.type = ItemID.None;
+
+                List<DrawData> existingDrawData = drawInfo.DrawDataCache;
+                for (int i = 0; i < 1; i++)
+                {
+                    float scale = 1.28f + 0.04f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi));
+                    float opacity = (0.13f + (0.23f * (0.5f + (modPLayer.barrierHealth / drawPlayer.statLifeMax2))));
+                    List<DrawData> afterimages = new List<DrawData>();
+                    for (int j = 0; j < existingDrawData.Count; j++)
+                    {
+                        var drawData = existingDrawData[j];
+                        drawData.position = existingDrawData[j].position;
+                        drawData.color = Color.Yellow * opacity;
+                        drawData.scale = new Vector2(scale);
+                        afterimages.Add(drawData);
+                    }
+                    drawInfo.DrawDataCache.InsertRange(0, afterimages);
+                }
+                drawInfo.heldItem.type = itemTypeCache;
+            }
+        }
     }
 }
