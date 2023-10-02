@@ -609,28 +609,26 @@ namespace TerRoguelike.TerPlayer
 
             protected override void Draw(ref PlayerDrawSet drawInfo)
             {
-                int itemTypeCache = drawInfo.heldItem.type;
                 Player drawPlayer = drawInfo.drawPlayer;
                 TerRoguelikePlayer modPLayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
-                drawInfo.heldItem.type = ItemID.None;
 
                 List<DrawData> existingDrawData = drawInfo.DrawDataCache;
-                for (int i = 0; i < 1; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    float scale = 1.28f + 0.04f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi));
-                    float opacity = (0.13f + (0.23f * (0.5f + (modPLayer.barrierHealth / drawPlayer.statLifeMax2))));
+                    float scale = 0.8f + 0.08f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi));
+                    float opacity = (0.13f + (0.23f * (0.5f + (modPLayer.barrierHealth / drawPlayer.statLifeMax2)))) * 0.3f;
                     List<DrawData> afterimages = new List<DrawData>();
                     for (int j = 0; j < existingDrawData.Count; j++)
                     {
                         var drawData = existingDrawData[j];
-                        drawData.position = existingDrawData[j].position;
+                        drawData.position = existingDrawData[j].position + (Vector2.UnitY * 6f).RotatedBy(MathHelper.PiOver2 * i);
                         drawData.color = Color.Yellow * opacity;
                         drawData.scale = new Vector2(scale);
                         afterimages.Add(drawData);
+                        drawData.shader = 1;
                     }
                     drawInfo.DrawDataCache.InsertRange(0, afterimages);
                 }
-                drawInfo.heldItem.type = itemTypeCache;
             }
         }
     }
