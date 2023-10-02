@@ -7,6 +7,7 @@ namespace TerRoguelike.Items.Common
 {
     public class RunningShoe : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<RunningShoe>();
         public override bool UtilityItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()

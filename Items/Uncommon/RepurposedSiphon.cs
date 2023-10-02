@@ -8,11 +8,13 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Uncommon
 {
     public class RepurposedSiphon : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<RepurposedSiphon>();
         public override bool HealingItem => true;
         public override int itemTier => 1;
         public override void SetDefaults()

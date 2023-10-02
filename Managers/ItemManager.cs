@@ -12,9 +12,11 @@ using Microsoft.Xna.Framework;
 using TerRoguelike.Schematics;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
+using TerRoguelike.Items;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Items.Rare;
+using Terraria.ModLoader.Core;
 using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Managers
@@ -25,87 +27,97 @@ namespace TerRoguelike.Managers
         public static List<int> PastRoomRewardCategories = new List<int>();
         public static int GiveCommon(bool giveCooldown = true)
         {
-            int chosenItem;
-            int category = ChooseCategory();
+            BaseRoguelikeItem chosenItem;
+            int category = ChooseCategory(0);
             if (category == 0)
-                chosenItem = CommonCombatItems[Main.rand.Next(CommonCombatItems.Count)];
+                chosenItem = GetItemFromListWithWeights(CommonCombatItems);
             else if (category == 1)
-                chosenItem = CommonHealingItems[Main.rand.Next(CommonHealingItems.Count)];
+                chosenItem = GetItemFromListWithWeights(CommonHealingItems);
             else
-                chosenItem = CommonUtilityItems[Main.rand.Next(CommonUtilityItems.Count)];
+                chosenItem = GetItemFromListWithWeights(CommonUtilityItems);
 
-            return chosenItem;
+            return chosenItem.modItemID;
         }
         public static int GiveUncommon(bool giveCooldown = true)
         {
             if (giveCooldown)
                 RoomRewardCooldown += 1;
 
-            int chosenItem;
-            int category = ChooseCategory();
+            BaseRoguelikeItem chosenItem;
+            int category = ChooseCategory(1);
             if (category == 0)
-                chosenItem = UncommonCombatItems[Main.rand.Next(UncommonCombatItems.Count)];
+                
+                chosenItem = GetItemFromListWithWeights(UncommonCombatItems);
             else if (category == 1)
-                chosenItem = UncommonHealingItems[Main.rand.Next(UncommonHealingItems.Count)];
+                chosenItem = GetItemFromListWithWeights(UncommonHealingItems);
             else
-                chosenItem = UncommonUtilityItems[Main.rand.Next(UncommonUtilityItems.Count)];
+                chosenItem = GetItemFromListWithWeights(UncommonUtilityItems);
 
-            return chosenItem;
+
+            return chosenItem.modItemID;
         }
         public static int GiveRare(bool giveCooldown = true)
         {
             if (giveCooldown)
                 RoomRewardCooldown += 2;
 
-            int chosenItem;
-            int category = ChooseCategory();
+            BaseRoguelikeItem chosenItem;
+            int category = ChooseCategory(2);
             if (category == 0)
-                chosenItem = RareCombatItems[Main.rand.Next(RareCombatItems.Count)];
+                chosenItem = GetItemFromListWithWeights(RareCombatItems);
             else if (category == 1)
-                chosenItem = RareHealingItems[Main.rand.Next(RareHealingItems.Count)];
+                chosenItem = GetItemFromListWithWeights(RareHealingItems);
             else
-                chosenItem = RareUtilityItems[Main.rand.Next(RareUtilityItems.Count)];
+                chosenItem = GetItemFromListWithWeights(RareUtilityItems);
 
-            return chosenItem;
+            return chosenItem.modItemID;
         }
 
-        public static int ChooseCategory()
+        public static int ChooseCategory(int tier)
         {
             int combatChance = 33;
             int healingChance = 33;
             int utilityChance = 33;
+            switch (tier)
+            {
+                case 0:
+                    combatChance = CommonCombatItems.Count;
+                    healingChance = CommonHealingItems.Count;
+                    utilityChance = CommonUtilityItems.Count;
+                    break;
+                case 1:
+                    combatChance = UncommonCombatItems.Count;
+                    healingChance = UncommonHealingItems.Count;
+                    utilityChance = UncommonUtilityItems.Count;
+                    break;
+                case 2:
+                    combatChance = RareCombatItems.Count;
+                    healingChance = RareHealingItems.Count;
+                    utilityChance = RareUtilityItems.Count;
+                    break;
+            }
 
             if (!PastRoomRewardCategories.Any())
             {
-                combatChance = 50;
-                healingChance = 25;
-                utilityChance = 25;
+                combatChance *= 2;
             }
             else if (!PastRoomRewardCategories.Contains(0))
             {
-                combatChance = 50;
-                healingChance = 25;
-                utilityChance = 25;
+                combatChance *= 2;
             }
             else
             {
                 if ((float)PastRoomRewardCategories.FindAll(x => x == 0).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
-                    combatChance = 50;
-                    healingChance = 25;
-                    utilityChance = 25;
+                    combatChance *= 2;
                 }
                 else if ((float)PastRoomRewardCategories.FindAll(x => x == 1).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
-                    combatChance = 25;
-                    healingChance = 50;
-                    utilityChance = 25;
+                    healingChance *= 2;
                 }
                 else if ((float)PastRoomRewardCategories.FindAll(x => x == 2).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
-                    combatChance = 25;
-                    healingChance = 25;
-                    utilityChance = 50;
+                    utilityChance *= 2;
                 }
             }
 
@@ -122,65 +134,106 @@ namespace TerRoguelike.Managers
             return chosenCategory;
         }
 
-        #region Common Item Lists
-        public static List<int> CommonCombatItems = new List<int>()
+        public static BaseRoguelikeItem GetItemFromListWithWeights(List<BaseRoguelikeItem> list)
         {
-            ModContent.ItemType<ClingyGrenade>(),
-            ModContent.ItemType<PocketSpotter>(),
-            ModContent.ItemType<CoolantCanister>(),
-            ModContent.ItemType<AntiqueLens>()
-        };
-        public static List<int> CommonHealingItems = new List<int>()
-        {
-            ModContent.ItemType<LivingCrystal>(),
-            ModContent.ItemType<SoulstealCoating>()
-        };
-        public static List<int> CommonUtilityItems = new List<int>()
-        {
-            ModContent.ItemType<RunningShoe>(),
-            ModContent.ItemType<BunnyHopper>(),
-            ModContent.ItemType<TimesHaveBeenTougher>(),
-            ModContent.ItemType<RustedShield>(),
-            ModContent.ItemType<AmberBead>()
-        };
-        #endregion
+            float totalWeight = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                totalWeight += list[i].ItemDropWeight;
+            }
+            float randomFloat = Main.rand.NextFloat(totalWeight + float.Epsilon);
+            int returnIndex = 0;
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                randomFloat -= list[i].ItemDropWeight;
+                if (randomFloat <= 0)
+                {
+                    returnIndex = i;
+                    break;
+                }
+            }
+            return list[returnIndex];
+        }
 
-        #region Uncommon Item Lists
-        public static List<int> UncommonCombatItems = new List<int>()
+        internal static void Load()
         {
-            ModContent.ItemType<EvilEye>(),
-            ModContent.ItemType<SpentShell>(),
-            ModContent.ItemType<HeatSeekingChip>(),
-            ModContent.ItemType<LockOnMissile>()
-        };
-        public static List<int> UncommonHealingItems = new List<int>()
-        {
-            ModContent.ItemType<RepurposedSiphon>(),
-            ModContent.ItemType<EnchantingEye>()
-        };
-        public static List<int> UncommonUtilityItems = new List<int>()
-        {
-            ModContent.ItemType<BouncyBall>(),
-            ModContent.ItemType<AirCanister>()
-        };
-        #endregion
+            AllItems = new List<BaseRoguelikeItem>()
+            {
+                new ClingyGrenade(),
+                new PocketSpotter(),
+                new CoolantCanister(),
+                new AntiqueLens(),
+                new LivingCrystal(),
+                new SoulstealCoating(),
+                new RunningShoe(),
+                new BunnyHopper(),
+                new TimesHaveBeenTougher(),
+                new RustedShield(),
+                new AmberBead(),
+                new EvilEye(),
+                new SpentShell(),
+                new HeatSeekingChip(),
+                new LockOnMissile(),
+                new RepurposedSiphon(),
+                new EnchantingEye(),
+                new BouncyBall(),
+                new AirCanister(),
+                new VolatileRocket(),
+                new TheDreamsoul(),
+                new RareHealingItem(),
+                new RareUtilityItem()
+            };
+            CommonCombatItems = new List<BaseRoguelikeItem>();
+            CommonHealingItems = new List<BaseRoguelikeItem>();
+            CommonUtilityItems = new List<BaseRoguelikeItem>();
 
-        #region Rare Item Lists
-        public static List<int> RareCombatItems = new List<int>()
+            UncommonCombatItems = new List<BaseRoguelikeItem>();
+            UncommonHealingItems = new List<BaseRoguelikeItem>();
+            UncommonUtilityItems = new List<BaseRoguelikeItem>();
+
+            RareCombatItems = new List<BaseRoguelikeItem>();
+            RareHealingItems = new List<BaseRoguelikeItem>();
+            RareUtilityItems = new List<BaseRoguelikeItem>();
+
+            CommonCombatItems = AllItems.FindAll(x => x.itemTier == 0 && x.CombatItem);
+            CommonHealingItems = AllItems.FindAll(x => x.itemTier == 0 && x.HealingItem);
+            CommonUtilityItems = AllItems.FindAll(x => x.itemTier == 0 && x.UtilityItem);
+
+            UncommonCombatItems = AllItems.FindAll(x => x.itemTier == 1 && x.CombatItem);
+            UncommonHealingItems = AllItems.FindAll(x => x.itemTier == 1 && x.HealingItem);
+            UncommonUtilityItems = AllItems.FindAll(x => x.itemTier == 1 && x.UtilityItem);
+
+            RareCombatItems = AllItems.FindAll(x => x.itemTier == 2 && x.CombatItem);
+            RareHealingItems = AllItems.FindAll(x => x.itemTier == 2 && x.HealingItem);
+            RareUtilityItems = AllItems.FindAll(x => x.itemTier == 2 && x.UtilityItem);
+        }
+        internal static void Unload()
         {
-            ModContent.ItemType<VolatileRocket>(),
-            ModContent.ItemType<TheDreamsoul>()
-        };
-        public static List<int> RareHealingItems = new List<int>()
-        {
-            ModContent.ItemType<RareHealingItem>(),
-            ModContent.ItemType<RareHealingItem>()
-        };
-        public static List<int> RareUtilityItems = new List<int>()
-        {
-            ModContent.ItemType<RareUtilityItem>(),
-            ModContent.ItemType<RareUtilityItem>()
-        };
-        #endregion
+            AllItems = null;
+
+            CommonCombatItems = null;
+            CommonHealingItems = null;
+            CommonUtilityItems = null;
+
+            UncommonCombatItems = null;
+            UncommonHealingItems = null;
+            UncommonUtilityItems = null;
+
+            RareCombatItems = null;
+            RareHealingItems = null;
+            RareUtilityItems = null;
+        }
+        public static List<BaseRoguelikeItem> AllItems;
+        public static List<BaseRoguelikeItem> CommonCombatItems;
+        public static List<BaseRoguelikeItem> CommonHealingItems;
+        public static List<BaseRoguelikeItem> CommonUtilityItems;
+
+        public static List<BaseRoguelikeItem> UncommonCombatItems;
+        public static List<BaseRoguelikeItem> UncommonHealingItems;
+        public static List<BaseRoguelikeItem> UncommonUtilityItems;
+
+        public static List<BaseRoguelikeItem> RareCombatItems;
+        public static List<BaseRoguelikeItem> RareHealingItems;
+        public static List<BaseRoguelikeItem> RareUtilityItems;
     }
 }

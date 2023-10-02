@@ -8,11 +8,13 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Rare
 {
     public class RareHealingItem : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<RareHealingItem>();
         public override bool HealingItem => true;
         public override int itemTier => 2;
         public override void SetDefaults()

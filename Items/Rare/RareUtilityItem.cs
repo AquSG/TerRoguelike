@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Rare
 {
     public class RareUtilityItem : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<RareUtilityItem>();
         public override bool UtilityItem => true;
         public override int itemTier => 2;
         public override void SetDefaults()

@@ -40,15 +40,6 @@ Items: {
 			'''
 	}
 
-	UncommonCombatItem: {
-		DisplayName: Uncommon Combat Item
-		Tooltip:
-			'''
-			15% increased damage
-			Extra copies of this item also grant 15% increased damage
-			'''
-	}
-
 	ClingyGrenade: {
 		DisplayName: Clingy Grenade
 		Tooltip:

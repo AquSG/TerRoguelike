@@ -8,11 +8,13 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Uncommon
 {
     public class LockOnMissile : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<LockOnMissile>();
         public override bool CombatItem => true;
         public override int itemTier => 1;
         public override void SetDefaults()

@@ -17,9 +17,11 @@ namespace TerRoguelike.Items
         public virtual bool CombatItem => false;
         public virtual bool HealingItem => false;
         public virtual bool UtilityItem => false;
+        public virtual float ItemDropWeight => 1f;
         public virtual int itemTier => 0;
         public virtual int animationTicksPerFrame => 0;
         public virtual int animationFrameCount => 0;
+        public virtual int modItemID => -1;
         public override void SetStaticDefaults()
         {
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)

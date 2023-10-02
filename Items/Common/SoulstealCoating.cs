@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Common
 {
     public class SoulstealCoating : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<SoulstealCoating>();
         public override bool HealingItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()

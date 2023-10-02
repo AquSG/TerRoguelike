@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Rare
 {
     public class TheDreamsoul : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<TheDreamsoul>();
         public override bool CombatItem => true;
         public override int itemTier => 2;
         public override int animationTicksPerFrame => 6;

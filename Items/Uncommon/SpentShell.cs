@@ -8,11 +8,13 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Uncommon
 {
     public class SpentShell: BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<SpentShell>();
         public override bool CombatItem => true;
         public override int itemTier => 1;
         public override void SetDefaults()

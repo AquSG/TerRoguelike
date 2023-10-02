@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Common
 {
     public class ClingyGrenade : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<ClingyGrenade>();
         public override bool CombatItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()

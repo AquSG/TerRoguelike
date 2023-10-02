@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Common
 {
     public class BunnyHopper : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<BunnyHopper>();
         public override bool UtilityItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()

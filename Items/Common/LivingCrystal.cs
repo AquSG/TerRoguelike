@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Common
 {
     public class LivingCrystal : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<LivingCrystal>();
         public override bool HealingItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()

@@ -8,11 +8,13 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Uncommon
 {
     public class BouncyBall : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<BouncyBall>();
         public override bool UtilityItem => true;
         public override int itemTier => 1;
         public override void SetDefaults()

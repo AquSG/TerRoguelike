@@ -13,6 +13,7 @@ namespace TerRoguelike.Items.Common
 {
     public class PocketSpotter : BaseRoguelikeItem, ILocalizedModType
     {
+        public override int modItemID => ModContent.ItemType<PocketSpotter>();
         public override bool CombatItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()

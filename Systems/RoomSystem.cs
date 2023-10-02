@@ -58,7 +58,11 @@ namespace TerRoguelike.Systems
                     bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
                     if (teleportCheck)
                     {
-                        var nextFloor = FloorID[RoomManager.FloorIDsInPlay[player.GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage + 1]];
+                        int nextFloorID = player.GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage + 1;
+                        if (nextFloorID >= RoomManager.FloorIDsInPlay.Count)
+                            nextFloorID = 0;
+
+                        var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
                         var targetRoom = RoomID[nextFloor.StartRoomID];
                         player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                         player.GetModPlayer<TerRoguelikePlayer>().currentFloor = nextFloor;
