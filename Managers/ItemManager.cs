@@ -165,6 +165,7 @@ namespace TerRoguelike.Managers
                 new AntiqueLens(),
                 new LivingCrystal(),
                 new SoulstealCoating(),
+                new BottleOfVigor(),
                 new RunningShoe(),
                 new BunnyHopper(),
                 new TimesHaveBeenTougher(),

@@ -27,6 +27,7 @@ namespace TerRoguelike.TerPlayer
         public int antiqueLens;
         public int livingCrystal;
         public int soulstealCoating;
+        public int bottleOfVigor;
         public int runningShoe;
         public int bunnyHopper;
         public int timesHaveBeenTougher;
@@ -70,6 +71,7 @@ namespace TerRoguelike.TerPlayer
             antiqueLens = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
+            bottleOfVigor = 0;
             runningShoe = 0;
             bunnyHopper = 0;
             timesHaveBeenTougher = 0;
@@ -119,6 +121,12 @@ namespace TerRoguelike.TerPlayer
                 }
             }
             outOfDangerTime++;
+
+            if (bottleOfVigor > 0)
+            {
+                int maxLifeIncrease = bottleOfVigor * 20;
+                Player.statLifeMax2 += maxLifeIncrease;
+            }
 
             if (rustedShield > 0)
             {

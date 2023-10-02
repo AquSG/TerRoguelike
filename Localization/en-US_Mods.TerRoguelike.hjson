@@ -261,4 +261,13 @@ Items: {
 			Extra copies of this item grant 15 more barrier on kill
 			'''
 	}
+
+	BottleOfVigor: {
+		DisplayName: Bottle Of Vigor
+		Tooltip:
+			'''
+			+20 max life
+			Extra copies of this item also grant +20 max life
+			'''
+	}
 }

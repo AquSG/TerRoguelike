@@ -120,7 +120,7 @@ namespace TerRoguelike.Projectiles
 
             if (homingTarget == -1)
             {
-                float prefferedDistance = 160f;
+                float prefferedDistance = 480f;
                 List<float> npcHomingRating = new List<float>(new float[Main.maxNPCs]);
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
@@ -139,7 +139,7 @@ namespace TerRoguelike.Projectiles
                     }
                     else
                     {
-                        npcHomingRating[i] += 1f - (distance / 1000);
+                        npcHomingRating[i] += 1f - (distance / 1000f);
                     }
                 }
                 homingCheckCooldown = 10;

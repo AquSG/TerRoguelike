@@ -14,12 +14,6 @@ namespace TerRoguelike.UI
 {
     public static class BarrierUI
     {
-        // These values were handpicked on a 1080p screen by Ozzatron. Please disregard the bizarre precision.
-        private const float MouseDragEpsilon = 0.05f; // 0.05%
-
-        private static Vector2? barrierDragOffset = null;
-
-
         private static Texture2D barrierBarTex, barrierBorderTex;
         internal static void Load()
         {
@@ -37,7 +31,6 @@ namespace TerRoguelike.UI
 
         internal static void Reset()
         {
-            barrierDragOffset = null;
         }
 
         public static void Draw(SpriteBatch spriteBatch, Player player)
