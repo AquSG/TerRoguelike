@@ -37,7 +37,7 @@ namespace TerRoguelike.TerPlayer
         public int evilEye;
         public int spentShell;
         public int heatSeekingChip;
-        public int repurposedSiphon;
+        public int bloodSiphon;
         public int enchantingEye;
         public int bouncyBall;
         public int airCanister;
@@ -81,7 +81,7 @@ namespace TerRoguelike.TerPlayer
             evilEye = 0;
             spentShell = 0;
             heatSeekingChip = 0;
-            repurposedSiphon = 0;
+            bloodSiphon = 0;
             enchantingEye = 0;
             bouncyBall = 0;
             airCanister = 0;
@@ -326,9 +326,9 @@ namespace TerRoguelike.TerPlayer
 
                 evilEyeStacks.Add(180);
             }
-            if (repurposedSiphon > 0)
+            if (bloodSiphon > 0)
             {
-                int healAmt = repurposedSiphon;
+                int healAmt = bloodSiphon;
                 Player.Heal(healAmt);
             }
             if (enchantingEye > 0 && hit.Crit)

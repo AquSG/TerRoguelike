@@ -12,9 +12,9 @@ using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Uncommon
 {
-    public class RepurposedSiphon : BaseRoguelikeItem, ILocalizedModType
+    public class BloodSiphon : BaseRoguelikeItem, ILocalizedModType
     {
-        public override int modItemID => ModContent.ItemType<RepurposedSiphon>();
+        public override int modItemID => ModContent.ItemType<BloodSiphon>();
         public override bool HealingItem => true;
         public override int itemTier => 1;
         public override void SetDefaults()
@@ -25,7 +25,7 @@ namespace TerRoguelike.Items.Uncommon
         }
         public override void ItemEffects(Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().repurposedSiphon += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().bloodSiphon += Item.stack;
         }
     }
 }

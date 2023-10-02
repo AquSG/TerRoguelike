@@ -16,7 +16,9 @@ namespace TerRoguelike.Items.Uncommon
     {
         public override int modItemID => ModContent.ItemType<HeatSeekingChip>();
         public override bool CombatItem => true;
+        public override bool UtilityItem => true;
         public override int itemTier => 1;
+        public override float ItemDropWeight => 0.5f;
         public override void SetDefaults()
         {
             base.SetDefaults();

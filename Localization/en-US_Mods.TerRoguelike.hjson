@@ -145,15 +145,6 @@ Items: {
 			'''
 	}
 
-	RepurposedSiphon: {
-		DisplayName: Repurposed Siphon
-		Tooltip:
-			'''
-			+1 HP upon hitting enemies
-			Extra copies of this item increase the healing amount by 1
-			'''
-	}
-
 	EnchantingEye: {
 		DisplayName: Enchanting Eye
 		Tooltip:
@@ -268,6 +259,15 @@ Items: {
 			'''
 			+20 max life
 			Extra copies of this item also grant +20 max life
+			'''
+	}
+
+	BloodSiphon: {
+		DisplayName: Blood Siphon
+		Tooltip:
+			'''
+			+1 HP upon hitting enemies
+			Extra copies of this item increase the healing amount by 1
 			'''
 	}
 }

@@ -46,7 +46,6 @@ namespace TerRoguelike.Managers
             BaseRoguelikeItem chosenItem;
             int category = ChooseCategory(1);
             if (category == 0)
-                
                 chosenItem = GetItemFromListWithWeights(UncommonCombatItems);
             else if (category == 1)
                 chosenItem = GetItemFromListWithWeights(UncommonHealingItems);
@@ -75,53 +74,53 @@ namespace TerRoguelike.Managers
 
         public static int ChooseCategory(int tier)
         {
-            int combatChance = 33;
-            int healingChance = 33;
-            int utilityChance = 33;
+            float combatChance = 33f;
+            float healingChance = 33f;
+            float utilityChance = 33f;
             switch (tier)
             {
                 case 0:
-                    combatChance = CommonCombatItems.Count;
-                    healingChance = CommonHealingItems.Count;
-                    utilityChance = CommonUtilityItems.Count;
+                    combatChance = GetItemListWeight(CommonCombatItems);
+                    healingChance = GetItemListWeight(CommonHealingItems);
+                    utilityChance = GetItemListWeight(CommonUtilityItems);
                     break;
                 case 1:
-                    combatChance = UncommonCombatItems.Count;
-                    healingChance = UncommonHealingItems.Count;
-                    utilityChance = UncommonUtilityItems.Count;
+                    combatChance = GetItemListWeight(UncommonCombatItems);
+                    healingChance = GetItemListWeight(UncommonHealingItems);
+                    utilityChance = GetItemListWeight(UncommonUtilityItems);
                     break;
                 case 2:
-                    combatChance = RareCombatItems.Count;
-                    healingChance = RareHealingItems.Count;
-                    utilityChance = RareUtilityItems.Count;
+                    combatChance = GetItemListWeight(RareCombatItems);
+                    healingChance = GetItemListWeight(RareHealingItems);
+                    utilityChance = GetItemListWeight(RareUtilityItems);
                     break;
             }
 
             if (!PastRoomRewardCategories.Any())
             {
-                combatChance *= 2;
+                combatChance *= 2f;
             }
             else if (!PastRoomRewardCategories.Contains(0))
             {
-                combatChance *= 2;
+                combatChance *= 2f;
             }
             else
             {
                 if ((float)PastRoomRewardCategories.FindAll(x => x == 0).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
-                    combatChance *= 2;
+                    combatChance *= 2f;
                 }
                 else if ((float)PastRoomRewardCategories.FindAll(x => x == 1).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
-                    healingChance *= 2;
+                    healingChance *= 2f;
                 }
                 else if ((float)PastRoomRewardCategories.FindAll(x => x == 2).Count() / (float)PastRoomRewardCategories.Count() < 1f / 6f)
                 {
-                    utilityChance *= 2;
+                    utilityChance *= 2f;
                 }
             }
 
-            int chance = Main.rand.Next(1, combatChance + healingChance + utilityChance + 1);
+            float chance = Main.rand.NextFloat(combatChance + healingChance + utilityChance + float.Epsilon);
             int chosenCategory;
             if (chance <= combatChance)
                 chosenCategory = 0;
@@ -136,12 +135,8 @@ namespace TerRoguelike.Managers
 
         public static BaseRoguelikeItem GetItemFromListWithWeights(List<BaseRoguelikeItem> list)
         {
-            float totalWeight = 0;
-            for (int i = 0; i < list.Count; i++)
-            {
-                totalWeight += list[i].ItemDropWeight;
-            }
-            float randomFloat = Main.rand.NextFloat(totalWeight + float.Epsilon);
+            float weight = GetItemListWeight(list);
+            float randomFloat = Main.rand.NextFloat(weight + float.Epsilon);
             int returnIndex = 0;
             for (int i = list.Count - 1; i >= 0; i--)
             {
@@ -154,7 +149,15 @@ namespace TerRoguelike.Managers
             }
             return list[returnIndex];
         }
-
+        public static float GetItemListWeight(List<BaseRoguelikeItem> list)
+        {
+            float totalWeight = 0;
+            for (int i = 0; i < list.Count; i++)
+            {
+                totalWeight += list[i].ItemDropWeight;
+            }
+            return totalWeight;
+        }
         internal static void Load()
         {
             AllItems = new List<BaseRoguelikeItem>()
@@ -175,7 +178,7 @@ namespace TerRoguelike.Managers
                 new SpentShell(),
                 new HeatSeekingChip(),
                 new LockOnMissile(),
-                new RepurposedSiphon(),
+                new BloodSiphon(),
                 new EnchantingEye(),
                 new BouncyBall(),
                 new AirCanister(),

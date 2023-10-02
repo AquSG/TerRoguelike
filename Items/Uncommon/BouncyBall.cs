@@ -15,8 +15,10 @@ namespace TerRoguelike.Items.Uncommon
     public class BouncyBall : BaseRoguelikeItem, ILocalizedModType
     {
         public override int modItemID => ModContent.ItemType<BouncyBall>();
+        public override bool CombatItem => true;
         public override bool UtilityItem => true;
         public override int itemTier => 1;
+        public override float ItemDropWeight => 0.5f;
         public override void SetDefaults()
         {
             base.SetDefaults();
