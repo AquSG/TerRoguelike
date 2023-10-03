@@ -63,6 +63,7 @@ namespace TerRoguelike.TerPlayer
         public int outOfDangerTime = 600;
         public bool dodgeAttack = false;
         public float healMultiplier = 1f;
+        public float diminishingDR = 0f;
         #endregion
         public override void PreUpdate()
         {
@@ -96,6 +97,7 @@ namespace TerRoguelike.TerPlayer
             procLuck = 0;
             scaleMultiplier = 1f;
             healMultiplier = 1f;
+            diminishingDR = 0f;
 
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
@@ -398,6 +400,14 @@ namespace TerRoguelike.TerPlayer
                     dodgeAttack = true;
                     return;
                 }
+            }
+
+            if (diminishingDR != 0f)
+            {
+                if (diminishingDR > 0)
+                    modifiers.SourceDamage *= (100f / (100f + diminishingDR));
+                else
+                    modifiers.SourceDamage *= 2 - (100f / (100f - diminishingDR));
             }
 
             modifiers.ModifyHurtInfo += ModifyHurtInfo_TerRoguelike;
