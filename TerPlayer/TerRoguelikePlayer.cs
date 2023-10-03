@@ -44,7 +44,7 @@ namespace TerRoguelike.TerPlayer
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
-        public int rareUtilityItem;
+        public int itemPotentiometer;
         public List<int> evilEyeStacks = new List<int>();
         public float jumpSpeedMultiplier;
         public float scaleMultiplier;
@@ -89,7 +89,7 @@ namespace TerRoguelike.TerPlayer
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
-            rareUtilityItem = 0;
+            itemPotentiometer = 0;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
@@ -128,7 +128,7 @@ namespace TerRoguelike.TerPlayer
 
             if (bottleOfVigor > 0)
             {
-                int maxLifeIncrease = bottleOfVigor * 20;
+                int maxLifeIncrease = bottleOfVigor * 10;
                 Player.statLifeMax2 += maxLifeIncrease;
             }
 
@@ -216,11 +216,6 @@ namespace TerRoguelike.TerPlayer
             {
                 int luckIncrease = theDreamsoul;
                 procLuck += luckIncrease;
-            }
-            if (rareUtilityItem > 0)
-            {
-                float speedIncrease = rareUtilityItem * 0.60f;
-                Player.moveSpeed += speedIncrease;
             }
         }
         public override void PostUpdateEquips()
@@ -345,6 +340,7 @@ namespace TerRoguelike.TerPlayer
         public void OnKillEffects(NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+
             if (soulstealCoating > 0 && !modTarget.activatedSoulstealCoating)
             {
                 Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI);
@@ -357,6 +353,14 @@ namespace TerRoguelike.TerPlayer
                 modTarget.activatedAmberBead = true;
                 if (barrierHealth > Player.statLifeMax2)
                     barrierHealth = Player.statLifeMax2;
+            }
+            if (itemPotentiometer > 0)
+            {
+                float chance = 0.02f * itemPotentiometer;
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    SpawnRoguelikeItem(target.Center);
+                }
             }
         }
         public override void OnHurt(Player.HurtInfo info)
@@ -421,6 +425,54 @@ namespace TerRoguelike.TerPlayer
             Player.immuneTime += 45;
             Player.immune = true;
             outOfDangerTime = 0;
+        }
+        public void SpawnRoguelikeItem(Vector2 position)
+        {
+            int chance = Main.rand.Next(1, 101);
+            int itemType;
+            int itemTier;
+
+            if (chance <= 80)
+            {
+                itemType = ItemManager.GiveCommon(false);
+                itemTier = 0;
+            }
+            else if (chance <= 98)
+            {
+                itemType = ItemManager.GiveUncommon(false);
+                itemTier = 1;
+            }
+            else
+            {
+                itemType = ItemManager.GiveRare(false);
+                itemTier = 2;
+            }
+
+            position = FindAirToPlayer(position);
+            
+            SpawnManager.SpawnItem(itemType, position, itemTier, 75, 0.5f);
+        }
+        public Vector2 FindAirToPlayer(Vector2 position)
+        {
+            Point tilePos = position.ToTileCoordinates();
+            Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
+            if (tile != null)
+            {
+                if (!tile.HasTile)
+                {
+                    return position;
+                }
+            }
+
+            float distanceReCheckMove = 22.627f;
+            Vector2 direction = Player.Center - position;
+            if (direction.Length() >= distanceReCheckMove)
+            {
+                position += direction.SafeNormalize(Vector2.UnitY) * distanceReCheckMove;
+                return FindAirToPlayer(position);
+            }
+
+            return Player.Center;
         }
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {

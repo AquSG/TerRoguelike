@@ -13,16 +13,6 @@ Projectiles: {
 }
 
 Items: {
-
-	RareUtilityItem: {
-		DisplayName: Rare Utility Item
-		Tooltip:
-			'''
-			60% increased movement speed
-			Extra copies of this item also grant 60% increased movement speed
-			'''
-	}
-
 	ClingyGrenade: {
 		DisplayName: Clingy Grenade
 		Tooltip:
@@ -237,10 +227,10 @@ Items: {
 	}
 
 	BottleOfVigor: {
-		DisplayName: Bottle Of Vigor
+		DisplayName: Bottle of Vigor
 		Tooltip:
 			'''
-			+20 max life
+			+10 max life
 			Extra copies of this item also grant +20 max life
 			'''
 	}
@@ -260,6 +250,15 @@ Items: {
 			'''
 			+100% healing effectiveness
 			Extra copies of this item also grant +100% healing effectiveness
+			'''
+	}
+
+	ItemPotentiometer: {
+		DisplayName: Item Potentiometer
+		Tooltip:
+			'''
+			Enemies have a 2% chance to drop an item on kill
+			Extra copies of this item increase the chance by 2%
 			'''
 	}
 }

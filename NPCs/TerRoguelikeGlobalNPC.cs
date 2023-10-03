@@ -21,6 +21,7 @@ namespace TerRoguelike.NPCs
 
         public bool activatedSoulstealCoating = false;
         public bool activatedAmberBead = false;
+        public bool activatedItemPotentiometer = false;
 
         #endregion
         public override bool InstancePerEntity => true;

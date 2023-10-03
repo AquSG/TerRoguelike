@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Rare
 {
-    public class RareUtilityItem : BaseRoguelikeItem, ILocalizedModType
+    public class ItemPotentiometer : BaseRoguelikeItem, ILocalizedModType
     {
-        public override int modItemID => ModContent.ItemType<RareUtilityItem>();
+        public override int modItemID => ModContent.ItemType<ItemPotentiometer>();
         public override bool UtilityItem => true;
         public override int itemTier => 2;
         public override void SetDefaults()
@@ -24,7 +24,7 @@ namespace TerRoguelike.Items.Rare
         }
         public override void ItemEffects(Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().rareUtilityItem += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().itemPotentiometer += Item.stack;
         }
     }
 }
