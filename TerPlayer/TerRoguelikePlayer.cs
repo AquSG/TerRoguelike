@@ -43,7 +43,7 @@ namespace TerRoguelike.TerPlayer
         public int airCanister;
         public int volatileRocket;
         public int theDreamsoul;
-        public int rareHealingItem;
+        public int cornucopia;
         public int rareUtilityItem;
         public List<int> evilEyeStacks = new List<int>();
         public float jumpSpeedMultiplier;
@@ -62,6 +62,7 @@ namespace TerRoguelike.TerPlayer
         public float barrierFloor = 0;
         public int outOfDangerTime = 600;
         public bool dodgeAttack = false;
+        public float healMultiplier = 1f;
         #endregion
         public override void PreUpdate()
         {
@@ -87,13 +88,14 @@ namespace TerRoguelike.TerPlayer
             airCanister = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
-            rareHealingItem = 0;
+            cornucopia = 0;
             rareUtilityItem = 0;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
             procLuck = 0;
             scaleMultiplier = 1f;
+            healMultiplier = 1f;
 
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
@@ -115,6 +117,8 @@ namespace TerRoguelike.TerPlayer
                 Player.GetCritChance(DamageClass.Generic) -= 3f;
                 Player.hasMagiluminescence = true;
                 Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
+                Player.lifeRegen += 4;
+                Player.lifeRegenTime = 0;
                 if (Player.controlDown)
                 {
                     Player.gravity *= 1.5f;
@@ -213,11 +217,6 @@ namespace TerRoguelike.TerPlayer
                 int luckIncrease = theDreamsoul;
                 procLuck += luckIncrease;
             }
-            if (rareHealingItem > 0)
-            {
-                int regenIncrease = rareHealingItem * 12;
-                Player.lifeRegen += regenIncrease;
-            }
             if (rareUtilityItem > 0)
             {
                 float speedIncrease = rareUtilityItem * 0.60f;
@@ -244,6 +243,12 @@ namespace TerRoguelike.TerPlayer
             {
                 Player.moveSpeed *= 1.30f;
                 Player.maxRunSpeed *= 1.30f;
+            }
+            if (cornucopia > 0)
+            {
+                float healMultiIncrease = (float)cornucopia;
+                healMultiplier += healMultiIncrease;
+                Player.lifeRegen *= (int)(1f + healMultiIncrease);
             }
 
             Player.jumpSpeedBoost += 5f * jumpSpeedMultiplier;
@@ -329,12 +334,12 @@ namespace TerRoguelike.TerPlayer
             if (bloodSiphon > 0)
             {
                 int healAmt = bloodSiphon;
-                Player.Heal(healAmt);
+                ScaleableHeal(healAmt);
             }
             if (enchantingEye > 0 && hit.Crit)
             {
                 int healAmt = enchantingEye * 8;
-                Player.Heal(healAmt);
+                ScaleableHeal(healAmt);
             }
         }
         public void OnKillEffects(NPC target, NPC.HitInfo hit, int damageDone)
@@ -342,8 +347,7 @@ namespace TerRoguelike.TerPlayer
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
             if (soulstealCoating > 0 && !modTarget.activatedSoulstealCoating)
             {
-                int healingAmt = (int)(Player.statLifeMax2 * soulstealCoating * 0.1f);
-                Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI, healingAmt);
+                Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI);
                 modTarget.activatedSoulstealCoating = true;
             }
             if (amberBead > 0 && !modTarget.activatedAmberBead)
@@ -402,6 +406,11 @@ namespace TerRoguelike.TerPlayer
                 BarrierHitEffect(info.Damage + (int)barrierHealth);
                 barrierFullAbsorbHit = true;
             }
+        }
+        public void ScaleableHeal(int healAmt)
+        {
+            healAmt = (int)(healAmt * healMultiplier);
+            Player.Heal(healAmt);
         }
         public void BarrierHitEffect(int damage)
         {

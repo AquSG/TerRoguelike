@@ -9,12 +9,12 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Projectiles
 {
     public class SoulstealHealingOrb : ModProjectile, ILocalizedModType
     {
-        public ref float HealingAmt => ref Projectile.ai[0];
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
@@ -51,7 +51,10 @@ namespace TerRoguelike.Projectiles
             float playerDist = playerVector.Length();
             if (playerDist < 50f && Projectile.position.X < player.position.X + player.width && Projectile.position.X + Projectile.width > player.position.X && Projectile.position.Y < player.position.Y + player.height && Projectile.position.Y + Projectile.height > player.position.Y)
             {
-                player.Heal((int)HealingAmt);
+                TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+
+                int healAmt = (int)(player.statLifeMax2 * modPlayer.soulstealCoating * 0.1f);
+                modPlayer.ScaleableHeal(healAmt);
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.15f }, Projectile.Center);
                 Projectile.Kill();
             }

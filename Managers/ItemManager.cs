@@ -184,7 +184,7 @@ namespace TerRoguelike.Managers
                 new AirCanister(),
                 new VolatileRocket(),
                 new TheDreamsoul(),
-                new RareHealingItem(),
+                new Cornucopia(),
                 new RareUtilityItem()
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();

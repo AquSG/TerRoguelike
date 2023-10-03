@@ -12,9 +12,9 @@ using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.Items.Rare
 {
-    public class RareHealingItem : BaseRoguelikeItem, ILocalizedModType
+    public class Cornucopia : BaseRoguelikeItem, ILocalizedModType
     {
-        public override int modItemID => ModContent.ItemType<RareHealingItem>();
+        public override int modItemID => ModContent.ItemType<Cornucopia>();
         public override bool HealingItem => true;
         public override int itemTier => 2;
         public override void SetDefaults()
@@ -25,7 +25,7 @@ namespace TerRoguelike.Items.Rare
         }
         public override void ItemEffects(Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().rareHealingItem += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().cornucopia += Item.stack;
         }
     }
 }

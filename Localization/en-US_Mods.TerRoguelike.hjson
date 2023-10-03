@@ -13,23 +13,6 @@ Projectiles: {
 }
 
 Items: {
-	RareCombatItem: {
-		DisplayName: Rare Combat Item
-		Tooltip:
-			'''
-			60% increased damage
-			Extra copies of this item also grant 60% increased damage
-			'''
-	}
-
-	RareHealingItem: {
-		DisplayName: Rare Healing Item
-		Tooltip:
-			'''
-			+6 HP/s
-			Extra copies of this item also grant +6 HP/s
-			'''
-	}
 
 	RareUtilityItem: {
 		DisplayName: Rare Utility Item
@@ -268,6 +251,15 @@ Items: {
 			'''
 			+1 HP upon hitting enemies
 			Extra copies of this item increase the healing amount by 1
+			'''
+	}
+
+	Cornucopia: {
+		DisplayName: Cornucopia
+		Tooltip:
+			'''
+			+100% healing effectiveness
+			Extra copies of this item also grant +100% healing effectiveness
 			'''
 	}
 }
