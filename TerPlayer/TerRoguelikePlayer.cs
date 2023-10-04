@@ -20,7 +20,7 @@ namespace TerRoguelike.TerPlayer
 {
     public class TerRoguelikePlayer : ModPlayer
     {
-        #region Variables
+        #region Item Variables
         public int coolantCanister;
         public int clingyGrenade;
         public int pocketSpotter;
@@ -46,13 +46,15 @@ namespace TerRoguelike.TerPlayer
         public int cornucopia;
         public int itemPotentiometer;
         public List<int> evilEyeStacks = new List<int>();
-        public float jumpSpeedMultiplier;
-        public float scaleMultiplier;
+        #endregion
 
+        #region Misc Variables
         public Floor currentFloor;
         public int shotsToFire = 1;
         public int extraDoubleJumps = 0;
         public int timesDoubleJumped = 0;
+        public float jumpSpeedMultiplier;
+        public float scaleMultiplier;
         public int procLuck = 0;
         public float swingAnimCompletion = 0;
         public int bladeFlashTime = 0;
@@ -65,6 +67,8 @@ namespace TerRoguelike.TerPlayer
         public float healMultiplier = 1f;
         public float diminishingDR = 0f;
         #endregion
+
+        #region Reset Variables
         public override void PreUpdate()
         {
             coolantCanister = 0;
@@ -102,14 +106,9 @@ namespace TerRoguelike.TerPlayer
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
         }
-        public override void OnEnterWorld()
-        {
-            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
-            {
-                if (Player.armor[3].type == ItemID.CreativeWings)
-                    Player.armor[3] = new Item();
-            }
-        }
+        #endregion
+
+        #region Always Active Effects
         public override void UpdateEquips()
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -258,11 +257,9 @@ namespace TerRoguelike.TerPlayer
             if (barrierHealth < 0)
                 barrierHealth = 0;
         }
-        public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
-        {
-            if (target.life <= 0)
-                OnKillEffects(target, hit, damageDone);
-        }
+        #endregion
+
+        #region On Hit Enemy
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
@@ -339,6 +336,9 @@ namespace TerRoguelike.TerPlayer
                 ScaleableHeal(healAmt);
             }
         }
+        #endregion
+
+        #region On Kill Enemy
         public void OnKillEffects(NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
@@ -365,10 +365,9 @@ namespace TerRoguelike.TerPlayer
                 }
             }
         }
-        public override void OnHurt(Player.HurtInfo info)
-        {
-            outOfDangerTime = 0;
-        }
+        #endregion
+
+        #region Player Hurt
         public override bool FreeDodge(Player.HurtInfo info)
         {
             if (dodgeAttack)
@@ -421,11 +420,6 @@ namespace TerRoguelike.TerPlayer
                 barrierFullAbsorbHit = true;
             }
         }
-        public void ScaleableHeal(int healAmt)
-        {
-            healAmt = (int)(healAmt * healMultiplier);
-            Player.Heal(healAmt);
-        }
         public void BarrierHitEffect(int damage)
         {
             CombatText.NewText(Player.getRect(), Color.Gold, damage > (int)barrierHealth ? -(int)barrierHealth : -damage);
@@ -435,6 +429,18 @@ namespace TerRoguelike.TerPlayer
             Player.immuneTime += 45;
             Player.immune = true;
             outOfDangerTime = 0;
+        }
+        public override void OnHurt(Player.HurtInfo info)
+        {
+            outOfDangerTime = 0;
+        }
+        #endregion
+
+        #region Mechanical Functions
+        public void ScaleableHeal(int healAmt)
+        {
+            healAmt = (int)(healAmt * healMultiplier);
+            Player.Heal(healAmt);
         }
         public void SpawnRoguelikeItem(Vector2 position)
         {
@@ -484,6 +490,22 @@ namespace TerRoguelike.TerPlayer
 
             return Player.Center;
         }
+
+        public override void OnExtraJumpRefreshed(ExtraJump jump)
+        {
+            timesDoubleJumped = 0;
+        }
+        public override void OnEnterWorld()
+        {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                if (Player.armor[3].type == ItemID.CreativeWings)
+                    Player.armor[3] = new Item();
+            }
+        }
+        #endregion
+
+        #region Edit Starting Items
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {
             static Item createItem(int type)
@@ -501,14 +523,14 @@ namespace TerRoguelike.TerPlayer
 
             return items;
         }
+
         public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod, bool mediumCoreDeath)
         {
             itemsByMod["Terraria"].Clear();
         }
-        public override void OnExtraJumpRefreshed(ExtraJump jump)
-        {
-            timesDoubleJumped = 0;
-        }
+        #endregion
+
+        #region Draw Effects
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
             if (bladeFlashTime > 0)
@@ -525,6 +547,7 @@ namespace TerRoguelike.TerPlayer
             if (enchantingEye > 0)
                 EnchantingEyePlayerEffect();
         }
+        #endregion
 
         #region Item Drawing on Player
         public void EvilEyePlayerEffect()
@@ -673,6 +696,7 @@ namespace TerRoguelike.TerPlayer
         }
         #endregion
 
+        #region Barrier Effect Drawing
         public class BarrierDrawLayer : PlayerDrawLayer
         {
             public override Position GetDefaultPosition() => new AfterParent(PlayerDrawLayers.LastVanillaLayer);
@@ -710,5 +734,6 @@ namespace TerRoguelike.TerPlayer
                 }
             }
         }
+        #endregion
     }
 }
