@@ -166,6 +166,7 @@ namespace TerRoguelike.Managers
                 new PocketSpotter(),
                 new CoolantCanister(),
                 new AntiqueLens(),
+                new InstigatorsBrace(),
                 new LivingCrystal(),
                 new SoulstealCoating(),
                 new BottleOfVigor(),

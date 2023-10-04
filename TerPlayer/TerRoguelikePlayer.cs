@@ -25,6 +25,7 @@ namespace TerRoguelike.TerPlayer
         public int clingyGrenade;
         public int pocketSpotter;
         public int antiqueLens;
+        public int instigatorsBrace;
         public int livingCrystal;
         public int soulstealCoating;
         public int bottleOfVigor;
@@ -66,6 +67,7 @@ namespace TerRoguelike.TerPlayer
         public bool dodgeAttack = false;
         public float healMultiplier = 1f;
         public float diminishingDR = 0f;
+        public float bonusDamageMultiplier = 1f;
         #endregion
 
         #region Reset Variables
@@ -75,6 +77,7 @@ namespace TerRoguelike.TerPlayer
             clingyGrenade = 0;
             pocketSpotter = 0;
             antiqueLens = 0;
+            instigatorsBrace = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             bottleOfVigor = 0;
@@ -102,6 +105,7 @@ namespace TerRoguelike.TerPlayer
             scaleMultiplier = 1f;
             healMultiplier = 1f;
             diminishingDR = 0f;
+            bonusDamageMultiplier = 1f;
 
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
@@ -264,8 +268,11 @@ namespace TerRoguelike.TerPlayer
         {
             TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
 
+            if (bonusDamageMultiplier != 1f)
+                hit.Damage = (int)(hit.Damage / bonusDamageMultiplier);
+
             if (target.life <= 0)
-                OnKillEffects(target, hit, damageDone);
+                OnKillEffects(target, hit);
 
             if (clingyGrenade > 0 && !modProj.procChainBools.clinglyGrenadePreviously)
             {
@@ -336,10 +343,20 @@ namespace TerRoguelike.TerPlayer
                 ScaleableHeal(healAmt);
             }
         }
+        public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
+        {
+            if (instigatorsBrace > 0 && (target.life / (float)target.lifeMax) >= 0.9f)
+            {
+                float bonusDamage= 0.75f * instigatorsBrace;
+                bonusDamageMultiplier *= 1 + bonusDamage;
+            }
+
+            modifiers.FinalDamage *= bonusDamageMultiplier;
+        }
         #endregion
 
         #region On Kill Enemy
-        public void OnKillEffects(NPC target, NPC.HitInfo hit, int damageDone)
+        public void OnKillEffects(NPC target, NPC.HitInfo hit)
         {
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
 

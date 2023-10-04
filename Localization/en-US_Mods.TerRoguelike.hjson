@@ -261,4 +261,13 @@ Items: {
 			Extra copies of this item increase the chance by 2%
 			'''
 	}
+
+	InstigatorsBrace: {
+		DisplayName: Instigator's Brace
+		Tooltip:
+			'''
+			Enemies take 75% bonus damage when above 90% life
+			Extra copies of this item increase the bonus damage by 75%
+			'''
+	}
 }
