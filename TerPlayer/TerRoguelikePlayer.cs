@@ -15,6 +15,7 @@ using TerRoguelike.World;
 using Terraria.ModLoader.Assets;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -29,6 +30,7 @@ namespace TerRoguelike.TerPlayer
         public int livingCrystal;
         public int soulstealCoating;
         public int bottleOfVigor;
+        public int benignFungus;
         public int runningShoe;
         public int bunnyHopper;
         public int timesHaveBeenTougher;
@@ -47,6 +49,7 @@ namespace TerRoguelike.TerPlayer
         public int cornucopia;
         public int itemPotentiometer;
         public List<int> evilEyeStacks = new List<int>();
+        public int benignFungusCooldown = 0;
         #endregion
 
         #region Misc Variables
@@ -68,6 +71,7 @@ namespace TerRoguelike.TerPlayer
         public float healMultiplier = 1f;
         public float diminishingDR = 0f;
         public float bonusDamageMultiplier = 1f;
+        public bool onGround = false;
         #endregion
 
         #region Reset Variables
@@ -81,6 +85,7 @@ namespace TerRoguelike.TerPlayer
             livingCrystal = 0;
             soulstealCoating = 0;
             bottleOfVigor = 0;
+            benignFungus = 0;
             runningShoe = 0;
             bunnyHopper = 0;
             timesHaveBeenTougher = 0;
@@ -107,6 +112,7 @@ namespace TerRoguelike.TerPlayer
             diminishingDR = 0f;
             bonusDamageMultiplier = 1f;
 
+            onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
         }
@@ -176,6 +182,13 @@ namespace TerRoguelike.TerPlayer
                 int regenIncrease = livingCrystal * 4;
                 Player.lifeRegen += regenIncrease;
             }
+            if (benignFungusCooldown > 0)
+                benignFungusCooldown--;
+            if (benignFungus > 0 && benignFungusCooldown == 0 && Math.Abs(Player.velocity.X) > 2.5f && onGround)
+            {
+                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Bottom + new Vector2(0, -5f), Vector2.Zero, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
+                benignFungusCooldown += Main.rand.Next(13, 16);
+            } 
             if (runningShoe > 0)
             {
                 float speedIncrease = runningShoe * 0.08f;

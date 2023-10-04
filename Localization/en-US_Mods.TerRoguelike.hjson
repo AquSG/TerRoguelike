@@ -10,6 +10,7 @@ Projectiles: {
 	Missile.DisplayName: Missile
 	AdaptiveBladeHoldout.DisplayName: Adaptive Blade Holdout
 	AdaptiveBladeSlash.DisplayName: Adaptive Blade Slash
+	HealingFungus.DisplayName: Healing Fungus
 }
 
 Items: {
@@ -268,6 +269,16 @@ Items: {
 			'''
 			Enemies take 75% bonus damage when above 90% life
 			Extra copies of this item increase the bonus damage by 75%
+			'''
+	}
+
+	BenignFungus: {
+		DisplayName: Benign Fungus
+		Tooltip:
+			'''
+			Spawn healing fungi while running on ground
+			+1 HP upon touching healing fungi
+			Extra copies of this item increase the healing amount by 1
 			'''
 	}
 }
