@@ -42,6 +42,10 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player player = Main.player[i];
+
+                if (player == null || !player.active)
+                    return;
+
                 Vector2 playerVector = player.Center - Projectile.Center;
                 float playerDist = playerVector.Length();
                 if (playerDist < 50f && Projectile.position.X < player.position.X + player.width && Projectile.position.X + Projectile.width > player.position.X && Projectile.position.Y < player.position.Y + player.height && Projectile.position.Y + Projectile.height > player.position.Y)
