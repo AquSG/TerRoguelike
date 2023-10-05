@@ -4,6 +4,8 @@ using static TerRoguelike.Managers.SpawnManager;
 using TerRoguelike.Managers;
 using static TerRoguelike.Systems.RoomSystem;
 using TerRoguelike.UI;
+using Terraria;
+using TerRoguelike.Shaders;
 
 namespace TerRoguelike
 {
@@ -16,6 +18,10 @@ namespace TerRoguelike
             SchematicManager.Load();
             BarrierUI.Load();
             ItemManager.Load();
+            if (!Main.dedServ)
+            {
+                LoadClient();
+            }
         }
         public override void Unload()
         {
@@ -26,6 +32,10 @@ namespace TerRoguelike
             pendingItems = null;
             BarrierUI.Unload();
             ItemManager.Unload();
+        }
+        public void LoadClient()
+        {
+            TerRoguelikeShaders.LoadShaders();
         }
     }
 }
