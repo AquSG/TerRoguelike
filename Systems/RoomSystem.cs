@@ -286,7 +286,8 @@ namespace TerRoguelike.Systems
                 PendingEnemy enemy = SpawnManager.pendingEnemies[i];
                 Texture2D texture = TextureAssets.Npc[enemy.NPCType].Value;
                 int frameCount = Main.npcFrameCount[enemy.NPCType];
-                Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), Color.HotPink * 0.75f, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
+                Color color = Color.HotPink * (0.75f * (1 - enemy.TelegraphDuration/60f));
+                Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), color, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
             }
             
             Main.spriteBatch.End();

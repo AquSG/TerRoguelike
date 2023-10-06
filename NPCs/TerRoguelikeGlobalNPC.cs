@@ -43,12 +43,12 @@ namespace TerRoguelike.NPCs
                 {
                     int hitDamage = 0;
                     int targetDamage = (int)(npc.lifeMax * 0.01f);
-                    int damageCap = 20;
+                    int damageCap = 50;
                     int owner = -1;
                     if (targetDamage > damageCap)
                         targetDamage = damageCap;
-                    else if (targetDamage < 3)
-                        targetDamage = 3;
+                    else if (targetDamage < 1)
+                        targetDamage = 1;
 
                     for (int i = 0; i < ignitedStacks.Count; i++)
                     {
@@ -171,7 +171,6 @@ namespace TerRoguelike.NPCs
                             position += new Vector2(0, -9);
                         break;
                 }
-
                 for (float i = 0; i < 1; i += 0.125f)
                 {
                     spriteBatch.Draw(texture, position + new Vector2(0, npc.gfxOffY) + (i * MathHelper.TwoPi + npc.rotation).ToRotationVector2() * outlineThickness - Main.screenPosition, npc.frame, color, npc.rotation, vector, npc.scale, spriteEffects, 0f);
