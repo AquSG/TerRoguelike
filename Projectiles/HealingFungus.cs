@@ -44,7 +44,7 @@ namespace TerRoguelike.Projectiles
                 Player player = Main.player[i];
 
                 if (player == null || !player.active)
-                    return;
+                    continue;
 
                 Vector2 playerVector = player.Center - Projectile.Center;
                 float playerDist = playerVector.Length();

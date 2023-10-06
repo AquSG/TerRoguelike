@@ -27,6 +27,7 @@ namespace TerRoguelike.TerPlayer
         public int pocketSpotter;
         public int antiqueLens;
         public int instigatorsBrace;
+        public int hotPepper;
         public int livingCrystal;
         public int soulstealCoating;
         public int bottleOfVigor;
@@ -70,7 +71,6 @@ namespace TerRoguelike.TerPlayer
         public bool dodgeAttack = false;
         public float healMultiplier = 1f;
         public float diminishingDR = 0f;
-        public float bonusDamageMultiplier = 1f;
         public bool onGround = false;
         #endregion
 
@@ -82,6 +82,7 @@ namespace TerRoguelike.TerPlayer
             pocketSpotter = 0;
             antiqueLens = 0;
             instigatorsBrace = 0;
+            hotPepper = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             bottleOfVigor = 0;
@@ -110,7 +111,6 @@ namespace TerRoguelike.TerPlayer
             scaleMultiplier = 1f;
             healMultiplier = 1f;
             diminishingDR = 0f;
-            bonusDamageMultiplier = 1f;
 
             onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
             barrierFloor = 0;
@@ -280,12 +280,14 @@ namespace TerRoguelike.TerPlayer
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            TerRoguelikeGlobalNPC modNPC = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
 
+            float bonusDamageMultiplier = GetBonusDamageMulti(target, proj.Center, proj);
             if (bonusDamageMultiplier != 1f)
                 hit.Damage = (int)(hit.Damage / bonusDamageMultiplier);
 
             if (target.life <= 0)
-                OnKillEffects(target, hit);
+                OnKillEffects(target);
 
             if (clingyGrenade > 0 && !modProj.procChainBools.clinglyGrenadePreviously)
             {
@@ -358,21 +360,42 @@ namespace TerRoguelike.TerPlayer
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {
-            if (instigatorsBrace > 0 && (target.life / (float)target.lifeMax) >= 0.9f)
+            modifiers.FinalDamage *= GetBonusDamageMulti(target, proj.Center, proj);
+        }
+        public float GetBonusDamageMulti(NPC npc, Vector2 hitPosition, Projectile? projectile = null)
+        {
+            float bonusDamageMultiplier = 1f;
+            if (instigatorsBrace > 0 && (npc.life / (float)npc.lifeMax) >= 0.9f)
             {
-                float bonusDamage= 0.75f * instigatorsBrace;
+                float bonusDamage = 0.75f * instigatorsBrace;
                 bonusDamageMultiplier *= 1 + bonusDamage;
             }
-
-            modifiers.FinalDamage *= bonusDamageMultiplier;
+            return bonusDamageMultiplier;
         }
         #endregion
 
         #region On Kill Enemy
-        public void OnKillEffects(NPC target, NPC.HitInfo hit)
+        public void OnKillEffects(NPC target)
         {
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
 
+            if (hotPepper > 0 && !modTarget.activatedHotPepper)
+            {
+                float radius = 128f + (48f * (hotPepper - 1));
+                int damageToDeal = 150 + (75 * (hotPepper - 1));
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (npc == null || !npc.active)
+                        continue;
+
+                    if (npc.Center.Distance(target.Center) <= radius)
+                    {
+                        npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().ignitedStacks.Add(new IgnitedStack(damageToDeal, Player.whoAmI));
+                    }
+                }
+                modTarget.activatedHotPepper = true;
+            }
             if (soulstealCoating > 0 && !modTarget.activatedSoulstealCoating)
             {
                 Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<SoulstealHealingOrb>(), 0, 0f, Player.whoAmI);

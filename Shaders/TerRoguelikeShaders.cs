@@ -25,8 +25,10 @@ namespace TerRoguelike.Shaders
             // Strings provided to LoadShader are the .xnb file paths.
             Effect LoadShader(string path) => terAss.Request<Effect>($"{ShaderPath}{path}", AssetRequestMode.ImmediateLoad).Value;
 
+
             BasicTintShader = LoadShader("BasicTint");
             RegisterMiscShader(BasicTintShader, "TintPass", "BasicTint");
+
         }
         private static void RegisterMiscShader(Effect shader, string passName, string registrationName)
         {

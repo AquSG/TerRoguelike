@@ -281,4 +281,15 @@ Items: {
 			Extra copies of this item increase the healing amount by 1
 			'''
 	}
+
+	HotPepper: {
+		DisplayName: Hot Pepper
+		Tooltip:
+			'''
+			Enemies ignite other nearby enemies on kill
+			Ignite deals 300 base damage in total over a duration
+			The radius of ignition is 8 tiles
+			Extra copies of this item increase the radius by 3 tiles and base damage by 100
+			'''
+	}
 }
