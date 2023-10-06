@@ -32,6 +32,7 @@ namespace TerRoguelike.TerPlayer
         public int soulstealCoating;
         public int bottleOfVigor;
         public int benignFungus;
+        public int sentientPutty;
         public int runningShoe;
         public int bunnyHopper;
         public int timesHaveBeenTougher;
@@ -89,6 +90,7 @@ namespace TerRoguelike.TerPlayer
             soulstealCoating = 0;
             bottleOfVigor = 0;
             benignFungus = 0;
+            sentientPutty = 0;
             runningShoe = 0;
             bunnyHopper = 0;
             timesHaveBeenTougher = 0;
@@ -193,6 +195,12 @@ namespace TerRoguelike.TerPlayer
                 Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Bottom + new Vector2(0, -5f), Vector2.Zero, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
                 benignFungusCooldown += Main.rand.Next(13, 16);
             } 
+            if (sentientPutty > 0 && outOfDangerTime == 120)
+            {
+                int healAmt = sentientPutty * 10;
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.12f }, Player.Center);
+                ScaleableHeal(healAmt);
+            }
             if (runningShoe > 0)
             {
                 float speedIncrease = runningShoe * 0.08f;

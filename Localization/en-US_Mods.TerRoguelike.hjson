@@ -301,4 +301,13 @@ Items: {
 			Extra copies of this item reduce the time needed by a diminishing amount
 			'''
 	}
+
+	SentientPutty: {
+		DisplayName: Sentient Putty
+		Tooltip:
+			'''
+			+10 HP after being hit and then avoiding damage for 2 seconds
+			Extra copies of this item increase the healing amount by 10
+			'''
+	}
 }
