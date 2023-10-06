@@ -33,6 +33,7 @@ namespace TerRoguelike.TerPlayer
         public int bottleOfVigor;
         public int benignFungus;
         public int sentientPutty;
+        public int memoryFoam;
         public int runningShoe;
         public int bunnyHopper;
         public int timesHaveBeenTougher;
@@ -91,6 +92,7 @@ namespace TerRoguelike.TerPlayer
             bottleOfVigor = 0;
             benignFungus = 0;
             sentientPutty = 0;
+            memoryFoam = 0;
             runningShoe = 0;
             bunnyHopper = 0;
             timesHaveBeenTougher = 0;
@@ -200,6 +202,11 @@ namespace TerRoguelike.TerPlayer
                 int healAmt = sentientPutty * 10;
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.12f }, Player.Center);
                 ScaleableHeal(healAmt);
+            }
+            if (memoryFoam > 0 && outOfDangerTime >= 420)
+            {
+                int regenIncrease = memoryFoam * 8;
+                Player.lifeRegen += regenIncrease;
             }
             if (runningShoe > 0)
             {

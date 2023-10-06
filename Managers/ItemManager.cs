@@ -173,6 +173,7 @@ namespace TerRoguelike.Managers
                 new BottleOfVigor(),
                 new BenignFungus(),
                 new SentientPutty(),
+                new MemoryFoam(),
                 new RunningShoe(),
                 new BunnyHopper(),
                 new TimesHaveBeenTougher(),

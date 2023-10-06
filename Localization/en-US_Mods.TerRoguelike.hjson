@@ -213,7 +213,7 @@ Items: {
 			'''
 			Barrier floor becomes 8% of max barrier
 			Barrier cannot naturally decay below the barrier floor
-			After not being hit for 7 seconds, barrier quickly recharges up to the barrier floor
+			After avoiding damage for 7 seconds, barrier quickly recharges up to the barrier floor
 			Extra copies of this item increase the barrier floor by another 8% of max barrier
 			'''
 	}
@@ -308,6 +308,15 @@ Items: {
 			'''
 			+10 HP after being hit and then avoiding damage for 2 seconds
 			Extra copies of this item increase the healing amount by 10
+			'''
+	}
+
+	MemoryFoam: {
+		DisplayName: Memory Foam
+		Tooltip:
+			'''
+			+4 HP/s after avoiding damage for 7 seconds
+			Extra copies of this item increase the regen by +4 HP/s
 			'''
 	}
 }
