@@ -275,13 +275,18 @@ namespace TerRoguelike.Systems
         }
         public void DrawPendingEnemies()
         {
+            if (SpawnManager.pendingEnemies == null)
+                return;
+            if (!SpawnManager.pendingEnemies.Any())
+                return;
+
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             for (int i = 0; i < SpawnManager.pendingEnemies.Count; i++)
             {
                 PendingEnemy enemy = SpawnManager.pendingEnemies[i];
                 Texture2D texture = TextureAssets.Npc[enemy.NPCType].Value;
                 int frameCount = Main.npcFrameCount[enemy.NPCType];
-                Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), Color.HotPink * 0.5f, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
+                Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), Color.HotPink * 0.75f, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
             }
             
             Main.spriteBatch.End();

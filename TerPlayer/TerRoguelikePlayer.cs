@@ -72,6 +72,7 @@ namespace TerRoguelike.TerPlayer
         public float healMultiplier = 1f;
         public float diminishingDR = 0f;
         public bool onGround = false;
+        public float previousBonusDamageMulti = 1f;
         #endregion
 
         #region Reset Variables
@@ -111,6 +112,7 @@ namespace TerRoguelike.TerPlayer
             scaleMultiplier = 1f;
             healMultiplier = 1f;
             diminishingDR = 0f;
+            previousBonusDamageMulti = 1f;
 
             onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
             barrierFloor = 0;
@@ -282,9 +284,8 @@ namespace TerRoguelike.TerPlayer
             TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
             TerRoguelikeGlobalNPC modNPC = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
 
-            float bonusDamageMultiplier = GetBonusDamageMulti(target, proj.Center, proj);
-            if (bonusDamageMultiplier != 1f)
-                hit.Damage = (int)(hit.Damage / bonusDamageMultiplier);
+            if (previousBonusDamageMulti != 1f)
+                hit.Damage = (int)(hit.Damage / previousBonusDamageMulti);
 
             if (target.life <= 0)
                 OnKillEffects(target);
@@ -370,6 +371,7 @@ namespace TerRoguelike.TerPlayer
                 float bonusDamage = 0.75f * instigatorsBrace;
                 bonusDamageMultiplier *= 1 + bonusDamage;
             }
+            previousBonusDamageMulti = bonusDamageMultiplier;
             return bonusDamageMultiplier;
         }
         #endregion
