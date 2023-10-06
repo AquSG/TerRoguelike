@@ -18,6 +18,7 @@ using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.Bestiary;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Systems
 {
@@ -161,6 +162,8 @@ namespace TerRoguelike.Systems
         }
         public override void PostDrawTiles()
         {
+            DrawPendingEnemies();
+
             if (RoomList == null)
                 return;
 
@@ -269,6 +272,19 @@ namespace TerRoguelike.Systems
                     Main.spriteBatch.End();
                 }
             }
+        }
+        public void DrawPendingEnemies()
+        {
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            for (int i = 0; i < SpawnManager.pendingEnemies.Count; i++)
+            {
+                PendingEnemy enemy = SpawnManager.pendingEnemies[i];
+                Texture2D texture = TextureAssets.Npc[enemy.NPCType].Value;
+                int frameCount = Main.npcFrameCount[enemy.NPCType];
+                Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), Color.HotPink * 0.5f, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
+            }
+            
+            Main.spriteBatch.End();
         }
     }
 }

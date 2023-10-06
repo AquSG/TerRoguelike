@@ -9,6 +9,8 @@ using Terraria.DataStructures;
 using Microsoft.Xna.Framework;
 using Terraria.ID;
 using TerRoguelike.NPCs;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Managers
 {
@@ -32,15 +34,22 @@ namespace TerRoguelike.Managers
                 return;
 
             int loopcount = -1;
+            
             foreach (PendingEnemy enemy in pendingEnemies)
             {
                 loopcount++;
+                
+                float frameCount = Main.npcFrameCount[enemy.NPCType];
+                
                 Dust.NewDustDirect(enemy.Position - new Vector2(15f * enemy.TelegraphSize, 15f * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), DustID.CrystalPulse, Scale: 0.5f);
                 enemy.TelegraphDuration--;
                 if (enemy.TelegraphDuration <= 0)
                 {
+                    NPC npc = new NPC();
+                    npc.type = enemy.NPCType;
+                    npc.SetDefaults(npc.type);
                     enemy.TelegraphSize *= 2f;
-                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)enemy.Position.X, (int)enemy.Position.Y, enemy.NPCType);
+                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)enemy.Position.X, (int)enemy.Position.Y + (int)(npc.height / 2f), enemy.NPCType);
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = enemy.RoomListID;
                     for (int i = 0; i < 15; i++)

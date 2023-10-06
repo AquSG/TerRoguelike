@@ -43,12 +43,12 @@ namespace TerRoguelike.NPCs
                 {
                     int hitDamage = 0;
                     int targetDamage = (int)(npc.lifeMax * 0.01f);
-                    int damageCap = 5;
+                    int damageCap = 20;
                     int owner = -1;
                     if (targetDamage > damageCap)
                         targetDamage = damageCap;
-                    else if (targetDamage <= 0)
-                        targetDamage = 1;
+                    else if (targetDamage < 3)
+                        targetDamage = 3;
 
                     for (int i = 0; i < ignitedStacks.Count; i++)
                     {
@@ -128,17 +128,6 @@ namespace TerRoguelike.NPCs
         {
             if (ignitedStacks != null && ignitedStacks.Any())
             {
-                /*
-                Texture2D texture = TextureAssets.Npc[npc.type].Value;
-                SpriteEffects spriteEffects = npc.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-                for (int i = 0; i < 4; i++)
-                {
-                    drawColor = Color.Lerp(Color.Yellow, Color.Orange, Main.rand.NextFloat(0.3f + float.Epsilon) + 0.35f + (0.35f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 8f % 60f)))) * 0.8f;
-                    Vector2 position =  npc.Center + (Vector2.UnitY * 4).RotatedBy(MathHelper.PiOver2 * i) - Main.screenPosition;
-                    Main.EntitySpriteDraw(texture, position, npc.frame, drawColor, npc.rotation, npc.frame.Size() * 0.5f, npc.scale, spriteEffects);
-                }
-                */
-
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
