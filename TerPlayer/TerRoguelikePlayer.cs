@@ -43,6 +43,7 @@ namespace TerRoguelike.TerPlayer
         public int heatSeekingChip;
         public int bloodSiphon;
         public int enchantingEye;
+        public int automaticDefibrillator;
         public int bouncyBall;
         public int airCanister;
         public int volatileRocket;
@@ -99,6 +100,7 @@ namespace TerRoguelike.TerPlayer
             heatSeekingChip = 0;
             bloodSiphon = 0;
             enchantingEye = 0;
+            automaticDefibrillator = 0;
             bouncyBall = 0;
             airCanister = 0;
             volatileRocket = 0;

@@ -183,6 +183,7 @@ namespace TerRoguelike.Managers
                 new LockOnMissile(),
                 new BloodSiphon(),
                 new EnchantingEye(),
+                new AutomaticDefibrillator(),
                 new BouncyBall(),
                 new AirCanister(),
                 new VolatileRocket(),

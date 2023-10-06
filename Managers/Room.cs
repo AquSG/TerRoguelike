@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
+using TerRoguelike.TerPlayer;
 using TerRoguelike.NPCs;
 using Terraria.Chat;
 using TerRoguelike.Systems;
@@ -74,6 +75,7 @@ namespace TerRoguelike.Managers
             }
                 
             WallUpdate();
+            PlayerItemsUpdate();
 
             roomTime++;
             for (int i = 0; i < RoomSpawnCap; i++)
@@ -249,6 +251,32 @@ namespace TerRoguelike.Managers
                 itemTier = 2;
             }
             SpawnManager.SpawnItem(itemType, (RoomPosition + (RoomDimensions / 2f)) * 16f, itemTier, 75, 0.5f);
+        }
+        public void PlayerItemsUpdate()
+        {
+            int totalAutomaticDefibrillator = 0;
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+                if (player == null)
+                    continue;
+                if (!player.active)
+                    continue;
+
+                TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                totalAutomaticDefibrillator += modPlayer.automaticDefibrillator;
+            }
+
+            if (totalAutomaticDefibrillator > 0)
+            {
+                int healTime = (int)(1500 * (4 / (float)(totalAutomaticDefibrillator + 4)));
+                if (healTime <= 0)
+                    healTime = 1;
+                if (roomTime % healTime == 0 && roomTime > 0)
+                {
+                    RoomSystem.healingPulses.Add(new HealingPulse(new Vector2(RoomPosition.X + (RoomDimensions.X * 0.5f), RoomPosition.Y + (RoomDimensions.Y * 0.5f)) * 16f));
+                }
+            }
         }
     }
 }

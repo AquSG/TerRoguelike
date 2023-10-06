@@ -292,4 +292,13 @@ Items: {
 			Extra copies of this item increase the radius by 3 tiles and base damage by 100
 			'''
 	}
+
+	AutomaticDefibrillator: {
+		DisplayName: Automatic Defibrillator
+		Tooltip:
+			'''
+			Every 20 seconds in an active room, summon a pulse that heals for 50% max life
+			Extra copies of this item reduce the time needed by a diminishing amount
+			'''
+	}
 }

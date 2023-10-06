@@ -19,12 +19,15 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.Bestiary;
 using Terraria.GameContent;
+using Terraria.Graphics.Shaders;
+using Terraria.Audio;
 
 namespace TerRoguelike.Systems
 {
     public class RoomSystem : ModSystem
     {
         public static List<Room> RoomList;
+        public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -32,6 +35,7 @@ namespace TerRoguelike.Systems
         public override void PostUpdateWorld()
         {
             SpawnManager.UpdateSpawnManager();
+            UpdateHealingPulse();
 
             if (RoomList == null)
                 return;
@@ -163,6 +167,7 @@ namespace TerRoguelike.Systems
         public override void PostDrawTiles()
         {
             DrawPendingEnemies();
+            DrawHealingPulse();
 
             if (RoomList == null)
                 return;
@@ -286,11 +291,91 @@ namespace TerRoguelike.Systems
                 PendingEnemy enemy = SpawnManager.pendingEnemies[i];
                 Texture2D texture = TextureAssets.Npc[enemy.NPCType].Value;
                 int frameCount = Main.npcFrameCount[enemy.NPCType];
-                Color color = Color.HotPink * (0.75f * (1 - enemy.TelegraphDuration/60f));
+                Color color = Color.HotPink * (0.75f * (1 - enemy.TelegraphDuration / 60f));
                 Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), color, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
             }
-            
+
             Main.spriteBatch.End();
         }
+        public void UpdateHealingPulse()
+        {
+            if (healingPulses == null)
+                healingPulses = new List<HealingPulse>();
+
+            if (!healingPulses.Any())
+                return;
+
+            for (int p = 0; p < healingPulses.Count; p++)
+            {
+                HealingPulse pulse = healingPulses[p];
+                if (pulse.Time == 30)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyWindAttack with { Volume = 0.15f });
+                }
+                if (pulse.Time == 0)
+                {
+                    for (int i = 0; i < Main.maxPlayers; i++)
+                    {
+                        Player player = Main.player[i];
+                        if (player == null)
+                            continue;
+                        if (!player.active)
+                            continue;
+
+                        TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                        modPlayer.ScaleableHeal((int)(player.statLifeMax2 / 2f));
+                        SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 0.75f });
+                    }
+                }
+                pulse.Time--;
+                healingPulses.RemoveAll(x => x.Time <= -30);
+            }
+        }
+        public void DrawHealingPulse()
+        {
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            for (int p = 0; p < healingPulses.Count; p++)
+            {
+                HealingPulse pulse = healingPulses[p];
+                Texture2D telegraphBase = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/InvisibleProj").Value;
+
+                float scale;
+                float opacity;
+                if (pulse.Time > 2)
+                {
+                    float interpolant = (pulse.Time - 2) / 28f;
+                    scale = MathHelper.Lerp(0.01f, 2f, interpolant);
+                    opacity = MathHelper.Lerp(0.5f, 0f, interpolant);
+                }
+                else
+                {
+                    float interpolant = Math.Abs(pulse.Time - 2) / 32f;
+                    scale = MathHelper.Lerp(0.01f, 20f, interpolant);
+                    opacity = MathHelper.Lerp(1f, 0f, interpolant);
+                }
+                    
+                
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseOpacity(0.5f * opacity);
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseColor(Color.Lerp(Color.Green, Color.GreenYellow, 0.5f));
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseSecondaryColor(Color.LightGreen);
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseSaturation(scale);
+
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].Apply();
+
+                Vector2 drawPosition = pulse.Position - Main.screenPosition;
+                Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0, telegraphBase.Size() / 2f, scale * 156f, 0, 0);
+            }
+            Main.spriteBatch.End();
+        }
+    }
+    public class HealingPulse
+    {
+        public HealingPulse(Vector2 position)
+        {
+            Position = position;
+        }
+        public Vector2 Position;
+        public int Time = 30;
     }
 }

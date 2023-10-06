@@ -16,6 +16,7 @@ namespace TerRoguelike.Shaders
         internal const string CalamityShaderPrefix = "TerRoguelike:";
 
         internal static Effect BasicTintShader;
+        internal static Effect CircularGradientWithEdge;
 
         public static void LoadShaders()
         {
@@ -28,6 +29,9 @@ namespace TerRoguelike.Shaders
 
             BasicTintShader = LoadShader("BasicTint");
             RegisterMiscShader(BasicTintShader, "TintPass", "BasicTint");
+
+            CircularGradientWithEdge = LoadShader("CircularGradientWithEdge");
+            RegisterMiscShader(CircularGradientWithEdge, "CircularGradientWithEdgePass", "CircularGradientWithEdge");
 
         }
         private static void RegisterMiscShader(Effect shader, string passName, string registrationName)
