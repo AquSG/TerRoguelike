@@ -41,6 +41,7 @@ namespace TerRoguelike.TerPlayer
         public int timesHaveBeenTougher;
         public int rustedShield;
         public int amberBead;
+        public int flimsyPauldron;
         public int lockOnMissile;
         public int evilEye;
         public int spentShell;
@@ -102,6 +103,7 @@ namespace TerRoguelike.TerPlayer
             timesHaveBeenTougher = 0;
             rustedShield = 0;
             amberBead = 0;
+            flimsyPauldron = 0;
             lockOnMissile = 0;
             evilEye = 0;
             spentShell = 0;
@@ -331,7 +333,7 @@ namespace TerRoguelike.TerPlayer
                     if (hit.Crit)
                         damage /= 2;
 
-                    int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<ClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
+                    int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<StuckClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
                     TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
 
                     spawnedModProj.procChainBools = new ProcChainBools(modProj.procChainBools);
@@ -475,7 +477,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.075f }, Player.Center);
                     CombatText.NewText(Player.getRect(), Color.LightGray, "blocked!");
-                    Player.immuneTime += 45;
+                    Player.immuneTime += 40;
                     Player.immune = true;
                     dodgeAttack = true;
                     return;
@@ -494,11 +496,16 @@ namespace TerRoguelike.TerPlayer
         }
         private void ModifyHurtInfo_TerRoguelike(ref Player.HurtInfo info)
         {
+            if (flimsyPauldron > 0)
+            {
+                int reductedDamage = 5 * flimsyPauldron;
+                info.Damage -= reductedDamage;
+            }
             if (barrierHealth > 1 && info.Damage > (int)barrierHealth)
             {
                 info.Damage -= (int)barrierHealth;
-                BarrierHitEffect(info.Damage + (int)barrierHealth);
                 barrierFullAbsorbHit = true;
+                BarrierHitEffect(info.Damage + (int)barrierHealth);
             }
         }
         public void BarrierHitEffect(int damage)
@@ -507,7 +514,7 @@ namespace TerRoguelike.TerPlayer
             SoundStyle soundStyle = damage < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
             SoundEngine.PlaySound(soundStyle, Player.Center);
             barrierHealth -= damage;
-            Player.immuneTime += 45;
+            Player.immuneTime += damage == 1 ? 20 : 40;
             Player.immune = true;
             outOfDangerTime = 0;
         }

@@ -12,7 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Projectiles
 {
-    public class ClingyGrenade : ModProjectile, ILocalizedModType
+    public class StuckClingyGrenade : ModProjectile, ILocalizedModType
     {
         public int target = -1;
         public int stuckNPC = -1;

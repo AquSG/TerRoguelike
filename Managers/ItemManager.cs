@@ -181,6 +181,7 @@ namespace TerRoguelike.Managers
                 new TimesHaveBeenTougher(),
                 new RustedShield(),
                 new AmberBead(),
+                new FlimsyPauldron(),
                 new EvilEye(),
                 new SpentShell(),
                 new HeatSeekingChip(),
