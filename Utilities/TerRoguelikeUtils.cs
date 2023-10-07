@@ -123,5 +123,19 @@ namespace TerRoguelike.Utilities
             }
             return false;
         }
+        /// <summary>
+        /// Returns a color lerp that supports multiple colors.
+        /// </summary>
+        /// <param name="increment">The 0-1 incremental value used when interpolating.</param>
+        /// <param name="colors">The various colors to interpolate across.</param>
+        /// <returns></returns>
+        public static Color MulticolorLerp(float increment, params Color[] colors)
+        {
+            increment %= 0.999f;
+            int currentColorIndex = (int)(increment * colors.Length);
+            Color currentColor = colors[currentColorIndex];
+            Color nextColor = colors[(currentColorIndex + 1) % colors.Length];
+            return Color.Lerp(currentColor, nextColor, increment * colors.Length % 1f);
+        }
     }
 }

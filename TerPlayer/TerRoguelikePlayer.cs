@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.Graphics.Shaders;
+using Terraria.Graphics.Effects;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Items.Weapons;
@@ -16,6 +17,7 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using ReLogic.Content;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -42,6 +44,7 @@ namespace TerRoguelike.TerPlayer
         public int rustedShield;
         public int amberBead;
         public int flimsyPauldron;
+        public int protectiveBubble;
         public int lockOnMissile;
         public int evilEye;
         public int spentShell;
@@ -72,6 +75,7 @@ namespace TerRoguelike.TerPlayer
         public Vector2 playerToCursor = Vector2.Zero;
         public float barrierHealth = 0;
         public bool barrierFullAbsorbHit = false;
+        public int barrierInHurt = 0;
         public float barrierFloor = 0;
         public int outOfDangerTime = 600;
         public bool dodgeAttack = false;
@@ -104,6 +108,7 @@ namespace TerRoguelike.TerPlayer
             rustedShield = 0;
             amberBead = 0;
             flimsyPauldron = 0;
+            protectiveBubble = 0;
             lockOnMissile = 0;
             evilEye = 0;
             spentShell = 0;
@@ -129,6 +134,7 @@ namespace TerRoguelike.TerPlayer
             onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
+            barrierInHurt = 0;
         }
         #endregion
 
@@ -223,6 +229,11 @@ namespace TerRoguelike.TerPlayer
             {
                 float jumpSpeedIncrease = bunnyHopper * 0.12f;
                 jumpSpeedMultiplier += jumpSpeedIncrease;
+            }
+            if (protectiveBubble > 0 && outOfDangerTime >= 420)
+            {
+                float drIncrease = protectiveBubble * 50f;
+                diminishingDR += drIncrease;
             }
 
             if (evilEye > 0)
@@ -461,7 +472,7 @@ namespace TerRoguelike.TerPlayer
 
             if (barrierHealth > 1 && info.Damage <= (int)barrierHealth && !barrierFullAbsorbHit)
             {
-                BarrierHitEffect(info.Damage);
+                BarrierHitEffect(info.Damage, info.Damage);
                 return true;
             }
 
@@ -503,24 +514,40 @@ namespace TerRoguelike.TerPlayer
             }
             if (barrierHealth > 1 && info.Damage > (int)barrierHealth)
             {
+                int preBarrierDamage = info.Damage;
                 info.Damage -= (int)barrierHealth;
                 barrierFullAbsorbHit = true;
-                BarrierHitEffect(info.Damage + (int)barrierHealth);
+                BarrierHitEffect(info.Damage + (int)barrierHealth, preBarrierDamage);
             }
         }
-        public void BarrierHitEffect(int damage)
+        public void BarrierHitEffect(int damageToBarrier, int fullHitDamage)
         {
-            CombatText.NewText(Player.getRect(), Color.Gold, damage > (int)barrierHealth ? -(int)barrierHealth : -damage);
-            SoundStyle soundStyle = damage < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
+            barrierInHurt = damageToBarrier;
+            CombatText.NewText(Player.getRect(), Color.Gold, damageToBarrier > (int)barrierHealth ? -(int)barrierHealth : -damageToBarrier);
+            SoundStyle soundStyle = damageToBarrier < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
             SoundEngine.PlaySound(soundStyle, Player.Center);
-            barrierHealth -= damage;
-            Player.immuneTime += damage == 1 ? 20 : 40;
+            barrierHealth -= damageToBarrier;
+            Player.immuneTime += fullHitDamage == 1 ? 20 : 40;
             Player.immune = true;
+            HurtEffects(fullHitDamage);
+            
+        }
+        public void HurtEffects(int damage)
+        {
+            if (protectiveBubble > 0 && outOfDangerTime >= 420)
+            {
+                SoundEngine.PlaySound(SoundID.Item87 with { Volume = 0.75f }, Player.Center);
+                for (int i = 0; i < 15; i++)
+                {
+                    Dust.NewDust(Player.MountedCenter + new Vector2(-16, -16), 32, 32, DustID.BlueTorch);
+                }
+            }
             outOfDangerTime = 0;
         }
         public override void OnHurt(Player.HurtInfo info)
         {
-            outOfDangerTime = 0;
+            if (barrierInHurt <= 0)
+                HurtEffects(info.Damage);
         }
         #endregion
 
@@ -668,6 +695,57 @@ namespace TerRoguelike.TerPlayer
 
                 Vector2 drawPosition = Player.Center - Main.screenPosition;
                 Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0, telegraphBase.Size() / 2f, scale * 156f, 0, 0);
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            }
+            
+            if (protectiveBubble > 0 && outOfDangerTime >= 400)
+            {
+                Main.spriteBatch.End();
+                Effect shieldEffect = Filters.Scene["TerRoguelike:ProtectiveBubbleShield"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, shieldEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                // If in vanity, the shield is always projected as if it's at full strength.
+                float shieldStrength = 1f;
+
+                // Noise scale also grows and shrinks, although out of sync with the shield
+                float noiseScale = MathHelper.Lerp(0.4f, 0.8f, (float)Math.Sin(Main.GlobalTimeWrappedHourly * 0.3f) * 0.5f + 0.5f);
+
+                // Define shader parameters
+                
+                shieldEffect.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly * 0.24f);
+                shieldEffect.Parameters["blowUpPower"].SetValue(2.5f);
+                shieldEffect.Parameters["blowUpSize"].SetValue(0.5f);
+                shieldEffect.Parameters["noiseScale"].SetValue(noiseScale);
+
+                // Shield opacity multiplier slightly changes, this is independent of current shield strength
+                float baseShieldOpacity = 0.2f + 0.05f * (float)Math.Sin(Main.GlobalTimeWrappedHourly * 2f);
+                shieldEffect.Parameters["shieldOpacity"].SetValue(baseShieldOpacity * (0.5f + 0.5f * shieldStrength));
+                shieldEffect.Parameters["shieldEdgeBlendStrenght"].SetValue(4f);
+
+                Color edgeColor;
+                Color shieldColor;
+
+                float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (float)Math.Log2(Math.Pow((outOfDangerTime - 400) * 0.9f, 2)) + 6f) / 20f, 0f, 1f);
+                Color blueTint = new Color(51, 102, 255);
+                Color cyanTint = new Color(71, 202, 255);
+                Color wulfGreen = new Color(100, 180, 220) * 0.8f;
+                edgeColor = MulticolorLerp(Main.GlobalTimeWrappedHourly * 0.2f, blueTint, cyanTint, wulfGreen) * 0.5f * opacity;
+                shieldColor = blueTint * 0.125f * opacity;
+
+                // Define shader parameters for shield color
+                shieldEffect.Parameters["shieldColor"].SetValue(shieldColor.ToVector3());
+                shieldEffect.Parameters["shieldEdgeColor"].SetValue(edgeColor.ToVector3());
+
+                // Fetch shield noise overlay texture (this is the techy overlay fed to the shader)
+                Asset<Texture2D> NoiseTex = ModContent.Request<Texture2D>("TerRoguelike/Shaders/OverheadWaves");
+                Vector2 pos = Player.MountedCenter + Player.gfxOffY * Vector2.UnitY - Main.screenPosition;
+                Texture2D tex = NoiseTex.Value;
+
+                float scale = 0.115f * opacity;
+                Main.spriteBatch.Draw(tex, pos, null, Color.White, 0, tex.Size() / 2f, scale, 0, 0);
+
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 

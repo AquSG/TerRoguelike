@@ -65,7 +65,9 @@ namespace TerRoguelike.Projectiles
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileHit", 4) with { Volume = 0.3f }, Projectile.Center);
                 for (int i = 0; i < 10; i++)
                 {
-                    Dust.NewDust(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.YellowTorch);
+                    Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.YellowTorch);
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
                 }
             }
 

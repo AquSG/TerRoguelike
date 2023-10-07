@@ -182,6 +182,7 @@ namespace TerRoguelike.Managers
                 new RustedShield(),
                 new AmberBead(),
                 new FlimsyPauldron(),
+                new ProtectiveBubble(),
                 new EvilEye(),
                 new SpentShell(),
                 new HeatSeekingChip(),

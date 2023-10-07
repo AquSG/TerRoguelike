@@ -59,13 +59,22 @@ namespace TerRoguelike.Projectiles
             {
                 originalDirection = Projectile.velocity.SafeNormalize(-Vector2.UnitY);
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileLaunch", 4) with { Volume = 0.07f }, Projectile.Center);
+                for (int i = 0; i < 5; i++)
+                {
+                    Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-8, -8), 16, 16, DustID.PinkTorch, -Projectile.velocity.X * 7, -Projectile.velocity.Y * 7);
+                    dust.noGravity = true;
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
+                }
             }
             if (Projectile.timeLeft == 59)
             {
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileHit", 4) with { Volume = 0.3f }, Projectile.Center);
                 for (int i = 0; i < 10; i++)
                 {
-                    Dust.NewDust(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.PinkTorch);
+                    Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.PinkTorch);
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
                 }
             }
             Projectile.localAI[1]++;
