@@ -1,21 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Items.Weapons;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs;
 using TerRoguelike.Projectiles;
-using TerRoguelike.World;
-using Terraria.ModLoader.Assets;
-using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Utilities;
+using TerRoguelike.World;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -28,6 +28,7 @@ namespace TerRoguelike.TerPlayer
         public int antiqueLens;
         public int instigatorsBrace;
         public int hotPepper;
+        public int brazenNunchucks;
         public int livingCrystal;
         public int soulstealCoating;
         public int bottleOfVigor;
@@ -87,6 +88,7 @@ namespace TerRoguelike.TerPlayer
             antiqueLens = 0;
             instigatorsBrace = 0;
             hotPepper = 0;
+            brazenNunchucks = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             bottleOfVigor = 0;
@@ -196,7 +198,7 @@ namespace TerRoguelike.TerPlayer
             {
                 Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Bottom + new Vector2(0, -5f), Vector2.Zero, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
                 benignFungusCooldown += Main.rand.Next(13, 16);
-            } 
+            }
             if (sentientPutty > 0 && outOfDangerTime == 120)
             {
                 int healAmt = sentientPutty * 10;
@@ -378,7 +380,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {
-            modifiers.FinalDamage *= GetBonusDamageMulti(target, proj.Center, proj);
+            modifiers.FinalDamage *= GetBonusDamageMulti(target, target.getRect().ClosestPointInRect(proj.Center), proj);
         }
         public float GetBonusDamageMulti(NPC npc, Vector2 hitPosition, Projectile? projectile = null)
         {
@@ -386,6 +388,11 @@ namespace TerRoguelike.TerPlayer
             if (instigatorsBrace > 0 && (npc.life / (float)npc.lifeMax) >= 0.9f)
             {
                 float bonusDamage = 0.75f * instigatorsBrace;
+                bonusDamageMultiplier *= 1 + bonusDamage;
+            }
+            if (brazenNunchucks > 0 && Vector2.Distance(Player.Center, hitPosition) <= 128f)
+            {
+                float bonusDamage = 0.2f * brazenNunchucks;
                 bonusDamageMultiplier *= 1 + bonusDamage;
             }
             previousBonusDamageMulti = bonusDamageMultiplier;
@@ -537,7 +544,7 @@ namespace TerRoguelike.TerPlayer
             }
 
             position = FindAirToPlayer(position);
-            
+
             SpawnManager.SpawnItem(itemType, position, itemTier, 75, 0.5f);
         }
         public Vector2 FindAirToPlayer(Vector2 position)
@@ -605,12 +612,56 @@ namespace TerRoguelike.TerPlayer
         #region Draw Effects
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
+            NPC closestNPC;
+            float closestNPCDistance = -1f;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+
+                if (npc == null || !npc.active)
+                    continue;
+
+                if (closestNPCDistance == -1f)
+                {
+                    closestNPCDistance = Vector2.Distance(Player.Center, npc.Center);
+                    closestNPC = npc;
+                }
+                else if (Vector2.Distance(Player.Center, npc.Center) < closestNPCDistance)
+                {
+                    closestNPCDistance = Vector2.Distance(Player.Center, npc.Center);
+                    closestNPC = npc;
+                }
+            }
+
             if (bladeFlashTime > 0)
             {
                 drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 23f);
                 bladeFlashTime--;
             }
 
+            if (brazenNunchucks > 0)
+            {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                Texture2D telegraphBase = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/InvisibleProj").Value;
+
+                float scale = 1.64f;
+                float opacity = MathHelper.Lerp(0.08f, 0f, (closestNPCDistance - 128f) / 128f);
+
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseOpacity(opacity);
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseColor(Color.Lerp(Color.Orange, Color.SandyBrown, 0.5f) * 0.85f);
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseSecondaryColor(Color.SandyBrown * 0.75f);
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].UseSaturation(scale);
+
+                GameShaders.Misc["TerRoguelike:CircularGradientWithEdge"].Apply();
+
+                Vector2 drawPosition = Player.Center - Main.screenPosition;
+                Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0, telegraphBase.Size() / 2f, scale * 156f, 0, 0);
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            }
             return;
 
             if (evilEye > 0)

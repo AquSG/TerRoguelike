@@ -319,4 +319,13 @@ Items: {
 			Extra copies of this item increase the regen by +4 HP/s
 			'''
 	}
+
+	BrazenNunchucks: {
+		DisplayName: Brazen Nunchucks
+		Tooltip:
+			'''
+			Enemies take 20% bonus damage when within 8 tiles of you
+			Extra copies of this item increase the bonus damage by 20%
+			'''
+	}
 }
