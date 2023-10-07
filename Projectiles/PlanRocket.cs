@@ -13,14 +13,15 @@ using Terraria.Graphics.Renderers;
 
 namespace TerRoguelike.Projectiles
 {
-    public class Missile : ModProjectile, ILocalizedModType
+    public class PlanRocket : ModProjectile, ILocalizedModType
     {
         public override string Texture => "TerRoguelike/Projectiles/AdaptiveGunBullet";
         public float rotationOffset = 0;
         public bool ableToHit = true;
         public TerRoguelikeGlobalProjectile modProj;
         TerRoguelikePlayer modPlayer;
-        public int setTimeLeft = 3000;
+        public int setTimeLeft = 6300;
+        public Vector2 originalDirection;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
@@ -56,31 +57,31 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.localAI[1] == 0)
             {
+                originalDirection = Projectile.velocity.SafeNormalize(-Vector2.UnitY);
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileLaunch", 4) with { Volume = 0.07f }, Projectile.Center);
             }
-            Projectile.localAI[1]++;
-
             if (Projectile.timeLeft == 59)
             {
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileHit", 4) with { Volume = 0.3f }, Projectile.Center);
                 for (int i = 0; i < 10; i++)
                 {
-                    Dust.NewDust(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.YellowTorch);
+                    Dust.NewDust(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.PinkTorch);
                 }
             }
+            Projectile.localAI[1]++;
 
             if (modPlayer == null)
                 modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
 
-            if (modProj.homingTarget == -1)
+            if (modProj.homingTarget == -1 && Projectile.ai[0] != -1)
                 modProj.homingTarget = (int)Projectile.ai[0];
 
-            if (Projectile.localAI[1] > 90)
+            if (Projectile.localAI[1] > 300)
                 modProj.HomingAI(Projectile, 0.001128f * 2.9f, true);
             else
             {
                 rotationOffset += Main.rand.Next(-1, 2) * (MathHelper.Pi / 72f);
-                Projectile.velocity = (Projectile.velocity.Length() * -Vector2.UnitY).RotatedBy(rotationOffset);
+                Projectile.velocity = (Projectile.velocity.Length() * originalDirection).RotatedBy(rotationOffset);
             }
 
             if (Projectile.timeLeft <= 60)
@@ -100,16 +101,16 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.timeLeft <= 60 && i + Projectile.timeLeft <= 60)
                     continue;
 
-                Color color = Color.Lerp(Color.Yellow, Color.White, (float)i / (Projectile.oldPos.Length / 2));
+                Color color = Color.Lerp(Color.DeepPink, Color.White, (float)i / (Projectile.oldPos.Length / 2));
                 Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f) - Main.screenPosition;
                 
                 // Become smaller the futher along the old positions we are.
-                Vector2 scale = new Vector2(2.2f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
+                Vector2 scale = new Vector2(1.3f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
             if (Projectile.velocity != Vector2.Zero)
             {
-                Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Missile").Value;
+                Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/PlanRocket").Value;
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition;
                 Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
             }

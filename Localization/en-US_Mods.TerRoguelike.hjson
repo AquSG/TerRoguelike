@@ -11,6 +11,7 @@ Projectiles: {
 	AdaptiveBladeHoldout.DisplayName: Adaptive Blade Holdout
 	AdaptiveBladeSlash.DisplayName: Adaptive Blade Slash
 	HealingFungus.DisplayName: Healing Fungus
+	PlanRocket.DisplayName: Plan Rocket
 }
 
 Items: {
@@ -142,7 +143,7 @@ Items: {
 		DisplayName: Volatile Rocket
 		Tooltip:
 			'''
-			Main attacks explode for 60% total damage
+			Original attacks explode for 60% total damage
 			Extra copies of this item increase the size of the explosion by 100%
 			'''
 	}
@@ -326,6 +327,16 @@ Items: {
 			'''
 			Enemies take 20% bonus damage when within 8 tiles of you
 			Extra copies of this item increase the bonus damage by 20%
+			'''
+	}
+
+	AttackPlan: {
+		DisplayName: Attack Plan
+		Tooltip:
+			'''
+			Upon entering a room, deploy 8 homing rockets from the center of the room
+			Homing rockets deal 100 base damage
+			Extra copies of this item increase the amount of homing rockets by 4
 			'''
 	}
 }

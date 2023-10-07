@@ -34,7 +34,6 @@ namespace TerRoguelike.NPCs
         public int ignitedHitCooldown = 0;
         #endregion
         public override bool InstancePerEntity => true;
-
         public override void PostAI(NPC npc)
         {
             if (ignitedStacks != null && ignitedStacks.Any())

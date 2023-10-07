@@ -12,6 +12,7 @@ using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
 using Terraria.ID;
 using TerRoguelike.Systems;
+using TerRoguelike.Projectiles;
 using Terraria.ModLoader.IO;
 using Microsoft.Xna.Framework;
 using TerRoguelike.NPCs;
@@ -28,6 +29,7 @@ namespace TerRoguelike.Systems
     {
         public static List<Room> RoomList;
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
+        public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -36,6 +38,7 @@ namespace TerRoguelike.Systems
         {
             SpawnManager.UpdateSpawnManager();
             UpdateHealingPulse();
+            UpdateAttackPlanRocketBundles();
 
             if (RoomList == null)
                 return;
@@ -333,6 +336,11 @@ namespace TerRoguelike.Systems
         }
         public void DrawHealingPulse()
         {
+            if (healingPulses == null)
+                return;
+            if (!healingPulses.Any())
+                return;
+
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             for (int p = 0; p < healingPulses.Count; p++)
@@ -368,6 +376,33 @@ namespace TerRoguelike.Systems
             }
             Main.spriteBatch.End();
         }
+        public void UpdateAttackPlanRocketBundles()
+        {
+            if (attackPlanRocketBundles == null)
+                attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
+            if (!attackPlanRocketBundles.Any())
+                return;
+
+            for (int i = 0; i < attackPlanRocketBundles.Count; i++)
+            {
+                AttackPlanRocketBundle bundle = attackPlanRocketBundles[i];
+
+                if (!RoomList[bundle.SourceRoom].active)
+                {
+                    bundle.Time = -1;
+                    continue;
+                }
+
+                if (bundle.Time % 12 == 0)
+                {
+                    Projectile.NewProjectile(Projectile.GetSource_None(), bundle.Position + new Vector2(0, -32).RotatedBy(bundle.Rotation), (-Vector2.UnitY * 2.2f).RotatedBy(bundle.Rotation), ModContent.ProjectileType<PlanRocket>(), 100, 1f, bundle.Owner, -1);
+                    bundle.Count--;
+                    bundle.Rotation += MathHelper.PiOver4;
+                }
+                bundle.Time--;
+            }
+            attackPlanRocketBundles.RemoveAll(x => x.Time < 0);
+        }
     }
     public class HealingPulse
     {
@@ -377,5 +412,22 @@ namespace TerRoguelike.Systems
         }
         public Vector2 Position;
         public int Time = 30;
+    }
+    public class AttackPlanRocketBundle
+    {
+        public AttackPlanRocketBundle(Vector2 position, int count, int owner, int sourceRoom)
+        {
+            Position = position;
+            Count = count;
+            Owner = owner;
+            Time = count * 12;
+            SourceRoom = sourceRoom;
+        }
+        public Vector2 Position;
+        public int Count;
+        public int Owner;
+        public int Time;
+        public float Rotation = 0f - MathHelper.PiOver2;
+        public int SourceRoom;
     }
 }

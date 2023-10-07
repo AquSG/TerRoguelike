@@ -169,6 +169,7 @@ namespace TerRoguelike.Managers
                 new InstigatorsBrace(),
                 new HotPepper(),
                 new BrazenNunchucks(),
+                new AttackPlan(),
                 new LivingCrystal(),
                 new SoulstealCoating(),
                 new BottleOfVigor(),

@@ -29,6 +29,7 @@ namespace TerRoguelike
             SchematicManager.Unload();
             RoomList = null;
             healingPulses = null;
+            attackPlanRocketBundles = null;
             pendingEnemies = null;
             pendingItems = null;
             BarrierUI.Unload();

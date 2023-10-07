@@ -29,6 +29,7 @@ namespace TerRoguelike.TerPlayer
         public int instigatorsBrace;
         public int hotPepper;
         public int brazenNunchucks;
+        public int attackPlan;
         public int livingCrystal;
         public int soulstealCoating;
         public int bottleOfVigor;
@@ -89,6 +90,7 @@ namespace TerRoguelike.TerPlayer
             instigatorsBrace = 0;
             hotPepper = 0;
             brazenNunchucks = 0;
+            attackPlan = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             bottleOfVigor = 0;
@@ -612,7 +614,6 @@ namespace TerRoguelike.TerPlayer
         #region Draw Effects
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
-            NPC closestNPC;
             float closestNPCDistance = -1f;
             for (int i = 0; i < Main.maxNPCs; i++)
             {
@@ -624,13 +625,15 @@ namespace TerRoguelike.TerPlayer
                 if (closestNPCDistance == -1f)
                 {
                     closestNPCDistance = Vector2.Distance(Player.Center, npc.Center);
-                    closestNPC = npc;
                 }
                 else if (Vector2.Distance(Player.Center, npc.Center) < closestNPCDistance)
                 {
                     closestNPCDistance = Vector2.Distance(Player.Center, npc.Center);
-                    closestNPC = npc;
                 }
+            }
+            if (closestNPCDistance == -1)
+            {
+                closestNPCDistance = 10000f;
             }
 
             if (bladeFlashTime > 0)

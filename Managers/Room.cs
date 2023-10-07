@@ -12,6 +12,7 @@ using TerRoguelike.TerPlayer;
 using TerRoguelike.NPCs;
 using Terraria.Chat;
 using TerRoguelike.Systems;
+using TerRoguelike.Projectiles;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Managers
@@ -209,6 +210,8 @@ namespace TerRoguelike.Managers
         }
         public void RoomClearReward()
         {
+            ClearPlanRockets();
+
             int chance = Main.rand.Next(1, 101);
             int itemType;
             int itemTier;
@@ -255,6 +258,8 @@ namespace TerRoguelike.Managers
         public void PlayerItemsUpdate()
         {
             int totalAutomaticDefibrillator = 0;
+            Vector2 roomCenter = new Vector2(RoomPosition.X + (RoomDimensions.X * 0.5f), RoomPosition.Y + (RoomDimensions.Y * 0.5f)) * 16f;
+
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player player = Main.player[i];
@@ -274,7 +279,37 @@ namespace TerRoguelike.Managers
                     healTime = 1;
                 if (roomTime % healTime == 0 && roomTime > 0)
                 {
-                    RoomSystem.healingPulses.Add(new HealingPulse(new Vector2(RoomPosition.X + (RoomDimensions.X * 0.5f), RoomPosition.Y + (RoomDimensions.Y * 0.5f)) * 16f));
+                    RoomSystem.healingPulses.Add(new HealingPulse(roomCenter));
+                }
+            }
+
+            if (roomTime == 30)
+            {
+                for (int i = 0; i < Main.maxPlayers; i++)
+                {
+                    Player player = Main.player[i];
+                    if (player == null)
+                        continue;
+                    if (!player.active)
+                        continue;
+
+                    TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                    if (modPlayer.attackPlan <= 0)
+                        continue;
+
+                    int rocketCount = 4 + (4 * modPlayer.attackPlan);
+                    RoomSystem.attackPlanRocketBundles.Add(new AttackPlanRocketBundle(roomCenter, rocketCount, player.whoAmI, myRoom));
+                }
+            }
+        }
+        public void ClearPlanRockets()
+        {
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                Projectile proj = Main.projectile[i];
+                if (proj.type == ModContent.ProjectileType<PlanRocket>())
+                {
+                    proj.timeLeft = 60;
                 }
             }
         }
