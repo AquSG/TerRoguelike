@@ -18,6 +18,7 @@ using TerRoguelike.Utilities;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Content;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -32,6 +33,7 @@ namespace TerRoguelike.TerPlayer
         public int hotPepper;
         public int brazenNunchucks;
         public int attackPlan;
+        public int sanguineOrb;
         public int livingCrystal;
         public int soulstealCoating;
         public int bottleOfVigor;
@@ -96,6 +98,7 @@ namespace TerRoguelike.TerPlayer
             hotPepper = 0;
             brazenNunchucks = 0;
             attackPlan = 0;
+            sanguineOrb = 0;
             livingCrystal = 0;
             soulstealCoating = 0;
             bottleOfVigor = 0;
@@ -352,6 +355,14 @@ namespace TerRoguelike.TerPlayer
                     spawnedModProj.procChainBools.clinglyGrenadePreviously = true;
                     if (hit.Crit)
                         spawnedModProj.procChainBools.critPreviously = true;
+                }
+            }
+            if (sanguineOrb > 0)
+            {
+                float chance = 0.08f * sanguineOrb;
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(240, Player.whoAmI));
                 }
             }
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)

@@ -358,4 +358,15 @@ Items: {
 			Extra copies of this item increase the diminishing DR by 50
 			'''
 	}
+
+	SanguineOrb: {
+		DisplayName: Sanguine Orb
+		Tooltip:
+			'''
+			8% chance upon hitting an enemy to inflict bleeding
+			Bleeding deals 240 base damage in total over a duration
+			Inflicting bleeding also extends the duration of other bleeding stacks on the enemy
+			Extra copies of this item further increase the chance by 8%
+			'''
+	}
 }
