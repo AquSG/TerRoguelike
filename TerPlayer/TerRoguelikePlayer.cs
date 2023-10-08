@@ -19,6 +19,7 @@ using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Content;
 using TerRoguelike.Items.Common;
+using TerRoguelike.Items.Uncommon;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -51,6 +52,7 @@ namespace TerRoguelike.TerPlayer
         public int evilEye;
         public int spentShell;
         public int heatSeekingChip;
+        public int backupDagger;
         public int bloodSiphon;
         public int enchantingEye;
         public int automaticDefibrillator;
@@ -62,6 +64,7 @@ namespace TerRoguelike.TerPlayer
         public int itemPotentiometer;
         public List<int> evilEyeStacks = new List<int>();
         public int benignFungusCooldown = 0;
+        public int storedDaggers = 0;
         #endregion
 
         #region Misc Variables
@@ -85,6 +88,7 @@ namespace TerRoguelike.TerPlayer
         public float diminishingDR = 0f;
         public bool onGround = false;
         public float previousBonusDamageMulti = 1f;
+        public int timeAttacking = 0;
         #endregion
 
         #region Reset Variables
@@ -116,6 +120,7 @@ namespace TerRoguelike.TerPlayer
             evilEye = 0;
             spentShell = 0;
             heatSeekingChip = 0;
+            backupDagger = 0;
             bloodSiphon = 0;
             enchantingEye = 0;
             automaticDefibrillator = 0;
@@ -159,6 +164,22 @@ namespace TerRoguelike.TerPlayer
                 }
             }
             outOfDangerTime++;
+
+            if (Player.itemAnimation > 0)
+            {
+                if (timeAttacking < 0)
+                    timeAttacking = 0;
+
+                timeAttacking++;
+            }
+            else
+            {
+                timeAttacking--;
+
+                if (timeAttacking > 0)
+                    timeAttacking = 0;
+            }
+                
 
             if (bottleOfVigor > 0)
             {
@@ -265,6 +286,45 @@ namespace TerRoguelike.TerPlayer
             {
                 shotsToFire += spentShell;
             }
+            if (backupDagger > 0)
+            {
+                int maxStocks = 3 + backupDagger;
+                int stockRate = (int)(360f / (float)maxStocks);
+                if (storedDaggers > maxStocks)
+                {
+                    storedDaggers = maxStocks;
+                    SoundEngine.PlaySound(SoundID.Item7, Player.Center);
+                }
+                    
+                int releaseCooldown = (int)(stockRate / 2f);
+                if (releaseCooldown > 8)
+                    releaseCooldown = 8;
+                if (releaseCooldown < 1)
+                    releaseCooldown = 1;
+
+                if (timeAttacking > 0)
+                {
+                    if (stockRate < 1)
+                        stockRate = 1;
+
+                    if (timeAttacking % stockRate == 0 && storedDaggers < maxStocks)
+                    {
+                        storedDaggers++;
+                        if (storedDaggers == maxStocks)
+                            SoundEngine.PlaySound(SoundID.Item63 with { Volume = 0.8f }, Player.Center);
+                        else
+                            SoundEngine.PlaySound(SoundID.Item64 with { Volume = 0.4f }, Player.Center);
+                    }
+                }
+                else if (Math.Abs(timeAttacking) % releaseCooldown == 0 && storedDaggers > 0)
+                {
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (Main.MouseWorld - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
+                    storedDaggers--;
+                }
+            }
+            else
+                storedDaggers = 0;
+
             if (airCanister > 0)
             {
                 extraDoubleJumps += airCanister;
@@ -402,6 +462,15 @@ namespace TerRoguelike.TerPlayer
             {
                 int healAmt = enchantingEye * 8;
                 ScaleableHeal(healAmt);
+            }
+
+            if (proj.type == ModContent.ProjectileType<ThrownBackupDagger>())
+            {
+                if (ChanceRollWithLuck(0.5f, procLuck))
+                {
+                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(120, Player.whoAmI));
+                }
+                
             }
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)

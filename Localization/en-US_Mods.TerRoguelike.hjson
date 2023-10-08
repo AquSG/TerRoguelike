@@ -13,6 +13,7 @@ Projectiles: {
 	HealingFungus.DisplayName: Healing Fungus
 	PlanRocket.DisplayName: Plan Rocket
 	StuckClingyGrenade.DisplayName: Stuck Clingy Grenade
+	ThrownBackupDagger.DisplayName: Thrown Backup Dagger
 }
 
 Items: {
@@ -364,9 +365,21 @@ Items: {
 		Tooltip:
 			'''
 			8% chance upon hitting an enemy to inflict bleeding
-			Bleeding deals 240 base damage in total over a duration
+			Bleeding deals 240 base damage in total over a duration, which can be extended by inflicting bleeding again
 			Inflicting bleeding also extends the duration of other bleeding stacks on the enemy
 			Extra copies of this item further increase the chance by 8%
+			'''
+	}
+
+	BackupDagger: {
+		DisplayName: Backup Dagger
+		Tooltip:
+			'''
+			Stock up to 4 daggers while attacking
+			Stop attacking to release a flurry of all stocked daggers
+			Daggers home in on enemies, deal 100 base damage on hit, and have a 50% chance to inflict bleeding on hit
+			Bleeding deals 120 base damage over a duration, which can be extended by inflicting bleeding again
+			Extra copies of this item make daggers stock faster, and increase the maximum daggers by 1
 			'''
 	}
 }
