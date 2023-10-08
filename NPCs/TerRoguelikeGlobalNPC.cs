@@ -264,7 +264,7 @@ namespace TerRoguelike.NPCs
                 float rotationCompletionOffset = MathHelper.TwoPi / bleedingStacks.Count * i;
                 rotation += rotationCompletionOffset;
                 specificPosition += new Vector2(0, 16).RotatedBy(rotation);
-                specificPosition.Y -= (specificPosition.Y - position.Y) * 0.5f;
+                specificPosition += (specificPosition - position) * new Vector2((npc.frame.Width * npc.scale) / 32f, -0.5f) ;
                 if (specificPosition.Y >= position.Y && inFront)
                     Main.EntitySpriteDraw(texture, specificPosition - Main.screenPosition, null, color, 0f, texture.Size() * 0.5f, 1f, SpriteEffects.None);
                 else if (!inFront)
