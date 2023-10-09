@@ -391,4 +391,13 @@ Items: {
 			Extra copies of this item increase the movement speed bonus by 25%
 			'''
 	}
+
+	BallAndChain: {
+		DisplayName: Ball and Chain
+		Tooltip:
+			'''
+			Slow enemies horizontally by 30% for 2 seconds on hit
+			Extra copies of this item increase the slow duration by 2 seconds
+			'''
+	}
 }

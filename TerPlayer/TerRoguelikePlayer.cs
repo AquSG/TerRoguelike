@@ -59,6 +59,7 @@ namespace TerRoguelike.TerPlayer
         public int bouncyBall;
         public int airCanister;
         public int unencumberingStone;
+        public int ballAndChain;
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
@@ -128,6 +129,7 @@ namespace TerRoguelike.TerPlayer
             bouncyBall = 0;
             airCanister = 0;
             unencumberingStone = 0;
+            ballAndChain = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
@@ -469,6 +471,12 @@ namespace TerRoguelike.TerPlayer
             {
                 int healAmt = enchantingEye * 8;
                 ScaleableHeal(healAmt);
+            }
+            if (ballAndChain > 0)
+            {
+                int slowTime = 120 * ballAndChain;
+                if (modNPC.ballAndChainSlow < slowTime)
+                    modNPC.ballAndChainSlow = slowTime;
             }
 
             if (proj.type == ModContent.ProjectileType<ThrownBackupDagger>())

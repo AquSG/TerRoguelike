@@ -34,8 +34,19 @@ namespace TerRoguelike.NPCs
         public int ignitedHitCooldown = 0;
         public List<BleedingStack> bleedingStacks = new List<BleedingStack>();
         public int bleedingHitCooldown = 0;
+        public int ballAndChainSlow = 0;
         #endregion
         public override bool InstancePerEntity => true;
+
+        public override bool PreAI(NPC npc)
+        {
+            if (ballAndChainSlow > 0)
+            {
+                npc.velocity /= 0.7f;
+                ballAndChainSlow--;
+            }
+            return true;
+        }
         public override void PostAI(NPC npc)
         {
             if (ignitedStacks != null && ignitedStacks.Any())
@@ -106,6 +117,12 @@ namespace TerRoguelike.NPCs
             }
             if (bleedingHitCooldown > 0)
                 bleedingHitCooldown--;
+
+            if (ballAndChainSlow > 0)
+            {
+                npc.velocity *= 0.7f;
+                ballAndChainSlow--;
+            }
         }
         public void IgniteHit(int hitDamage, NPC npc, int owner)
         {
@@ -241,6 +258,11 @@ namespace TerRoguelike.NPCs
                     if (Main.rand.NextBool(5))
                         Dust.NewDust(npc.position, npc.width, npc.height, DustID.Torch);
                 }
+            }
+            if (ballAndChainSlow > 0)
+            {
+                drawColor = drawColor.MultiplyRGB(Color.LightGray);
+                Dust.NewDust(npc.BottomLeft + new Vector2(0, -4f), npc.width, 1, DustID.t_Slime, newColor: Color.Gray, Scale: 0.5f);
             }
         }
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
