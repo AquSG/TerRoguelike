@@ -382,4 +382,13 @@ Items: {
 			Extra copies of this item make daggers stock faster, and increase the maximum daggers by 1
 			'''
 	}
+
+	UnencumberingStone: {
+		DisplayName: Unencumbering Stone
+		Tooltip:
+			'''
+			25% increased movement speed after not attacking for 5 seconds
+			Extra copies of this item increase the movement speed bonus by 25%
+			'''
+	}
 }

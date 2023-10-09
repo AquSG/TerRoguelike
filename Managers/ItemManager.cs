@@ -194,6 +194,7 @@ namespace TerRoguelike.Managers
                 new AutomaticDefibrillator(),
                 new BouncyBall(),
                 new AirCanister(),
+                new UnencumberingStone(),
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new Cornucopia(),

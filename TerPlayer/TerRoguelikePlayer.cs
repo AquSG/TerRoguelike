@@ -58,6 +58,7 @@ namespace TerRoguelike.TerPlayer
         public int automaticDefibrillator;
         public int bouncyBall;
         public int airCanister;
+        public int unencumberingStone;
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
@@ -126,6 +127,7 @@ namespace TerRoguelike.TerPlayer
             automaticDefibrillator = 0;
             bouncyBall = 0;
             airCanister = 0;
+            unencumberingStone = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
@@ -165,7 +167,7 @@ namespace TerRoguelike.TerPlayer
             }
             outOfDangerTime++;
 
-            if (Player.itemAnimation > 0)
+            if (Player.itemAnimation > 0 && Player.HeldItem.damage > 0)
             {
                 if (timeAttacking < 0)
                     timeAttacking = 0;
@@ -328,6 +330,11 @@ namespace TerRoguelike.TerPlayer
             if (airCanister > 0)
             {
                 extraDoubleJumps += airCanister;
+            }
+            if (unencumberingStone > 0 && timeAttacking <= -300)
+            {
+                float speedIncrease = unencumberingStone * 0.25f;
+                Player.moveSpeed += speedIncrease;
             }
             if (theDreamsoul > 0)
             {
