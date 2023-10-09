@@ -660,6 +660,7 @@ namespace TerRoguelike.TerPlayer
                     Player.immune = true;
                     soulOfLenaUses++;
                     soulOfLenaHurtVisual = true;
+                    SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.25f }, Player.Center);
                 }
             }
         }
