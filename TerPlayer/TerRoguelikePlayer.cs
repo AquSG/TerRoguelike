@@ -60,6 +60,7 @@ namespace TerRoguelike.TerPlayer
         public int airCanister;
         public int unencumberingStone;
         public int ballAndChain;
+        public int soulOfLena;
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
@@ -67,6 +68,8 @@ namespace TerRoguelike.TerPlayer
         public List<int> evilEyeStacks = new List<int>();
         public int benignFungusCooldown = 0;
         public int storedDaggers = 0;
+        public int soulOfLenaUses = 0;
+        public bool soulOfLenaHurtVisual = false;
         #endregion
 
         #region Misc Variables
@@ -130,6 +133,7 @@ namespace TerRoguelike.TerPlayer
             airCanister = 0;
             unencumberingStone = 0;
             ballAndChain = 0;
+            soulOfLena = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
@@ -644,6 +648,20 @@ namespace TerRoguelike.TerPlayer
             if (barrierInHurt <= 0)
                 HurtEffects(info.Damage);
         }
+        public override void PostHurt(Player.HurtInfo info)
+        {
+            if (soulOfLena > 0)
+            {
+                if (soulOfLenaUses < soulOfLena && Player.statLife / (float)Player.statLifeMax2 <= 0.25f)
+                {
+                    Player.immuneTime += 300;
+                    Player.immuneNoBlink = true;
+                    Player.immune = true;
+                    soulOfLenaUses++;
+                    soulOfLenaHurtVisual = true;
+                }
+            }
+        }
         #endregion
 
         #region Mechanical Functions
@@ -844,6 +862,19 @@ namespace TerRoguelike.TerPlayer
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
+            }
+
+            if (soulOfLenaHurtVisual && Player.immuneTime > 0)
+            {
+                r = 0.4f;
+                g = 0.8f;
+                b = 1f;
+                a = 0.5f;
+                if (Player.immuneTime <= 1)
+                {
+                    soulOfLenaHurtVisual = false;
+                }
+                Lighting.AddLight(Player.Center, 0f, 0.24f, 0.36f);
             }
             return;
 

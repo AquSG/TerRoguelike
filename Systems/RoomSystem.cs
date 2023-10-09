@@ -73,7 +73,9 @@ namespace TerRoguelike.Systems
                         var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
                         var targetRoom = RoomID[nextFloor.StartRoomID];
                         player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
-                        player.GetModPlayer<TerRoguelikePlayer>().currentFloor = nextFloor;
+                        TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                        modPlayer.currentFloor = nextFloor;
+                        modPlayer.soulOfLenaUses = 0;
                     }
 
                     if (room.closedTime == 1)

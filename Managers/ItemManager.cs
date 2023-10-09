@@ -196,6 +196,7 @@ namespace TerRoguelike.Managers
                 new AirCanister(),
                 new UnencumberingStone(),
                 new BallAndChain(),
+                new SoulOfLena(),
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new Cornucopia(),

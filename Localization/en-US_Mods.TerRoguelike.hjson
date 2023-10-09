@@ -400,4 +400,13 @@ Items: {
 			Extra copies of this item increase the slow duration by 2 seconds
 			'''
 	}
+
+	SoulOfLena: {
+		DisplayName: Soul Of Lena
+		Tooltip:
+			'''
+			Once per floor, when getting hit and falling below 25% Max HP, become intangible for 5 seconds
+			Extra copies of this item increase the amount of times this effect can occur per floor by 1
+			'''
+	}
 }
