@@ -94,6 +94,7 @@ namespace TerRoguelike.TerPlayer
         public bool onGround = false;
         public float previousBonusDamageMulti = 1f;
         public int timeAttacking = 0;
+        public Vector2 lenaVisualPosition = Vector2.Zero;
         #endregion
 
         #region Reset Variables
@@ -864,18 +865,47 @@ namespace TerRoguelike.TerPlayer
 
             }
 
-            if (soulOfLenaHurtVisual && Player.immuneTime > 0)
+            if (soulOfLena > 0)
             {
-                r = 0.4f;
-                g = 0.8f;
-                b = 1f;
-                a = 0.5f;
-                if (Player.immuneTime <= 1)
+                bool hurtCheck = Player.immuneTime > 0 && soulOfLenaHurtVisual;
+                if (hurtCheck)
                 {
-                    soulOfLenaHurtVisual = false;
+                    r = 0.4f;
+                    g = 0.8f;
+                    b = 1f;
+                    a = 0.5f;
+                    if (Player.immuneTime <= 1)
+                    {
+                        soulOfLenaHurtVisual = false;
+                    }
+                    Lighting.AddLight(Player.Center, 0f, 0.24f, 0.36f);
                 }
-                Lighting.AddLight(Player.Center, 0f, 0.24f, 0.36f);
+                if (soulOfLenaUses < soulOfLena || soulOfLenaHurtVisual)
+                {
+                    Vector2 desiredPos = Player.Top - new Vector2(32 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f);
+                    Texture2D lenaTex = ModContent.Request<Texture2D>("TerRoguelike/TerPlayer/Lena").Value;
+                    Texture2D circleTex = ModContent.Request<Texture2D>("TerRoguelike/TerPlayer/LenaGlow").Value;
+                    int lenaFrame = hurtCheck ? 2 : (Main.GlobalTimeWrappedHourly % 1.1f >= 0.55f ? 1 : 0);
+                    int frameHeight = lenaTex.Height / 3;
+                    SpriteEffects spriteEffects = Player.direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+                    Color color = soulOfLenaHurtVisual && soulOfLenaUses == soulOfLena ? Color.White * MathHelper.Lerp(0, 1f, Player.immuneTime / 300f) : Color.White;
+                    if (lenaVisualPosition == Vector2.Zero)
+                    {
+                        lenaVisualPosition = desiredPos;
+                    }
+                    else
+                    {
+                        lenaVisualPosition = Vector2.Lerp(lenaVisualPosition, desiredPos, 0.02f);
+                    }
+                    Main.EntitySpriteDraw(circleTex, lenaVisualPosition - Main.screenPosition, null, color.MultiplyRGB(Color.Cyan) * 0.15f, 0f, circleTex.Size() * 0.5f, 0.75f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(lenaTex, lenaVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * lenaFrame, lenaTex.Width, frameHeight), color, 0f, new Vector2(lenaTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
+                }
+                else
+                    lenaVisualPosition = Vector2.Zero;
             }
+            else
+                lenaVisualPosition = Vector2.Zero;
+
             return;
 
             if (evilEye > 0)

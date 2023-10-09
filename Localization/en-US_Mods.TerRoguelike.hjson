@@ -402,7 +402,7 @@ Items: {
 	}
 
 	SoulOfLena: {
-		DisplayName: Soul Of Lena
+		DisplayName: Soul of Lena
 		Tooltip:
 			'''
 			Once per floor, when getting hit and falling below 25% Max HP, become intangible for 5 seconds

@@ -76,6 +76,7 @@ namespace TerRoguelike.Systems
                         TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                         modPlayer.currentFloor = nextFloor;
                         modPlayer.soulOfLenaUses = 0;
+                        modPlayer.lenaVisualPosition = Vector2.Zero;
                     }
 
                     if (room.closedTime == 1)
