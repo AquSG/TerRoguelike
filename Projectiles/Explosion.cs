@@ -68,7 +68,7 @@ namespace TerRoguelike.Projectiles
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             int frameHeight = texture.Height / Main.projFrames[Projectile.type];
-            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.White, 0f, new Vector2(texture.Width / 2f, (frameHeight / 2f)), Projectile.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.White, 0f, new Vector2(texture.Width * 0.5f, (frameHeight * 0.5f)), Projectile.scale, SpriteEffects.None);
             return false;
         }
     }

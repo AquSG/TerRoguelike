@@ -189,6 +189,7 @@ namespace TerRoguelike.Managers
                 new HeatSeekingChip(),
                 new LockOnMissile(),
                 new BackupDagger(),
+                new ClusterBombSatchel(),
                 new BloodSiphon(),
                 new EnchantingEye(),
                 new AutomaticDefibrillator(),

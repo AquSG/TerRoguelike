@@ -53,6 +53,7 @@ namespace TerRoguelike.TerPlayer
         public int spentShell;
         public int heatSeekingChip;
         public int backupDagger;
+        public int clusterBombSatchel;
         public int bloodSiphon;
         public int enchantingEye;
         public int automaticDefibrillator;
@@ -131,6 +132,7 @@ namespace TerRoguelike.TerPlayer
             spentShell = 0;
             heatSeekingChip = 0;
             backupDagger = 0;
+            clusterBombSatchel = 0;
             bloodSiphon = 0;
             enchantingEye = 0;
             automaticDefibrillator = 0;
@@ -587,12 +589,20 @@ namespace TerRoguelike.TerPlayer
                 modTarget.activatedAmberBead = true;
                 AddBarrierHealth(barrierGainAmt);
             }
-            if (thrillOfTheHunt > 0)
+            if (thrillOfTheHunt > 0 && !modTarget.activatedThrillOfTheHunt)
             {
                 if (thrillOfTheHuntStacks == null)
                     thrillOfTheHuntStacks = new List<int>();
 
                 thrillOfTheHuntStacks.Add(480);
+                modTarget.activatedThrillOfTheHunt = true;
+            }
+            if (clusterBombSatchel > 0 && !modTarget.activatedClusterBombSatchel)
+            {
+                int damage = 350 + (150 * clusterBombSatchel);
+                int spawnedProj = Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<ClusterHandler>(), damage, 0f, Player.whoAmI);
+                Main.projectile[spawnedProj].scale = 1f + (0.12f * (clusterBombSatchel - 1));
+                modTarget.activatedClusterBombSatchel = true;
             }
             if (itemPotentiometer > 0)
             {

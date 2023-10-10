@@ -14,6 +14,7 @@ Projectiles: {
 	PlanRocket.DisplayName: Plan Rocket
 	StuckClingyGrenade.DisplayName: Stuck Clingy Grenade
 	ThrownBackupDagger.DisplayName: Thrown Backup Dagger
+	ClusterHandler.DisplayName: Cluster Handler
 }
 
 Items: {
@@ -432,10 +433,21 @@ Items: {
 		DisplayName: Thrill of the Hunt
 		Tooltip:
 			'''
-			Gain a stackable attack speed and movement speed buff upon killing enemies
+			Gain a stackable attack speed and movement speed buff on kill
 			Each stack lasts 8 seconds and grants 15% increased attack speed and movement speed
 			However, the amount of stacks is capped at 5
 			Extra copies of this item increase the stack cap by 2, and increase the attack speed bonus by 15%
+			'''
+	}
+
+	ClusterBombSatchel: {
+		DisplayName: Cluster Bomb Satchel
+		Tooltip:
+			'''
+			Enemies release clusters of bombs on kill
+			The cluster bombs cumulatively explode after a short delay
+			The explosion deals 500 base damage to enemies within 8 tiles from the center
+			Extra copies of this item increase the explosion scale by 12% and base damage by 150
 			'''
 	}
 }
