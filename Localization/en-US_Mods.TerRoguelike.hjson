@@ -53,7 +53,7 @@ Items: {
 			Critically striking an enemy grants a stackable attack speed buff
 			Each stack lasts 3 seconds and grants 10% increased attack speed
 			However, the amount of stacks is capped at 5
-			Extra copies of this item increase the stack cap by 2, and grant an extra 10% increased attack speed for every crit stack
+			Extra copies of this item increase the stack cap by 2, and increase the attack speed bonus by 10%
 			'''
 	}
 
@@ -425,6 +425,17 @@ Items: {
 			'''
 			Gain 5 barrier upon hitting enemies with melee damage
 			Extra copies of this item increase the barrier gain by 5
+			'''
+	}
+
+	ThrillOfTheHunt: {
+		DisplayName: Thrill of the Hunt
+		Tooltip:
+			'''
+			Gain a stackable attack speed and movement speed buff upon killing enemies
+			Each stack lasts 8 seconds and grants 15% increased attack speed and movement speed
+			However, the amount of stacks is capped at 5
+			Extra copies of this item increase the stack cap by 2, and increase the attack speed bonus by 15%
 			'''
 	}
 }

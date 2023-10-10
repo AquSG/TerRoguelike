@@ -63,11 +63,13 @@ namespace TerRoguelike.TerPlayer
         public int soulOfLena;
         public int emeraldRing;
         public int amberRing;
+        public int thrillOfTheHunt;
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
         public int itemPotentiometer;
         public List<int> evilEyeStacks = new List<int>();
+        public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
         public int storedDaggers = 0;
         public int soulOfLenaUses = 0;
@@ -139,6 +141,7 @@ namespace TerRoguelike.TerPlayer
             soulOfLena = 0;
             emeraldRing = 0;
             amberRing = 0;
+            thrillOfTheHunt = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
@@ -355,6 +358,25 @@ namespace TerRoguelike.TerPlayer
                     diminishingDR += drIncrease;
                 }
             }
+
+            if (thrillOfTheHunt > 0)
+            {
+                if (thrillOfTheHuntStacks.Any())
+                {
+                    for (int i = 0; i < thrillOfTheHuntStacks.Count; i++)
+                    {
+                        thrillOfTheHuntStacks[i]--;
+                    }
+
+                    thrillOfTheHuntStacks.RemoveAll(time => time <= 0);
+
+                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(thrillOfTheHuntStacks.Count(), 1, 4 + thrillOfTheHunt) * 0.15f * (float)thrillOfTheHunt;
+                    Player.moveSpeed += MathHelper.Clamp(thrillOfTheHuntStacks.Count(), 1, 4 + thrillOfTheHunt) * 0.15f;
+                }
+            }
+            else if (thrillOfTheHuntStacks.Any())
+                thrillOfTheHuntStacks.Clear();
+
             if (theDreamsoul > 0)
             {
                 int luckIncrease = theDreamsoul;
@@ -564,6 +586,13 @@ namespace TerRoguelike.TerPlayer
                 int barrierGainAmt = amberBead * 15;
                 modTarget.activatedAmberBead = true;
                 AddBarrierHealth(barrierGainAmt);
+            }
+            if (thrillOfTheHunt > 0)
+            {
+                if (thrillOfTheHuntStacks == null)
+                    thrillOfTheHuntStacks = new List<int>();
+
+                thrillOfTheHuntStacks.Add(480);
             }
             if (itemPotentiometer > 0)
             {
