@@ -21,7 +21,7 @@ namespace TerRoguelike.Items.Weapons
         public override void SetDefaults()
         {
             Item.damage = 100;
-            Item.DamageType = DamageClass.Ranged;
+            Item.DamageType = DamageClass.Melee;
             Item.width = 62;
             Item.height = 32;
             Item.useTime = 26;

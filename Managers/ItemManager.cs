@@ -197,6 +197,8 @@ namespace TerRoguelike.Managers
                 new UnencumberingStone(),
                 new BallAndChain(),
                 new SoulOfLena(),
+                new EmeraldRing(),
+                new AmberRing(),
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new Cornucopia(),

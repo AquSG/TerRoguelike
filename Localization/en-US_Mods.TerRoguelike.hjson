@@ -226,7 +226,7 @@ Items: {
 		Tooltip:
 			'''
 			Gain 15 barrier on kill
-			Extra copies of this item grant 15 more barrier on kill
+			Extra copies of this item increase the barrier gain by 15
 			'''
 	}
 
@@ -407,6 +407,24 @@ Items: {
 			'''
 			Once per floor, when getting hit and falling below 25% Max HP, become intangible for 5 seconds
 			Extra copies of this item increase the amount of times this effect can occur per floor by 1
+			'''
+	}
+
+	EmeraldRing: {
+		DisplayName: Emerald Ring
+		Tooltip:
+			'''
+			+20 diminishing DR while utilizing a melee weapon
+			Extra copies of this item increase the diminishing DR by 20
+			'''
+	}
+
+	AmberRing: {
+		DisplayName: Amber Ring
+		Tooltip:
+			'''
+			Gain 5 barrier upon hitting enemies with melee damage
+			Extra copies of this item increase the barrier gain by 5
 			'''
 	}
 }

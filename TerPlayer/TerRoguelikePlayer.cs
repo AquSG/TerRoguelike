@@ -61,6 +61,8 @@ namespace TerRoguelike.TerPlayer
         public int unencumberingStone;
         public int ballAndChain;
         public int soulOfLena;
+        public int emeraldRing;
+        public int amberRing;
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
@@ -135,6 +137,8 @@ namespace TerRoguelike.TerPlayer
             unencumberingStone = 0;
             ballAndChain = 0;
             soulOfLena = 0;
+            emeraldRing = 0;
+            amberRing = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
@@ -343,6 +347,14 @@ namespace TerRoguelike.TerPlayer
                 float speedIncrease = unencumberingStone * 0.25f;
                 Player.moveSpeed += speedIncrease;
             }
+            if (emeraldRing > 0 && timeAttacking > 0)
+            {
+                if (Player.HeldItem.CountsAsClass(DamageClass.Melee))
+                {
+                    int drIncrease = emeraldRing * 20;
+                    diminishingDR += drIncrease;
+                }
+            }
             if (theDreamsoul > 0)
             {
                 int luckIncrease = theDreamsoul;
@@ -483,6 +495,11 @@ namespace TerRoguelike.TerPlayer
                 if (modNPC.ballAndChainSlow < slowTime)
                     modNPC.ballAndChainSlow = slowTime;
             }
+            if (amberRing > 0 && proj.DamageType == DamageClass.Melee)
+            {
+                int barrierGainAmt = 5 * amberRing;
+                AddBarrierHealth(barrierGainAmt);
+            }
 
             if (proj.type == ModContent.ProjectileType<ThrownBackupDagger>())
             {
@@ -545,10 +562,8 @@ namespace TerRoguelike.TerPlayer
             if (amberBead > 0 && !modTarget.activatedAmberBead)
             {
                 int barrierGainAmt = amberBead * 15;
-                barrierHealth += barrierGainAmt;
                 modTarget.activatedAmberBead = true;
-                if (barrierHealth > Player.statLifeMax2)
-                    barrierHealth = Player.statLifeMax2;
+                AddBarrierHealth(barrierGainAmt);
             }
             if (itemPotentiometer > 0)
             {
@@ -671,6 +686,12 @@ namespace TerRoguelike.TerPlayer
         {
             healAmt = (int)(healAmt * healMultiplier);
             Player.Heal(healAmt);
+        }
+        public void AddBarrierHealth(int barrierGainAmt)
+        {
+            barrierHealth += barrierGainAmt;
+            if (barrierHealth > Player.statLifeMax2)
+                barrierHealth = Player.statLifeMax2;
         }
         public void SpawnRoguelikeItem(Vector2 position)
         {
