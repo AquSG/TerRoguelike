@@ -55,6 +55,8 @@ namespace TerRoguelike.Systems
                 if (room == null)
                     continue;
 
+                room.myRoom = loopCount;
+
                 for (int i = 0; i < Main.maxPlayers; i++)
                 {
                     Player player;
@@ -63,25 +65,28 @@ namespace TerRoguelike.Systems
                     else
                         player = Main.player[i];
 
+                    TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                     bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f - 1f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f + 1f;
                     bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
                     if (roomXcheck && roomYcheck)
                     {
+                        modPlayer.currentRoom = -1;
                         if (room.AssociatedFloor != -1)
-                            player.GetModPlayer<TerRoguelikePlayer>().currentFloor = FloorID[room.AssociatedFloor];
+                            modPlayer.currentFloor = FloorID[room.AssociatedFloor];
+                        if (room.active)
+                            modPlayer.currentRoom = room.myRoom;
 
                         room.awake = true;
                         bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
                         if (teleportCheck)
                         {
-                            int nextFloorID = player.GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage + 1;
+                            int nextFloorID = modPlayer.currentFloor.Stage + 1;
                             if (nextFloorID >= RoomManager.FloorIDsInPlay.Count)
                                 nextFloorID = 0;
 
                             var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
                             var targetRoom = RoomID[nextFloor.StartRoomID];
                             player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
-                            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                             modPlayer.currentFloor = nextFloor;
                             modPlayer.soulOfLenaUses = 0;
                             modPlayer.lenaVisualPosition = Vector2.Zero;
@@ -97,7 +102,6 @@ namespace TerRoguelike.Systems
                         break;
                 }
 
-                room.myRoom = loopCount;
                 room.Update();
             }
         }

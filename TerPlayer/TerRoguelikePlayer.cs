@@ -58,6 +58,7 @@ namespace TerRoguelike.TerPlayer
         public int bloodSiphon;
         public int enchantingEye;
         public int automaticDefibrillator;
+        public int stimPack;
         public int bouncyBall;
         public int airCanister;
         public int unencumberingStone;
@@ -101,6 +102,7 @@ namespace TerRoguelike.TerPlayer
         public float previousBonusDamageMulti = 1f;
         public int timeAttacking = 0;
         public Vector2 lenaVisualPosition = Vector2.Zero;
+        public int currentRoom = -1;
         #endregion
 
         #region Reset Variables
@@ -137,6 +139,7 @@ namespace TerRoguelike.TerPlayer
             bloodSiphon = 0;
             enchantingEye = 0;
             automaticDefibrillator = 0;
+            stimPack = 0;
             bouncyBall = 0;
             airCanister = 0;
             unencumberingStone = 0;
@@ -344,6 +347,17 @@ namespace TerRoguelike.TerPlayer
             else
                 storedDaggers = 0;
 
+            if (stimPack > 0)
+            {
+                if (currentRoom != -1)
+                {
+                    if (RoomSystem.RoomList[currentRoom].roomTime <= 600)
+                    {
+                        int lifeRegenIncrease = stimPack * 16;
+                        Player.lifeRegen += lifeRegenIncrease;
+                    }
+                }
+            }
             if (airCanister > 0)
             {
                 extraDoubleJumps += airCanister;

@@ -450,4 +450,13 @@ Items: {
 			Extra copies of this item increase the explosion scale by 12% and base damage by 150
 			'''
 	}
+
+	StimPack: {
+		DisplayName: Stim-Pack
+		Tooltip:
+			'''
+			+8 HP/s for 10 seconds upon entering a room
+			Extra copies of this item increase the regen by +8 HP/s
+			'''
+	}
 }

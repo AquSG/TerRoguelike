@@ -193,6 +193,7 @@ namespace TerRoguelike.Managers
                 new BloodSiphon(),
                 new EnchantingEye(),
                 new AutomaticDefibrillator(),
+                new StimPack(),
                 new BouncyBall(),
                 new AirCanister(),
                 new UnencumberingStone(),
