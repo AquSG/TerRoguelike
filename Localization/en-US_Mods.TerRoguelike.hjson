@@ -459,4 +459,14 @@ Items: {
 			Extra copies of this item increase the regen by +8 HP/s
 			'''
 	}
+
+	BarbedLasso: {
+		DisplayName: Barbed Lasso
+		Tooltip:
+			'''
+			Steal life from 1 enemy within 8 tiles of you
+			The amount of life you steal is equal to 2% of your max hp and is affected by bonus damage
+			Extra copies of this item increase the amount of enemies that you can steal life from by 1
+			'''
+	}
 }

@@ -59,6 +59,7 @@ namespace TerRoguelike.TerPlayer
         public int enchantingEye;
         public int automaticDefibrillator;
         public int stimPack;
+        public int barbedLasso;
         public int bouncyBall;
         public int airCanister;
         public int unencumberingStone;
@@ -77,6 +78,8 @@ namespace TerRoguelike.TerPlayer
         public int storedDaggers = 0;
         public int soulOfLenaUses = 0;
         public bool soulOfLenaHurtVisual = false;
+        public List<int> barbedLassoTargets = new List<int>();
+        public int barbedLassoHitCooldown = 0;
         #endregion
 
         #region Misc Variables
@@ -140,6 +143,7 @@ namespace TerRoguelike.TerPlayer
             enchantingEye = 0;
             automaticDefibrillator = 0;
             stimPack = 0;
+            barbedLasso = 0;
             bouncyBall = 0;
             airCanister = 0;
             unencumberingStone = 0;
@@ -358,6 +362,69 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+
+            if (barbedLasso > 0)
+            {
+                barbedLassoTargets.Clear();
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage)
+                        continue;
+
+                    float requiredDistance = 128f;
+                    float npcDistance = Player.Center.Distance(npc.getRect().ClosestPointInRect(Player.Center));
+                    if (npcDistance <= requiredDistance)
+                    {
+                        barbedLassoTargets.Add(i);
+                        if (barbedLassoTargets.Count == barbedLasso)
+                            break;
+                    }
+                }
+
+                if (barbedLassoHitCooldown <= 0 && barbedLassoTargets.Any())
+                {
+                    int totalHealAmt = 0;
+                    for (int i = 0; i < barbedLassoTargets.Count; i++)
+                    {
+                        NPC target = Main.npc[barbedLassoTargets[i]];
+                        int hitDamage = (int)(Player.statLifeMax2 * 0.02f);
+                        hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.getRect().ClosestPointInRect(Player.Center)));
+
+                        if (target.life - hitDamage <= 0)
+                        {
+                            OnKillEffects(target);
+                        }
+                        NPC.HitInfo info = new NPC.HitInfo();
+                        info.HideCombatText = true;
+                        info.Damage = hitDamage;
+                        info.InstantKill = false;
+                        info.HitDirection = 1;
+                        info.Knockback = 0f;
+                        info.Crit = false;
+
+                        target.StrikeNPC(info);
+                        NetMessage.SendStrikeNPC(target, info);
+                        CombatText.NewText(target.getRect(), Color.DarkGreen, hitDamage);
+
+                        totalHealAmt += hitDamage;
+                    }
+
+                    ScaleableHeal(totalHealAmt);
+
+                    barbedLassoHitCooldown += 30;
+                }
+                if (barbedLassoHitCooldown > 0)
+                    barbedLassoHitCooldown--;
+            }
+            else
+            {
+                barbedLassoTargets.Clear();
+                if (barbedLassoHitCooldown > 0)
+                    barbedLassoHitCooldown--;
+            }
+                
+
             if (airCanister > 0)
             {
                 extraDoubleJumps += airCanister;
@@ -985,6 +1052,26 @@ namespace TerRoguelike.TerPlayer
             else
                 lenaVisualPosition = Vector2.Zero;
 
+            if (barbedLasso > 0)
+            {
+                if (barbedLassoTargets.Any())
+                {
+                    for (int i = 0; i < barbedLassoTargets.Count; i++)
+                    {
+                        NPC npc = Main.npc[barbedLassoTargets[i]];
+
+                        Vector2 distanceVector = npc.Center - Player.MountedCenter;
+                        for (int d = 0; d < 1; d++)
+                        {
+                            Vector2 dustPosition = distanceVector.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(1f, distanceVector.Length());
+                            Dust dust = Dust.NewDustPerfect(Player.MountedCenter + dustPosition, DustID.GreenTorch);
+                            dust.noGravity = true;
+                            dust.noLight = true;
+                            dust.noLightEmittence = true;
+                        }
+                    }
+                }
+            }
             return;
 
             if (evilEye > 0)
