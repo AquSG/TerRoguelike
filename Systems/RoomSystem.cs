@@ -22,6 +22,7 @@ using Terraria.GameContent.Bestiary;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.Audio;
+using System.IO;
 
 namespace TerRoguelike.Systems
 {
@@ -405,6 +406,14 @@ namespace TerRoguelike.Systems
                 bundle.Time--;
             }
             attackPlanRocketBundles.RemoveAll(x => x.Time < 0);
+        }
+        public override void NetSend(BinaryWriter writer)
+        {
+            writer.Write(TerRoguelikeWorld.IsTerRoguelikeWorld);
+        }
+        public override void NetReceive(BinaryReader reader)
+        {
+            TerRoguelikeWorld.IsTerRoguelikeWorld = reader.ReadBoolean();
         }
     }
     public class HealingPulse
