@@ -178,8 +178,8 @@ namespace TerRoguelike.NPCs
             {
                 for (int i = 0; i < bleedingStacks.Count; i++)
                 {
-                    if (bleedingStacks[i].DamageToDeal < stack.DamageToDeal) ;
-                    bleedingStacks[i].DamageToDeal = stack.DamageToDeal;
+                    if (bleedingStacks[i].DamageToDeal < stack.DamageToDeal)
+                        bleedingStacks[i].DamageToDeal = stack.DamageToDeal;
                 }
             }
             else

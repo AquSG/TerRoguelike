@@ -31,6 +31,7 @@ namespace TerRoguelike.Systems
         public static List<Room> RoomList;
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
+        public static bool obtainedRoomListFromServer = false;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -54,36 +55,46 @@ namespace TerRoguelike.Systems
                 if (room == null)
                     continue;
 
-                var player = Main.player[Main.myPlayer];
-
-                bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f - 1f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f + 1f;
-                bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
-                if (roomXcheck && roomYcheck)
+                for (int i = 0; i < Main.maxPlayers; i++)
                 {
-                    if (room.AssociatedFloor != -1)
-                        player.GetModPlayer<TerRoguelikePlayer>().currentFloor = FloorID[room.AssociatedFloor];
+                    Player player;
+                    if (Main.netMode == NetmodeID.SinglePlayer)
+                        player = Main.player[Main.myPlayer];
+                    else
+                        player = Main.player[i];
 
-                    room.awake = true;
-                    bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
-                    if (teleportCheck)
+                    bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f - 1f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f + 1f;
+                    bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
+                    if (roomXcheck && roomYcheck)
                     {
-                        int nextFloorID = player.GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage + 1;
-                        if (nextFloorID >= RoomManager.FloorIDsInPlay.Count)
-                            nextFloorID = 0;
+                        if (room.AssociatedFloor != -1)
+                            player.GetModPlayer<TerRoguelikePlayer>().currentFloor = FloorID[room.AssociatedFloor];
 
-                        var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
-                        var targetRoom = RoomID[nextFloor.StartRoomID];
-                        player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
-                        TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
-                        modPlayer.currentFloor = nextFloor;
-                        modPlayer.soulOfLenaUses = 0;
-                        modPlayer.lenaVisualPosition = Vector2.Zero;
+                        room.awake = true;
+                        bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
+                        if (teleportCheck)
+                        {
+                            int nextFloorID = player.GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage + 1;
+                            if (nextFloorID >= RoomManager.FloorIDsInPlay.Count)
+                                nextFloorID = 0;
+
+                            var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
+                            var targetRoom = RoomID[nextFloor.StartRoomID];
+                            player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
+                            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                            modPlayer.currentFloor = nextFloor;
+                            modPlayer.soulOfLenaUses = 0;
+                            modPlayer.lenaVisualPosition = Vector2.Zero;
+                        }
+
+                        if (room.closedTime == 1)
+                        {
+                            player.statLife = player.statLifeMax2;
+                        }
                     }
 
-                    if (room.closedTime == 1)
-                    {
-                        player.statLife = player.statLifeMax2;
-                    }
+                    if (Main.netMode == NetmodeID.SinglePlayer)
+                        break;
                 }
 
                 room.myRoom = loopCount;
@@ -119,6 +130,11 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
+            TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
+            if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+                return;
+
             if (SpawnManager.pendingEnemies != null)
                 SpawnManager.pendingEnemies.Clear();
             else
@@ -135,7 +151,6 @@ namespace TerRoguelike.Systems
             var roomPositions = tag.GetList<Vector2>("roomPositions");
             var roomDimensions = tag.GetList<Vector2>("roomDimensions");
             var floorIDsInPlay = tag.GetList<int>("floorIDsInPlay");
-            var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             foreach (int id in roomIDs)
             {
                 if (id == -1)
@@ -152,7 +167,6 @@ namespace TerRoguelike.Systems
             {
                 RoomManager.FloorIDsInPlay.Add(floorID);
             }
-            TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
         }
         public static void ResetRoomID(int id)
         {
@@ -410,10 +424,40 @@ namespace TerRoguelike.Systems
         public override void NetSend(BinaryWriter writer)
         {
             writer.Write(TerRoguelikeWorld.IsTerRoguelikeWorld);
+            List<byte> packageRoomLisIDs = new List<byte>();
+            for (int i = 0; i < RoomList.Count; i++)
+            {
+                packageRoomLisIDs.Add((byte)RoomList[i].ID);
+            }
+            ReadOnlySpan<byte> sentRoomList = packageRoomLisIDs.ToArray();
+            writer.Write(sentRoomList.Length);
+            writer.Write(sentRoomList);
         }
         public override void NetReceive(BinaryReader reader)
         {
+            if (obtainedRoomListFromServer)
+                return;
+
+            if (RoomList == null)
+                RoomList = new List<Room>();
+
             TerRoguelikeWorld.IsTerRoguelikeWorld = reader.ReadBoolean();
+            int roomListLength = reader.ReadInt32();
+            byte[] recievedRoomIDs = reader.ReadBytes(roomListLength);
+            for (int i = 0; i < recievedRoomIDs.Length; i++)
+            {
+                int roomID = (int)recievedRoomIDs[i];
+                RoomList.Add(RoomID[roomID]);
+                ResetRoomID(roomID);
+            }
+            obtainedRoomListFromServer = true;
+        }
+        public override void ClearWorld()
+        {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                obtainedRoomListFromServer = false;
+            else
+                obtainedRoomListFromServer = true;
         }
     }
     public class HealingPulse

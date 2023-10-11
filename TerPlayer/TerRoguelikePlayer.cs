@@ -20,6 +20,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Content;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Items.Uncommon;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -600,8 +601,11 @@ namespace TerRoguelike.TerPlayer
             if (clusterBombSatchel > 0 && !modTarget.activatedClusterBombSatchel)
             {
                 int damage = 350 + (150 * clusterBombSatchel);
+                float scale = 1f + (0.12f * (clusterBombSatchel - 1));
+                if (scale > 15f)
+                    scale = 15f;
                 int spawnedProj = Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<ClusterHandler>(), damage, 0f, Player.whoAmI);
-                Main.projectile[spawnedProj].scale = 1f + (0.12f * (clusterBombSatchel - 1));
+                Main.projectile[spawnedProj].scale = scale;
                 modTarget.activatedClusterBombSatchel = true;
             }
             if (itemPotentiometer > 0)
