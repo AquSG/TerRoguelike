@@ -90,6 +90,10 @@ namespace TerRoguelike.Systems
                             modPlayer.currentFloor = nextFloor;
                             modPlayer.soulOfLenaUses = 0;
                             modPlayer.lenaVisualPosition = Vector2.Zero;
+                            if (modPlayer.giftBox > 0)
+                            {
+                                modPlayer.GiftBoxLogic((targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f);
+                            }
                         }
 
                         if (room.closedTime == 1)

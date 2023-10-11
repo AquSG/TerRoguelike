@@ -69,6 +69,7 @@ namespace TerRoguelike.TerPlayer
         public int emeraldRing;
         public int amberRing;
         public int thrillOfTheHunt;
+        public int giftBox;
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
@@ -155,6 +156,7 @@ namespace TerRoguelike.TerPlayer
             emeraldRing = 0;
             amberRing = 0;
             thrillOfTheHunt = 0;
+            giftBox = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
@@ -840,6 +842,32 @@ namespace TerRoguelike.TerPlayer
             barrierHealth += barrierGainAmt;
             if (barrierHealth > Player.statLifeMax2)
                 barrierHealth = Player.statLifeMax2;
+        }
+        public void GiftBoxLogic(Vector2 position)
+        {
+            float commonWeight = 0.8f;
+            float uncommonWeight = 0.18f * (float)giftBox;
+            float rareWeight = 0.02f * (float)Math.Pow(giftBox, 2);
+            float chance = Main.rand.NextFloat(commonWeight + uncommonWeight + rareWeight + float.Epsilon);
+            int itemType;
+            int itemTier;
+            if (chance <= commonWeight)
+            {
+                itemType = ItemManager.GiveCommon(false);
+                itemTier = 0;
+            }
+            else if (chance <= commonWeight + uncommonWeight)
+            {
+                itemType = ItemManager.GiveUncommon(false);
+                itemTier = 1;
+            }
+            else
+            {
+                itemType = ItemManager.GiveRare(false);
+                itemTier = 2;
+            }
+
+            SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f);
         }
         public void SpawnRoguelikeItem(Vector2 position)
         {

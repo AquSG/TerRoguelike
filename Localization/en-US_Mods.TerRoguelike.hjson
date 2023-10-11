@@ -479,4 +479,13 @@ Items: {
 			Extra copies of this item increase the amount of temporary max life per kill by 1
 			'''
 	}
+
+	GiftBox: {
+		DisplayName: Gift Box
+		Tooltip:
+			'''
+			Produce an item upon entering a new floor
+			Extra copies of this item increase the chance of producing higher tier items
+			'''
+	}
 }

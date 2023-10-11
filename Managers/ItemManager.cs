@@ -204,6 +204,7 @@ namespace TerRoguelike.Managers
                 new EmeraldRing(),
                 new AmberRing(),
                 new ThrillOfTheHunt(),
+                new GiftBox(),
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new Cornucopia(),
