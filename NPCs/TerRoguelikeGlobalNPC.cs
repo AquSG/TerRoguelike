@@ -30,6 +30,7 @@ namespace TerRoguelike.NPCs
         public bool activatedAmberBead = false;
         public bool activatedThrillOfTheHunt = false;
         public bool activatedClusterBombSatchel = false;
+        public bool activatedSteamEngine = false;
         public bool activatedItemPotentiometer = false;
 
         public List<IgnitedStack> ignitedStacks = new List<IgnitedStack>();

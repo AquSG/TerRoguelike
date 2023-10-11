@@ -60,6 +60,7 @@ namespace TerRoguelike.TerPlayer
         public int automaticDefibrillator;
         public int stimPack;
         public int barbedLasso;
+        public int steamEngine;
         public int bouncyBall;
         public int airCanister;
         public int unencumberingStone;
@@ -80,6 +81,7 @@ namespace TerRoguelike.TerPlayer
         public bool soulOfLenaHurtVisual = false;
         public List<int> barbedLassoTargets = new List<int>();
         public int barbedLassoHitCooldown = 0;
+        public List<int> steamEngineStacks = new List<int>();
         #endregion
 
         #region Misc Variables
@@ -144,6 +146,7 @@ namespace TerRoguelike.TerPlayer
             automaticDefibrillator = 0;
             stimPack = 0;
             barbedLasso = 0;
+            steamEngine = 0;
             bouncyBall = 0;
             airCanister = 0;
             unencumberingStone = 0;
@@ -211,6 +214,24 @@ namespace TerRoguelike.TerPlayer
             {
                 int maxLifeIncrease = bottleOfVigor * 10;
                 Player.statLifeMax2 += maxLifeIncrease;
+            }
+            if (steamEngine > 0)
+            {
+                int maxLifeIncrease = steamEngine * steamEngineStacks.Count;
+                Player.statLifeMax2 += maxLifeIncrease;
+                for (int i = 0; i < steamEngineStacks.Count; i++)
+                {
+                    steamEngineStacks[i]--;
+                }
+                steamEngineStacks.RemoveAll(x => x <= 0);
+            }
+            else if (steamEngineStacks.Any())
+            {
+                for (int i = 0; i < steamEngineStacks.Count; i++)
+                {
+                    steamEngineStacks[i]--;
+                }
+                steamEngineStacks.RemoveAll(x => x <= 0);
             }
 
             if (rustedShield > 0)
@@ -423,7 +444,6 @@ namespace TerRoguelike.TerPlayer
                 if (barbedLassoHitCooldown > 0)
                     barbedLassoHitCooldown--;
             }
-                
 
             if (airCanister > 0)
             {
@@ -442,7 +462,6 @@ namespace TerRoguelike.TerPlayer
                     diminishingDR += drIncrease;
                 }
             }
-
             if (thrillOfTheHunt > 0)
             {
                 if (thrillOfTheHuntStacks.Any())
@@ -688,6 +707,11 @@ namespace TerRoguelike.TerPlayer
                 int spawnedProj = Projectile.NewProjectile(Projectile.GetSource_None(), target.Center, Vector2.Zero, ModContent.ProjectileType<ClusterHandler>(), damage, 0f, Player.whoAmI);
                 Main.projectile[spawnedProj].scale = scale;
                 modTarget.activatedClusterBombSatchel = true;
+            }
+            if (steamEngine > 0 && !modTarget.activatedSteamEngine)
+            {
+                steamEngineStacks.Add(3600);
+                modTarget.activatedSteamEngine = true;
             }
             if (itemPotentiometer > 0)
             {

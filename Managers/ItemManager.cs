@@ -195,6 +195,7 @@ namespace TerRoguelike.Managers
                 new AutomaticDefibrillator(),
                 new StimPack(),
                 new BarbedLasso(),
+                new SteamEngine(),
                 new BouncyBall(),
                 new AirCanister(),
                 new UnencumberingStone(),

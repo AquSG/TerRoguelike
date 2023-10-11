@@ -469,4 +469,14 @@ Items: {
 			Extra copies of this item increase the amount of enemies that you can steal life from by 1
 			'''
 	}
+
+	SteamEngine: {
+		DisplayName: Steam Engine
+		Tooltip:
+			'''
+			+1 max life for 1 minute upon killing an enemy
+			There is no cap on how much max hp can be gained from this
+			Extra copies of this item increase the amount of temporary max life per kill by 1
+			'''
+	}
 }
