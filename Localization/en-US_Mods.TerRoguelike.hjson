@@ -15,6 +15,7 @@ Projectiles: {
 	StuckClingyGrenade.DisplayName: Stuck Clingy Grenade
 	ThrownBackupDagger.DisplayName: Thrown Backup Dagger
 	ClusterHandler.DisplayName: Cluster Handler
+	MagicFist.DisplayName: Magic Fist
 }
 
 Items: {
@@ -486,6 +487,16 @@ Items: {
 			'''
 			Produce an item upon entering a new floor
 			Extra copies of this item increase the chance of producing higher tier items
+			'''
+	}
+
+	RetaliatoryFist: {
+		DisplayName: Retaliatory Fist
+		Tooltip:
+			'''
+			Upon taking damage, manifest up to 3 fists over enemies within 12 tiles
+			Fists deal 250 base damage
+			Extra copies of this item increase the max fists by 2, range by 2 tiles, and base damage by 125
 			'''
 	}
 }

@@ -190,6 +190,7 @@ namespace TerRoguelike.Managers
                 new LockOnMissile(),
                 new BackupDagger(),
                 new ClusterBombSatchel(),
+                new RetaliatoryFist(),
                 new BloodSiphon(),
                 new EnchantingEye(),
                 new AutomaticDefibrillator(),

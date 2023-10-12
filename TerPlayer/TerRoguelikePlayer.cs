@@ -55,6 +55,7 @@ namespace TerRoguelike.TerPlayer
         public int heatSeekingChip;
         public int backupDagger;
         public int clusterBombSatchel;
+        public int retaliatoryFist;
         public int bloodSiphon;
         public int enchantingEye;
         public int automaticDefibrillator;
@@ -142,6 +143,7 @@ namespace TerRoguelike.TerPlayer
             heatSeekingChip = 0;
             backupDagger = 0;
             clusterBombSatchel = 0;
+            retaliatoryFist = 0;
             bloodSiphon = 0;
             enchantingEye = 0;
             automaticDefibrillator = 0;
@@ -806,6 +808,32 @@ namespace TerRoguelike.TerPlayer
                 {
                     Dust.NewDust(Player.MountedCenter + new Vector2(-16, -16), 32, 32, DustID.BlueTorch);
                 }
+            }
+            if (retaliatoryFist > 0)
+            {
+                bool playSound = false;
+                float requiredDistance = 160f + (32f * retaliatoryFist);
+                int projSpawnCount = 0;
+                int projMaxSpawnCount = 1 + (retaliatoryFist * 2);
+                int fistDamage = 125 + (retaliatoryFist * 125);
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    if (projSpawnCount >= projMaxSpawnCount)
+                        break;
+
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.life <= 0 || npc.friendly)
+                        continue;
+
+                    if (Player.Center.Distance(npc.getRect().ClosestPointInRect(Player.Center)) <= requiredDistance)
+                    {
+                        Projectile.NewProjectile(Player.GetSource_FromThis(), npc.Center + new Vector2(0, -96), Vector2.Zero, ModContent.ProjectileType<MagicFist>(), fistDamage, 0f, Player.whoAmI, i);
+                        playSound = true;
+                        projSpawnCount++;
+                    }
+                }
+                if (playSound)
+                    SoundEngine.PlaySound(SoundID.Item105 with { Volume = 0.5f }, Player.Center);
             }
             outOfDangerTime = 0;
         }
