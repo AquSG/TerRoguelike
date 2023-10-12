@@ -28,37 +28,15 @@ namespace TerRoguelike.Schematics
             LoadRoomIDs();
             LoadFloorIDs();
             PilePlacementMaps = new Dictionary<string, PilePlacementFunction>();
-            TileMaps = new Dictionary<string, SchematicMetaTile[,]>
+            TileMaps = new Dictionary<string, SchematicMetaTile[,]>();
+
+            for (int i = 0; i < RoomID.Count; i++)
             {
-                [RoomID[0].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[0].Filename),
-                [RoomID[1].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[1].Filename),
-                [RoomID[2].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[2].Filename),
-                [RoomID[5].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[5].Filename),
-                [RoomID[6].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[6].Filename),
-                [RoomID[7].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[7].Filename),
-                [RoomID[8].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[8].Filename),
-                [RoomID[9].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[9].Filename),
-                [RoomID[10].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[10].Filename),
-                [RoomID[11].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[11].Filename),
-                [RoomID[12].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[12].Filename),
-                [RoomID[13].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[13].Filename),
-                [RoomID[14].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[14].Filename),
-                [RoomID[15].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[15].Filename),
-                [RoomID[16].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[16].Filename),
-                [RoomID[17].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[17].Filename),
-                [RoomID[18].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[18].Filename),
-                [RoomID[19].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[19].Filename),
-                [RoomID[20].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[20].Filename),
-                [RoomID[21].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[21].Filename),
-                [RoomID[22].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[22].Filename),
-                [RoomID[23].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[23].Filename),
-                [RoomID[24].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[24].Filename),
-                [RoomID[25].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[25].Filename),
-                [RoomID[26].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[26].Filename),
-                [RoomID[27].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[27].Filename),
-                [RoomID[28].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[28].Filename),
-                [RoomID[29].Key] = TerRoguelikeSchematicIO.LoadSchematic(RoomID[29].Filename),
-            };
+                if (RoomID[i].IsRoomVariant)
+                    continue;
+
+                TileMaps.Add(RoomID[i].Key, TerRoguelikeSchematicIO.LoadSchematic(RoomID[i].Filename));
+            }
         }
         public static void LoadRoomIDs()
         {

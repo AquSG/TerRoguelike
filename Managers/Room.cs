@@ -29,6 +29,7 @@ namespace TerRoguelike.Managers
         public virtual bool CanExitUp => false; // if room is capable of exiting up
         public virtual bool IsBossRoom => false; //if room is the end to a floor
         public virtual bool IsStartRoom => false; // if room is the start of a floor
+        public virtual bool IsRoomVariant => false; // if room uses the schematic of another room
         public int myRoom; // index in RoomList
         public bool initialized = false; // whether initialize has run yet
         public bool awake = false; // whether a player has ever stepped into this room
