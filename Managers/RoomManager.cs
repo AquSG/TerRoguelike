@@ -30,6 +30,7 @@ namespace TerRoguelike.Managers
         public static List<Room> CrimsonRoomDown;
         public static List<Room> CrimsonRoomUp;
         
+        //The ultimate worldgen function
         public static void GenerateRoomStructure()
         {
             currentFloor = 0;

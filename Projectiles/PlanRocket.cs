@@ -15,6 +15,8 @@ namespace TerRoguelike.Projectiles
 {
     public class PlanRocket : ModProjectile, ILocalizedModType
     {
+        //This is basically the same as missile but changed for different visuals and allowing wiggling in all directions.
+        //also gets killed on room clear
         public override string Texture => "TerRoguelike/Projectiles/AdaptiveGunBullet";
         public float rotationOffset = 0;
         public bool ableToHit = true;

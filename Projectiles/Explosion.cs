@@ -37,6 +37,7 @@ namespace TerRoguelike.Projectiles
         {
             if (MaxScale == -1f)
             {
+                //scale support
                 MaxScale = Projectile.scale;
                 Projectile.position = Projectile.Center + new Vector2(-25 * MaxScale, -25 * MaxScale);
                 Projectile.width = (int)(50 * MaxScale);
@@ -52,7 +53,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.localAI[0] = 1;
             }
 
-            Projectile.scale = (0.5f + (0.5f * Projectile.timeLeft / 20f)) * MaxScale;
+            Projectile.scale = (0.5f + (0.5f * Projectile.timeLeft / 20f)) * MaxScale; //shrink as time passes
             Projectile.frame = Projectile.frameCounter / 4 % Main.projFrames[Projectile.type];
             Projectile.frameCounter++;
         }
@@ -63,7 +64,7 @@ namespace TerRoguelike.Projectiles
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SolarFlare, Scale: 0.75f);
             }
         }
-        public override bool? CanDamage() => Projectile.timeLeft == 20 ? (bool?)null : false;
+        public override bool? CanDamage() => Projectile.timeLeft == 20 ? (bool?)null : false; //hitbox only active for frame 1
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;

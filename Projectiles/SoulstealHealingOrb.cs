@@ -24,13 +24,12 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.width = 16;
             Projectile.height = 16;
-            Projectile.timeLeft = 120;
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.extraUpdates = 3;
-            Projectile.timeLeft = 6000;
+            Projectile.timeLeft = 2400;
         }
 
         public override void AI()
@@ -44,13 +43,14 @@ namespace TerRoguelike.Projectiles
             }
             Projectile.localAI[0]++;
 
-            if (Projectile.timeLeft == 1)
-                Projectile.position = player.Center;
+            if (Projectile.timeLeft == 2)
+                Projectile.position = player.Center; //if it somehow fucking hasn't reached the player yet, just teleport it on top of them for the heal.
 
             Vector2 playerVector = player.Center - Projectile.Center;
             float playerDist = playerVector.Length();
             if (playerDist < 50f && Projectile.position.X < player.position.X + player.width && Projectile.position.X + Projectile.width > player.position.X && Projectile.position.Y < player.position.Y + player.height && Projectile.position.Y + Projectile.height > player.position.Y)
             {
+                // heal the killer
                 TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
 
                 int healAmt = (int)(player.statLifeMax2 * modPlayer.soulstealCoating * 0.1f);

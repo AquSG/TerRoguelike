@@ -45,6 +45,7 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
         public override bool? CanHitNPC(NPC target)
         {
+            //Lasts past the first hit for visuals.
             if (Projectile.penetrate == 1)
                 return false;
 

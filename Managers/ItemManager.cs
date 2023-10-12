@@ -23,6 +23,7 @@ namespace TerRoguelike.Managers
 {
     public class ItemManager
     {
+        //ITEM TIERS: 0 - Common, 1 - Uncommon, 2 - Rare
         public static int RoomRewardCooldown = 0;
         public static List<int> PastRoomRewardCategories = new List<int>();
         public static int GiveCommon(bool giveCooldown = true)
@@ -79,6 +80,7 @@ namespace TerRoguelike.Managers
             float utilityChance = 33f;
             switch (tier)
             {
+                //obtain weights of each list so that every item in each tier has the same chance of appearing as every other.
                 case 0:
                     combatChance = GetItemListWeight(CommonCombatItems);
                     healingChance = GetItemListWeight(CommonHealingItems);
@@ -96,6 +98,7 @@ namespace TerRoguelike.Managers
                     break;
             }
 
+            //attempt to steer the rewarded category towards a category the player is reportedly lacking in.
             if (!PastRoomRewardCategories.Any())
             {
                 combatChance *= 2f;

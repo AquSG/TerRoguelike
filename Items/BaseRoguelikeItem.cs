@@ -17,11 +17,11 @@ namespace TerRoguelike.Items
         public virtual bool CombatItem => false;
         public virtual bool HealingItem => false;
         public virtual bool UtilityItem => false;
-        public virtual float ItemDropWeight => 1f;
-        public virtual int itemTier => 0;
-        public virtual int animationTicksPerFrame => 0;
-        public virtual int animationFrameCount => 0;
-        public virtual int modItemID => -1;
+        public virtual float ItemDropWeight => 1f; //the item's weight in it's respective lists. this is normally used for items in multiple categories to give them the same overall drop chance as other items.
+        public virtual int itemTier => 0; // item tiers : 0 - common, 1 - uncommon, 2 - rare
+        public virtual int animationTicksPerFrame => 0; // used if the item sprite has animation
+        public virtual int animationFrameCount => 0;// used if the item sprite has animation
+        public virtual int modItemID => -1; // the ModContent.ItemType<> of this item, used for collecting it's default information on the fly
         public override void SetStaticDefaults()
         {
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)
@@ -35,6 +35,9 @@ namespace TerRoguelike.Items
             Item.width = 20;
             Item.height = 20;
         }
+        /// <summary>
+        /// Item Effects happen here. updated in UpdateInventory(Player player)
+        /// </summary>
         public virtual void ItemEffects(Player player)
         {
 
@@ -45,6 +48,7 @@ namespace TerRoguelike.Items
         }
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
+            // Generalized drawing for all TerRoguelike Items. they all have the same 20x20 hitbox but have different offsets to account for their size.
             Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)
             {

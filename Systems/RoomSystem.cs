@@ -26,9 +26,9 @@ using System.IO;
 
 namespace TerRoguelike.Systems
 {
-    public class RoomSystem : ModSystem
+    public class RoomSystem : ModSystem //This file handles pretty much everything relating to updating rooms
     {
-        public static List<Room> RoomList;
+        public static List<Room> RoomList; //List of all rooms currently in play in the world
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static bool obtainedRoomListFromServer = false;
@@ -38,9 +38,9 @@ namespace TerRoguelike.Systems
         }
         public override void PostUpdateWorld()
         {
-            SpawnManager.UpdateSpawnManager();
-            UpdateHealingPulse();
-            UpdateAttackPlanRocketBundles();
+            SpawnManager.UpdateSpawnManager(); //Run all logic for all pending items and enemies being telegraphed
+            UpdateHealingPulse(); //Used for uncommon healing item based on room time
+            UpdateAttackPlanRocketBundles(); //Used for the attack plan item that handles future attack plan bundles
 
             if (RoomList == null)
                 return;
@@ -55,9 +55,9 @@ namespace TerRoguelike.Systems
                 if (room == null)
                     continue;
 
-                room.myRoom = loopCount;
+                room.myRoom = loopCount; //updates the room's 'myRoom' to refer to it's index on RoomList
 
-                for (int i = 0; i < Main.maxPlayers; i++)
+                for (int i = 0; i < Main.maxPlayers; i++) //Player collision with rooms
                 {
                     Player player;
                     if (Main.netMode == NetmodeID.SinglePlayer)
@@ -70,24 +70,26 @@ namespace TerRoguelike.Systems
                     bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
                     if (roomXcheck && roomYcheck)
                     {
-                        modPlayer.currentRoom = -1;
+                        modPlayer.currentRoom = -1; //Current room is -1 unless the player is inside an active room in RoomList
                         if (room.AssociatedFloor != -1)
-                            modPlayer.currentFloor = FloorID[room.AssociatedFloor];
+                            modPlayer.currentFloor = FloorID[room.AssociatedFloor]; //If player is inside a room with a valid value for an associated floor, set it to that.
                         if (room.active)
-                            modPlayer.currentRoom = room.myRoom;
+                            modPlayer.currentRoom = room.myRoom; 
 
                         room.awake = true;
                         bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
-                        if (teleportCheck)
+                        if (teleportCheck) //New Floor Blue Wall Portal Teleport
                         {
                             int nextFloorID = modPlayer.currentFloor.Stage + 1;
-                            if (nextFloorID >= RoomManager.FloorIDsInPlay.Count)
+                            if (nextFloorID >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
                                 nextFloorID = 0;
 
                             var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
                             var targetRoom = RoomID[nextFloor.StartRoomID];
                             player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                             modPlayer.currentFloor = nextFloor;
+
+                            //New floor item effects
                             modPlayer.soulOfLenaUses = 0;
                             modPlayer.lenaVisualPosition = Vector2.Zero;
                             if (modPlayer.giftBox > 0)
@@ -96,13 +98,13 @@ namespace TerRoguelike.Systems
                             }
                         }
 
-                        if (room.closedTime == 1)
+                        if (room.closedTime == 1) // heal players on room clear so no waiting slog for natural life regen
                         {
                             player.statLife = player.statLifeMax2;
                         }
                     }
 
-                    if (Main.netMode == NetmodeID.SinglePlayer)
+                    if (Main.netMode == NetmodeID.SinglePlayer) // don't loop through all players if in singleplayer lol
                         break;
                 }
 
@@ -117,6 +119,7 @@ namespace TerRoguelike.Systems
             if (RoomList == null)
                 return;
 
+            //Save all critical data, such as what rooms are in play, their positions, dimensions, and what floors are in play
             var roomIDs = new List<int>();
             var roomPositions = new List<Vector2>();
             var roomDimensions = new List<Vector2>();
@@ -176,6 +179,9 @@ namespace TerRoguelike.Systems
                 RoomManager.FloorIDsInPlay.Add(floorID);
             }
         }
+        /// <summary>
+        /// Resets the given room ID to it's default values, aside from position and dimensions
+        /// </summary>
         public static void ResetRoomID(int id)
         {
             RoomID[id].active = true;
@@ -225,6 +231,7 @@ namespace TerRoguelike.Systems
                         if (!canDraw)
                             continue;
 
+                        //Draw the blue wall portal
                         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
@@ -256,6 +263,7 @@ namespace TerRoguelike.Systems
 
                 if (room.wallActive)
                 {
+                    //Draw the pink borders indicating the bounds of the room
                     Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                     for (float side = 0; side < 2; side++)
                     {
@@ -307,6 +315,9 @@ namespace TerRoguelike.Systems
                 }
             }
         }
+        /// <summary>
+        /// Draw the first frame of each pending enemy's animation as an attempt to telegraph what is spawning there
+        /// </summary>
         public void DrawPendingEnemies()
         {
             if (SpawnManager.pendingEnemies == null)
@@ -431,6 +442,7 @@ namespace TerRoguelike.Systems
         }
         public override void NetSend(BinaryWriter writer)
         {
+            //Sorrowful attempt at any semblance of multiplayer compat
             writer.Write(TerRoguelikeWorld.IsTerRoguelikeWorld);
             List<byte> packageRoomLisIDs = new List<byte>();
             for (int i = 0; i < RoomList.Count; i++)

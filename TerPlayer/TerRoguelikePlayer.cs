@@ -213,7 +213,7 @@ namespace TerRoguelike.TerPlayer
                     timeAttacking = 0;
             }
                 
-
+            //max life effects happen before barrier calculations
             if (bottleOfVigor > 0)
             {
                 int maxLifeIncrease = bottleOfVigor * 10;
@@ -238,6 +238,7 @@ namespace TerRoguelike.TerPlayer
                 steamEngineStacks.RemoveAll(x => x <= 0);
             }
 
+            //barrier calculations happen now
             if (rustedShield > 0)
             {
                 float addedBarrier = 0.08f * Player.statLifeMax2 * rustedShield;
@@ -257,6 +258,7 @@ namespace TerRoguelike.TerPlayer
                     barrierHealth = barrierFloor;
             }
 
+            //everything else
             if (coolantCanister > 0)
             {
                 float attackSpeedIncrease = coolantCanister * 0.10f;

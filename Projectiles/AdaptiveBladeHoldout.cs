@@ -16,6 +16,7 @@ namespace TerRoguelike.Projectiles
 {
     public class AdaptiveBladeHoldout : ModProjectile, ILocalizedModType
     {
+        //This manages whatever happens when you hold down with adaptive blade
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
 
         public ref float Charge => ref Projectile.ai[0];
@@ -49,7 +50,7 @@ namespace TerRoguelike.Projectiles
             if (modPlayer == null)
                 modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
 
-            if (Charge >= 60f && !autoRelease)
+            if (Charge >= 60f && !autoRelease) //cap chargetime if no autorelease
             {
                 Charge = 60f;
                 
@@ -58,7 +59,7 @@ namespace TerRoguelike.Projectiles
             float pointingRotation = (Main.MouseWorld - Owner.MountedCenter).ToRotation();
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 16f;
 
-            if (Owner.channel)
+            if (Owner.channel) //Keep the player's hands full relative to attack speed
             {
                 Projectile.timeLeft = 2;
                 Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic)) + 2;
@@ -69,21 +70,21 @@ namespace TerRoguelike.Projectiles
                     Owner.itemAnimation = 2;
                 Owner.heldProj = Projectile.whoAmI;
             }
-            else
+            else // player released m1. swing it.
             {
                 ReleaseSword();
                 return;
             }
-            if (autoRelease && Charge >= 60f)
+            if (autoRelease && Charge >= 60f) // autorelease swing sword
             {
                 ReleaseSword();
             }
                 
             
-            if (Charge < 60 || autoRelease)
+            if (Charge < 60 || autoRelease) // charge. autorelease allows overflowing of charge amount, leading to more than 1 swing a frame
             {
                 float chargeAmt = 1f * Owner.GetAttackSpeed(DamageClass.Generic);
-                if (chargeAmt >= 3f)
+                if (chargeAmt >= 3f) // autorelease at 3x attack speed
                     autoRelease = true;
                 else
                     autoRelease = false;
@@ -100,9 +101,9 @@ namespace TerRoguelike.Projectiles
         public void ReleaseSword()
         {
             if ((Charge <= 60f || (Owner.channel && autoRelease)) && modPlayer.swingAnimCompletion == 0)
-                modPlayer.swingAnimCompletion += 0.00001f;
+                modPlayer.swingAnimCompletion += 0.00001f; // start the swing anim
 
-            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
+            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire; //multishot support
             int damage = Charge >= 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
             SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
             for (int i = 0; i < shotsToFire; i++)
@@ -130,7 +131,7 @@ namespace TerRoguelike.Projectiles
                 Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().swingDirection = Owner.direction;
             }
             Charge -= 60f;
-            if (Charge > 60f)
+            if (Charge > 60f) // support for swinging more than once a frame if one has that much attack speed
             {
                 ReleaseSword();
             }

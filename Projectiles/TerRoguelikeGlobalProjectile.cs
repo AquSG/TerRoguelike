@@ -27,7 +27,7 @@ namespace TerRoguelike.Projectiles
         public int swingDirection = 0;
         public override bool PreAI(Projectile projectile)
         {
-            extraBounces = 0;
+            extraBounces = 0; // set bounces in projectile ai.
             return true;
         }
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
@@ -41,6 +41,7 @@ namespace TerRoguelike.Projectiles
             }
 
             
+            //Crit inheritance and custom crit chance supported by proc luck
             if (procChainBools.critPreviously)
                 modifiers.SetCrit();
             else if (!procChainBools.originalHit)
@@ -73,7 +74,7 @@ namespace TerRoguelike.Projectiles
             TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
             if (modPlayer.volatileRocket > 0 && projectile.penetrate > 1 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
-                SpawnExplosion(projectile, modPlayer, originalHit: true);
+                SpawnExplosion(projectile, modPlayer, originalHit: true); //Explosions not spawned from hits are counted as original hits, to calculate crit themselves.
             }
         }
         public void SpawnExplosion(Projectile projectile, TerRoguelikePlayer modPlayer, NPC target = null, bool originalHit = false, bool crit = false)
@@ -103,7 +104,7 @@ namespace TerRoguelike.Projectiles
             
             if (homingTarget != -1)
             {
-                if (!Main.npc[homingTarget].active)
+                if (!Main.npc[homingTarget].active || Main.npc[homingTarget].life <= 0) //reset homing target if it's gone
                     homingTarget = -1;
             }
 
@@ -112,7 +113,7 @@ namespace TerRoguelike.Projectiles
                 projectile.velocity = projectile.velocity.RotatedBy(homingStrength * MathHelper.TwoPi);
             }
 
-            if (homingCheckCooldown > 0)
+            if (homingCheckCooldown > 0) //cooldown on homing checks as an attempt to stave off lag
             {
                 homingCheckCooldown--;
                 return;
@@ -120,6 +121,7 @@ namespace TerRoguelike.Projectiles
 
             if (homingTarget == -1)
             {
+                //create a list of each npc's homing rating relative to the projectile's position and velocity direction to try and choose the best target.
                 float prefferedDistance = 480f;
                 List<float> npcHomingRating = new List<float>(new float[Main.maxNPCs]);
                 for (int i = 0; i < Main.maxNPCs; i++)
@@ -169,7 +171,7 @@ namespace TerRoguelike.Projectiles
 
             setAngle += projectile.velocity.ToRotation();
 
-            Vector2 setVelocity = setAngle.ToRotationVector2() * projectile.velocity.Length();
+            Vector2 setVelocity = setAngle.ToRotationVector2() * projectile.velocity.Length(); // rotate projectile somwhat in the direction of the target
 
 
             Main.projectile[projIndex].velocity = setVelocity;
@@ -177,6 +179,7 @@ namespace TerRoguelike.Projectiles
     }
     public class ProcChainBools
     {
+        //proc chain bools, usually used to make spawned projectiles inherit what their parent projectiles have done in the past. prevents infinite proc chains, and allows crit inheritance.
         public ProcChainBools() { }
         public ProcChainBools(ProcChainBools procChainBools)
         {

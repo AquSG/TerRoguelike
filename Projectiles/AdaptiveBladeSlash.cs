@@ -44,6 +44,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.localAI[0] == 0)
             {
+                //scale support
                 Projectile.position = Projectile.Center + new Vector2(-34 * Projectile.scale, -34 * Projectile.scale);
                 Projectile.width = (int)(68 * Projectile.scale);
                 Projectile.height = (int)(68 * Projectile.scale);
@@ -56,17 +57,21 @@ namespace TerRoguelike.Projectiles
 
             if (stuckPosition == Vector2.Zero)
             {
+                //keep this shit stuck to the player
                 stuckPosition = player.position - Projectile.position;
             }
             Projectile.position = player.position - stuckPosition;
             Projectile.frame = (int)(Projectile.localAI[0] / 4);
-            Projectile.localAI[0] += 1 * player.GetAttackSpeed(DamageClass.Generic);
-            if (Projectile.frame > Main.projFrames[Projectile.type])
+            Projectile.localAI[0] += 1 * player.GetAttackSpeed(DamageClass.Generic); // animation speed scales with attack speed
+            if (Projectile.frame > Main.projFrames[Projectile.type]) // kill when done animating
             {
                 Projectile.Kill();
             }
         }
+        //rotating rectangle hitbox collision
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.rotation.ToRotationVector2(), backCutoff: 0.3f);
+        
+        //only hit if in the first 3 frames of animation
         public override bool? CanDamage() => Projectile.frame <= 3 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)
         {

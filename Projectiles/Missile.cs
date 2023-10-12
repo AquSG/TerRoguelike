@@ -46,6 +46,7 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
         public override bool? CanHitNPC(NPC target)
         {
+            //same situation as adaptive gun bullet. hits once but lives on for visuals.
             if (Projectile.penetrate == 1)
                 return false;
 
@@ -81,6 +82,7 @@ namespace TerRoguelike.Projectiles
                 modProj.HomingAI(Projectile, 0.001128f * 2.9f, true);
             else
             {
+                // wiggle at the start
                 rotationOffset += Main.rand.Next(-1, 2) * (MathHelper.Pi / 72f);
                 Projectile.velocity = (Projectile.velocity.Length() * -Vector2.UnitY).RotatedBy(rotationOffset);
             }

@@ -15,13 +15,14 @@ namespace TerRoguelike.Projectiles
 {
     public class ClusterHandler : ModProjectile, ILocalizedModType
     {
+        //almost everything in this is just visuals. the hitbox is active for 1/4 of a second after 30 frames pass, and is a big square
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public float MaxScale = -1f;
-        public List<Vector2> bombPositions = new List<Vector2>();
-        public List<Vector2> bombVelocities = new List<Vector2>();
-        public List<float> bombRotations = new List<float>();
-        public List<int> bombDetonateOffset = new List<int>();
-        public float randomSmokeRotation = -100f;
+        public List<Vector2> bombPositions = new List<Vector2>(); // purely visual 
+        public List<Vector2> bombVelocities = new List<Vector2>(); // purely visual
+        public List<float> bombRotations = new List<float>(); // purely visual
+        public List<int> bombDetonateOffset = new List<int>(); // purely visual
+        public float randomSmokeRotation = -100f; // purely visual
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 5;
@@ -43,6 +44,7 @@ namespace TerRoguelike.Projectiles
         {
             if (MaxScale == -1f)
             {
+                //scale support
                 MaxScale = Projectile.scale * 2.56f;
                 Projectile.position = Projectile.Center + new Vector2(-50 * MaxScale, -50 * MaxScale);
                 Projectile.width = (int)(100 * MaxScale);

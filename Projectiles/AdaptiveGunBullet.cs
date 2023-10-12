@@ -44,7 +44,9 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
         public override bool? CanHitNPC(NPC target)
         {
-            if (Projectile.penetrate == 1)
+            // used for not immediately cutting off afterimages when the projectile would in normal circumstances be killed.
+            // allows the afterimages to visually catch up so that the bullet always visually looks like it reached a point.
+            if (Projectile.penetrate == 1) 
                 return false;
 
             return (bool?)null;
@@ -54,6 +56,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.localAI[0] == 0)
             {
+                //scale support
                 Projectile.position = Projectile.Center + new Vector2(-2 * Projectile.scale, -2 * Projectile.scale);
                 Projectile.width = (int)(4 * Projectile.scale);
                 Projectile.height = (int)(4 * Projectile.scale);
@@ -106,6 +109,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
+            //currently, no piercing is available for this.
             Projectile.timeLeft = 60;
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;

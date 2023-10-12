@@ -16,6 +16,7 @@ namespace TerRoguelike.Managers
 {
     public class SpawnManager
     {
+        //Custom classes being updated so that projectile/npc limitations don't get in the way of crucial gameplay elements
         public static List<PendingEnemy> pendingEnemies = new List<PendingEnemy>();
         public static List<PendingItem> pendingItems = new List<PendingItem>();
         public static void UpdateSpawnManager()
@@ -38,8 +39,6 @@ namespace TerRoguelike.Managers
             foreach (PendingEnemy enemy in pendingEnemies)
             {
                 loopcount++;
-                
-                float frameCount = Main.npcFrameCount[enemy.NPCType];
                 
                 Dust.NewDustDirect(enemy.Position - new Vector2(15f * enemy.TelegraphSize, 15f * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), DustID.CrystalPulse, Scale: 0.5f);
                 enemy.TelegraphDuration--;

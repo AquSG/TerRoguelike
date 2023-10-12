@@ -25,6 +25,7 @@ namespace TerRoguelike.NPCs
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
 
+        //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
         public bool activatedSoulstealCoating = false;
         public bool activatedAmberBead = false;
@@ -33,6 +34,7 @@ namespace TerRoguelike.NPCs
         public bool activatedSteamEngine = false;
         public bool activatedItemPotentiometer = false;
 
+        //debuffs
         public List<IgnitedStack> ignitedStacks = new List<IgnitedStack>();
         public int ignitedHitCooldown = 0;
         public List<BleedingStack> bleedingStacks = new List<BleedingStack>();
@@ -43,7 +45,7 @@ namespace TerRoguelike.NPCs
 
         public override bool PreAI(NPC npc)
         {
-            if (ballAndChainSlow > 0)
+            if (ballAndChainSlow > 0) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
             {
                 npc.velocity /= 0.7f;
                 ballAndChainSlow--;
@@ -52,7 +54,7 @@ namespace TerRoguelike.NPCs
         }
         public override void PostAI(NPC npc)
         {
-            if (ignitedStacks != null && ignitedStacks.Any())
+            if (ignitedStacks != null && ignitedStacks.Any()) // ignite debuff logic
             {
                 if (ignitedHitCooldown <= 0)
                 {
@@ -89,7 +91,7 @@ namespace TerRoguelike.NPCs
             if (ignitedHitCooldown > 0)
                 ignitedHitCooldown--;
 
-            if (bleedingStacks != null && bleedingStacks.Any())
+            if (bleedingStacks != null && bleedingStacks.Any()) // bleeding debuff logic
             {
                 if (bleedingHitCooldown <= 0)
                 {
@@ -121,7 +123,7 @@ namespace TerRoguelike.NPCs
             if (bleedingHitCooldown > 0)
                 bleedingHitCooldown--;
 
-            if (ballAndChainSlow > 0)
+            if (ballAndChainSlow > 0) // slow down
             {
                 npc.velocity *= 0.7f;
                 ballAndChainSlow--;
@@ -148,7 +150,7 @@ namespace TerRoguelike.NPCs
             npc.StrikeNPC(info);
             NetMessage.SendStrikeNPC(npc, info);
             CombatText.NewText(npc.getRect(), Color.DarkKhaki, hitDamage);
-            ignitedHitCooldown += 10;
+            ignitedHitCooldown += 10; // hits 6 times a second
         }
         public void BleedingHit(int hitDamage, NPC npc, int owner)
         {
@@ -171,7 +173,7 @@ namespace TerRoguelike.NPCs
             npc.StrikeNPC(info);
             NetMessage.SendStrikeNPC(npc, info);
             CombatText.NewText(npc.getRect(), Color.MediumVioletRed, hitDamage);
-            bleedingHitCooldown = 20;
+            bleedingHitCooldown = 20; // hits 3 times a second
         }
         public void AddBleedingStackWithRefresh(BleedingStack stack)
         {
@@ -192,6 +194,8 @@ namespace TerRoguelike.NPCs
         {
             if (!isRoomNPC)
                 return true;
+
+            //stop all room npcs from dropping shit at all 
 
             var AllLoadedItemIDs = new int[ItemLoader.ItemCount];
             for (int i = 0; i < ItemLoader.ItemCount; i++)
@@ -245,7 +249,6 @@ namespace TerRoguelike.NPCs
 
             if (bleedingStacks != null && bleedingStacks.Any())
             {
-
                 DrawRotatlingBloodParticles(false, npc);
             }
 
@@ -276,6 +279,9 @@ namespace TerRoguelike.NPCs
                 
             }
         }
+        /// <summary>
+        /// Drawns top half behind npcs and bottom half in front of npcs.
+        /// </summary>
         public void DrawRotatlingBloodParticles(bool inFront, NPC npc)
         {
             Texture2D texture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/AdaptiveGunBullet").Value;
@@ -296,6 +302,9 @@ namespace TerRoguelike.NPCs
                     Main.EntitySpriteDraw(texture, specificPosition - Main.screenPosition, null, color, 0f, texture.Size() * 0.5f, 1f, SpriteEffects.None);
             }
         }
+        /// <summary>
+        /// A sorrowful attempt at getting the sprite center of every npc in the game for proper visuals
+        /// </summary>
         public Vector2 GetDrawCenter(NPC npc)
         {
             Vector2 position = npc.Center + new Vector2(0, npc.gfxOffY);

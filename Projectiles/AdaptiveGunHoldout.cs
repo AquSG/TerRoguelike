@@ -16,6 +16,7 @@ namespace TerRoguelike.Projectiles
 {
     public class AdaptiveGunHoldout : ModProjectile, ILocalizedModType
     {
+        //This manages whatever happens when you hold down with adaptive gun
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
 
         public ref float Charge => ref Projectile.ai[0];
@@ -51,7 +52,7 @@ namespace TerRoguelike.Projectiles
                 modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
             }
 
-            if (Owner.channel)
+            if (Owner.channel) //Keep the player's hands full relative to attack speed
             {
                 Projectile.timeLeft = 2;
                 Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
@@ -67,18 +68,18 @@ namespace TerRoguelike.Projectiles
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 40f;
 
             
-            if (Charge > 0f)
+            if (Charge > 0f) // attack when charge is full. scales great with attack speed
             {
                 ShootBullet();
             }
 
-            Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic);
+            Charge += 1f * Owner.GetAttackSpeed(DamageClass.Generic); //increase charge relative to attack speed
         }
 
         public void ShootBullet()
         {
             float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
-            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire;
+            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire; //multishot support
             SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
             for (int i = 0; i < shotsToFire; i++)
             {
@@ -103,7 +104,7 @@ namespace TerRoguelike.Projectiles
                 Main.projectile[spawnedProjectile].scale = modPlayer.scaleMultiplier;
             }
             Charge -= 20f;
-            if (Charge > 0f)
+            if (Charge > 0f) // if the player has enough attack speed to shoot more than once a frame, allow it.
                 ShootBullet();
 
         }

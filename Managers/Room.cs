@@ -19,34 +19,38 @@ namespace TerRoguelike.Managers
 {
     public class Room
     {
-        public virtual string Key => null;
-        public virtual string Filename => null;
-        public virtual int ID => -1;
-        public virtual int AssociatedFloor => -1;
-        public virtual bool CanExitRight => false;
-        public virtual bool CanExitDown => false;
-        public virtual bool CanExitUp => false;
-        public virtual bool IsBossRoom => false;
-        public virtual bool IsStartRoom => false;
-        public int myRoom;
-        public bool initialized = false;
-        public bool awake = false;
-        public bool active = true;
-        public Vector2 RoomDimensions;
-        public int roomTime;
-        public int closedTime;
+        // base room class used by all rooms
+        public virtual string Key => null; //schematic key
+        public virtual string Filename => null; //schematic filename
+        public virtual int ID => -1; //ID in RoomID list
+        public virtual int AssociatedFloor => -1; // what floor this room is associated with
+        public virtual bool CanExitRight => false; // if room is capable of exiting right
+        public virtual bool CanExitDown => false; // if room is capable of exiting down
+        public virtual bool CanExitUp => false; // if room is capable of exiting up
+        public virtual bool IsBossRoom => false; //if room is the end to a floor
+        public virtual bool IsStartRoom => false; // if room is the start of a floor
+        public int myRoom; // index in RoomList
+        public bool initialized = false; // whether initialize has run yet
+        public bool awake = false; // whether a player has ever stepped into this room
+        public bool active = true; // whether the room has been completed or not
+        public Vector2 RoomDimensions; // dimensions of the room
+        public int roomTime; // time the room has been active
+        public int closedTime; // time the room has been completed
         public const int RoomSpawnCap = 200;
-        public Vector2 RoomPosition;
+        public Vector2 RoomPosition; //position of the room
+
+        //potential NPC variables
         public Vector2[] NPCSpawnPosition = new Vector2[RoomSpawnCap];
         public int[] NPCToSpawn = new int[RoomSpawnCap];
         public int[] TimeUntilSpawn = new int[RoomSpawnCap];
         public int[] TelegraphDuration = new int[RoomSpawnCap];
         public float[] TelegraphSize = new float[RoomSpawnCap];
         public bool[] NotSpawned = new bool[RoomSpawnCap];
-        public bool anyAlive = true;
-        public int roomClearGraceTime = -1;
-        public int lastTelegraphDuration;
-        public bool wallActive = false;
+
+        public bool anyAlive = true; // whether any associated npcs are alive
+        public int roomClearGraceTime = -1; // time gap of 1 seconds after the last enemy has spawned where a room cannot be considered cleared to prevent any accidents happening
+        public int lastTelegraphDuration; // used for roomClearGraceTime
+        public bool wallActive = false; // whether the barriers of the room are active
         public virtual void AddRoomNPC(int arrayLocation, Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0)
         {
             NPCSpawnPosition[arrayLocation] = npcSpawnPosition + (RoomPosition * 16f);
@@ -60,34 +64,37 @@ namespace TerRoguelike.Managers
         }
         public virtual void Update()
         {
-            if (!awake)
+            if (!awake) // not been touced yet? return
                 return;
 
-            if (!initialized)
+            if (!initialized) // initialize the room
                 InitializeRoom();
 
-            if (closedTime <= 60)
+            if (closedTime <= 60) //wall is visually active up to 1 second after room clear
                 wallActive = true;
 
-            if (!active)
+            if (!active) // room done, closed time increments
             {
                 closedTime++;
                 return;
             }
                 
-            WallUpdate();
-            PlayerItemsUpdate();
+            WallUpdate(); // update wall logic
+            PlayerItemsUpdate(); // update items from all players
 
-            roomTime++;
+            roomTime++; //time room is active
+
             for (int i = 0; i < RoomSpawnCap; i++)
             {
-                if (TimeUntilSpawn[i] - roomTime == 0)
+                if (TimeUntilSpawn[i] - roomTime == 0) //spawn pending enemy that has reached it's time
                 {
                     SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
                     lastTelegraphDuration = TelegraphDuration[i];
                     NotSpawned[i] = false;
                 } 
             }
+
+            // if there is still an enemy yet to be spawned, do not continue with room clear logic
             bool cancontinue = true;
             for (int i = 0; i < RoomSpawnCap; i++)
             {
@@ -100,6 +107,7 @@ namespace TerRoguelike.Managers
 
             if (cancontinue)
             {
+                // start checking if any npcs in the world are active and associated with this room
                 if (roomClearGraceTime == -1)
                 {
                     roomClearGraceTime += lastTelegraphDuration + 60;
@@ -125,7 +133,7 @@ namespace TerRoguelike.Managers
                     }
                 }
             }
-            if (!anyAlive && roomClearGraceTime == 0)
+            if (!anyAlive && roomClearGraceTime == 0) // all associated enemies are gone. room cleared.
             {
                 active = false;
                 RoomClearReward();
@@ -134,6 +142,7 @@ namespace TerRoguelike.Managers
         public virtual void InitializeRoom()
         {
             initialized = true;
+            //sanity check for all npc slots
             for (int i = 0; i < NotSpawned.Length; i++)
             {
                 NotSpawned[i] = false;
@@ -141,7 +150,7 @@ namespace TerRoguelike.Managers
         }
         public void WallUpdate()
         {
-            for (int playerID = 0; playerID < Main.maxPlayers; playerID++)
+            for (int playerID = 0; playerID < Main.maxPlayers; playerID++) // keep players in the fucking room
             {
                 var player = Main.player[playerID];
                 bool boundLeft = (player.position.X + player.velocity.X) < (RoomPosition.X + 1f) * 16f;
@@ -170,7 +179,7 @@ namespace TerRoguelike.Managers
                 }
 
             }
-            for (int npcID = 0; npcID < Main.maxNPCs; npcID++)
+            for (int npcID = 0; npcID < Main.maxNPCs; npcID++) // keep npcs in the fucking room
             {
                 var npc = Main.npc[npcID];
                 if (npc == null)
@@ -212,6 +221,7 @@ namespace TerRoguelike.Managers
         {
             ClearPlanRockets();
 
+            // reward. boss rooms give higher tiers.
             int chance = Main.rand.Next(1, 101);
             int itemType;
             int itemTier;
