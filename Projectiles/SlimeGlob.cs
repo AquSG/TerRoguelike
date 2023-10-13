@@ -41,7 +41,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.frame = (int)Projectile.ai[0] / 7 % 3;
                 Projectile.rotation = Projectile.velocity.ToRotation();
                 if (Projectile.velocity.Y < 8)
-                    Projectile.velocity.Y += 0.065f;
+                    Projectile.velocity.Y += 0.085f;
                 if (Projectile.velocity.Y > 8)
                     Projectile.velocity.Y = 8;
 
@@ -82,6 +82,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.velocity = Vector2.Zero;
                 Projectile.rotation = 0f;
                 Projectile.Bottom = new Vector2(Projectile.Bottom.X, (int)(Projectile.oldPosition.Y / 16f) * 16f + 16f);
+                SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.2f }, Projectile.Center);
             }
             
             return false;
