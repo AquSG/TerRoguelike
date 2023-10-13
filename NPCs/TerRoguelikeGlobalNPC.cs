@@ -32,6 +32,7 @@ namespace TerRoguelike.NPCs
         public bool activatedThrillOfTheHunt = false;
         public bool activatedClusterBombSatchel = false;
         public bool activatedSteamEngine = false;
+        public bool activatedNutritiousSlime = false;
         public bool activatedItemPotentiometer = false;
 
         //debuffs

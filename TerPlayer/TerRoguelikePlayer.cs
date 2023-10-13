@@ -75,6 +75,7 @@ namespace TerRoguelike.TerPlayer
         public int volatileRocket;
         public int theDreamsoul;
         public int cornucopia;
+        public int nutritiousSlime;
         public int itemPotentiometer;
         public int barrierSynthesizer;
         public int jetLeg;
@@ -169,6 +170,7 @@ namespace TerRoguelike.TerPlayer
             volatileRocket = 0;
             theDreamsoul = 0;
             cornucopia = 0;
+            nutritiousSlime = 0;
             itemPotentiometer = 0;
             barrierSynthesizer = 0;
             jetLeg = 0;
@@ -783,13 +785,24 @@ namespace TerRoguelike.TerPlayer
                 steamEngineStacks.Add(3600);
                 modTarget.activatedSteamEngine = true;
             }
-            if (itemPotentiometer > 0)
+            if (nutritiousSlime > 0 && !modTarget.activatedNutritiousSlime)
+            {
+                int slimeCount = 4;
+                for (int i = 0; i < slimeCount; i++)
+                {
+                    Vector2 velocity = (-Vector2.UnitY * 3f).RotatedBy(Main.rand.NextFloat(-MathHelper.Pi / 3f, (MathHelper.Pi / 3f) + float.Epsilon));
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), target.Center, velocity, ModContent.ProjectileType<SlimeGlob>(), 0, 0f, Player.whoAmI);
+                }
+                modTarget.activatedNutritiousSlime = true;
+            }
+            if (itemPotentiometer > 0 && !modTarget.activatedItemPotentiometer)
             {
                 float chance = 0.02f * itemPotentiometer;
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
                     SpawnRoguelikeItem(target.Center);
                 }
+                modTarget.activatedItemPotentiometer = true;
             }
         }
         #endregion
