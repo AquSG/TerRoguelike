@@ -18,8 +18,6 @@ namespace TerRoguelike.Managers
     public class RoomManager
     {
         public static List<int> FloorIDsInPlay;
-        public static List<Room> StartRoomIDs;
-        public static List<Room> BossRoomIDs;
         public static List<int> oldRoomDirections;
         public static int currentFloor;
 
@@ -29,18 +27,29 @@ namespace TerRoguelike.Managers
         public static List<Room> CrimsonRoomRight;
         public static List<Room> CrimsonRoomDown;
         public static List<Room> CrimsonRoomUp;
+        public static List<Room> ForestRoomRight;
+        public static List<Room> ForestRoomDown;
+        public static List<Room> ForestRoomUp;
+
         
         //The ultimate worldgen function
         public static void GenerateRoomStructure()
         {
-            currentFloor = 0;
+            List<int> floor1Floors = new List<int>()
+            {
+                0,
+                2
+            };
+            currentFloor = floor1Floors[Main.rand.Next(floor1Floors.Count)];
+
             FloorIDsInPlay = new List<int>();
             RoomSystem.RoomList = new List<Room>();
             oldRoomDirections = new List<int>();
             SetAllRoomIDs();
 
+            int firstRoomID = FloorID[currentFloor].StartRoomID;
             int roomCount = 8;
-            string mapKey = RoomID[0].Key;
+            string mapKey = RoomID[firstRoomID].Key;
             var schematic = TileMaps[mapKey];
 
             int startpositionX = Main.maxTilesX / 32;
@@ -51,21 +60,21 @@ namespace TerRoguelike.Managers
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;
 
-            DefaultRoom defaultRoom = new DefaultRoom();
-            defaultRoom.RoomPosition = placementPoint.ToVector2();
-            defaultRoom.RoomDimensions = schematicSize;
-            RoomSystem.NewRoom(defaultRoom);
+            var firstRoom = RoomID[firstRoomID];
+            firstRoom.RoomPosition = placementPoint.ToVector2();
+            firstRoom.RoomDimensions = schematicSize;
+            RoomSystem.NewRoom(firstRoom);
             
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
-            PlaceRoom(roomCount, defaultRoom);
+            PlaceRoom(roomCount, firstRoom);
         }
         public static void PlaceRoom(int roomCount, Room previousRoom)
         {
             roomCount--;
             if (roomCount == 0)
             {
-                var selectedRoom = BossRoomIDs[currentFloor];
+                var selectedRoom = RoomID[FloorID[currentFloor].BossRoomIDs[Main.rand.Next(FloorID[currentFloor].BossRoomIDs.Count)]];
                 string mapKey = selectedRoom.Key;
                 var schematic = TileMaps[mapKey];
 
@@ -92,6 +101,9 @@ namespace TerRoguelike.Managers
                         break;
                     case 1:
                         return;
+                    case 2:
+                        currentFloor = 1;
+                        break;
                 }
 
                 GenerateNextFloor(selectedRoom);
@@ -119,6 +131,14 @@ namespace TerRoguelike.Managers
                         if (!CrimsonRoomDown.Any())
                             anyDown = false;
                         if (!CrimsonRoomUp.Any())
+                            anyUp = false;
+                        break;
+                    case 2:
+                        if (!ForestRoomRight.Any())
+                            anyRight = false;
+                        if (!ForestRoomDown.Any())
+                            anyDown = false;
+                        if (!ForestRoomUp.Any())
                             anyUp = false;
                         break;
                 }
@@ -194,6 +214,10 @@ namespace TerRoguelike.Managers
                     selectedRoom = CrimsonRoomRight[Main.rand.Next(CrimsonRoomRight.Count)];
                     CrimsonRoomRight.Remove(selectedRoom);
                     break;
+                case 2:
+                    selectedRoom = ForestRoomRight[Main.rand.Next(ForestRoomRight.Count)];
+                    ForestRoomRight.Remove(selectedRoom);
+                    break;
             }
             
             string mapKey = selectedRoom.Key;
@@ -229,6 +253,10 @@ namespace TerRoguelike.Managers
                     selectedRoom = CrimsonRoomDown[Main.rand.Next(CrimsonRoomDown.Count)];
                     CrimsonRoomDown.Remove(selectedRoom);
                     break;
+                case 2:
+                    selectedRoom = ForestRoomDown[Main.rand.Next(ForestRoomDown.Count)];
+                    ForestRoomDown.Remove(selectedRoom);
+                    break;
             }
 
             string mapKey = selectedRoom.Key;
@@ -263,6 +291,10 @@ namespace TerRoguelike.Managers
                     selectedRoom = CrimsonRoomUp[Main.rand.Next(CrimsonRoomUp.Count)];
                     CrimsonRoomUp.Remove(selectedRoom);
                     break;
+                case 2:
+                    selectedRoom = ForestRoomUp[Main.rand.Next(ForestRoomUp.Count)];
+                    ForestRoomUp.Remove(selectedRoom);
+                    break;
             }
 
             string mapKey = selectedRoom.Key;
@@ -288,18 +320,8 @@ namespace TerRoguelike.Managers
         {
             oldRoomDirections.Clear();
 
-            Room floorStartingRoom = RoomID[0];
+            Room floorStartingRoom = RoomID[FloorID[currentFloor].StartRoomID];
             int roomCount = 8;
-            switch (currentFloor)
-            {
-                case 0:
-                    floorStartingRoom = StartRoomIDs[0];
-                    break;
-                case 1:
-                    floorStartingRoom = StartRoomIDs[1];
-                    roomCount = 9;
-                    break;
-            }
 
             string mapKey = floorStartingRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -318,86 +340,88 @@ namespace TerRoguelike.Managers
 
             PlaceRoom(roomCount, floorStartingRoom);
         }
-        public static void SetAllRoomIDs()
-        {
-            SetStartRoomIDs();
-            SetBossRoomIDs();
-            SetAllBaseRoomIDs();
-            SetAllCrimsonRoomIDs();
-        }
-        public static void SetStartRoomIDs()
-        {
-            StartRoomIDs = new List<Room>();
-            StartRoomIDs.Add(RoomID[0]);
-            StartRoomIDs.Add(RoomID[16]);
-        }
-        public static void SetBossRoomIDs()
-        {
-            BossRoomIDs = new List<Room>();
-            BossRoomIDs.Add(RoomID[5]);
-            BossRoomIDs.Add(RoomID[29]);
-        }
-        public static void SetAllBaseRoomIDs()
+        public static void ResetRoomGenLists()
         {
             BaseRoomRight = new List<Room>();
             BaseRoomDown = new List<Room>();
             BaseRoomUp = new List<Room>();
-            SetBaseRoomRightIDs();
-            SetBaseRoomDownIDs();
-            SetBaseRoomUpIDs();
-        }
-        public static void SetBaseRoomRightIDs()
-        {
-            BaseRoomRight.Add(RoomID[1]);
-            BaseRoomRight.Add(RoomID[2]);
-            BaseRoomRight.Add(RoomID[3]);
-            BaseRoomRight.Add(RoomID[4]);
-            BaseRoomRight.Add(RoomID[7]);
-            BaseRoomRight.Add(RoomID[10]);
-            BaseRoomRight.Add(RoomID[13]);
-        }
-        public static void SetBaseRoomDownIDs()
-        {
-            BaseRoomDown.Add(RoomID[8]);
-            BaseRoomDown.Add(RoomID[11]);
-            BaseRoomDown.Add(RoomID[14]);
-        }
-        public static void SetBaseRoomUpIDs()
-        {
-            BaseRoomUp.Add(RoomID[6]);
-            BaseRoomUp.Add(RoomID[9]);
-            BaseRoomUp.Add(RoomID[12]);
-            BaseRoomUp.Add(RoomID[15]);
-        }
-        public static void SetAllCrimsonRoomIDs()
-        {
+
             CrimsonRoomRight = new List<Room>();
             CrimsonRoomDown = new List<Room>();
             CrimsonRoomUp = new List<Room>();
-            SetCrimsonRoomRightIDs();
-            SetCrimsonRoomDownIDs();
-            SetCrimsonRoomUpIDs();
+
+            ForestRoomRight = new List<Room>();
+            ForestRoomDown = new List<Room>();
+            ForestRoomUp = new List<Room>();
         }
-        public static void SetCrimsonRoomRightIDs()
+        public static void SetAllRoomIDs()
         {
-            CrimsonRoomRight.Add(RoomID[17]);
-            CrimsonRoomRight.Add(RoomID[18]);
-            CrimsonRoomRight.Add(RoomID[22]);
-            CrimsonRoomRight.Add(RoomID[24]);
-            CrimsonRoomRight.Add(RoomID[28]);
+            ResetRoomGenLists();
+
+            for (int i = 0; i < RoomID.Count; i++)
+            {
+                string key = RoomID[i].Key;
+                if (key.Contains("Boss") || key.Contains("Start"))
+                    continue;
+
+                if (key.Contains("Base"))
+                {
+                    SortBaseRoomIDs(i, key);
+                    continue;
+                }
+                if (key.Contains("Crimson"))
+                {
+                    SortCrimsonRoomIDs(i, key);
+                    continue;
+                }
+                if (key.Contains("Forest"))
+                {
+                    SortForestRoomIDs(i, key);
+                    continue;
+                }
+            }
         }
-        public static void SetCrimsonRoomDownIDs()
+        public static void SortBaseRoomIDs(int id, string key)
         {
-            CrimsonRoomDown.Add(RoomID[20]);
-            CrimsonRoomDown.Add(RoomID[25]);
-            CrimsonRoomDown.Add(RoomID[27]);
+            if (key.Contains("Down"))
+            {
+                BaseRoomDown.Add(RoomID[id]);
+                return;
+            }
+            if (key.Contains("Up"))
+            {
+                BaseRoomUp.Add(RoomID[id]);
+                return;
+            }
+            BaseRoomRight.Add(RoomID[id]);
         }
-        public static void SetCrimsonRoomUpIDs()
+        public static void SortCrimsonRoomIDs(int id, string key)
         {
-            CrimsonRoomUp.Add(RoomID[19]);
-            CrimsonRoomUp.Add(RoomID[21]);
-            CrimsonRoomUp.Add(RoomID[23]);
-            CrimsonRoomUp.Add(RoomID[26]);
+            if (key.Contains("Down"))
+            {
+                CrimsonRoomDown.Add(RoomID[id]);
+                return;
+            }
+            if (key.Contains("Up"))
+            {
+                CrimsonRoomUp.Add(RoomID[id]);
+                return;
+            }
+            CrimsonRoomRight.Add(RoomID[id]);
+        }
+        public static void SortForestRoomIDs(int id, string key)
+        {
+            if (key.Contains("Down"))
+            {
+                ForestRoomDown.Add(RoomID[id]);
+                return;
+            }
+            if (key.Contains("Up"))
+            {
+                ForestRoomUp.Add(RoomID[id]);
+                return;
+            }
+            ForestRoomRight.Add(RoomID[id]);
         }
     }
 }

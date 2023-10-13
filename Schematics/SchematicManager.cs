@@ -70,11 +70,27 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new CrimsonEnemyRoom6Down());
             RoomID.Add(new CrimsonEnemyRoom7());
             RoomID.Add(new CrimsonBossRoom1());
+            RoomID.Add(new ForestStartRoom());
+            RoomID.Add(new ForestBossRoom1());
+            RoomID.Add(new ForestEnemyRoom1());
+            RoomID.Add(new ForestEnemyRoom1Up());
+            RoomID.Add(new ForestEnemyRoom2());
+            RoomID.Add(new ForestEnemyRoom2Down());
+            RoomID.Add(new ForestEnemyRoom2Up());
+            RoomID.Add(new ForestEnemyRoom3Down());
+            RoomID.Add(new ForestEnemyRoom4Down());
+            RoomID.Add(new ForestEnemyRoom4Up());
+            RoomID.Add(new ForestEnemyRoom5());
+            RoomID.Add(new ForestEnemyRoom5Down());
+            RoomID.Add(new ForestEnemyRoom5Up());
+            RoomID.Add(new ForestEnemyRoom6());
+            RoomID.Add(new ForestEnemyRoom6Up());
         }
         public static void LoadFloorIDs()
         {
             FloorID.Add(new BaseFloor());
             FloorID.Add(new CrimsonFloor());
+            FloorID.Add(new ForestFloor());
         }
         internal static void Unload()
         {

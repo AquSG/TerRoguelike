@@ -15,6 +15,7 @@ namespace TerRoguelike.Floors
     {
         public override int FloorID => 0;
         public override int StartRoomID => 0;
+        public override List<int> BossRoomIDs => new List<int>() { 5 };
         public override int Stage => 0;
     }
 }

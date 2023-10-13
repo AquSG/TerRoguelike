@@ -11,11 +11,11 @@ using Terraria.ID;
 
 namespace TerRoguelike.Floors
 {
-    public class CrimsonFloor : Floor
+    public class ForestFloor : Floor
     {
-        public override int FloorID => 1;
-        public override int StartRoomID => 16;
-        public override List<int> BossRoomIDs => new List<int>() { 29 };
-        public override int Stage => 1;
+        public override int FloorID => 2;
+        public override int StartRoomID => 30;
+        public override List<int> BossRoomIDs => new List<int>() { 31 };
+        public override int Stage => 0;
     }
 }
