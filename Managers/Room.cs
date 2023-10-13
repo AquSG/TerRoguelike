@@ -22,7 +22,7 @@ namespace TerRoguelike.Managers
         // base room class used by all rooms
         public virtual string Key => null; //schematic key
         public virtual string Filename => null; //schematic filename
-        public virtual int ID => -1; //ID in RoomID list
+        public int ID = -1; //ID in RoomID list
         public virtual int AssociatedFloor => -1; // what floor this room is associated with
         public virtual bool CanExitRight => false; // if room is capable of exiting right
         public virtual bool CanExitDown => false; // if room is capable of exiting down

@@ -13,7 +13,6 @@ namespace TerRoguelike.Rooms
 {
     public class BaseBossRoom1 : Room
     {
-        public override int ID => 5;
         public override int AssociatedFloor => 0;
         public override string Key => "BaseBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/BaseBossRoom1.csch";

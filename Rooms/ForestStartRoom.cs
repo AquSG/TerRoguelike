@@ -13,7 +13,6 @@ namespace TerRoguelike.Rooms
 {
     public class ForestStartRoom : Room
     {
-        public override int ID => 30;
         public override int AssociatedFloor => 2;
         public override string Key => "ForestStartRoom";
         public override string Filename => "Schematics/RoomSchematics/ForestStartRoom.csch";

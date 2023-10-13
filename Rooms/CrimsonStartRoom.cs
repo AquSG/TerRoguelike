@@ -13,7 +13,6 @@ namespace TerRoguelike.Rooms
 {
     public class CrimsonStartRoom : Room
     {
-        public override int ID => 16;
         public override int AssociatedFloor => 1;
         public override string Key => "CrimsonStartRoom";
         public override string Filename => "Schematics/RoomSchematics/CrimsonStartRoom.csch";

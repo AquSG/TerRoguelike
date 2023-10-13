@@ -17,6 +17,7 @@ namespace TerRoguelike.Schematics
     {
         public static List<Room> RoomID = new List<Room>();
         public static List<Floor> FloorID = new List<Floor>();
+        public static Dictionary<string, int> RoomDict = new Dictionary<string, int>(); // fetches the RoomID based on the given key. does not work with room variants
 
         internal static Dictionary<string, SchematicMetaTile[,]> TileMaps;
         internal static Dictionary<string, PilePlacementFunction> PilePlacementMaps;
@@ -85,6 +86,16 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new ForestEnemyRoom5Up());
             RoomID.Add(new ForestEnemyRoom6());
             RoomID.Add(new ForestEnemyRoom6Up());
+
+            for (int i = 0; i < RoomID.Count; i++)
+            {
+                RoomID[i].ID = i;
+
+                if (RoomID[i].IsRoomVariant)
+                    continue;
+
+                RoomDict.Add(RoomID[i].Key, i);
+            }
         }
         public static void LoadFloorIDs()
         {

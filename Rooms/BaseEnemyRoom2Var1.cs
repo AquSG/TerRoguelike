@@ -13,7 +13,6 @@ namespace TerRoguelike.Rooms
 {
     public class BaseEnemyRoom2Var1 : Room
     {
-        public override int ID => 4;
         public override string Key => "BaseEnemyRoom2";
         public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom2.csch";
         public override bool CanExitRight => true;

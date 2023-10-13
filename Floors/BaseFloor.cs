@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
+using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
@@ -14,8 +15,8 @@ namespace TerRoguelike.Floors
     public class BaseFloor : Floor
     {
         public override int FloorID => 0;
-        public override int StartRoomID => 0;
-        public override List<int> BossRoomIDs => new List<int>() { 5 };
+        public override int StartRoomID => RoomDict["DefaultRoom"];
+        public override List<int> BossRoomIDs => new List<int>() { RoomDict["BaseBossRoom1"] };
         public override int Stage => 0;
     }
 }
