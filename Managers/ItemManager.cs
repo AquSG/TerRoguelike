@@ -212,7 +212,8 @@ namespace TerRoguelike.Managers
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new Cornucopia(),
-                new ItemPotentiometer()
+                new ItemPotentiometer(),
+                new BarrierSynthesizer()
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();

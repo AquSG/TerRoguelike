@@ -75,6 +75,7 @@ namespace TerRoguelike.TerPlayer
         public int theDreamsoul;
         public int cornucopia;
         public int itemPotentiometer;
+        public int barrierSynthesizer;
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -163,6 +164,7 @@ namespace TerRoguelike.TerPlayer
             theDreamsoul = 0;
             cornucopia = 0;
             itemPotentiometer = 0;
+            barrierSynthesizer = 0;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
@@ -865,6 +867,14 @@ namespace TerRoguelike.TerPlayer
         public void ScaleableHeal(int healAmt)
         {
             healAmt = (int)(healAmt * healMultiplier);
+            if (barrierSynthesizer > 0)
+            {
+                if (Player.statLife + healAmt > Player.statLifeMax2)
+                {
+                    int barrierHealAmt = (int)((Player.statLife + healAmt - Player.statLifeMax2) * barrierSynthesizer * 0.5f);
+                    AddBarrierHealth(barrierHealAmt);
+                }
+            }
             Player.Heal(healAmt);
         }
         public void AddBarrierHealth(int barrierGainAmt)
@@ -872,6 +882,8 @@ namespace TerRoguelike.TerPlayer
             barrierHealth += barrierGainAmt;
             if (barrierHealth > Player.statLifeMax2)
                 barrierHealth = Player.statLifeMax2;
+
+            CombatText.NewText(Player.getRect(), Color.LightGoldenrodYellow, barrierGainAmt);
         }
         public void GiftBoxLogic(Vector2 position)
         {

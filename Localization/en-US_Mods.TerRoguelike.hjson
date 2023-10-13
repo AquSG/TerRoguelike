@@ -499,4 +499,13 @@ Items: {
 			Extra copies of this item increase the max fists by 2, range by 2 tiles, and base damage by 125
 			'''
 	}
+
+	BarrierSynthesizer: {
+		DisplayName: Barrier Synthesizer
+		Tooltip:
+			'''
+			Healing past max hp heals barrier instead at a 50% conversion ratio
+			Extra copies of this item increase the healing conversion ratio by 50%
+			'''
+	}
 }
