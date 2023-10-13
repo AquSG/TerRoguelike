@@ -21,6 +21,7 @@ using ReLogic.Content;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Systems;
+using TerRoguelike.Items.Rare;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -76,6 +77,7 @@ namespace TerRoguelike.TerPlayer
         public int cornucopia;
         public int itemPotentiometer;
         public int barrierSynthesizer;
+        public int jetLeg;
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -111,6 +113,10 @@ namespace TerRoguelike.TerPlayer
         public int timeAttacking = 0;
         public Vector2 lenaVisualPosition = Vector2.Zero;
         public int currentRoom = -1;
+        public int DashDir = 0;
+        public int DashDelay = 0;
+        public int DashTime = -6;
+        public int DashDirCache = 0;
         #endregion
 
         #region Reset Variables
@@ -165,6 +171,7 @@ namespace TerRoguelike.TerPlayer
             cornucopia = 0;
             itemPotentiometer = 0;
             barrierSynthesizer = 0;
+            jetLeg = 0;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
@@ -178,6 +185,22 @@ namespace TerRoguelike.TerPlayer
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
             barrierInHurt = 0;
+        }
+        public override void ResetEffects()
+        {
+            if (Player.controlRight && Player.releaseRight && Player.doubleTapCardinalTimer[2] < 15)
+            {
+                DashDir = 1;
+            }
+            else if (Player.controlLeft && Player.releaseLeft && Player.doubleTapCardinalTimer[3] < 15)
+            {
+                DashDir = -1;
+            }
+            else
+            {
+                DashDir = 0;
+            }
+
         }
         #endregion
 
@@ -531,6 +554,45 @@ namespace TerRoguelike.TerPlayer
             }
             if (barrierHealth < 0)
                 barrierHealth = 0;
+        }
+        public override void PreUpdateMovement()
+        {
+            if (jetLeg > 0)
+            {
+                if (DashDir != 0 && DashDelay == 0)
+                {
+                    DashDirCache = DashDir;
+                    SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot with { Volume = 0.7f });
+                    Player.immuneTime += 7;
+                    DashTime += 15;
+                    int dashDelayAdd = (int)(600 * 4 / (float)(jetLeg + 3));
+                    if (dashDelayAdd < 30)
+                        dashDelayAdd = 30;
+
+                    DashDelay += dashDelayAdd;
+                }
+                if (DashTime > 0)
+                {
+                    JetLegDashMovement();
+                    DashDelay++;
+                }
+            }
+
+            if (DashTime > -6)
+                DashTime--;
+            if (DashDelay > 0)
+            {
+                DashDelay--;
+                if (DashDelay == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.42f });
+                }
+            }
+
+            if (DashTime <= -6)
+            {
+                DashDirCache = 0;
+            }
         }
         #endregion
 
@@ -1166,6 +1228,17 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+
+            if (jetLeg > 0)
+            {
+                if (DashDirCache != 0 && DashTime > -6)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Dust.NewDustDirect(Player.Bottom + new Vector2((-8 - (i * Player.velocity.X * 0.5f)) * DashDirCache, -10), 4, 8, DustID.Torch, SpeedX: (-4f - i) * DashDirCache);
+                    }
+                }
+            }
             return;
 
             if (evilEye > 0)
@@ -1360,6 +1433,16 @@ namespace TerRoguelike.TerPlayer
                     drawInfo.DrawDataCache.InsertRange(0, afterimages);
                 }
             }
+        }
+        #endregion
+
+        #region Jet Leg Dash
+        public void JetLegDashMovement()
+        {
+            Player.velocity.X = Player.maxRunSpeed * DashDirCache * 1.5f;
+            Player.immuneTime++;
+            Player.immune = true;
+            Player.immuneNoBlink = true;
         }
         #endregion
     }

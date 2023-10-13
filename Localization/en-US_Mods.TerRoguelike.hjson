@@ -508,4 +508,15 @@ Items: {
 			Extra copies of this item increase the healing conversion ratio by 50%
 			'''
 	}
+
+	JetLeg: {
+		DisplayName: Jet Leg
+		Tooltip:
+			'''
+			Gain a quick invincibility dash that has a cooldown
+			The dash gives 1/3 of a second of invincibility and has a 10 second cooldown
+			Double tap left or right to activate the dash
+			Extra copies of this item decrease the cooldown of the dash
+			'''
+	}
 }
