@@ -556,8 +556,6 @@ namespace TerRoguelike.TerPlayer
                             bestTargetDistance = distance;
                             droneTarget = i;
                             droneBuddyAttackCooldown = 20;
-                            if (droneBuddyVisualPosition.X > Player.Center.X)
-                                droneBuddyRotation += MathHelper.Pi;
                         }
                     }
                 }
@@ -1347,11 +1345,9 @@ namespace TerRoguelike.TerPlayer
                 int faceFrame = droneBuddyState == 1 ? 5 : (Main.GlobalTimeWrappedHourly % 9f <= 0.4f ? 4 : 3);
                 int frameHeight = droneTex.Height / 6;
                 SpriteEffects spriteEffects = droneBuddyState != 1 ? (droneBuddyVisualPosition.X > Player.Center.X ? SpriteEffects.FlipHorizontally : SpriteEffects.None) : (Main.npc[droneTarget].Center.X >= droneBuddyVisualPosition.X ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-                float desiredRot = droneBuddyState != 1 ? MathHelper.Clamp(droneBuddyVisualPosition.Distance(desiredPos) / 500f, -MathHelper.PiOver4, MathHelper.PiOver4) : (Main.npc[droneTarget].Center - droneBuddyVisualPosition).ToRotation();
+                float idleRotation = MathHelper.Clamp(droneBuddyVisualPosition.Distance(desiredPos) / 500f, -MathHelper.PiOver4, MathHelper.PiOver4) * (spriteEffects == SpriteEffects.FlipHorizontally ? -1 : 1);
+                float desiredRot = droneBuddyState != 1 ? idleRotation + (spriteEffects == SpriteEffects.FlipHorizontally ? MathHelper.Pi : 0) : (Main.npc[droneTarget].Center - droneBuddyVisualPosition).ToRotation();
                 Color color = Color.White;
-
-                if (droneBuddyState != 1 && spriteEffects == SpriteEffects.FlipHorizontally)
-                    desiredRot = -desiredRot;
                 
                 if (Math.Abs(droneBuddyRotation - desiredRot) > MathHelper.PiOver2 * 3f)
                 {
@@ -1371,7 +1367,7 @@ namespace TerRoguelike.TerPlayer
                     droneBuddyRotation = MathHelper.Lerp(droneBuddyRotation, desiredRot, 0.08f);
                     
                 }
-                droneSeenRot = droneBuddyState != 1 ? droneBuddyRotation : (spriteEffects == SpriteEffects.FlipHorizontally ? droneBuddyRotation - MathHelper.Pi : droneBuddyRotation);
+                droneSeenRot = spriteEffects == SpriteEffects.FlipHorizontally ? droneBuddyRotation - MathHelper.Pi : droneBuddyRotation;
                 Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * droneFrame, droneTex.Width, frameHeight), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
                 Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * faceFrame, droneTex.Width, frameHeight), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
 
@@ -1380,9 +1376,9 @@ namespace TerRoguelike.TerPlayer
                     float opacity = MathHelper.Clamp(MathHelper.Lerp(0f, 1f, (droneBuddyHealTime) / 30f), 0f, 1f);
                     Texture2D squareTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/AdaptiveGunBullet").Value;
                     Vector2 projSpawnPos = droneBuddyVisualPosition + (new Vector2(0.4f * (droneBuddyVisualPosition.X > Player.Center.X ? -1 : 1), 1f).RotatedBy(droneSeenRot) * 11f * new Vector2(1.2f, 1));
-                    for (int i = 0; i < 50; i++)
+                    for (int i = 0; i < 15; i++)
                     {
-                        float randFloat = Main.rand.NextFloat(1f);
+                        float randFloat = (i / 15f) + (Main.GlobalTimeWrappedHourly % 0.1f);
                         Vector2 pointOnLine = (Player.MountedCenter + new Vector2(0, Player.gfxOffY) - projSpawnPos) * randFloat;
                         pointOnLine.Y += (-1 * (float)Math.Pow(randFloat * 2f - 1, 2) + 1) * 32f;
                         pointOnLine += projSpawnPos;
