@@ -211,6 +211,7 @@ namespace TerRoguelike.Managers
                 new GiftBox(),
                 new VolatileRocket(),
                 new TheDreamsoul(),
+                new DroneBuddy(),
                 new Cornucopia(),
                 new NutritiousSlime(),
                 new ItemPotentiometer(),

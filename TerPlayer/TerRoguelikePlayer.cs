@@ -18,10 +18,7 @@ using TerRoguelike.Utilities;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Content;
-using TerRoguelike.Items.Common;
-using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Systems;
-using TerRoguelike.Items.Rare;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -74,6 +71,7 @@ namespace TerRoguelike.TerPlayer
         public int giftBox;
         public int volatileRocket;
         public int theDreamsoul;
+        public int droneBuddy;
         public int cornucopia;
         public int nutritiousSlime;
         public int itemPotentiometer;
@@ -88,6 +86,10 @@ namespace TerRoguelike.TerPlayer
         public List<int> barbedLassoTargets = new List<int>();
         public int barbedLassoHitCooldown = 0;
         public List<int> steamEngineStacks = new List<int>();
+        public int droneBuddyState = 0; // 0 - passive, 1 - aggressive, 2 - healing
+        public float droneBuddyAttackCooldown = 0;
+        public int droneTarget = -1;
+        public int droneBuddyHealTime = 0;
         #endregion
 
         #region Misc Variables
@@ -113,6 +115,9 @@ namespace TerRoguelike.TerPlayer
         public float previousBonusDamageMulti = 1f;
         public int timeAttacking = 0;
         public Vector2 lenaVisualPosition = Vector2.Zero;
+        public Vector2 droneBuddyVisualPosition = Vector2.Zero;
+        public float droneBuddyRotation = 0f;
+        public float droneSeenRot = 0f;
         public int currentRoom = -1;
         public int DashDir = 0;
         public int DashDelay = 0;
@@ -169,6 +174,7 @@ namespace TerRoguelike.TerPlayer
             giftBox = 0;
             volatileRocket = 0;
             theDreamsoul = 0;
+            droneBuddy = 0;
             cornucopia = 0;
             nutritiousSlime = 0;
             itemPotentiometer = 0;
@@ -517,6 +523,85 @@ namespace TerRoguelike.TerPlayer
             {
                 int luckIncrease = theDreamsoul;
                 procLuck += luckIncrease;
+            }
+            if (droneBuddy > 0)
+            {
+                if (droneBuddyState != 2 && droneBuddyHealTime < 600)
+                    droneBuddyHealTime++;
+
+                if (droneTarget != -1 && droneBuddyAttackCooldown <= 0)
+                {
+                    droneBuddyRotation = droneBuddyRotation % MathHelper.TwoPi;
+                    NPC npc = Main.npc[droneTarget];
+                    if (!npc.active || npc.life <= 0 || npc.Center.Distance(Player.Center) > 960f || !Collision.CanHit(droneBuddyVisualPosition, 1, 1, Main.npc[droneTarget].Center, 1, 1))
+                        droneTarget = -1;
+                    else
+                        droneBuddyAttackCooldown += 20f / (1f + ((droneBuddy - 1) * 0.5f));
+                }
+                if (droneTarget == -1)
+                {
+                    float bestTargetDistance = 960f;
+                    for (int i = 0; i < Main.maxNPCs; i++)
+                    {
+                        NPC npc = Main.npc[i];
+                        if (!npc.active || npc.life <= 0 || !npc.CanBeChasedBy())
+                            continue;
+
+                        if (!Collision.CanHit(droneBuddyVisualPosition, 1, 1, Main.npc[i].Center, 1, 1))
+                            continue;
+
+                        float distance = npc.Center.Distance(Player.Center);
+                        if (distance <= bestTargetDistance)
+                        {
+                            bestTargetDistance = distance;
+                            droneTarget = i;
+                            droneBuddyAttackCooldown = 20;
+                            if (droneBuddyVisualPosition.X > Player.Center.X)
+                                droneBuddyRotation += MathHelper.Pi;
+                        }
+                    }
+                }
+                if (droneTarget != -1)
+                {
+                    droneBuddyState = 1;
+                    droneBuddyAttackCooldown--;
+                    if (droneBuddyAttackCooldown <= 0)
+                    {
+                        Vector2 projSpawnPos = droneBuddyVisualPosition + (Vector2.UnitY.RotatedBy(droneSeenRot) * 11f * new Vector2(1.2f, 1));
+                        droneBuddyAttackCooldown = 0;
+                        int spawnedProjectile = Projectile.NewProjectile(Player.GetSource_FromThis(), projSpawnPos, (Main.npc[droneTarget].Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), 100, 1f, Player.whoAmI);
+                        Main.projectile[spawnedProjectile].scale = scaleMultiplier;
+                        SoundEngine.PlaySound(SoundID.Item108 with { Volume = 0.3f }, droneBuddyVisualPosition);
+                        Dust dust = Dust.NewDustDirect(projSpawnPos - new Vector2(2), 4, 4, DustID.YellowTorch);
+                        dust.noLight = true;
+                        dust.noLightEmittence = true;
+                    }
+                }
+                else
+                {
+                    if (droneBuddyState != 2)
+                        droneBuddyState = 0;
+                    if (droneBuddyHealTime >= 600)
+                    {
+                        droneBuddyState = 2;
+                    }
+                    if (droneBuddyState == 2)
+                    {
+                        if (droneBuddyHealTime % 15 == 0)
+                        {
+                            int healAmt = 2 * droneBuddy;
+                            ScaleableHeal(healAmt);
+                        }
+                        droneBuddyHealTime -= 2;
+                        if (droneBuddyHealTime <= 0)
+                            droneBuddyState = 0;
+                    }
+                }
+                    
+            }
+            else
+            {
+                droneBuddyHealTime = 0;
             }
         }
         public override void PostUpdateEquips()
@@ -1197,7 +1282,7 @@ namespace TerRoguelike.TerPlayer
                 }
                 if (soulOfLenaUses < soulOfLena || soulOfLenaHurtVisual)
                 {
-                    Vector2 desiredPos = Player.Top - new Vector2(32 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f);
+                    Vector2 desiredPos = Player.Top - new Vector2(32 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f + 12f);
                     Texture2D lenaTex = ModContent.Request<Texture2D>("TerRoguelike/TerPlayer/Lena").Value;
                     Texture2D circleTex = ModContent.Request<Texture2D>("TerRoguelike/TerPlayer/LenaGlow").Value;
                     int lenaFrame = hurtCheck ? 2 : (Main.GlobalTimeWrappedHourly % 1.1f >= 0.55f ? 1 : 0);
@@ -1252,6 +1337,65 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+
+            if (droneBuddy > 0)
+            {
+                Vector2 desiredPos = droneBuddyState != 1 ? Player.Center - new Vector2(48 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f) : Player.Center + ((Main.npc[droneTarget].Center - Player.Center).SafeNormalize(Vector2.UnitY) * 48);
+                Texture2D droneTex = ModContent.Request<Texture2D>("TerRoguelike/TerPlayer/DroneBuddyMinion").Value;
+                float fullAnimTime = Main.GlobalTimeWrappedHourly % 0.5f;
+                int droneFrame = fullAnimTime % 0.25f <= 0.125f ? 1 : (fullAnimTime <= 0.25f ? 0 : 2);
+                int faceFrame = droneBuddyState == 1 ? 5 : (Main.GlobalTimeWrappedHourly % 9f <= 0.4f ? 4 : 3);
+                int frameHeight = droneTex.Height / 6;
+                SpriteEffects spriteEffects = droneBuddyState != 1 ? (droneBuddyVisualPosition.X > Player.Center.X ? SpriteEffects.FlipHorizontally : SpriteEffects.None) : (Main.npc[droneTarget].Center.X >= droneBuddyVisualPosition.X ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                float desiredRot = droneBuddyState != 1 ? MathHelper.Clamp(droneBuddyVisualPosition.Distance(desiredPos) / 500f, -MathHelper.PiOver4, MathHelper.PiOver4) : (Main.npc[droneTarget].Center - droneBuddyVisualPosition).ToRotation();
+                Color color = Color.White;
+
+                if (droneBuddyState != 1 && spriteEffects == SpriteEffects.FlipHorizontally)
+                    desiredRot = -desiredRot;
+                
+                if (Math.Abs(droneBuddyRotation - desiredRot) > MathHelper.PiOver2 * 3f)
+                {
+                    if (droneBuddyRotation < desiredRot)
+                        droneBuddyRotation += MathHelper.TwoPi;
+                    else if (desiredRot < droneBuddyRotation)
+                        desiredRot += MathHelper.TwoPi;
+                }
+                if (droneBuddyVisualPosition == Vector2.Zero)
+                {
+                    droneBuddyVisualPosition = desiredPos;
+                    droneBuddyRotation = 0f;
+                }
+                else
+                {
+                    droneBuddyVisualPosition = Vector2.Lerp(droneBuddyVisualPosition, desiredPos, 0.03f);
+                    droneBuddyRotation = MathHelper.Lerp(droneBuddyRotation, desiredRot, 0.08f);
+                    
+                }
+                droneSeenRot = droneBuddyState != 1 ? droneBuddyRotation : (spriteEffects == SpriteEffects.FlipHorizontally ? droneBuddyRotation - MathHelper.Pi : droneBuddyRotation);
+                Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * droneFrame, droneTex.Width, frameHeight), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
+                Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * faceFrame, droneTex.Width, frameHeight), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
+
+                if (droneBuddyState == 2)
+                {
+                    float opacity = MathHelper.Clamp(MathHelper.Lerp(0f, 1f, (droneBuddyHealTime) / 30f), 0f, 1f);
+                    Texture2D squareTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/AdaptiveGunBullet").Value;
+                    Vector2 projSpawnPos = droneBuddyVisualPosition + (new Vector2(0.4f * (droneBuddyVisualPosition.X > Player.Center.X ? -1 : 1), 1f).RotatedBy(droneSeenRot) * 11f * new Vector2(1.2f, 1));
+                    for (int i = 0; i < 50; i++)
+                    {
+                        float randFloat = Main.rand.NextFloat(1f);
+                        Vector2 pointOnLine = (Player.MountedCenter + new Vector2(0, Player.gfxOffY) - projSpawnPos) * randFloat;
+                        pointOnLine.Y += (-1 * (float)Math.Pow(randFloat * 2f - 1, 2) + 1) * 32f;
+                        pointOnLine += projSpawnPos;
+                        if (pointOnLine.Distance(Player.MountedCenter) < 20f)
+                            continue;
+
+                        Main.EntitySpriteDraw(squareTex, pointOnLine - Main.screenPosition, null, Color.LimeGreen * opacity, Main.rand.NextFloatDirection(), squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                    }
+                }
+            }
+            else
+                droneBuddyVisualPosition = Vector2.Zero;
+
             return;
 
             if (evilEye > 0)

@@ -530,4 +530,15 @@ Items: {
 			Extra copies of this item increase the healing amount by another 2% max life
 			'''
 	}
+
+	DroneBuddy: {
+		DisplayName: Drone Buddy
+		Tooltip:
+			'''
+			Gain a drone buddy to fight for you
+			Fires bullets for 100 base damage at nearby enemies automatically
+			Periodically heals you for 8 HP/s when no enemies are within line of sight
+			Extra copies of this item increase the fire rate of the drone, and heal amount by 8 HP/s
+			'''
+	}
 }
