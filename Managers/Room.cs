@@ -220,7 +220,7 @@ namespace TerRoguelike.Managers
         }
         public void RoomClearReward()
         {
-            ClearPlanRockets();
+            ClearRockets();
 
             // reward. boss rooms give higher tiers.
             int chance = Main.rand.Next(1, 101);
@@ -313,12 +313,12 @@ namespace TerRoguelike.Managers
                 }
             }
         }
-        public void ClearPlanRockets()
+        public void ClearRockets()
         {
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile proj = Main.projectile[i];
-                if (proj.type == ModContent.ProjectileType<PlanRocket>())
+                if (proj.type == ModContent.ProjectileType<PlanRocket>() || proj.type == ModContent.ProjectileType<Missile>())
                 {
                     proj.timeLeft = 60;
                 }

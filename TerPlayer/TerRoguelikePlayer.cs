@@ -539,7 +539,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     droneBuddyRotation = droneBuddyRotation % MathHelper.TwoPi;
                     NPC npc = Main.npc[droneTarget];
-                    if (!npc.active || npc.life <= 0 || npc.Center.Distance(Player.Center) > 960f || !Collision.CanHit(droneBuddyVisualPosition, 1, 1, Main.npc[droneTarget].Center, 1, 1))
+                    if (!npc.CanBeChasedBy() || npc.life <= 0 || npc.Center.Distance(Player.Center) > 960f || !Collision.CanHit(droneBuddyVisualPosition, 1, 1, npc.Center, 1, 1))
                         droneTarget = -1;
                     else
                         droneBuddyAttackCooldown += 20f / (1f + ((droneBuddy - 1) * 0.5f));
@@ -550,10 +550,10 @@ namespace TerRoguelike.TerPlayer
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         NPC npc = Main.npc[i];
-                        if (!npc.active || npc.life <= 0 || !npc.CanBeChasedBy())
+                        if (npc.life <= 0 || !npc.CanBeChasedBy())
                             continue;
 
-                        if (!Collision.CanHit(droneBuddyVisualPosition, 1, 1, Main.npc[i].Center, 1, 1))
+                        if (!Collision.CanHit(droneBuddyVisualPosition, 1, 1, npc.Center, 1, 1))
                             continue;
 
                         float distance = npc.Center.Distance(Player.Center);
@@ -613,7 +613,7 @@ namespace TerRoguelike.TerPlayer
                 if (allSeeingEyeTarget != -1)
                 {
                     NPC npc = Main.npc[allSeeingEyeTarget];
-                    if (!npc.active || npc.life <= 0 || !npc.CanBeChasedBy())
+                    if (npc.life <= 0 || !npc.CanBeChasedBy())
                         allSeeingEyeTarget = -1;
                 }
 
@@ -623,7 +623,7 @@ namespace TerRoguelike.TerPlayer
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         NPC npc = Main.npc[i];
-                        if (!npc.active || npc.life <= 0 || !npc.CanBeChasedBy())
+                        if (npc.life <= 0 || !npc.CanBeChasedBy())
                             continue;
 
                         if (npc.getRect().Contains(Main.MouseWorld.ToPoint()))

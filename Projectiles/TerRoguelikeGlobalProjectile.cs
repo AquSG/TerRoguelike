@@ -99,12 +99,10 @@ namespace TerRoguelike.Projectiles
         {
             if (projectile.velocity == Vector2.Zero)
                 return;
-
-            int projIndex = projectile.whoAmI;
             
             if (homingTarget != -1)
             {
-                if (!Main.npc[homingTarget].active || Main.npc[homingTarget].life <= 0) //reset homing target if it's gone
+                if (!Main.npc[homingTarget].CanBeChasedBy() || Main.npc[homingTarget].life <= 0) //reset homing target if it's gone
                     homingTarget = -1;
             }
 
@@ -127,7 +125,7 @@ namespace TerRoguelike.Projectiles
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (!npc.CanBeChasedBy(null, false))
+                    if (!npc.CanBeChasedBy(null, false) || npc.life <= 0)
                     {
                         npcHomingRating[i] = -10;
                         continue;
@@ -151,7 +149,7 @@ namespace TerRoguelike.Projectiles
 
                 homingTarget = npcHomingRating.FindIndex(x => x == npcHomingRating.Max());
 
-                if (!Main.npc[homingTarget].CanBeChasedBy(null, false))
+                if (!Main.npc[homingTarget].CanBeChasedBy(null, false) || Main.npc[homingTarget].life <= 0)
                 {
                     homingTarget = -1;
                     return;
@@ -174,7 +172,7 @@ namespace TerRoguelike.Projectiles
             Vector2 setVelocity = setAngle.ToRotationVector2() * projectile.velocity.Length(); // rotate projectile somwhat in the direction of the target
 
 
-            Main.projectile[projIndex].velocity = setVelocity;
+            projectile.velocity = setVelocity;
         }
     }
     public class ProcChainBools
