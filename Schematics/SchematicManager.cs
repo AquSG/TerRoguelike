@@ -15,6 +15,9 @@ namespace TerRoguelike.Schematics
     // TODO -- This can be made into a ModSystem with simple OnModLoad and Unload hooks.
     public static class SchematicManager
     {
+        //schematic code lifted from the Calamity Mod. Edits made in places to support the way we do things in TerRoguelike
+        //You NEED the Calamity Schematic Exporter mod to be able to create the necessary files that are used for this schematic logic
+
         public static List<Room> RoomID = new List<Room>();
         public static List<Floor> FloorID = new List<Floor>();
         public static Dictionary<string, int> RoomDict = new Dictionary<string, int>(); // fetches the RoomID based on the given key. does not work with room variants

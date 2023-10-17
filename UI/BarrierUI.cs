@@ -14,6 +14,7 @@ namespace TerRoguelike.UI
 {
     public static class BarrierUI
     {
+        //"ripper bars" lifted from the Calamity Mod and largely gutted to only the things needed for drawing the barrier bar
         private static Texture2D barrierBarTex, barrierBorderTex;
         internal static void Load()
         {

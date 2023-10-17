@@ -12,6 +12,7 @@ using Terraria.ModLoader.IO;
 
 namespace TerRoguelike.Schematics
 {
+    //schematic code lifted from the Calamity Mod
     #region Structs
     // A struct parallel to Tile which, for modded tiles, stores offset tile and wall type IDs based on the schematic's mod name arrays.
     [DebuggerDisplay("Tile ID = {TileType}, Wall ID = {WallType}")]

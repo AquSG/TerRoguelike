@@ -13,6 +13,7 @@ namespace TerRoguelike.Shaders
 {
     public class TerRoguelikeShaders
     {
+        //Shader loading and registering lifted from the Calamity Mod
         private const string ShaderPath = "Shaders/";
         internal const string CalamityShaderPrefix = "TerRoguelike:";
 
@@ -29,13 +30,13 @@ namespace TerRoguelike.Shaders
             Effect LoadShader(string path) => terAss.Request<Effect>($"{ShaderPath}{path}", AssetRequestMode.ImmediateLoad).Value;
 
 
-            BasicTintShader = LoadShader("BasicTint");
+            BasicTintShader = LoadShader("BasicTint"); //lifted from the Calamity Mod
             RegisterMiscShader(BasicTintShader, "TintPass", "BasicTint");
 
-            CircularGradientWithEdge = LoadShader("CircularGradientWithEdge");
+            CircularGradientWithEdge = LoadShader("CircularGradientWithEdge"); //lifted from the Calamity Mod. Though I technically helped make the edited version of this one.
             RegisterMiscShader(CircularGradientWithEdge, "CircularGradientWithEdgePass", "CircularGradientWithEdge");
 
-            ProtectiveBubbleShield = LoadShader("ProtectiveBubbleShield");
+            ProtectiveBubbleShield = LoadShader("ProtectiveBubbleShield"); //lifted from the Calamity Mod
             RegisterScreenShader(ProtectiveBubbleShield, "ShieldPass", "ProtectiveBubbleShield");
 
         }

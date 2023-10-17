@@ -17,6 +17,8 @@ namespace TerRoguelike.ILEditing
         }
         private int AdjustDamageVariance(On_Main.orig_DamageVar_float_int_float orig, float dmg, int percent, float luck)
         {
+            //IL edit lifted from the Calamity Mod. Only active if in a TerRoguelike world.
+
             // Change the default damage variance from +-15% to +-5%.
             // If other mods decide to change the scale, they can override this. We're solely killing the default value.
             if (percent == Main.DefaultDamageVariationPercent && TerRoguelikeWorld.IsTerRoguelikeWorld)

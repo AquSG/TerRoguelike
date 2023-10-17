@@ -25,6 +25,7 @@ namespace TerRoguelike.Systems
 {
     public class UIManagementSystem : ModSystem
     {
+        //ui system lifted from the Calamity Mod
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int mouseIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");

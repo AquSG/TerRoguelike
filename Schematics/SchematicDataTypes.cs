@@ -1,5 +1,6 @@
 ﻿namespace TerRoguelike.Schematics
 {
+    //schematic code lifted from the Calamity Mod
     public struct ChestItem
     {
         internal int Type;

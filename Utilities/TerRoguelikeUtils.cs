@@ -28,6 +28,7 @@ namespace TerRoguelike.Utilities
         /// <param name="stepDisplace">Should the item get displaced with the player's height during the walk anim? </param>
         public static void CleanHoldStyle(Player player, float desiredRotation, Vector2 desiredPosition, Vector2 spriteSize, Vector2? rotationOriginFromCenter = null, bool noSandstorm = false, bool flipAngle = false, bool stepDisplace = true)
         {
+            //function lifted from the Calamity Mod
             if (noSandstorm)
                 player.sandStorm = false;
 
@@ -79,10 +80,11 @@ namespace TerRoguelike.Utilities
         /// Determines if a tile is solid ground based on whether it's active and not actuated or if the tile is solid in any way, including just the top.
         /// </summary>
         /// <param name="tile">The tile to check.</param>
-        public static bool IsTileSolidGround(this Tile tile) => tile != null && tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]);
+        public static bool IsTileSolidGround(this Tile tile) => tile != null && tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]); //function lifted from the Calamity Mod
 
         public static Tile ParanoidTileRetrieval(int x, int y)
         {
+            //function lifted from the Calamity Mod
             if (!WorldGen.InWorld(x, y))
                 return new Tile();
 
@@ -97,6 +99,8 @@ namespace TerRoguelike.Utilities
         /// <param name="directionOverride">An optional direction override</param>
         public static bool RotatingHitboxCollision(this Entity entity, Vector2 targetTopLeft, Vector2 targetHitboxDimensions, Vector2? directionOverride = null, float scale = 1f, float backCutoff = 1f)
         {
+            //function lifted from the Calamity Mod
+
             Vector2 lineDirection = directionOverride ?? entity.velocity;
 
             // Ensure that the line direction is a unit vector.
@@ -131,6 +135,8 @@ namespace TerRoguelike.Utilities
         /// <returns></returns>
         public static Color MulticolorLerp(float increment, params Color[] colors)
         {
+            //function lifted from the Calamity Mod
+
             increment %= 0.999f;
             int currentColorIndex = (int)(increment * colors.Length);
             Color currentColor = colors[currentColorIndex];
