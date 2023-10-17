@@ -214,6 +214,7 @@ namespace TerRoguelike.Managers
                 new DroneBuddy(),
                 new Cornucopia(),
                 new NutritiousSlime(),
+                new AllSeeingEye(),
                 new ItemPotentiometer(),
                 new BarrierSynthesizer(),
                 new JetLeg()

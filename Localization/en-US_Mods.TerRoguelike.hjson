@@ -541,4 +541,14 @@ Items: {
 			Extra copies of this item increase the fire rate of the drone, and heal amount by 8 HP/s
 			'''
 	}
+
+	AllSeeingEye: {
+		DisplayName: All-Seeing Eye
+		Tooltip:
+			'''
+			Place your cursor on enemies to steal life from them
+			The amount of life you steal is equal to 2% of your max life and is affected by bonus damage
+			Extra copies of this item increase the healing amount by 2%
+			'''
+	}
 }

@@ -19,6 +19,7 @@ using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Content;
 using TerRoguelike.Systems;
+using TerRoguelike.Items.Rare;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -74,6 +75,7 @@ namespace TerRoguelike.TerPlayer
         public int droneBuddy;
         public int cornucopia;
         public int nutritiousSlime;
+        public int allSeeingEye;
         public int itemPotentiometer;
         public int barrierSynthesizer;
         public int jetLeg;
@@ -86,10 +88,12 @@ namespace TerRoguelike.TerPlayer
         public List<int> barbedLassoTargets = new List<int>();
         public int barbedLassoHitCooldown = 0;
         public List<int> steamEngineStacks = new List<int>();
+        public int allSeeingEyeTarget = -1;
         public int droneBuddyState = 0; // 0 - passive, 1 - aggressive, 2 - healing
         public float droneBuddyAttackCooldown = 0;
         public int droneTarget = -1;
         public int droneBuddyHealTime = 0;
+        public int allSeeingEyeHitCooldown = 30;
         #endregion
 
         #region Misc Variables
@@ -177,9 +181,11 @@ namespace TerRoguelike.TerPlayer
             droneBuddy = 0;
             cornucopia = 0;
             nutritiousSlime = 0;
+            allSeeingEye = 0;
             itemPotentiometer = 0;
             barrierSynthesizer = 0;
             jetLeg = 0;
+
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
@@ -600,6 +606,67 @@ namespace TerRoguelike.TerPlayer
             else
             {
                 droneBuddyHealTime = 0;
+            }
+
+            if (allSeeingEye > 0)
+            {
+                if (allSeeingEyeTarget != -1)
+                {
+                    NPC npc = Main.npc[allSeeingEyeTarget];
+                    if (!npc.active || npc.life <= 0 || !npc.CanBeChasedBy())
+                        allSeeingEyeTarget = -1;
+                }
+
+                if (allSeeingEyeHitCooldown <= 0)
+                {
+                    allSeeingEyeTarget = -1;
+                    for (int i = 0; i < Main.maxNPCs; i++)
+                    {
+                        NPC npc = Main.npc[i];
+                        if (!npc.active || npc.life <= 0 || !npc.CanBeChasedBy())
+                            continue;
+
+                        if (npc.getRect().Contains(Main.MouseWorld.ToPoint()))
+                        {
+                            allSeeingEyeTarget = i;
+                            break;
+                        }
+                    }
+                }
+
+                if (allSeeingEyeTarget != -1 && allSeeingEyeHitCooldown <= 0)
+                {
+                    NPC target = Main.npc[allSeeingEyeTarget];
+                    int hitDamage = (int)(Player.statLifeMax2 * 0.02f * allSeeingEye);
+                    hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.getRect().ClosestPointInRect(Player.Center)));
+
+                    if (target.life - hitDamage <= 0)
+                    {
+                        OnKillEffects(target);
+                    }
+                    NPC.HitInfo info = new NPC.HitInfo();
+                    info.HideCombatText = true;
+                    info.Damage = hitDamage;
+                    info.InstantKill = false;
+                    info.HitDirection = 1;
+                    info.Knockback = 0f;
+                    info.Crit = false;
+
+                    target.StrikeNPC(info);
+                    NetMessage.SendStrikeNPC(target, info);
+                    CombatText.NewText(target.getRect(), Color.DarkGreen, hitDamage);
+
+                    allSeeingEyeHitCooldown += 30;
+                    ScaleableHeal(hitDamage);
+                }
+
+                if (allSeeingEyeHitCooldown > 0)
+                    allSeeingEyeHitCooldown--;
+            }
+            else
+            {
+                allSeeingEyeTarget = -1;
+                allSeeingEyeHitCooldown = 30;
             }
         }
         public override void PostUpdateEquips()
@@ -1391,6 +1458,25 @@ namespace TerRoguelike.TerPlayer
             }
             else
                 droneBuddyVisualPosition = Vector2.Zero;
+
+            if (allSeeingEye > 0)
+            {
+                if (allSeeingEyeTarget != -1)
+                {
+                    NPC npc = Main.npc[allSeeingEyeTarget];
+
+                    Vector2 distanceVector = npc.Center - Player.MountedCenter;
+                    for (int d = 0; d < 2; d++)
+                    {
+                        Vector2 placement = distanceVector.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(1f, distanceVector.Length());
+                        Vector2 dustPosition = placement;
+                        Dust dust = Dust.NewDustPerfect(Player.MountedCenter + dustPosition, DustID.GreenTorch, placement.Length() * (-placement.SafeNormalize(Vector2.UnitY)) * 0.05f + Player.velocity);
+                        dust.noGravity = true;
+                        dust.noLight = true;
+                        dust.noLightEmittence = true;
+                    }
+                }
+            }
 
             return;
 
