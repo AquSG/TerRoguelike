@@ -73,6 +73,7 @@ namespace TerRoguelike.TerPlayer
         public int volatileRocket;
         public int theDreamsoul;
         public int droneBuddy;
+        public int overclocker;
         public int cornucopia;
         public int nutritiousSlime;
         public int allSeeingEye;
@@ -94,6 +95,7 @@ namespace TerRoguelike.TerPlayer
         public int droneTarget = -1;
         public int droneBuddyHealTime = 0;
         public int allSeeingEyeHitCooldown = 30;
+        public int overclockerTime = 0;
         #endregion
 
         #region Misc Variables
@@ -179,6 +181,7 @@ namespace TerRoguelike.TerPlayer
             volatileRocket = 0;
             theDreamsoul = 0;
             droneBuddy = 0;
+            overclocker = 0;
             cornucopia = 0;
             nutritiousSlime = 0;
             allSeeingEye = 0;
@@ -250,8 +253,19 @@ namespace TerRoguelike.TerPlayer
 
                 if (timeAttacking > 0)
                     timeAttacking = 0;
+
+                if (overclocker > 0)
+                {
+                    if (overclockerTime < 360)
+                    {
+                        overclockerTime += overclocker;
+                        if (overclockerTime > 360)
+                            overclockerTime = 360;
+                    }
+                        
+                }
             }
-                
+            
             //max life effects happen before barrier calculations
             if (bottleOfVigor > 0)
             {
@@ -608,6 +622,18 @@ namespace TerRoguelike.TerPlayer
                 droneBuddyHealTime = 0;
             }
 
+            if (overclocker > 0)
+            {
+                if (overclockerTime > 0 && timeAttacking > 0)
+                {
+                    float attackSpeedIncrease = (float)Math.Pow(overclockerTime / 180f, 2f);
+                    Player.GetAttackSpeed(DamageClass.Generic) += attackSpeedIncrease;
+                    overclockerTime -= 3;
+                }
+            }
+            else
+                overclockerTime = 0;
+            
             if (allSeeingEye > 0)
             {
                 if (allSeeingEyeTarget != -1)
@@ -1330,6 +1356,25 @@ namespace TerRoguelike.TerPlayer
 
             }
 
+            if (overclockerTime > 0)
+            {
+                r += (1f - r) * (overclockerTime / 360f);
+                g -= g * (overclockerTime / 360f) * 0.5f;
+                b -= b * (overclockerTime / 360f) * 0.5f;
+
+                if (overclockerTime >= 180)
+                {
+                    float rate = overclockerTime == 360 ? 0.2f : 0.5f;
+                    if (Main.GlobalTimeWrappedHourly % rate <= 0.017f)
+                    {
+                        int chosenSmoke = Main.rand.Next(3);
+                        int goreID = chosenSmoke == 0 ? GoreID.Smoke1 : (chosenSmoke == 1 ? GoreID.Smoke2 : GoreID.Smoke3);
+                        Gore smoke = Gore.NewGoreDirect(Player.GetSource_FromThis(), Player.Top + new Vector2(-16, -16), -Vector2.UnitY, goreID, 0.5f);
+                        smoke.alpha = 150;
+                    }
+                }   
+            }
+
             if (soulOfLena > 0)
             {
                 bool hurtCheck = Player.immuneTime > 0 && soulOfLenaHurtVisual;
@@ -1477,7 +1522,6 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
-
             return;
 
             if (evilEye > 0)
@@ -1652,13 +1696,13 @@ namespace TerRoguelike.TerPlayer
             protected override void Draw(ref PlayerDrawSet drawInfo)
             {
                 Player drawPlayer = drawInfo.drawPlayer;
-                TerRoguelikePlayer modPLayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
+                TerRoguelikePlayer modPlayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
 
                 List<DrawData> existingDrawData = drawInfo.DrawDataCache;
                 for (int i = 0; i < 4; i++)
                 {
                     float scale = 0.8f + 0.08f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi));
-                    float opacity = (0.13f + (0.23f * (0.5f + (modPLayer.barrierHealth / drawPlayer.statLifeMax2)))) * 0.3f;
+                    float opacity = (0.13f + (0.23f * (0.5f + (modPlayer.barrierHealth / drawPlayer.statLifeMax2)))) * 0.3f;
                     List<DrawData> afterimages = new List<DrawData>();
                     for (int j = 0; j < existingDrawData.Count; j++)
                     {

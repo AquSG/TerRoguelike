@@ -551,4 +551,13 @@ Items: {
 			Extra copies of this item increase the healing amount by 2%
 			'''
 	}
+
+	Overclocker: {
+		DisplayName: Overclocker
+		Tooltip:
+			'''
+			Build up a burst of up to 400% increased attack speed after not attacking for up to 6 seconds
+			Extra copies of this item increase the buildup rate by 100%
+			'''
+	}
 }

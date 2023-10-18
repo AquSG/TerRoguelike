@@ -99,7 +99,7 @@ namespace TerRoguelike.Utilities
         /// <param name="directionOverride">An optional direction override</param>
         public static bool RotatingHitboxCollision(this Entity entity, Vector2 targetTopLeft, Vector2 targetHitboxDimensions, Vector2? directionOverride = null, float scale = 1f, float backCutoff = 1f)
         {
-            //function lifted from the Calamity Mod
+            //function lifted from the Calamity Mod. return statement edited due to an oversight where if the entity hitbox was 100% encased within the target hitbox, it would only hit if the outlines barely overlapped.
 
             Vector2 lineDirection = directionOverride ?? entity.velocity;
 
@@ -109,7 +109,8 @@ namespace TerRoguelike.Utilities
             Vector2 end = entity.Center + lineDirection * entity.height * 0.5f * scale;
 
             float _ = 0f;
-            return Collision.CheckAABBvLineCollision(targetTopLeft, targetHitboxDimensions, start, end, entity.width * scale, ref _);
+
+            return Collision.CheckAABBvLineCollision(targetTopLeft, targetHitboxDimensions, start, end, entity.width * scale, ref _) || new Rectangle((int)targetTopLeft.X, (int)targetTopLeft.Y, (int)targetHitboxDimensions.X, (int)targetHitboxDimensions.Y).Contains(entity.Center.ToPoint());
         }
         /// <summary>
         /// Returns whether a proc should occur or not with the given chance.
