@@ -560,4 +560,13 @@ Items: {
 			Extra copies of this item increase the buildup rate by 100%
 			'''
 	}
+
+	GiantDoorShield: {
+		DisplayName: Giant Door Shield
+		Tooltip:
+			'''
+			+100 diminishing DR which only affects barrier health
+			Extra copies of this item increase the diminishing DR by 100
+			'''
+	}
 }

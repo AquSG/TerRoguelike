@@ -80,6 +80,7 @@ namespace TerRoguelike.TerPlayer
         public int itemPotentiometer;
         public int barrierSynthesizer;
         public int jetLeg;
+        public int giantDoorShield;
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -117,6 +118,7 @@ namespace TerRoguelike.TerPlayer
         public bool dodgeAttack = false;
         public float healMultiplier = 1f;
         public float diminishingDR = 0f;
+        public float barrierDiminishingDR = 0f;
         public bool onGround = false;
         public float previousBonusDamageMulti = 1f;
         public int timeAttacking = 0;
@@ -188,6 +190,7 @@ namespace TerRoguelike.TerPlayer
             itemPotentiometer = 0;
             barrierSynthesizer = 0;
             jetLeg = 0;
+            giantDoorShield = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -196,6 +199,7 @@ namespace TerRoguelike.TerPlayer
             scaleMultiplier = 1f;
             healMultiplier = 1f;
             diminishingDR = 0f;
+            barrierDiminishingDR = 0f;
             previousBonusDamageMulti = 1f;
 
             onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
@@ -633,6 +637,12 @@ namespace TerRoguelike.TerPlayer
             }
             else
                 overclockerTime = 0;
+
+            if (giantDoorShield > 0)
+            {
+                float barrierDiminishingDRIncrease = 100f * giantDoorShield;
+                barrierDiminishingDR += barrierDiminishingDRIncrease;
+            }
             
             if (allSeeingEye > 0)
             {
@@ -1034,16 +1044,32 @@ namespace TerRoguelike.TerPlayer
                 int reductedDamage = 5 * flimsyPauldron;
                 info.Damage -= reductedDamage;
             }
-            if (barrierHealth > 1 && info.Damage > (int)barrierHealth)
+            if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)
             {
                 int preBarrierDamage = info.Damage;
                 info.Damage -= (int)barrierHealth;
                 barrierFullAbsorbHit = true;
-                BarrierHitEffect(info.Damage + (int)barrierHealth, preBarrierDamage);
+                BarrierHitEffect((int)barrierHealth, preBarrierDamage);
             }
         }
         public void BarrierHitEffect(int damageToBarrier, int fullHitDamage)
         {
+            Main.NewText(damageToBarrier.ToString());
+            if (barrierDiminishingDR != 0)
+            {
+                int damageChange = 0;
+                if (barrierDiminishingDR > 0)
+                    damageChange = (int)(damageToBarrier * ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR))));
+                else
+                    damageChange = (int)(damageToBarrier * (2 - ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR))))) - damageToBarrier;
+
+                Main.NewText(damageChange.ToString());
+
+                damageToBarrier += damageChange;
+                fullHitDamage += damageChange;
+            }
+            if (damageToBarrier < 1)
+                damageToBarrier = 1;
             barrierInHurt = damageToBarrier;
             CombatText.NewText(Player.getRect(), Color.Gold, damageToBarrier > (int)barrierHealth ? -(int)barrierHealth : -damageToBarrier);
             SoundStyle soundStyle = damageToBarrier < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
