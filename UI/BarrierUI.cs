@@ -36,6 +36,9 @@ namespace TerRoguelike.UI
 
         public static void Draw(SpriteBatch spriteBatch, Player player)
         {
+            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+            if (player.dead || modPlayer.deathEffectTimer > 0)
+                return;
 
             Vector2 barrierScreenRatioPos = new Vector2(((float)Main.screenWidth - (Main.UIScale * 361f)), (Main.UIScale * 32f));
             // Convert the screen ratio position to an absolute position in pixels
@@ -43,9 +46,6 @@ namespace TerRoguelike.UI
             Vector2 barrierScreenPos = barrierScreenRatioPos;
             barrierScreenPos.X = (int)(barrierScreenPos.X);
             barrierScreenPos.Y = (int)(barrierScreenPos.Y);
-
-            // Grab the ModPlayer object and draw if applicable. If not applicable, save positions to config.
-            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
 
             DrawBarriereBar(spriteBatch, modPlayer, barrierScreenPos, player);
             

@@ -135,6 +135,11 @@ namespace TerRoguelike.TerPlayer
         public int DashDirCache = 0;
         public int deathEffectTimer = 0;
         public bool reviveDeathEffect = false;
+        public int deadTime = 0;
+        public int killerNPC = -1;
+        public int killerNPCType = 0;
+        public int killerProj = -1;
+        public int killerProjType = 0;
         #endregion
 
         #region Reset Variables
@@ -319,6 +324,9 @@ namespace TerRoguelike.TerPlayer
                 if (barrierHealth < barrierFloor)
                     barrierHealth = barrierFloor;
             }
+
+            if (deathEffectTimer > 0)
+                return;
 
             //everything else
             if (coolantCanister > 0)
@@ -1178,11 +1186,24 @@ namespace TerRoguelike.TerPlayer
                         Player.immuneNoBlink = true;
                         deathEffectTimer += 120;
                         reviveDeathEffect = true;
+                        SoundEngine.PlaySound(SoundID.PlayerKilled);
+                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/LossRevive"));
                         ZoomSystem.SetZoomAnimation(2.5f, 60);
                         return false;
                     }
                 }
             }
+            if (damageSource.SourceNPCIndex > -1 && damageSource.SourceNPCIndex < Main.maxNPCs)
+            {
+                killerNPC = damageSource.SourceNPCIndex;
+                killerNPCType = Main.npc[killerNPC].type;
+            }
+            if (damageSource.SourceProjectileLocalIndex > -1 && damageSource.SourceProjectileLocalIndex < Main.maxProjectiles)
+            {
+                killerProj = damageSource.SourceProjectileLocalIndex;
+                killerProjType = Main.projectile[damageSource.SourceProjectileLocalIndex].type;
+            }
+            SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
             ZoomSystem.SetZoomAnimation(2.5f, 60);
             deathEffectTimer += 120;
             return true;
@@ -1328,7 +1349,7 @@ namespace TerRoguelike.TerPlayer
         #region Draw Effects
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
-            if (deathEffectTimer > 0)
+            if (deathEffectTimer > 0 || Player.dead)
             {
                 r = 0f;
                 g = 0f;
@@ -1817,8 +1838,6 @@ namespace TerRoguelike.TerPlayer
         #region Death Effect
         public void DoDeathEffect()
         {
-            Main.hideUI = true;
-
             Texture2D ghostTex = TextureAssets.Npc[NPCID.Ghost].Value;
             int frameCount = Main.npcFrameCount[NPCID.Ghost];
             int frameHeight = ghostTex.Height / frameCount;
@@ -1851,14 +1870,17 @@ namespace TerRoguelike.TerPlayer
             deathEffectTimer--;
             if (deathEffectTimer <= 0)
             {
+                if (reviveDeathEffect)
+                    SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f });
                 reviveDeathEffect = false;
-                Main.hideUI = false;
                 Player.immuneNoBlink = false;
             }
         }
         public override void OnRespawn()
         {
             ZoomSystem.SetZoomAnimation(1f, 20);
+            killerNPC = -1;
+            killerProj = -1;
         }
         #endregion
     }

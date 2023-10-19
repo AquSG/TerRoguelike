@@ -143,6 +143,7 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            ZoomSystem.SetZoomAnimation(1f, 2);
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -203,6 +204,10 @@ namespace TerRoguelike.Systems
         }
         public override void PostDrawTiles()
         {
+            Player player = Main.player[Main.myPlayer];
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld && player.dead)
+                player.respawnTimer = 60;
+
             DrawDeathScene();
             DrawPendingEnemies();
             DrawHealingPulse();
@@ -330,6 +335,10 @@ namespace TerRoguelike.Systems
                     Main.spriteBatch.Begin();
                     modPlayer.DoDeathEffect();
                     Main.spriteBatch.End();
+                }
+                if (player.dead)
+                {
+                    modPlayer.deadTime++;
                 }
             }
         }
