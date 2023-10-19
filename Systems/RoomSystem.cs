@@ -23,6 +23,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.Audio;
 using System.IO;
+using Terraria.UI;
 
 namespace TerRoguelike.Systems
 {
@@ -202,6 +203,7 @@ namespace TerRoguelike.Systems
         }
         public override void PostDrawTiles()
         {
+            DrawDeathScene();
             DrawPendingEnemies();
             DrawHealingPulse();
 
@@ -316,6 +318,22 @@ namespace TerRoguelike.Systems
                 }
             }
         }
+
+        public void DrawDeathScene()
+        {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                Player player = Main.player[Main.myPlayer];
+                TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                if (modPlayer.deathEffectTimer > 0)
+                {
+                    Main.spriteBatch.Begin();
+                    modPlayer.DoDeathEffect();
+                    Main.spriteBatch.End();
+                }
+            }
+        }
+
         /// <summary>
         /// Draw the first frame of each pending enemy's animation as an attempt to telegraph what is spawning there
         /// </summary>

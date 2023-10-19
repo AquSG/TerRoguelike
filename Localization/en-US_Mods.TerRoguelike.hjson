@@ -569,4 +569,15 @@ Items: {
 			Extra copies of this item increase the diminishing DR by 100
 			'''
 	}
+
+	TrumpCard: {
+		DisplayName: Trump Card
+		Tooltip:
+			'''
+			+1 revive
+			Upon death, this item is consumed instead.
+			You also gain some immunity frames, and heal to maximum health and barrier
+			Extra copies of this item grant +1 more revive
+			'''
+	}
 }

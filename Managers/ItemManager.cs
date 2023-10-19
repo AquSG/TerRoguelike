@@ -219,7 +219,8 @@ namespace TerRoguelike.Managers
                 new ItemPotentiometer(),
                 new BarrierSynthesizer(),
                 new JetLeg(),
-                new GiantDoorShield()
+                new GiantDoorShield(),
+                new TrumpCard()
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();

@@ -20,6 +20,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Content;
 using TerRoguelike.Systems;
 using TerRoguelike.Items.Rare;
+using Terraria.GameContent;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -81,6 +82,7 @@ namespace TerRoguelike.TerPlayer
         public int barrierSynthesizer;
         public int jetLeg;
         public int giantDoorShield;
+        public int trumpCard;
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -131,6 +133,8 @@ namespace TerRoguelike.TerPlayer
         public int DashDelay = 0;
         public int DashTime = -6;
         public int DashDirCache = 0;
+        public int deathEffectTimer = 0;
+        public bool reviveDeathEffect = false;
         #endregion
 
         #region Reset Variables
@@ -191,6 +195,7 @@ namespace TerRoguelike.TerPlayer
             barrierSynthesizer = 0;
             jetLeg = 0;
             giantDoorShield = 0;
+            trumpCard = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -745,6 +750,26 @@ namespace TerRoguelike.TerPlayer
         }
         public override void PreUpdateMovement()
         {
+            if (deathEffectTimer > 0)
+            {
+                Player.immuneTime = 360;
+                Player.immune = true;
+                Player.immuneNoBlink = true;
+                Player.velocity = Vector2.Zero;
+                Player.controlDown = false;
+                Player.controlUp = false;
+                Player.controlRight = false;
+                Player.controlLeft = false;
+                Player.controlMount = false;
+                Player.controlHook = false;
+                Player.controlInv = false;
+                Player.controlCreativeMenu = false;
+                Player.controlUseItem = false;
+                Player.controlUseTile = false;
+                Player.controlJump = false;
+                Player.itemTime = 1;
+                Player.itemAnimation = 1;
+            }
             if (jetLeg > 0)
             {
                 if (DashDir != 0 && DashDelay == 0)
@@ -1054,7 +1079,6 @@ namespace TerRoguelike.TerPlayer
         }
         public void BarrierHitEffect(int damageToBarrier, int fullHitDamage)
         {
-            Main.NewText(damageToBarrier.ToString());
             if (barrierDiminishingDR != 0)
             {
                 int damageChange = 0;
@@ -1062,8 +1086,6 @@ namespace TerRoguelike.TerPlayer
                     damageChange = (int)(damageToBarrier * ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR))));
                 else
                     damageChange = (int)(damageToBarrier * (2 - ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR))))) - damageToBarrier;
-
-                Main.NewText(damageChange.ToString());
 
                 damageToBarrier += damageChange;
                 fullHitDamage += damageChange;
@@ -1137,6 +1159,32 @@ namespace TerRoguelike.TerPlayer
                     SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.25f }, Player.Center);
                 }
             }
+        }
+        public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
+        {
+            if (trumpCard > 0)
+            {
+                for (int inventoryItem = 0; inventoryItem < 50; inventoryItem++)
+                {
+                    Item item = Player.inventory[inventoryItem];
+                    if (item.type == ModContent.ItemType<TrumpCard>())
+                    {
+                        item.stack--;
+
+                        Player.statLife = Player.statLifeMax2;
+                        barrierHealth = Player.statLifeMax2;
+                        Player.immuneTime = 360;
+                        Player.immune = true;
+                        Player.immuneNoBlink = true;
+                        deathEffectTimer += 120;
+                        reviveDeathEffect = true;
+                        return false;
+                    }
+                }
+            }
+
+            deathEffectTimer += 120;
+            return true;
         }
         #endregion
 
@@ -1279,6 +1327,15 @@ namespace TerRoguelike.TerPlayer
         #region Draw Effects
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
+            if (deathEffectTimer > 0)
+            {
+                r = 0f;
+                g = 0f;
+                b = 0f;
+                a = 0f;
+                return;
+            }
+
             float closestNPCDistance = -1f;
             for (int i = 0; i < Main.maxNPCs; i++)
             {
@@ -1713,7 +1770,8 @@ namespace TerRoguelike.TerPlayer
             public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
             {
                 Player drawPlayer = drawInfo.drawPlayer;
-                if (drawInfo.shadow != 0f || drawPlayer.dead || (drawPlayer.immuneAlpha > 120))
+                TerRoguelikePlayer modPlayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
+                if (drawInfo.shadow != 0f || drawPlayer.dead || (drawPlayer.immuneAlpha > 120) || modPlayer.deathEffectTimer > 0)
                     return false;
 
                 return drawInfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().barrierHealth > 1f;
@@ -1752,6 +1810,43 @@ namespace TerRoguelike.TerPlayer
             Player.immuneTime++;
             Player.immune = true;
             Player.immuneNoBlink = true;
+        }
+        #endregion
+
+        #region Death Effect
+        public void DoDeathEffect()
+        {
+            Main.hideUI = true;
+
+            Texture2D ghostTex = TextureAssets.Npc[NPCID.Ghost].Value;
+            int frameCount = Main.npcFrameCount[NPCID.Ghost];
+            int frameHeight = ghostTex.Height / frameCount;
+            int frame = (int)((Main.GlobalTimeWrappedHourly / 0.25f) % frameCount);
+            Vector2 offset;
+            float opacity;
+            if (reviveDeathEffect)
+            {
+                float posInterpolant = (float)-Math.Abs(Math.Pow((deathEffectTimer / 120f * 2f) - 1, 3)) + 1f;
+                offset = new Vector2(0, MathHelper.Lerp(0, -80f, posInterpolant));
+                opacity = 1f;
+            }
+            else
+            {
+                float posInterpolant = MathHelper.Clamp((float)-Math.Pow(deathEffectTimer / 120f, 3) + 1f, 0, 1f);
+                offset = new Vector2(0, MathHelper.Lerp(0, -80f, posInterpolant));
+                opacity = MathHelper.Clamp(MathHelper.Lerp(0f, 1f, (deathEffectTimer) / 60f), 0f, 1f);
+            }
+            
+            
+            Main.EntitySpriteDraw(ghostTex, Player.Center - Main.screenPosition + offset, new Rectangle(0, frameHeight * frame, ghostTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(ghostTex.Width * 0.5f, (frameHeight * 0.5f)), 1f, SpriteEffects.None);
+
+            deathEffectTimer--;
+            if (deathEffectTimer <= 0)
+            {
+                reviveDeathEffect = false;
+                Main.hideUI = false;
+                Player.immuneNoBlink = false;
+            }
         }
         #endregion
     }
