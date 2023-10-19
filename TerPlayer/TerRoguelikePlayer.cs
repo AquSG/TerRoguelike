@@ -1178,11 +1178,12 @@ namespace TerRoguelike.TerPlayer
                         Player.immuneNoBlink = true;
                         deathEffectTimer += 120;
                         reviveDeathEffect = true;
+                        ZoomSystem.SetZoomAnimation(2.5f, 60);
                         return false;
                     }
                 }
             }
-
+            ZoomSystem.SetZoomAnimation(2.5f, 60);
             deathEffectTimer += 120;
             return true;
         }
@@ -1821,14 +1822,21 @@ namespace TerRoguelike.TerPlayer
             Texture2D ghostTex = TextureAssets.Npc[NPCID.Ghost].Value;
             int frameCount = Main.npcFrameCount[NPCID.Ghost];
             int frameHeight = ghostTex.Height / frameCount;
-            int frame = (int)((Main.GlobalTimeWrappedHourly / 0.25f) % frameCount);
+            int frame = (int)((Main.GlobalTimeWrappedHourly / 0.15f) % frameCount);
             Vector2 offset;
             float opacity;
             if (reviveDeathEffect)
             {
                 float posInterpolant = (float)-Math.Abs(Math.Pow((deathEffectTimer / 120f * 2f) - 1, 3)) + 1f;
+                if (deathEffectTimer <= 60)
+                    posInterpolant = (float)MathHelper.Clamp(posInterpolant * 2f, 0, 1f);
                 offset = new Vector2(0, MathHelper.Lerp(0, -80f, posInterpolant));
-                opacity = 1f;
+                float opacityInterpolant = (deathEffectTimer) / 90f;
+                if (deathEffectTimer <= 30)
+                    opacityInterpolant = 1f - ((deathEffectTimer + 30) / 90f);
+                opacity = MathHelper.Clamp(MathHelper.Lerp(0.3f, 1f, opacityInterpolant), 0f, 1f);
+                if (deathEffectTimer == 20)
+                    ZoomSystem.SetZoomAnimation(1f, 20);
             }
             else
             {
@@ -1838,7 +1846,7 @@ namespace TerRoguelike.TerPlayer
             }
             
             
-            Main.EntitySpriteDraw(ghostTex, Player.Center - Main.screenPosition + offset, new Rectangle(0, frameHeight * frame, ghostTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(ghostTex.Width * 0.5f, (frameHeight * 0.5f)), 1f, SpriteEffects.None);
+            Main.EntitySpriteDraw(ghostTex, Player.Center - Main.screenPosition + (offset * ZoomSystem.zoomOverride), new Rectangle(0, frameHeight * frame, ghostTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(ghostTex.Width * 0.5f, (frameHeight * 0.5f)), ZoomSystem.zoomOverride, SpriteEffects.None);
 
             deathEffectTimer--;
             if (deathEffectTimer <= 0)
@@ -1847,6 +1855,10 @@ namespace TerRoguelike.TerPlayer
                 Main.hideUI = false;
                 Player.immuneNoBlink = false;
             }
+        }
+        public override void OnRespawn()
+        {
+            ZoomSystem.SetZoomAnimation(1f, 20);
         }
         #endregion
     }
