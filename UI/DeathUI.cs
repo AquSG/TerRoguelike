@@ -15,6 +15,9 @@ using ReLogic.Graphics;
 using Terraria.ID;
 using Terraria.Graphics;
 using Terraria.GameContent;
+using TerRoguelike.Managers;
+using System.Linq;
+using TerRoguelike.Items;
 
 namespace TerRoguelike.UI
 {
@@ -22,11 +25,13 @@ namespace TerRoguelike.UI
     {
         private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex;
         private static Vector2 mainMenuButtonOffset = new Vector2(0, 206);
+        public static List<Item> itemsToDraw;
         internal static void Load()
         {
             baseUITex = ModContent.Request<Texture2D>("TerRoguelike/UI/DeathUI", AssetRequestMode.ImmediateLoad).Value;
             mainMenuButtonTex = ModContent.Request<Texture2D>("TerRoguelike/UI/MenuButton", AssetRequestMode.ImmediateLoad).Value;
             mainMenuButtonHoverTex = ModContent.Request<Texture2D>("TerRoguelike/UI/MenuButtonHover", AssetRequestMode.ImmediateLoad).Value;
+            itemsToDraw = new List<Item>();
             Reset();
         }
 
@@ -34,6 +39,7 @@ namespace TerRoguelike.UI
         {
             Reset();
             baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = null;
+            itemsToDraw = null;
         }
 
         internal static void Reset()
@@ -59,7 +65,7 @@ namespace TerRoguelike.UI
             bool mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
 
             MouseState ms = Mouse.GetState();
-            if (ms.LeftButton == ButtonState.Pressed && mainMenuHover)
+            if (ms.LeftButton == ButtonState.Pressed && mainMenuHover && modPlayer.deadTime > 150)
             {
                 WorldGen.SaveAndQuit();
             }
@@ -70,6 +76,9 @@ namespace TerRoguelike.UI
         #region Draw Death UI
         private static void DrawDeathUI(SpriteBatch spriteBatch, TerRoguelikePlayer modPlayer, Vector2 screenPos, Player player, bool mainMenuHover)
         {
+            //if (!modPlayer.inWorld)
+                //return;
+
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (modPlayer.deadTime - 120) / 60f), 0, 1f);
             // Draw the border of the Barrier Bar first
             spriteBatch.Draw(baseUITex, screenPos, null, Color.White * 0.85f * opacity, 0f, baseUITex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
@@ -86,13 +95,14 @@ namespace TerRoguelike.UI
                     scale = verticalScale;
                 else
                     scale = horizontalScale;
+                if (scale > 4f)
+                    scale = 4f;
                 spriteBatch.Draw(enemyTex, screenPos + new Vector2(240, -40), new Rectangle(0, frameHeight, enemyTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(enemyTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
             }
             else if (modPlayer.killerProj != -1)
             {
-
                 Texture2D projTex = TextureAssets.Projectile[modPlayer.killerProjType].Value;
-                int frameHeight = projTex.Height / Main.npcFrameCount[modPlayer.killerNPCType];
+                int frameHeight = projTex.Height / Main.projFrames[modPlayer.killerProjType];
                 float horizontalScale = 180f / (float)projTex.Width;
                 float verticalScale = 250f / (float)frameHeight;
                 float scale;
@@ -100,8 +110,58 @@ namespace TerRoguelike.UI
                     scale = verticalScale;
                 else
                     scale = horizontalScale;
-                spriteBatch.Draw(projTex, screenPos + new Vector2(240, -40), new Rectangle(0, frameHeight, projTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(projTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
+                if (scale > 4f)
+                    scale = 4f;
+                spriteBatch.Draw(projTex, screenPos + new Vector2(240, -40), new Rectangle(0, 0, projTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(projTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
             }
+
+            if (!itemsToDraw.Any())
+            {
+                for (int invItem = 0; invItem < 50; invItem++)
+                {
+                    Item item = player.inventory[invItem];
+                    int rogueItemType = ItemManager.AllItems.FindIndex(x => x.modItemID == item.type);
+                    if (rogueItemType != -1)
+                    {
+                        itemsToDraw.Add(item);
+                    }
+                }
+            }
+
+            if (itemsToDraw.Any())
+            {
+                Vector2 itemDrawStartPos = new Vector2(-346, -180);
+                Vector2 itemDisplayDimensions = new Vector2(48, 48);
+                Vector2 itemDisplayPadding = new Vector2(1, 2);
+                for (int i = 0; i < itemsToDraw.Count; i++)
+                {
+                    Item item = itemsToDraw[i];
+                    Texture2D itemTex;
+                    int xMultiplier = i % 10;
+                    int yMultiplier = i / 10;
+                    float scale;
+                    Rectangle rect;
+                    Main.GetItemDrawFrame(item.type, out itemTex, out rect);
+                    if (itemTex.Width < itemTex.Height)
+                    {
+                        scale = 1f / (rect.Height / itemDisplayDimensions.Y);
+                    }
+                    else
+                    {
+                        scale = 1f / (itemTex.Width / itemDisplayDimensions.X);
+                    }
+                    if (scale > 1f)
+                        scale = 1f;
+                    Vector2 itemDrawPos = itemDrawStartPos + new Vector2((itemDisplayDimensions.X + itemDisplayPadding.X) * xMultiplier, (itemDisplayDimensions.Y + itemDisplayPadding.Y) * yMultiplier);
+                    spriteBatch.Draw(itemTex, screenPos + itemDrawPos, rect, Color.White * opacity, 0f, rect.Size() * 0.5f, scale, SpriteEffects.None, 0);
+                    if (item.stack > 1)
+                    {
+                        float textOffset = 8f - (6f * (item.stack.ToString().Count() - 1));
+                        ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.MouseText.Value, item.stack.ToString(), screenPos + itemDrawPos + (Vector2.UnitX * textOffset), Color.White * opacity, 0f, Vector2.Zero, new Vector2(1f));
+                    }
+                }
+            }
+            
             Texture2D finalMainMenuButtonTex = mainMenuHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
             spriteBatch.Draw(finalMainMenuButtonTex, screenPos + mainMenuButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Main Menu", screenPos + (mainMenuHover ? new Vector2(-108, 182) : new Vector2(-95, 185)), (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, Vector2.Zero, new Vector2(mainMenuHover ? 1f : 0.9f));

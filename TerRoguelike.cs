@@ -16,9 +16,9 @@ namespace TerRoguelike
         {
             Instance = this;
             SchematicManager.Load();
+            ItemManager.Load();
             BarrierUI.Load();
             DeathUI.Load();
-            ItemManager.Load();
             if (!Main.dedServ)
             {
                 LoadClient();

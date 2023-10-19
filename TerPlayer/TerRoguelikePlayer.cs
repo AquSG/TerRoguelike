@@ -21,6 +21,7 @@ using ReLogic.Content;
 using TerRoguelike.Systems;
 using TerRoguelike.Items.Rare;
 using Terraria.GameContent;
+using TerRoguelike.UI;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -1318,6 +1319,7 @@ namespace TerRoguelike.TerPlayer
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
             }
+            DeathUI.itemsToDraw.Clear();
         }
         #endregion
 
@@ -1881,6 +1883,7 @@ namespace TerRoguelike.TerPlayer
             ZoomSystem.SetZoomAnimation(1f, 20);
             killerNPC = -1;
             killerProj = -1;
+            DeathUI.itemsToDraw.Clear();
         }
         #endregion
     }
