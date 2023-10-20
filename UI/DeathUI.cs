@@ -18,13 +18,16 @@ using Terraria.GameContent;
 using TerRoguelike.Managers;
 using System.Linq;
 using TerRoguelike.Items;
+using TerRoguelike.MainMenu;
+using TerRoguelike.World;
 
 namespace TerRoguelike.UI
 {
     public static class DeathUI
     {
         private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex;
-        private static Vector2 mainMenuButtonOffset = new Vector2(0, 206);
+        private static Vector2 mainMenuButtonOffset = new Vector2(-200, 206);
+        private static Vector2 restartButtonOffset = new Vector2(200, 206);
         public static List<Item> itemsToDraw;
         internal static void Load()
         {
@@ -57,24 +60,45 @@ namespace TerRoguelike.UI
             DeathUIScreenPos.X = (int)(DeathUIScreenPos.X);
             DeathUIScreenPos.Y = (int)(DeathUIScreenPos.Y);
 
-            float uiScale = Main.UIScale;
             Rectangle mouseHitbox = new Rectangle((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y, 8, 8);
 
-            Rectangle mainMenuBar = Utils.CenteredRectangle(DeathUIScreenPos + mainMenuButtonOffset, mainMenuButtonTex.Size() * uiScale);
+            Rectangle mainMenuBar = Utils.CenteredRectangle(DeathUIScreenPos + mainMenuButtonOffset, mainMenuButtonTex.Size());
+            Rectangle restartBar = Utils.CenteredRectangle(DeathUIScreenPos + restartButtonOffset, mainMenuButtonTex.Size());
 
             bool mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
+            bool restartHover = mouseHitbox.Intersects(restartBar);
 
             MouseState ms = Mouse.GetState();
             if (ms.LeftButton == ButtonState.Pressed && mainMenuHover && modPlayer.deadTime > 150)
             {
+                if (TerRoguelikeWorld.IsDeletableOnExit)
+                {
+                    TerRoguelikeMenu.wipeTempPlayer = true;
+                    TerRoguelikeMenu.wipeTempWorld = true;
+                }
+                WorldGen.SaveAndQuit();
+            }
+            else if (ms.LeftButton == ButtonState.Pressed && restartHover && modPlayer.deadTime > 150)
+            {
+                if (TerRoguelikeWorld.IsDeletableOnExit)
+                {
+                    IEnumerable<Item> vanillaItems = from item in player.inventory
+                                                     where !item.IsAir
+                                                     select item into x
+                                                     select x.Clone();
+                    List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
+                    PlayerLoader.SetStartInventory(player, startingItems);
+                    TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                    TerRoguelikeMenu.wipeTempWorld = true;
+                }
                 WorldGen.SaveAndQuit();
             }
 
-            DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover);   
+            DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);   
         }
 
         #region Draw Death UI
-        private static void DrawDeathUI(SpriteBatch spriteBatch, TerRoguelikePlayer modPlayer, Vector2 screenPos, Player player, bool mainMenuHover)
+        private static void DrawDeathUI(SpriteBatch spriteBatch, TerRoguelikePlayer modPlayer, Vector2 screenPos, Player player, bool mainMenuHover, bool restartHover)
         {
             //if (!modPlayer.inWorld)
                 //return;
@@ -163,8 +187,11 @@ namespace TerRoguelike.UI
             }
             
             Texture2D finalMainMenuButtonTex = mainMenuHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
+            Texture2D finalRestartButtonTex = restartHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
             spriteBatch.Draw(finalMainMenuButtonTex, screenPos + mainMenuButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Main Menu", screenPos + (mainMenuHover ? new Vector2(-108, 182) : new Vector2(-95, 185)), (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, Vector2.Zero, new Vector2(mainMenuHover ? 1f : 0.9f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Main Menu", screenPos + (mainMenuHover ? new Vector2(-312, 182) : new Vector2(-300, 185)), (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, Vector2.Zero, new Vector2(mainMenuHover ? 1f : 0.9f));
+            spriteBatch.Draw(finalRestartButtonTex, screenPos + restartButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Quick Restart", screenPos + (restartHover ? new Vector2(78 - 12, 182) : new Vector2(78, 185)), (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, Vector2.Zero, new Vector2(restartHover ? 1f : 0.9f));
         }
         #endregion
     }

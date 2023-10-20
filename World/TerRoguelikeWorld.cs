@@ -16,5 +16,6 @@ namespace TerRoguelike.World
     public static class TerRoguelikeWorld
     {
         public static bool IsTerRoguelikeWorld = false;
+        public static bool IsDeletableOnExit = false;
     }
 }

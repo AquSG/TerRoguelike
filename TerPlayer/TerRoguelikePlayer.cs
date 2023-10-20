@@ -22,6 +22,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.Items.Rare;
 using Terraria.GameContent;
 using TerRoguelike.UI;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -1320,6 +1321,7 @@ namespace TerRoguelike.TerPlayer
                     Player.armor[3] = new Item();
             }
             DeathUI.itemsToDraw.Clear();
+            deadTime = 0;
         }
         #endregion
 
@@ -1887,6 +1889,7 @@ namespace TerRoguelike.TerPlayer
             killerNPC = -1;
             killerProj = -1;
             DeathUI.itemsToDraw.Clear();
+            deadTime = 0;
         }
         #endregion
     }

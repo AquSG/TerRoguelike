@@ -116,7 +116,9 @@ namespace TerRoguelike.Systems
         public override void SaveWorldData(TagCompound tag)
         {
             var isTerRoguelikeWorld = TerRoguelikeWorld.IsTerRoguelikeWorld;
+            var isDeletableOnExit = TerRoguelikeWorld.IsDeletableOnExit;
             tag["isTerRoguelikeWorld"] = isTerRoguelikeWorld;
+            tag["isDeletableOnExit"] = isDeletableOnExit;
 
             if (RoomList == null)
                 return;
@@ -144,7 +146,9 @@ namespace TerRoguelike.Systems
         public override void LoadWorldData(TagCompound tag)
         {
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
+            var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
+            TerRoguelikeWorld.IsDeletableOnExit = isDeletableOnExit;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
 
