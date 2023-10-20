@@ -143,7 +143,6 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
-            ZoomSystem.SetZoomAnimation(1f, 2);
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -506,6 +505,8 @@ namespace TerRoguelike.Systems
                 obtainedRoomListFromServer = false;
             else
                 obtainedRoomListFromServer = true;
+
+            ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
         }
     }
     public class HealingPulse

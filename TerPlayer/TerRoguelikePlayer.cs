@@ -1857,7 +1857,7 @@ namespace TerRoguelike.TerPlayer
                     opacityInterpolant = 1f - ((deathEffectTimer + 30) / 90f);
                 opacity = MathHelper.Clamp(MathHelper.Lerp(0.3f, 1f, opacityInterpolant), 0f, 1f);
                 if (deathEffectTimer == 20)
-                    ZoomSystem.SetZoomAnimation(1f, 20);
+                    ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
             }
             else
             {
@@ -1874,13 +1874,16 @@ namespace TerRoguelike.TerPlayer
             {
                 if (reviveDeathEffect)
                     SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f });
+                else if (!Player.dead)
+                    ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
+
                 reviveDeathEffect = false;
                 Player.immuneNoBlink = false;
             }
         }
         public override void OnRespawn()
         {
-            ZoomSystem.SetZoomAnimation(1f, 20);
+            ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
             killerNPC = -1;
             killerProj = -1;
             DeathUI.itemsToDraw.Clear();
