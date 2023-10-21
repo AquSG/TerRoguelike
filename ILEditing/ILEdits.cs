@@ -16,6 +16,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using Microsoft.Xna.Framework;
 using TerRoguelike.TerPlayer;
+using Terraria.Audio;
+using Terraria.ID;
 
 namespace TerRoguelike.ILEditing
 {
@@ -25,12 +27,13 @@ namespace TerRoguelike.ILEditing
         {
             On_Main.DamageVar_float_int_float += AdjustDamageVariance;
             On_UICharacterCreation.FinishCreatingCharacter += FinishCreatingCharacterEdit;
+            On_UICharacterCreation.Click_GoBack += ExitCreatingCharacter;
             On_WorldGen.SaveAndQuit += On_WorldGen_SaveAndQuit;
             On_PlayerDrawLayers.DrawPlayer_04_ElectrifiedDebuffBack += EditElectrifiedDisplayCondition1;
             On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
         }
 
-		private void EditElectrifiedDisplayCondition1(On_PlayerDrawLayers.orig_DrawPlayer_04_ElectrifiedDebuffBack orig, ref PlayerDrawSet drawinfo)
+        private void EditElectrifiedDisplayCondition1(On_PlayerDrawLayers.orig_DrawPlayer_04_ElectrifiedDebuffBack orig, ref PlayerDrawSet drawinfo)
 		{
 			if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
 			{
@@ -78,8 +81,18 @@ namespace TerRoguelike.ILEditing
             }
 			ThreadPool.QueueUserWorkItem(WorldGen.SaveAndQuitCallBack, callback);
 		}
+		private void ExitCreatingCharacter(On_UICharacterCreation.orig_Click_GoBack orig, UICharacterCreation self, Terraria.UI.UIMouseEvent evt, Terraria.UI.UIElement listeningElement)
+		{
+			if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
+			{
+				SoundEngine.PlaySound(SoundID.MenuClose);
+				Main.menuMode = 0;
+			}
+			else
+				orig.Invoke(self, evt, listeningElement);
 
-        private void FinishCreatingCharacterEdit(On_UICharacterCreation.orig_FinishCreatingCharacter orig, UICharacterCreation self)
+		}
+		private void FinishCreatingCharacterEdit(On_UICharacterCreation.orig_FinishCreatingCharacter orig, UICharacterCreation self)
         {
 			//tmod gonna kill me for this
 			if (TerRoguelikeMenu.prepareForRoguelikeGeneration)

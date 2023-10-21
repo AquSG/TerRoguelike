@@ -598,4 +598,13 @@ Items: {
 			Extra copies of this item make debuffs last another 100% longer
 			'''
 	}
+
+	SymbioticFungus: {
+		DisplayName: Symbiotic Fungus
+		Tooltip:
+			'''
+			Heal for 8% max life every second after standing still for more than 1 second
+			Extra copies of this item increase the healing amount by 4% max life
+			'''
+	}
 }

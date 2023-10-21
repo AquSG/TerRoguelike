@@ -72,7 +72,7 @@ namespace TerRoguelike.Systems
                     }
                 }
 
-                if (player.dead)
+                if (player.dead && TerRoguelikeWorld.IsTerRoguelikeWorld)
                 {
                     int deathIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
                     if (deathIndex != -1)

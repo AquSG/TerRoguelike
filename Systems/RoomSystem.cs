@@ -155,8 +155,11 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
             TerRoguelikeWorld.IsDeletableOnExit = isDeletableOnExit;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                RoomList = new List<Room>();
                 return;
-
+            }
+                
             if (SpawnManager.pendingEnemies != null)
                 SpawnManager.pendingEnemies.Clear();
             else

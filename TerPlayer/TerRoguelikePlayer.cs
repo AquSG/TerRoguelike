@@ -80,6 +80,7 @@ namespace TerRoguelike.TerPlayer
         public int cornucopia;
         public int nutritiousSlime;
         public int allSeeingEye;
+        public int symbioticFungus;
         public int itemPotentiometer;
         public int barrierSynthesizer;
         public int jetLeg;
@@ -87,6 +88,7 @@ namespace TerRoguelike.TerPlayer
         public int trumpCard;
         public int portableGenerator;
         public int forgottenBioWeapon;
+
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -104,6 +106,7 @@ namespace TerRoguelike.TerPlayer
         public int allSeeingEyeHitCooldown = 30;
         public int overclockerTime = 0;
         public int portableGeneratorImmuneTime = 0;
+        public int symbioticFungusHealCooldown = 60;
         #endregion
 
         #region Misc Variables
@@ -127,12 +130,14 @@ namespace TerRoguelike.TerPlayer
         public float diminishingDR = 0f;
         public float barrierDiminishingDR = 0f;
         public bool onGround = false;
+        public int standingStillTime = 0;
         public float previousBonusDamageMulti = 1f;
         public int timeAttacking = 0;
         public Vector2 lenaVisualPosition = Vector2.Zero;
         public Vector2 droneBuddyVisualPosition = Vector2.Zero;
         public float droneBuddyRotation = 0f;
         public float droneSeenRot = 0f;
+        public List<VisualFungus> visualFungi = new List<VisualFungus>();
         public int currentRoom = -1;
         public int DashDir = 0;
         public int DashDelay = 0;
@@ -201,6 +206,7 @@ namespace TerRoguelike.TerPlayer
             cornucopia = 0;
             nutritiousSlime = 0;
             allSeeingEye = 0;
+            symbioticFungus = 0;
             itemPotentiometer = 0;
             barrierSynthesizer = 0;
             jetLeg = 0;
@@ -220,6 +226,11 @@ namespace TerRoguelike.TerPlayer
             previousBonusDamageMulti = 1f;
 
             onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
+            if (onGround && !Player.controlDown && !Player.controlUp && !Player.controlLeft && !Player.controlRight)
+                standingStillTime++;
+            else
+                standingStillTime = 0;
+
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
             barrierInHurt = 0;
@@ -658,12 +669,29 @@ namespace TerRoguelike.TerPlayer
             else
                 overclockerTime = 0;
 
+            if (symbioticFungus > 0)
+            {
+                if (symbioticFungusHealCooldown > 0)
+                    symbioticFungusHealCooldown--;
+                if (standingStillTime >= 60 && symbioticFungusHealCooldown <= 0)
+                {
+                    int healAmt = (int)(Player.statLifeMax2 * (0.04f + (0.04f * symbioticFungus)));
+                    ScaleableHeal(healAmt);
+                    symbioticFungusHealCooldown += 60;
+                }
+            }
+            else
+            {
+                symbioticFungusHealCooldown = 60;
+                visualFungi.Clear();
+            }
+
             if (giantDoorShield > 0)
             {
                 float barrierDiminishingDRIncrease = 100f * giantDoorShield;
                 barrierDiminishingDR += barrierDiminishingDRIncrease;
             }
-            
+
             if (allSeeingEye > 0)
             {
                 if (allSeeingEyeTarget != -1)
@@ -1664,6 +1692,11 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+
+            if (symbioticFungus > 0)
+            {
+                DrawVisualFungi();
+            }
             return;
 
             if (evilEye > 0)
@@ -1869,6 +1902,61 @@ namespace TerRoguelike.TerPlayer
             Player.immuneTime++;
             Player.immune = true;
             Player.immuneNoBlink = true;
+        }
+        #endregion
+
+        #region Symbiotic Fungus Visuals
+
+        public void DrawVisualFungi()
+        {
+            if (standingStillTime >= 45)
+            {
+                if (Main.GlobalTimeWrappedHourly % 0.33334 < 0.016667f)
+                {
+                    Vector2 position = Player.Center + (Vector2.UnitY * 12f) + Main.rand.NextVector2CircularEdge(24f, 12f);
+                    visualFungi.Add(new VisualFungus(Main.rand.Next(150, 210), position, Main.rand.Next(0, Main.projFrames[ModContent.ProjectileType<HealingFungus>()]), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally));
+                }
+            }
+            if (!visualFungi.Any())
+            {
+                return;
+            }
+                
+            Texture2D fungTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/HealingFungus").Value;
+            int frameHeight = fungTex.Height / Main.projFrames[ModContent.ProjectileType<HealingFungus>()];
+            for (int i = 0; i < visualFungi.Count; i++)
+            {
+                VisualFungus fungus = visualFungi[i];
+
+                float opacity = 1f;
+
+                if (fungus.Lifetime < 30)
+                    opacity = MathHelper.Lerp(0f, 1f, fungus.Lifetime / 30f);
+                else if (fungus.MaxLifetime - fungus.Lifetime < 30)
+                    opacity = MathHelper.Lerp(0f, 1f, (fungus.MaxLifetime - fungus.Lifetime) / 30f);
+
+                Main.EntitySpriteDraw(fungTex, fungus.Position - Main.screenPosition, new Rectangle(0, frameHeight * fungus.Type, fungTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(fungTex.Width * 0.5f, frameHeight * 0.5f), 1f, fungus.Effects);
+                fungus.Position.Y -= 0.2f * (fungus.Lifetime / (float)fungus.MaxLifetime);
+
+                fungus.Lifetime--;
+            }
+            visualFungi.RemoveAll(x => x.Lifetime <= 0);
+        }
+        public class VisualFungus
+        {
+            public VisualFungus(int maxLifetime, Vector2 position, int type, SpriteEffects effects)
+            {
+                MaxLifetime = maxLifetime;
+                Lifetime = maxLifetime;
+                Position = position;
+                Type = type;
+                Effects = effects;
+            }
+            public int MaxLifetime = 0;
+            public int Lifetime = 0;
+            public Vector2 Position = Vector2.Zero;
+            public int Type = -1;
+            public SpriteEffects Effects = SpriteEffects.None;
         }
         #endregion
 

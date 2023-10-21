@@ -216,6 +216,7 @@ namespace TerRoguelike.Managers
                 new Cornucopia(),
                 new NutritiousSlime(),
                 new AllSeeingEye(),
+                new SymbioticFungus(),
                 new ItemPotentiometer(),
                 new BarrierSynthesizer(),
                 new JetLeg(),

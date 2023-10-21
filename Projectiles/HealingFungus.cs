@@ -74,7 +74,7 @@ namespace TerRoguelike.Projectiles
             Color color = Color.White * 0.5f;
             if (Projectile.timeLeft < 15)
                 color *= Projectile.timeLeft / 15f;
-            Main.EntitySpriteDraw(texture, drawPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), color, 0f, new Vector2(texture.Width / 2f, (frameHeight / 2f)), 1f, spriteEffects, 0);
+            Main.EntitySpriteDraw(texture, drawPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), color, 0f, new Vector2(texture.Width * 0.5f, (frameHeight * 0.5f)), 1f, spriteEffects, 0);
             return false;
         }
     }

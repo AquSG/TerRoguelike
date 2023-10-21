@@ -76,6 +76,8 @@ namespace TerRoguelike.UI
                     TerRoguelikeMenu.wipeTempPlayer = true;
                     TerRoguelikeMenu.wipeTempWorld = true;
                 }
+                modPlayer.killerNPC = -1;
+                modPlayer.killerProj = -1;
                 WorldGen.SaveAndQuit();
             }
             else if (ms.LeftButton == ButtonState.Pressed && restartHover && modPlayer.deadTime > 150)
@@ -91,6 +93,8 @@ namespace TerRoguelike.UI
                     TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
                     TerRoguelikeMenu.wipeTempWorld = true;
                 }
+                modPlayer.killerNPC = -1;
+                modPlayer.killerProj = -1;
                 WorldGen.SaveAndQuit();
             }
 
