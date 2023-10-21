@@ -85,6 +85,8 @@ namespace TerRoguelike.TerPlayer
         public int jetLeg;
         public int giantDoorShield;
         public int trumpCard;
+        public int portableGenerator;
+        public int forgottenBioWeapon;
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -101,6 +103,7 @@ namespace TerRoguelike.TerPlayer
         public int droneBuddyHealTime = 0;
         public int allSeeingEyeHitCooldown = 30;
         public int overclockerTime = 0;
+        public int portableGeneratorImmuneTime = 0;
         #endregion
 
         #region Misc Variables
@@ -203,6 +206,8 @@ namespace TerRoguelike.TerPlayer
             jetLeg = 0;
             giantDoorShield = 0;
             trumpCard = 0;
+            portableGenerator = 0;
+            forgottenBioWeapon = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -719,6 +724,29 @@ namespace TerRoguelike.TerPlayer
                 allSeeingEyeTarget = -1;
                 allSeeingEyeHitCooldown = 30;
             }
+
+            if (portableGenerator > 0)
+            {
+                if (portableGeneratorImmuneTime > 0)
+                {
+                    portableGeneratorImmuneTime--;
+                    if (portableGeneratorImmuneTime == 0)
+                    {
+                        Player.immuneTime = 60;
+                        Player.immuneNoBlink = false;
+                        Player.immune = true;
+                        SoundEngine.PlaySound(SoundID.NPCHit43 with { Volume = 0.3f });
+                    }
+                    else
+                    {
+                        Player.immuneTime = 2;
+                        Player.immuneNoBlink = true;
+                        Player.immune = true;
+                    }
+                }
+            }
+            else
+                portableGeneratorImmuneTime = 0;
         }
         public override void PostUpdateEquips()
         {
@@ -866,7 +894,8 @@ namespace TerRoguelike.TerPlayer
                 float chance = 0.08f * sanguineOrb;
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
-                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(240, Player.whoAmI));
+                    int bleedDamage = 240;
+                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
                 }
             }
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
@@ -910,6 +939,9 @@ namespace TerRoguelike.TerPlayer
             if (ballAndChain > 0)
             {
                 int slowTime = 120 * ballAndChain;
+                if (forgottenBioWeapon > 0)
+                    slowTime *= forgottenBioWeapon + 1;
+
                 if (modNPC.ballAndChainSlow < slowTime)
                     modNPC.ballAndChainSlow = slowTime;
             }
@@ -923,7 +955,8 @@ namespace TerRoguelike.TerPlayer
             {
                 if (ChanceRollWithLuck(0.5f, procLuck))
                 {
-                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(120, Player.whoAmI));
+                    int bleedDamage = 120;
+                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
                 }
                 
             }
@@ -958,7 +991,7 @@ namespace TerRoguelike.TerPlayer
             if (hotPepper > 0 && !modTarget.activatedHotPepper)
             {
                 float radius = 128f + (48f * (hotPepper - 1));
-                int damageToDeal = 300 + (75 * (hotPepper - 1));
+                int igniteDamage = 300 + (75 * (hotPepper - 1));
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
@@ -967,7 +1000,7 @@ namespace TerRoguelike.TerPlayer
 
                     if (npc.Center.Distance(target.Center) <= radius)
                     {
-                        npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().ignitedStacks.Add(new IgnitedStack(damageToDeal, Player.whoAmI));
+                        npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
                     }
                 }
                 modTarget.activatedHotPepper = true;

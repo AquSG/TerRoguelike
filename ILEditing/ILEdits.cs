@@ -11,6 +11,11 @@ using TerRoguelike.MainMenu;
 using Terraria.IO;
 using Terraria.GameContent.Creative;
 using System.Threading;
+using Terraria.DataStructures;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.GameContent;
+using Microsoft.Xna.Framework;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.ILEditing
 {
@@ -21,7 +26,48 @@ namespace TerRoguelike.ILEditing
             On_Main.DamageVar_float_int_float += AdjustDamageVariance;
             On_UICharacterCreation.FinishCreatingCharacter += FinishCreatingCharacterEdit;
             On_WorldGen.SaveAndQuit += On_WorldGen_SaveAndQuit;
+            On_PlayerDrawLayers.DrawPlayer_04_ElectrifiedDebuffBack += EditElectrifiedDisplayCondition1;
+            On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
         }
+
+		private void EditElectrifiedDisplayCondition1(On_PlayerDrawLayers.orig_DrawPlayer_04_ElectrifiedDebuffBack orig, ref PlayerDrawSet drawinfo)
+		{
+			if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
+			{
+				return;
+			}
+			Texture2D value = TextureAssets.GlowMask[25].Value;
+			int num = drawinfo.drawPlayer.miscCounter / 5;
+			for (int i = 0; i < 2; i++)
+			{
+				num %= 7;
+				if (num <= 1 || num >= 5)
+				{
+					DrawData item = new DrawData(value, new Vector2((float)(int)(drawinfo.Position.X - Main.screenPosition.X - (float)(drawinfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawinfo.drawPlayer.width / 2)), (float)(int)(drawinfo.Position.Y - Main.screenPosition.Y + (float)drawinfo.drawPlayer.height - (float)drawinfo.drawPlayer.bodyFrame.Height + 4f)) + drawinfo.drawPlayer.bodyPosition + new Vector2((float)(drawinfo.drawPlayer.bodyFrame.Width / 2), (float)(drawinfo.drawPlayer.bodyFrame.Height / 2)), (Rectangle?)new Rectangle(0, num * value.Height / 7, value.Width, value.Height / 7), drawinfo.colorElectricity, drawinfo.drawPlayer.bodyRotation, new Vector2((float)(value.Width / 2), (float)(value.Height / 14)), 1f, drawinfo.playerEffect, 0f);
+					drawinfo.DrawDataCache.Add(item);
+				}
+				num += 3;
+			}
+		}
+		private void EditElectrifiedDisplayCondition2(On_PlayerDrawLayers.orig_DrawPlayer_34_ElectrifiedDebuffFront orig, ref PlayerDrawSet drawinfo)
+        {
+			if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
+			{
+				return;
+			}
+			Texture2D value = TextureAssets.GlowMask[25].Value;
+			int num = drawinfo.drawPlayer.miscCounter / 5;
+			for (int i = 0; i < 2; i++)
+			{
+				num %= 7;
+				if (num > 1 && num < 5)
+				{
+					DrawData item = new DrawData(value, new Vector2((float)(int)(drawinfo.Position.X - Main.screenPosition.X - (float)(drawinfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawinfo.drawPlayer.width / 2)), (float)(int)(drawinfo.Position.Y - Main.screenPosition.Y + (float)drawinfo.drawPlayer.height - (float)drawinfo.drawPlayer.bodyFrame.Height + 4f)) + drawinfo.drawPlayer.bodyPosition + new Vector2((float)(drawinfo.drawPlayer.bodyFrame.Width / 2), (float)(drawinfo.drawPlayer.bodyFrame.Height / 2)), (Rectangle?)new Rectangle(0, num * value.Height / 7, value.Width, value.Height / 7), drawinfo.colorElectricity, drawinfo.drawPlayer.bodyRotation, new Vector2((float)(value.Width / 2), (float)(value.Height / 14)), 1f, drawinfo.playerEffect, 0f);
+					drawinfo.DrawDataCache.Add(item);
+				}
+				num += 3;
+			}
+		}
 
         private void On_WorldGen_SaveAndQuit(On_WorldGen.orig_SaveAndQuit orig, Action callback)
         {

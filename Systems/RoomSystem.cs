@@ -98,6 +98,11 @@ namespace TerRoguelike.Systems
                             {
                                 modPlayer.GiftBoxLogic((targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f);
                             }
+                            if (modPlayer.portableGenerator > 0)
+                            {
+                                modPlayer.portableGeneratorImmuneTime += 540 + (600 * modPlayer.portableGenerator);
+                                SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.5f });
+                            }
                         }
 
                         if (room.closedTime == 1) // heal players on room clear so no waiting slog for natural life regen

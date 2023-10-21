@@ -220,7 +220,9 @@ namespace TerRoguelike.Managers
                 new BarrierSynthesizer(),
                 new JetLeg(),
                 new GiantDoorShield(),
-                new TrumpCard()
+                new TrumpCard(),
+                new PortableGenerator(),
+                new ForgottenBioWeapon()
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();

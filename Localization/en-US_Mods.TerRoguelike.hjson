@@ -580,4 +580,22 @@ Items: {
 			Extra copies of this item grant +1 more revive
 			'''
 	}
+
+	PortableGenerator: {
+		DisplayName: Portable Generator
+		Tooltip:
+			'''
+			Become immune to being hit for 20 seconds upon entering a new floor
+			Extra copies of this item increase the duration by 10 seconds
+			'''
+	}
+
+	ForgottenBioWeapon: {
+		DisplayName: Forgotten Bio-Weapon
+		Tooltip:
+			'''
+			Debuffs on enemies last 100% longer
+			Extra copies of this item make debuffs last another 100% longer
+			'''
+	}
 }

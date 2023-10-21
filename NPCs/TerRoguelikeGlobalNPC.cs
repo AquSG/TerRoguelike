@@ -344,8 +344,9 @@ namespace TerRoguelike.NPCs
     {
         public IgnitedStack(int damageToDeal, int owner)
         {
-            DamageToDeal = damageToDeal;
             Owner = owner;
+            damageToDeal *= Main.player[owner].GetModPlayer<TerRoguelikePlayer>().forgottenBioWeapon + 1;
+            DamageToDeal = damageToDeal;
         }
         public int DamageToDeal = 0;
         public int Owner = -1;
@@ -354,8 +355,9 @@ namespace TerRoguelike.NPCs
     {
         public BleedingStack(int damageToDeal, int owner)
         {
-            DamageToDeal = damageToDeal;
             Owner = owner;
+            damageToDeal *= Main.player[owner].GetModPlayer<TerRoguelikePlayer>().forgottenBioWeapon + 1;
+            DamageToDeal = damageToDeal;
         }
         public int DamageToDeal = 0;
         public int Owner = -1;
