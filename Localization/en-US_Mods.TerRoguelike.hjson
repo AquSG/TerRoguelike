@@ -74,9 +74,9 @@ Items: {
 		DisplayName: Spent Shell
 		Tooltip:
 			'''
-			+1 projectile per weapon use
+			+1 main attack per weapon use
 			Attack speed is decreased by a multiplier to somewhat compensate
-			Extra copies of this item also grant +1 projectile per weapon use
+			Extra copies of this item also grant +1 main attack per weapon use
 			'''
 	}
 
@@ -605,6 +605,17 @@ Items: {
 			'''
 			Heal for 8% max life every second after standing still for more than 1 second
 			Extra copies of this item increase the healing amount by 4% max life
+			'''
+	}
+
+	ShotgunComponent: {
+		DisplayName: Shotgun Component
+		Tooltip: 
+			'''
+			4x main attacks per weapon use
+			Attack speed is decreased by a multiplier to somewhat compensate
+			Bullets gain minor spread
+			Extra copies of this item increase the main attack multiplier by 4
 			'''
 	}
 }

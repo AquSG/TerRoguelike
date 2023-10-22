@@ -80,7 +80,15 @@ namespace TerRoguelike.Projectiles
         {
             float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
             int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire; //multishot support
-            SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
+            if (modPlayer.shotgunComponent > 0)
+            {
+                SoundEngine.PlaySound(SoundID.Item36 with { Volume = SoundID.Item41.Volume * 0.6f });
+            }
+            else
+            {
+                SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
+            }
+            
             for (int i = 0; i < shotsToFire; i++)
             {
                 float mainAngle;
@@ -96,6 +104,10 @@ namespace TerRoguelike.Projectiles
                 else
                 {
                     mainAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() - ((float)((shotsToFire - 1) / 2) * MathHelper.Pi/spread) + ((float)i * MathHelper.Pi / spread);
+                }
+                if (modPlayer.shotgunComponent > 0)
+                {
+                    mainAngle += Main.rand.NextFloat(-MathHelper.Pi * 0.01f, MathHelper.Pi * 0.01f + float.Epsilon);
                 }
 
                 

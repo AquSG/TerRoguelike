@@ -213,6 +213,7 @@ namespace TerRoguelike.Managers
                 new TheDreamsoul(),
                 new DroneBuddy(),
                 new Overclocker(),
+                new ShotgunComponent(),
                 new Cornucopia(),
                 new NutritiousSlime(),
                 new AllSeeingEye(),
