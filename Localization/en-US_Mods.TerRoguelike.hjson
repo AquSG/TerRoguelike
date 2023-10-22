@@ -76,7 +76,7 @@ Items: {
 			'''
 			+1 main attack per weapon use
 			Attack speed is decreased by a multiplier to somewhat compensate
-			Extra copies of this item also grant +1 main attack per weapon use
+			Extra copies of this item also grant +1 main attack per weapon use, and further decrease attack speed
 			'''
 	}
 
@@ -610,12 +610,22 @@ Items: {
 
 	ShotgunComponent: {
 		DisplayName: Shotgun Component
-		Tooltip: 
+		Tooltip:
 			'''
 			4x main attacks per weapon use
 			Attack speed is decreased by a multiplier to somewhat compensate
 			Bullets gain minor spread
-			Extra copies of this item increase the main attack multiplier by 4
+			Extra copies of this item increase the main attack multiplier by 4, and further decrease attack speed
+			'''
+	}
+
+	SniperComponent: {
+		DisplayName: Sniper Component
+		Tooltip:
+			'''
+			8x damage
+			Massively decreased attack speed by a multiplier
+			Extra copies of this item increase the damage multiplier by 8, and further decrease attack speed
 			'''
 	}
 }
