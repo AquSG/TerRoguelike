@@ -79,6 +79,7 @@ namespace TerRoguelike.TerPlayer
         public int overclocker;
         public int shotgunComponent;
         public int sniperComponent;
+        public int minigunComponent;
         public int cornucopia;
         public int nutritiousSlime;
         public int allSeeingEye;
@@ -207,6 +208,7 @@ namespace TerRoguelike.TerPlayer
             overclocker = 0;
             shotgunComponent = 0;
             sniperComponent = 0;
+            minigunComponent = 0;
             cornucopia = 0;
             nutritiousSlime = 0;
             allSeeingEye = 0;
@@ -804,12 +806,20 @@ namespace TerRoguelike.TerPlayer
             if (sniperComponent > 0)
             {
                 float finalAttackSpeedMultiplier = 1f;
+                float finalDamageMultiplier = 8f * sniperComponent;
                 for (int i = 0; i < sniperComponent; i++)
                 {
                     finalAttackSpeedMultiplier *= 1 - (4f / (4f + sniperComponent));
                 }
                 Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
-                Player.GetDamage(DamageClass.Generic) *= 8f * sniperComponent;
+                Player.GetDamage(DamageClass.Generic) *= finalDamageMultiplier;
+            }
+            if (minigunComponent > 0)
+            {
+                float finalAttackSpeedMultiplier = 1.5f + (2 * minigunComponent);
+                float finalDamageMultiplier = 0.4f;
+                Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
+                Player.GetDamage(DamageClass.Generic) *= finalDamageMultiplier;
             }
 
             if (!Player.GetJumpState(ExtraJump.CloudInABottle).Available && timesDoubleJumped < extraDoubleJumps)

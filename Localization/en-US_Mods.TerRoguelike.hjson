@@ -628,4 +628,15 @@ Items: {
 			Extra copies of this item increase the damage multiplier by 8, and further decrease attack speed
 			'''
 	}
+
+	MinigunComponent: {
+		DisplayName: Minigun Component
+		Tooltip:
+			'''
+			3.5x attack speed
+			0.4x damage
+			Bullets gain spread
+			Extra copies of this item increase the attack speed multiplier by 2
+			'''
+	}
 }

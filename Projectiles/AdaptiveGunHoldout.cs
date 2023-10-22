@@ -82,7 +82,15 @@ namespace TerRoguelike.Projectiles
             int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire; //multishot support
             if (modPlayer.shotgunComponent > 0)
             {
-                SoundEngine.PlaySound(SoundID.Item36 with { Volume = SoundID.Item41.Volume * 0.6f });
+                SoundEngine.PlaySound(SoundID.Item36 with { Volume = SoundID.Item36.Volume * 0.6f });
+            }
+            else if (modPlayer.sniperComponent > 0)
+            {
+                SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f });
+            }
+            else if (modPlayer.minigunComponent > 0)
+            {
+                SoundEngine.PlaySound(SoundID.Item11 with { Volume = SoundID.Item11.Volume * 0.6f });
             }
             else
             {
@@ -109,7 +117,10 @@ namespace TerRoguelike.Projectiles
                 {
                     mainAngle += Main.rand.NextFloat(-MathHelper.Pi * 0.01f, MathHelper.Pi * 0.01f + float.Epsilon);
                 }
-
+                if (modPlayer.minigunComponent > 0)
+                {
+                    mainAngle += Main.rand.NextFloat(-MathHelper.Pi * 0.01f, MathHelper.Pi * 0.04f + float.Epsilon);
+                }
                 
                 Vector2 direction = (mainAngle).ToRotationVector2();
                 int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);

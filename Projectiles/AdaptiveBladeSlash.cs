@@ -60,7 +60,7 @@ namespace TerRoguelike.Projectiles
                 //keep this shit stuck to the player
                 stuckPosition = player.position - Projectile.position;
             }
-            Projectile.position = player.position - stuckPosition;
+            Projectile.position = player.position - stuckPosition + (Vector2.UnitY * player.gfxOffY);
             Projectile.frame = (int)(Projectile.localAI[0] / 4);
             Projectile.localAI[0] += 1 * player.GetAttackSpeed(DamageClass.Generic); // animation speed scales with attack speed
             if (Projectile.frame > Main.projFrames[Projectile.type]) // kill when done animating
