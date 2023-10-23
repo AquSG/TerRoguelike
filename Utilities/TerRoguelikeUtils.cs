@@ -144,5 +144,15 @@ namespace TerRoguelike.Utilities
             Color nextColor = colors[(currentColorIndex + 1) % colors.Length];
             return Color.Lerp(currentColor, nextColor, increment * colors.Length % 1f);
         }
+
+        public static bool TopSlope (Tile tile)
+        {
+            byte b = (byte)tile.Slope;
+            if (b != 1)
+            {
+                return b == 2;
+            }
+            return true;
+        }
     }
 }

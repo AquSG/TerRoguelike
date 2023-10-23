@@ -17,6 +17,7 @@ namespace TerRoguelike
             Instance = this;
             SchematicManager.Load();
             ItemManager.Load();
+            NPCManager.Load();
             BarrierUI.Load();
             DeathUI.Load();
             if (!Main.dedServ)
@@ -36,6 +37,7 @@ namespace TerRoguelike
             BarrierUI.Unload();
             DeathUI.Unload();
             ItemManager.Unload();
+            NPCManager.Unload();
         }
         public void LoadClient()
         {

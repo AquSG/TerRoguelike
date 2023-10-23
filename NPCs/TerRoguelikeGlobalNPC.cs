@@ -16,6 +16,9 @@ using Terraria.Graphics;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.Managers;
+using System.IO;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs
 {
@@ -41,7 +44,151 @@ namespace TerRoguelike.NPCs
         public List<BleedingStack> bleedingStacks = new List<BleedingStack>();
         public int bleedingHitCooldown = 0;
         public int ballAndChainSlow = 0;
+        public Vector2 drawCenter = new Vector2(-1000);
         #endregion
+
+        #region Base AIs
+        public void RogueFighterAI(NPC npc, float xCap)
+        {
+            if (!npc.HasPlayerTarget)
+            {
+                npc.target = npc.FindClosestPlayer();
+            }
+
+            Player target = Main.player[npc.target];
+
+            if (npc.Center.X < target.Center.X)
+            {
+                npc.direction = 1;
+                npc.spriteDirection = 1;
+            }
+            else
+            {
+                npc.direction = -1;
+                npc.spriteDirection = -1;
+            }
+
+            if (npc.velocity.X < -xCap || npc.velocity.X > xCap)
+            {
+                if (npc.velocity.Y == 0f)
+                {
+                    npc.velocity *= 0.8f;
+                }
+            }
+            else if (npc.velocity.X < xCap && npc.direction == 1)
+            {
+                npc.velocity.X += 0.07f;
+                if (npc.velocity.X > xCap)
+                {
+                    npc.velocity.X = xCap;
+                }
+            }
+            else if (npc.velocity.X > -xCap && npc.direction == -1)
+            {
+                npc.velocity.X -= 0.07f;
+                if (npc.velocity.X < -xCap)
+                {
+                    npc.velocity.X = -xCap;
+                }
+            }
+
+            if (npc.collideX && npc.collideY)
+            {
+                npc.velocity.Y = -7.9f;
+            }
+            if (npc.velocity.Y == 0f && Main.player[npc.target].Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - Main.player[npc.target].Center.X) < (float)(Main.player[npc.target].width * 3) && Collision.CanHit(npc, Main.player[npc.target]))
+            {
+
+                if (npc.velocity.Y == 0f)
+                {
+                    int num112 = 6;
+                    if (Main.player[npc.target].Bottom.Y > npc.Top.Y - (float)(num112 * 16))
+                    {
+                        npc.velocity.Y = -7.9f;
+                    }
+                    else
+                    {
+                        int bottomtilepointx = (int)(npc.Center.X / 16f);
+                        int bottomtilepointY = (int)(npc.Bottom.Y / 16f) - 1;
+                        for (int i = bottomtilepointY; i > bottomtilepointY - num112; i--)
+                        {
+                            if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                            {
+                                npc.velocity.Y = -7.9f;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (npc.velocity.Y == 0f && Main.player[npc.target].Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - Main.player[npc.target].Center.X) < (float)(Main.player[npc.target].width * 3) && Collision.CanHit(npc, Main.player[npc.target]))
+            {
+                int fluff = 6;
+                int bottomtilepointx = (int)(npc.Center.X / 16f);
+                int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                {
+                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    {
+                        npc.position.Y += 1;
+                        npc.stairFall = true;
+                        npc.velocity.Y += 0.01f;
+                        break;
+                    }
+                }
+            }
+            if (npc.velocity.Y >= 0f)
+            {
+                int dir = 0;
+                if (npc.velocity.X < 0f)
+                {
+                    dir = -1;
+                }
+                if (npc.velocity.X > 0f)
+                {
+                    dir = 1;
+                }
+                Vector2 futurePos = npc.position;
+                futurePos.X += npc.velocity.X;
+                int tileX = (int)((futurePos.X + (float)(npc.width / 2) + (float)((npc.width / 2 + 1) * dir)) / 16f);
+                int tileY = (int)((futurePos.Y + (float)npc.height - 1f) / 16f);
+                if (WorldGen.InWorld(tileX, tileY, 4))
+                {
+                    if ((float)(tileX * 16) < futurePos.X + (float)npc.width && (float)(tileX * 16 + 16) > futurePos.X && ((Main.tile[tileX, tileY].HasUnactuatedTile && !TopSlope(Main.tile[tileX, tileY]) && !TopSlope(Main.tile[tileX, tileY - 1]) && Main.tileSolid[Main.tile[tileX, tileY].TileType] && !Main.tileSolidTop[Main.tile[tileX, tileY].TileType]) || (Main.tile[tileX, tileY - 1].IsHalfBlock && Main.tile[tileX, tileY - 1].HasUnactuatedTile)) && (!Main.tile[tileX, tileY - 1].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 1].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 1].TileType] || (Main.tile[tileX, tileY - 1].IsHalfBlock && (!Main.tile[tileX, tileY - 4].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 4].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 4].TileType]))) && (!Main.tile[tileX, tileY - 2].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 2].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 2].TileType]) && (!Main.tile[tileX, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 3].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 3].TileType]) && (!Main.tile[tileX - dir, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX - dir, tileY - 3].TileType]))
+                    {
+                        float tilePosY = tileY * 16;
+                        if (Main.tile[tileX, tileY].IsHalfBlock)
+                        {
+                            tilePosY += 8f;
+                        }
+                        if (Main.tile[tileX, tileY - 1].IsHalfBlock)
+                        {
+                            tilePosY -= 8f;
+                        }
+                        if (tilePosY < futurePos.Y + (float)npc.height)
+                        {
+                            float difference = futurePos.Y + (float)npc.height - tilePosY;
+                            if (difference <= 16.1f)
+                            {
+                                npc.gfxOffY += npc.position.Y + (float)npc.height - tilePosY;
+                                npc.position.Y = tilePosY - (float)npc.height;
+                            }
+                            if (difference < 9f)
+                            {
+                                npc.stepSpeed = 1f;
+                            }
+                            else
+                            {
+                                npc.stepSpeed = 2f;
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+        #endregion
+
         public override bool InstancePerEntity => true;
 
         public override bool PreAI(NPC npc)
@@ -237,7 +384,7 @@ namespace TerRoguelike.NPCs
                 GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
                 GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
 
-                Vector2 position = GetDrawCenter(npc);
+                Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
                 for (float i = 0; i < 1; i += 0.125f)
                 {
                     spriteBatch.Draw(texture, position + (i * MathHelper.TwoPi + npc.rotation).ToRotationVector2() * outlineThickness - Main.screenPosition, npc.frame, color, npc.rotation, vector, npc.scale, spriteEffects, 0f);
@@ -287,7 +434,7 @@ namespace TerRoguelike.NPCs
         {
             Texture2D texture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/AdaptiveGunBullet").Value;
             Color color = Color.Red * 0.8f;
-            Vector2 position = GetDrawCenter(npc);
+            Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
 
             for (int i = 0; i < bleedingStacks.Count; i++)
             {
@@ -308,7 +455,20 @@ namespace TerRoguelike.NPCs
         /// </summary>
         public Vector2 GetDrawCenter(NPC npc)
         {
-            Vector2 position = npc.Center + new Vector2(0, npc.gfxOffY);
+            if (drawCenter != new Vector2(-1000))
+                return drawCenter + npc.Center;
+
+            
+            for (int i = 0; i < NPCManager.AllNPCs.Count; i++)
+            {
+                if (npc.type == NPCManager.AllNPCs[i].modNPCID)
+                {
+                    drawCenter = NPCManager.AllNPCs[i].DrawCenterOffset;
+                    return drawCenter + npc.Center;
+                }
+            }
+
+            Vector2 position = npc.Center;
             switch (npc.aiStyle)
             {
                 case NPCAIStyleID.Fighter:
