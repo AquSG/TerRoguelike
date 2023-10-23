@@ -20,7 +20,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(0, new Vector2(320, (RoomDimensions.Y * 16f) - 32f), NPCID.Paladin, 60, 120, 0.9f);
+            AddRoomNPC(0, new Vector2(RoomDimensions.X * 8f, (RoomDimensions.Y * 16f) - 72f), NPCID.Paladin, 60, 120, 0.9f);
         }
     }
 }

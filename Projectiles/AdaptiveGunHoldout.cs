@@ -67,7 +67,7 @@ namespace TerRoguelike.Projectiles
             float pointingRotation = (Main.MouseWorld - Owner.MountedCenter).ToRotation();
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 40f;
 
-            
+
             if (Charge > 0f) // attack when charge is full. scales great with attack speed
             {
                 ShootBullet();
@@ -123,7 +123,7 @@ namespace TerRoguelike.Projectiles
                 }
                 
                 Vector2 direction = (mainAngle).ToRotationVector2();
-                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
                 Main.projectile[spawnedProjectile].scale = modPlayer.scaleMultiplier;
             }
             Charge -= 20f;

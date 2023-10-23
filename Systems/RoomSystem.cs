@@ -255,7 +255,7 @@ namespace TerRoguelike.Systems
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(room.RoomDimensions.X - 2, i);
-                            if (Main.tile[targetBlock.ToPoint()].TileType != TileID.Platforms)
+                            if (Main.tile[targetBlock.ToPoint()].TileType != TileID.Platforms && Main.tile[targetBlock.ToPoint()].TileType != TileID.Torches)
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;

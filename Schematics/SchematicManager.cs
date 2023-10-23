@@ -60,6 +60,8 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new BaseEnemyRoom6());
             RoomID.Add(new BaseEnemyRoom6Down());
             RoomID.Add(new BaseEnemyRoom6Up());
+            RoomID.Add(new BaseEnemyRoom7());
+            RoomID.Add(new BaseEnemyRoom7Up());
             RoomID.Add(new CrimsonStartRoom());
             RoomID.Add(new CrimsonEnemyRoom1());
             RoomID.Add(new CrimsonEnemyRoom2());

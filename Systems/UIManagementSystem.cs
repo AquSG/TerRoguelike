@@ -27,13 +27,16 @@ namespace TerRoguelike.Systems
     {
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            int deathTextIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Death Text");
-            if (deathTextIndex != -1)
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
-                GameInterfaceLayer layer = layers[deathTextIndex];
-                layer.Active = false;
+                int deathTextIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Death Text");
+                if (deathTextIndex != -1)
+                {
+                    GameInterfaceLayer layer = layers[deathTextIndex];
+                    layer.Active = false;
+                }
             }
-
+            
             if (Main.myPlayer > -1 && Main.myPlayer < Main.maxPlayers)
             {
                 Player player = Main.player[Main.myPlayer];
