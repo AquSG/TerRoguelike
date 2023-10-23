@@ -200,21 +200,25 @@ namespace TerRoguelike.Managers
                 {
                     npc.position.X = (RoomPosition.X + 1f) * 16f;
                     npc.velocity.X = 0;
+                    npc.collideX = true;
                 }
                 if (boundRight)
                 {
                     npc.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f) - (float)npc.width;
                     npc.velocity.X = 0;
+                    npc.collideX = true;
                 }
                 if (boundTop)
                 {
                     npc.position.Y = (RoomPosition.Y + 1f) * 16f;
                     npc.velocity.Y = 0;
+                    npc.collideY = true;
                 }
                 if (boundBottom)
                 {
                     npc.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - (float)npc.height;
                     npc.velocity.Y = 0;
+                    npc.collideY = true;
                 }
             }
         }

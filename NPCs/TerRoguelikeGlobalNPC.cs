@@ -53,19 +53,34 @@ namespace TerRoguelike.NPCs
             if (!npc.HasPlayerTarget)
             {
                 npc.target = npc.FindClosestPlayer();
-            }
-
-            Player target = Main.player[npc.target];
-
-            if (npc.Center.X < target.Center.X)
-            {
                 npc.direction = 1;
                 npc.spriteDirection = 1;
             }
-            else
+            Player target = Main.player[npc.target];
+
+            
+            if (npc.ai[0] == 0 && !target.dead)
             {
-                npc.direction = -1;
-                npc.spriteDirection = -1;
+                if (npc.Center.X < target.Center.X)
+                {
+                    npc.direction = 1;
+                    npc.spriteDirection = 1;
+                }
+                else
+                {
+                    npc.direction = -1;
+                    npc.spriteDirection = -1;
+                }
+            }
+            else if (npc.ai[0] > 60)
+            {
+                npc.ai[0] = -240;
+                npc.direction *= -1;
+                npc.spriteDirection *= -1;
+            }
+            if (npc.ai[0] < 0)
+            {
+                npc.ai[0]++;
             }
 
             if (npc.velocity.X < -xCap || npc.velocity.X > xCap)
@@ -92,10 +107,18 @@ namespace TerRoguelike.NPCs
                 }
             }
 
-            if (npc.collideX && npc.collideY)
+            if (npc.collideX)
             {
-                npc.velocity.Y = -7.9f;
+                npc.ai[0]++;
+                if (npc.collideY && npc.oldVelocity.Y >= 0)
+                {
+                    npc.velocity.Y = -7.9f;
+                }
+                    
             }
+            else if (npc.ai[0] > 0)
+                npc.ai[0] = 0f;
+
             if (npc.velocity.Y == 0f && Main.player[npc.target].Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - Main.player[npc.target].Center.X) < (float)(Main.player[npc.target].width * 3) && Collision.CanHit(npc, Main.player[npc.target]))
             {
 
