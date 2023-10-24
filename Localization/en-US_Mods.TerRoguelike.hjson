@@ -644,4 +644,5 @@ Items: {
 NPCs: {
 	Splinter.DisplayName: Splinter
 	Spookrow.DisplayName: Spookrow
+	UndeadGuard.DisplayName: Undead Guard
 }

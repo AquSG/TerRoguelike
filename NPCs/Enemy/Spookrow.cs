@@ -20,6 +20,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<Spookrow>();
         public override List<int> associatedFloors => new List<int>() { 2 };
         public override Vector2 DrawCenterOffset => new Vector2(0, -11);
+        public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 6;
@@ -39,7 +40,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.rotation = MathHelper.Clamp(MathHelper.Lerp(0.2f, 0f, (NPC.ai[0] - 30) / 60f), 0f, 0.2f) * NPC.spriteDirection;
-            modNPC.RogueSpookrowAI(NPC, 6f);
+            modNPC.RogueSpookrowAI(NPC, 6f, -6.7f);
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

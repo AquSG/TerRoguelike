@@ -48,7 +48,7 @@ namespace TerRoguelike.NPCs
         #endregion
 
         #region Base AIs
-        public void RogueFighterAI(NPC npc, float xCap)
+        public void RogueFighterAI(NPC npc, float xCap, float jumpVelocity)
         {
             if (!npc.HasPlayerTarget)
             {
@@ -103,7 +103,7 @@ namespace TerRoguelike.NPCs
             {
                 npc.ai[0]++;
                 if (npc.collideY && npc.oldVelocity.Y >= 0)
-                    npc.velocity.Y = -7.9f;
+                    npc.velocity.Y = jumpVelocity;
             }
             else if (npc.ai[0] > 0)
                 npc.ai[0] = 0f;
@@ -116,7 +116,7 @@ namespace TerRoguelike.NPCs
                     int num112 = 6;
                     if (Main.player[npc.target].Bottom.Y > npc.Top.Y - (float)(num112 * 16))
                     {
-                        npc.velocity.Y = -7.9f;
+                        npc.velocity.Y = jumpVelocity;
                     }
                     else
                     {
@@ -126,7 +126,7 @@ namespace TerRoguelike.NPCs
                         {
                             if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                             {
-                                npc.velocity.Y = -7.9f;
+                                npc.velocity.Y = jumpVelocity;
                                 break;
                             }
                         }
@@ -191,7 +191,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueSpookrowAI(NPC npc, float xCap)
+        public void RogueSpookrowAI(NPC npc, float xCap, float jumpVelocity)
         {
             if (!npc.HasPlayerTarget)
             {
@@ -237,7 +237,7 @@ namespace TerRoguelike.NPCs
             if (npc.ai[0] == 60 && npc.collideY)
             {
                 npc.velocity.X = xCap * npc.direction;
-                npc.velocity.Y = -6.7f;
+                npc.velocity.Y = jumpVelocity;
                 npc.ai[0]++;
             }
 

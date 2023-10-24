@@ -30,7 +30,8 @@ namespace TerRoguelike.Managers
             AllNPCs = new List<BaseRoguelikeNPC>()
             {
                 new Splinter(),
-                new Spookrow()
+                new Spookrow(),
+                new UndeadGuard()
             };
         }
         internal static void Unload()
@@ -38,5 +39,25 @@ namespace TerRoguelike.Managers
             AllNPCs = null;
         }
         public static List<BaseRoguelikeNPC> AllNPCs;
+        /// <summary>
+        /// Choose a random enemy that has an associated floor ID and combat style.
+        /// </summary>
+        /// <param name="floorID"></param> 
+        /// <param name="combatStyle"></param>
+        /// <returns>Matching enemy. if no matching combat style, chooses any style. if absolutely no options, returns NPCID.None</returns>
+        public static int ChooseEnemy(int floorID, int combatStyle)
+        {
+            List<BaseRoguelikeNPC> enemyPool = AllNPCs.FindAll(x => x.associatedFloors.Contains(floorID) && x.CombatStyle == combatStyle);
+            if (!enemyPool.Any())
+            {
+                enemyPool = AllNPCs.FindAll(x => x.associatedFloors.Contains(floorID) && x.CombatStyle >= 0);
+            }
+            if (enemyPool.Any())
+            {
+                int randIndex = Main.rand.Next(enemyPool.Count);
+                return enemyPool[randIndex].modNPCID;
+            }
+            return 0;
+        }
     }
 }

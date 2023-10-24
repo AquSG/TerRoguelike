@@ -15,15 +15,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.NPCs.Enemy
 {
-    public class Splinter : BaseRoguelikeNPC
+    public class UndeadGuard : BaseRoguelikeNPC
     {
-        public override int modNPCID => ModContent.NPCType<Splinter>();
-        public override List<int> associatedFloors => new List<int>() { 2 };
+        public override int modNPCID => ModContent.NPCType<UndeadGuard>();
+        public override List<int> associatedFloors => new List<int>() { 0 };
         public override Vector2 DrawCenterOffset => new Vector2(0, -4);
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 14;
+            Main.npcFrameCount[modNPCID] = 15;
         }
         public override void SetDefaults()
         {
@@ -31,16 +31,16 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.width = 18;
             NPC.height = 40;
             NPC.aiStyle = -1;
-            NPC.damage = 35;
+            NPC.damage = 40;
             NPC.lifeMax = 600;
-            NPC.HitSound = SoundID.NPCHit7;
-            NPC.DeathSound = SoundID.NPCDeath6;
-            NPC.knockBackResist = 0.2f;
+            NPC.HitSound = SoundID.NPCHit2;
+            NPC.DeathSound = SoundID.NPCDeath2;
+            NPC.knockBackResist = 0.15f;
         }
         public override void AI()
         {
             NPC.frameCounter += NPC.velocity.Length() * 0.25d;
-            modNPC.RogueFighterAI(NPC, 2f, -7.9f);
+            modNPC.RogueFighterAI(NPC, 1.875f, -7.9f);
             
         }
         public override void HitEffect(NPC.HitInfo hit)
@@ -48,18 +48,21 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage/ (double)NPC.lifeMax * 100.0; i++)
+                for (int num655 = 0; (double)num655 < hit.Damage / (double)NPC.lifeMax * 50.0; num655++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.WoodFurniture, hit.HitDirection, -1f, 0, default(Color), 1.1f);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, hit.HitDirection, -1f);
                 }
+                return;
             }
-            else
+            for (int num656 = 0; num656 < 20; num656++)
             {
-                for (int i = 0; i < 60; i++)
-                {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.WoodFurniture, 2 * hit.HitDirection, -2f, 0, default(Color), 1.1f);
-                }
+                Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, 2.5f * (float)hit.HitDirection, -2.5f);
             }
+            Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, NPC.velocity, 42, NPC.scale);
+            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
+            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
+            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
+            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
         }
         public override void FindFrame(int frameHeight)
         {
