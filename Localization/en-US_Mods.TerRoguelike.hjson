@@ -641,4 +641,7 @@ Items: {
 	}
 }
 
-NPCs.Splinter.DisplayName: Splinter
+NPCs: {
+	Splinter.DisplayName: Splinter
+	Spookrow.DisplayName: Spookrow
+}

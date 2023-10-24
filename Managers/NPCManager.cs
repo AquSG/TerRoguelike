@@ -29,7 +29,8 @@ namespace TerRoguelike.Managers
         {
             AllNPCs = new List<BaseRoguelikeNPC>()
             {
-                new Splinter()
+                new Splinter(),
+                new Spookrow()
             };
         }
         internal static void Unload()
