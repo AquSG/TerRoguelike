@@ -225,7 +225,11 @@ namespace TerRoguelike.NPCs
                 npc.direction = 1;
             else
                 npc.direction = -1;
-
+            
+            if (npc.ai[0] == 0)
+            {
+                npc.spriteDirection = npc.direction;
+            }
             if (npc.ai[0] >= 30 && npc.ai[0] < 60)
                 npc.spriteDirection = npc.direction;
             if (npc.ai[0] != 60)

@@ -8,6 +8,7 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
 
 namespace TerRoguelike.Rooms
 {
@@ -20,7 +21,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(0, new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f) - 160f), NPCID.MourningWood, 60, 120, 0.9f);
+            AddRoomNPC(new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f) - 160f), NPCID.MourningWood, 60, 120, 0.9f);
         }
     }
 }

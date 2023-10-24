@@ -1,19 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using TerRoguelike.Managers;
-using TerRoguelike.TerPlayer;
 using TerRoguelike.NPCs;
-using Terraria.Chat;
-using TerRoguelike.Systems;
 using TerRoguelike.Projectiles;
-using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.Systems;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Managers
 {
@@ -52,16 +43,24 @@ namespace TerRoguelike.Managers
         public int roomClearGraceTime = -1; // time gap of 1 seconds after the last enemy has spawned where a room cannot be considered cleared to prevent any accidents happening
         public int lastTelegraphDuration; // used for roomClearGraceTime
         public bool wallActive = false; // whether the barriers of the room are active
-        public virtual void AddRoomNPC(int arrayLocation, Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0)
+        public virtual void AddRoomNPC(Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0)
         {
-            NPCSpawnPosition[arrayLocation] = npcSpawnPosition + (RoomPosition * 16f);
-            NPCToSpawn[arrayLocation] = npcToSpawn;
-            TimeUntilSpawn[arrayLocation] = timeUntilSpawn;
-            TelegraphDuration[arrayLocation] = telegraphDuration;
-            if (telegraphSize == 0)
-                telegraphSize = 1f;
-            TelegraphSize[arrayLocation] = telegraphSize;
-            NotSpawned[arrayLocation] = true;
+            for (int i = 0; i < RoomSpawnCap; i++)
+            {
+                if (!NotSpawned[i])
+                {
+                    NPCSpawnPosition[i] = npcSpawnPosition + (RoomPosition * 16f);
+                    NPCToSpawn[i] = npcToSpawn;
+                    TimeUntilSpawn[i] = timeUntilSpawn;
+                    TelegraphDuration[i] = telegraphDuration;
+                    if (telegraphSize == 0)
+                        telegraphSize = 1f;
+                    TelegraphSize[i] = telegraphSize;
+                    NotSpawned[i] = true;
+                    break;
+                }
+            }
+            
         }
         public virtual void Update()
         {

@@ -19,11 +19,11 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(0, new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f / 2f) + 32), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(1, new Vector2((RoomDimensions.X * 16f / 2f) + 48f, (RoomDimensions.Y * 16f / 2f) + 48f), NPCID.BloodCrawlerWall, 90, 120, 0.45f);
-            AddRoomNPC(2, new Vector2((RoomDimensions.X * 16f / 2f) + 96f, (RoomDimensions.Y * 16f / 2f) + 68f), NPCID.BloodCrawlerWall, 120, 120, 0.45f);
-            AddRoomNPC(3, new Vector2((RoomDimensions.X * 16f / 2f) + 126f, (RoomDimensions.Y * 16f / 2f) + 96f), NPCID.BloodCrawlerWall, 150, 120, 0.45f);
-            AddRoomNPC(4, new Vector2(232f, 96f), NPCID.FloatyGross, 350, 120, 0.6f);
+            AddRoomNPC(new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f / 2f) + 32), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
+            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f) + 48f, (RoomDimensions.Y * 16f / 2f) + 48f), NPCID.BloodCrawlerWall, 90, 120, 0.45f);
+            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f) + 96f, (RoomDimensions.Y * 16f / 2f) + 68f), NPCID.BloodCrawlerWall, 120, 120, 0.45f);
+            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f) + 126f, (RoomDimensions.Y * 16f / 2f) + 96f), NPCID.BloodCrawlerWall, 150, 120, 0.45f);
+            AddRoomNPC(new Vector2(232f, 96f), NPCID.FloatyGross, 350, 120, 0.6f);
         }
     }
 }

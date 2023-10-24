@@ -22,9 +22,9 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(0, new Vector2(64f, 72f), NPCID.BlueArmoredBones, 60, 120, 0.45f);
-            AddRoomNPC(1, new Vector2((RoomDimensions.X * 16f) - 64f, 72f), NPCID.BlueArmoredBones, 60, 120, 0.45f);
-            AddRoomNPC(2, new Vector2(RoomDimensions.X / 2f * 16f, (RoomDimensions.Y * 16f) - 32f), NPCID.RainbowSlime, 360, 120, 0.55f);
+            AddRoomNPC(new Vector2(64f, 72f), NPCID.BlueArmoredBones, 60, 120, 0.45f);
+            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 64f, 72f), NPCID.BlueArmoredBones, 60, 120, 0.45f);
+            AddRoomNPC(new Vector2(RoomDimensions.X / 2f * 16f, (RoomDimensions.Y * 16f) - 32f), NPCID.RainbowSlime, 360, 120, 0.55f);
         }
     }
 }
