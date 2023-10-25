@@ -91,6 +91,20 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new ForestEnemyRoom5Up());
             RoomID.Add(new ForestEnemyRoom6());
             RoomID.Add(new ForestEnemyRoom6Up());
+            RoomID.Add(new CorruptStartRoom());
+            RoomID.Add(new CorruptBossRoom1());
+            RoomID.Add(new CorruptEnemyRoom1Down());
+            RoomID.Add(new CorruptEnemyRoom2Down());
+            RoomID.Add(new CorruptEnemyRoom3());
+            RoomID.Add(new CorruptEnemyRoom3Down());
+            RoomID.Add(new CorruptEnemyRoom4Down());
+            RoomID.Add(new CorruptEnemyRoom5());
+            RoomID.Add(new CorruptEnemyRoom5Up());
+            RoomID.Add(new CorruptEnemyRoom6());
+            RoomID.Add(new CorruptEnemyRoom7());
+            RoomID.Add(new CorruptEnemyRoom8());
+            RoomID.Add(new CorruptEnemyRoom9());
+            RoomID.Add(new CorruptEnemyRoom10());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
@@ -107,6 +121,7 @@ namespace TerRoguelike.Schematics
             FloorID.Add(new BaseFloor());
             FloorID.Add(new CrimsonFloor());
             FloorID.Add(new ForestFloor());
+            FloorID.Add(new CorruptFloor());
         }
         internal static void Unload()
         {

@@ -30,17 +30,20 @@ namespace TerRoguelike.Managers
         public static List<Room> ForestRoomRight;
         public static List<Room> ForestRoomDown;
         public static List<Room> ForestRoomUp;
+        public static List<Room> CorruptRoomRight;
+        public static List<Room> CorruptRoomDown;
+        public static List<Room> CorruptRoomUp;
 
-        
+
         //The ultimate worldgen function
         public static void GenerateRoomStructure()
         {
-            List<int> floor1Floors = new List<int>()
+            List<int> stage0Floors = new List<int>()
             {
                 0,
                 2
             };
-            currentFloor = floor1Floors[Main.rand.Next(floor1Floors.Count)];
+            currentFloor = stage0Floors[Main.rand.Next(stage0Floors.Count)];
 
             FloorIDsInPlay = new List<int>();
             RoomSystem.RoomList = new List<Room>();
@@ -94,17 +97,9 @@ namespace TerRoguelike.Managers
                 PlaceSchematic(mapKey, placementPoint, anchorType);
 
                 FloorIDsInPlay.Add(currentFloor);
-                switch (currentFloor)
-                {
-                    case 0:
-                        currentFloor = 1;
-                        break;
-                    case 1:
-                        return;
-                    case 2:
-                        currentFloor = 1;
-                        break;
-                }
+                ChooseNextFloor();
+                if (currentFloor == -1)
+                    return;
 
                 GenerateNextFloor(selectedRoom);
             }
@@ -139,6 +134,14 @@ namespace TerRoguelike.Managers
                         if (!ForestRoomDown.Any())
                             anyDown = false;
                         if (!ForestRoomUp.Any())
+                            anyUp = false;
+                        break;
+                    case 3:
+                        if (!CorruptRoomRight.Any())
+                            anyRight = false;
+                        if (!CorruptRoomDown.Any())
+                            anyDown = false;
+                        if (!CorruptRoomUp.Any())
                             anyUp = false;
                         break;
                 }
@@ -218,6 +221,10 @@ namespace TerRoguelike.Managers
                     selectedRoom = ForestRoomRight[Main.rand.Next(ForestRoomRight.Count)];
                     ForestRoomRight.Remove(selectedRoom);
                     break;
+                case 3:
+                    selectedRoom = CorruptRoomRight[Main.rand.Next(CorruptRoomRight.Count)];
+                    CorruptRoomRight.Remove(selectedRoom);
+                    break;
             }
             
             string mapKey = selectedRoom.Key;
@@ -257,6 +264,10 @@ namespace TerRoguelike.Managers
                     selectedRoom = ForestRoomDown[Main.rand.Next(ForestRoomDown.Count)];
                     ForestRoomDown.Remove(selectedRoom);
                     break;
+                case 3:
+                    selectedRoom = CorruptRoomDown[Main.rand.Next(CorruptRoomDown.Count)];
+                    CorruptRoomDown.Remove(selectedRoom);
+                    break;
             }
 
             string mapKey = selectedRoom.Key;
@@ -294,6 +305,10 @@ namespace TerRoguelike.Managers
                 case 2:
                     selectedRoom = ForestRoomUp[Main.rand.Next(ForestRoomUp.Count)];
                     ForestRoomUp.Remove(selectedRoom);
+                    break;
+                case 3:
+                    selectedRoom = CorruptRoomUp[Main.rand.Next(CorruptRoomUp.Count)];
+                    CorruptRoomUp.Remove(selectedRoom);
                     break;
             }
 
@@ -340,6 +355,20 @@ namespace TerRoguelike.Managers
 
             PlaceRoom(roomCount, floorStartingRoom);
         }
+        public static void ChooseNextFloor()
+        {
+            int currentStage = FloorID[currentFloor].Stage;
+            List<Floor> nextFloors = FloorID.FindAll(x => x.Stage == currentStage + 1);
+            if (nextFloors.Any())
+            {
+                Floor nextFloor = nextFloors[Main.rand.Next(nextFloors.Count)];
+                currentFloor = nextFloor.FloorID;
+            }
+            else
+            {
+                currentFloor = -1;
+            }
+        }
         public static void ResetRoomGenLists()
         {
             BaseRoomRight = new List<Room>();
@@ -353,6 +382,10 @@ namespace TerRoguelike.Managers
             ForestRoomRight = new List<Room>();
             ForestRoomDown = new List<Room>();
             ForestRoomUp = new List<Room>();
+
+            CorruptRoomRight = new List<Room>();
+            CorruptRoomDown = new List<Room>();
+            CorruptRoomUp = new List<Room>();
         }
         public static void SetAllRoomIDs()
         {
@@ -377,6 +410,11 @@ namespace TerRoguelike.Managers
                 if (key.Contains("Forest"))
                 {
                     SortForestRoomIDs(i, key);
+                    continue;
+                }
+                if (key.Contains("Corrupt"))
+                {
+                    SortCorruptRoomIDs(i, key);
                     continue;
                 }
             }
@@ -422,6 +460,20 @@ namespace TerRoguelike.Managers
                 return;
             }
             ForestRoomRight.Add(RoomID[id]);
+        }
+        public static void SortCorruptRoomIDs(int id, string key)
+        {
+            if (key.Contains("Down"))
+            {
+                CorruptRoomDown.Add(RoomID[id]);
+                return;
+            }
+            if (key.Contains("Up"))
+            {
+                CorruptRoomUp.Add(RoomID[id]);
+                return;
+            }
+            CorruptRoomRight.Add(RoomID[id]);
         }
     }
 }
