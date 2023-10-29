@@ -80,7 +80,7 @@ namespace TerRoguelike.Projectiles
                 return;
             }
                 
-            Projectile.rotation = Projectile.velocity != Vector2.Zero ? Projectile.velocity.ToRotation() - (MathHelper.PiOver4 * 3f) : Projectile.oldRot[1];
+            Projectile.rotation = Projectile.velocity != Vector2.Zero ? Projectile.velocity.ToRotation() : Projectile.oldRot[1];
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
@@ -114,7 +114,7 @@ namespace TerRoguelike.Projectiles
                 Vector2 drawPosition = Projectile.oldPos[i] + new Vector2(Projectile.width * 0.5f, Projectile.height * 0.5f) - Main.screenPosition;
                 
                 // Become smaller the futher along the old positions we are.
-                Vector2 scale = new Vector2(1f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
+                Vector2 scale = i == 0 ? new Vector2(1f) : new Vector2(1f) * MathHelper.Lerp(0.25f, 0.75f, 1f - i / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
             return false;

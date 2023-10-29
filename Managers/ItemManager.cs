@@ -167,7 +167,7 @@ namespace TerRoguelike.Managers
             {
                 new ClingyGrenade(),
                 new PocketSpotter(),
-                new CoolantCanister(),
+                new CoolantBarrel(),
                 new AntiqueLens(),
                 new InstigatorsBrace(),
                 new HotPepper(),

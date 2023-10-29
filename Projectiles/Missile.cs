@@ -108,13 +108,13 @@ namespace TerRoguelike.Projectiles
                 Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f) - Main.screenPosition;
                 
                 // Become smaller the futher along the old positions we are.
-                Vector2 scale = new Vector2(2.2f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
+                Vector2 scale = new Vector2(2.2f) * MathHelper.Lerp(0.25f, 0.95f, 1f - i / (float)Projectile.oldPos.Length);
                 Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
             if (Projectile.velocity != Vector2.Zero)
             {
                 Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Missile").Value;
-                Vector2 drawPosition = Projectile.Center - Main.screenPosition;
+                Vector2 drawPosition = Projectile.Center - Main.screenPosition + (Vector2.UnitX * 5).RotatedBy(Projectile.rotation);
                 Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
             }
             return false;

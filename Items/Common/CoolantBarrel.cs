@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Items.Common
 {
-    public class CoolantCanister : BaseRoguelikeItem, ILocalizedModType
+    public class CoolantBarrel : BaseRoguelikeItem, ILocalizedModType
     {
-        public override int modItemID => ModContent.ItemType<CoolantCanister>();
+        public override int modItemID => ModContent.ItemType<CoolantBarrel>();
         public override bool CombatItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()
@@ -24,7 +24,7 @@ namespace TerRoguelike.Items.Common
         }
         public override void ItemEffects(Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().coolantCanister += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().coolantBarrel += Item.stack;
         }
     }
 }

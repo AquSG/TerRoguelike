@@ -186,15 +186,6 @@ Items: {
 			'''
 	}
 
-	CoolantCanister: {
-		DisplayName: Coolant Canister
-		Tooltip:
-			'''
-			10% increased attack speed
-			Extra copies of this item also grant 10% increased attack speed
-			'''
-	}
-
 	AntiqueLens: {
 		DisplayName: Antique Lens
 		Tooltip:
@@ -637,6 +628,15 @@ Items: {
 			0.4x damage
 			Bullets gain spread
 			Extra copies of this item increase the attack speed multiplier by 2
+			'''
+	}
+
+	CoolantBarrel: {
+		DisplayName: Coolant Barrel
+		Tooltip:
+			'''
+			10% increased attack speed
+			Extra copies of this item also grant 10% increased attack speed
 			'''
 	}
 }
