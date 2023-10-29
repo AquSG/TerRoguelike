@@ -69,13 +69,13 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
                 float colorInterpolation = (float)Math.Cos(Projectile.timeLeft / 32f + Main.GlobalTimeWrappedHourly / 20f + i / (float)Projectile.oldPos.Length * MathHelper.Pi) * 0.5f + 0.5f;
-                Color color = Color.Lerp(Color.LightSeaGreen, Color.LimeGreen, colorInterpolation) * 0.4f;
+                Color color = Color.Lerp(Color.LightSeaGreen, Color.LimeGreen, colorInterpolation) * (i <= 1 ? 1f - (i * 0.05f) : 0.7f);
                 color.A = 0;
                 Vector2 drawPosition = Projectile.oldPos[i] - Main.screenPosition + new Vector2(8f, 8f);
                 Color outerColor = color;
                 Color innerColor = color * 0.5f;
-                float intensity = 0.9f + 0.15f * (float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi);
-                intensity *= MathHelper.Lerp(0.15f, 1f, 1f - i / (float)Projectile.oldPos.Length);
+                float intensity = 0.9f + 0.075f * (float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi);
+                intensity *= i <= 1 ? 1f : MathHelper.Lerp(0.15f, 0.6f, 1f - i / (float)Projectile.oldPos.Length);
                 if (Projectile.timeLeft <= 60) //Shrinks to nothing when projectile is nearing death
                 {
                     intensity *= Projectile.timeLeft / 60f;
