@@ -105,6 +105,35 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new CorruptEnemyRoom8());
             RoomID.Add(new CorruptEnemyRoom9());
             RoomID.Add(new CorruptEnemyRoom10());
+            RoomID.Add(new SnowStartRoom());
+            RoomID.Add(new SnowBossRoom1());
+            RoomID.Add(new SnowEnemyRoom1());
+            RoomID.Add(new SnowEnemyRoom1Down());
+            RoomID.Add(new SnowEnemyRoom2());
+            RoomID.Add(new SnowEnemyRoom3Down());
+            RoomID.Add(new SnowEnemyRoom3Up());
+            RoomID.Add(new SnowEnemyRoom4());
+            RoomID.Add(new SnowEnemyRoom5());
+            RoomID.Add(new SnowEnemyRoom6());
+            RoomID.Add(new SnowEnemyRoom7Down());
+            RoomID.Add(new SnowEnemyRoom7Up());
+            RoomID.Add(new SnowEnemyRoom8());
+            RoomID.Add(new SnowEnemyRoom9());
+            RoomID.Add(new DesertStartRoom());
+            RoomID.Add(new DesertBossRoom1());
+            RoomID.Add(new DesertBossRoom1Transition());
+            RoomID.Add(new DesertEnemyRoom1());
+            RoomID.Add(new DesertEnemyRoom1Down());
+            RoomID.Add(new DesertEnemyRoom2Down());
+            RoomID.Add(new DesertEnemyRoom2Up());
+            RoomID.Add(new DesertEnemyRoom3());
+            RoomID.Add(new DesertEnemyRoom4());
+            RoomID.Add(new DesertEnemyRoom4Down());
+            RoomID.Add(new DesertEnemyRoom4Up());
+            RoomID.Add(new DesertEnemyRoom5());
+            RoomID.Add(new DesertEnemyRoom6());
+            RoomID.Add(new DesertEnemyRoom7());
+            RoomID.Add(new DesertEnemyRoom8());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
@@ -122,6 +151,8 @@ namespace TerRoguelike.Schematics
             FloorID.Add(new CrimsonFloor());
             FloorID.Add(new ForestFloor());
             FloorID.Add(new CorruptFloor());
+            FloorID.Add(new SnowFloor());
+            FloorID.Add(new DesertFloor());
         }
         internal static void Unload()
         {

@@ -33,6 +33,12 @@ namespace TerRoguelike.Managers
         public static List<Room> CorruptRoomRight;
         public static List<Room> CorruptRoomDown;
         public static List<Room> CorruptRoomUp;
+        public static List<Room> SnowRoomRight;
+        public static List<Room> SnowRoomDown;
+        public static List<Room> SnowRoomUp;
+        public static List<Room> DesertRoomRight;
+        public static List<Room> DesertRoomDown;
+        public static List<Room> DesertRoomUp;
 
 
         //The ultimate worldgen function
@@ -72,36 +78,95 @@ namespace TerRoguelike.Managers
 
             PlaceRoom(roomCount, firstRoom);
         }
+        public static void PlaceBossRoom(Room previousRoom)
+        {
+            var selectedRoom = RoomID[FloorID[currentFloor].BossRoomIDs[Main.rand.Next(FloorID[currentFloor].BossRoomIDs.Count)]];
+            if (selectedRoom.HasTransition)
+            {
+                for (int i = 0; i < RoomID.Count; i++)
+                {
+                    Room room = RoomID[i];
+                    if (!room.Key.Contains("Transition"))
+                        continue;
+                    if (room.Key.Contains(selectedRoom.Key))
+                    {
+                        PlaceTransitionRoom(room, previousRoom);
+                        previousRoom = room;
+                        break;
+                    }
+                }
+            }
+
+            string mapKey = selectedRoom.Key;
+            var schematic = TileMaps[mapKey];
+
+            Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+            selectedRoom.RoomDimensions = schematicSize;
+            Point placementPoint;
+
+            switch (previousRoom.TransitionDirection)
+            {
+                case 0:
+                    placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y));
+                    break;
+                case 1:
+                    placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - selectedRoom.RoomDimensions.X), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - 1));
+                    if (placementPoint.X < (int)previousRoom.RoomPosition.X)
+                        placementPoint.X = (int)previousRoom.RoomPosition.X;
+                    break;
+                case 2:
+                    placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - selectedRoom.RoomDimensions.X), (int)(previousRoom.RoomPosition.Y - selectedRoom.RoomDimensions.Y + 1));
+                    if (placementPoint.X < (int)previousRoom.RoomPosition.X)
+                        placementPoint.X = (int)previousRoom.RoomPosition.X;
+                    break;
+                default:
+                    placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y));
+                    break;
+
+            }
+            if (placementPoint.Y + selectedRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
+                placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y);
+
+            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
+            selectedRoom.RoomPosition = placementPoint.ToVector2();
+
+            RoomSystem.NewRoom(selectedRoom);
+
+            PlaceSchematic(mapKey, placementPoint, anchorType);
+
+            FloorIDsInPlay.Add(currentFloor);
+            ChooseNextFloor();
+            if (currentFloor == -1)
+                return;
+
+            GenerateNextFloor(selectedRoom);
+        }
+        public static void PlaceTransitionRoom(Room transitionRoom, Room previousRoom)
+        {
+            string mapKey = transitionRoom.Key;
+            var schematic = TileMaps[mapKey];
+
+            Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+            transitionRoom.RoomDimensions = schematicSize;
+
+            Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - transitionRoom.RoomDimensions.Y));
+
+            if (placementPoint.Y + transitionRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
+                placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - transitionRoom.RoomDimensions.Y);
+
+            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
+            transitionRoom.RoomPosition = placementPoint.ToVector2();
+
+            RoomSystem.NewRoom(transitionRoom);
+
+            PlaceSchematic(mapKey, placementPoint, anchorType);
+        }
         public static void PlaceRoom(int roomCount, Room previousRoom)
         {
             roomCount--;
             if (roomCount == 0)
             {
-                var selectedRoom = RoomID[FloorID[currentFloor].BossRoomIDs[Main.rand.Next(FloorID[currentFloor].BossRoomIDs.Count)]];
-                string mapKey = selectedRoom.Key;
-                var schematic = TileMaps[mapKey];
-
-                Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
-                selectedRoom.RoomDimensions = schematicSize;
-
-                Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y));
-
-                if (placementPoint.Y + selectedRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
-                    placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y);
-
-                SchematicAnchor anchorType = SchematicAnchor.TopLeft;
-                selectedRoom.RoomPosition = placementPoint.ToVector2();
-                
-                RoomSystem.NewRoom(selectedRoom);
-
-                PlaceSchematic(mapKey, placementPoint, anchorType);
-
-                FloorIDsInPlay.Add(currentFloor);
-                ChooseNextFloor();
-                if (currentFloor == -1)
-                    return;
-
-                GenerateNextFloor(selectedRoom);
+                PlaceBossRoom(previousRoom);
             }
             else
             {
@@ -142,6 +207,22 @@ namespace TerRoguelike.Managers
                         if (!CorruptRoomDown.Any())
                             anyDown = false;
                         if (!CorruptRoomUp.Any())
+                            anyUp = false;
+                        break;
+                    case 4:
+                        if (!SnowRoomRight.Any())
+                            anyRight = false;
+                        if (!SnowRoomDown.Any())
+                            anyDown = false;
+                        if (!SnowRoomUp.Any())
+                            anyUp = false;
+                        break;
+                    case 5:
+                        if (!DesertRoomRight.Any())
+                            anyRight = false;
+                        if (!DesertRoomDown.Any())
+                            anyDown = false;
+                        if (!DesertRoomUp.Any())
                             anyUp = false;
                         break;
                 }
@@ -225,6 +306,14 @@ namespace TerRoguelike.Managers
                     selectedRoom = CorruptRoomRight[Main.rand.Next(CorruptRoomRight.Count)];
                     CorruptRoomRight.Remove(selectedRoom);
                     break;
+                case 4:
+                    selectedRoom = SnowRoomRight[Main.rand.Next(SnowRoomRight.Count)];
+                    SnowRoomRight.Remove(selectedRoom);
+                    break;
+                case 5:
+                    selectedRoom = DesertRoomRight[Main.rand.Next(DesertRoomRight.Count)];
+                    DesertRoomRight.Remove(selectedRoom);
+                    break;
             }
             
             string mapKey = selectedRoom.Key;
@@ -268,6 +357,14 @@ namespace TerRoguelike.Managers
                     selectedRoom = CorruptRoomDown[Main.rand.Next(CorruptRoomDown.Count)];
                     CorruptRoomDown.Remove(selectedRoom);
                     break;
+                case 4:
+                    selectedRoom = SnowRoomDown[Main.rand.Next(SnowRoomDown.Count)];
+                    SnowRoomDown.Remove(selectedRoom);
+                    break;
+                case 5:
+                    selectedRoom = DesertRoomDown[Main.rand.Next(DesertRoomDown.Count)];
+                    DesertRoomDown.Remove(selectedRoom);
+                    break;
             }
 
             string mapKey = selectedRoom.Key;
@@ -309,6 +406,14 @@ namespace TerRoguelike.Managers
                 case 3:
                     selectedRoom = CorruptRoomUp[Main.rand.Next(CorruptRoomUp.Count)];
                     CorruptRoomUp.Remove(selectedRoom);
+                    break;
+                case 4:
+                    selectedRoom = SnowRoomUp[Main.rand.Next(SnowRoomUp.Count)];
+                    SnowRoomUp.Remove(selectedRoom);
+                    break;
+                case 5:
+                    selectedRoom = DesertRoomUp[Main.rand.Next(DesertRoomUp.Count)];
+                    DesertRoomUp.Remove(selectedRoom);
                     break;
             }
 
@@ -386,6 +491,14 @@ namespace TerRoguelike.Managers
             CorruptRoomRight = new List<Room>();
             CorruptRoomDown = new List<Room>();
             CorruptRoomUp = new List<Room>();
+
+            SnowRoomRight = new List<Room>();
+            SnowRoomDown = new List<Room>();
+            SnowRoomUp = new List<Room>();
+
+            DesertRoomRight = new List<Room>();
+            DesertRoomDown = new List<Room>();
+            DesertRoomUp = new List<Room>();
         }
         public static void SetAllRoomIDs()
         {
@@ -415,6 +528,16 @@ namespace TerRoguelike.Managers
                 if (key.Contains("Corrupt"))
                 {
                     SortCorruptRoomIDs(i, key);
+                    continue;
+                }
+                if (key.Contains("Snow"))
+                {
+                    SortSnowRoomIDs(i, key);
+                    continue;
+                }
+                if (key.Contains("Desert"))
+                {
+                    SortDesertRoomIDs(i, key);
                     continue;
                 }
             }
@@ -474,6 +597,34 @@ namespace TerRoguelike.Managers
                 return;
             }
             CorruptRoomRight.Add(RoomID[id]);
+        }
+        public static void SortSnowRoomIDs(int id, string key)
+        {
+            if (key.Contains("Down"))
+            {
+                SnowRoomDown.Add(RoomID[id]);
+                return;
+            }
+            if (key.Contains("Up"))
+            {
+                SnowRoomUp.Add(RoomID[id]);
+                return;
+            }
+            SnowRoomRight.Add(RoomID[id]);
+        }
+        public static void SortDesertRoomIDs(int id, string key)
+        {
+            if (key.Contains("Down"))
+            {
+                DesertRoomDown.Add(RoomID[id]);
+                return;
+            }
+            if (key.Contains("Up"))
+            {
+                DesertRoomUp.Add(RoomID[id]);
+                return;
+            }
+            DesertRoomRight.Add(RoomID[id]);
         }
     }
 }

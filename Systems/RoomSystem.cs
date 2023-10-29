@@ -255,7 +255,8 @@ namespace TerRoguelike.Systems
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(room.RoomDimensions.X - 2, i);
-                            if (Main.tile[targetBlock.ToPoint()].TileType != TileID.Platforms && Main.tile[targetBlock.ToPoint()].TileType != TileID.Torches)
+                            int tileType = Main.tile[targetBlock.ToPoint()].TileType;
+                            if (tileType != TileID.Platforms && tileType != TileID.Torches && tileType != 165)
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;
@@ -290,7 +291,8 @@ namespace TerRoguelike.Systems
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(i, side * room.RoomDimensions.Y - side);
 
-                            if (Main.tile[targetBlock.ToPoint()].TileType != TileID.Platforms)
+                            int tileType = Main.tile[targetBlock.ToPoint()].TileType;
+                            if (tileType != TileID.Platforms && tileType != 165)
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;
@@ -311,7 +313,8 @@ namespace TerRoguelike.Systems
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(side * room.RoomDimensions.X - side, i);
-                            if (Main.tile[targetBlock.ToPoint()].TileType != TileID.Platforms)
+                            int tileType = Main.tile[targetBlock.ToPoint()].TileType;
+                            if (tileType != TileID.Platforms && tileType != 165)
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;
