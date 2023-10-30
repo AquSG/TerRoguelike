@@ -128,7 +128,7 @@ namespace TerRoguelike.Managers
                     if (!Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC)
                         continue;
 
-                    if (Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID == myRoom)
+                    if (Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID == myRoom && !Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().hostileTurnedAlly)
                     {
                         anyAlive = true;
                         break;

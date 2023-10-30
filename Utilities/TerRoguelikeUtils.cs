@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.NPCs;
 
 namespace TerRoguelike.Utilities
 {
@@ -153,6 +154,38 @@ namespace TerRoguelike.Utilities
                 return b == 2;
             }
             return true;
+        }
+        /// <summary>
+        /// Returns the closest npc with the given conditions.
+        /// chaseFriendly == null: neutral. both friendly and hostile can pass
+        /// chaseFriendly == true: only passes if friendly
+        /// chaseFriendly == false: only passes if not friendly
+        /// </summary>
+        /// <param name="origin"></param>
+        /// <param name="maxDistance"></param>
+        /// <returns>The index of the npc. -1 if not found</returns>
+        public static int ClosestNPC(Vector2 origin, float maxDistance, bool? chaseFriendly)
+        {
+            int furthest = -1;
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active)
+                    continue;
+
+                TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                
+                if (modNPC.CanBeChased(false, chaseFriendly))
+                {
+                    float distance = (origin - npc.getRect().ClosestPointInRect(origin)).Length();
+                    if (distance < maxDistance)
+                    {
+                        maxDistance = distance;
+                        furthest = i;
+                    }
+                }
+            }
+            return furthest;
         }
     }
 }

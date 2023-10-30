@@ -19,6 +19,7 @@ using TerRoguelike.TerPlayer;
 using TerRoguelike.Managers;
 using System.IO;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.NPCs
 {
@@ -27,6 +28,7 @@ namespace TerRoguelike.NPCs
         #region Variables
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
+        public bool hostileTurnedAlly = false;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -45,21 +47,18 @@ namespace TerRoguelike.NPCs
         public int bleedingHitCooldown = 0;
         public int ballAndChainSlow = 0;
         public Vector2 drawCenter = new Vector2(-1000);
+        public int whoAmI;
+        public int targetPlayer = -1;
+        public int targetNPC = -1;
+        public int friendlyFireHitCooldown = 0;
         #endregion
 
         #region Base AIs
         public void RogueFighterAI(NPC npc, float xCap, float jumpVelocity)
         {
-            if (!npc.HasPlayerTarget)
-            {
-                npc.target = npc.FindClosestPlayer();
-                npc.direction = 1;
-                npc.spriteDirection = 1;
-            }
-            Player target = Main.player[npc.target];
+            Entity target = GetTarget(npc, false, false);
 
-            
-            if (npc.ai[0] == 0 && !target.dead)
+            if (npc.ai[0] == 0 && (targetPlayer != -1 ? !Main.player[targetPlayer].dead : true) && (target != null ? target.active : false))
             {
                 if (npc.Center.X < target.Center.X)
                 {
@@ -108,47 +107,51 @@ namespace TerRoguelike.NPCs
             else if (npc.ai[0] > 0)
                 npc.ai[0] = 0f;
 
-            if (npc.velocity.Y == 0f && Main.player[npc.target].Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - Main.player[npc.target].Center.X) < (float)(Main.player[npc.target].width * 3) && Collision.CanHit(npc, Main.player[npc.target]))
+            if (target != null)
             {
-
-                if (npc.velocity.Y == 0f)
+                if (npc.velocity.Y == 0f && target.Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
                 {
-                    int num112 = 6;
-                    if (Main.player[npc.target].Bottom.Y > npc.Top.Y - (float)(num112 * 16))
+
+                    if (npc.velocity.Y == 0f)
                     {
-                        npc.velocity.Y = jumpVelocity;
-                    }
-                    else
-                    {
-                        int bottomtilepointx = (int)(npc.Center.X / 16f);
-                        int bottomtilepointY = (int)(npc.Bottom.Y / 16f) - 1;
-                        for (int i = bottomtilepointY; i > bottomtilepointY - num112; i--)
+                        int padding = 6;
+                        if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                         {
-                            if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                            npc.velocity.Y = jumpVelocity;
+                        }
+                        else
+                        {
+                            int bottomtilepointx = (int)(npc.Center.X / 16f);
+                            int bottomtilepointY = (int)(npc.Bottom.Y / 16f) - 1;
+                            for (int i = bottomtilepointY; i > bottomtilepointY - padding; i--)
                             {
-                                npc.velocity.Y = jumpVelocity;
-                                break;
+                                if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                                {
+                                    npc.velocity.Y = jumpVelocity;
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-            }
-            else if (npc.velocity.Y == 0f && Main.player[npc.target].Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - Main.player[npc.target].Center.X) < (float)(Main.player[npc.target].width * 3) && Collision.CanHit(npc, Main.player[npc.target]))
-            {
-                int fluff = 6;
-                int bottomtilepointx = (int)(npc.Center.X / 16f);
-                int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                else if (npc.velocity.Y == 0f && target.Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
                 {
-                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    int fluff = 6;
+                    int bottomtilepointx = (int)(npc.Center.X / 16f);
+                    int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
                     {
-                        npc.position.Y += 1;
-                        npc.stairFall = true;
-                        npc.velocity.Y += 0.01f;
-                        break;
+                        if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                        {
+                            npc.position.Y += 1;
+                            npc.stairFall = true;
+                            npc.velocity.Y += 0.01f;
+                            break;
+                        }
                     }
                 }
             }
+
             if (npc.velocity.Y >= 0f)
             {
                 int dir = 0;
@@ -193,13 +196,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueSpookrowAI(NPC npc, float xCap, float jumpVelocity)
         {
-            if (!npc.HasPlayerTarget)
-            {
-                npc.target = npc.FindClosestPlayer();
-                npc.direction = 1;
-                npc.spriteDirection = 1;
-            }
-            Player target = Main.player[npc.target];
+            Entity target = GetTarget(npc, false, false);
 
             int slopeCheck1 = (int)Main.tile[(int)(npc.BottomLeft.X / 16f), (int)(npc.BottomLeft.Y / 16f)].Slope;
             int slopeCheck2 = (int)Main.tile[(int)(npc.BottomRight.X / 16f), (int)(npc.BottomRight.Y / 16f)].Slope;
@@ -221,10 +218,21 @@ namespace TerRoguelike.NPCs
             if (npc.collideX)
                 npc.velocity.X = npc.oldVelocity.X * -0.5f;
 
-            if (npc.Center.X < target.Center.X)
-                npc.direction = 1;
+            if (target != null)
+            {
+                if (npc.Center.X < target.Center.X)
+                    npc.direction = 1;
+                else
+                    npc.direction = -1;
+            }
             else
-                npc.direction = -1;
+            {
+                if (npc.velocity.X != 0)
+                {
+                    npc.direction = -(int)(npc.velocity.X / Math.Abs(npc.velocity.X));
+                }
+            }
+            
             
             if (npc.ai[0] == 0)
             {
@@ -247,24 +255,26 @@ namespace TerRoguelike.NPCs
 
             
 
-            
-            if (npc.velocity.Y == 0f && Main.player[npc.target].Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - Main.player[npc.target].Center.X) < (float)(Main.player[npc.target].width * 4) && Collision.CanHit(npc, Main.player[npc.target]))
+            if (target != null)
             {
-                int fluff = 6;
-                int bottomtilepointx = (int)(npc.Center.X / 16f);
-                int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                if (npc.velocity.Y == 0f && target.Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 4) && Collision.CanHit(npc, target))
                 {
-                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    int fluff = 6;
+                    int bottomtilepointx = (int)(npc.Center.X / 16f);
+                    int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
                     {
-                        npc.position.Y += 1;
-                        npc.stairFall = true;
-                        npc.velocity.Y += 0.01f;
-                        break;
+                        if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                        {
+                            npc.position.Y += 1;
+                            npc.stairFall = true;
+                            npc.velocity.Y += 0.01f;
+                            break;
+                        }
                     }
                 }
             }
-
+            
             if (npc.velocity.Y >= 0f)
             {
                 int dir = 0;
@@ -311,7 +321,10 @@ namespace TerRoguelike.NPCs
         #endregion
 
         public override bool InstancePerEntity => true;
-
+        public override void OnSpawn(NPC npc, IEntitySource source)
+        {
+            whoAmI = npc.whoAmI;
+        }
         public override bool PreAI(NPC npc)
         {
             if (ballAndChainSlow > 0) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
@@ -396,6 +409,40 @@ namespace TerRoguelike.NPCs
             {
                 npc.velocity *= 0.7f;
                 ballAndChainSlow--;
+            }
+
+            if (hostileTurnedAlly)
+            {
+                if (friendlyFireHitCooldown == 0)
+                {
+                    for (int i = 0; i < Main.maxNPCs; i++)
+                    {
+                        NPC target = Main.npc[i];
+                        if (!target.active)
+                            continue;
+                        if (!target.GetGlobalNPC<TerRoguelikeGlobalNPC>().CanBeChased(false, false))
+                            continue;
+
+                        if (npc.getRect().Intersects(target.getRect()))
+                        {
+                            NPC.HitInfo info = new NPC.HitInfo();
+                            info.HideCombatText = true;
+                            info.Damage = npc.damage;
+                            info.InstantKill = false;
+                            info.HitDirection = 1;
+                            info.Knockback = 0f;
+                            info.Crit = false;
+
+                            target.StrikeNPC(info);
+                            NetMessage.SendStrikeNPC(target, info);
+                            CombatText.NewText(target.getRect(), Color.Orange, npc.damage);
+                            friendlyFireHitCooldown += 20;
+                        }
+                    }
+                }
+                else if (friendlyFireHitCooldown > 0)
+                    friendlyFireHitCooldown--;
+                
             }
         }
         public void IgniteHit(int hitDamage, NPC npc, int owner)
@@ -618,6 +665,76 @@ namespace TerRoguelike.NPCs
                     break;
             }
             return position;
+        }
+        /// <summary>
+        /// Whether this npc can be chased with the given conditions.
+        /// chaseFriendly == null: neutral. both friendly and hostile can pass
+        /// chaseFriendly == true: only passes if friendly
+        /// chaseFriendly == false: only passes if not friendly
+        /// </summary>
+        /// <param name="ignoreDontTakeDamage"></param>
+        /// <param name="chaseFriendly"></param>
+        /// <returns>true if passing, else false</returns>
+        public bool CanBeChased(bool ignoreDontTakeDamage = false, bool? chaseFriendly = false)
+        {
+            NPC npc = Main.npc[whoAmI];
+            bool allianceCheck = chaseFriendly == null ? true : (chaseFriendly == true ? npc.friendly : !npc.friendly);
+            if (npc.active && npc.chaseable && npc.lifeMax > 5 && (!npc.dontTakeDamage || ignoreDontTakeDamage) && allianceCheck)
+            {
+                return !npc.immortal;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Basic finding target behaviour. if friendly, targets hostile npcs. if not friendly, targets players.
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <param name="resetDir"></param>
+        /// <param name="resetSpriteDir"></param>
+        /// <returns></returns>
+        public Entity GetTarget(NPC npc, bool resetDir = false, bool resetSpriteDir = false)
+        {
+            if (targetPlayer != -1)
+            {
+                if (!Main.player[targetPlayer].active || Main.player[targetPlayer].dead || npc.friendly)
+                {
+                    targetPlayer = -1;
+                }
+            }
+            if (targetNPC != -1)
+            {
+                if (!Main.npc[targetNPC].GetGlobalNPC<TerRoguelikeGlobalNPC>().CanBeChased(false, false) || !npc.friendly)
+                {
+                    
+                    targetNPC = -1;
+                }
+            }
+
+            if (npc.friendly)
+            {
+                if (targetNPC == -1 || targetPlayer != -1)
+                {
+                    targetNPC = ClosestNPC(npc.Center, 3200f, false);
+                    targetPlayer = -1;
+                    if (resetDir)
+                        npc.direction = 1;
+                    if (resetSpriteDir)
+                        npc.spriteDirection = 1;
+                }
+            }
+            else
+            {
+                if (targetPlayer == -1 || targetNPC != -1)
+                {
+                    targetPlayer = npc.FindClosestPlayer();
+                    targetNPC = -1;
+                    if (resetDir)
+                        npc.direction = 1;
+                    if (resetSpriteDir)
+                        npc.spriteDirection = 1;
+                }
+            }
+            return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
         }
     }
 
