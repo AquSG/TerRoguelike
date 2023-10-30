@@ -1,3 +1,5 @@
+MapBuildingMessage: Forming the Dungeon
+
 Projectiles: {
 	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile
 	ItemSpawningProjectile.DisplayName: Item Spawning Projectile
@@ -638,6 +640,16 @@ Items: {
 			10% increased attack speed
 			Extra copies of this item also grant 10% increased attack speed
 			'''
+	}
+
+	BlackTile: {
+		DisplayName: Black Tile
+		Tooltip: ""
+	}
+
+	BlackWall: {
+		DisplayName: Black Wall
+		Tooltip: ""
 	}
 }
 

@@ -16,6 +16,7 @@ using tModPorter;
 using Terraria.Localization;
 using TerRoguelike.World;
 using TerRoguelike.MainMenu;
+using Microsoft.Xna.Framework;
 
 namespace TerRoguelike.Systems
 {
@@ -28,9 +29,15 @@ namespace TerRoguelike.Systems
         }
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
+            tasks.RemoveAll(x => x.Name != "Reset");
             tasks.Add(new PassLegacy("Building the Map", (progress, config) =>
             {
+                progress.CurrentPassWeight = 1;
+                progress.Value = 0;
                 progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
+                Main.worldSurface = 200;
+                Main.rockLayer = 225;
+                FillTheFuckingWorld(ref progress);
                 RoomManager.GenerateRoomStructure();
                 Main.spawnTileX = (Main.maxTilesX / 32) + 12;
                 Main.spawnTileY = (Main.maxTilesY / 2) + 12;
@@ -39,6 +46,21 @@ namespace TerRoguelike.Systems
                 if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
                     TerRoguelikeWorld.IsDeletableOnExit = true;
             }));
+        }
+        public void FillTheFuckingWorld(ref GenerationProgress progress)
+        {
+            double progPerTile = 0.98d / ((Main.maxTilesY - Main.worldSurface) * Main.maxTilesX);
+            for (int y = (int)Main.worldSurface; y < Main.maxTilesY; y++)
+            {
+                for (int x = 1; x < Main.maxTilesX; x++)
+                {
+                    progress.Value += progPerTile;
+                    WorldGen.PlaceTile(x, y, ModContent.TileType<Tiles.BlackTile>(), true);
+                    if (y == (int)Main.worldSurface)
+                        continue;
+                    WorldGen.PlaceWall(x, y, ModContent.WallType<Tiles.BlackWall>(), true);
+                }
+            }
         }
     }
 }
