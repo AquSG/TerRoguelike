@@ -21,24 +21,7 @@ namespace TerRoguelike.Managers
         public static List<int> oldRoomDirections;
         public static int currentFloor;
 
-        public static List<Room> BaseRoomRight;
-        public static List<Room> BaseRoomDown;
-        public static List<Room> BaseRoomUp;
-        public static List<Room> CrimsonRoomRight;
-        public static List<Room> CrimsonRoomDown;
-        public static List<Room> CrimsonRoomUp;
-        public static List<Room> ForestRoomRight;
-        public static List<Room> ForestRoomDown;
-        public static List<Room> ForestRoomUp;
-        public static List<Room> CorruptRoomRight;
-        public static List<Room> CorruptRoomDown;
-        public static List<Room> CorruptRoomUp;
-        public static List<Room> SnowRoomRight;
-        public static List<Room> SnowRoomDown;
-        public static List<Room> SnowRoomUp;
-        public static List<Room> DesertRoomRight;
-        public static List<Room> DesertRoomDown;
-        public static List<Room> DesertRoomUp;
+        public static List<Room> RoomGenPool;
 
 
         //The ultimate worldgen function
@@ -54,7 +37,7 @@ namespace TerRoguelike.Managers
             FloorIDsInPlay = new List<int>();
             RoomSystem.RoomList = new List<Room>();
             oldRoomDirections = new List<int>();
-            SetAllRoomIDs();
+            RoomGenPool = RoomID.FindAll(x => true);
 
             int firstRoomID = FloorID[currentFloor].StartRoomID;
             int roomCount = 8;
@@ -73,25 +56,47 @@ namespace TerRoguelike.Managers
             firstRoom.RoomPosition = placementPoint.ToVector2();
             firstRoom.RoomDimensions = schematicSize;
             RoomSystem.NewRoom(firstRoom);
+            RoomGenPool.Remove(firstRoom);
             
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
             PlaceRoom(roomCount, firstRoom);
+        }
+        public static string GetFloorKey()
+        {
+            switch (currentFloor)
+            {
+                case 0:
+                    return "Base";
+                case 1:
+                    return "Crimson";
+                case 2:
+                    return "Forest";
+                case 3:
+                    return "Corrupt";
+                case 4:
+                    return "Snow";
+                case 5:
+                    return "Desert";
+                default:
+                    return null;
+            }
         }
         public static void PlaceBossRoom(Room previousRoom)
         {
             var selectedRoom = RoomID[FloorID[currentFloor].BossRoomIDs[Main.rand.Next(FloorID[currentFloor].BossRoomIDs.Count)]];
             if (selectedRoom.HasTransition)
             {
-                for (int i = 0; i < RoomID.Count; i++)
+                for (int i = 0; i < RoomGenPool.Count; i++)
                 {
-                    Room room = RoomID[i];
+                    Room room = RoomGenPool[i];
                     if (!room.Key.Contains("Transition"))
                         continue;
                     if (room.Key.Contains(selectedRoom.Key))
                     {
                         PlaceTransitionRoom(room, previousRoom);
                         previousRoom = room;
+                        RoomGenPool.Remove(room);
                         break;
                     }
                 }
@@ -131,7 +136,7 @@ namespace TerRoguelike.Managers
             selectedRoom.RoomPosition = placementPoint.ToVector2();
 
             RoomSystem.NewRoom(selectedRoom);
-
+            RoomGenPool.Remove(selectedRoom);
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
             FloorIDsInPlay.Add(currentFloor);
@@ -171,61 +176,11 @@ namespace TerRoguelike.Managers
             else
             {
                 Room placedRoom;
-                bool anyRight = true;
-                bool anyDown = true;
-                bool anyUp = true;
+                bool anyRight = false;
+                bool anyDown = false;
+                bool anyUp = false;
 
-                switch (currentFloor)
-                {
-                    case 0:
-                        if (!BaseRoomRight.Any())
-                            anyRight = false;
-                        if (!BaseRoomDown.Any())
-                            anyDown = false;
-                        if (!BaseRoomUp.Any())
-                            anyUp = false;
-                        break;
-                    case 1:
-                        if (!CrimsonRoomRight.Any())
-                            anyRight = false;
-                        if (!CrimsonRoomDown.Any())
-                            anyDown = false;
-                        if (!CrimsonRoomUp.Any())
-                            anyUp = false;
-                        break;
-                    case 2:
-                        if (!ForestRoomRight.Any())
-                            anyRight = false;
-                        if (!ForestRoomDown.Any())
-                            anyDown = false;
-                        if (!ForestRoomUp.Any())
-                            anyUp = false;
-                        break;
-                    case 3:
-                        if (!CorruptRoomRight.Any())
-                            anyRight = false;
-                        if (!CorruptRoomDown.Any())
-                            anyDown = false;
-                        if (!CorruptRoomUp.Any())
-                            anyUp = false;
-                        break;
-                    case 4:
-                        if (!SnowRoomRight.Any())
-                            anyRight = false;
-                        if (!SnowRoomDown.Any())
-                            anyDown = false;
-                        if (!SnowRoomUp.Any())
-                            anyUp = false;
-                        break;
-                    case 5:
-                        if (!DesertRoomRight.Any())
-                            anyRight = false;
-                        if (!DesertRoomDown.Any())
-                            anyDown = false;
-                        if (!DesertRoomUp.Any())
-                            anyUp = false;
-                        break;
-                }
+                CheckDirAvailability(ref anyRight, ref anyDown, ref anyUp);
 
                 List<int> directionsAvailable = new List<int>();
                 if (previousRoom.CanExitRight && anyRight)
@@ -255,7 +210,7 @@ namespace TerRoguelike.Managers
                         directionsAvailable.Add(2);
                 }
 
-                if (!directionsAvailable.Any() || directionsAvailable.Count == 0)
+                if (!directionsAvailable.Any() || directionsAvailable.Count == 0) //failsafe. if no directions available, just plop down the boss room
                 {
                     PlaceRoom(1, previousRoom);
                     return;
@@ -287,34 +242,7 @@ namespace TerRoguelike.Managers
         }
         public static Room PlaceRight(Room previousRoom)
         {
-            Room selectedRoom = RoomID[0];
-            switch (currentFloor)
-            {
-                case 0:
-                    selectedRoom = BaseRoomRight[Main.rand.Next(BaseRoomRight.Count)];
-                    BaseRoomRight.Remove(selectedRoom);
-                    break;
-                case 1:
-                    selectedRoom = CrimsonRoomRight[Main.rand.Next(CrimsonRoomRight.Count)];
-                    CrimsonRoomRight.Remove(selectedRoom);
-                    break;
-                case 2:
-                    selectedRoom = ForestRoomRight[Main.rand.Next(ForestRoomRight.Count)];
-                    ForestRoomRight.Remove(selectedRoom);
-                    break;
-                case 3:
-                    selectedRoom = CorruptRoomRight[Main.rand.Next(CorruptRoomRight.Count)];
-                    CorruptRoomRight.Remove(selectedRoom);
-                    break;
-                case 4:
-                    selectedRoom = SnowRoomRight[Main.rand.Next(SnowRoomRight.Count)];
-                    SnowRoomRight.Remove(selectedRoom);
-                    break;
-                case 5:
-                    selectedRoom = DesertRoomRight[Main.rand.Next(DesertRoomRight.Count)];
-                    DesertRoomRight.Remove(selectedRoom);
-                    break;
-            }
+            Room selectedRoom = SelectRoom(0);
             
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -338,34 +266,7 @@ namespace TerRoguelike.Managers
         }
         public static Room PlaceDown(Room previousRoom)
         {
-            Room selectedRoom = RoomID[0];
-            switch (currentFloor)
-            {
-                case 0:
-                    selectedRoom = BaseRoomDown[Main.rand.Next(BaseRoomDown.Count)];
-                    BaseRoomDown.Remove(selectedRoom);
-                    break;
-                case 1:
-                    selectedRoom = CrimsonRoomDown[Main.rand.Next(CrimsonRoomDown.Count)];
-                    CrimsonRoomDown.Remove(selectedRoom);
-                    break;
-                case 2:
-                    selectedRoom = ForestRoomDown[Main.rand.Next(ForestRoomDown.Count)];
-                    ForestRoomDown.Remove(selectedRoom);
-                    break;
-                case 3:
-                    selectedRoom = CorruptRoomDown[Main.rand.Next(CorruptRoomDown.Count)];
-                    CorruptRoomDown.Remove(selectedRoom);
-                    break;
-                case 4:
-                    selectedRoom = SnowRoomDown[Main.rand.Next(SnowRoomDown.Count)];
-                    SnowRoomDown.Remove(selectedRoom);
-                    break;
-                case 5:
-                    selectedRoom = DesertRoomDown[Main.rand.Next(DesertRoomDown.Count)];
-                    DesertRoomDown.Remove(selectedRoom);
-                    break;
-            }
+            Room selectedRoom = SelectRoom(1);
 
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -388,34 +289,7 @@ namespace TerRoguelike.Managers
         }
         public static Room PlaceUp(Room previousRoom)
         {
-            Room selectedRoom = RoomID[0];
-            switch (currentFloor)
-            {
-                case 0:
-                    selectedRoom = BaseRoomUp[Main.rand.Next(BaseRoomUp.Count)];
-                    BaseRoomUp.Remove(selectedRoom);
-                    break;
-                case 1:
-                    selectedRoom = CrimsonRoomUp[Main.rand.Next(CrimsonRoomUp.Count)];
-                    CrimsonRoomUp.Remove(selectedRoom);
-                    break;
-                case 2:
-                    selectedRoom = ForestRoomUp[Main.rand.Next(ForestRoomUp.Count)];
-                    ForestRoomUp.Remove(selectedRoom);
-                    break;
-                case 3:
-                    selectedRoom = CorruptRoomUp[Main.rand.Next(CorruptRoomUp.Count)];
-                    CorruptRoomUp.Remove(selectedRoom);
-                    break;
-                case 4:
-                    selectedRoom = SnowRoomUp[Main.rand.Next(SnowRoomUp.Count)];
-                    SnowRoomUp.Remove(selectedRoom);
-                    break;
-                case 5:
-                    selectedRoom = DesertRoomUp[Main.rand.Next(DesertRoomUp.Count)];
-                    DesertRoomUp.Remove(selectedRoom);
-                    break;
-            }
+            Room selectedRoom = SelectRoom(2);
 
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -474,157 +348,75 @@ namespace TerRoguelike.Managers
                 currentFloor = -1;
             }
         }
-        public static void ResetRoomGenLists()
+        public static Room SelectRoom(int direction)
         {
-            BaseRoomRight = new List<Room>();
-            BaseRoomDown = new List<Room>();
-            BaseRoomUp = new List<Room>();
+            if (!RoomGenPool.Any())
+                return RoomID[0];
 
-            CrimsonRoomRight = new List<Room>();
-            CrimsonRoomDown = new List<Room>();
-            CrimsonRoomUp = new List<Room>();
+            string floorKey = GetFloorKey();
 
-            ForestRoomRight = new List<Room>();
-            ForestRoomDown = new List<Room>();
-            ForestRoomUp = new List<Room>();
-
-            CorruptRoomRight = new List<Room>();
-            CorruptRoomDown = new List<Room>();
-            CorruptRoomUp = new List<Room>();
-
-            SnowRoomRight = new List<Room>();
-            SnowRoomDown = new List<Room>();
-            SnowRoomUp = new List<Room>();
-
-            DesertRoomRight = new List<Room>();
-            DesertRoomDown = new List<Room>();
-            DesertRoomUp = new List<Room>();
-        }
-        public static void SetAllRoomIDs()
-        {
-            ResetRoomGenLists();
-
-            for (int i = 0; i < RoomID.Count; i++)
+            List<Room> roomSelection = new List<Room>();
+            
+            for (int i = 0; i < RoomGenPool.Count; i++)
             {
-                string key = RoomID[i].Key;
-                if (key.Contains("Boss") || key.Contains("Start"))
+                Room room = RoomGenPool[i];
+                if (!room.Key.Contains(floorKey))
+                    continue;
+                if (room.Key.Contains("Boss"))
+                    continue;
+                if (room.Key.Contains("Start"))
+                    continue;
+                if (room.Key.Contains("Transition"))
                     continue;
 
-                if (key.Contains("Base"))
+                bool containsDir = false;
+                if (direction == 1 && room.Key.Contains("Down"))
+                    containsDir = true;
+                else if (direction == 2 && room.Key.Contains("Up"))
+                    containsDir = true;
+                else if (direction == 0 && !room.Key.Contains("Down") && !room.Key.Contains("Up"))
+                    containsDir = true;
+
+                if (containsDir)
                 {
-                    SortBaseRoomIDs(i, key);
-                    continue;
-                }
-                if (key.Contains("Crimson"))
-                {
-                    SortCrimsonRoomIDs(i, key);
-                    continue;
-                }
-                if (key.Contains("Forest"))
-                {
-                    SortForestRoomIDs(i, key);
-                    continue;
-                }
-                if (key.Contains("Corrupt"))
-                {
-                    SortCorruptRoomIDs(i, key);
-                    continue;
-                }
-                if (key.Contains("Snow"))
-                {
-                    SortSnowRoomIDs(i, key);
-                    continue;
-                }
-                if (key.Contains("Desert"))
-                {
-                    SortDesertRoomIDs(i, key);
-                    continue;
+                    roomSelection.Add(room);
                 }
             }
+            if (roomSelection.Any())
+            {
+                Room selectedRoom = roomSelection[Main.rand.Next(roomSelection.Count)];
+                RoomGenPool.Remove(selectedRoom);
+                return selectedRoom;
+            }
+
+            return RoomID[0];
         }
-        public static void SortBaseRoomIDs(int id, string key)
+        public static void CheckDirAvailability(ref bool anyRight, ref bool anyDown, ref bool anyUp)
         {
-            if (key.Contains("Down"))
+            string floorKey = GetFloorKey();
+            for (int i = 0; i < RoomGenPool.Count; i++)
             {
-                BaseRoomDown.Add(RoomID[id]);
-                return;
+                Room room = RoomGenPool[i];
+                if (!room.Key.Contains(floorKey))
+                    continue;
+                if (room.Key.Contains("Boss"))
+                    continue;
+                if (room.Key.Contains("Start"))
+                    continue;
+                if (room.Key.Contains("Transition"))
+                    continue;
+
+                if (room.Key.Contains("Down"))
+                {
+                    anyDown = true;
+                }
+                else if (room.Key.Contains("Up"))
+                {
+                    anyUp = true;
+                }
+                else
+                    anyRight = true;
             }
-            if (key.Contains("Up"))
-            {
-                BaseRoomUp.Add(RoomID[id]);
-                return;
-            }
-            BaseRoomRight.Add(RoomID[id]);
-        }
-        public static void SortCrimsonRoomIDs(int id, string key)
-        {
-            if (key.Contains("Down"))
-            {
-                CrimsonRoomDown.Add(RoomID[id]);
-                return;
-            }
-            if (key.Contains("Up"))
-            {
-                CrimsonRoomUp.Add(RoomID[id]);
-                return;
-            }
-            CrimsonRoomRight.Add(RoomID[id]);
-        }
-        public static void SortForestRoomIDs(int id, string key)
-        {
-            if (key.Contains("Down"))
-            {
-                ForestRoomDown.Add(RoomID[id]);
-                return;
-            }
-            if (key.Contains("Up"))
-            {
-                ForestRoomUp.Add(RoomID[id]);
-                return;
-            }
-            ForestRoomRight.Add(RoomID[id]);
-        }
-        public static void SortCorruptRoomIDs(int id, string key)
-        {
-            if (key.Contains("Down"))
-            {
-                CorruptRoomDown.Add(RoomID[id]);
-                return;
-            }
-            if (key.Contains("Up"))
-            {
-                CorruptRoomUp.Add(RoomID[id]);
-                return;
-            }
-            CorruptRoomRight.Add(RoomID[id]);
-        }
-        public static void SortSnowRoomIDs(int id, string key)
-        {
-            if (key.Contains("Down"))
-            {
-                SnowRoomDown.Add(RoomID[id]);
-                return;
-            }
-            if (key.Contains("Up"))
-            {
-                SnowRoomUp.Add(RoomID[id]);
-                return;
-            }
-            SnowRoomRight.Add(RoomID[id]);
-        }
-        public static void SortDesertRoomIDs(int id, string key)
-        {
-            if (key.Contains("Down"))
-            {
-                DesertRoomDown.Add(RoomID[id]);
-                return;
-            }
-            if (key.Contains("Up"))
-            {
-                DesertRoomUp.Add(RoomID[id]);
-                return;
-            }
-            DesertRoomRight.Add(RoomID[id]);
         }
     }
 }
