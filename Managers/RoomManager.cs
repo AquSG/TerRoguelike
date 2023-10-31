@@ -19,7 +19,7 @@ namespace TerRoguelike.Managers
     {
         public static List<int> FloorIDsInPlay;
         public static List<int> oldRoomDirections;
-        public static int currentFloor;
+        public static int currentFloorGen;
 
         public static List<Room> RoomGenPool;
 
@@ -32,14 +32,14 @@ namespace TerRoguelike.Managers
                 0,
                 2
             };
-            currentFloor = stage0Floors[Main.rand.Next(stage0Floors.Count)];
+            currentFloorGen = stage0Floors[Main.rand.Next(stage0Floors.Count)];
 
             FloorIDsInPlay = new List<int>();
             RoomSystem.RoomList = new List<Room>();
             oldRoomDirections = new List<int>();
             RoomGenPool = RoomID.FindAll(x => true);
 
-            int firstRoomID = FloorID[currentFloor].StartRoomID;
+            int firstRoomID = FloorID[currentFloorGen].StartRoomID;
             int roomCount = 8;
             string mapKey = RoomID[firstRoomID].Key;
             var schematic = TileMaps[mapKey];
@@ -64,7 +64,7 @@ namespace TerRoguelike.Managers
         }
         public static string GetFloorKey()
         {
-            switch (currentFloor)
+            switch (currentFloorGen)
             {
                 case 0:
                     return "Base";
@@ -84,7 +84,7 @@ namespace TerRoguelike.Managers
         }
         public static void PlaceBossRoom(Room previousRoom)
         {
-            var selectedRoom = RoomID[FloorID[currentFloor].BossRoomIDs[Main.rand.Next(FloorID[currentFloor].BossRoomIDs.Count)]];
+            var selectedRoom = RoomID[FloorID[currentFloorGen].BossRoomIDs[Main.rand.Next(FloorID[currentFloorGen].BossRoomIDs.Count)]];
             if (selectedRoom.HasTransition)
             {
                 for (int i = 0; i < RoomGenPool.Count; i++)
@@ -139,9 +139,9 @@ namespace TerRoguelike.Managers
             RoomGenPool.Remove(selectedRoom);
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
-            FloorIDsInPlay.Add(currentFloor);
+            FloorIDsInPlay.Add(currentFloorGen);
             ChooseNextFloor();
-            if (currentFloor == -1)
+            if (currentFloorGen == -1)
                 return;
 
             GenerateNextFloor(selectedRoom);
@@ -314,7 +314,7 @@ namespace TerRoguelike.Managers
         {
             oldRoomDirections.Clear();
 
-            Room floorStartingRoom = RoomID[FloorID[currentFloor].StartRoomID];
+            Room floorStartingRoom = RoomID[FloorID[currentFloorGen].StartRoomID];
             int roomCount = 8;
 
             string mapKey = floorStartingRoom.Key;
@@ -336,16 +336,16 @@ namespace TerRoguelike.Managers
         }
         public static void ChooseNextFloor()
         {
-            int currentStage = FloorID[currentFloor].Stage;
+            int currentStage = FloorID[currentFloorGen].Stage;
             List<Floor> nextFloors = FloorID.FindAll(x => x.Stage == currentStage + 1);
             if (nextFloors.Any())
             {
                 Floor nextFloor = nextFloors[Main.rand.Next(nextFloors.Count)];
-                currentFloor = nextFloor.FloorID;
+                currentFloorGen = nextFloor.FloorID;
             }
             else
             {
-                currentFloor = -1;
+                currentFloorGen = -1;
             }
         }
         public static Room SelectRoom(int direction)

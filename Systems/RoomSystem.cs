@@ -81,11 +81,21 @@ namespace TerRoguelike.Systems
                         bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
                         if (teleportCheck) //New Floor Blue Wall Portal Teleport
                         {
-                            int nextFloorID = modPlayer.currentFloor.Stage + 1;
-                            if (nextFloorID >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
-                                nextFloorID = 0;
+                            int nextStage = modPlayer.currentFloor.Stage + 1;
+                            if (nextStage >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
+                            {
+                                nextStage = 0;
+                                TerRoguelikeWorld.currentStage = 0;
+                            }
+                            else
+                            {
+                                if (nextStage > TerRoguelikeWorld.currentStage)
+                                    TerRoguelikeWorld.currentStage = nextStage;
+                            }
 
-                            var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextFloorID]];
+                                
+
+                            var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
                             var targetRoom = RoomID[nextFloor.StartRoomID];
                             player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                             modPlayer.currentFloor = nextFloor;
@@ -154,6 +164,7 @@ namespace TerRoguelike.Systems
             var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
             TerRoguelikeWorld.IsDeletableOnExit = isDeletableOnExit;
+            TerRoguelikeWorld.currentStage = 0;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 RoomList = new List<Room>();

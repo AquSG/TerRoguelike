@@ -20,6 +20,7 @@ using System.Linq;
 using TerRoguelike.Items;
 using TerRoguelike.MainMenu;
 using TerRoguelike.World;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.UI
 {
@@ -71,6 +72,7 @@ namespace TerRoguelike.UI
             MouseState ms = Mouse.GetState();
             if (ms.LeftButton == ButtonState.Pressed && mainMenuHover && modPlayer.deadTime > 150)
             {
+                ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelikeWorld.IsDeletableOnExit)
                 {
                     TerRoguelikeMenu.wipeTempPlayer = true;
@@ -82,6 +84,7 @@ namespace TerRoguelike.UI
             }
             else if (ms.LeftButton == ButtonState.Pressed && restartHover && modPlayer.deadTime > 150)
             {
+                ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelikeWorld.IsDeletableOnExit)
                 {
                     IEnumerable<Item> vanillaItems = from item in player.inventory
