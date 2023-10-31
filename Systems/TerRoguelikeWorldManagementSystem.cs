@@ -25,7 +25,7 @@ namespace TerRoguelike.Systems
         //int taskCounter = 0;
         public override void PreWorldGen()
         {
-            
+
         }
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
@@ -55,9 +55,12 @@ namespace TerRoguelike.Systems
                 for (int x = 1; x < Main.maxTilesX; x++)
                 {
                     progress.Value += progPerTile;
-                    WorldGen.PlaceTile(x, y, ModContent.TileType<Tiles.BlackTile>(), true);
+                    
                     if (y == (int)Main.worldSurface)
+                    {
+                        WorldGen.PlaceTile(x, y, ModContent.TileType<Tiles.BlackTile>(), true);
                         continue;
+                    }
                     WorldGen.PlaceWall(x, y, ModContent.WallType<Tiles.BlackWall>(), true);
                 }
             }

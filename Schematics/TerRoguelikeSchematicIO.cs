@@ -76,6 +76,14 @@ namespace TerRoguelike.Schematics
         // This function is used by the schematic placer to respect the keepTile and keepWall booleans.
         public void ApplyTo(int x, int y, SchematicMetaTile original)
         {
+            if (TileType == (ushort)ModContent.TileType<Tiles.BlackTile>() || WallType == (ushort)ModContent.WallType<Tiles.BlackWall>())
+            {
+                if (Main.tile[x, y].HasTile || (Main.tile[x, y].WallType != (ushort)ModContent.WallType<Tiles.BlackWall>()))
+                {
+                    keepTile = true;
+                    keepWall = true;
+                }
+            }
             // The direct Main.tile[x, y] variable setting is used instead of using a temporarily variable since tiles are now value types.
             // Four cases.
             // Each is contained in its own region because the code LOOKS very similar but is different in practice
