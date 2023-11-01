@@ -39,20 +39,20 @@ namespace TerRoguelike.MainMenu
                         bool isCloudSave = activeWorldFileData.IsCloudSave;
                         if (FileUtilities.Exists(Main.worldPathName, isCloudSave))
                         {
-                            FileUtilities.Delete(Main.worldPathName, isCloudSave);
+                            FileUtilities.Delete(Main.worldPathName, isCloudSave, true);
                         }
                         if (FileUtilities.Exists(Main.worldPathName + ".bak", isCloudSave))
                         {
-                            FileUtilities.Delete(Main.worldPathName + ".bak", isCloudSave);
+                            FileUtilities.Delete(Main.worldPathName + ".bak", isCloudSave, true);
                         }
                         string moddedWorldPathName = Path.ChangeExtension(Main.worldPathName, ".twld");
                         if (FileUtilities.Exists(moddedWorldPathName, isCloudSave))
                         {
-                            FileUtilities.Delete(moddedWorldPathName, isCloudSave);
+                            FileUtilities.Delete(moddedWorldPathName, isCloudSave, true);
                         }
                         if (FileUtilities.Exists(moddedWorldPathName + ".bak", isCloudSave))
                         {
-                            FileUtilities.Delete(moddedWorldPathName + ".bak", isCloudSave);
+                            FileUtilities.Delete(moddedWorldPathName + ".bak", isCloudSave, true);
                         }
                         Main.ActiveWorldFileData = new WorldFileData();
                     }
@@ -70,20 +70,20 @@ namespace TerRoguelike.MainMenu
                         bool isCloudSave = activePlayerFileData.IsCloudSave;
                         if (FileUtilities.Exists(Main.playerPathName, isCloudSave))
                         {
-                            FileUtilities.Delete(Main.playerPathName, isCloudSave);
+                            FileUtilities.Delete(Main.playerPathName, isCloudSave, true);
                         }
                         if (FileUtilities.Exists(Main.playerPathName + ".bak", isCloudSave))
                         {
-                            FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave);
+                            FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave, true);
                         }
                         string moddedPlayerPathName = Path.ChangeExtension(Main.playerPathName, ".tplr");
                         if (FileUtilities.Exists(moddedPlayerPathName, isCloudSave))
                         {
-                            FileUtilities.Delete(moddedPlayerPathName, isCloudSave);
+                            FileUtilities.Delete(moddedPlayerPathName, isCloudSave, true);
                         }
                         if (FileUtilities.Exists(moddedPlayerPathName + ".bak", isCloudSave))
                         {
-                            FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave);
+                            FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave, true);
                         }
                         Main.ActivePlayerFileData = new PlayerFileData();
                     }
