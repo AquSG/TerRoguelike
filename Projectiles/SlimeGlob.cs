@@ -81,7 +81,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.frame = 3;
                 Projectile.velocity = Vector2.Zero;
                 Projectile.rotation = 0f;
-                Projectile.Bottom = new Vector2(Projectile.Bottom.X, (int)(Projectile.oldPosition.Y / 16f) * 16f + 16f);
+                Projectile.Bottom = new Vector2(Projectile.Bottom.X, (int)((Projectile.oldPosition.Y + 1f) / 16f) * 16f + 16f);
                 SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.2f }, Projectile.Center);
             }
             
