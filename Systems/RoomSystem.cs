@@ -224,7 +224,6 @@ namespace TerRoguelike.Systems
             RoomID[id].roomClearGraceTime = -1;
             RoomID[id].wallActive = false;
         }
-        public static List<int> RoomWallDrawException = new List<int>() {165, 3, 24, 32, 61, 62, 73, 74, 82, 83, 84, 185, 186, 187, 233, 236, 238};
         public override void PostDrawTiles()
         {
             Player player = Main.player[Main.myPlayer];
@@ -268,7 +267,7 @@ namespace TerRoguelike.Systems
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(room.RoomDimensions.X - 2, i);
                             int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                            if (tileType != TileID.Platforms && tileType != TileID.Torches && !RoomWallDrawException.Contains(tileType))
+                            if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;
@@ -304,7 +303,7 @@ namespace TerRoguelike.Systems
                             Vector2 targetBlock = room.RoomPosition + new Vector2(i, side * room.RoomDimensions.Y - side);
 
                             int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                            if (tileType != TileID.Platforms && !RoomWallDrawException.Contains(tileType))
+                            if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;
@@ -326,7 +325,7 @@ namespace TerRoguelike.Systems
                         {
                             Vector2 targetBlock = room.RoomPosition + new Vector2(side * room.RoomDimensions.X - side, i);
                             int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                            if (tileType != TileID.Platforms && !RoomWallDrawException.Contains(tileType))
+                            if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
                             {
                                 if (Main.tile[targetBlock.ToPoint()].HasTile)
                                     continue;
