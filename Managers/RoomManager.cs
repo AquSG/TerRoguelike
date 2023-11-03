@@ -78,6 +78,8 @@ namespace TerRoguelike.Managers
                     return "Snow";
                 case 5:
                     return "Desert";
+                case 6:
+                    return "Jungle";
                 default:
                     return null;
             }

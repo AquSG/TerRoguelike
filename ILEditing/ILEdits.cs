@@ -18,6 +18,8 @@ using Microsoft.Xna.Framework;
 using TerRoguelike.TerPlayer;
 using Terraria.Audio;
 using Terraria.ID;
+using MonoMod.Cil;
+using Mono.Cecil.Cil;
 
 namespace TerRoguelike.ILEditing
 {
@@ -31,6 +33,13 @@ namespace TerRoguelike.ILEditing
             On_WorldGen.SaveAndQuit += On_WorldGen_SaveAndQuit;
             On_PlayerDrawLayers.DrawPlayer_04_ElectrifiedDebuffBack += EditElectrifiedDisplayCondition1;
             On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
+            On_WorldGen.UpdateWorld_UndergroundTile += FuckUnderGroundUpdating;
+        }
+
+        private void FuckUnderGroundUpdating(On_WorldGen.orig_UpdateWorld_UndergroundTile orig, int i, int j, bool checkNPCSpawns, int wallDist)
+        {
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+				orig.Invoke(i, j, checkNPCSpawns, wallDist);
         }
 
         private void EditElectrifiedDisplayCondition1(On_PlayerDrawLayers.orig_DrawPlayer_04_ElectrifiedDebuffBack orig, ref PlayerDrawSet drawinfo)
@@ -169,5 +178,7 @@ namespace TerRoguelike.ILEditing
             // Remove the ability for luck to affect damage variance by setting it to 0 always.
             return orig(dmg, percent, 0f);
         }
-    }
+
+		public static void LogFailure(string name, string reason) => TerRoguelike.Instance.Logger.Warn($"IL edit \"{name}\" failed! {reason}");
+	}
 }
