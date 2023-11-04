@@ -11,7 +11,8 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
-using TerRoguelike.Utilities;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.GameInput;
 
 namespace TerRoguelike.Items.Weapons
 {
@@ -43,17 +44,14 @@ namespace TerRoguelike.Items.Weapons
         public override void UseItemFrame(Player player)
         {
             //Calculate the dirction in which the players arms should be pointing at.
-            Vector2 playerToCursor = (Main.MouseWorld - player.Center).SafeNormalize(Vector2.UnitX);
+            Vector2 playerToCursor = (AimWorld() - player.Center).SafeNormalize(Vector2.UnitX);
             float armPointingDirection = (playerToCursor.ToRotation());
 
             player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
-            TerRoguelikeUtils.CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(42, 30), new Vector2(-12, -4));
-        }
+            CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(42, 30), new Vector2(-12, -4));
 
-        public override void UseStyle(Player player, Rectangle heldItemFrame)
-        {
-            if (Main.MouseWorld.X > player.Center.X)
+            if (AimWorld().X > player.Center.X)
             {
                 player.ChangeDir(1);
             }
@@ -61,7 +59,18 @@ namespace TerRoguelike.Items.Weapons
             {
                 player.ChangeDir(-1);
             }
+        }
 
+        public override void UseStyle(Player player, Rectangle heldItemFrame)
+        {
+            if (AimWorld().X > player.Center.X)
+            {
+                player.ChangeDir(1);
+            }
+            else
+            {
+                player.ChangeDir(-1);
+            }
         }
     }
 }

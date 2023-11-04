@@ -11,8 +11,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
-using TerRoguelike.Utilities;
-using static Humanizer.In;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Items.Weapons
 {
@@ -46,7 +45,7 @@ namespace TerRoguelike.Items.Weapons
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
             //Calculate the dirction in which the players arms should be pointing at.
             if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
-                modPlayer.playerToCursor = (Main.MouseWorld - player.Center).SafeNormalize(Vector2.UnitX);
+                modPlayer.playerToCursor = (AimWorld() - player.Center).SafeNormalize(Vector2.UnitX);
             float armPointingDirection = (modPlayer.playerToCursor.ToRotation() - (MathHelper.Pi * player.direction / 3f));
             if (modPlayer.swingAnimCompletion > 0)
             {
@@ -67,22 +66,30 @@ namespace TerRoguelike.Items.Weapons
                 modPlayer.playerToCursor = Vector2.Zero;
             }
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
-            TerRoguelikeUtils.CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(38, 38), new Vector2(-14, 14));
+            CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(38, 38), new Vector2(-14, 14));
+
+            if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            {
+                player.ChangeDir(1);
+            }
+            else if (AimWorld().X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            {
+                player.ChangeDir(-1);
+            }
         }
 
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
 
-            if (Main.MouseWorld.X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
                 player.ChangeDir(1);
             }
-            else if (Main.MouseWorld.X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            else if (AimWorld().X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
                 player.ChangeDir(-1);
             }
-            
         }
     }
 }

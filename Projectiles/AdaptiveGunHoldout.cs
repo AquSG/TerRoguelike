@@ -11,6 +11,7 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using System.Reflection;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -64,7 +65,7 @@ namespace TerRoguelike.Projectiles
                 Owner.heldProj = Projectile.whoAmI;
             }
 
-            float pointingRotation = (Main.MouseWorld - Owner.MountedCenter).ToRotation();
+            float pointingRotation = (AimWorld() - Owner.MountedCenter).ToRotation();
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 40f;
 
 

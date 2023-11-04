@@ -10,6 +10,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.NPCs;
+using Terraria.GameInput;
 
 namespace TerRoguelike.Utilities
 {
@@ -186,6 +187,15 @@ namespace TerRoguelike.Utilities
                 }
             }
             return furthest;
+        }
+
+        /// <summary>
+        /// Basically Main.mouseWorld but takes into account if you are on controller and locked on to an NPC
+        /// </summary>
+        /// <returns></returns>
+        public static Vector2 AimWorld()
+        {
+            return LockOnHelper.Enabled ? LockOnHelper.AimedTarget.Center : Main.MouseWorld;
         }
     }
 }

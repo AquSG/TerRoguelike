@@ -465,7 +465,7 @@ namespace TerRoguelike.TerPlayer
                 }
                 else if (Math.Abs(timeAttacking) % releaseCooldown == 0 && storedDaggers > 0)
                 {
-                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (Main.MouseWorld - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (AimWorld() - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
                     storedDaggers--;
                 }
             }

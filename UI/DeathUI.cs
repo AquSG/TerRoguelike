@@ -21,6 +21,7 @@ using TerRoguelike.Items;
 using TerRoguelike.MainMenu;
 using TerRoguelike.World;
 using TerRoguelike.Systems;
+using Terraria.GameInput;
 
 namespace TerRoguelike.UI
 {
@@ -30,6 +31,8 @@ namespace TerRoguelike.UI
         private static Vector2 mainMenuButtonOffset = new Vector2(-200, 206);
         private static Vector2 restartButtonOffset = new Vector2(200, 206);
         public static List<Item> itemsToDraw;
+        public static bool mainMenuHover = false;
+        public static bool restartHover = false;
         internal static void Load()
         {
             baseUITex = ModContent.Request<Texture2D>("TerRoguelike/UI/DeathUI", AssetRequestMode.ImmediateLoad).Value;
@@ -66,11 +69,32 @@ namespace TerRoguelike.UI
             Rectangle mainMenuBar = Utils.CenteredRectangle(DeathUIScreenPos + mainMenuButtonOffset, mainMenuButtonTex.Size());
             Rectangle restartBar = Utils.CenteredRectangle(DeathUIScreenPos + restartButtonOffset, mainMenuButtonTex.Size());
 
-            bool mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
-            bool restartHover = mouseHitbox.Intersects(restartBar);
+            
 
             MouseState ms = Mouse.GetState();
-            if (ms.LeftButton == ButtonState.Pressed && mainMenuHover && modPlayer.deadTime > 150)
+            GamePadState gs = GamePad.GetState(PlayerIndex.One);
+
+            if (PlayerInput.UsingGamepad)
+            {
+                if (gs.ThumbSticks.Left.X < -0.4f || gs.DPad.Left == ButtonState.Pressed)
+                {
+                    mainMenuHover = true;
+                    restartHover = false;
+                }
+                else if (gs.ThumbSticks.Left.X > 0.4f || gs.DPad.Right == ButtonState.Pressed)
+                {
+                    mainMenuHover = false;
+                    restartHover = true;
+                }
+            }
+            else
+            {
+                 mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
+                 restartHover = mouseHitbox.Intersects(restartBar);
+            }
+
+            bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) : ms.LeftButton == ButtonState.Pressed;
+            if (pressed && mainMenuHover && modPlayer.deadTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelikeWorld.IsDeletableOnExit)
@@ -82,7 +106,7 @@ namespace TerRoguelike.UI
                 modPlayer.killerProj = -1;
                 WorldGen.SaveAndQuit();
             }
-            else if (ms.LeftButton == ButtonState.Pressed && restartHover && modPlayer.deadTime > 150)
+            else if (pressed && restartHover && modPlayer.deadTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelikeWorld.IsDeletableOnExit)

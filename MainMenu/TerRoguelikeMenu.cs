@@ -17,6 +17,8 @@ using Terraria.GameContent.UI.States;
 using Terraria.IO;
 using System.IO;
 using Terraria.Utilities;
+using Terraria.UI.Gamepad;
+using Terraria.GameInput;
 
 namespace TerRoguelike.MainMenu
 {
@@ -105,8 +107,12 @@ namespace TerRoguelike.MainMenu
                 else
                     mouseHover = false;
 
+                Texture2D xButtonTex = ModContent.Request<Texture2D>("TerRoguelike/MainMenu/XButton").Value;
                 ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, "Play TerRoguelike", position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, Vector2.Zero, new Vector2(0.8f));
-                if (mouseHover && Mouse.GetState().LeftButton == ButtonState.Pressed)
+                if (PlayerInput.UsingGamepadUI)
+                    Main.spriteBatch.Draw(xButtonTex, position + new Vector2(-36, 8), Color.White);
+
+                if (PlayerInput.UsingGamepad ? GamePad.GetState(PlayerIndex.One).Buttons.X == ButtonState.Pressed : mouseHover && Mouse.GetState().LeftButton == ButtonState.Pressed)
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
                     Main.PendingPlayer = new Player();
