@@ -20,14 +20,15 @@ using Terraria.Utilities;
 
 namespace TerRoguelike.MainMenu
 {
-    public class TerRoguelikeMenu : ModMenu
+    public static class TerRoguelikeMenu
     {
         public static bool prepareForRoguelikeGeneration = false;
         public static bool wipeTempPlayer = false;
         public static bool wipeTempWorld = false;
         public static PlayerFileData desiredPlayer = null;
-        public override string DisplayName => "TerRoguelike";
-        public override bool PreDrawLogo(SpriteBatch spriteBatch, ref Vector2 logoDrawCenter, ref float logoRotation, ref float logoScale, ref Color drawColor)
+        public static bool mouseHover = false;
+        public static string DisplayName => "TerRoguelike";
+        public static void DrawTerRoguelikeMenu()
         {
             if (Main.menuMode == 0)
             {
@@ -94,8 +95,17 @@ namespace TerRoguelike.MainMenu
                     desiredPlayer = null;
 
                 Vector2 position = new Vector2(Main.screenWidth / 2 - 150, Main.screenHeight * 0.75f);
-                bool mouseHover = new Rectangle((int)position.X, (int)position.Y, 290, 40).Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y);
-                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Play TerRoguelike", position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, Vector2.Zero, new Vector2(0.8f));
+                if (new Rectangle((int)position.X, (int)position.Y, 290, 40).Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y))
+                {
+                    if (!mouseHover)
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+
+                    mouseHover = true;
+                }
+                else
+                    mouseHover = false;
+
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, "Play TerRoguelike", position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, Vector2.Zero, new Vector2(0.8f));
                 if (mouseHover && Mouse.GetState().LeftButton == ButtonState.Pressed)
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
@@ -123,9 +133,8 @@ namespace TerRoguelike.MainMenu
                 Main.menuMode = 10;
                 WorldGen.playWorld();
             }
-            return true;
         }
-        public void QuickCreateWorld()
+        public static void QuickCreateWorld()
         {
             if (desiredPlayer != null)
                 desiredPlayer.SetAsActive();

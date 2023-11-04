@@ -34,7 +34,14 @@ namespace TerRoguelike.ILEditing
             On_PlayerDrawLayers.DrawPlayer_04_ElectrifiedDebuffBack += EditElectrifiedDisplayCondition1;
             On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
             On_WorldGen.UpdateWorld_UndergroundTile += FuckUnderGroundUpdating;
+            On_Main.DrawMenu += On_Main_DrawMenu; ;
         }
+
+		private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)
+		{
+			TerRoguelikeMenu.DrawTerRoguelikeMenu();
+			orig.Invoke(self, gameTime);
+		}
 
         private void FuckUnderGroundUpdating(On_WorldGen.orig_UpdateWorld_UndergroundTile orig, int i, int j, bool checkNPCSpawns, int wallDist)
         {
