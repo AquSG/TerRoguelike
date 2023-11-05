@@ -80,6 +80,8 @@ namespace TerRoguelike.Managers
                     return "Desert";
                 case 6:
                     return "Jungle";
+                case 7:
+                    return "Hell";
                 default:
                     return null;
             }
@@ -322,7 +324,7 @@ namespace TerRoguelike.Managers
             string mapKey = floorStartingRoom.Key;
             var schematic = TileMaps[mapKey];
 
-            Point placementPoint = new Point((int)previousRoom.RoomPosition.X + 200, Main.maxTilesY / 2);
+            Point placementPoint = new Point((int)previousRoom.RoomPosition.X + 200, FloorID[currentFloorGen].InHell ? Main.maxTilesY -  150 : Main.maxTilesY / 2);
 
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;

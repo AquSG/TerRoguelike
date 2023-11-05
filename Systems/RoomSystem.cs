@@ -78,7 +78,7 @@ namespace TerRoguelike.Systems
                             modPlayer.currentRoom = room.myRoom;
 
                         room.awake = true;
-                        bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f;
+                        bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f && !player.dead;
                         if (teleportCheck) //New Floor Blue Wall Portal Teleport
                         {
                             int nextStage = modPlayer.currentFloor.Stage + 1;

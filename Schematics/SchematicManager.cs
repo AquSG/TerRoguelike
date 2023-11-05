@@ -150,6 +150,18 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new JungleEnemyRoom5());
             RoomID.Add(new JungleEnemyRoom5Down());
             RoomID.Add(new JungleEnemyRoom5Up());
+            RoomID.Add(new HellStartRoom());
+            RoomID.Add(new HellBossRoom1());
+            RoomID.Add(new HellEnemyRoom1());
+            RoomID.Add(new HellEnemyRoom2());
+            RoomID.Add(new HellEnemyRoom3());
+            RoomID.Add(new HellEnemyRoom4());
+            RoomID.Add(new HellEnemyRoom5());
+            RoomID.Add(new HellEnemyRoom6());
+            RoomID.Add(new HellEnemyRoom7());
+            RoomID.Add(new HellEnemyRoom8());
+            RoomID.Add(new HellEnemyRoom9());
+            RoomID.Add(new HellEnemyRoom10());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
@@ -170,6 +182,7 @@ namespace TerRoguelike.Schematics
             FloorID.Add(new SnowFloor());
             FloorID.Add(new DesertFloor());
             FloorID.Add(new JungleFloor());
+            FloorID.Add(new HellFloor());
         }
         internal static void Unload()
         {

@@ -21,5 +21,6 @@ namespace TerRoguelike.Managers
         public virtual int StartRoomID => -1;
         public virtual List<int> BossRoomIDs => new List<int>();
         public virtual int Stage => -1;
+        public virtual bool InHell => false;
     }
 }
