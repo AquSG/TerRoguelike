@@ -50,24 +50,23 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
+            NPC.velocity = Vector2.UnitY * 2f;
             int segCount = 10;
-            NPC.Center += (-Vector2.UnitY * NPC.height * segCount * 0.5f);
             for (int i = 0; i < segCount; i++)
             {
                 Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * NPC.height * i), MathHelper.PiOver2 * 3f, NPC.height));
             }
-            NPC.GetGlobalNPC<TerRoguelikeGlobalNPC>().OverrideIgniteVisual = true;
+            modNPC.OverrideIgniteVisual = true;
         }
         public override void AI()
         {
-
-            NPC.velocity = (Main.MouseWorld - NPC.Center) * 0.0245f;
+            modNPC.RogueWormAI(NPC, 16f, MathHelper.Pi / 60f, 480);
             NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(ref Segments, NPC);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (NPC.GetGlobalNPC<TerRoguelikeGlobalNPC>().OverrideIgniteVisual && NPC.GetGlobalNPC<TerRoguelikeGlobalNPC>().ignitedStacks.Any())
+            if (modNPC.OverrideIgniteVisual && modNPC.ignitedStacks.Any())
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -111,7 +110,7 @@ namespace TerRoguelike.NPCs.Enemy
                 else
                     texture = bodyTex;
 
-                Color color = NPC.GetGlobalNPC<TerRoguelikeGlobalNPC>().ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor(new Point((int)(segment.Position.X / 16), (int)(segment.Position.Y / 16)));
+                Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor(new Point((int)(segment.Position.X / 16), (int)(segment.Position.Y / 16)));
                 spriteBatch.Draw(texture, segment.Position - screenPos, null, color, segment.Rotation + MathHelper.PiOver2, headTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             }
             return false;

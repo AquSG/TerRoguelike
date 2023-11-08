@@ -319,6 +319,33 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
+
+        public void RogueWormAI(NPC npc, float maxVelocity, float turnRadians, float slowTurnDist)
+        {
+            Entity target = GetTarget(npc, false, false);
+            Vector2 targetPos = npc.Center + Vector2.UnitX.RotatedBy(-npc.rotation);
+            if (target != null)
+            {
+                targetPos = target.Center;
+            }
+
+            float targetAngle = (targetPos - npc.Center).ToRotation();
+            bool slowTurn = npc.ai[0] == 0;
+            float newAngle = npc.rotation.AngleTowards(targetAngle, slowTurn ? turnRadians : turnRadians * 0.4f);
+            float angleChange = (float)Math.Atan2(Math.Sin(newAngle - npc.rotation), Math.Cos(newAngle - npc.rotation));
+            if ((targetPos - npc.Center).Length() > slowTurnDist)
+            {
+                npc.ai[0] = 0;
+            }
+            if (Math.Abs(angleChange) <= turnRadians * 0.3f || (targetPos - npc.Center).Length() < slowTurnDist * 0.75f)
+                npc.ai[0] = 1;
+
+            float velMultiplier = slowTurn ? Math.Abs(Vector2.Dot((npc.rotation + MathHelper.PiOver2).ToRotationVector2(), targetAngle.ToRotationVector2())) : 0;
+            npc.rotation = newAngle;
+            Vector2 wantedVelocity = slowTurn ? npc.rotation.ToRotationVector2() * (maxVelocity * ((((1f - velMultiplier * 0.85f)) + 0.15f))) : npc.rotation.ToRotationVector2() * maxVelocity;
+            npc.velocity = Vector2.Lerp(npc.velocity, wantedVelocity, 0.75f);
+        }
+
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
             for (int i = 0; i < segments.Count; i++)
