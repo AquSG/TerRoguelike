@@ -152,7 +152,7 @@ namespace TerRoguelike.UI
                     scale = horizontalScale;
                 if (scale > 4f)
                     scale = 4f;
-                spriteBatch.Draw(enemyTex, screenPos + new Vector2(240, -40), new Rectangle(0, frameHeight, enemyTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(enemyTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
+                spriteBatch.Draw(enemyTex, screenPos + new Vector2(240, -40), new Rectangle(0, 0, enemyTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(enemyTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
             }
             else if (modPlayer.killerProj != -1)
             {

@@ -25,10 +25,20 @@ namespace TerRoguelike.Projectiles
         public int bounceCount = 0;
         public int homingCheckCooldown = 0;
         public int swingDirection = 0;
+        public bool ultimateCollideOverride = false;
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0; // set bounces in projectile ai.
             return true;
+        }
+        public override bool? Colliding(Projectile projectile, Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            if (ultimateCollideOverride)
+            {
+                ultimateCollideOverride = false;
+                return true;
+            }
+            return null;
         }
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {

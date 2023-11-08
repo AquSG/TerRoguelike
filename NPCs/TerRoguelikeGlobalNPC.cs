@@ -51,6 +51,7 @@ namespace TerRoguelike.NPCs
         public int targetPlayer = -1;
         public int targetNPC = -1;
         public int friendlyFireHitCooldown = 0;
+        public bool OverrideIgniteVisual = false;
         #endregion
 
         #region Base AIs
@@ -318,6 +319,30 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
+        public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
+        {
+            for (int i = 0; i < segments.Count; i++)
+            {
+                WormSegment segment = segments[i];
+                segment.OldPosition = segment.Position;
+                segment.OldRotation = segment.Rotation;
+                if (i == 0)
+                {
+                    segment.Position += npc.velocity;
+                    segment.Rotation = npc.rotation;
+                    continue;
+                }
+
+                WormSegment oldSeg = segments[i - 1];
+
+                segment.Position = oldSeg.Position - (Vector2.UnitX * oldSeg.Height).RotatedBy(oldSeg.Rotation.AngleLerp((oldSeg.Position - segment.Position).ToRotation(), 0.95f));
+
+                Vector2 difference = oldSeg.Position - segment.Position;
+
+                segment.Rotation = (difference).ToRotation();
+            }
+        }
+
         #endregion
 
         public override bool InstancePerEntity => true;
@@ -535,7 +560,7 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (ignitedStacks != null && ignitedStacks.Any())
+            if (ignitedStacks != null && ignitedStacks.Any() && !OverrideIgniteVisual)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -736,6 +761,23 @@ namespace TerRoguelike.NPCs
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
         }
+    }
+
+    public class WormSegment
+    {
+        public WormSegment(Vector2 position, float rotation = 0f, float height = 1)
+        {
+            Position = position;
+            OldPosition = position;
+            Rotation = rotation;
+            OldRotation = rotation;
+            Height = height;
+        }
+        public Vector2 Position = Vector2.Zero;
+        public Vector2 OldPosition = Vector2.Zero;
+        public float Rotation = 0;
+        public float OldRotation = 0;
+        public float Height = 1f;
     }
 
     public class IgnitedStack
