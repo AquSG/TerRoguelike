@@ -24,6 +24,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.Audio;
 using System.IO;
 using Terraria.UI;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Systems
 {
@@ -160,6 +161,7 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;

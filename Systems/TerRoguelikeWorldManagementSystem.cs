@@ -55,10 +55,14 @@ namespace TerRoguelike.Systems
                 for (int x = 1; x < Main.maxTilesX; x++)
                 {
                     progress.Value += progPerTile;
-                    
-                    if (y == (int)Main.worldSurface)
+                    if (x == 1 && y == (int)Main.worldSurface)
                     {
                         WorldGen.PlaceTile(x, y, ModContent.TileType<Tiles.BlackTile>(), true);
+                        continue;
+                    }
+                    Main.tile[x, y].CopyFrom(Main.tile[1, (int)Main.worldSurface]);
+                    if (y == (int)Main.worldSurface)
+                    {
                         continue;
                     }
                     WorldGen.PlaceWall(x, y, ModContent.WallType<Tiles.BlackWall>(), true);

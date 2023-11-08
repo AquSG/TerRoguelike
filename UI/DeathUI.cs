@@ -119,6 +119,7 @@ namespace TerRoguelike.UI
                     PlayerLoader.SetStartInventory(player, startingItems);
                     TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
                     TerRoguelikeMenu.wipeTempWorld = true;
+                    TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
                 }
                 modPlayer.killerNPC = -1;
                 modPlayer.killerProj = -1;
