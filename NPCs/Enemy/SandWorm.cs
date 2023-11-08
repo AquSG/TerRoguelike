@@ -145,7 +145,7 @@ namespace TerRoguelike.NPCs.Enemy
             for (int i = 0; i < Segments.Count; i++)
             {
                 WormSegment segment = Segments[i];
-                if (segment.Position.Distance(projectile.getRect().ClosestPointInRect(segment.Position)) <= radius)
+                if (projectile.Colliding(projectile.getRect(), new Rectangle((int)(segment.Position.X - (NPC.width / 2)), (int)(segment.Position.Y - (NPC.height / 2)), NPC.width, NPC.height)))
                 {
                     projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().ultimateCollideOverride = true;
                     return null;
