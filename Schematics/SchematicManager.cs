@@ -42,6 +42,18 @@ namespace TerRoguelike.Schematics
                 TileMaps.Add(RoomID[i].Key, TerRoguelikeSchematicIO.LoadSchematic(RoomID[i].Filename));
             }
         }
+        public static void LoadFloorIDs()
+        {
+            FloorID.Add(new BaseFloor());
+            FloorID.Add(new CrimsonFloor());
+            FloorID.Add(new ForestFloor());
+            FloorID.Add(new CorruptFloor());
+            FloorID.Add(new SnowFloor());
+            FloorID.Add(new DesertFloor());
+            FloorID.Add(new JungleFloor());
+            FloorID.Add(new HellFloor());
+            FloorID.Add(new DungeonFloor());
+        }
         public static void LoadRoomIDs()
         {
             RoomID.Add(new DefaultRoom());
@@ -162,6 +174,21 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new HellEnemyRoom8());
             RoomID.Add(new HellEnemyRoom9());
             RoomID.Add(new HellEnemyRoom10());
+            RoomID.Add(new DungeonStartRoom());
+            RoomID.Add(new DungeonBossRoom1());
+            RoomID.Add(new DungeonBossRoom1Transition());
+            RoomID.Add(new DungeonEnemyRoom1());
+            RoomID.Add(new DungeonEnemyRoom1Down());
+            RoomID.Add(new DungeonEnemyRoom1Up());
+            RoomID.Add(new DungeonEnemyRoom2());
+            RoomID.Add(new DungeonEnemyRoom2Down());
+            RoomID.Add(new DungeonEnemyRoom2Up());
+            RoomID.Add(new DungeonEnemyRoom3());
+            RoomID.Add(new DungeonEnemyRoom3Down());
+            RoomID.Add(new DungeonEnemyRoom3Up());
+            RoomID.Add(new DungeonEnemyRoom4());
+            RoomID.Add(new DungeonEnemyRoom5());
+            RoomID.Add(new DungeonEnemyRoom6());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
@@ -172,17 +199,6 @@ namespace TerRoguelike.Schematics
 
                 RoomDict.Add(RoomID[i].Key, i);
             }
-        }
-        public static void LoadFloorIDs()
-        {
-            FloorID.Add(new BaseFloor());
-            FloorID.Add(new CrimsonFloor());
-            FloorID.Add(new ForestFloor());
-            FloorID.Add(new CorruptFloor());
-            FloorID.Add(new SnowFloor());
-            FloorID.Add(new DesertFloor());
-            FloorID.Add(new JungleFloor());
-            FloorID.Add(new HellFloor());
         }
         internal static void Unload()
         {
