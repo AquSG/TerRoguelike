@@ -11,6 +11,7 @@ using Terraria.ID;
 
 namespace TerRoguelike.Rooms
 {
+    //THIS SHIT IS DEFUNCT. just left it here for fun.
     public class WorldRoom : Room
     {
         public override void InitializeRoom()
