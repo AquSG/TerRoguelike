@@ -11,11 +11,11 @@ using Terraria.ID;
 
 namespace TerRoguelike.Rooms
 {
-    public class JungleStartRoom : Room
+    public class TempleStartRoom : Room
     {
-        public override int AssociatedFloor => 6;
-        public override string Key => "JungleStartRoom";
-        public override string Filename => "Schematics/RoomSchematics/JungleStartRoom.csch";
+        public override int AssociatedFloor => 9;
+        public override string Key => "TempleStartRoom";
+        public override string Filename => "Schematics/RoomSchematics/TempleStartRoom.csch";
         public override bool CanExitRight => true;
         public override bool CanExitDown => true;
         public override bool CanExitUp => true;

@@ -11,22 +11,16 @@ using Terraria.ID;
 
 namespace TerRoguelike.Rooms
 {
-    public class JungleStartRoom : Room
+    public class TempleEnemyRoom4Down : Room
     {
-        public override int AssociatedFloor => 6;
-        public override string Key => "JungleStartRoom";
-        public override string Filename => "Schematics/RoomSchematics/JungleStartRoom.csch";
+        public override string Key => "TempleEnemyRoom4Down";
+        public override string Filename => "Schematics/RoomSchematics/TempleEnemyRoom4Down.csch";
         public override bool CanExitRight => true;
         public override bool CanExitDown => true;
-        public override bool CanExitUp => true;
-        public override bool IsStartRoom => true;
         public override void InitializeRoom()
         {
-            active = false;
-        }
-        public override void Update()
-        {
-            active = false;
+            base.InitializeRoom();
+            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.FlyingSnake, 60, 120, 0.45f);
         }
     }
 }

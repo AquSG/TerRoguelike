@@ -84,6 +84,8 @@ namespace TerRoguelike.Managers
                     return "Hell";
                 case 8:
                     return "Dungeon";
+                case 9:
+                    return "Temple";
                 default:
                     return null;
             }
