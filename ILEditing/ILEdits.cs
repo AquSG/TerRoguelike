@@ -17,6 +17,8 @@ using Terraria.GameContent;
 using Microsoft.Xna.Framework;
 using TerRoguelike.TerPlayer;
 using Terraria.Audio;
+using TerRoguelike.Systems;
+using ReLogic.Utilities;
 using Terraria.ID;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
@@ -34,10 +36,17 @@ namespace TerRoguelike.ILEditing
             On_PlayerDrawLayers.DrawPlayer_04_ElectrifiedDebuffBack += EditElectrifiedDisplayCondition1;
             On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
             On_WorldGen.UpdateWorld_UndergroundTile += FuckUnderGroundUpdating;
-            On_Main.DrawMenu += On_Main_DrawMenu; ;
+            On_Main.DrawMenu += On_Main_DrawMenu;
+            On_SoundPlayer.PauseAll += On_SoundPlayer_PauseAll;
         }
 
-		private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)
+        private void On_SoundPlayer_PauseAll(On_SoundPlayer.orig_PauseAll orig, SoundPlayer self)
+        {
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+				orig.Invoke(self);
+		}
+
+        private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)
 		{
 			TerRoguelikeMenu.DrawTerRoguelikeMenu();
 			orig.Invoke(self, gameTime);
