@@ -161,6 +161,7 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
+            MusicSystem.Initialized = false;
             TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
