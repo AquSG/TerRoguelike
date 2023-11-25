@@ -38,7 +38,7 @@ namespace TerRoguelike.Rooms
             base.Update();
             if (!awake || !active)
                 return;
-            if (ClearCondition(!anyAlive && roomClearGraceTime == 0))
+            if (ClearCondition())
                 return;
             if (SpawnCountdown <= 0)
             {
