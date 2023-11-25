@@ -658,4 +658,8 @@ NPCs: {
 	Spookrow.DisplayName: Spookrow
 	UndeadGuard.DisplayName: Undead Guard
 	SandWorm.DisplayName: Sand Worm
+	NebulaPillar.DisplayName: Nebula Pillar
+	SolarPillar.DisplayName: Solar Pillar
+	StardustPillar.DisplayName: Stardust Pillar
+	VortexPillar.DisplayName: Vortex Pillar
 }

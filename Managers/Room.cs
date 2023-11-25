@@ -20,6 +20,7 @@ namespace TerRoguelike.Managers
         public virtual bool CanExitUp => false; // if room is capable of exiting up
         public virtual bool IsBossRoom => false; //if room is the end to a floor
         public virtual bool IsStartRoom => false; // if room is the start of a floor
+        public virtual bool IsPillarRoom => false; // if room uses the pillar clearing mechanic (lunar floor)
         public virtual bool IsRoomVariant => false; // if room uses the schematic of another room
         public virtual bool HasTransition => false; // if room is preceeded by a transition room
         public virtual int TransitionDirection => -1; // -1 if not a transition room. 0: right, 1: Down, 2: Up
@@ -66,7 +67,7 @@ namespace TerRoguelike.Managers
         }
         public virtual void Update()
         {
-            if (!awake) // not been touced yet? return
+            if (!StartCondition(awake)) // not been touched yet? return
                 return;
 
             if (!initialized) // initialize the room
@@ -135,7 +136,7 @@ namespace TerRoguelike.Managers
                     }
                 }
             }
-            if (!anyAlive && roomClearGraceTime == 0) // all associated enemies are gone. room cleared.
+            if (ClearCondition(!anyAlive && roomClearGraceTime == 0)) // all associated enemies are gone. room cleared.
             {
                 active = false;
                 RoomClearReward();
@@ -328,6 +329,14 @@ namespace TerRoguelike.Managers
                     proj.timeLeft = 60;
                 }
             }
+        }
+        public virtual bool ClearCondition(bool anyAlive)
+        {
+            return anyAlive;
+        }
+        public virtual bool StartCondition(bool awake)
+        {
+            return awake;
         }
     }
 }
