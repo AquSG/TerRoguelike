@@ -316,8 +316,10 @@ namespace TerRoguelike.Systems
                     if (room.ID == RoomDict["LunarBossRoom1"])
                     {
                         Main.spriteBatch.Begin();
+                        Vector2 position = (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f;
                         Texture2D moonLordTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/StillMoonLord").Value;
-                        Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                        Vector2 zoomOffset = (((position - Main.Camera.Center) * ZoomSystem.zoomOverride) - (position - Main.Camera.Center));
+                        Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, ZoomSystem.zoomOverride, SpriteEffects.None);
                         Main.spriteBatch.End();
                     }
                 }
@@ -561,12 +563,14 @@ namespace TerRoguelike.Systems
             for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
             {
                 Chain chain = TerRoguelikeWorld.chainList[i];
-                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f));
+                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f) * ZoomSystem.zoomOverride);
                 float rotation = (chain.End - visualStart).ToRotation();
                 int visualLength = (int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft));
+                Vector2 zoomOffset = (((chain.Start - Main.Camera.Center) * ZoomSystem.zoomOverride) - (chain.Start - Main.Camera.Center));
                 for (int j = 0; j < visualLength; j++)
                 {
-                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + ((chain.End - visualStart) * (j / (float)chain.Length)) - Main.screenPosition, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f, SpriteEffects.None);
+                    Vector2 position = ((chain.End - visualStart) * (j / (float)chain.Length) * ZoomSystem.zoomOverride);
+                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f * ZoomSystem.zoomOverride, SpriteEffects.None);
                 }
             }
             Main.spriteBatch.End();
