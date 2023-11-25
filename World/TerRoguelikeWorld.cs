@@ -11,6 +11,8 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.Projectiles;
 using Microsoft.Xna.Framework;
+using Terraria.Audio;
+using static TerRoguelike.Systems.MusicSystem;
 
 namespace TerRoguelike.World
 {
@@ -21,7 +23,26 @@ namespace TerRoguelike.World
         public static int currentStage = 0;
         public static bool lunarFloorInitialized = false;
         public static bool lunarBossSpawned = false;
+        public static bool escape = false;
+        public static int escapeTime = 0;
+        public const int escapeTimeSet = 18000;
         public static List<Chain> chainList = new List<Chain>();
+        public static void StartEscapeSequence()
+        {
+            escape = true;
+            escapeTime = escapeTimeSet;
+            currentStage++;
+            for (int i = 0; i < RoomSystem.RoomList.Count; i++)
+            {
+                if (RoomSystem.RoomList[i].IsBossRoom)
+                    continue;
+
+                RoomSystem.ResetRoomID(i);
+            }
+            MusicMode = 1;
+            SetCalm(Escape with { Volume = 0.25f });
+            SetCombat(Silence with { Volume = 0f });
+        }
     }
     public class Chain
     {

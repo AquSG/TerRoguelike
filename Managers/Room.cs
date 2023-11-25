@@ -5,6 +5,7 @@ using TerRoguelike.NPCs;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Managers
 {
@@ -26,6 +27,7 @@ namespace TerRoguelike.Managers
         public virtual int TransitionDirection => -1; // -1 if not a transition room. 0: right, 1: Down, 2: Up
         public int myRoom; // index in RoomList
         public bool initialized = false; // whether initialize has run yet
+        public bool escapeInitialized = false; // whether initialize has been run yet in the escape sequence
         public bool awake = false; // whether a player has ever stepped into this room
         public bool active = true; // whether the room has been completed or not
         public Vector2 RoomDimensions; // dimensions of the room
@@ -67,13 +69,13 @@ namespace TerRoguelike.Managers
         }
         public virtual void Update()
         {
-            if (!StartCondition(awake)) // not been touched yet? return
+            if (!StartCondition()) // not been touched yet? return
                 return;
 
             if (!initialized) // initialize the room
                 InitializeRoom();
 
-            if (closedTime <= 60) //wall is visually active up to 1 second after room clear
+            if (closedTime <= 60 && (TerRoguelikeWorld.escapeTime > TerRoguelikeWorld.escapeTimeSet - 180 || !TerRoguelikeWorld.escape)) //wall is visually active up to 1 second after room clear
                 wallActive = true;
 
             if (!active) // room done, closed time increments
@@ -136,7 +138,7 @@ namespace TerRoguelike.Managers
                     }
                 }
             }
-            if (ClearCondition(!anyAlive && roomClearGraceTime == 0)) // all associated enemies are gone. room cleared.
+            if (ClearCondition()) // all associated enemies are gone. room cleared.
             {
                 active = false;
                 RoomClearReward();
@@ -153,6 +155,9 @@ namespace TerRoguelike.Managers
         }
         public void WallUpdate()
         {
+            if (!wallActive)
+                return;
+
             for (int playerID = 0; playerID < Main.maxPlayers; playerID++) // keep players in the fucking room
             {
                 var player = Main.player[playerID];
@@ -224,8 +229,14 @@ namespace TerRoguelike.Managers
                 }
             }
         }
-        public void RoomClearReward()
+        public virtual void RoomClearReward()
         {
+            if (TerRoguelikeWorld.escape)
+                return;
+
+            if (Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage == 4 && IsBossRoom)
+                MusicSystem.MusicMode = 3;
+
             ClearRockets();
 
             // reward. boss rooms give higher tiers.
@@ -330,11 +341,11 @@ namespace TerRoguelike.Managers
                 }
             }
         }
-        public virtual bool ClearCondition(bool anyAlive)
+        public virtual bool ClearCondition()
         {
-            return anyAlive;
+            return !anyAlive && roomClearGraceTime == 0;
         }
-        public virtual bool StartCondition(bool awake)
+        public virtual bool StartCondition()
         {
             return awake;
         }

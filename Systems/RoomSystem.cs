@@ -26,6 +26,8 @@ using System.IO;
 using Terraria.UI;
 using TerRoguelike.MainMenu;
 using TerRoguelike.NPCs.Enemy.Pillar;
+using static TerRoguelike.World.TerRoguelikeWorld;
+using static TerRoguelike.Systems.MusicSystem;
 
 namespace TerRoguelike.Systems
 {
@@ -41,6 +43,15 @@ namespace TerRoguelike.Systems
         }
         public override void PostUpdateWorld()
         {
+            if (escapeTime > 0 && escape)
+            {
+                escapeTime--;
+                if (escapeTime == 0)
+                {
+                    escape = false;
+                }
+            }
+
             SpawnManager.UpdateSpawnManager(); //Run all logic for all pending items and enemies being telegraphed
             UpdateHealingPulse(); //Used for uncommon healing item based on room time
             UpdateAttackPlanRocketBundles(); //Used for the attack plan item that handles future attack plan bundles
@@ -80,47 +91,87 @@ namespace TerRoguelike.Systems
                         if (room.active)
                             modPlayer.currentRoom = room.myRoom;
 
-                        if (modPlayer.currentFloor.FloorID == 10 && !TerRoguelikeWorld.lunarFloorInitialized)
+                        if (modPlayer.currentFloor.FloorID == 10 && !lunarFloorInitialized)
                         {
                             InitializeLunarFloor();
                         }
+                        
+                        if (escape)
+                        {
+                            if (loopCount >= 2)
+                            {
+                                Room jumpstartRoom = RoomList[loopCount - 2];
+                                if (!jumpstartRoom.initialized)
+                                {
+                                    jumpstartRoom.awake = true;
+                                    jumpstartRoom.InitializeRoom();
+                                }
+                            }
+                        }
 
                         room.awake = true;
-                        bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f && !player.dead;
-                        if (teleportCheck) //New Floor Blue Wall Portal Teleport
+                        bool descendTeleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f && !player.dead && !escape;
+                        bool ascendTeleportCheck = room.IsStartRoom && player.position.X <= (room.RoomPosition.X * 16f) + 22f && !player.dead && escape;
+                        if (descendTeleportCheck) //New Floor Blue Wall Portal Teleport
                         {
                             int nextStage = modPlayer.currentFloor.Stage + 1;
                             if (nextStage >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
                             {
                                 nextStage = 0;
-                                TerRoguelikeWorld.currentStage = 0;
+                                currentStage = 0;
                             }
                             else
                             {
-                                if (nextStage > TerRoguelikeWorld.currentStage)
-                                    TerRoguelikeWorld.currentStage = nextStage;
+                                if (nextStage > currentStage)
+                                    currentStage = nextStage;
                             }
-
-
 
                             var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
                             var targetRoom = RoomID[nextFloor.StartRoomID];
                             player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                             modPlayer.currentFloor = nextFloor;
 
-                            //New floor item effects
-                            modPlayer.soulOfLenaUses = 0;
-                            modPlayer.lenaVisualPosition = Vector2.Zero;
-                            modPlayer.droneBuddyVisualPosition = Vector2.Zero;
-                            if (modPlayer.giftBox > 0)
+                            NewFloorEffects(targetRoom, modPlayer);
+                        }
+
+                        if (ascendTeleportCheck)
+                        {
+                            int nextStage = modPlayer.currentFloor.Stage - 1;
+                            if (nextStage < 0) // if FloorIDsInPlay underflows, send back to the start
                             {
-                                modPlayer.GiftBoxLogic((targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f);
+                                nextStage = 0;
+                                escape = false;
                             }
-                            if (modPlayer.portableGenerator > 0)
+
+                            var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
+                            Room potentialRoom = null;
+                            for (int j = 0; j < nextFloor.BossRoomIDs.Count; j++)
                             {
-                                modPlayer.portableGeneratorImmuneTime += 540 + (600 * modPlayer.portableGenerator);
-                                SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.5f });
+                                potentialRoom = RoomList.Find(x => x.ID == nextFloor.BossRoomIDs[j]);
+                                if (potentialRoom != null)
+                                    break;
                             }
+                            var targetRoom = potentialRoom;
+                            if (escape)
+                            {
+                                player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
+                                player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
+                                modPlayer.currentFloor = nextFloor;
+                            }
+                            else
+                            {
+                                player.Center = new Vector2(Main.maxTilesX * 8f, 3000f);
+                                for (int L = 0; L < RoomList.Count; L++)
+                                {
+                                    if (RoomList[L].IsBossRoom)
+                                        continue;
+
+                                    ResetRoomID(L);
+                                }
+                                MusicMode = 3;
+                            }
+
+                            NewFloorEffects(targetRoom, modPlayer);
                         }
 
                         if (room.closedTime == 1) // heal players on room clear so no waiting slog for natural life regen
@@ -136,11 +187,16 @@ namespace TerRoguelike.Systems
                 room.Update();
             }
         }
+        #region Initialize Lunar Floor
         public static void InitializeLunarFloor()
         {
-            if (TerRoguelikeWorld.lunarFloorInitialized)
+            MusicMode = 1;
+            SetCalm(FinalStage with { Volume = 0.4f });
+            SetCombat(Silence with { Volume = 0f });
+
+            if (lunarFloorInitialized)
                 return;
-            TerRoguelikeWorld.lunarFloorInitialized = true;
+            lunarFloorInitialized = true;
 
             Vector2 chainStart = (RoomID[RoomDict["LunarBossRoom1"]].RoomPosition + (RoomID[RoomDict["LunarBossRoom1"]].RoomDimensions * 0.5f)) * 16f;
             int pillarCount = 0;
@@ -158,7 +214,7 @@ namespace TerRoguelike.Systems
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<VortexPillar>());
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
-                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
                 }
@@ -167,7 +223,7 @@ namespace TerRoguelike.Systems
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<StardustPillar>());
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
-                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
                 }
@@ -176,7 +232,7 @@ namespace TerRoguelike.Systems
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<NebulaPillar>());
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
-                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
                 }
@@ -185,12 +241,15 @@ namespace TerRoguelike.Systems
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<SolarPillar>());
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
                     Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
-                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
                 }
             }
         }
+        #endregion
+
+        #region Save and Load Data
         public override void SaveWorldData(TagCompound tag)
         {
             var isTerRoguelikeWorld = TerRoguelikeWorld.IsTerRoguelikeWorld;
@@ -226,6 +285,7 @@ namespace TerRoguelike.Systems
             MusicSystem.Initialized = false;
             TerRoguelikeWorld.lunarFloorInitialized = false;
             TerRoguelikeWorld.lunarBossSpawned = false;
+            TerRoguelikeWorld.escape = false;
             TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
@@ -271,6 +331,8 @@ namespace TerRoguelike.Systems
                 RoomManager.FloorIDsInPlay.Add(floorID);
             }
         }
+        #endregion
+
         /// <summary>
         /// Resets the given room ID to it's default values, aside from position and dimensions
         /// </summary>
@@ -311,7 +373,7 @@ namespace TerRoguelike.Systems
                 if (room == null)
                     continue;
                 
-                if (TerRoguelikeWorld.lunarFloorInitialized && (!TerRoguelikeWorld.lunarBossSpawned || (!room.awake && room.closedTime <= 0)))
+                if (lunarFloorInitialized && (!lunarBossSpawned || (!room.awake && room.closedTime <= 0)))
                 {
                     if (room.ID == RoomDict["LunarBossRoom1"])
                     {
@@ -325,12 +387,55 @@ namespace TerRoguelike.Systems
                 }
                 
 
-                if (!room.StartCondition(room.awake))
+                if (!room.StartCondition())
                     continue;
+
+                if (room.IsStartRoom && escape)
+                {
+                    bool canDraw = false;
+                    for (int i = 0; i < Main.maxPlayers; i++)
+                    {
+                        if (Vector2.Distance(Main.player[i].Center, (room.RoomPosition + new Vector2(0, 0)) * 16f) < 2500f)
+                        {
+                            canDraw = true;
+                            break;
+                        }
+                    }
+                    if (!canDraw)
+                        continue;
+
+                    //Draw the blue wall portal
+                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                    for (float i = 0; i < room.RoomDimensions.Y; i++)
+                    {
+                        Vector2 targetBlock = room.RoomPosition + new Vector2(1, i);
+                        int tileType = Main.tile[targetBlock.ToPoint()].TileType;
+                        if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
+                        {
+                            if (Main.tile[targetBlock.ToPoint()].HasTile)
+                                continue;
+                        }
+
+                        Color color = Color.Cyan;
+
+                        color.A = 255;
+
+                        Vector2 drawPosition = targetBlock * 16f - Main.screenPosition + (Vector2.UnitX * 16f);
+                        float rotation = -MathHelper.PiOver2;
+
+                        Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+
+                        float scale = 0.75f;
+
+                        if (Main.rand.NextBool(8))
+                            Dust.NewDustDirect((targetBlock * 16f) + new Vector2(2f, 0), 2, 16, 206, Scale: scale);
+                    }
+                    Main.spriteBatch.End();
+                }
 
                 if (room.closedTime > 60)
                 {
-                    if (room.IsBossRoom)
+                    if (room.IsBossRoom && !escape)
                     {
                         bool canDraw = false;
                         for (int i = 0; i < Main.maxPlayers; i++)
@@ -431,7 +536,25 @@ namespace TerRoguelike.Systems
                 }
             }
         }
+        #region New Floor Effects
+        public void NewFloorEffects(Room targetRoom, TerRoguelikePlayer modPlayer)
+        {
+            modPlayer.soulOfLenaUses = 0;
+            modPlayer.lenaVisualPosition = Vector2.Zero;
+            modPlayer.droneBuddyVisualPosition = Vector2.Zero;
+            if (modPlayer.giftBox > 0)
+            {
+                modPlayer.GiftBoxLogic((targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f);
+            }
+            if (modPlayer.portableGenerator > 0)
+            {
+                modPlayer.portableGeneratorImmuneTime += 540 + (600 * modPlayer.portableGenerator);
+                SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.5f });
+            }
+        }
+        #endregion
 
+        #region Death Scene
         public void DrawDeathScene()
         {
             if (Main.netMode == NetmodeID.SinglePlayer)
@@ -450,7 +573,9 @@ namespace TerRoguelike.Systems
                 }
             }
         }
+        #endregion
 
+        #region Pending Enemies
         /// <summary>
         /// Draw the first frame of each pending enemy's animation as an attempt to telegraph what is spawning there
         /// </summary>
@@ -473,6 +598,9 @@ namespace TerRoguelike.Systems
 
             Main.spriteBatch.End();
         }
+        #endregion
+
+        #region Healing Pulses
         public void UpdateHealingPulse()
         {
             if (healingPulses == null)
@@ -549,32 +677,9 @@ namespace TerRoguelike.Systems
             }
             Main.spriteBatch.End();
         }
-        public void DrawChains()
-        {
-            if (TerRoguelikeWorld.chainList == null)
-                return;
+        #endregion
 
-            if (!TerRoguelikeWorld.chainList.Any())
-                return;
-
-            Texture2D chain1Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain1").Value;
-            Texture2D chain2Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain2").Value;
-            Main.spriteBatch.Begin();
-            for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
-            {
-                Chain chain = TerRoguelikeWorld.chainList[i];
-                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f) * ZoomSystem.zoomOverride);
-                float rotation = (chain.End - visualStart).ToRotation();
-                int visualLength = (int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft));
-                Vector2 zoomOffset = (((chain.Start - Main.Camera.Center) * ZoomSystem.zoomOverride) - (chain.Start - Main.Camera.Center));
-                for (int j = 0; j < visualLength; j++)
-                {
-                    Vector2 position = ((chain.End - visualStart) * (j / (float)chain.Length) * ZoomSystem.zoomOverride);
-                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f * ZoomSystem.zoomOverride, SpriteEffects.None);
-                }
-            }
-            Main.spriteBatch.End();
-        }
+        #region Chains
         public void UpdateChains()
         {
             if (TerRoguelikeWorld.chainList == null)
@@ -614,6 +719,35 @@ namespace TerRoguelike.Systems
             }
             TerRoguelikeWorld.chainList.RemoveAll(x => x.TimeLeft <= 0);
         }
+        public void DrawChains()
+        {
+            if (TerRoguelikeWorld.chainList == null)
+                return;
+
+            if (!TerRoguelikeWorld.chainList.Any())
+                return;
+
+            Texture2D chain1Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain1").Value;
+            Texture2D chain2Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain2").Value;
+            Main.spriteBatch.Begin();
+            for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
+            {
+                Chain chain = TerRoguelikeWorld.chainList[i];
+                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f) * ZoomSystem.zoomOverride);
+                float rotation = (chain.End - visualStart).ToRotation();
+                int visualLength = (int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft));
+                Vector2 zoomOffset = (((chain.Start - Main.Camera.Center) * ZoomSystem.zoomOverride) - (chain.Start - Main.Camera.Center));
+                for (int j = 0; j < visualLength; j++)
+                {
+                    Vector2 position = ((chain.End - visualStart) * (j / (float)chain.Length) * ZoomSystem.zoomOverride);
+                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f * ZoomSystem.zoomOverride, SpriteEffects.None);
+                }
+            }
+            Main.spriteBatch.End();
+        }
+        #endregion
+
+        #region Attack Plan Rocket Bundles
         public void UpdateAttackPlanRocketBundles()
         {
             if (attackPlanRocketBundles == null)
@@ -641,6 +775,9 @@ namespace TerRoguelike.Systems
             }
             attackPlanRocketBundles.RemoveAll(x => x.Time < 0);
         }
+        #endregion
+
+        #region Networking
         public override void NetSend(BinaryWriter writer)
         {
             //Sorrowful attempt at any semblance of multiplayer compat
@@ -673,6 +810,8 @@ namespace TerRoguelike.Systems
             }
             obtainedRoomListFromServer = true;
         }
+        #endregion
+
         public override void ClearWorld()
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
