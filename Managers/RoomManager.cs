@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework;
 using TerRoguelike.Schematics;
 using TerRoguelike.Managers;
 using TerRoguelike.Systems;
+using TerRoguelike.Floors;
 using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Managers
@@ -86,6 +87,8 @@ namespace TerRoguelike.Managers
                     return "Dungeon";
                 case 9:
                     return "Temple";
+                case 10:
+                    return "Lunar";
                 default:
                     return null;
             }
@@ -340,7 +343,143 @@ namespace TerRoguelike.Managers
 
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
+            if (currentFloorGen == 10) // lunar floor ID
+            {
+                PlaceFinalFloor(floorStartingRoom);
+                return;
+            }
+
             PlaceRoom(roomCount, floorStartingRoom);
+        }
+
+        public static void PlaceFinalFloor(Room startRoom)
+        {
+            FloorIDsInPlay.Add(currentFloorGen);
+            Room nextRoom = RoomID[RoomDict["LunarHallRoom1"]];
+
+            string mapKey = nextRoom.Key;
+            var schematic = TileMaps[mapKey];
+
+            Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+            nextRoom.RoomDimensions = schematicSize;
+
+            Point placementPoint = new Point((int)(startRoom.RoomPosition.X + startRoom.RoomDimensions.X - 1), (int)(startRoom.RoomPosition.Y + startRoom.RoomDimensions.Y - nextRoom.RoomDimensions.Y));
+
+            if (placementPoint.Y + nextRoom.RoomDimensions.Y < (int)startRoom.RoomPosition.Y + startRoom.RoomDimensions.Y)
+                placementPoint.Y = (int)(startRoom.RoomPosition.Y + startRoom.RoomDimensions.Y - nextRoom.RoomDimensions.Y);
+
+            SchematicAnchor anchorType = SchematicAnchor.TopLeft;
+            nextRoom.RoomPosition = placementPoint.ToVector2();
+
+            RoomSystem.NewRoom(nextRoom);
+
+            PlaceSchematic(mapKey, placementPoint, anchorType);
+
+            Room previousRoom = nextRoom;
+            nextRoom = RoomID[RoomDict["LunarHallRoom2"]];
+
+            mapKey = nextRoom.Key;
+            schematic = TileMaps[mapKey];
+
+            schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+            nextRoom.RoomDimensions = schematicSize;
+
+            placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - nextRoom.RoomDimensions.Y));
+
+            if (placementPoint.Y + nextRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
+                placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - nextRoom.RoomDimensions.Y);
+
+            anchorType = SchematicAnchor.TopLeft;
+            nextRoom.RoomPosition = placementPoint.ToVector2();
+
+            RoomSystem.NewRoom(nextRoom);
+
+            PlaceSchematic(mapKey, placementPoint, anchorType);
+
+            previousRoom = nextRoom;
+            Room bossRoom = RoomID[RoomDict["LunarBossRoom1"]];
+            nextRoom = RoomID[RoomDict["LunarBossRoom1"]];
+
+            mapKey = nextRoom.Key;
+            schematic = TileMaps[mapKey];
+
+            schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+            nextRoom.RoomDimensions = schematicSize;
+
+            placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - nextRoom.RoomDimensions.Y));
+
+            if (placementPoint.Y + nextRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
+                placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - nextRoom.RoomDimensions.Y);
+
+            anchorType = SchematicAnchor.TopLeft;
+            nextRoom.RoomPosition = placementPoint.ToVector2();
+
+            RoomSystem.NewRoom(nextRoom);
+
+            PlaceSchematic(mapKey, placementPoint, anchorType);
+
+            for (int i = 0; i < 4; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        nextRoom = RoomID[RoomDict["LunarPillarRoomTopLeft"]];
+                        break;
+                    case 1:
+                        nextRoom = RoomID[RoomDict["LunarPillarRoomTopRight"]];
+                        break;
+                    case 2:
+                        nextRoom = RoomID[RoomDict["LunarPillarRoomBottomLeft"]];
+                        break;
+                    case 3:
+                        nextRoom = RoomID[RoomDict["LunarPillarRoomBottomRight"]];
+                        break;
+                }
+
+                mapKey = nextRoom.Key;
+                schematic = TileMaps[mapKey];
+
+                schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+                nextRoom.RoomDimensions = schematicSize;
+
+                if (i < 2)
+                {
+                    if (i % 2 == 0)
+                    {
+                        placementPoint = new Point((int)(bossRoom.RoomPosition.X + (bossRoom.RoomDimensions.X * 0.5f) - nextRoom.RoomDimensions.X), (int)(bossRoom.RoomPosition.Y - nextRoom.RoomDimensions.Y + 1));
+                    }
+                    else
+                    {
+                        placementPoint = new Point((int)(bossRoom.RoomPosition.X + (bossRoom.RoomDimensions.X * 0.5f)), (int)(bossRoom.RoomPosition.Y - nextRoom.RoomDimensions.Y + 1));
+                    }
+
+                    anchorType = SchematicAnchor.TopLeft;
+                    nextRoom.RoomPosition = placementPoint.ToVector2();
+
+                    RoomSystem.NewRoom(nextRoom);
+
+                    PlaceSchematic(mapKey, placementPoint, anchorType);
+                }
+                else
+                {
+                    if (i % 2 == 0)
+                    {
+                        placementPoint = new Point((int)(bossRoom.RoomPosition.X + (bossRoom.RoomDimensions.X * 0.5f) - nextRoom.RoomDimensions.X), (int)(bossRoom.RoomPosition.Y + bossRoom.RoomDimensions.Y - 1));
+                    }
+                    else
+                    {
+                        placementPoint = new Point((int)(bossRoom.RoomPosition.X + (bossRoom.RoomDimensions.X * 0.5f)), (int)(bossRoom.RoomPosition.Y + bossRoom.RoomDimensions.Y - 1));
+                    }
+                    
+
+                    anchorType = SchematicAnchor.TopLeft;
+                    nextRoom.RoomPosition = placementPoint.ToVector2();
+
+                    RoomSystem.NewRoom(nextRoom);
+
+                    PlaceSchematic(mapKey, placementPoint, anchorType);
+                }
+            }
         }
         public static void ChooseNextFloor()
         {

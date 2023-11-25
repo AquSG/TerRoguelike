@@ -145,8 +145,8 @@ namespace TerRoguelike.MainMenu
             if (desiredPlayer != null)
                 desiredPlayer.SetAsActive();
 
-            Main.maxTilesX = 4200;
-            Main.maxTilesY = 1200;
+            Main.maxTilesX = 6400;
+            Main.maxTilesY = 1800;
             Main.GameMode = 0;
             WorldGen.WorldGenParam_Evil = 0;
             Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName = "The Dungeon", false, Main.GameMode);

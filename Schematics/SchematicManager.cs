@@ -54,6 +54,7 @@ namespace TerRoguelike.Schematics
             FloorID.Add(new HellFloor());
             FloorID.Add(new DungeonFloor());
             FloorID.Add(new TempleFloor());
+            FloorID.Add(new LunarFloor());
         }
         public static void LoadRoomIDs()
         {
@@ -204,6 +205,14 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new TempleEnemyRoom5Up());
             RoomID.Add(new TempleEnemyRoom6());
             RoomID.Add(new TempleEnemyRoom7());
+            RoomID.Add(new LunarStartRoom());
+            RoomID.Add(new LunarBossRoom1());
+            RoomID.Add(new LunarHallRoom1());
+            RoomID.Add(new LunarHallRoom2());
+            RoomID.Add(new LunarPillarRoomTopLeft());
+            RoomID.Add(new LunarPillarRoomTopRight());
+            RoomID.Add(new LunarPillarRoomBottomLeft());
+            RoomID.Add(new LunarPillarRoomBottomRight());
 
             for (int i = 0; i < RoomID.Count; i++)
             {

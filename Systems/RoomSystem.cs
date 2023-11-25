@@ -25,6 +25,7 @@ using Terraria.Audio;
 using System.IO;
 using Terraria.UI;
 using TerRoguelike.MainMenu;
+using TerRoguelike.NPCs.Enemy.Pillar;
 
 namespace TerRoguelike.Systems
 {
@@ -43,6 +44,7 @@ namespace TerRoguelike.Systems
             SpawnManager.UpdateSpawnManager(); //Run all logic for all pending items and enemies being telegraphed
             UpdateHealingPulse(); //Used for uncommon healing item based on room time
             UpdateAttackPlanRocketBundles(); //Used for the attack plan item that handles future attack plan bundles
+            UpdateChains();
 
             if (RoomList == null)
                 return;
@@ -77,6 +79,11 @@ namespace TerRoguelike.Systems
                             modPlayer.currentFloor = FloorID[room.AssociatedFloor]; //If player is inside a room with a valid value for an associated floor, set it to that.
                         if (room.active)
                             modPlayer.currentRoom = room.myRoom;
+
+                        if (modPlayer.currentFloor.FloorID == 10 && !TerRoguelikeWorld.lunarFloorInitialized)
+                        {
+                            InitializeLunarFloor();
+                        }
 
                         room.awake = true;
                         bool teleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f && !player.dead;
@@ -129,6 +136,61 @@ namespace TerRoguelike.Systems
                 room.Update();
             }
         }
+        public static void InitializeLunarFloor()
+        {
+            if (TerRoguelikeWorld.lunarFloorInitialized)
+                return;
+            TerRoguelikeWorld.lunarFloorInitialized = true;
+
+            Vector2 chainStart = (RoomID[RoomDict["LunarBossRoom1"]].RoomPosition + (RoomID[RoomDict["LunarBossRoom1"]].RoomDimensions * 0.5f)) * 16f;
+            int pillarCount = 0;
+            for (int i = 0; i < RoomList.Count; i++)
+            {
+                if (pillarCount >= 4)
+                    break;
+
+                Room room = RoomList[i];
+                if (room == null)
+                    continue;
+
+                if (room.ID == RoomDict["LunarPillarRoomTopLeft"])
+                {
+                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<VortexPillar>());
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    pillarCount++;
+                    continue;
+                }
+                if (room.ID == RoomDict["LunarPillarRoomTopRight"])
+                {
+                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<StardustPillar>());
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    pillarCount++;
+                    continue;
+                }
+                if (room.ID == RoomDict["LunarPillarRoomBottomLeft"])
+                {
+                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<NebulaPillar>());
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    pillarCount++;
+                    continue;
+                }
+                if (room.ID == RoomDict["LunarPillarRoomBottomRight"])
+                {
+                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<SolarPillar>());
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
+                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
+                    pillarCount++;
+                    continue;
+                }
+            }
+        }
         public override void SaveWorldData(TagCompound tag)
         {
             var isTerRoguelikeWorld = TerRoguelikeWorld.IsTerRoguelikeWorld;
@@ -162,6 +224,8 @@ namespace TerRoguelike.Systems
         public override void LoadWorldData(TagCompound tag)
         {
             MusicSystem.Initialized = false;
+            TerRoguelikeWorld.lunarFloorInitialized = false;
+            TerRoguelikeWorld.lunarBossSpawned = false;
             TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
@@ -236,6 +300,7 @@ namespace TerRoguelike.Systems
             DrawDeathScene();
             DrawPendingEnemies();
             DrawHealingPulse();
+            DrawChains();
 
             if (RoomList == null)
                 return;
@@ -245,7 +310,20 @@ namespace TerRoguelike.Systems
             {
                 if (room == null)
                     continue;
-                if (!room.awake)
+                
+                if (TerRoguelikeWorld.lunarFloorInitialized && (!TerRoguelikeWorld.lunarBossSpawned || (!room.awake && room.closedTime <= 0)))
+                {
+                    if (room.ID == RoomDict["LunarBossRoom1"])
+                    {
+                        Main.spriteBatch.Begin();
+                        Texture2D moonLordTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/StillMoonLord").Value;
+                        Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                        Main.spriteBatch.End();
+                    }
+                }
+                
+
+                if (!room.StartCondition(room.awake))
                     continue;
 
                 if (room.closedTime > 60)
@@ -469,6 +547,69 @@ namespace TerRoguelike.Systems
             }
             Main.spriteBatch.End();
         }
+        public void DrawChains()
+        {
+            if (TerRoguelikeWorld.chainList == null)
+                return;
+
+            if (!TerRoguelikeWorld.chainList.Any())
+                return;
+
+            Texture2D chain1Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain1").Value;
+            Texture2D chain2Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain2").Value;
+            Main.spriteBatch.Begin();
+            for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
+            {
+                Chain chain = TerRoguelikeWorld.chainList[i];
+                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f));
+                float rotation = (chain.End - visualStart).ToRotation();
+                int visualLength = (int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft));
+                for (int j = 0; j < visualLength; j++)
+                {
+                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + ((chain.End - visualStart) * (j / (float)chain.Length)) - Main.screenPosition, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f, SpriteEffects.None);
+                }
+            }
+            Main.spriteBatch.End();
+        }
+        public void UpdateChains()
+        {
+            if (TerRoguelikeWorld.chainList == null)
+                return;
+            if (!TerRoguelikeWorld.chainList.Any())
+                return;
+
+            for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
+            {
+                Chain chain = TerRoguelikeWorld.chainList[i];
+                if (chain.TimeLeft != chain.MaxTimeLeft)
+                {
+                    if ((int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft)) != (int)(chain.Length * ((chain.TimeLeft - 1) / (float)chain.MaxTimeLeft)))
+                    {
+                        Vector2 soundPos = chain.Start + ((chain.End - chain.Start) * ((int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft)) / (float)chain.Length));
+                        if ((int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft)) == 1)
+                        {
+                            SoundEngine.PlaySound(SoundID.DD2_WitherBeastDeath with { Volume = 0.8f }, soundPos);
+                        }
+                        else
+                            SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { Volume = 0.8f }, soundPos);
+                    }
+                    chain.TimeLeft--;
+                }
+                if (chain.AttachedNPC != -1)
+                {
+                    if (!Main.npc[chain.AttachedNPC].active)
+                    {
+                        chain.TimeLeft--;
+                        chain.AttachedNPC = -1;
+                    }
+                    else
+                    {
+                        chain.End = Main.npc[chain.AttachedNPC].Center;
+                    }
+                }
+            }
+            TerRoguelikeWorld.chainList.RemoveAll(x => x.TimeLeft <= 0);
+        }
         public void UpdateAttackPlanRocketBundles()
         {
             if (attackPlanRocketBundles == null)
@@ -536,6 +677,8 @@ namespace TerRoguelike.Systems
                 obtainedRoomListFromServer = true;
 
             ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+
+            TerRoguelikeWorld.chainList.Clear();
         }
     }
     public class HealingPulse

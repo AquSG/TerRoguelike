@@ -26,5 +26,9 @@ namespace TerRoguelike.NPCs
         {
             NPC.value = 0f;
         }
+        public override bool CheckActive()
+        {
+            return false;
+        }
     }
 }
