@@ -662,4 +662,5 @@ NPCs: {
 	SolarPillar.DisplayName: Solar Pillar
 	StardustPillar.DisplayName: Stardust Pillar
 	VortexPillar.DisplayName: Vortex Pillar
+	GiantBat.DisplayName: Giant Bat
 }
