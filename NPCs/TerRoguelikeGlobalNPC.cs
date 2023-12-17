@@ -20,6 +20,7 @@ using TerRoguelike.Managers;
 using System.IO;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
+using TerRoguelike.Projectiles;
 
 namespace TerRoguelike.NPCs
 {
@@ -59,7 +60,12 @@ namespace TerRoguelike.NPCs
         {
             Entity target = GetTarget(npc, false, false);
 
-            if (npc.ai[0] == 0 && (targetPlayer != -1 ? !Main.player[targetPlayer].dead : true) && (target != null ? target.active : false))
+            if (target == null && npc.direction == 0)
+            {
+                npc.direction = 1;
+                npc.spriteDirection = 1;
+            }
+            if (npc.ai[0] == 0 && (target != null ? target.active : false))
             {
                 if (npc.Center.X < target.Center.X)
                 {
@@ -378,24 +384,52 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[0] = -attackCooldown;
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
+                    Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
+                    Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType = npc.type;
                     if (hostileTurnedAlly || npc.friendly)
                     {
                         Main.projectile[proj].friendly = true;
                         Main.projectile[proj].hostile = false;
-                        Main.projectile[proj].damage *= 2;
                     }
                     else
                     {
                         Main.projectile[proj].friendly = false;
                         Main.projectile[proj].hostile = true;
+                        Main.projectile[proj].damage /= 2;
                     }
                 }
             }
             else
             {
-                if (npc.velocity != Vector2.Zero)
+                if (npc.ai[0] != 0)
                 {
-                    npc.velocity += -npc.velocity.SafeNormalize(Vector2.UnitY) * acceleration;
+                    npc.ai[0]++;
+                }
+
+                if (npc.ai[0] >= attackTelegraph)
+                {
+                    npc.ai[0] = -attackCooldown;
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
+                    Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
+                    if (hostileTurnedAlly || npc.friendly)
+                    {
+                        Main.projectile[proj].friendly = true;
+                        Main.projectile[proj].hostile = false;
+                    }
+                    else
+                    {
+                        Main.projectile[proj].friendly = false;
+                        Main.projectile[proj].hostile = true;
+                        Main.projectile[proj].damage /= 2;
+                    }
+                }
+
+                npc.velocity.X += (npc.velocity.X == 0 ? 1 : npc.velocity.X / Math.Abs(npc.velocity.X)) * acceleration;
+                npc.velocity.Y += Main.rand.NextFloat(-acceleration / 2f, acceleration / 2f);
+                
+                if (npc.velocity.Length() > maxVelocity)
+                {
+                    npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * maxVelocity;
                 }
             }
 
@@ -842,6 +876,9 @@ namespace TerRoguelike.NPCs
                 if (targetPlayer == -1 || targetNPC != -1)
                 {
                     targetPlayer = npc.FindClosestPlayer();
+                    if (Main.player[targetPlayer].dead)
+                        targetPlayer = -1;
+
                     targetNPC = -1;
                     if (resetDir)
                         npc.direction = 1;

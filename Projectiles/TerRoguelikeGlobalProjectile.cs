@@ -13,6 +13,7 @@ using TerRoguelike.TerPlayer;
 using Terraria.Audio;
 using Terraria.ID;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
@@ -26,6 +27,8 @@ namespace TerRoguelike.Projectiles
         public int homingCheckCooldown = 0;
         public int swingDirection = 0;
         public bool ultimateCollideOverride = false;
+        public int npcOwner = -1;
+        public int npcOwnerType = -1;
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0; // set bounces in projectile ai.
@@ -78,6 +81,9 @@ namespace TerRoguelike.Projectiles
             {
                 SpawnExplosion(projectile, modPlayer, target, crit: hit.Crit);
             }
+        }
+        public override void OnSpawn(Projectile projectile, IEntitySource source)
+        {
         }
         public override void OnKill(Projectile projectile, int timeLeft)
         {

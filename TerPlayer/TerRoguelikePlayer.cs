@@ -1298,8 +1298,16 @@ namespace TerRoguelike.TerPlayer
             }
             if (damageSource.SourceProjectileLocalIndex > -1 && damageSource.SourceProjectileLocalIndex < Main.maxProjectiles)
             {
-                killerProj = damageSource.SourceProjectileLocalIndex;
-                killerProjType = Main.projectile[damageSource.SourceProjectileLocalIndex].type;
+                if (Main.projectile[damageSource.SourceProjectileLocalIndex].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner > -1)
+                {
+                    killerNPC = Main.projectile[damageSource.SourceProjectileLocalIndex].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner;
+                    killerNPCType = Main.projectile[damageSource.SourceProjectileLocalIndex].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType;
+                }
+                else
+                {
+                    killerProj = damageSource.SourceProjectileLocalIndex;
+                    killerProjType = Main.projectile[killerProj].type;
+                }
             }
             SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
             ZoomSystem.SetZoomAnimation(2.5f, 60);
