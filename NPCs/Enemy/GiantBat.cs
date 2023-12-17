@@ -32,7 +32,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.width = 20;
             NPC.height = 18;
             NPC.aiStyle = -1;
-            NPC.damage = 35;
+            NPC.damage = 36;
             NPC.lifeMax = 600;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
@@ -43,7 +43,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             int attackCooldown = 30;
             NPC.frameCounter += 0.2d;
-            modNPC.RogueGiantBatAI(NPC, 128f, 0.3f, 4.8f, 30, attackCooldown, 32f, ProjectileID.NorthPoleSnowflake, new Vector2(0, 10f), NPC.damage / 2);
+            modNPC.RogueGiantBatAI(NPC, 128f, 0.3f, 4.8f, 30, attackCooldown, 32f, ProjectileID.NorthPoleSnowflake, new Vector2(0, 10f), NPC.damage);
             NPC.rotation = (NPC.velocity.X / 18f) * MathHelper.PiOver2;
             if (NPC.ai[0] == -attackCooldown)
             {
