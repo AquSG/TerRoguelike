@@ -345,6 +345,69 @@ namespace TerRoguelike.NPCs
             Vector2 wantedVelocity = slowTurn ? npc.rotation.ToRotationVector2() * (maxVelocity * ((((1f - velMultiplier * 0.85f)) + 0.15f))) : npc.rotation.ToRotationVector2() * maxVelocity;
             npc.velocity = Vector2.Lerp(npc.velocity, wantedVelocity, 0.75f);
         }
+        public void RogueGiantBatAI(NPC npc, float distanceAbove, float acceleration, float maxVelocity, int attackTelegraph, int attackCooldown, float attackDistance, int projType, Vector2 projVelocity, int projDamage)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (target != null)
+            {
+                Vector2 targetPos = target.Center + new Vector2(0, -distanceAbove);
+                if ((npc.Center - targetPos).Length() < attackDistance)
+                {
+                    npc.velocity *= 0.95f;
+                    if (npc.ai[0] == 0)
+                    {
+                        npc.ai[0]++;
+                    }
+                }
+                else
+                {
+                    npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
+                }
+                if (npc.velocity.Length() > maxVelocity)
+                {
+                    npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitY) * maxVelocity;
+                }
+
+                if (npc.ai[0] != 0)
+                {
+                    npc.ai[0]++;
+                }
+
+                if (npc.ai[0] >= attackTelegraph)
+                {
+                    npc.ai[0] = -attackCooldown;
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
+                    if (hostileTurnedAlly || npc.friendly)
+                    {
+                        Main.projectile[proj].friendly = true;
+                        Main.projectile[proj].hostile = false;
+                        Main.projectile[proj].damage *= 2;
+                    }
+                    else
+                    {
+                        Main.projectile[proj].friendly = false;
+                        Main.projectile[proj].hostile = true;
+                    }
+                }
+            }
+            else
+            {
+                if (npc.velocity != Vector2.Zero)
+                {
+                    npc.velocity += -npc.velocity.SafeNormalize(Vector2.UnitY) * acceleration;
+                }
+            }
+
+            if (npc.collideX)
+            {
+                npc.velocity.X *= -0.75f;
+            }
+            if (npc.collideY)
+            {
+                npc.velocity.Y *= -0.25f;
+            }
+        }
 
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
