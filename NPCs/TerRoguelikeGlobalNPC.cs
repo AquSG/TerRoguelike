@@ -217,7 +217,7 @@ namespace TerRoguelike.NPCs
             }
             else
             {
-                if (npc.ai[1] == 0 && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
+                if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
                 {
                     npc.ai[1]++;
                 }
@@ -249,7 +249,7 @@ namespace TerRoguelike.NPCs
                     npc.spriteDirection = -1;
                 }
             }
-            else if (npc.ai[0] > 60)
+            else if (npc.ai[0] > 60 && npc.ai[1] <= 0)
             {
                 npc.ai[0] = -240;
                 npc.direction *= -1;
