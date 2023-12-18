@@ -22,7 +22,7 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<SandWorm>();
         public override List<int> associatedFloors => new List<int>() { 2 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, -4);
+        public override Vector2 DrawCenterOffset => new Vector2(0, -6);
         public override int CombatStyle => 0;
         public List<WormSegment> Segments = new List<WormSegment>();
         public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormHead").Value;
@@ -97,7 +97,7 @@ namespace TerRoguelike.NPCs.Enemy
                     }
                 }
                 spriteBatch.End();
-                spriteBatch.Begin();
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
             for (int i = Segments.Count - 1; i >= 0; i--)
             {
