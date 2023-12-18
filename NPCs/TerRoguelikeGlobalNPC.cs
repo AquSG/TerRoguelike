@@ -201,6 +201,177 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
+        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            float realXCap = npc.ai[1] > 0 ? xCap * speedMultiWhenShooting : xCap;
+
+            if (npc.ai[1] != 0)
+                npc.ai[1]++;
+
+            if (target == null)
+            {
+                if (npc.ai[1] > 0)
+                    npc.ai[1] = 0;
+            }
+            else
+            {
+                if (npc.ai[1] == 0 && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
+                {
+                    npc.ai[1]++;
+                }
+                
+                if (npc.ai[1] >= attackTelegraph)
+                {
+                    Vector2 projSpawnPos = npc.Center + projOffset;
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * projSpeed, projType, projDamage, 0f);
+                    SetUpNPCProj(npc, proj);
+                    npc.ai[1] = -attackCooldown;
+                }
+            }
+
+            if (target == null && npc.direction == 0)
+            {
+                npc.direction = 1;
+                npc.spriteDirection = 1;
+            }
+            if (npc.ai[0] == 0 && (target != null ? target.active : false))
+            {
+                if (npc.Center.X < target.Center.X)
+                {
+                    npc.direction = 1;
+                    npc.spriteDirection = 1;
+                }
+                else
+                {
+                    npc.direction = -1;
+                    npc.spriteDirection = -1;
+                }
+            }
+            else if (npc.ai[0] > 60)
+            {
+                npc.ai[0] = -240;
+                npc.direction *= -1;
+                npc.spriteDirection *= -1;
+            }
+            if (npc.ai[0] < 0)
+                npc.ai[0]++;
+
+            if (npc.velocity.X < -realXCap || npc.velocity.X > realXCap)
+            {
+                if (npc.velocity.Y == 0f)
+                    npc.velocity *= 0.8f;
+            }
+            else if (npc.velocity.X < realXCap && npc.direction == 1)
+            {
+                npc.velocity.X += 0.07f;
+                if (npc.velocity.X > realXCap)
+                    npc.velocity.X = realXCap;
+            }
+            else if (npc.velocity.X > -realXCap && npc.direction == -1)
+            {
+                npc.velocity.X -= 0.07f;
+                if (npc.velocity.X < -realXCap)
+                    npc.velocity.X = -realXCap;
+            }
+
+            if (npc.collideX)
+            {
+                npc.ai[0]++;
+                if (npc.collideY && npc.oldVelocity.Y >= 0)
+                    npc.velocity.Y = jumpVelocity;
+            }
+            else if (npc.ai[0] > 0)
+                npc.ai[0] = 0f;
+
+            if (target != null)
+            {
+                if (npc.velocity.Y == 0f && target.Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
+                {
+
+                    if (npc.velocity.Y == 0f)
+                    {
+                        int padding = 6;
+                        if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
+                        {
+                            npc.velocity.Y = jumpVelocity;
+                        }
+                        else
+                        {
+                            int bottomtilepointx = (int)(npc.Center.X / 16f);
+                            int bottomtilepointY = (int)(npc.Bottom.Y / 16f) - 1;
+                            for (int i = bottomtilepointY; i > bottomtilepointY - padding; i--)
+                            {
+                                if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                                {
+                                    npc.velocity.Y = jumpVelocity;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (npc.velocity.Y == 0f && target.Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
+                {
+                    int fluff = 6;
+                    int bottomtilepointx = (int)(npc.Center.X / 16f);
+                    int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    {
+                        if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                        {
+                            npc.position.Y += 1;
+                            npc.stairFall = true;
+                            npc.velocity.Y += 0.01f;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (npc.velocity.Y >= 0f)
+            {
+                int dir = 0;
+                if (npc.velocity.X < 0f)
+                    dir = -1;
+                if (npc.velocity.X > 0f)
+                    dir = 1;
+
+                Vector2 futurePos = npc.position;
+                futurePos.X += npc.velocity.X;
+                int tileX = (int)((futurePos.X + (float)(npc.width / 2) + (float)((npc.width / 2 + 1) * dir)) / 16f);
+                int tileY = (int)((futurePos.Y + (float)npc.height - 1f) / 16f);
+                if (WorldGen.InWorld(tileX, tileY, 4))
+                {
+                    if ((float)(tileX * 16) < futurePos.X + (float)npc.width && (float)(tileX * 16 + 16) > futurePos.X && ((Main.tile[tileX, tileY].HasUnactuatedTile && !TopSlope(Main.tile[tileX, tileY]) && !TopSlope(Main.tile[tileX, tileY - 1]) && Main.tileSolid[Main.tile[tileX, tileY].TileType] && !Main.tileSolidTop[Main.tile[tileX, tileY].TileType]) || (Main.tile[tileX, tileY - 1].IsHalfBlock && Main.tile[tileX, tileY - 1].HasUnactuatedTile)) && (!Main.tile[tileX, tileY - 1].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 1].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 1].TileType] || (Main.tile[tileX, tileY - 1].IsHalfBlock && (!Main.tile[tileX, tileY - 4].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 4].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 4].TileType]))) && (!Main.tile[tileX, tileY - 2].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 2].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 2].TileType]) && (!Main.tile[tileX, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 3].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 3].TileType]) && (!Main.tile[tileX - dir, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX - dir, tileY - 3].TileType]))
+                    {
+                        float tilePosY = tileY * 16;
+                        if (Main.tile[tileX, tileY].IsHalfBlock)
+                            tilePosY += 8f;
+
+                        if (Main.tile[tileX, tileY - 1].IsHalfBlock)
+                            tilePosY -= 8f;
+
+                        if (tilePosY < futurePos.Y + (float)npc.height)
+                        {
+                            float difference = futurePos.Y + (float)npc.height - tilePosY;
+                            if (difference <= 16.1f)
+                            {
+                                npc.gfxOffY += npc.position.Y + (float)npc.height - tilePosY;
+                                npc.position.Y = tilePosY - (float)npc.height;
+                            }
+
+                            if (difference < 9f)
+                                npc.stepSpeed = 1f;
+                            else
+                                npc.stepSpeed = 2f;
+                        }
+
+                    }
+                }
+            }
+        }
         public void RogueSpookrowAI(NPC npc, float xCap, float jumpVelocity)
         {
             Entity target = GetTarget(npc, false, false);
@@ -384,19 +555,7 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[0] = -attackCooldown;
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
-                    Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
-                    Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType = npc.type;
-                    if (hostileTurnedAlly || npc.friendly)
-                    {
-                        Main.projectile[proj].friendly = true;
-                        Main.projectile[proj].hostile = false;
-                    }
-                    else
-                    {
-                        Main.projectile[proj].friendly = false;
-                        Main.projectile[proj].hostile = true;
-                        Main.projectile[proj].damage /= 2;
-                    }
+                    SetUpNPCProj(npc, proj);
                 }
             }
             else
@@ -410,18 +569,7 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[0] = -attackCooldown;
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
-                    Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
-                    if (hostileTurnedAlly || npc.friendly)
-                    {
-                        Main.projectile[proj].friendly = true;
-                        Main.projectile[proj].hostile = false;
-                    }
-                    else
-                    {
-                        Main.projectile[proj].friendly = false;
-                        Main.projectile[proj].hostile = true;
-                        Main.projectile[proj].damage /= 2;
-                    }
+                    SetUpNPCProj(npc, proj);
                 }
 
                 npc.velocity.X += (npc.velocity.X == 0 ? 1 : npc.velocity.X / Math.Abs(npc.velocity.X)) * acceleration;
@@ -887,6 +1035,23 @@ namespace TerRoguelike.NPCs
                 }
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
+        }
+
+        public void SetUpNPCProj(NPC npc, int proj)
+        {
+            Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
+            Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType = npc.type;
+            if (hostileTurnedAlly || npc.friendly)
+            {
+                Main.projectile[proj].friendly = true;
+                Main.projectile[proj].hostile = false;
+            }
+            else
+            {
+                Main.projectile[proj].friendly = false;
+                Main.projectile[proj].hostile = true;
+                Main.projectile[proj].damage /= 2;
+            }
         }
     }
 

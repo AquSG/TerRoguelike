@@ -18,6 +18,7 @@ using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Items.Rare;
 using Terraria.ModLoader.Core;
 using TerRoguelike.NPCs.Enemy;
+using TerRoguelike.NPCs.Enemy.Pillar;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 
@@ -31,7 +32,14 @@ namespace TerRoguelike.Managers
             {
                 new Splinter(),
                 new Spookrow(),
-                new UndeadGuard()
+                new UndeadGuard(),
+                new SandWorm(),
+                new GiantBat(),
+                new IcyMerman(),
+                new SolarPillar(),
+                new NebulaPillar(),
+                new StardustPillar(),
+                new VortexPillar()
             };
         }
         internal static void Unload()
