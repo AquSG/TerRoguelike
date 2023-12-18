@@ -56,6 +56,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
+            NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 150.0; i++)
@@ -87,12 +88,12 @@ namespace TerRoguelike.NPCs.Enemy
         {
             headRotation = NPC.spriteDirection == -1 ? 0f : MathHelper.Pi;
 
-            if (modNPC.targetNPC != -1)
+            if (modNPC.targetNPC != -1 && NPC.ai[0] >= 0)
             {
                 NPC npc = Main.npc[modNPC.targetNPC];
                 headRotation = (NPC.Center - npc.Center).ToRotation();
             }
-            else if (modNPC.targetPlayer != -1)
+            else if (modNPC.targetPlayer != -1 && NPC.ai[0] >= 0)
             {
                 Player player = Main.player[modNPC.targetPlayer];
                 headRotation = (NPC.Center - player.Center).ToRotation();
