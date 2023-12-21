@@ -19,6 +19,7 @@ Projectiles: {
 	ClusterHandler.DisplayName: Cluster Handler
 	MagicFist.DisplayName: Magic Fist
 	SlimeGlob.DisplayName: Slime Glob
+	Snowflake.DisplayName: Snowflake
 }
 
 Items: {
@@ -665,4 +666,5 @@ NPCs: {
 	GiantBat.DisplayName: Giant Bat
 	IcyMerman.DisplayName: Icy Merman
 	IceTortoise.DisplayName: Ice Tortoise
+	Frostbiter.DisplayName: Frostbiter
 }

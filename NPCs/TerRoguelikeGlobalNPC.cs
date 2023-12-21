@@ -693,6 +693,25 @@ namespace TerRoguelike.NPCs
         {
             Entity target = GetTarget(npc, false, false);
 
+            npc.stairFall = true;
+
+            if (npc.collideY)
+            {
+                int fluff = 6;
+                int bottomtilepointx = (int)(npc.Center.X / 16f);
+                int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                {
+                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    {
+                        npc.position.Y += 1;
+                        npc.stairFall = true;
+                        npc.velocity.Y += 0.01f;
+                        break;
+                    }
+                }
+            }
+
             if (target != null)
             {
                 Vector2 targetPos = target.Center + new Vector2(0, -distanceAbove);
@@ -755,6 +774,153 @@ namespace TerRoguelike.NPCs
             if (npc.collideY)
             {
                 npc.velocity.Y *= -0.25f;
+            }
+        }
+        public void RogueFrostbiterAI(NPC npc, float distanceBeside, int dashTime, float dashVelocity, float passiveAccel, float passiveMaxVelocity, int attackTelegraph, int waitTimeAfterAttack, float attackDistance, int projType, float projVelocity, int projDamage, int projCount)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (target != null)
+            {
+                if (npc.ai[0] <= 0)
+                {
+                    if (npc.ai[1] == 0)
+                    {
+                        if (npc.Center.X >= target.Center.X)
+                        {
+                            npc.direction = 1;
+                        }
+                        else
+                        {
+                            npc.direction = -1;
+                        }
+                    }
+                    else if (npc.direction != 0)
+                    {
+                        Vector2 nextTarget = Main.rand.NextVector2CircularEdge(attackDistance, attackDistance);
+                        nextTarget.X = Math.Abs(nextTarget.X) * -npc.direction;
+                        nextTarget += target.Center;
+                        npc.ai[2] = nextTarget.X;
+                        npc.ai[3] = nextTarget.Y;
+                        npc.direction = 0;
+                    }
+                }
+
+                Vector2 targetPos = npc.ai[1] == 0 ? new Vector2(distanceBeside * npc.direction, 0) + target.Center : new Vector2(npc.ai[2], npc.ai[3]);
+
+                if (npc.ai[0] != 0)
+                {
+                    npc.ai[0]++;
+                    if (npc.ai[0] < attackTelegraph)
+                        npc.velocity *= 0.93f;
+                }
+
+                float greaterDist = attackDistance > distanceBeside ? attackDistance : distanceBeside;
+                if ((npc.Center - targetPos).Length() < 64f || ((npc.collideX || npc.collideY) && (npc.Center - target.Center).Length() < greaterDist))
+                {
+                    if (npc.ai[0] == 0)
+                    {
+                        npc.ai[0]++;
+                    }
+                }
+                else if (npc.ai[0] == 0)
+                {
+                    npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * ((npc.Center - targetPos).Length() < 64f ? passiveAccel : passiveAccel * 2f);
+                }
+                if (npc.velocity.Length() > passiveMaxVelocity && npc.ai[0] < attackTelegraph)
+                {
+                    npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitY) * passiveMaxVelocity;
+                }
+
+
+                if (npc.ai[0] >= attackTelegraph)
+                {
+                    if (npc.ai[1] == 0 && npc.ai[0] == attackTelegraph)
+                    {
+                        npc.velocity = (target.Center - npc.Center).SafeNormalize(Vector2.UnitX * npc.direction) * dashVelocity;
+                    }
+                    else if (npc.ai[1] == 1)
+                    {
+                        float anglePerProj = MathHelper.TwoPi / projCount;
+                        for (int i = 0; i < projCount; i++)
+                        {
+                            int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (-Vector2.UnitY * projVelocity).RotatedBy(anglePerProj * i), projType, projDamage, 0f);
+                            SetUpNPCProj(npc, proj);
+                        }
+                    }
+
+                    if (npc.ai[1] == 1 || npc.ai[0] >= attackTelegraph + dashTime)
+                    {
+                        npc.ai[0] = -waitTimeAfterAttack;
+                        if (npc.ai[1] == 0)
+                        {
+                            npc.ai[1] = 1;
+                        }
+                        else
+                        {
+                            npc.ai[1] = 0;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (npc.ai[0] == 0)
+                {
+                    if (npc.ai[1] == 0)
+                    {
+                        if (npc.direction == 0)
+                        {
+                            npc.direction = 1;
+                        }
+                        else
+                        {
+                            npc.direction *= -1;
+                        }
+                    }
+                    else if (npc.direction != 0)
+                    {
+                        Vector2 nextTarget = Main.rand.NextVector2CircularEdge(attackDistance, attackDistance);
+                        nextTarget.X = Math.Abs(nextTarget.X) * -npc.direction;
+                        nextTarget += npc.Center;
+                        npc.ai[2] = nextTarget.X;
+                        npc.ai[3] = nextTarget.Y;
+                    }
+                }
+
+                npc.ai[0]++;
+                if (npc.ai[0] < attackTelegraph)
+                    npc.velocity *= 0.93f;
+
+                if (npc.ai[0] >= attackTelegraph)
+                {
+                    if (npc.ai[1] == 0 && npc.ai[0] == attackTelegraph)
+                    {
+                        npc.velocity = Vector2.UnitX * npc.direction * dashVelocity;
+                    }
+                    else if (npc.ai[1] == 1)
+                    {
+                        float anglePerProj = MathHelper.TwoPi / projCount;
+                        for (int i = 0; i < projCount; i++)
+                        {
+                            int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (-Vector2.UnitY * projVelocity).RotatedBy(anglePerProj * i), projType, projDamage, 0f);
+                            SetUpNPCProj(npc, proj);
+                        }
+                    }
+
+                    if (npc.ai[1] == 1 || npc.ai[0] >= attackTelegraph + dashTime)
+                    {
+                        npc.ai[0] = -waitTimeAfterAttack;
+                        if (npc.ai[1] == 0)
+                        {
+                            npc.ai[1] = 1;
+                        }
+                        else
+                        {
+                            npc.ai[1] = 0;
+                        }
+                    }
+                }
             }
         }
 

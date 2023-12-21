@@ -8,6 +8,8 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -19,7 +21,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.IcyMerman, 60, 120, 0.45f);
+            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<Frostbiter>(), 60, 120, 0.45f);
         }
     }
 }
