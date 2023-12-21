@@ -70,7 +70,12 @@ namespace TerRoguelike.Projectiles
         }
         //rotating rectangle hitbox collision
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.rotation.ToRotationVector2(), backCutoff: 0.3f);
-        
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            float xVector = (target.Center - Main.player[Projectile.owner].Center).X;
+            modifiers.HitDirectionOverride = (int)(Math.Abs(xVector) / xVector);
+        }
+
         //only hit if in the first 3 frames of animation
         public override bool? CanDamage() => Projectile.frame <= 3 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)

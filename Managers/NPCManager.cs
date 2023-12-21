@@ -40,7 +40,8 @@ namespace TerRoguelike.Managers
                 new NebulaPillar(),
                 new StardustPillar(),
                 new VortexPillar(),
-                new IceTortoise()
+                new IceTortoise(),
+                new Frostbiter()
             };
         }
         internal static void Unload()
