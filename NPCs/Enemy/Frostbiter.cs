@@ -59,7 +59,7 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[0] == -attackCooldown && NPC.ai[1] == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item28 with { Volume = 0.8f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item28 with { Volume = 0.5f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

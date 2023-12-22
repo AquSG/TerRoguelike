@@ -64,6 +64,28 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(ref Segments, NPC);
         }
+        public override void HitEffect(NPC.HitInfo hit)
+        {
+            if (NPC.life <= 0)
+            {
+                for (int i = 0; i < Segments.Count; i++)
+                {
+                    WormSegment segment = Segments[i];
+                    if (i == 0)
+                    {
+                        Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, GoreID.DuneSplicerHead, NPC.scale);
+                        continue;
+                    }
+                    if (i == Segments.Count - 1)
+                    {
+                        Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, GoreID.DuneSplicerTail, NPC.scale);
+                        continue;
+                    }
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, GoreID.DuneSplicerBody, NPC.scale);
+                }
+            }
+            
+        }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (modNPC.OverrideIgniteVisual && modNPC.ignitedStacks.Any())

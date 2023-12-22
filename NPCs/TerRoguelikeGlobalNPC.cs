@@ -866,7 +866,6 @@ namespace TerRoguelike.NPCs
                         npc.ai[1] = 0;
                 }
             }
-            Main.NewText(npc.direction);
         }
 
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
