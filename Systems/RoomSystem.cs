@@ -58,7 +58,7 @@ namespace TerRoguelike.Systems
                         if (Main.player[i].dead)
                             continue;
 
-                        if (Main.player[i].GetModPlayer<TerRoguelikePlayer>().currentRoom == -1)
+                        if (Main.player[i].GetModPlayer<TerRoguelikePlayer>().escaped)
                             continue;
 
                         Main.player[i].KillMe(PlayerDeathReason.LegacyDefault(), Main.rand.Next(10000, 25000), Main.rand.NextBool() ? -1 : 1);
@@ -66,7 +66,6 @@ namespace TerRoguelike.Systems
                     escape = false;
                 }
             }
-
             SpawnManager.UpdateSpawnManager(); //Run all logic for all pending items and enemies being telegraphed
             UpdateHealingPulse(); //Used for uncommon healing item based on room time
             UpdateAttackPlanRocketBundles(); //Used for the attack plan item that handles future attack plan bundles
@@ -195,11 +194,9 @@ namespace TerRoguelike.Systems
                             else
                             {
                                 player.Center = new Vector2(Main.maxTilesX * 8f, 3000f);
+                                player.GetModPlayer<TerRoguelikePlayer>().escaped = true;
                                 for (int L = 0; L < RoomList.Count; L++)
                                 {
-                                    if (RoomList[L].IsBossRoom)
-                                        continue;
-
                                     ResetRoomID(RoomList[L].ID);
                                 }
                                 MusicMode = 3;

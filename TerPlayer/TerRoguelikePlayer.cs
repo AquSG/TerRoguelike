@@ -114,6 +114,7 @@ namespace TerRoguelike.TerPlayer
 
         #region Misc Variables
         public Floor currentFloor;
+        public bool escaped = false;
         public int shotsToFire = 1;
         public int extraDoubleJumps = 0;
         public int timesDoubleJumped = 0;
