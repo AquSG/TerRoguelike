@@ -17,6 +17,7 @@ namespace TerRoguelike.Rooms
         public override string Key => "HellStartRoom";
         public override string Filename => "Schematics/RoomSchematics/HellStartRoom.csch";
         public override bool CanExitRight => true;
+        public override bool IsStartRoom => true;
         public override void InitializeRoom()
         {
             active = false;

@@ -20,6 +20,7 @@ Projectiles: {
 	MagicFist.DisplayName: Magic Fist
 	SlimeGlob.DisplayName: Slime Glob
 	Snowflake.DisplayName: Snowflake
+	DesertSpiritCurse.DisplayName: Desert Spirit Curse
 }
 
 Items: {
@@ -668,4 +669,5 @@ NPCs: {
 	IceTortoise.DisplayName: Ice Tortoise
 	Frostbiter.DisplayName: Frostbiter
 	UndeadViking.DisplayName: Undead Viking
+	DesertSpirit.DisplayName: Desert Spirit
 }

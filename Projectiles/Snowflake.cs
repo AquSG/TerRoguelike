@@ -27,6 +27,7 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = false;
             Projectile.timeLeft = 240;
             Projectile.direction = Main.rand.NextBool() ? -1 : 1;
+            Projectile.penetrate = -1;
         }
 
         public override void AI()

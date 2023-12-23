@@ -35,6 +35,14 @@ namespace TerRoguelike.Managers
         public int closedTime; // time the room has been completed
         public const int RoomSpawnCap = 200;
         public Vector2 RoomPosition; //position of the room
+        public Vector2 RoomPosition16
+        {
+            get { return RoomPosition * 16f; }
+        }
+        public Vector2 RoomCenter16
+        {
+            get { return new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f); }
+        }
 
         //potential NPC variables
         public Vector2[] NPCSpawnPosition = new Vector2[RoomSpawnCap];
@@ -229,6 +237,31 @@ namespace TerRoguelike.Managers
                 }
             }
         }
+        public Rectangle CheckRectWithWallCollision(Rectangle rect)
+        {
+            bool boundLeft = (rect.X) < (RoomPosition.X + 1f) * 16f;
+            bool boundRight = (rect.X + rect.Width) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
+            bool boundTop = (rect.Y) < (RoomPosition.Y + 1f) * 16f;
+            bool boundBottom = (rect.Y + rect.Height) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
+            if (boundLeft)
+            {
+                rect.X = (int)((RoomPosition.X + 1f) * 16f);
+            }
+            if (boundRight)
+            {
+                rect.X = (int)((RoomPosition.X - 1f + RoomDimensions.X) * 16f) - rect.Width;
+            }
+            if (boundTop)
+            {
+                rect.Y = (int)((RoomPosition.Y + 1f) * 16f);
+            }
+            if (boundBottom)
+            {
+                rect.Y = (int)((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - rect.Height;
+            }
+
+            return rect;
+        }
         public virtual void RoomClearReward()
         {
             if (TerRoguelikeWorld.escape)
@@ -285,6 +318,9 @@ namespace TerRoguelike.Managers
         }
         public void PlayerItemsUpdate()
         {
+            if (TerRoguelikeWorld.escape)
+                return;
+
             int totalAutomaticDefibrillator = 0;
             Vector2 roomCenter = new Vector2(RoomPosition.X + (RoomDimensions.X * 0.5f), RoomPosition.Y + (RoomDimensions.Y * 0.5f)) * 16f;
 

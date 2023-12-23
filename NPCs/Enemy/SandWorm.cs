@@ -21,7 +21,7 @@ namespace TerRoguelike.NPCs.Enemy
     public class SandWorm : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<SandWorm>();
-        public override List<int> associatedFloors => new List<int>() { 2 };
+        public override List<int> associatedFloors => new List<int>() { 5 };
         public override Vector2 DrawCenterOffset => new Vector2(0, -6);
         public override int CombatStyle => 0;
         public List<WormSegment> Segments = new List<WormSegment>();

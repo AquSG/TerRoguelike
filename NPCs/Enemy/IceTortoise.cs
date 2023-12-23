@@ -88,22 +88,20 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)
                 {
-                    int num321 = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, 67, NPC.velocity.X, NPC.velocity.Y, 90, default(Color), 1.5f);
-                    Main.dust[num321].noGravity = true;
-                    Dust dust122 = Main.dust[num321];
-                    Dust dust190 = dust122;
-                    dust190.velocity *= 0.2f;
+                    int d = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, 67, NPC.velocity.X, NPC.velocity.Y, 90, default(Color), 1.5f);
+                    Dust dust = Main.dust[d];
+                    dust.noGravity = true;
+                    dust.velocity *= 0.2f;
                 }
             }
             else
             {
                 for (int i = 0; i < 50; i++)
                 {
-                    int num324 = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, 67, NPC.velocity.X, NPC.velocity.Y, 90, default(Color), 1.5f);
-                    Main.dust[num324].noGravity = true;
-                    Dust dust123 = Main.dust[num324];
-                    Dust dust190 = dust123;
-                    dust190.velocity *= 0.2f;
+                    int d = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, 67, NPC.velocity.X, NPC.velocity.Y, 90, default(Color), 1.5f);
+                    Dust dust = Main.dust[d];
+                    dust.noGravity = true;
+                    dust.velocity *= 0.2f;
                 }
                 Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, NPC.velocity, 180, NPC.scale);
             }

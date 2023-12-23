@@ -48,21 +48,24 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
-                for (int num655 = 0; (double)num655 < hit.Damage / (double)NPC.lifeMax * 50.0; num655++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, hit.HitDirection, -1f);
                 }
-                return;
             }
-            for (int num656 = 0; num656 < 20; num656++)
+            else
             {
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, 2.5f * (float)hit.HitDirection, -2.5f);
+                for (int i = 0; i < 20; i++)
+                {
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, 2.5f * (float)hit.HitDirection, -2.5f);
+                }
+                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, NPC.velocity, 42, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
             }
-            Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, NPC.velocity, 42, NPC.scale);
-            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
-            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
-            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
-            Gore.NewGore(NPC.GetSource_FromThis(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
+            
         }
         public override void FindFrame(int frameHeight)
         {
