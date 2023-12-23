@@ -42,7 +42,18 @@ namespace TerRoguelike.Items.Weapons
 
         public override void UseItemFrame(Player player)
         {
+
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+
+            if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            {
+                player.ChangeDir(1);
+            }
+            else if (AimWorld().X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            {
+                player.ChangeDir(-1);
+            }
+
             //Calculate the dirction in which the players arms should be pointing at.
             if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
                 modPlayer.playerToCursor = (AimWorld() - player.Center).SafeNormalize(Vector2.UnitX);
@@ -68,14 +79,7 @@ namespace TerRoguelike.Items.Weapons
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(38, 38), new Vector2(-14, 14));
 
-            if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
-            {
-                player.ChangeDir(1);
-            }
-            else if (AimWorld().X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
-            {
-                player.ChangeDir(-1);
-            }
+            
         }
 
         public override void UseStyle(Player player, Rectangle heldItemFrame)
