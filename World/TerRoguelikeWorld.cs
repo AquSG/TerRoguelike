@@ -37,7 +37,7 @@ namespace TerRoguelike.World
                 if (RoomSystem.RoomList[i].IsBossRoom)
                     continue;
 
-                RoomSystem.ResetRoomID(i);
+                RoomSystem.ResetRoomID(RoomSystem.RoomList[i].ID);
             }
             MusicMode = 1;
             SetCalm(Escape with { Volume = 0.25f });

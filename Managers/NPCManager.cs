@@ -42,7 +42,8 @@ namespace TerRoguelike.Managers
                 new VortexPillar(),
                 new IceTortoise(),
                 new Frostbiter(),
-                new UndeadViking()
+                new UndeadViking(),
+                new DesertSpirit(),
             };
         }
         internal static void Unload()

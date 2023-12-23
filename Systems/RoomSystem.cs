@@ -28,6 +28,7 @@ using TerRoguelike.MainMenu;
 using TerRoguelike.NPCs.Enemy.Pillar;
 using static TerRoguelike.World.TerRoguelikeWorld;
 using static TerRoguelike.Systems.MusicSystem;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Systems
 {
@@ -48,6 +49,20 @@ namespace TerRoguelike.Systems
                 escapeTime--;
                 if (escapeTime == 0)
                 {
+                    for (int i = 0; i < Main.maxPlayers; i++)
+                    {
+                        if (Main.player[i] == null)
+                            continue;
+                        if (!Main.player[i].active)
+                            continue;
+                        if (Main.player[i].dead)
+                            continue;
+
+                        if (Main.player[i].GetModPlayer<TerRoguelikePlayer>().currentRoom == -1)
+                            continue;
+
+                        Main.player[i].KillMe(PlayerDeathReason.LegacyDefault(), Main.rand.Next(10000, 25000), Main.rand.NextBool() ? -1 : 1);
+                    }
                     escape = false;
                 }
             }
@@ -95,7 +110,7 @@ namespace TerRoguelike.Systems
                         {
                             InitializeLunarFloor();
                         }
-                        
+
                         if (escape)
                         {
                             if (loopCount >= 2)
@@ -157,6 +172,25 @@ namespace TerRoguelike.Systems
                                 player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                                 modPlayer.currentFloor = nextFloor;
+                                for (int n = 0; n < Main.maxNPCs; n++)
+                                {
+                                    NPC npc = Main.npc[n];
+                                    if (npc == null)
+                                        continue;
+                                    if (!npc.active)
+                                        continue;
+                                    if (npc.life <= 0)
+                                        continue;
+
+                                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                                    if (!modNPC.isRoomNPC)
+                                        continue;
+                                    if (modNPC.sourceRoomListID < 0)
+                                        continue;
+
+                                    if (modNPC.sourceRoomListID > targetRoom.myRoom)
+                                        npc.active = false;
+                                }
                             }
                             else
                             {
@@ -166,9 +200,29 @@ namespace TerRoguelike.Systems
                                     if (RoomList[L].IsBossRoom)
                                         continue;
 
-                                    ResetRoomID(L);
+                                    ResetRoomID(RoomList[L].ID);
                                 }
                                 MusicMode = 3;
+
+                                for (int n = 0; n < Main.maxNPCs; n++)
+                                {
+                                    NPC npc = Main.npc[n];
+                                    if (npc == null)
+                                        continue;
+                                    if (!npc.active)
+                                        continue;
+                                    if (npc.life <= 0)
+                                        continue;
+
+                                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                                    if (!modNPC.isRoomNPC)
+                                        continue;
+                                    if (modNPC.sourceRoomListID < 0)
+                                        continue;
+
+                                    if (modNPC.sourceRoomListID > targetRoom.myRoom)
+                                        npc.active = false;
+                                }
                             }
 
                             NewFloorEffects(targetRoom, modPlayer);

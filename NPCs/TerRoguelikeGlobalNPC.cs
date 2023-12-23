@@ -21,6 +21,7 @@ using System.IO;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
+using static TerRoguelike.Systems.RoomSystem;
 
 namespace TerRoguelike.NPCs
 {
@@ -65,7 +66,7 @@ namespace TerRoguelike.NPCs
                 npc.direction = 1;
                 npc.spriteDirection = 1;
             }
-            if (npc.ai[0] == 0 && (target != null ? target.active : false))
+            if (npc.ai[0] == 0 && target != null)
             {
                 if (npc.Center.X < target.Center.X)
                 {
@@ -236,7 +237,7 @@ namespace TerRoguelike.NPCs
                 npc.direction = 1;
                 npc.spriteDirection = 1;
             }
-            if (npc.ai[0] == 0 && (target != null ? target.active : false))
+            if (npc.ai[0] == 0 && target != null)
             {
                 if (npc.Center.X < target.Center.X)
                 {
@@ -372,6 +373,67 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
+        public void RogueTeleportingShooterAI(NPC npc, float minTeleportDist, float maxTeleportDist, int teleportCooldown, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (target == null && npc.direction == 0)
+            {
+                npc.direction = 1;
+                npc.spriteDirection = 1;
+            }
+            if (target != null)
+            {
+                if (npc.Center.X < target.Center.X)
+                {
+                    npc.direction = 1;
+                    npc.spriteDirection = 1;
+                }
+                else
+                {
+                    npc.direction = -1;
+                    npc.spriteDirection = -1;
+                }
+            }
+
+            npc.ai[0]++;
+
+            if ((int)(npc.ai[0] - attackTelegraph) % (attackTelegraph + attackCooldown) == 0)
+            {
+                Vector2 projPos = npc.Center + projOffset;
+                Vector2 projVel = target == null ? Vector2.UnitX * npc.direction * projSpeed : (target.Center - projPos).SafeNormalize(Vector2.UnitX * npc.direction) * projSpeed;
+                int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f);
+                SetUpNPCProj(npc, proj);
+            }
+
+            if (npc.ai[0] >= teleportCooldown)
+            {
+                npc.ai[0] = 0;
+                Vector2 teleportPos = npc.Center;
+                if (target != null)
+                {
+                    teleportPos = (Main.rand.NextFloat(MathHelper.TwoPi).ToRotationVector2() * Main.rand.NextFloat(minTeleportDist, maxTeleportDist + float.Epsilon)) + target.Center;
+                    if (isRoomNPC && sourceRoomListID >= 0)
+                    {
+                        Room room = RoomList[sourceRoomListID];
+                        if (room.wallActive)
+                        {
+                            Rectangle npcRect = npc.getRect();
+                            npcRect.X += (int)(teleportPos - npc.Center).X;
+                            npcRect.Y += (int)(teleportPos - npc.Center).Y;
+
+                            Rectangle newRect = room.CheckRectWithWallCollision(npcRect);
+                            teleportPos = new Vector2(newRect.X + (newRect.Width * 0.5f), newRect.Y + (newRect.Height * 0.5f));
+                            if ((teleportPos - target.Center).Length() < minTeleportDist)
+                            {
+                                teleportPos = ((room.RoomCenter16 + room.RoomPosition16 - target.Center).SafeNormalize(Vector2.UnitX) * minTeleportDist) + target.Center;
+                            }
+                        }
+                    }
+                }
+                npc.Center = teleportPos;
+            }
+        }
         public void RogueTortoiseAI(NPC npc, float xCap, float jumpVelocity, int jumpTime, int dashTime, float dashVelocity, int attackCooldown, int attackTelegraph)
         {
             Entity target = GetTarget(npc, false, false);
@@ -384,7 +446,7 @@ namespace TerRoguelike.NPCs
                 npc.direction = 1;
                 npc.spriteDirection = 1;
             }
-            if (npc.ai[0] == 0 && (target != null ? target.active : false) && npc.ai[1] >= 0)
+            if (npc.ai[0] == 0 && target != null && npc.ai[1] >= 0)
             {
                 if (npc.Center.X < target.Center.X)
                 {
@@ -667,6 +729,7 @@ namespace TerRoguelike.NPCs
         public void RogueWormAI(NPC npc, float maxVelocity, float turnRadians, float slowTurnDist)
         {
             Entity target = GetTarget(npc, false, false);
+
             Vector2 targetPos = npc.Center + Vector2.UnitX.RotatedBy(-npc.rotation);
             if (target != null)
             {
