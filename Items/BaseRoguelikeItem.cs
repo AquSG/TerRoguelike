@@ -22,6 +22,7 @@ namespace TerRoguelike.Items
         public virtual int animationTicksPerFrame => 0; // used if the item sprite has animation
         public virtual int animationFrameCount => 0;// used if the item sprite has animation
         public virtual int modItemID => -1; // the ModContent.ItemType<> of this item, used for collecting it's default information on the fly
+        public Texture2D texture;
         public override void SetStaticDefaults()
         {
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)
@@ -34,6 +35,7 @@ namespace TerRoguelike.Items
         {
             Item.width = 20;
             Item.height = 20;
+            texture = ModContent.Request<Texture2D>(Texture).Value;
         }
         /// <summary>
         /// Item Effects happen here. updated in UpdateInventory(Player player)
@@ -49,10 +51,9 @@ namespace TerRoguelike.Items
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
             // Generalized drawing for all TerRoguelike Items. they all have the same 20x20 hitbox but have different offsets to account for their size.
-            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)
             {
-                Rectangle drawRect = Main.itemAnimations[Item.type].GetFrame(texture);
+                Rectangle drawRect = Main.itemAnimations[Type].GetFrame(texture);
                 Vector2 origin = new Vector2(texture.Width / 2f, drawRect.Height * 0.5f - 2f);
                 spriteBatch.Draw(texture, new Vector2(Item.Center.X, Item.Bottom.Y - (drawRect.Height * 0.5f)) - Main.screenPosition, drawRect, Color.White, rotation, origin, 1f, SpriteEffects.None, 0f);
             }

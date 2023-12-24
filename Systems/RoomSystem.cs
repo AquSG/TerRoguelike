@@ -733,14 +733,14 @@ namespace TerRoguelike.Systems
         #region Chains
         public void UpdateChains()
         {
-            if (TerRoguelikeWorld.chainList == null)
+            if (chainList == null)
                 return;
-            if (!TerRoguelikeWorld.chainList.Any())
+            if (!chainList.Any())
                 return;
 
-            for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
+            for (int i = 0; i < chainList.Count; i++)
             {
-                Chain chain = TerRoguelikeWorld.chainList[i];
+                Chain chain = chainList[i];
                 if (chain.TimeLeft != chain.MaxTimeLeft)
                 {
                     if ((int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft)) != (int)(chain.Length * ((chain.TimeLeft - 1) / (float)chain.MaxTimeLeft)))
@@ -768,22 +768,22 @@ namespace TerRoguelike.Systems
                     }
                 }
             }
-            TerRoguelikeWorld.chainList.RemoveAll(x => x.TimeLeft <= 0);
+            chainList.RemoveAll(x => x.TimeLeft <= 0);
         }
         public void DrawChains()
         {
-            if (TerRoguelikeWorld.chainList == null)
+            if (chainList == null)
                 return;
 
-            if (!TerRoguelikeWorld.chainList.Any())
+            if (!chainList.Any())
                 return;
 
             Texture2D chain1Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain1").Value;
             Texture2D chain2Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain2").Value;
             Main.spriteBatch.Begin();
-            for (int i = 0; i < TerRoguelikeWorld.chainList.Count; i++)
+            for (int i = 0; i < chainList.Count; i++)
             {
-                Chain chain = TerRoguelikeWorld.chainList[i];
+                Chain chain = chainList[i];
                 Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f) * ZoomSystem.zoomOverride);
                 float rotation = (chain.End - visualStart).ToRotation();
                 int visualLength = (int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft));
@@ -872,7 +872,7 @@ namespace TerRoguelike.Systems
 
             ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
 
-            TerRoguelikeWorld.chainList.Clear();
+            chainList.Clear();
         }
     }
     public class HealingPulse
