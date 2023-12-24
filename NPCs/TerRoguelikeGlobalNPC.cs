@@ -57,7 +57,7 @@ namespace TerRoguelike.NPCs
         #endregion
 
         #region Base AIs
-        public void RogueFighterAI(NPC npc, float xCap, float jumpVelocity)
+        public void RogueFighterAI(NPC npc, float xCap, float jumpVelocity, float acceleration = 0.07f)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -95,13 +95,13 @@ namespace TerRoguelike.NPCs
             }
             else if (npc.velocity.X < xCap && npc.direction == 1)
             {
-                npc.velocity.X += 0.07f;
+                npc.velocity.X += acceleration;
                 if (npc.velocity.X > xCap)
                     npc.velocity.X = xCap;
             }
             else if (npc.velocity.X > -xCap && npc.direction == -1)
             {
-                npc.velocity.X -= 0.07f;
+                npc.velocity.X -= acceleration;
                 if (npc.velocity.X < -xCap)
                     npc.velocity.X = -xCap;
             }
