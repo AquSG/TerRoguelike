@@ -671,4 +671,5 @@ NPCs: {
 	UndeadViking.DisplayName: Undead Viking
 	DesertSpirit.DisplayName: Desert Spirit
 	AntlionCharger.DisplayName: Antlion Charger
+	Tortoise.DisplayName: Tortoise
 }
