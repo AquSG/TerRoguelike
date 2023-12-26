@@ -443,11 +443,11 @@ namespace TerRoguelike.NPCs
 
             if (target != null)
             {
-                npc.rotation = MathHelper.Clamp(npc.rotation.AngleTowards((npc.Center - target.Center).ToRotation(), 0.03f), MathHelper.PiOver2 - (attackCone * 0.5f), MathHelper.PiOver2 + (attackCone * 0.5f));
+                npc.rotation = MathHelper.Clamp(npc.rotation.AngleTowards((npc.Center - target.Center).ToRotation(), 0.02f), MathHelper.PiOver2 - (attackCone * 0.5f), MathHelper.PiOver2 + (attackCone * 0.5f));
             }
             else
             {
-                npc.rotation = npc.rotation.AngleTowards(0f, 0.03f);
+                npc.rotation = npc.rotation.AngleTowards(0f, 0.02f);
             }
 
             if (npc.ai[0] >= 0 && (int)(npc.ai[0] - attackTelegraph) % (attackTelegraph + attackCooldown) == 0)
@@ -468,6 +468,7 @@ namespace TerRoguelike.NPCs
                 npc.noGravity = true;
                 if (npc.ai[0] == -burrowUpTime)
                 {
+                    npc.rotation = MathHelper.PiOver2;
                     npc.Center = new Vector2(npc.ai[2], npc.ai[3]) + (Vector2.UnitY * burrowDepth);
                 }
 
@@ -480,10 +481,6 @@ namespace TerRoguelike.NPCs
                     npc.Center -= Vector2.UnitY * (burrowDepth / burrowUpTime);
                 }
 
-            }
-            else
-            {
-                npc.noGravity = false;
             }
 
             if (npc.ai[0] >= burrowCooldown)
