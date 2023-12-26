@@ -25,6 +25,10 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/AntlionHead").Value;
         public Texture2D texture;
         public override bool ignoreRoomWallCollision => true;
+        public int attackTelegraph = 120;
+        public int attackCooldown = 60;
+        public int burrowDownTime = 60;
+        public int burrowUpTime = 60;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 2;
@@ -46,11 +50,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            int attackTelegraph = 120;
-            int attackCooldown = 60;
-
             NPC.frameCounter += 0.2d;
-            modNPC.RogueAntlionAI(NPC, MathHelper.PiOver2, 80f, 200f, 60, 60, 80f, 360, attackTelegraph, attackCooldown, ProjectileID.SandBallFalling, Vector2.Zero, 15, NPC.damage, MathHelper.Pi * 0.0675f, 7f, 12f);
+            modNPC.RogueAntlionAI(NPC, MathHelper.PiOver2, 80f, 200f, burrowDownTime, burrowUpTime, 80f, 360, attackTelegraph, attackCooldown, ProjectileID.SandBallFalling, Vector2.Zero, 15, NPC.damage, MathHelper.Pi * 0.0675f, 7f, 12f);
 
             if (NPC.ai[0] >= 0 && (int)(NPC.ai[0] - attackTelegraph) % (attackTelegraph + attackCooldown) == 0)
             {
@@ -82,8 +83,9 @@ namespace TerRoguelike.NPCs.Enemy
             int headFrameHeight = (int)(headTex.Size().Y * 0.2d);
             int headFrame = (int)(NPC.frameCounter % 5d);
             int frameHeight = (int)(texture.Size().Y * 0.5d);
-            Main.EntitySpriteDraw(headTex, NPC.Center - Main.screenPosition + (Vector2.UnitY * 8), new Rectangle(0, headFrameHeight * headFrame, headTex.Width, headFrameHeight), drawColor, NPC.rotation - MathHelper.PiOver2, new Vector2(headTex.Width * 0.5f, (headFrameHeight * 0.5f)) + (Vector2.UnitY * 8), NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition + (Vector2.UnitY * 10), new Rectangle(0, frameHeight, texture.Width, frameHeight), drawColor, 0f, new Vector2(headTex.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, SpriteEffects.None);
+            float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, Math.Abs(NPC.ai[0] + burrowDownTime) / 60), 0f, 1f);
+            Main.EntitySpriteDraw(headTex, NPC.Center - Main.screenPosition + (Vector2.UnitY * 8), new Rectangle(0, headFrameHeight * headFrame, headTex.Width, headFrameHeight), drawColor * opacity, NPC.rotation - MathHelper.PiOver2, new Vector2(headTex.Width * 0.5f, (headFrameHeight * 0.5f)) + (Vector2.UnitY * 8), NPC.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition + (Vector2.UnitY * 10), new Rectangle(0, frameHeight, texture.Width, frameHeight), drawColor * opacity, 0f, new Vector2(headTex.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, SpriteEffects.None);
             return false;
         }
     }
