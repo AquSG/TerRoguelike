@@ -22,6 +22,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Systems.RoomSystem;
+using System.Threading.Tasks.Dataflow;
 
 namespace TerRoguelike.NPCs
 {
@@ -432,6 +433,144 @@ namespace TerRoguelike.NPCs
                     }
                 }
                 npc.Center = teleportPos;
+            }
+        }
+        public void RogueAntlionAI(NPC npc, float attackCone, float minBurrowDist, float maxBurrowDist, int burrowDownTime, int burrowUpTime, float burrowDepth, int burrowCooldown, int attackTelegraph, int attackCooldown, int projType, Vector2 projOffset, int projCount, int projDamage, float projSpread, float minProjVelocity, float maxProjVelocity)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            npc.ai[0]++;
+
+            if (target != null)
+            {
+                npc.rotation = MathHelper.Clamp(npc.rotation.AngleTowards((npc.Center - target.Center).ToRotation(), 0.03f), MathHelper.PiOver2 - (attackCone * 0.5f), MathHelper.PiOver2 + (attackCone * 0.5f));
+            }
+            else
+            {
+                npc.rotation = npc.rotation.AngleTowards(0f, 0.03f);
+            }
+
+            if (npc.ai[0] >= 0 && (int)(npc.ai[0] - attackTelegraph) % (attackTelegraph + attackCooldown) == 0)
+            {
+                Vector2 projPos = npc.Center + projOffset;
+                for (int i = 0; i < projCount; i++)
+                {
+                    float projSpeed = Main.rand.NextFloat(minProjVelocity, maxProjVelocity + float.Epsilon);
+                    Vector2 projVel = (npc.rotation + MathHelper.Pi + Main.rand.NextFloat(-projSpread * 0.5f, projSpread * 0.5f + float.Epsilon)).ToRotationVector2() * projSpeed;
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f);
+                    SetUpNPCProj(npc, proj);
+                }
+                
+            }
+
+            if (npc.ai[0] < 0)
+            {
+                npc.noGravity = true;
+                if (npc.ai[0] == -burrowUpTime)
+                {
+                    npc.Center = new Vector2(npc.ai[2], npc.ai[3]) + (Vector2.UnitY * burrowDepth);
+                }
+
+                if (npc.ai[0] < -burrowUpTime)
+                {
+                    npc.Center += Vector2.UnitY * (burrowDepth / burrowDownTime);
+                }
+                else
+                {
+                    npc.Center -= Vector2.UnitY * (burrowDepth / burrowUpTime);
+                }
+
+            }
+            else
+            {
+                npc.noGravity = false;
+            }
+
+            if (npc.ai[0] >= burrowCooldown)
+            {
+                bool roomCondition = false;
+
+                npc.ai[0] = -(burrowDownTime + burrowUpTime);
+                Vector2 burrowPos = npc.Center;
+                if (target != null)
+                {
+                    if (isRoomNPC && sourceRoomListID >= 0)
+                    {
+                        Room room = RoomList[sourceRoomListID];
+                        if (room.wallActive)
+                        {
+                            roomCondition = true;
+                        }
+                    }
+
+                    for (int i = 0; i < 50; i++)
+                    {
+                        burrowPos = (Main.rand.NextBool() ? -Vector2.UnitX : Vector2.UnitX) * Main.rand.NextFloat(minBurrowDist, maxBurrowDist + float.Epsilon) + target.Center;
+
+                        Rectangle npcRect = npc.getRect();
+                        npcRect.X += (int)(burrowPos - npc.Center).X;
+                        npcRect.Y += (int)(burrowPos - npc.Center).Y;
+
+                        Room room = null;
+                        if (roomCondition)
+                        {
+                            room = RoomList[sourceRoomListID];
+                        }
+
+
+
+                        Rectangle newRect = npcRect;
+                        if (roomCondition)
+                        {
+                            newRect = room.CheckRectWithWallCollision(npcRect);
+                        }
+                        burrowPos = new Vector2(newRect.X + (newRect.Width * 0.5f), newRect.Y + (newRect.Height * 0.5f));
+                        if (roomCondition && (burrowPos - target.Center).Length() < minBurrowDist)
+                        {
+                            burrowPos = ((Vector2.UnitX * (room.RoomCenter16.X + room.RoomPosition16.X - target.Center.X)).SafeNormalize(Vector2.UnitX) * minBurrowDist) + target.Center;
+                        }
+
+                        int blockX = (int)(burrowPos.X / 16f);
+                        int blockY = (int)(burrowPos.Y / 16f);
+
+                        bool validPos = false;
+                        int validYoffset = 0;
+                        int checkDirection = TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY].TileType] && Main.tile[blockX, blockY].HasTile ? -1 : 1;
+
+                        for (int j = 0; j < 25; j++)
+                        {
+                            if (checkDirection == 1)
+                            {
+                                if (TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY + j].TileType] && Main.tile[blockX, blockY + j].HasTile)
+                                {
+                                    validPos = true;
+                                    validYoffset = j - 1;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (!(TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY - j].TileType] && Main.tile[blockX, blockY - j].HasTile))
+                                {
+                                    validPos = true;
+                                    validYoffset = -j;
+                                    break;
+                                }
+                            }
+                        }
+                        if (validPos)
+                        {
+                            burrowPos = new Vector2(blockX, blockY + validYoffset) * 16f;
+                            break;
+                        }
+
+                        if (i == 49)
+                            burrowPos = npc.Center;
+
+                    }
+                }
+                npc.ai[2] = burrowPos.X;
+                npc.ai[3] = burrowPos.Y;
             }
         }
         public void RogueTortoiseAI(NPC npc, float xCap, float jumpVelocity, int jumpTime, int dashTime, float dashVelocity, int attackCooldown, int attackTelegraph)

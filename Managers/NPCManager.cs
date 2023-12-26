@@ -45,7 +45,8 @@ namespace TerRoguelike.Managers
                 new UndeadViking(),
                 new DesertSpirit(),
                 new AntlionCharger(),
-                new Tortoise()
+                new Tortoise(),
+                new Antlion()
             };
         }
         internal static void Unload()

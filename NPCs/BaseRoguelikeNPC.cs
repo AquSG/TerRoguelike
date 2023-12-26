@@ -16,6 +16,7 @@ namespace TerRoguelike.NPCs
     {
         public virtual int modNPCID => -1; // the ModContent.NPCType<> of this item, used for collecting it's default information on the fly
         public virtual List<int> associatedFloors { get; set; }
+        public virtual bool ignoreRoomWallCollision => false;
         public virtual TerRoguelikeGlobalNPC modNPC 
         {
             get { return NPC.GetGlobalNPC<TerRoguelikeGlobalNPC>(); }
