@@ -21,6 +21,7 @@ Projectiles: {
 	SlimeGlob.DisplayName: Slime Glob
 	Snowflake.DisplayName: Snowflake
 	DesertSpiritCurse.DisplayName: Desert Spirit Curse
+	SandBlast.DisplayName: Sand Blast
 }
 
 Items: {
