@@ -29,7 +29,6 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D bodyTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormBody").Value;
         public Texture2D tailTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormTail").Value;
         public bool CollisionPass = false;
-        public override bool ignoreRoomWallCollision => true;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 1;
@@ -48,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
+            modNPC.IgnoreRoomWallCollision = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

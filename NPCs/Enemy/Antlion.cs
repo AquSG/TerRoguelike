@@ -27,7 +27,6 @@ namespace TerRoguelike.NPCs.Enemy
         public override int CombatStyle => 1;
         public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/AntlionHead").Value;
         public Texture2D texture;
-        public override bool ignoreRoomWallCollision => true;
         public int attackTelegraph = 120;
         public int attackCooldown = 60;
         public int burrowDownTime = 60;
@@ -50,6 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.behindTiles = true;
             texture = ModContent.Request<Texture2D>(Texture).Value;
             NPC.noGravity = false;
+            modNPC.IgnoreRoomWallCollision = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -59,7 +59,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.frameCounter += 0.2d;
-            modNPC.RogueAntlionAI(NPC, MathHelper.PiOver2, 80f, 200f, burrowDownTime, burrowUpTime, 48f, 360, attackTelegraph, attackCooldown, ModContent.ProjectileType<SandBlast>(), Vector2.Zero, 15, NPC.damage, MathHelper.Pi * 0.0675f, 9f, 15f);
+            modNPC.RogueAntlionAI(NPC, MathHelper.TwoPi / 3f, 80f, 200f, burrowDownTime, burrowUpTime, 48f, 360, attackTelegraph, attackCooldown, ModContent.ProjectileType<SandBlast>(), Vector2.Zero, 15, NPC.damage, MathHelper.Pi * 0.0675f, 9f, 15f);
 
             if (NPC.ai[0] >= 0 && (int)(NPC.ai[0] - attackTelegraph) % (attackTelegraph + attackCooldown) == 0)
             {
