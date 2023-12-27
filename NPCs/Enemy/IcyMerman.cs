@@ -52,7 +52,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.frameCounter += NPC.velocity.Length() * 0.25d;
-            modNPC.RogueFighterShooterAI(NPC, 2f, -7.9f, 320f, 30, 30, 0.3f, ProjectileID.IceBolt, 5f, new Vector2(0, -14), 30, true);
+            modNPC.RogueFighterShooterAI(NPC, 2f, -7.9f, 320f, 30, 30, 0.3f, ProjectileID.IceBolt, 5f, new Vector2(0, -14), NPC.damage, true);
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
