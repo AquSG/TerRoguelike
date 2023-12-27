@@ -24,7 +24,6 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
     {
         public override int modNPCID => ModContent.NPCType<VortexPillar>();
         public override List<int> associatedFloors => new List<int>() { 10 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, 0);
         public override int CombatStyle => -1;
 
         public override void SetDefaults()
@@ -42,6 +41,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
             NPC.immortal = false;
+            modNPC.drawCenter = new Vector2(0, -18);
         }
         public override void AI()
         {

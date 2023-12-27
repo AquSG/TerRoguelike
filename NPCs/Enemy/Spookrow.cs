@@ -19,7 +19,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<Spookrow>();
         public override List<int> associatedFloors => new List<int>() { 2 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, -11);
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
@@ -36,6 +35,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath6;
             NPC.knockBackResist = 0.2f;
+            modNPC.drawCenter = new Vector2(0, -11);
         }
         public override void AI()
         {

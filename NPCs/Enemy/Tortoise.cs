@@ -20,7 +20,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<Tortoise>();
         public override List<int> associatedFloors => new List<int>() { 6 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, 0);
         public override int CombatStyle => 0;
         public int attackCooldown = 360;
         public int dashTime = 220;
@@ -41,6 +40,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit24;
             NPC.DeathSound = SoundID.NPCDeath27;
             NPC.knockBackResist = 0f;
+            modNPC.drawCenter = new Vector2(0, 0);
         }
         public override void AI()
         {

@@ -22,7 +22,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<SandWorm>();
         public override List<int> associatedFloors => new List<int>() { 5 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, -6);
         public override int CombatStyle => 0;
         public List<WormSegment> Segments = new List<WormSegment>();
         public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormHead").Value;
@@ -48,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
             modNPC.IgnoreRoomWallCollision = true;
+            modNPC.drawCenter = new Vector2(0, -6);
         }
         public override void OnSpawn(IEntitySource source)
         {

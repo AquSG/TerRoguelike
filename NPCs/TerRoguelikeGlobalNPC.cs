@@ -1414,16 +1414,6 @@ namespace TerRoguelike.NPCs
             if (drawCenter != new Vector2(-1000))
                 return drawCenter + npc.Center;
 
-            
-            for (int i = 0; i < NPCManager.AllNPCs.Count; i++)
-            {
-                if (npc.type == NPCManager.AllNPCs[i].modNPCID)
-                {
-                    drawCenter = NPCManager.AllNPCs[i].DrawCenterOffset;
-                    return drawCenter + npc.Center;
-                }
-            }
-
             Vector2 position = npc.Center;
             switch (npc.aiStyle)
             {

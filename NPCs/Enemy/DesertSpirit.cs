@@ -21,7 +21,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<DesertSpirit>();
         public override List<int> associatedFloors => new List<int>() { 5 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, 3);
         public override int CombatStyle => 1;
         public int attackTelegraph = 60;
         public int attackCooldown = 30;
@@ -42,6 +41,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.2f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
+            modNPC.drawCenter = new Vector2(0, 3);
         }
         public override void AI()
         {

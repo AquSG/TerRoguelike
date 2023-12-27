@@ -19,7 +19,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<UndeadGuard>();
         public override List<int> associatedFloors => new List<int>() { 0 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, -4);
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
@@ -36,6 +35,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit2;
             NPC.DeathSound = SoundID.NPCDeath2;
             NPC.knockBackResist = 0.15f;
+            modNPC.drawCenter = new Vector2(0, -4);
         }
         public override void AI()
         {
