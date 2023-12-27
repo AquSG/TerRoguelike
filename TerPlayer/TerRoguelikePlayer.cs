@@ -521,7 +521,7 @@ namespace TerRoguelike.TerPlayer
                         info.HideCombatText = true;
                         info.Damage = hitDamage;
                         info.InstantKill = false;
-                        info.HitDirection = 1;
+                        info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                         info.Knockback = 0f;
                         info.Crit = false;
 
@@ -739,7 +739,7 @@ namespace TerRoguelike.TerPlayer
                     info.HideCombatText = true;
                     info.Damage = hitDamage;
                     info.InstantKill = false;
-                    info.HitDirection = 1;
+                    info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                     info.Knockback = 0f;
                     info.Crit = false;
 

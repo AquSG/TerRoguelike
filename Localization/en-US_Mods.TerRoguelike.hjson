@@ -674,4 +674,5 @@ NPCs: {
 	AntlionCharger.DisplayName: Antlion Charger
 	Antlion.DisplayName: Antlion
 	Tortoise.DisplayName: Tortoise
+	Lamia.DisplayName: Lamia
 }

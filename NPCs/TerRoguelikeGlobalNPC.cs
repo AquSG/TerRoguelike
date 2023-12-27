@@ -204,7 +204,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired)
+        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -220,7 +220,7 @@ namespace TerRoguelike.NPCs
             }
             else
             {
-                if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
+                if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
                 {
                     npc.ai[1]++;
                 }
@@ -293,7 +293,7 @@ namespace TerRoguelike.NPCs
                 if (npc.velocity.Y == 0f && target.Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
                 {
 
-                    if (npc.velocity.Y == 0f)
+                    if (npc.velocity.Y == 0f && (canJumpShoot || npc.ai[1] == -1 || npc.ai[1] == 0))
                     {
                         int padding = 6;
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
@@ -1247,7 +1247,7 @@ namespace TerRoguelike.NPCs
             info.HideCombatText = true;
             info.Damage = hitDamage;
             info.InstantKill = false;
-            info.HitDirection = 1;
+            info.HitDirection = Main.rand.NextBool() ? -1 : 1;
             info.Knockback = 0f;
             info.Crit = false;
 
@@ -1270,7 +1270,7 @@ namespace TerRoguelike.NPCs
             info.HideCombatText = true;
             info.Damage = hitDamage;
             info.InstantKill = false;
-            info.HitDirection = 1;
+            info.HitDirection = Main.rand.NextBool() ? -1 : 1;
             info.Knockback = 0f;
             info.Crit = false;
 
