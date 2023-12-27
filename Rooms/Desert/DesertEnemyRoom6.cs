@@ -22,6 +22,8 @@ namespace TerRoguelike.Rooms
         {
             base.InitializeRoom();
             AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<DesertSpirit>(), 60, 120, 0.45f);
+            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<SandWorm>(), 180, 120, 0.45f);
+            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<Antlion>(), 300, 120, 0.45f);
         }
     }
 }

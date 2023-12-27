@@ -206,13 +206,8 @@ namespace TerRoguelike.Managers
                     continue;
                 if (npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID != myRoom)
                     continue;
-
-                var rogueNPC = NPCManager.AllNPCs.Find(x => x.modNPCID == npc.type);
-                if (rogueNPC != null)
-                {
-                    if (rogueNPC.ignoreRoomWallCollision)
-                        continue;
-                }
+                if (npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().IgnoreRoomWallCollision)
+                    continue;
 
                 bool boundLeft = (npc.position.X + npc.velocity.X) < (RoomPosition.X + 1f) * 16f;
                 bool boundRight = (npc.position.X + (float)npc.width + npc.velocity.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;

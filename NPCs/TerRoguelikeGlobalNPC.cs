@@ -32,6 +32,7 @@ namespace TerRoguelike.NPCs
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
         public bool hostileTurnedAlly = false;
+        public bool IgnoreRoomWallCollision = false;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -540,6 +541,13 @@ namespace TerRoguelike.NPCs
                             {
                                 if (TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY + j].TileType] && Main.tile[blockX, blockY + j].HasTile)
                                 {
+                                    if (roomCondition)
+                                    {
+                                        Vector2 potentialBurrowPos = ((burrowPos + (Vector2.UnitY * 16 * j)) - npc.Center) + npc.position;
+                                        Rectangle potentialBurrowRect = new Rectangle((int)potentialBurrowPos.X, (int)potentialBurrowPos.Y, npc.width, npc.height);
+                                        if (potentialBurrowRect != room.CheckRectWithWallCollision(potentialBurrowRect))
+                                            continue;
+                                    }
                                     validPos = true;
                                     validYoffset = j - 1;
                                     break;
@@ -549,6 +557,13 @@ namespace TerRoguelike.NPCs
                             {
                                 if (!(TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY - j].TileType] && Main.tile[blockX, blockY - j].HasTile))
                                 {
+                                    if (roomCondition)
+                                    {
+                                        Vector2 potentialBurrowPos = ((burrowPos + (Vector2.UnitY * -16 * j)) - npc.Center) + npc.position;
+                                        Rectangle potentialBurrowRect = new Rectangle((int)potentialBurrowPos.X, (int)potentialBurrowPos.Y, npc.width, npc.height);
+                                        if (potentialBurrowRect != room.CheckRectWithWallCollision(potentialBurrowRect))
+                                            continue;
+                                    }
                                     validPos = true;
                                     validYoffset = -j;
                                     break;
