@@ -19,7 +19,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<AntlionCharger>();
         public override List<int> associatedFloors => new List<int>() { 5 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, 2);
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
@@ -36,6 +35,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit31;
             NPC.DeathSound = SoundID.NPCDeath34;
             NPC.knockBackResist = 0.4f;
+            modNPC.drawCenter = new Vector2(0, 2);
         }
         public override void AI()
         {

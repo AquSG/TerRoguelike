@@ -21,7 +21,6 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<Frostbiter>();
         public override List<int> associatedFloors => new List<int>() { 4 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, 2);
         public override int CombatStyle => 2;
         public override void SetStaticDefaults()
         {
@@ -40,6 +39,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.5f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
+            modNPC.drawCenter = new Vector2(0, 2);
         }
         public override void AI()
         {

@@ -25,7 +25,6 @@ namespace TerRoguelike.NPCs.Enemy
         public List<int> offsetFrames = new List<int>() { 3, 4, 5, 10, 11, 12 };
         public override int modNPCID => ModContent.NPCType<IcyMerman>();
         public override List<int> associatedFloors => new List<int>() { 4 };
-        public override Vector2 DrawCenterOffset => new Vector2(0, -6);
         public override int CombatStyle => 2;
 
 
@@ -48,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0.5f;
+            modNPC.drawCenter = new Vector2(0, -6);
         }
         public override void AI()
         {
