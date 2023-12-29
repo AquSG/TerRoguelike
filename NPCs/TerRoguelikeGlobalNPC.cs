@@ -585,6 +585,154 @@ namespace TerRoguelike.NPCs
                 npc.ai[3] = burrowPos.Y;
             }
         }
+        public void RogueAntlionSwarmerAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            npc.ai[3]++;
+            if (npc.collideY)
+            {
+                int fluff = 6;
+                int bottomtilepointx = (int)(npc.Center.X / 16f);
+                int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                {
+                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    {
+                        npc.position.Y += 1;
+                        npc.stairFall = true;
+                        npc.velocity.Y += 0.01f;
+                        break;
+                    }
+                }
+            }
+
+            if (npc.direction == 0)
+            {
+                if (target == null)
+                {
+                    npc.direction = 1;
+                    npc.spriteDirection = 1;
+                }
+                    
+                else
+                {
+                    if (npc.Center.X >= target.Center.X)
+                    {
+                        npc.direction = -1;
+                        npc.spriteDirection = -1;
+                    }
+                    else
+                    {
+                        npc.direction = 1;
+                        npc.spriteDirection = 1;
+                    }
+                }
+            }
+
+            if (npc.ai[2] != 0)
+                npc.ai[2]++;
+
+            bool distanceCheck = false;
+            bool LoSCheck = false;
+
+            if (target != null)
+            {
+                float dist = (target.Center - npc.Center).Length();
+
+                if (dist >= minAttackDist && dist <= maxAttackDist)
+                    distanceCheck = true;
+
+                if (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1))
+                    LoSCheck = true;
+
+                if (npc.ai[2] == 0 && LoSCheck && distanceCheck)
+                {
+                    npc.ai[2]++;
+                }
+                else if (npc.ai[2] >= attackTelegraph)
+                {
+                    npc.ai[2] = -attackCooldown;
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center + projOffset, (target.Center - npc.Center).SafeNormalize(Vector2.UnitX * npc.direction) * projSpeed, projType, projDamage, 0f);
+                    SetUpNPCProj(npc, proj);
+                }
+            }
+
+            if (npc.ai[2] > 0)
+            {
+                npc.velocity *= 0.93f;
+                if (target != null)
+                {
+                    if (npc.Center.X >= target.Center.X)
+                    {
+                        npc.direction = -1;
+                        npc.spriteDirection = -1;
+                    }
+                    else
+                    {
+                        npc.direction = 1;
+                        npc.spriteDirection = 1;
+                    }
+                }
+                else
+                    npc.ai[2] = 0;
+            }
+            else
+            {
+                if (distanceCheck && LoSCheck)
+                {
+                    npc.velocity *= 0.93f;
+                }
+                else if (LoSCheck && !distanceCheck)
+                {
+                    float desiredDist = (minAttackDist + maxAttackDist) * 0.5f;
+                    Vector2 desiredPos = (npc.Center - target.Center).SafeNormalize(Vector2.UnitX) * desiredDist + target.Center;
+                    npc.velocity += (desiredPos - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
+
+                    if (npc.Center.X >= target.Center.X)
+                    {
+                        npc.direction = -1;
+                        npc.spriteDirection = -1;
+                    }
+                    else
+                    {
+                        npc.direction = 1;
+                        npc.spriteDirection = 1;
+                    }
+                }
+                else
+                {
+                    if (Math.Abs(npc.velocity.X) < xCap)
+                    {
+                        npc.velocity.X += acceleration * npc.direction;
+                    }
+                    if (Math.Abs(npc.velocity.X) > xCap)
+                    {
+                        npc.velocity.X *= 0.98f;
+                    }
+                    if (Math.Abs(npc.velocity.Y) < yCap)
+                    {
+                        npc.velocity.Y += (target == null ? 1f : 0.75f) * acceleration * (float)Math.Cos((npc.ai[3] / 60f) * MathHelper.Pi) + (target == null ? 0 : (target.Center.Y >= npc.Center.Y ? 1 : -1) * acceleration * 0.25f);
+                    }
+                    if (Math.Abs(npc.velocity.Y) > yCap)
+                    {
+                        npc.velocity.Y *= 0.98f;
+                    }
+
+                    if (npc.collideX)
+                        npc.ai[0]++;
+                    else
+                        npc.ai[0] = 0;
+
+                    if (npc.ai[0] >= 90)
+                    {
+                        npc.ai[0] = 0;
+                        npc.direction *= -1;
+                        npc.spriteDirection *= -1;
+                    }
+                }
+            }
+        }
         public void RogueTortoiseAI(NPC npc, float xCap, float jumpVelocity, int jumpTime, int dashTime, float dashVelocity, int attackCooldown, int attackTelegraph)
         {
             Entity target = GetTarget(npc, false, false);
@@ -876,7 +1024,6 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-
         public void RogueWormAI(NPC npc, float maxVelocity, float turnRadians, float slowTurnDist)
         {
             Entity target = GetTarget(npc, false, false);
