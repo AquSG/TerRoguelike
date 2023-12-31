@@ -22,6 +22,7 @@ Projectiles: {
 	Snowflake.DisplayName: Snowflake
 	DesertSpiritCurse.DisplayName: Desert Spirit Curse
 	SandBlast.DisplayName: Sand Blast
+	Stinger.DisplayName: Stinger
 }
 
 Items: {
@@ -676,4 +677,5 @@ NPCs: {
 	Tortoise.DisplayName: Tortoise
 	Lamia.DisplayName: Lamia
 	AntlionSwarmer.DisplayName: Antlion Swarmer
+	Hornet.DisplayName: Hornet
 }

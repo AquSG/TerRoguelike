@@ -585,11 +585,12 @@ namespace TerRoguelike.NPCs
                 npc.ai[3] = burrowPos.Y;
             }
         }
-        public void RogueAntlionSwarmerAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired)
+        public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired)
         {
             Entity target = GetTarget(npc, false, false);
 
             npc.ai[3]++;
+            npc.stairFall = true;
             if (npc.collideY)
             {
                 int fluff = 6;
@@ -600,7 +601,6 @@ namespace TerRoguelike.NPCs
                     if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                     {
                         npc.position.Y += 1;
-                        npc.stairFall = true;
                         npc.velocity.Y += 0.01f;
                         break;
                     }
@@ -794,6 +794,11 @@ namespace TerRoguelike.NPCs
             }
             else
             {
+                if (npc.ai[1] >= -dashTime)
+                {
+                    npc.stairFall = true;
+                }
+
                 if (npc.ai[1] < -dashTime)
                 {
                     npc.ai[1]++;

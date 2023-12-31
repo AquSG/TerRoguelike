@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy
             int attackCooldown = 30;
             NPC.frameCounter += 0.25d;
             NPC.rotation = MathHelper.PiOver2 * NPC.velocity.Length() * 0.02f * NPC.direction;
-            modNPC.RogueAntlionSwarmerAI(NPC, 7f, 4f, 0.09f, 128f, 240f, attackTelegraph, attackCooldown, ModContent.ProjectileType<SandBlast>(), 15f, new Vector2(18 * NPC.direction, -6).RotatedBy(NPC.rotation), NPC.damage, true);
+            modNPC.RogueFlyingShooterAI(NPC, 7f, 4f, 0.09f, 128f, 240f, attackTelegraph, attackCooldown, ModContent.ProjectileType<SandBlast>(), 15f, new Vector2(18 * NPC.direction, -6).RotatedBy(NPC.rotation), NPC.damage, true);
             if (NPC.ai[2] == -attackCooldown)
             {
                 SoundEngine.PlaySound(SoundID.Item63 with { Volume = 0.9f }, NPC.Center);
