@@ -14,7 +14,7 @@ using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Projectiles
 {
-    public class SandBlast : ModProjectile, ILocalizedModType
+    public class Stinger : ModProjectile, ILocalizedModType
     {
         public override void SetDefaults()
         {
@@ -22,30 +22,29 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 10;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 600;
-            Projectile.direction = Main.rand.NextBool() ? -1 : 1;
+            Projectile.timeLeft = 180;
             Projectile.penetrate = 1;
         }
 
         public override void AI()
         {
-            Projectile.rotation += MathHelper.Pi * 0.02f * Projectile.velocity.Length() * Projectile.direction;
-            Projectile.velocity.X *= 0.99f;
-            Projectile.velocity.Y += 0.25f;
-            if (Main.rand.NextBool(4))
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Sand, 0, 0, 0, default, 1f);
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 18, 0f, 0f, 0, default(Color), 0.9f);
+            Main.dust[d].noGravity = true;
         }
+
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.Lerp(lightColor, Color.White, 0.4f);
         }
+
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 5; i++)
             {
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Sand, 0, 0, 0, default, 0.9f);
-            } 
-            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 18, 0f, 0f, 0, default(Color), 1.5f);
+                Main.dust[d].noGravity = true;
+            }
             return true;
         }
     }
