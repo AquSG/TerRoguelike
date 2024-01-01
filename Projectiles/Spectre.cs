@@ -15,10 +15,11 @@ using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
-    public class DesertSpiritCurse : ModProjectile, ILocalizedModType
+    public class Spectre : ModProjectile, ILocalizedModType
     {
         public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
-        public Texture2D fireTex;
+        public Texture2D spectreTex;
+        public Entity target = null;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = 4;
@@ -32,14 +33,27 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.timeLeft = 320;
-            fireTex = ModContent.Request<Texture2D>(Texture).Value;
+            spectreTex = ModContent.Request<Texture2D>(Texture).Value;
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.2f }, Projectile.Center);
+            Projectile.rotation = Projectile.velocity.ToRotation();
             for (int i = 0; i < 8; i++)
             {
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, 0, 0, 0, default, 1f);
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpectreStaff, 0, 0, 0, default, 1.65f);
+            }
+
+            if (Projectile.ai[0] != -1)
+            {
+                if (Projectile.ai[1] == 1)
+                {
+                    target = Main.player[(int)Projectile.ai[0]];
+                }
+                else if (Projectile.ai[1] == 2)
+                {
+                    target = Main.npc[(int)Projectile.ai[0]];
+                }
             }
         }
         public override void AI()
@@ -49,18 +63,32 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.velocity.Length() < 10)
                 Projectile.velocity *= 1.01f;
+
             if (Main.rand.NextBool(3))
             {
-                int i = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, 0, 0, 0, default, 1f);
+                int i = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpectreStaff, 0, 0, 0, default, 1.8f);
                 Main.dust[i].noGravity = true;
                 Main.dust[i].velocity *= 0;
-            } 
+            }
+
+            if (target != null)
+            {
+                if (!target.active)
+                {
+                    target = null;
+                        return;
+                }
+
+                Projectile.velocity = Projectile.rotation.AngleTowards((target.Center - Projectile.Center).ToRotation(), 0.01f).ToRotationVector2() * Projectile.velocity.Length();
+            }
+
+            Projectile.rotation = Projectile.velocity.ToRotation();
         }
         public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 8; i++)
             {
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, 0, 0, 0, default, 1f);
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SpectreStaff, 0, 0, 0, default, 1.5f);
             }
         }
         public override Color? GetAlpha(Color lightColor)
@@ -69,14 +97,14 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            int frameHeight = fireTex.Height / Main.projFrames[Type];
+            int frameHeight = spectreTex.Height / Main.projFrames[Type];
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null ,Color.Purple * 0.8f, 0f, glowTex.Size() * 0.5f, 0.1f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.White * 0.6f, 0f, glowTex.Size() * 0.5f, 0.085f, SpriteEffects.None, 0);
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.EntitySpriteDraw(fireTex, Projectile.Center - Main.screenPosition + (Vector2.UnitY * -6), new Rectangle(0, frameHeight * Projectile.frame, fireTex.Width, frameHeight), Color.White, 0f, new Vector2(fireTex.Size().X * 0.5f, fireTex.Size().Y / (Main.projFrames[Type] * 2)), 1f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(spectreTex, Projectile.Center - Main.screenPosition + (Vector2.UnitY * -6).RotatedBy(Projectile.rotation - MathHelper.PiOver2), new Rectangle(0, frameHeight * Projectile.frame, spectreTex.Width, frameHeight), Color.White * 0.75f, Projectile.rotation - MathHelper.PiOver2, new Vector2(spectreTex.Size().X * 0.5f, spectreTex.Size().Y / (Main.projFrames[Type] * 2)), 1f, SpriteEffects.None, 0);
 
             return false;
         }

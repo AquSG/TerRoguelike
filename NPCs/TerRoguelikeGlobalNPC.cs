@@ -375,7 +375,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueTeleportingShooterAI(NPC npc, float minTeleportDist, float maxTeleportDist, int teleportCooldown, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage)
+        public void RogueTeleportingShooterAI(NPC npc, float minTeleportDist, float maxTeleportDist, int teleportCooldown, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool findAir = false, bool respectGravity = false)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -404,36 +404,109 @@ namespace TerRoguelike.NPCs
             {
                 Vector2 projPos = npc.Center + projOffset;
                 Vector2 projVel = target == null ? Vector2.UnitX * npc.direction * projSpeed : (target.Center - projPos).SafeNormalize(Vector2.UnitX * npc.direction) * projSpeed;
-                int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f);
+                int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f, -1, target != null ? target.whoAmI : -1, targetPlayer != -1 ? 1 : (targetNPC != -1 ? 2 : 0));
                 SetUpNPCProj(npc, proj);
             }
 
             if (npc.ai[0] >= teleportCooldown)
             {
                 npc.ai[0] = 0;
-                Vector2 teleportPos = npc.Center;
+                Vector2 teleportPos = npc.Bottom;
                 if (target != null)
                 {
-                    teleportPos = (Main.rand.NextFloat(MathHelper.TwoPi).ToRotationVector2() * Main.rand.NextFloat(minTeleportDist, maxTeleportDist + float.Epsilon)) + target.Center;
-                    if (isRoomNPC && sourceRoomListID >= 0)
-                    {
-                        Room room = RoomList[sourceRoomListID];
-                        if (room.wallActive)
-                        {
-                            Rectangle npcRect = npc.getRect();
-                            npcRect.X += (int)(teleportPos - npc.Center).X;
-                            npcRect.Y += (int)(teleportPos - npc.Center).Y;
+                    int checks = 1;
+                    if (findAir)
+                        checks = 12;
 
-                            Rectangle newRect = room.CheckRectWithWallCollision(npcRect);
-                            teleportPos = new Vector2(newRect.X + (newRect.Width * 0.5f), newRect.Y + (newRect.Height * 0.5f));
-                            if ((teleportPos - target.Center).Length() < minTeleportDist)
+                    for (int i = 0; i < checks; i++)
+                    {
+                        teleportPos = (Main.rand.NextFloat(MathHelper.TwoPi).ToRotationVector2() * Main.rand.NextFloat(minTeleportDist, maxTeleportDist + float.Epsilon)) + target.Center;
+                        if (isRoomNPC && sourceRoomListID >= 0)
+                        {
+                            Room room = RoomList[sourceRoomListID];
+                            if (room.wallActive)
                             {
-                                teleportPos = ((room.RoomCenter16 + room.RoomPosition16 - target.Center).SafeNormalize(Vector2.UnitX) * minTeleportDist) + target.Center;
+                                Rectangle npcRect = npc.getRect();
+                                npcRect.X += (int)(teleportPos - npc.Bottom).X;
+                                npcRect.Y += (int)(teleportPos - npc.Bottom).Y;
+
+                                Rectangle newRect = room.CheckRectWithWallCollision(npcRect);
+                                teleportPos = new Vector2(newRect.X + (newRect.Width * 0.5f), newRect.Y + (newRect.Height * 0.5f));
+                                if ((teleportPos - target.Center).Length() < minTeleportDist)
+                                {
+                                    teleportPos = ((room.RoomCenter16 + room.RoomPosition16 - target.Center).SafeNormalize(Vector2.UnitX) * minTeleportDist) + target.Center;
+                                }
                             }
+                        }
+
+                        
+                        if (findAir)
+                        {
+                            bool pass = false;
+                            int npcBlockHeight = (int)(npc.height / 16f) + npc.height % 16 == 0 ? 0 : 1;
+                            Point targetBlock = new Point((int)(teleportPos.X / 16f), (int)(teleportPos.Y / 16f));
+
+
+                            if (Main.tile[targetBlock].IsTileSolidGround() || (!respectGravity && Main.tile[targetBlock + new Point(0, npcBlockHeight)].IsTileSolidGround()))
+                            {
+                                for (int y = 0; y < 25; y++)
+                                {
+                                    if (!Main.tile[targetBlock - new Point(0, y)].IsTileSolidGround())
+                                    {
+                                        if (!Main.tile[targetBlock - new Point(0, y + npcBlockHeight)].IsTileSolidGround())
+                                        {
+                                            targetBlock -= new Point(0, y - 1);
+                                            pass = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            else if (respectGravity)
+                            {
+                                for (int y = 0; y < 25; y++)
+                                {
+                                    if (Main.tile[targetBlock + new Point(0, y)].IsTileSolidGround())
+                                    {
+                                        if (!Main.tile[targetBlock + new Point(0, y - npcBlockHeight)].IsTileSolidGround())
+                                        {
+                                            targetBlock += new Point(0, y + npcBlockHeight - 1);
+                                            pass = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (isRoomNPC && sourceRoomListID >= 0)
+                            {
+                                Room room = RoomList[sourceRoomListID];
+                                Rectangle potentialTeleportRect = new Rectangle((int)((targetBlock.X * 16f) + 8) - (npc.width / 2), (int)(targetBlock.Y * 16f) - npc.height, npc.width, npc.height);
+                                if (potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
+                                {
+                                    continue;
+                                }
+                            }
+
+                            if (pass)
+                            {
+                                Vector2 potentialTeleportPos = new Vector2(targetBlock.X * 16f + 8, targetBlock.Y * 16f);
+                                if ((potentialTeleportPos - target.Center).Length() < minTeleportDist)
+                                    continue;
+
+                                teleportPos = potentialTeleportPos;
+                                break;
+                            }
+                            else if (i == checks - 1)
+                                teleportPos = npc.Bottom;
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
                 }
-                npc.Center = teleportPos;
+                npc.Bottom = teleportPos;
             }
         }
         public void RogueAntlionAI(NPC npc, float attackCone, float minBurrowDist, float maxBurrowDist, int burrowDownTime, int burrowUpTime, float burrowDepth, int burrowCooldown, int attackTelegraph, int attackCooldown, int projType, Vector2 projOffset, int projCount, int projDamage, float projSpread, float minProjVelocity, float maxProjVelocity)

@@ -23,6 +23,7 @@ Projectiles: {
 	DesertSpiritCurse.DisplayName: Desert Spirit Curse
 	SandBlast.DisplayName: Sand Blast
 	Stinger.DisplayName: Stinger
+	Spectre.DisplayName: Spectre
 }
 
 Items: {
@@ -678,4 +679,5 @@ NPCs: {
 	Lamia.DisplayName: Lamia
 	AntlionSwarmer.DisplayName: Antlion Swarmer
 	Hornet.DisplayName: Hornet
+	SpectreMaster.DisplayName: Spectre Master
 }
