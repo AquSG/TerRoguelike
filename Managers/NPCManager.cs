@@ -47,7 +47,10 @@ namespace TerRoguelike.Managers
                 new AntlionCharger(),
                 new Tortoise(),
                 new Antlion(),
-                new Lamia()
+                new Lamia(),
+                new AntlionSwarmer(),
+                new Hornet(),
+                new SpectreMaster()
             };
         }
         internal static void Unload()
