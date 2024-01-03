@@ -24,6 +24,7 @@ Projectiles: {
 	SandBlast.DisplayName: Sand Blast
 	Stinger.DisplayName: Stinger
 	Spectre.DisplayName: Spectre
+	FireBlast.DisplayName: Fire Blast
 }
 
 Items: {
@@ -680,4 +681,5 @@ NPCs: {
 	AntlionSwarmer.DisplayName: Antlion Swarmer
 	Hornet.DisplayName: Hornet
 	SpectreMaster.DisplayName: Spectre Master
+	Diabolist.DisplayName: Diabolist
 }
