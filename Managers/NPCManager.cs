@@ -50,7 +50,8 @@ namespace TerRoguelike.Managers
                 new Lamia(),
                 new AntlionSwarmer(),
                 new Hornet(),
-                new SpectreMaster()
+                new SpectreMaster(),
+                new Diabolist()
             };
         }
         internal static void Unload()
