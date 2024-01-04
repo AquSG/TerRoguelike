@@ -46,8 +46,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.aiStyle = -1;
             NPC.damage = 25;
             NPC.lifeMax = 600;
-            NPC.HitSound = SoundID.NPCHit1;
-            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.HitSound = SoundID.NPCHit2;
+            NPC.DeathSound = SoundID.NPCDeath2;
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -6);
         }
@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
             }
 
             int attackCooldown = 120;
-            NPC.frameCounter += NPC.velocity.Length() * 0.25d;
+            NPC.frameCounter += NPC.velocity.Length() * 0.2d;
             bulletPos = new Vector2(-36, 2 * NPC.direction).RotatedBy(gunRot);
             modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 720f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SniperBullet>(), 2f, bulletPos, NPC.damage * 2, true, false, gunRot + MathHelper.Pi);
             if (NPC.ai[1] == -attackCooldown)
@@ -80,21 +80,23 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 150.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, hit.HitDirection, -1f);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, hit.HitDirection, -1f);
                 }
-                return;
             }
-            for (int num475 = 0; num475 < 75; num475++)
+            else
             {
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, 2 * hit.HitDirection, -2f);
+                for (int i = 0; i < 20; i++)
+                {
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, 2.5f * (float)hit.HitDirection, -2.5f);
+                }
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 42, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
             }
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 273, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 274, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 274, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 275, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 275, NPC.scale);
         }
         public override void FindFrame(int frameHeight)
         {
@@ -141,6 +143,25 @@ namespace TerRoguelike.NPCs.Enemy
                         Main.EntitySpriteDraw(telegraphTex, pos - Main.screenPosition, null, startColor * opacity, gunRot, origin, 1f, SpriteEffects.None, 0);
                     }
                 
+                }
+
+                if (modNPC.ignitedStacks.Any() && NPC.ai[1] > 0)
+                {
+                    spriteBatch.End();
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                    Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
+                    Vector3 colorHSL = Main.rgbToHsl(color);
+                    float outlineThickness = 1f;
+
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                    GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
+                    for (float j = 0; j < 1; j += 0.125f)
+                    {
+                        spriteBatch.Draw(gunTex, NPC.Center - Main.screenPosition + (j * MathHelper.TwoPi + gunRot).ToRotationVector2() * outlineThickness, null, drawColor, gunRot, new Vector2(gunTex.Size().X * 0.75f, gunTex.Size().Y * (spriteEffects == SpriteEffects.FlipVertically ? 0.35f : 0.65f)), NPC.scale, spriteEffects, 0f);
+                    }
                 }
             }
             Main.spriteBatch.End();

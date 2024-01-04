@@ -80,7 +80,6 @@ namespace TerRoguelike.NPCs.Enemy
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
             }
-			
 		}
             
         public override Color? GetAlpha(Color drawColor)
