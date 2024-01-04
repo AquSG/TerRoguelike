@@ -25,6 +25,7 @@ Projectiles: {
 	Stinger.DisplayName: Stinger
 	Spectre.DisplayName: Spectre
 	FireBlast.DisplayName: Fire Blast
+	SniperBullet.DisplayName: Sniper Bullet
 }
 
 Items: {
@@ -682,4 +683,5 @@ NPCs: {
 	Hornet.DisplayName: Hornet
 	SpectreMaster.DisplayName: Spectre Master
 	Diabolist.DisplayName: Diabolist
+	UndeadSharpshooter.DisplayName: Undead Sharpshooter
 }

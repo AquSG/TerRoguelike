@@ -51,7 +51,8 @@ namespace TerRoguelike.Managers
                 new AntlionSwarmer(),
                 new Hornet(),
                 new SpectreMaster(),
-                new Diabolist()
+                new Diabolist(),
+                new UndeadSharpshooter()
             };
         }
         internal static void Unload()

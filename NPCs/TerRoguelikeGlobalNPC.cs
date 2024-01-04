@@ -204,7 +204,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true)
+        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -228,7 +228,7 @@ namespace TerRoguelike.NPCs
                 if (npc.ai[1] >= attackTelegraph)
                 {
                     Vector2 projSpawnPos = npc.Center + projOffset;
-                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * projSpeed, projType, projDamage, 0f);
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, (projVelocityDirectionOverride == null ? (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY) : Vector2.UnitX.RotatedBy((double)projVelocityDirectionOverride)) * projSpeed, projType, projDamage, 0f);
                     SetUpNPCProj(npc, proj);
                     npc.ai[1] = -attackCooldown;
                 }
