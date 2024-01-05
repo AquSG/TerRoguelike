@@ -17,6 +17,7 @@ using Terraria.GameContent.Animations;
 using Terraria.Graphics.Shaders;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -26,7 +27,7 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D telegraphTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/LineGradient").Value;
         public int currentFrame = 0;
         public override int modNPCID => ModContent.NPCType<UndeadSharpshooter>();
-        public override List<int> associatedFloors => new List<int>() { 8 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Dungeon"] };
         public override int CombatStyle => 2;
 
         public Vector2 bulletPos = Vector2.Zero;

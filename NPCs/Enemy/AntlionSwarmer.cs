@@ -14,13 +14,14 @@ using TerRoguelike.NPCs;
 using TerRoguelike.Projectiles;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class AntlionSwarmer : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<AntlionSwarmer>();
-        public override List<int> associatedFloors => new List<int>() { 5 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 1;
         public override void SetStaticDefaults()
         {

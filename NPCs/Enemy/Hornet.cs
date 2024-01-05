@@ -15,13 +15,14 @@ using TerRoguelike.Projectiles;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Hornet : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<Hornet>();
-        public override List<int> associatedFloors => new List<int>() { 6 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Jungle"] };
         public override int CombatStyle => 1;
         public override void SetStaticDefaults()
         {

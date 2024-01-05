@@ -16,6 +16,7 @@ using Terraria.Audio;
 using Terraria.GameContent.Animations;
 using Terraria.Graphics.Shaders;
 using TerRoguelike.Projectiles;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -23,7 +24,7 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public List<int> offsetFrames = new List<int>() { 3, 4, 5, 10, 11, 12 };
         public override int modNPCID => ModContent.NPCType<Lamia>();
-        public override List<int> associatedFloors => new List<int>() { 5 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 2;
         public int attackTelegraph = 30;
 

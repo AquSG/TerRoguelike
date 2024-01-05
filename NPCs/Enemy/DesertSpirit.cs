@@ -14,13 +14,14 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class DesertSpirit : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<DesertSpirit>();
-        public override List<int> associatedFloors => new List<int>() { 5 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 1;
         public int attackTelegraph = 60;
         public int attackCooldown = 30;

@@ -14,9 +14,9 @@ namespace TerRoguelike.Floors
 {
     public class SnowFloor : Floor
     {
-        public override int FloorID => 4;
         public override int StartRoomID => RoomDict["SnowStartRoom"];
         public override List<int> BossRoomIDs => new List<int>() { RoomDict["SnowBossRoom1"] };
         public override int Stage => 2;
+        public override string Name => "Snow";
     }
 }

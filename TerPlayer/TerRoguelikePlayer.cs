@@ -1,28 +1,27 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
-using Terraria.Graphics.Shaders;
+using Terraria.GameContent;
 using Terraria.Graphics.Effects;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerRoguelike.Items.Rare;
 using TerRoguelike.Items.Weapons;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs;
 using TerRoguelike.Projectiles;
+using TerRoguelike.Systems;
+using TerRoguelike.UI;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using ReLogic.Content;
-using TerRoguelike.Systems;
-using TerRoguelike.Items.Rare;
-using Terraria.GameContent;
-using TerRoguelike.UI;
-using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.TerPlayer
 {

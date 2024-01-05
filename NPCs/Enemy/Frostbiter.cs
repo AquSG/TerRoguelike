@@ -14,13 +14,14 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using TerRoguelike.Projectiles;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Frostbiter : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<Frostbiter>();
-        public override List<int> associatedFloors => new List<int>() { 4 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Snow"] };
         public override int CombatStyle => 2;
         public override void SetStaticDefaults()
         {

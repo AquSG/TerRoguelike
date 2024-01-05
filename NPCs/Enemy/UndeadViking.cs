@@ -12,13 +12,14 @@ using Terraria.ID;
 using Terraria.GameContent;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class UndeadViking : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<UndeadViking>();
-        public override List<int> associatedFloors => new List<int>() { 4 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Snow"] };
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
