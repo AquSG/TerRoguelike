@@ -488,7 +488,7 @@ namespace TerRoguelike.Managers
             if (nextFloors.Any())
             {
                 Floor nextFloor = nextFloors[Main.rand.Next(nextFloors.Count)];
-                currentFloorGen = nextFloor.FloorID;
+                currentFloorGen = nextFloor.ID;
             }
             else
             {

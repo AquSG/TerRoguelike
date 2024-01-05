@@ -12,13 +12,14 @@ using Terraria.ID;
 using Terraria.GameContent;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class UndeadGuard : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<UndeadGuard>();
-        public override List<int> associatedFloors => new List<int>() { 0 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Base"] };
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {

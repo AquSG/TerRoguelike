@@ -17,10 +17,11 @@ namespace TerRoguelike.Managers
 {
     public class Floor
     {
-        public virtual int FloorID => 0;
+        public int ID = -1;
         public virtual int StartRoomID => -1;
         public virtual List<int> BossRoomIDs => new List<int>();
         public virtual int Stage => -1;
         public virtual bool InHell => false;
+        public virtual string Name => "";
     }
 }

@@ -13,13 +13,14 @@ using Terraria.GameContent;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Tortoise : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<Tortoise>();
-        public override List<int> associatedFloors => new List<int>() { 6 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Jungle"] };
         public override int CombatStyle => 0;
         public int attackCooldown = 360;
         public int dashTime = 220;

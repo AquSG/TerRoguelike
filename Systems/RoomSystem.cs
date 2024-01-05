@@ -105,7 +105,7 @@ namespace TerRoguelike.Systems
                         if (room.active)
                             modPlayer.currentRoom = room.myRoom;
 
-                        if (modPlayer.currentFloor.FloorID == 10 && !lunarFloorInitialized)
+                        if (modPlayer.currentFloor.ID == 10 && !lunarFloorInitialized)
                         {
                             InitializeLunarFloor();
                         }

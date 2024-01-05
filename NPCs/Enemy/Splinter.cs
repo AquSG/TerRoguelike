@@ -12,13 +12,14 @@ using Terraria.ID;
 using Terraria.GameContent;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Splinter : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<Splinter>();
-        public override List<int> associatedFloors => new List<int>() { 2 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Forest"] };
         public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {

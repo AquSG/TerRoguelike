@@ -14,13 +14,14 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Diabolist : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<Diabolist>();
-        public override List<int> associatedFloors => new List<int>() { 8 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Dungeon"] };
         public override int CombatStyle => 1;
         public int attackTelegraph = 60;
         public int attackCooldown = 120;
@@ -82,11 +83,6 @@ namespace TerRoguelike.NPCs.Enemy
             }
 		}
             
-        public override Color? GetAlpha(Color drawColor)
-        {
-            //return Color.Lerp(drawColor, Color.White, 0.5f);
-            return drawColor;
-        }
         public override void FindFrame(int frameHeight)
         {
             int currentFrame = NPC.ai[0] % (attackCooldown + attackTelegraph) <= attackTelegraph ? 1 : 0;

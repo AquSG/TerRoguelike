@@ -16,13 +16,14 @@ using Terraria.Audio;
 using TerRoguelike.Projectiles;
 using Terraria.DataStructures;
 using Terraria.Graphics.Shaders;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Antlion : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<Antlion>();
-        public override List<int> associatedFloors => new List<int>() { 5 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 1;
         public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/AntlionHead").Value;
         public Texture2D texture;

@@ -14,10 +14,10 @@ namespace TerRoguelike.Floors
 {
     public class HellFloor : Floor
     {
-        public override int FloorID => 7;
         public override int StartRoomID => RoomDict["HellStartRoom"];
         public override List<int> BossRoomIDs => new List<int>() { RoomDict["HellBossRoom1"] };
         public override int Stage => 3;
         public override bool InHell => true;
+        public override string Name => "Hell";
     }
 }

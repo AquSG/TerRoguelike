@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Terraria.GameContent.Animations;
 using Terraria.Graphics.Shaders;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -24,7 +25,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int currentFrame = 0;
         public List<int> offsetFrames = new List<int>() { 3, 4, 5, 10, 11, 12 };
         public override int modNPCID => ModContent.NPCType<IcyMerman>();
-        public override List<int> associatedFloors => new List<int>() { 4 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Snow"] };
         public override int CombatStyle => 2;
 
 
