@@ -224,7 +224,7 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[1]++;
                 }
-                
+
                 if (npc.ai[1] >= attackTelegraph)
                 {
                     Vector2 projSpawnPos = npc.Center + projOffset;
@@ -439,7 +439,7 @@ namespace TerRoguelike.NPCs
                             }
                         }
 
-                        
+
                         if (findAir)
                         {
                             bool pass = false;
@@ -534,7 +534,7 @@ namespace TerRoguelike.NPCs
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f);
                     SetUpNPCProj(npc, proj);
                 }
-                
+
             }
 
             if (npc.ai[0] < 0)
@@ -687,7 +687,7 @@ namespace TerRoguelike.NPCs
                     npc.direction = 1;
                     npc.spriteDirection = 1;
                 }
-                    
+
                 else
                 {
                     if (npc.Center.X >= target.Center.X)
@@ -883,7 +883,7 @@ namespace TerRoguelike.NPCs
                     {
                         npc.ai[1]++;
                         npc.velocity.X = dashVelocity * npc.direction;
-                        
+
                     }
                 }
                 if (npc.ai[1] > -dashTime)
@@ -903,7 +903,7 @@ namespace TerRoguelike.NPCs
                     npc.ai[1]++;
                 }
             }
-            
+
 
             if (npc.collideX)
             {
@@ -988,7 +988,7 @@ namespace TerRoguelike.NPCs
             {
                 npc.collideY = true;
             }
-                
+
 
             if (npc.collideY)
             {
@@ -996,7 +996,7 @@ namespace TerRoguelike.NPCs
                 if (npc.ai[0] > 60 && npc.oldVelocity.Y >= 0)
                     npc.ai[0] = 30;
             }
-                
+
 
             npc.velocity.X *= 0.98f;
             if (npc.collideX)
@@ -1016,8 +1016,8 @@ namespace TerRoguelike.NPCs
                     npc.direction = -(int)(npc.velocity.X / Math.Abs(npc.velocity.X));
                 }
             }
-            
-            
+
+
             if (npc.ai[0] == 0)
             {
                 npc.spriteDirection = npc.direction;
@@ -1037,7 +1037,7 @@ namespace TerRoguelike.NPCs
                 npc.ai[0]++;
             }
 
-            
+
 
             if (target != null)
             {
@@ -1058,7 +1058,7 @@ namespace TerRoguelike.NPCs
                     }
                 }
             }
-            
+
             if (npc.velocity.Y >= 0f)
             {
                 int dir = 0;
@@ -1199,7 +1199,7 @@ namespace TerRoguelike.NPCs
 
                 npc.velocity.X += (npc.velocity.X == 0 ? 1 : npc.velocity.X / Math.Abs(npc.velocity.X)) * acceleration;
                 npc.velocity.Y += Main.rand.NextFloat(-acceleration / 2f, acceleration / 2f);
-                
+
                 if (npc.velocity.Length() > maxVelocity)
                 {
                     npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * maxVelocity;
@@ -1241,7 +1241,7 @@ namespace TerRoguelike.NPCs
                         else
                             npc.direction *= -1;
                     }
-                    
+
                 }
                 else if (npc.direction != 0)
                 {
@@ -1304,6 +1304,23 @@ namespace TerRoguelike.NPCs
                     else
                         npc.ai[1] = 0;
                 }
+            }
+        }
+        public void RogueDungeonSpiritAI(NPC npc, float acceleration, float speedCap)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (target != null)
+            {
+                npc.velocity += (target.Center - npc.Center).SafeNormalize(Vector2.UnitX) * acceleration;
+                if (npc.velocity.Length() > speedCap || (npc.Center - target.Center).Length() < 64f)
+                {
+                    npc.velocity *= 0.98f;
+                }
+            }
+            else
+            {
+                npc.velocity *= 0.98f;
             }
         }
 
