@@ -684,4 +684,5 @@ NPCs: {
 	SpectreMaster.DisplayName: Spectre Master
 	Diabolist.DisplayName: Diabolist
 	UndeadSharpshooter.DisplayName: Undead Sharpshooter
+	DungeonSpirit.DisplayName: Dungeon Spirit
 }
