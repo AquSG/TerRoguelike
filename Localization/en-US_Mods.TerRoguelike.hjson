@@ -685,4 +685,5 @@ NPCs: {
 	Diabolist.DisplayName: Diabolist
 	UndeadSharpshooter.DisplayName: Undead Sharpshooter
 	DungeonSpirit.DisplayName: Dungeon Spirit
+	UndeadAssasin.DisplayName: Undead Assasin
 }

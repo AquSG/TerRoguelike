@@ -53,7 +53,8 @@ namespace TerRoguelike.Managers
                 new SpectreMaster(),
                 new Diabolist(),
                 new UndeadSharpshooter(),
-                new DungeonSpirit()
+                new DungeonSpirit(),
+                new UndeadAssasin()
             };
         }
         internal static void Unload()
