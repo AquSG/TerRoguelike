@@ -51,14 +51,14 @@ namespace TerRoguelike.NPCs.Enemy
         {
             NPC.frameCounter += NPC.velocity.Length() * 0.2d;
 
-            modNPC.RogueAssasinAI(NPC, 3f, -7.9f, 0.07f, attackTelegraph, attackCooldown, attackExhaust, 96f, 212f);
+            modNPC.RogueAssasinAI(NPC, 3f, -7.9f, 0.07f, attackTelegraph, attackCooldown, attackExhaust, 128, 212f);
 
             if (NPC.ai[1] == attackTelegraph + attackCooldown + 1)
             {
                 SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack with { Volume = 0.7f }, NPC.Center);
                 for (int i = 0; i < 50; i++)
                 {
-                    int d = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Bone, 0f, 0f, 100, default(Color), 1.2f);
+                    int d = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Bone, 0f, 0f, 100, default(Color), 2f);
                     Dust dust = Main.dust[d];
                     dust.noGravity = true;
                     dust.velocity *= 0.75f;
