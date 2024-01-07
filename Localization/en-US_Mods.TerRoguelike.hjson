@@ -26,6 +26,7 @@ Projectiles: {
 	Spectre.DisplayName: Spectre
 	FireBlast.DisplayName: Fire Blast
 	SniperBullet.DisplayName: Sniper Bullet
+	SpikedBall.DisplayName: Spiked Ball
 }
 
 Items: {
@@ -686,4 +687,5 @@ NPCs: {
 	UndeadSharpshooter.DisplayName: Undead Sharpshooter
 	DungeonSpirit.DisplayName: Dungeon Spirit
 	UndeadAssasin.DisplayName: Undead Assasin
+	UndeadBrute.DisplayName: Undead Brute
 }
