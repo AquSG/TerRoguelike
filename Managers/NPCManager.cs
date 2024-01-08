@@ -55,7 +55,8 @@ namespace TerRoguelike.Managers
                 new UndeadSharpshooter(),
                 new DungeonSpirit(),
                 new UndeadAssasin(),
-                new UndeadBrute()
+                new UndeadBrute(),
+                new CrimsonDreg()
             };
         }
         internal static void Unload()
