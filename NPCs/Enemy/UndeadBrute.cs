@@ -60,6 +60,12 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.frameCounter += NPC.velocity.Length() * 0.2d;
 
             modNPC.RogueBallAndChainThrowerAI(NPC, 2f, -7.9f, 0.07f, attackWindup, attackExhaust, attackCooldown, ref ball, 8f, 48f, NPC.damage, 160f);
+
+            if (NPC.ai[1] > attackCooldown && NPC.ai[1] <= attackWindup + attackCooldown + 1 && ((NPC.ai[1] - attackCooldown) % 0.66f < 0.02f) || NPC.ai[1] == attackWindup + attackCooldown + 1)
+            {
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/chainHit") with { Volume = 0.4f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.3f, Pitch = -0.8f}, NPC.Center);
+            }
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
@@ -109,17 +115,35 @@ namespace TerRoguelike.NPCs.Enemy
             }
             if (NPC.ai[1] > attackCooldown)
             {
-                Vector2 armPos = NPC.Center + new Vector2(6 * NPC.spriteDirection, -2);
+                Vector2 armPos = NPC.Center + (new Vector2(6 * NPC.spriteDirection, -2) * NPC.scale);
                 float armRot = NPC.ai[1] <= attackCooldown + attackWindup ? chainVect.ToRotation() : (Main.projectile[(int)NPC.ai[3]].Center - NPC.Center).ToRotation();
                 SpriteEffects spriteEffects = NPC.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
-                spriteBatch.Draw(armTex, armPos - Main.screenPosition, null, drawColor, armRot - MathHelper.PiOver4 * 0.9f * NPC.spriteDirection + (NPC.spriteDirection == -1 ? MathHelper.Pi : 0), new Vector2(NPC.spriteDirection == -1 ? armTex.Size().X * 0.5f : armTex.Size().X * 0.5f, armTex.Size().Y * 0.3f), 1f, spriteEffects, 0);
+                float realArmRot = armRot - MathHelper.PiOver4 * 0.9f * NPC.spriteDirection + (NPC.spriteDirection == -1 ? MathHelper.Pi : 0);
+
+                if (modNPC.ignitedStacks.Any() && NPC.ai[1] > 0)
+                {
+                    spriteBatch.End();
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                    Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
+                    Vector3 colorHSL = Main.rgbToHsl(color);
+                    float outlineThickness = 1f;
+
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                    GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
+                    for (float j = 0; j < 1; j += 0.125f)
+                    {
+                        spriteBatch.Draw(armTex, armPos - Main.screenPosition + (j * MathHelper.TwoPi + realArmRot).ToRotationVector2() * outlineThickness, null, drawColor, realArmRot, new Vector2(armTex.Size().X * 0.5f, armTex.Size().Y * 0.3f), NPC.scale, spriteEffects, 0f);
+                    }
+                    Main.spriteBatch.End();
+                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                }
+                spriteBatch.Draw(armTex, armPos - Main.screenPosition, null, drawColor, realArmRot, new Vector2(armTex.Size().X * 0.5f, armTex.Size().Y * 0.3f), NPC.scale, spriteEffects, 0);
             }
 
             return true;
-        }
-        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
-        {
-                
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
         {
