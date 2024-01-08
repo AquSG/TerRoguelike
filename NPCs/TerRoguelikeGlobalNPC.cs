@@ -1527,6 +1527,7 @@ namespace TerRoguelike.NPCs
             }
             else
             {
+                npc.velocity.X *= 0.9f;
                 if (npc.ai[1] >= attackWindUpTime + attackExhaustTime + attackCooldown)
                 {
                     if ((Main.projectile[(int)npc.ai[3]].Center - npc.Center).Length() <= 12f || !Main.projectile[(int)npc.ai[3]].active)

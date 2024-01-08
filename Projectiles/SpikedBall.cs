@@ -80,6 +80,7 @@ namespace TerRoguelike.Projectiles
                     if ((targetPos - Projectile.Center).Length() <= 12f)
                     {
                         Projectile.Kill();
+                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/chainHit") with { Volume = 0.4f }, Projectile.Center);
                     }
                 }
                 else
@@ -87,6 +88,11 @@ namespace TerRoguelike.Projectiles
                     if (Projectile.timeLeft > 30)
                         Projectile.timeLeft = 30;
                 }
+            }
+
+            if (Projectile.ai[1] == 90)
+            {
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/chainLoop") with { Volume = 0.6f }, Projectile.Center);
             }
         }
         public override bool PreDraw(ref Color lightColor)
