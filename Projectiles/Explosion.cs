@@ -16,6 +16,7 @@ namespace TerRoguelike.Projectiles
     {
         public override string Texture => "TerRoguelike/Projectiles/Explosion";
         public float MaxScale = -1f;
+        public Texture2D texture;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 5;
@@ -31,6 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.localNPCHitCooldown = -1;
             Projectile.friendly = true;
             Projectile.hostile = false;
+            texture = ModContent.Request<Texture2D>(Texture).Value;
         }
 
         public override void AI()
@@ -67,7 +69,6 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.timeLeft == 20 ? (bool?)null : false; //hitbox only active for frame 1
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
             int frameHeight = texture.Height / Main.projFrames[Projectile.type];
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.White, 0f, new Vector2(texture.Width * 0.5f, (frameHeight * 0.5f)), Projectile.scale, SpriteEffects.None);
             return false;
