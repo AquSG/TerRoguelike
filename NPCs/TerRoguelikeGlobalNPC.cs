@@ -509,6 +509,36 @@ namespace TerRoguelike.NPCs
                 npc.Bottom = teleportPos;
             }
         }
+        public void RogueTurretAI(NPC npc, int attackTelegraph, int attackCooldown, float attackDist, int projType, int projDamage, float projVelocity, Vector2 projOffset, bool LoSRequired, float? directionOverride = null, float? attackCone = null)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (target != null)
+            {
+                if (npc.ai[0] == 0)
+                {
+                    if ((!LoSRequired || Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1)) && (npc.Center - target.Center).Length() <= attackDist && (attackCone == null || Math.Abs(RadianSizeBetween((target.Center - npc.Center).ToRotation(), (float)directionOverride)) <= attackCone * 0.5f))
+                    {
+                        npc.ai[0]++;
+                    }
+                }
+                else
+                {
+                    npc.ai[0]++;
+                    if (npc.ai[0] == attackTelegraph)
+                    {
+                        float direction = directionOverride == null ? (target.Center - (npc.Center + projOffset)).ToRotation() : (float)directionOverride;
+                        int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center + projOffset, Vector2.UnitX.RotatedBy(direction) * projVelocity, projType, projDamage, 0f);
+                        SetUpNPCProj(npc, proj);
+                        npc.ai[0] = -attackCooldown;
+                    }
+                }
+            }
+            else if (npc.ai[0] > 0)
+            {
+                npc.ai[0] = 0;
+            }
+        }
         public void RogueAntlionAI(NPC npc, float attackCone, float minBurrowDist, float maxBurrowDist, int burrowDownTime, int burrowUpTime, float burrowDepth, int burrowCooldown, int attackTelegraph, int attackCooldown, int projType, Vector2 projOffset, int projCount, int projDamage, float projSpread, float minProjVelocity, float maxProjVelocity)
         {
             Entity target = GetTarget(npc, false, false);

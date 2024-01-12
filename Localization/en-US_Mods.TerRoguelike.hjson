@@ -27,6 +27,7 @@ Projectiles: {
 	FireBlast.DisplayName: Fire Blast
 	SniperBullet.DisplayName: Sniper Bullet
 	SpikedBall.DisplayName: Spiked Ball
+	BallistaShot.DisplayName: Ballista Shot
 }
 
 Items: {
@@ -689,4 +690,5 @@ NPCs: {
 	UndeadAssasin.DisplayName: Undead Assasin
 	UndeadBrute.DisplayName: Undead Brute
 	CrimsonDreg.DisplayName: Crimson Dreg
+	Ballista.DisplayName: Ballista
 }
