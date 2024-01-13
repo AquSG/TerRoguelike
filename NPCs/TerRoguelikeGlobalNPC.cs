@@ -535,9 +535,9 @@ namespace TerRoguelike.NPCs
                 }
             }
             else if (npc.ai[0] > 0)
-            {
                 npc.ai[0] = 0;
-            }
+            else if (npc.ai[0] < 0)
+                npc.ai[0]++;
         }
         public void RogueAntlionAI(NPC npc, float attackCone, float minBurrowDist, float maxBurrowDist, int burrowDownTime, int burrowUpTime, float burrowDepth, int burrowCooldown, int attackTelegraph, int attackCooldown, int projType, Vector2 projOffset, int projCount, int projDamage, float projSpread, float minProjVelocity, float maxProjVelocity)
         {
