@@ -28,6 +28,7 @@ Projectiles: {
 	SniperBullet.DisplayName: Sniper Bullet
 	SpikedBall.DisplayName: Spiked Ball
 	BallistaShot.DisplayName: Ballista Shot
+	WoodSliver.DisplayName: Wood Sliver
 }
 
 Items: {
@@ -691,4 +692,5 @@ NPCs: {
 	UndeadBrute.DisplayName: Undead Brute
 	CrimsonDreg.DisplayName: Crimson Dreg
 	Ballista.DisplayName: Ballista
+	WrathfulRoot.DisplayName: Wrathful Root
 }
