@@ -29,6 +29,7 @@ Projectiles: {
 	SpikedBall.DisplayName: Spiked Ball
 	BallistaShot.DisplayName: Ballista Shot
 	WoodSliver.DisplayName: Wood Sliver
+	IchorBlob.DisplayName: Ichor Blob
 }
 
 Items: {
@@ -693,4 +694,5 @@ NPCs: {
 	CrimsonDreg.DisplayName: Crimson Dreg
 	Ballista.DisplayName: Ballista
 	WrathfulRoot.DisplayName: Wrathful Root
+	IchorSticker.DisplayName: Ichor Sticker
 }

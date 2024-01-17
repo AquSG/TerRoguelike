@@ -688,7 +688,7 @@ namespace TerRoguelike.NPCs
                 npc.ai[3] = burrowPos.Y;
             }
         }
-        public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired)
+        public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, float deceleration = 0.93f)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -763,7 +763,7 @@ namespace TerRoguelike.NPCs
 
             if (npc.ai[2] > 0)
             {
-                npc.velocity *= 0.93f;
+                npc.velocity *= deceleration;
                 if (target != null)
                 {
                     if (npc.Center.X >= target.Center.X)
@@ -784,7 +784,7 @@ namespace TerRoguelike.NPCs
             {
                 if (distanceCheck && LoSCheck)
                 {
-                    npc.velocity *= 0.93f;
+                    npc.velocity *= deceleration;
                 }
                 else if (LoSCheck && !distanceCheck)
                 {

@@ -58,7 +58,8 @@ namespace TerRoguelike.Managers
                 new UndeadBrute(),
                 new CrimsonDreg(),
                 new Ballista(),
-                new WrathfulRoot()
+                new WrathfulRoot(),
+                new IchorSticker()
             };
         }
         internal static void Unload()
