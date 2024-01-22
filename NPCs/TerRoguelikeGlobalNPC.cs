@@ -1838,6 +1838,141 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
+        public void RogueSpiderAI(NPC npc, float speedCap, float acceleration, int passiveRoamCooldown, int passiveRoamTime, int boredomTime, float homeRadius)
+        {
+            Entity target = GetTarget(npc, false, false);
+            npc.stairFall = true;
+
+            Vector2 homePos = new Vector2(npc.ai[2], npc.ai[3]);
+            if (homePos == Vector2.Zero)
+            {
+                homePos = npc.Center;
+                npc.ai[2] = npc.Center.X;
+                npc.ai[3] = npc.Center.Y;
+            }
+
+            if (target != null)
+            {
+                if (npc.ai[1] != 2)
+                {
+                    if (Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1) && (npc.Center - target.Center).Length() <= homeRadius * 6)
+                    {
+                        npc.ai[1] = 2;
+                        npc.ai[0] = 1;
+                    }
+                }
+                if (npc.ai[1] == 2)
+                {
+                    if (!Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1))
+                    {
+                        npc.ai[0]++;
+                        if (npc.ai[0] >= boredomTime)
+                        {
+                            npc.ai[1] = 1;
+                        }
+                    }
+                    else
+                    {
+                        npc.ai[0] = 1;
+                    }
+                }
+            }
+            else
+            {
+                npc.ai[0] = 0;
+            }
+
+            if (npc.ai[1] != 2)
+            {
+                if ((npc.Center - homePos).Length() <= homeRadius)
+                {
+                    npc.ai[1] = 0;
+                }
+                else
+                {
+                    npc.ai[1] = 1;
+                }
+            }
+            
+            if (npc.ai[1] == 2)
+            {
+                if (target != null)
+                {
+                    npc.velocity += (target.Center - npc.Center).SafeNormalize(Vector2.UnitX) * acceleration;
+                }
+
+                if (npc.collideX && ((npc.oldVelocity.X < 0 && (target.Center.X - npc.Center.X) < 0) || (npc.oldVelocity.X > 0 && (target.Center.X - npc.Center.X) > 0)))
+                {
+                    npc.velocity.X = 1f * (npc.oldVelocity.X / Math.Abs(npc.oldVelocity.X)) * -speedCap;
+                }
+                if (npc.collideY && ((npc.oldVelocity.Y < 0 && (target.Center.Y - npc.Center.Y) < 0) || (npc.oldVelocity.Y > 0 && (target.Center.Y - npc.Center.Y) > 0)))
+                {
+                    npc.velocity.Y = 1f * (npc.oldVelocity.Y / Math.Abs(npc.oldVelocity.Y)) * -speedCap;
+                }
+            }
+            else if (npc.ai[1] == 1)
+            {
+                if ((npc.Center - homePos).Length() > homeRadius * 4)
+                {
+                    npc.ai[2] = npc.Center.X;
+                    npc.ai[3] = npc.Center.Y;
+                    homePos = npc.Center;
+                    npc.ai[1] = 0;
+                }
+                else
+                {
+                    npc.velocity += (homePos - npc.Center).SafeNormalize(Vector2.UnitX) * acceleration;
+                    npc.ai[0] -= 0.5f;
+                    if (npc.ai[0] < 0)
+                    {
+                        npc.ai[2] = npc.Center.X;
+                        npc.ai[3] = npc.Center.Y;
+                        homePos = npc.Center;
+                        npc.ai[1] = 0;
+                    }
+                    else
+                    {
+                        if (npc.collideX && ((npc.velocity.X < 0 && (homePos.X - npc.Center.X) < 0) || (npc.velocity.X > 0 && (homePos.X - npc.Center.X) > 0)))
+                        {
+                            npc.velocity.X = 1f * (npc.velocity.X / -Math.Abs(npc.velocity.X)) * speedCap;
+                        }
+                        if (npc.collideY && ((npc.velocity.Y < 0 && (homePos.Y - npc.Center.Y) < 0) || (npc.velocity.Y > 0 && (homePos.Y - npc.Center.Y) > 0)))
+                        {
+                            npc.velocity.Y = 1f * (npc.velocity.Y / -Math.Abs(npc.velocity.Y)) * speedCap;
+                        }
+
+                    }
+                }
+            }
+            else if (npc.ai[1] == 0)
+            {
+                if (npc.ai[0] >= 0)
+                {
+                    npc.ai[0] = -passiveRoamCooldown - passiveRoamTime;
+                }
+
+                if (npc.ai[0] >= -passiveRoamTime)
+                {
+                    float direction = npc.velocity.ToRotation();
+                    if (npc.ai[0] == -passiveRoamTime)
+                    {
+                        direction = Main.rand.NextFloat(MathHelper.TwoPi);
+                    }
+
+                    npc.velocity += (Vector2.UnitX * acceleration).RotatedBy(direction);
+                }
+                else
+                {
+                    npc.velocity *= (1 - acceleration);
+                }
+                npc.ai[0]++;
+            }
+
+            if (npc.velocity.Length() > speedCap)
+            {
+                npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * speedCap;
+            }
+        }
 
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
