@@ -695,4 +695,5 @@ NPCs: {
 	Ballista.DisplayName: Ballista
 	WrathfulRoot.DisplayName: Wrathful Root
 	IchorSticker.DisplayName: Ichor Sticker
+	BloodCrawler.DisplayName: Blood Crawler
 }
