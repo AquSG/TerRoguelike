@@ -696,4 +696,7 @@ NPCs: {
 	WrathfulRoot.DisplayName: Wrathful Root
 	IchorSticker.DisplayName: Ichor Sticker
 	BloodCrawler.DisplayName: Blood Crawler
+	BlackRecluse.DisplayName: Black Recluse
+	GiantSpider.DisplayName: Giant Spider
+	JungleCreeper.DisplayName: Jungle Creeper
 }
