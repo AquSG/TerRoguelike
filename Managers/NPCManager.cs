@@ -60,7 +60,10 @@ namespace TerRoguelike.Managers
                 new Ballista(),
                 new WrathfulRoot(),
                 new IchorSticker(),
-                new BloodCrawler()
+                new BloodCrawler(),
+                new GiantSpider(),
+                new JungleCreeper(),
+                new BlackRecluse()
             };
         }
         internal static void Unload()
