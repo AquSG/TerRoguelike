@@ -699,4 +699,5 @@ NPCs: {
 	BlackRecluse.DisplayName: Black Recluse
 	GiantSpider.DisplayName: Giant Spider
 	JungleCreeper.DisplayName: Jungle Creeper
+	CrawlingSludge.DisplayName: Crawling Sludge
 }
