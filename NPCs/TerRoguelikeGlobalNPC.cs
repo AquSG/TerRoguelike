@@ -1973,6 +1973,44 @@ namespace TerRoguelike.NPCs
                 npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * speedCap;
             }
         }
+        public void RogueCrawlerAI(NPC npc, float speedCap, float acceleration, int waitTime)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+                if (npc.ai[0] <= 0)
+                {
+                    if (npc.direction == 0)
+                    {
+                        npc.direction = Main.rand.NextBool() ? -1 : 1;
+                    }
+
+                    if (Math.Abs(npc.velocity.X) < speedCap)
+                        npc.velocity.X += acceleration * npc.direction;
+                    if (Math.Abs(npc.velocity.X) > speedCap)
+                        npc.velocity.X = speedCap * npc.direction;
+
+                    Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
+
+                    if (npc.collideX)
+                    {
+                        npc.ai[0]++;
+                    }
+                    else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround())
+                    {
+                        npc.ai[0]++;
+                    }
+                }
+                else
+                {
+                    npc.ai[0]++;
+                    npc.velocity.X *= 0.8f;
+                    if (npc.ai[0] >= waitTime)
+                    {
+                        npc.ai[0] = 0;
+                        npc.direction *= -1;
+                    }
+                }
+        }
 
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
