@@ -58,7 +58,7 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 100.0; i++)
 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 4, hit.HitDirection, -1f, NPC.alpha, Color.Purple;
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 4, hit.HitDirection, -1f, NPC.alpha, Color.Purple);
                 }
             }
             else
