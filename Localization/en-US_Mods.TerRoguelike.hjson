@@ -700,4 +700,5 @@ NPCs: {
 	GiantSpider.DisplayName: Giant Spider
 	JungleCreeper.DisplayName: Jungle Creeper
 	CrawlingSludge.DisplayName: Crawling Sludge
+	UndeadPrisoner.DisplayName: Undead Prisoner
 }

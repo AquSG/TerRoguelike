@@ -63,7 +63,9 @@ namespace TerRoguelike.Managers
                 new BloodCrawler(),
                 new GiantSpider(),
                 new JungleCreeper(),
-                new BlackRecluse()
+                new BlackRecluse(),
+                new CrawlingSludge(),
+                new UndeadPrisoner()
             };
         }
         internal static void Unload()
