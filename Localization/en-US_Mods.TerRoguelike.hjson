@@ -701,4 +701,5 @@ NPCs: {
 	JungleCreeper.DisplayName: Jungle Creeper
 	CrawlingSludge.DisplayName: Crawling Sludge
 	UndeadPrisoner.DisplayName: Undead Prisoner
+	StoneDrone.DisplayName: Stone Drone
 }
