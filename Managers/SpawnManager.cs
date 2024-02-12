@@ -11,6 +11,7 @@ using Terraria.ID;
 using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Managers
 {
@@ -44,13 +45,16 @@ namespace TerRoguelike.Managers
                 enemy.TelegraphDuration--;
                 if (enemy.TelegraphDuration <= 0)
                 {
-                    NPC npc = new NPC();
-                    npc.type = enemy.NPCType;
-                    npc.SetDefaults(npc.type);
+                    NPC dummyNpc = new NPC();
+                    dummyNpc.type = enemy.NPCType;
+                    dummyNpc.SetDefaults(dummyNpc.type);
                     enemy.TelegraphSize *= 2f;
-                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)enemy.Position.X, (int)enemy.Position.Y + (int)(npc.height / 2f), enemy.NPCType);
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = enemy.RoomListID;
+                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)enemy.Position.X, (int)enemy.Position.Y + (int)(dummyNpc.height / 2f), enemy.NPCType);
+                    NPC npc = Main.npc[spawnedNpc];
+                    TerRoguelikeGlobalNPC modNpc = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                    modNpc.isRoomNPC = true;
+                    modNpc.sourceRoomListID = enemy.RoomListID;
+
                     for (int i = 0; i < 15; i++)
                     {
                         Dust dust = Dust.NewDustDirect(enemy.Position - new Vector2(15f * enemy.TelegraphSize, 15f * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), DustID.CrystalPulse, Scale: 1f);
@@ -60,6 +64,14 @@ namespace TerRoguelike.Managers
                 }
             }
             pendingEnemies.RemoveAll(enemy => enemy.spent);
+        }
+        public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
+        {
+            double healthMultiplier = Math.Pow(1.4d, TerRoguelikeWorld.currentStage);
+            double damageMultiplier = Math.Pow(1.05d, TerRoguelikeWorld.currentStage);
+            npc.lifeMax = (int)(modNpc.baseMaxHP * healthMultiplier);
+            npc.life = npc.lifeMax;
+            npc.damage = (int)(modNpc.baseDamage * damageMultiplier);
         }
         public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {

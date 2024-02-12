@@ -33,6 +33,8 @@ namespace TerRoguelike.NPCs
         public int sourceRoomListID = -1;
         public bool hostileTurnedAlly = false;
         public bool IgnoreRoomWallCollision = false;
+        public int baseMaxHP = 0;
+        public int baseDamage = 0;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -2046,6 +2048,13 @@ namespace TerRoguelike.NPCs
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
             whoAmI = npc.whoAmI;
+            baseMaxHP = npc.lifeMax;
+            baseDamage = npc.damage;
+
+            if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+                return;
+
+            SpawnManager.ApplyNPCDifficultyScaling(npc, this);
         }
         public override bool PreAI(NPC npc)
         {
