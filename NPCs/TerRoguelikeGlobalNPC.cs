@@ -206,7 +206,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0)
+        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -230,8 +230,13 @@ namespace TerRoguelike.NPCs
                 if (npc.ai[1] == attackTelegraph)
                 {
                     Vector2 projSpawnPos = npc.Center + projOffset;
-                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, (projVelocityDirectionOverride == null ? (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY) : Vector2.UnitX.RotatedBy((double)projVelocityDirectionOverride)) * projSpeed, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
+                    Vector2 velocityDirection = ((projVelocityDirectionOverride == null ? (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY) : Vector2.UnitX.RotatedBy((double)projVelocityDirectionOverride)));
+                    for (int i = 0; i < projectileCount; i++)
+                    {
+                        Vector2 velocity = velocityDirection * (projSpeed + (maxVelocityDeviation == 0 ? 0 : Main.rand.NextFloat(-maxVelocityDeviation, maxVelocityDeviation + float.Epsilon)));
+                        int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, projMaxSpread == 0 ? velocity : velocity.RotatedBy(Main.rand.NextFloat(-projMaxSpread, projMaxSpread + float.Epsilon)), projType, projDamage, 0f);
+                        SetUpNPCProj(npc, proj);
+                    }
                 }
 
                 if (npc.ai[1] >= attackTelegraph + extendedAttackSlowdownTime)
