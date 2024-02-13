@@ -52,7 +52,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.velocity = Vector2.UnitY * 2f;
+            NPC.velocity = Vector2.UnitY * -1f;
+            NPC.rotation = -MathHelper.PiOver2;
             int segCount = 10;
             for (int i = 0; i < segCount; i++)
             {
