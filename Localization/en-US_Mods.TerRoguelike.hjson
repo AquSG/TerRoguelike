@@ -702,4 +702,5 @@ NPCs: {
 	CrawlingSludge.DisplayName: Crawling Sludge
 	UndeadPrisoner.DisplayName: Undead Prisoner
 	StoneDrone.DisplayName: Stone Drone
+	UndeadEnforcer.DisplayName: Undead Enforcer
 }
