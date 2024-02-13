@@ -67,7 +67,7 @@ namespace TerRoguelike.Managers
         }
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {
-            double healthMultiplier = Math.Pow(1.4d, TerRoguelikeWorld.currentStage);
+            double healthMultiplier = Math.Pow(1.2d, TerRoguelikeWorld.currentStage);
             double damageMultiplier = Math.Pow(1.05d, TerRoguelikeWorld.currentStage);
             npc.lifeMax = (int)(modNpc.baseMaxHP * healthMultiplier);
             npc.life = npc.lifeMax;
