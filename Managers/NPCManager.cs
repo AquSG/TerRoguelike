@@ -67,7 +67,8 @@ namespace TerRoguelike.Managers
                 new CrawlingSludge(),
                 new UndeadPrisoner(),
                 new StoneDrone(),
-                new UndeadEnforcer()
+                new UndeadEnforcer(),
+                new Tumbletwig()
             };
         }
         internal static void Unload()
