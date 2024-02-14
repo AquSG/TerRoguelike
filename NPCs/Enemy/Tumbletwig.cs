@@ -42,6 +42,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, -2);
             NPC.noGravity = false;
+            NPC.noTileCollide = false;
         }
         public override void AI()
         {
