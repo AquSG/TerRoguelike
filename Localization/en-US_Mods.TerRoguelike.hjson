@@ -704,4 +704,5 @@ NPCs: {
 	StoneDrone.DisplayName: Stone Drone
 	UndeadEnforcer.DisplayName: Undead Enforcer
 	Tumbletwig.DisplayName: Tumbletwig
+	RockGolem.DisplayName: Rock Golem
 }
