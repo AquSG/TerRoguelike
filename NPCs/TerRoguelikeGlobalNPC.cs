@@ -2033,19 +2033,6 @@ namespace TerRoguelike.NPCs
                 npc.direction = Main.rand.NextBool() ? -1 : 1; // 1 counterclockwise, -1 clockwise
                 npc.ai[3] = 1;
             }
-            for (int x = 0; x < 2; x++)
-            {
-                for (int y = 0; y < 2; y++)
-                {
-                    Point tilePos = new Point((int)(npc.position.X + (npc.width * x)) / 16, (int)(npc.position.Y + (npc.height * y)) / 16);
-                    Tile t = Main.tile[tilePos];
-                    if (t.Slope != SlopeType.Solid)
-                    {
-                        npc.collideX = true;
-                        break;
-                    }
-                }
-            }
             if (npc.collideX || npc.collideY)
             {
                 npc.noGravity = true;
