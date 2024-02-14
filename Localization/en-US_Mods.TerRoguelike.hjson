@@ -703,4 +703,5 @@ NPCs: {
 	UndeadPrisoner.DisplayName: Undead Prisoner
 	StoneDrone.DisplayName: Stone Drone
 	UndeadEnforcer.DisplayName: Undead Enforcer
+	Tumbletwig.DisplayName: Tumbletwig
 }

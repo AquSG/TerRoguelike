@@ -2023,6 +2023,137 @@ namespace TerRoguelike.NPCs
                     }
                 }
         }
+        public void RogueTumbletwigAI(NPC npc, float speedCap, float acceleration, float attackDist, int projType, float projSpeed, int projDamage, int attackTelegraph, int attackDuration, int attackShootCooldown, int attackCooldown, float attackSpread)
+        {
+            Entity target = GetTarget(npc, false, false);
+            //npc ai 3: 0 = right, 1 = down, 2 = left, 3 = up
+
+            if (npc.direction == 0)
+            {
+                npc.direction = Main.rand.NextBool() ? -1 : 1; // 1 counterclockwise, -1 clockwise
+                npc.ai[3] = 1;
+            }
+            if (npc.collideX || npc.collideY)
+            {
+                npc.noGravity = true;
+            }
+
+            if (!npc.noGravity)
+            {
+                npc.ai[0] = 0;
+                return;
+            }
+
+            bool attacking = false;
+
+            if (target != null)
+            {
+                if (npc.ai[0] > 0)
+                    npc.ai[0]++;
+                else if (Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1) && (npc.Center - target.Center).Length() <= attackDist)
+                {
+                    npc.ai[0]++;
+                }
+
+                if ((npc.ai[0] - attackTelegraph) % attackShootCooldown == 0 && npc.ai[0] <= attackTelegraph + attackDuration && npc.ai[0] >= attackTelegraph)
+                {
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-attackSpread, attackSpread + float.Epsilon)) * projSpeed, projType, projDamage, 0f);
+                    SetUpNPCProj(npc, proj);
+                }
+                if (npc.ai[0] > 0 && npc.ai[0] < attackTelegraph + attackDuration)
+                    attacking = true;
+
+                if (npc.ai[0] == attackTelegraph + attackDuration)
+                    npc.direction = Main.rand.NextBool() ? -1 : 1;
+                else if (npc.ai[0] >= attackTelegraph + attackDuration + attackCooldown)
+                    npc.ai[0] = 0;
+            }
+            else
+            {
+                npc.ai[0] = 0;
+            }
+
+            if (npc.ai[3] == 1) // down collide
+            {
+                if (!attacking)
+                    npc.velocity.X += acceleration * npc.direction;
+                npc.velocity.Y += 16f;
+                if (npc.collideX)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 0 : 2;
+                    npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
+                }
+                else if (!npc.collideY)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 2 : 0;
+                    npc.velocity.Y = Math.Abs(npc.oldVelocity.X);
+                    npc.velocity.X *= -1;
+                }
+            }
+            else if (npc.ai[3] == 0) // right collide
+            {
+                npc.velocity.X += 16f;
+                if (!attacking)
+                    npc.velocity.Y += -acceleration * npc.direction;
+                if (npc.collideY)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 3 : 1;
+                    npc.velocity.X = -Math.Abs(npc.oldVelocity.Y);
+                    npc.velocity.Y = npc.direction == 1 ? -16 : 16;
+                }
+                else if (!npc.collideX)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 1 : 3;
+                    npc.velocity.X = Math.Abs(npc.oldVelocity.Y);
+                    npc.velocity.Y *= -1;
+                }
+            }
+            else if (npc.ai[3] == 3) // up collide
+            {
+                if (!attacking)
+                    npc.velocity.X += -acceleration * npc.direction;
+                npc.velocity.Y += -16f;
+                if (npc.collideX)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 2 : 0;
+                    npc.velocity.Y = Math.Abs(npc.oldVelocity.X);
+                }
+                else if (!npc.collideY)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 0 : 2;
+                    npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
+                    npc.velocity.X *= -1;
+                }
+            }
+            else if (npc.ai[3] == 2)// left collide
+            {
+                npc.velocity.X += -16f;
+                if (!attacking)
+                    npc.velocity.Y += acceleration * npc.direction;
+                if (npc.collideY)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 1 : 3;
+                    npc.velocity.X = Math.Abs(npc.oldVelocity.Y);
+                    npc.velocity.Y = npc.direction == 1 ? 16 : -16;
+                }
+                else if (!npc.collideX)
+                {
+                    npc.ai[3] = npc.direction == 1 ? 3 : 1;
+                    npc.velocity.X = -Math.Abs(npc.oldVelocity.Y);
+                    npc.velocity.Y *= -1;
+                }
+            }
+
+            if (Math.Abs(npc.velocity.X) > speedCap)
+                npc.velocity.X = speedCap * (npc.velocity.X / Math.Abs(npc.velocity.X));
+            if (Math.Abs(npc.velocity.Y) > speedCap)
+                npc.velocity.Y = speedCap * (npc.velocity.Y / Math.Abs(npc.velocity.Y));
+
+            if (attacking)
+            {
+                npc.velocity *= 0.97f;
+            }
+        }
 
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
