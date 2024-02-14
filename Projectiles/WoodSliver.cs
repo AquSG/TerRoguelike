@@ -34,7 +34,7 @@ namespace TerRoguelike.Projectiles
 
         public override Color? GetAlpha(Color lightColor)
         {
-            return Color.Lerp(lightColor, Color.White, 0.4f);
+            return Color.Lerp(lightColor, Color.White, 0.6f);
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)

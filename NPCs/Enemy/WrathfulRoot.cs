@@ -16,6 +16,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.Projectiles;
 using Terraria.DataStructures;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.Audio;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -68,7 +69,12 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.velocity.X += 0.5f * -NPC.direction;
-            modNPC.RogueTurretAI(NPC, 10, 80, 300f, ModContent.ProjectileType<WoodSliver>(), NPC.damage, 12f, Vector2.UnitY * 7, true, NPC.direction == 1 ? 0f : MathHelper.Pi, MathHelper.PiOver4);
+            int attackCooldown = 80;
+            modNPC.RogueTurretAI(NPC, 10, attackCooldown, 300f, ModContent.ProjectileType<WoodSliver>(), NPC.damage, 12f, Vector2.UnitY * 7, true, NPC.direction == 1 ? 0f : MathHelper.Pi, MathHelper.PiOver4);
+            if (NPC.ai[0] == -attackCooldown)
+            {
+                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.8f }, NPC.Center);
+            }
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

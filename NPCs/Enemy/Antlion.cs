@@ -24,7 +24,7 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<Antlion>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
-        public override int CombatStyle => 1;
+        public override int CombatStyle => 2;
         public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/AntlionHead").Value;
         public Texture2D texture;
         public int attackTelegraph = 120;
