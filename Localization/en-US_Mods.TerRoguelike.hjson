@@ -31,6 +31,8 @@ Projectiles: {
 	WoodSliver.DisplayName: Wood Sliver
 	IchorBlob.DisplayName: Ichor Blob
 	GreenPetal.DisplayName: Green Petal
+	CursedFlame.DisplayName: Cursed Flame
+	BouncingFire.DisplayName: Bouncing Fire
 }
 
 Items: {
@@ -707,4 +709,7 @@ NPCs: {
 	Tumbletwig.DisplayName: Tumbletwig
 	RockGolem.DisplayName: Rock Golem
 	SeedLobber.DisplayName: Seed Lobber
+	CursedSlime.DisplayName: Cursed Slime
+	IchorSlime.DisplayName: Ichor Slime
+	LavaSlime.DisplayName: Lava Slime
 }

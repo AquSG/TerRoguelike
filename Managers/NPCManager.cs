@@ -70,7 +70,10 @@ namespace TerRoguelike.Managers
                 new UndeadEnforcer(),
                 new Tumbletwig(),
                 new RockGolem(),
-                new SeedLobber()
+                new SeedLobber(),
+                new CursedSlime(),
+                new IchorSlime(),
+                new LavaSlime()
             };
         }
         internal static void Unload()
