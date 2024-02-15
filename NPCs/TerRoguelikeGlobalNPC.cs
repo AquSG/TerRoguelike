@@ -2023,6 +2023,69 @@ namespace TerRoguelike.NPCs
                     }
                 }
         }
+        public void RogueCrawlerShooterAI(NPC npc, float speedCap, float acceleration, int waitTime, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (npc.ai[1] != 0)
+                npc.ai[1]++;
+
+            if (npc.ai[0] <= 0)
+            {
+                if (npc.direction == 0)
+                {
+                    npc.direction = Main.rand.NextBool() ? -1 : 1;
+                }
+
+                if (Math.Abs(npc.velocity.X) < speedCap)
+                    npc.velocity.X += acceleration * npc.direction;
+                if (Math.Abs(npc.velocity.X) > speedCap)
+                    npc.velocity.X = speedCap * npc.direction;
+
+                Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
+
+                if (npc.collideX)
+                {
+                    npc.ai[0]++;
+                }
+                else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround())
+                {
+                    npc.ai[0]++;
+                }
+            }
+            else
+            {
+                npc.ai[0]++;
+                npc.velocity.X *= 0.8f;
+                if (npc.ai[0] >= waitTime)
+                {
+                    npc.ai[0] = 0;
+                    npc.direction *= -1;
+                }
+            }
+
+            if (target != null)
+            {
+                if (npc.ai[1] == 0 && Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1))
+                {
+                    npc.ai[1]++;
+                }
+
+                if (npc.ai[1] >= attackTelegraph)
+                {
+                    if (((int)npc.ai[1] - attackTelegraph) % attackTimeBetween == 0)
+                    {
+                        int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) * projSpeed, projType, projDamage, 0);
+                        SetUpNPCProj(npc, proj);
+                    }
+
+                    if (npc.ai[1] >= attackTelegraph + attackDuration)
+                        npc.ai[1] = -attackCooldown;
+                }
+            }
+            else if (npc.ai[1] > 0)
+                npc.ai[1] = 0;
+        }
         public void RogueTumbletwigAI(NPC npc, float speedCap, float acceleration, float attackDist, int projType, float projSpeed, int projDamage, int attackTelegraph, int attackDuration, int attackShootCooldown, int attackCooldown, float attackSpread)
         {
             // I FUCKING HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATE SLOOOOOOOOOOOOOOOOOOOOOOOOOOOPES FUCK YOU RED FUUUUUUUUCK YOUUUUUUUUU I SWEAR TO FUCK WHY ARE SLOPES SO FUCKING JANK. I'LL JUST NEVER FUCKING USE THEM IN MY BUILDS
