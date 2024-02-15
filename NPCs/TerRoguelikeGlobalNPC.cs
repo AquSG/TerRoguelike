@@ -304,7 +304,7 @@ namespace TerRoguelike.NPCs
                 if (npc.velocity.Y == 0f && target.Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
                 {
 
-                    if (npc.velocity.Y == 0f && (canJumpShoot || npc.ai[1] == -1 || npc.ai[1] == 0))
+                    if (npc.velocity.Y == 0f && (canJumpShoot || npc.ai[1] <= 0))
                     {
                         int padding = 6;
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
