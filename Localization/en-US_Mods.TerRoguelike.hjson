@@ -30,6 +30,7 @@ Projectiles: {
 	BallistaShot.DisplayName: Ballista Shot
 	WoodSliver.DisplayName: Wood Sliver
 	IchorBlob.DisplayName: Ichor Blob
+	GreenPetal.DisplayName: Green Petal
 }
 
 Items: {
@@ -705,4 +706,5 @@ NPCs: {
 	UndeadEnforcer.DisplayName: Undead Enforcer
 	Tumbletwig.DisplayName: Tumbletwig
 	RockGolem.DisplayName: Rock Golem
+	SeedLobber.DisplayName: Seed Lobber
 }
