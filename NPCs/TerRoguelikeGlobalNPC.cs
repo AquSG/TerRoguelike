@@ -70,6 +70,8 @@ namespace TerRoguelike.NPCs
                 npc.direction = 1;
                 npc.spriteDirection = 1;
             }
+
+            bool LoSBoredomCheck = target == null ? false : (Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1));
             if (npc.ai[0] == 0 && target != null)
             {
                 if (npc.Center.X < target.Center.X)
@@ -86,8 +88,16 @@ namespace TerRoguelike.NPCs
             else if (npc.ai[0] > 60)
             {
                 npc.ai[0] = -240;
-                npc.direction *= -1;
-                npc.spriteDirection *= -1;
+                if (!LoSBoredomCheck)
+                {
+                    npc.direction *= -1;
+                    npc.spriteDirection *= -1;
+                }
+                else
+                {
+                    npc.direction = Main.rand.NextBool() ? -1 : 1;
+                    npc.spriteDirection = npc.direction;
+                }
             }
             if (npc.ai[0] < 0)
                 npc.ai[0]++;
@@ -110,10 +120,10 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = -xCap;
             }
 
-            if (npc.collideX)
+            if (npc.collideX || LoSBoredomCheck)
             {
                 npc.ai[0]++;
-                if (npc.collideY && npc.oldVelocity.Y >= 0)
+                if (npc.collideX && npc.collideY && npc.oldVelocity.Y >= 0)
                     npc.velocity.Y = jumpVelocity;
             }
             else if (npc.ai[0] > 0)
@@ -245,6 +255,7 @@ namespace TerRoguelike.NPCs
                 }
             }
 
+            bool LoSBoredomCheck = target == null ? false : (LoSRequired && Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1));
             if (target == null && npc.direction == 0)
             {
                 npc.direction = 1;
@@ -266,8 +277,17 @@ namespace TerRoguelike.NPCs
             else if (npc.ai[0] > 60 && npc.ai[1] <= 0)
             {
                 npc.ai[0] = -240;
-                npc.direction *= -1;
-                npc.spriteDirection *= -1;
+                
+                if (!LoSBoredomCheck)
+                {
+                    npc.direction *= -1;
+                    npc.spriteDirection *= -1;
+                }
+                else
+                {
+                    npc.direction = Main.rand.NextBool() ? -1 : 1;
+                    npc.spriteDirection = npc.direction;
+                }
             }
             if (npc.ai[0] < 0)
                 npc.ai[0]++;
@@ -290,10 +310,10 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = -realXCap;
             }
 
-            if (npc.collideX)
+            if (npc.collideX || LoSBoredomCheck)
             {
                 npc.ai[0]++;
-                if (npc.collideY && npc.oldVelocity.Y >= 0)
+                if (npc.collideY && npc.oldVelocity.Y >= 0 && npc.collideX)
                     npc.velocity.Y = jumpVelocity;
             }
             else if (npc.ai[0] > 0)
@@ -1401,6 +1421,7 @@ namespace TerRoguelike.NPCs
                 }
                 else if (npc.ai[2] == 0)
                 {
+                    bool LoSBoredomCheck = target == null ? false : (Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1));
                     if (target == null && npc.direction == 0)
                     {
                         npc.direction = 1;
@@ -1422,8 +1443,16 @@ namespace TerRoguelike.NPCs
                     else if (npc.ai[0] > 60)
                     {
                         npc.ai[0] = -240;
-                        npc.direction *= -1;
-                        npc.spriteDirection *= -1;
+                        if (!LoSBoredomCheck)
+                        {
+                            npc.direction *= -1;
+                            npc.spriteDirection *= -1;
+                        }
+                        else
+                        {
+                            npc.direction = Main.rand.NextBool() ? -1 : 1;
+                            npc.spriteDirection = npc.direction;
+                        }
                     }
                     if (npc.ai[0] < 0)
                         npc.ai[0]++;
@@ -1446,10 +1475,10 @@ namespace TerRoguelike.NPCs
                             npc.velocity.X = -xCap;
                     }
 
-                    if (npc.collideX)
+                    if (npc.collideX || LoSBoredomCheck)
                     {
                         npc.ai[0]++;
-                        if (npc.collideY && npc.oldVelocity.Y >= 0)
+                        if (npc.collideX && npc.collideY && npc.oldVelocity.Y >= 0)
                             npc.velocity.Y = jumpVelocity;
                     }
                     else if (npc.ai[0] > 0)
@@ -2290,6 +2319,7 @@ namespace TerRoguelike.NPCs
                 }
             }
 
+            bool LoSBoredomCheck = target == null ? false : (LoSRequired && Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1));
             if (target == null && npc.direction == 0)
             {
                 npc.direction = 1;
@@ -2311,8 +2341,17 @@ namespace TerRoguelike.NPCs
             else if (npc.ai[0] > 60 && npc.ai[1] <= 0)
             {
                 npc.ai[0] = -240;
-                npc.direction *= -1;
-                npc.spriteDirection *= -1;
+                if (!LoSBoredomCheck)
+                {
+                    npc.direction *= -1;
+                    npc.spriteDirection *= -1;
+                }
+                else
+                {
+                    npc.direction = Main.rand.NextBool() ? -1 : 1;
+                    npc.spriteDirection = npc.direction;
+                }
+                
             }
             if (npc.ai[0] < 0)
                 npc.ai[0]++;
@@ -2335,10 +2374,10 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = -realXCap;
             }
 
-            if (npc.collideX)
+            if (npc.collideX || LoSBoredomCheck)
             {
                 npc.ai[0]++;
-                if (npc.collideY && npc.oldVelocity.Y >= 0)
+                if (npc.collideX && npc.collideY && npc.oldVelocity.Y >= 0)
                     npc.velocity.Y = jumpVelocity;
             }
             else if (npc.ai[0] > 0)

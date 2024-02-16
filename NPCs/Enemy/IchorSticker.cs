@@ -47,8 +47,8 @@ namespace TerRoguelike.NPCs.Enemy
             int attackTelegraph = 45;
             int attackCooldown = 75;
             NPC.frameCounter += 0.15d;
-            NPC.rotation = MathHelper.PiOver2 * NPC.velocity.Length() * 0.02f * NPC.direction;
-            modNPC.RogueFlyingShooterAI(NPC, 0.6f, 0.6f, 0.02f, 160f, 480f, attackTelegraph, attackCooldown, ModContent.ProjectileType<IchorBlob>(), 8f, new Vector2(0, 10).RotatedBy(NPC.rotation), NPC.damage, true, 0.98f);
+            NPC.rotation = MathHelper.PiOver2 * Math.Abs(NPC.velocity.X) * 0.16f * (NPC.velocity.X == 0 ? 0 : ((NPC.velocity.X) / Math.Abs(NPC.velocity.X)));
+            modNPC.RogueFlyingShooterAI(NPC, 1f, 1f, 0.02f, 160f, 480f, attackTelegraph, attackCooldown, ModContent.ProjectileType<IchorBlob>(), 8f, new Vector2(0, 10).RotatedBy(NPC.rotation), NPC.damage, true, 0.98f);
             if (NPC.ai[2] == -attackCooldown)
             {
                 SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.9f }, NPC.Center);
