@@ -34,6 +34,7 @@ Projectiles: {
 	CursedFlame.DisplayName: Cursed Flame
 	BouncingFire.DisplayName: Bouncing Fire
 	ShadowBlast.DisplayName: Shadow Blast
+	VileSpit.DisplayName: Vile Spit
 }
 
 Items: {
@@ -714,4 +715,5 @@ NPCs: {
 	IchorSlime.DisplayName: Ichor Slime
 	LavaSlime.DisplayName: Lava Slime
 	ShadowCaster.DisplayName: Shadow Caster
+	Corruptor.DisplayName: Corruptor
 }
