@@ -851,7 +851,9 @@ namespace TerRoguelike.NPCs
         {
             Entity target = GetTarget(npc, false, false);
 
-            if (npc.ai[1] < attackCooldown && npc.ai[1] >= 0)
+            if (npc.ai[1] < attackCooldown && npc.ai[1] >= 0 && npc.ai[1] != attackCooldown - attackTelegraph)
+                npc.ai[1]++;
+            else if (npc.ai[1] == attackCooldown - attackTelegraph && npc.collideY)
                 npc.ai[1]++;
 
             if (target == null && npc.direction == 0)
@@ -881,7 +883,7 @@ namespace TerRoguelike.NPCs
             if (npc.ai[0] < 0)
                 npc.ai[0]++;
 
-            if (npc.ai[0] >= 0 && npc.ai[1] >= attackCooldown && npc.collideY)
+            if (npc.ai[1] >= attackCooldown)
             {
                 npc.ai[1] = -jumpTime - dashTime;
             }
@@ -1988,6 +1990,8 @@ namespace TerRoguelike.NPCs
         public void RogueCrawlerAI(NPC npc, float speedCap, float acceleration, int waitTime)
         {
             Entity target = GetTarget(npc, false, false);
+            if (npc.ai[2] < 0)
+                npc.ai[2]++;
 
                 if (npc.ai[0] <= 0)
                 {
@@ -2003,11 +2007,11 @@ namespace TerRoguelike.NPCs
 
                     Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
 
-                    if (npc.collideX)
+                    if (npc.collideX && npc.ai[2] >= 0)
                     {
                         npc.ai[0]++;
                     }
-                    else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround())
+                    else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && npc.ai[2] >= 0)
                     {
                         npc.ai[0]++;
                     }
@@ -2018,6 +2022,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X *= 0.8f;
                     if (npc.ai[0] >= waitTime)
                     {
+                        npc.ai[2] = -60;
                         npc.ai[0] = 0;
                         npc.direction *= -1;
                     }
@@ -2029,6 +2034,8 @@ namespace TerRoguelike.NPCs
 
             if (npc.ai[1] != 0)
                 npc.ai[1]++;
+            if (npc.ai[2] < 0)
+                npc.ai[2]++;
 
             if (npc.ai[0] <= 0)
             {
@@ -2044,11 +2051,11 @@ namespace TerRoguelike.NPCs
 
                 Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
 
-                if (npc.collideX)
+                if (npc.collideX && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
                 }
-                else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround())
+                else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
                 }
@@ -2057,8 +2064,9 @@ namespace TerRoguelike.NPCs
             {
                 npc.ai[0]++;
                 npc.velocity.X *= 0.8f;
-                if (npc.ai[0] >= waitTime)
+                if (npc.ai[0] >= 60)
                 {
+                    npc.ai[2] = -waitTime;
                     npc.ai[0] = 0;
                     npc.direction *= -1;
                 }
@@ -2098,6 +2106,8 @@ namespace TerRoguelike.NPCs
                 npc.direction = Main.rand.NextBool() ? -1 : 1; // 1 counterclockwise, -1 clockwise
                 npc.ai[3] = 1;
             }
+            if (npc.ai[2] > 0)
+                npc.ai[2]--;
 
             if (npc.collideX || npc.collideY)
             {
@@ -2148,12 +2158,14 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[3] = npc.direction == 1 ? 0 : 2;
                     npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
+                    npc.ai[2] = 6;
                 }
-                else if (!npc.collideY)
+                else if (!npc.collideY && npc.ai[2] == 0)
                 {
                     npc.ai[3] = npc.direction == 1 ? 2 : 0;
                     npc.velocity.Y = Math.Abs(npc.oldVelocity.X);
                     npc.velocity.X *= -1;
+                    npc.ai[2] = 6;
                 }
             }
             else if (npc.ai[3] == 0) // right collide
@@ -2166,12 +2178,14 @@ namespace TerRoguelike.NPCs
                     npc.ai[3] = npc.direction == 1 ? 3 : 1;
                     npc.velocity.X = -Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y = npc.direction == 1 ? -16 : 16;
+                    npc.ai[2] = 6;
                 }
-                else if (!npc.collideX)
+                else if (!npc.collideX && npc.ai[2] == 0)
                 {
                     npc.ai[3] = npc.direction == 1 ? 1 : 3;
                     npc.velocity.X = Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y *= -1;
+                    npc.ai[2] = 6;
                 }
             }
             else if (npc.ai[3] == 3) // up collide
@@ -2183,12 +2197,14 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[3] = npc.direction == 1 ? 2 : 0;
                     npc.velocity.Y = Math.Abs(npc.oldVelocity.X);
+                    npc.ai[2] = 6;
                 }
-                else if (!npc.collideY)
+                else if (!npc.collideY && npc.ai[2] == 0)
                 {
                     npc.ai[3] = npc.direction == 1 ? 0 : 2;
                     npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
                     npc.velocity.X *= -1;
+                    npc.ai[2] = 6;
                 }
             }
             else if (npc.ai[3] == 2)// left collide
@@ -2201,12 +2217,14 @@ namespace TerRoguelike.NPCs
                     npc.ai[3] = npc.direction == 1 ? 1 : 3;
                     npc.velocity.X = Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y = npc.direction == 1 ? 16 : -16;
+                    npc.ai[2] = 6;
                 }
-                else if (!npc.collideX)
+                else if (!npc.collideX && npc.ai[2] == 0)
                 {
                     npc.ai[3] = npc.direction == 1 ? 3 : 1;
                     npc.velocity.X = -Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y *= -1;
+                    npc.ai[2] = 6;
                 }
             }
 
