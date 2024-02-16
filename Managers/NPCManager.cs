@@ -73,7 +73,8 @@ namespace TerRoguelike.Managers
                 new SeedLobber(),
                 new CursedSlime(),
                 new IchorSlime(),
-                new LavaSlime()
+                new LavaSlime(),
+                new ShadowCaster()
             };
         }
         internal static void Unload()

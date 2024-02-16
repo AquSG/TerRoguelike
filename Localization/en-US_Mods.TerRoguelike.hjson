@@ -33,6 +33,7 @@ Projectiles: {
 	GreenPetal.DisplayName: Green Petal
 	CursedFlame.DisplayName: Cursed Flame
 	BouncingFire.DisplayName: Bouncing Fire
+	ShadowBlast.DisplayName: Shadow Blast
 }
 
 Items: {
@@ -712,4 +713,5 @@ NPCs: {
 	CursedSlime.DisplayName: Cursed Slime
 	IchorSlime.DisplayName: Ichor Slime
 	LavaSlime.DisplayName: Lava Slime
+	ShadowCaster.DisplayName: Shadow Caster
 }
