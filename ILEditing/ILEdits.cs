@@ -22,11 +22,14 @@ using ReLogic.Utilities;
 using Terraria.ID;
 using MonoMod.Cil;
 using Mono.Cecil.Cil;
+using Terraria.ModLoader.Core;
+using static Terraria.Collision;
 
 namespace TerRoguelike.ILEditing
 {
     public class ILEdits : ModSystem
     {
+		public int passInNPC = -1;
         public override void OnModLoad()
         {
             On_Main.DamageVar_float_int_float += AdjustDamageVariance;
@@ -38,7 +41,264 @@ namespace TerRoguelike.ILEditing
             On_WorldGen.UpdateWorld_UndergroundTile += FuckUnderGroundUpdating;
             On_Main.DrawMenu += On_Main_DrawMenu;
             On_SoundPlayer.PauseAll += On_SoundPlayer_PauseAll;
+            On_Collision.SlopeCollision += On_Collision_SlopeCollision;
+            On_NPC.UpdateCollision += On_NPC_UpdateCollision;
         }
+
+        private void On_NPC_UpdateCollision(On_NPC.orig_UpdateCollision orig, NPC self)
+        {
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld && self.type != 72 && self.type != 247 && self.type != 248 && (self.type < 542 || self.type > 545) && (!NPCID.Sets.BelongsToInvasionOldOnesArmy[self.type] || !self.noGravity))
+				passInNPC = self.whoAmI;
+
+			orig.Invoke(self);
+			return;
+        }
+
+        private Vector4 On_Collision_SlopeCollision(On_Collision.orig_SlopeCollision orig, Vector2 Position, Vector2 Velocity, int Width, int Height, float gravity, bool fall)
+        {
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+				return orig.Invoke(Position, Velocity, Width, Height, gravity, fall);
+
+			NPC npc = passInNPC == -1 ? null : Main.npc[passInNPC];
+			stair = false;
+			stairFall = false;
+			bool[] array = new bool[5];
+			float y = Position.Y;
+			float y2 = Position.Y;
+			sloping = false;
+			Vector2 savedPosition = Position;
+			Vector2 savedVelocity = Velocity;
+			int value5 = (int)(Position.X / 16f) - 1;
+			int value2 = (int)((Position.X + (float)Width) / 16f) + 2;
+			int value3 = (int)(Position.Y / 16f) - 1;
+			int value4 = (int)((Position.Y + (float)Height) / 16f) + 2;
+			int num19 = Utils.Clamp(value5, 0, Main.maxTilesX - 1);
+			value2 = Utils.Clamp(value2, 0, Main.maxTilesX - 1);
+			value3 = Utils.Clamp(value3, 0, Main.maxTilesY - 1);
+			value4 = Utils.Clamp(value4, 0, Main.maxTilesY - 1);
+			Vector2 vector4 = default(Vector2);
+			for (int i = num19; i < value2; i++)
+			{
+				for (int j = value3; j < value4; j++)
+				{
+					if (Main.tile[i, j] == null || !Main.tile[i, j].HasTile || Main.tile[i, j].IsActuated || (!Main.tileSolid[Main.tile[i, j].TileType] && (!Main.tileSolidTop[Main.tile[i, j].TileType] || Main.tile[i, j].TileFrameY != 0)))
+					{
+						continue;
+					}
+					vector4.X = i * 16;
+					vector4.Y = j * 16;
+					int num11 = 16;
+					if (Main.tile[i, j].IsHalfBlock)
+					{
+						vector4.Y += 8f;
+						num11 -= 8;
+					}
+					if (!(Position.X + (float)Width > vector4.X) || !(Position.X < vector4.X + 16f) || !(Position.Y + (float)Height > vector4.Y) || !(Position.Y < vector4.Y + (float)num11))
+					{
+						continue;
+					}
+					bool flag = true;
+					if (TileID.Sets.Platforms[Main.tile[i, j].TileType])
+					{
+						if (Velocity.Y < 0f)
+						{
+							flag = false;
+						}
+						if (Position.Y + (float)Height < (float)(j * 16) || Position.Y + (float)Height - (1f + Math.Abs(Velocity.X)) > (float)(j * 16 + 16))
+						{
+							flag = false;
+						}
+						if (((Main.tile[i, j].Slope == SlopeType.SlopeDownLeft && Velocity.X >= 0f) || (Main.tile[i, j].Slope == SlopeType.SlopeDownRight && Velocity.X <= 0f)) && (Position.Y + (float)Height) / 16f - 1f == (float)j)
+						{
+							flag = false;
+						}
+					}
+					if (!flag)
+					{
+						continue;
+					}
+					bool flag2 = false;
+					if (fall && TileID.Sets.Platforms[Main.tile[i, j].TileType])
+					{
+						flag2 = true;
+					}
+					SlopeType slopeType = Main.tile[i, j].Slope;
+					vector4.X = i * 16;
+					vector4.Y = j * 16;
+					if (!(Position.X + (float)Width > vector4.X) || !(Position.X < vector4.X + 16f) || !(Position.Y + (float)Height > vector4.Y) || !(Position.Y < vector4.Y + 16f))
+					{
+						continue;
+					}
+					float num13 = 0f;
+					if (slopeType == SlopeType.SlopeUpLeft || slopeType == SlopeType.SlopeUpRight)
+					{
+						if (slopeType == SlopeType.SlopeUpLeft)
+						{
+							num13 = Position.X - vector4.X;
+						}
+						if (slopeType == SlopeType.SlopeUpRight)
+						{
+							num13 = vector4.X + 16f - (Position.X + (float)Width);
+						}
+						if (num13 >= 0f)
+						{
+							if (Position.Y <= vector4.Y + 16f - num13)
+							{
+								float num14 = vector4.Y + 16f - Position.Y - num13;
+								if (Position.Y + num14 > y2)
+								{
+									if (npc != null)
+										npc.collideY = true;
+									savedPosition.Y = Position.Y + num14;
+									y2 = savedPosition.Y;
+									if (savedVelocity.Y < 0.0101f)
+									{
+										savedVelocity.Y = 0.0101f;
+									}
+									array[(int)slopeType] = true;
+								}
+							}
+						}
+						else if (Position.Y > vector4.Y)
+						{
+							if (npc != null)
+								npc.collideY = true;
+							float num15 = vector4.Y + 16f;
+							if (savedPosition.Y < num15)
+							{
+								savedPosition.Y = num15;
+								if (savedVelocity.Y < 0.0101f)
+								{
+									savedVelocity.Y = 0.0101f;
+								}
+							}
+						}
+					}
+					if (slopeType != SlopeType.SlopeDownLeft && slopeType != SlopeType.SlopeDownRight)
+					{
+						continue;
+					}
+					if (slopeType == SlopeType.SlopeDownLeft)
+					{
+						num13 = Position.X - vector4.X;
+					}
+					if (slopeType == SlopeType.SlopeDownRight)
+					{
+						num13 = vector4.X + 16f - (Position.X + (float)Width);
+					}
+					if (num13 >= 0f)
+					{
+						if (!(Position.Y + (float)Height >= vector4.Y + num13))
+						{
+							continue;
+						}
+						float num16 = vector4.Y - (Position.Y + (float)Height) + num13;
+						if (!(Position.Y + num16 < y))
+						{
+							continue;
+						}
+						if (flag2)
+						{
+							stairFall = true;
+							continue;
+						}
+						if (TileID.Sets.Platforms[Main.tile[i, j].TileType])
+						{
+							stair = true;
+						}
+						else
+						{
+							stair = false;
+						}
+						if (npc != null)
+							npc.collideY = true;
+						savedPosition.Y = Position.Y + num16;
+						y = savedPosition.Y;
+						if (savedVelocity.Y > 0f)
+						{
+							savedVelocity.Y = 0f;
+						}
+						array[(int)slopeType] = true;
+						continue;
+					}
+					if (TileID.Sets.Platforms[Main.tile[i, j].TileType] && !(Position.Y + (float)Height - 4f - Math.Abs(Velocity.X) <= vector4.Y))
+					{
+						if (flag2)
+						{
+							stairFall = true;
+						}
+						continue;
+					}
+					float num17 = vector4.Y - (float)Height;
+					if (!(savedPosition.Y > num17))
+					{
+						continue;
+					}
+					if (flag2)
+					{
+						stairFall = true;
+						continue;
+					}
+					if (TileID.Sets.Platforms[Main.tile[i, j].TileType])
+					{
+						stair = true;
+					}
+					else
+					{
+						stair = false;
+					}
+					if (npc != null)
+						npc.collideY = true;
+					savedPosition.Y = num17;
+					if (savedVelocity.Y > 0f)
+					{
+						savedVelocity.Y = 0f;
+					}
+				}
+			}
+			Vector2 velocity = savedPosition - Position;
+			Vector2 vector5 = TileCollision(Position, velocity, Width, Height);
+			if (vector5.Y > velocity.Y)
+			{
+				if (npc != null)
+					npc.collideY = true;
+
+				float num18 = velocity.Y - vector5.Y;
+				savedPosition.Y = Position.Y + vector5.Y;
+				if (array[1])
+				{
+					savedPosition.X = Position.X - num18;
+				}
+				if (array[2])
+				{
+					savedPosition.X = Position.X + num18;
+				}
+				savedVelocity.X = 0f;
+				savedVelocity.Y = 0f;
+				up = false;
+			}
+			else if (vector5.Y < velocity.Y)
+			{
+				if (npc != null)
+					npc.collideY = true;
+
+				float num10 = vector5.Y - velocity.Y;
+				savedPosition.Y = Position.Y + vector5.Y;
+				if (array[3])
+				{
+					savedPosition.X = Position.X - num10;
+				}
+				if (array[4])
+				{
+					savedPosition.X = Position.X + num10;
+				}
+				savedVelocity.X = 0f;
+				savedVelocity.Y = 0f;
+			}
+
+			passInNPC = -1;
+			return new Vector4(savedPosition, savedVelocity.X, savedVelocity.Y);
+		}
 
         private void On_SoundPlayer_PauseAll(On_SoundPlayer.orig_PauseAll orig, SoundPlayer self)
         {
