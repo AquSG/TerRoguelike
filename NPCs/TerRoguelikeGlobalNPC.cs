@@ -2470,6 +2470,69 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
+        public void RogueCorruptorAI(NPC npc, float speedCap, float acceleration, int attackTelegraph, int attackCooldown, int projType, float projSpeed, int projDamage)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (npc.ai[3] > 0)
+                npc.ai[3] -= npc.collideX || npc.collideY ? 10 : 1;
+            else if (npc.ai[3] < 0)
+                npc.ai[3] += npc.collideX || npc.collideY ? 10 : 1;
+            if (npc.ai[0] != 0)
+                npc.ai[0]++;
+
+            if (npc.collideX)
+            {
+                npc.velocity.X = -npc.oldVelocity.X * 0.5f;
+            }
+            if (npc.collideY)
+            {
+                npc.velocity.Y = -npc.oldVelocity.Y * 0.5f;
+            }
+
+            if (target != null)
+            {
+                Vector2 velocityDirection = (target.Center - npc.Center);
+                float angle = velocityDirection.ToRotation();
+                bool LoS = Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1);
+                if (!LoS)
+                {
+                    if (npc.ai[3] == 0)
+                    {
+                        npc.ai[3] = 300 * (Main.rand.NextBool() ? -1 : 1);
+                    }
+                    int direction = npc.ai[3] > 0 ? 1 : -1;
+                    angle += MathHelper.Pi * Main.rand.NextFloat(0.3f, 0.45f) * direction;
+                }
+                else
+                {
+                    npc.ai[3] = 0;
+                }
+                npc.velocity += (Vector2.UnitX * acceleration).RotatedBy(angle);
+
+                if (npc.ai[0] == 0 && LoS)
+                {
+                    npc.ai[0]++;
+                }
+                if (npc.ai[0] >= attackTelegraph)
+                {
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, velocityDirection.SafeNormalize(Vector2.UnitX) * projSpeed, projType, projDamage, 0);
+                    SetUpNPCProj(npc, proj);
+                    npc.ai[0] = -attackCooldown;
+                }
+            }
+            else
+            {
+                if (npc.ai[0] > 0)
+                    npc.ai[0] = 0;
+
+                npc.velocity += (Vector2.UnitX * acceleration).RotatedBy(npc.velocity.ToRotation());
+            }
+            if (npc.velocity.Length() > speedCap)
+            {
+                npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * speedCap;
+            }
+        }
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
             for (int i = 0; i < segments.Count; i++)
