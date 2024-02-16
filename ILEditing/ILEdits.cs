@@ -148,7 +148,10 @@ namespace TerRoguelike.ILEditing
 								if (Position.Y + num14 > y2)
 								{
 									if (npc != null)
-										npc.collideY = true;
+									{
+										if (npc.velocity.Y < 0)
+											npc.collideY = true;
+									}
 									savedPosition.Y = Position.Y + num14;
 									y2 = savedPosition.Y;
 									if (savedVelocity.Y < 0.0101f)
@@ -162,7 +165,10 @@ namespace TerRoguelike.ILEditing
 						else if (Position.Y > vector4.Y)
 						{
 							if (npc != null)
-								npc.collideY = true;
+							{
+								if (npc.velocity.Y < 0)
+									npc.collideY = true;
+							}
 							float num15 = vector4.Y + 16f;
 							if (savedPosition.Y < num15)
 							{
@@ -211,7 +217,11 @@ namespace TerRoguelike.ILEditing
 							stair = false;
 						}
 						if (npc != null)
-							npc.collideY = true;
+                        {
+							if (npc.velocity.Y > 0)
+								npc.collideY = true;
+						}
+							
 						savedPosition.Y = Position.Y + num16;
 						y = savedPosition.Y;
 						if (savedVelocity.Y > 0f)
