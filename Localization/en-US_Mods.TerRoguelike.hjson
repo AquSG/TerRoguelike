@@ -35,6 +35,7 @@ Projectiles: {
 	BouncingFire.DisplayName: Bouncing Fire
 	ShadowBlast.DisplayName: Shadow Blast
 	VileSpit.DisplayName: Vile Spit
+	BloodClot.DisplayName: Blood Clot
 }
 
 Items: {
@@ -716,4 +717,5 @@ NPCs: {
 	LavaSlime.DisplayName: Lava Slime
 	ShadowCaster.DisplayName: Shadow Caster
 	Corruptor.DisplayName: Corruptor
+	Crimator.DisplayName: Crimator
 }

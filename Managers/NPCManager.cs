@@ -75,7 +75,8 @@ namespace TerRoguelike.Managers
                 new IchorSlime(),
                 new LavaSlime(),
                 new ShadowCaster(),
-                new Corruptor()
+                new Corruptor(),
+                new Crimator()
             };
         }
         internal static void Unload()
