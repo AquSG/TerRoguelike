@@ -2560,6 +2560,7 @@ namespace TerRoguelike.NPCs
                 npc.ai[0] = 0;
 
             Vector2 directionVector = targetPos - npc.Center;
+            npc.velocity *= 0.9925f;
             npc.velocity += (npc.Center - anchorPos).Length() > maxDist ? (anchorPos - npc.Center).SafeNormalize(-Vector2.UnitY) * acceleration : (directionVector).SafeNormalize(-Vector2.UnitY) * acceleration;
             if (npc.velocity.Length() > speedCap)
                 npc.velocity = npc.velocity.SafeNormalize(-Vector2.UnitY) * speedCap;

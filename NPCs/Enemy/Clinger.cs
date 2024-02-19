@@ -83,7 +83,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueClingerAI(NPC, 4f, 0.09f, AnchorPos, 240f, 30, 90, ModContent.ProjectileType<CursedFlame>(), 8f, NPC.damage);
+            int attackTelegraph = 30;
+            modNPC.RogueClingerAI(NPC, 4f, 0.09f, AnchorPos, 240f, attackTelegraph, 90, ModContent.ProjectileType<CursedFlame>(), 8f, NPC.damage);
 
             NPC.frameCounter += 0.1d;
             float direction = (NPC.Center - AnchorPos).ToRotation();
@@ -92,6 +93,15 @@ namespace TerRoguelike.NPCs.Enemy
             else if (modNPC.targetNPC != -1)
                 direction = (Main.npc[modNPC.targetNPC].Center - NPC.Center).ToRotation();
             NPC.rotation = direction;
+
+            if (NPC.ai[0] < attackTelegraph && NPC.ai[0] > 0)
+            {
+                Vector2 offset = (Main.rand.Next(16, 21) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
+                Dust d = Dust.NewDustPerfect(NPC.Center + offset + NPC.velocity + (Vector2.UnitX * 12).RotatedBy(NPC.rotation), DustID.CursedTorch, -offset.SafeNormalize(Vector2.UnitX) + NPC.velocity, NPC.alpha, default(Color), 1.5f);
+                d.noGravity = true;
+                d.noLight = true;
+                d.noLightEmittence = true;
+            }
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
