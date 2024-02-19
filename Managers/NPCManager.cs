@@ -76,7 +76,9 @@ namespace TerRoguelike.Managers
                 new LavaSlime(),
                 new ShadowCaster(),
                 new Corruptor(),
-                new Crimator()
+                new Crimator(),
+                new Clinger(),
+                new BloodthirstyAxe()
             };
         }
         internal static void Unload()

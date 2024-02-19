@@ -2565,6 +2565,55 @@ namespace TerRoguelike.NPCs
             if (npc.velocity.Length() > speedCap)
                 npc.velocity = npc.velocity.SafeNormalize(-Vector2.UnitY) * speedCap;
         }
+        public void RogueEvilToolAI(NPC npc, float dashSpeed, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (npc.ai[0] != attackTelegraph)
+                npc.ai[0]++;
+
+            if (npc.direction == 0)
+            {
+                npc.direction = Main.rand.NextBool() ? -1 : 1;
+                npc.spriteDirection = npc.direction;
+            }
+            if (target != null)
+            {
+                if (npc.ai[0] == attackTelegraph)
+                {
+                    npc.ai[0]++;
+                    npc.velocity = (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * dashSpeed;
+
+                    if (npc.Center.X > target.Center.X)
+                    {
+                        npc.direction = -1;
+                        npc.spriteDirection = -1;
+                    }
+                    else
+                    {
+                        npc.direction = 1;
+                        npc.spriteDirection = 1;
+                    }
+                }
+            }
+
+            if (npc.ai[0] <= attackTelegraph)
+            {
+                npc.velocity *= 0.95f;
+            }
+            else if (npc.ai[0] <= attackTelegraph + attackDuration)
+            {
+                if (((int)npc.ai[0] - attackTelegraph) % attackTimeBetween == 0)
+                {
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, target == null ? Vector2.UnitY * projSpeed : (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * projSpeed, projType, projDamage, 0);
+                    SetUpNPCProj(npc, proj);
+                }
+            }
+            else
+            {
+                npc.ai[0] = -attackCooldown;
+            }
+        }
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
             for (int i = 0; i < segments.Count; i++)

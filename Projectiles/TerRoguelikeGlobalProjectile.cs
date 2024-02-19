@@ -190,6 +190,14 @@ namespace TerRoguelike.Projectiles
 
             projectile.velocity = setVelocity;
         }
+        public void InheritNPCProjValues(Projectile proj, Projectile parentProj)
+        {
+            TerRoguelikeGlobalProjectile parentModProj = parentProj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            npcOwner = parentModProj.npcOwner;
+            npcOwnerType = parentModProj.npcOwnerType;
+            proj.hostile = parentProj.hostile;
+            proj.friendly = parentProj.friendly;
+        }
     }
     public class ProcChainBools
     {
