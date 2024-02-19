@@ -36,6 +36,7 @@ Projectiles: {
 	ShadowBlast.DisplayName: Shadow Blast
 	VileSpit.DisplayName: Vile Spit
 	BloodClot.DisplayName: Blood Clot
+	BloodOrb.DisplayName: Blood Orb
 }
 
 Items: {
@@ -719,4 +720,5 @@ NPCs: {
 	Corruptor.DisplayName: Corruptor
 	Crimator.DisplayName: Crimator
 	Clinger.DisplayName: Clinger
+	BloodthirstyAxe.DisplayName: Bloodthirsty Axe
 }
