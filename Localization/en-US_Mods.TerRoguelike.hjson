@@ -718,4 +718,5 @@ NPCs: {
 	ShadowCaster.DisplayName: Shadow Caster
 	Corruptor.DisplayName: Corruptor
 	Crimator.DisplayName: Crimator
+	Clinger.DisplayName: Clinger
 }

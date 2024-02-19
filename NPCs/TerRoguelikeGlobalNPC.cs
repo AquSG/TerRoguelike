@@ -2533,6 +2533,37 @@ namespace TerRoguelike.NPCs
                 npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * speedCap;
             }
         }
+        public void RogueClingerAI(NPC npc, float speedCap, float acceleration, Vector2 anchorPos, float maxDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, int projDamage)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            if (npc.ai[0] != 0)
+                npc.ai[0]++;
+
+            Vector2 targetPos = target == null ? (npc.Center - anchorPos).SafeNormalize(-Vector2.UnitY) * maxDist + anchorPos : ((target.Center - anchorPos).Length() > maxDist ? (target.Center - anchorPos).SafeNormalize(-Vector2.UnitY) * maxDist + anchorPos : target.Center);
+
+            if (target != null)
+            {
+                if (npc.ai[0] == 0 && Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1))
+                {
+                    npc.ai[0]++;
+                }
+                
+                if (npc.ai[0] >= attackTelegraph)
+                {
+                    int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) * projSpeed, projType, projDamage, 0f);
+                    SetUpNPCProj(npc, proj);
+                    npc.ai[0] = -attackCooldown;
+                }
+            }
+            else if (npc.ai[0] > 0)
+                npc.ai[0] = 0;
+
+            Vector2 directionVector = targetPos - npc.Center;
+            npc.velocity += (npc.Center - anchorPos).Length() > maxDist ? (anchorPos - npc.Center).SafeNormalize(-Vector2.UnitY) * acceleration : (directionVector).SafeNormalize(-Vector2.UnitY) * acceleration;
+            if (npc.velocity.Length() > speedCap)
+                npc.velocity = npc.velocity.SafeNormalize(-Vector2.UnitY) * speedCap;
+        }
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
         {
             for (int i = 0; i < segments.Count; i++)
