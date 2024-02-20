@@ -403,6 +403,7 @@ namespace TerRoguelike.Systems
             RoomID[id].anyAlive = true;
             RoomID[id].roomClearGraceTime = -1;
             RoomID[id].wallActive = false;
+            RoomID[id].haltSpawns = false;
         }
         public override void PostDrawTiles()
         {
