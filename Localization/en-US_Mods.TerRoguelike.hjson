@@ -37,6 +37,7 @@ Projectiles: {
 	VileSpit.DisplayName: Vile Spit
 	BloodClot.DisplayName: Blood Clot
 	BloodOrb.DisplayName: Blood Orb
+	Iceflake.DisplayName: Iceflake
 }
 
 Items: {
@@ -721,4 +722,5 @@ NPCs: {
 	Crimator.DisplayName: Crimator
 	Clinger.DisplayName: Clinger
 	BloodthirstyAxe.DisplayName: Bloodthirsty Axe
+	IceSpirit.DisplayName: Ice Spirit
 }

@@ -14,6 +14,7 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using static TerRoguelike.Schematics.SchematicManager;
+using TerRoguelike.Projectiles;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -44,7 +45,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             int attackCooldown = 30;
             NPC.frameCounter += 0.2d;
-            modNPC.RogueGiantBatAI(NPC, 128f, 0.3f, 4.8f, 30, attackCooldown, 32f, ProjectileID.NorthPoleSnowflake, new Vector2(0, 10f), NPC.damage);
+            modNPC.RogueGiantBatAI(NPC, 128f, 0.3f, 4.8f, 30, attackCooldown, 32f, ModContent.ProjectileType<Iceflake>(), new Vector2(0, 2.5f), NPC.damage);
             NPC.rotation = (NPC.velocity.X / 18f) * MathHelper.PiOver2;
             if (NPC.ai[0] == -attackCooldown)
             {

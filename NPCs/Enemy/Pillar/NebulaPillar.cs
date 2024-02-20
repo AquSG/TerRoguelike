@@ -76,5 +76,12 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             }
             return null;
         }
+        public override void OnKill()
+        {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld && modNPC.isRoomNPC)
+            {
+                RoomSystem.RoomList[modNPC.sourceRoomListID].haltSpawns = true;
+            }
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace TerRoguelike.Managers
         public bool escapeInitialized = false; // whether initialize has been run yet in the escape sequence
         public bool awake = false; // whether a player has ever stepped into this room
         public bool active = true; // whether the room has been completed or not
+        public bool haltSpawns = false; // if true, prevents any more enemies from spawning in that room
         public Vector2 RoomDimensions; // dimensions of the room
         public int roomTime; // time the room has been active
         public int closedTime; // time the room has been completed
@@ -97,24 +98,30 @@ namespace TerRoguelike.Managers
 
             roomTime++; //time room is active
 
-            for (int i = 0; i < RoomSpawnCap; i++)
+            if (!haltSpawns)
             {
-                if (TimeUntilSpawn[i] - roomTime == 0) //spawn pending enemy that has reached it's time
+                for (int i = 0; i < RoomSpawnCap; i++)
                 {
-                    SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
-                    lastTelegraphDuration = TelegraphDuration[i];
-                    NotSpawned[i] = false;
-                } 
+                    if (TimeUntilSpawn[i] - roomTime == 0) //spawn pending enemy that has reached it's time
+                    {
+                        SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
+                        lastTelegraphDuration = TelegraphDuration[i];
+                        NotSpawned[i] = false;
+                    }
+                }
             }
-
+            
             // if there is still an enemy yet to be spawned, do not continue with room clear logic
             bool cancontinue = true;
-            for (int i = 0; i < RoomSpawnCap; i++)
+            if (!haltSpawns)
             {
-                if (NotSpawned[i] == true)
+                for (int i = 0; i < RoomSpawnCap; i++)
                 {
-                    cancontinue = false;
-                    break;
+                    if (NotSpawned[i] == true)
+                    {
+                        cancontinue = false;
+                        break;
+                    }
                 }
             }
 
