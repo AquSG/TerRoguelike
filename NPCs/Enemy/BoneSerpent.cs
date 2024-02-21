@@ -19,15 +19,15 @@ using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
-    public class SandWorm : BaseRoguelikeNPC
+    public class BoneSerpent : BaseRoguelikeNPC
     {
-        public override int modNPCID => ModContent.NPCType<SandWorm>();
-        public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
+        public override int modNPCID => ModContent.NPCType<BoneSerpent>();
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Hell"] };
         public override int CombatStyle => 0;
         public List<WormSegment> Segments = new List<WormSegment>();
-        public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormHead").Value;
-        public Texture2D bodyTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormBody").Value;
-        public Texture2D tailTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormTail").Value;
+        public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/BoneSerpentHead").Value;
+        public Texture2D bodyTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/BoneSerpentBody").Value;
+        public Texture2D tailTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/BoneSerpentTail").Value;
         public bool CollisionPass = false;
         public override void SetStaticDefaults()
         {
@@ -36,30 +36,31 @@ namespace TerRoguelike.NPCs.Enemy
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 34;
-            NPC.height = 34;
+            NPC.width = 38;
+            NPC.height = 38;
             NPC.aiStyle = -1;
             NPC.damage = 35;
             NPC.lifeMax = 1000;
-            NPC.HitSound = SoundID.NPCHit1;
-            NPC.DeathSound = SoundID.NPCDeath1;
+            NPC.HitSound = SoundID.NPCHit2;
+            NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
             modNPC.IgnoreRoomWallCollision = true;
+            modNPC.OverrideIgniteVisual = true;
             modNPC.drawCenter = new Vector2(0, -6);
         }
         public override void OnSpawn(IEntitySource source)
         {
             NPC.velocity = Vector2.UnitY * -1f;
             NPC.rotation = -MathHelper.PiOver2;
-            int segCount = 10;
+            int segCount = 25;
+            int segmentHeight = 20;
             for (int i = 0; i < segCount; i++)
             {
-                Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * NPC.height * i), MathHelper.PiOver2 * 3f, NPC.height));
+                Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * segmentHeight * i), MathHelper.PiOver2 * 3f, i == 0 ? NPC.height : segmentHeight));
             }
-            modNPC.OverrideIgniteVisual = true;
         }
         public override void AI()
         {
@@ -76,15 +77,15 @@ namespace TerRoguelike.NPCs.Enemy
                     WormSegment segment = Segments[i];
                     if (i == 0)
                     {
-                        Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, GoreID.DuneSplicerHead, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 67, NPC.scale);
                         continue;
                     }
                     if (i == Segments.Count - 1)
                     {
-                        Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, GoreID.DuneSplicerTail, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, 69, NPC.scale);
                         continue;
                     }
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, GoreID.DuneSplicerBody, NPC.scale);
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, 68, NPC.scale);
                 }
             }
             
@@ -136,16 +137,16 @@ namespace TerRoguelike.NPCs.Enemy
                     texture = bodyTex;
 
                 Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor(new Point((int)(segment.Position.X / 16), (int)(segment.Position.Y / 16)));
-                spriteBatch.Draw(texture, segment.Position - screenPos, null, color, segment.Rotation + MathHelper.PiOver2, headTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                spriteBatch.Draw(texture, segment.Position - screenPos, null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             }
             return false;
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
         {
-            float radius = NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2;
             for (int i = 0; i < Segments.Count; i++)
             {
                 WormSegment segment = Segments[i];
+                float radius = i == 0 ? (NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2) : segment.Height / 2;
                 if (segment.Position.Distance(target.getRect().ClosestPointInRect(segment.Position)) <= radius)
                 {
                     CollisionPass = true;
@@ -169,7 +170,8 @@ namespace TerRoguelike.NPCs.Enemy
             for (int i = 0; i < Segments.Count; i++)
             {
                 WormSegment segment = Segments[i];
-                if (projectile.Colliding(projectile.getRect(), new Rectangle((int)(segment.Position.X - (NPC.width / 2)), (int)(segment.Position.Y - (NPC.height / 2)), NPC.width, NPC.height)))
+                bool pass = projectile.Colliding(projectile.getRect(), new Rectangle((int)(segment.Position.X - ((i == 0 ? NPC.width : segment.Height) / 2)), (int)(segment.Position.Y - ((i == 0 ? NPC.height : segment.Height) / 2)), NPC.width, NPC.height));
+                if (pass)
                 {
                     projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().ultimateCollideOverride = true;
                     return null;
