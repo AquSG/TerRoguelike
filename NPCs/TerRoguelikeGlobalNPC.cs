@@ -277,7 +277,7 @@ namespace TerRoguelike.NPCs
             else if (npc.ai[0] > 60 && npc.ai[1] <= 0)
             {
                 npc.ai[0] = -240;
-                
+
                 if (!LoSBoredomCheck)
                 {
                     npc.direction *= -1;
@@ -1576,7 +1576,7 @@ namespace TerRoguelike.NPCs
                 {
                     npc.velocity.X *= 0.9f;
                     float targetAngle = target != null ? (target.Center - npc.Center).ToRotation() : (npc.ai[2] * -MathHelper.PiOver2) + MathHelper.PiOver2;
-                    if (Math.Abs(RadianSizeBetween((ball.Center - npc.Center).ToRotation(), targetAngle - (MathHelper.PiOver2 * npc.ai[2]))) <  MathHelper.Pi * 0.0625f)
+                    if (Math.Abs(RadianSizeBetween((ball.Center - npc.Center).ToRotation(), targetAngle - (MathHelper.PiOver2 * npc.ai[2]))) < MathHelper.Pi * 0.0625f)
                     {
                         npc.ai[3] = Projectile.NewProjectile(npc.GetSource_FromThis(), ball.Center, (Vector2.UnitX * launchVelocity).RotatedBy(targetAngle + (MathHelper.PiOver4 * npc.ai[2] * 0.4f)), ModContent.ProjectileType<SpikedBall>(), damage, 0f, -1, ball.Rotation);
                         SetUpNPCProj(npc, (int)npc.ai[3]);
@@ -1665,63 +1665,63 @@ namespace TerRoguelike.NPCs
 
 
 
-                                    bool pass = false;
-                                    int npcBlockHeight = (int)(npc.height / 16f) + npc.height % 16 == 0 ? 0 : 1;
-                                    Point targetBlock = new Point((int)(teleportPos.X / 16f), (int)(teleportPos.Y / 16f));
+                                bool pass = false;
+                                int npcBlockHeight = (int)(npc.height / 16f) + npc.height % 16 == 0 ? 0 : 1;
+                                Point targetBlock = new Point((int)(teleportPos.X / 16f), (int)(teleportPos.Y / 16f));
 
 
-                                    if (Main.tile[targetBlock].IsTileSolidGround())
+                                if (Main.tile[targetBlock].IsTileSolidGround())
+                                {
+                                    for (int y = 0; y < 25; y++)
                                     {
-                                        for (int y = 0; y < 25; y++)
+                                        if (!Main.tile[targetBlock - new Point(0, y)].IsTileSolidGround())
                                         {
-                                            if (!Main.tile[targetBlock - new Point(0, y)].IsTileSolidGround())
+                                            if (!Main.tile[targetBlock - new Point(0, y + npcBlockHeight)].IsTileSolidGround())
                                             {
-                                                if (!Main.tile[targetBlock - new Point(0, y + npcBlockHeight)].IsTileSolidGround())
-                                                {
-                                                    targetBlock -= new Point(0, y - 1);
-                                                    pass = true;
-                                                    break;
-                                                }
+                                                targetBlock -= new Point(0, y - 1);
+                                                pass = true;
+                                                break;
                                             }
                                         }
                                     }
-                                    else
+                                }
+                                else
+                                {
+                                    for (int y = 0; y < 25; y++)
                                     {
-                                        for (int y = 0; y < 25; y++)
+                                        if (Main.tile[targetBlock + new Point(0, y)].IsTileSolidGround())
                                         {
-                                            if (Main.tile[targetBlock + new Point(0, y)].IsTileSolidGround())
+                                            if (!Main.tile[targetBlock + new Point(0, y - npcBlockHeight)].IsTileSolidGround())
                                             {
-                                                if (!Main.tile[targetBlock + new Point(0, y - npcBlockHeight)].IsTileSolidGround())
-                                                {
-                                                    targetBlock += new Point(0, y + npcBlockHeight - 1);
-                                                    pass = true;
-                                                    break;
-                                                }
+                                                targetBlock += new Point(0, y + npcBlockHeight - 1);
+                                                pass = true;
+                                                break;
                                             }
                                         }
                                     }
+                                }
 
-                                    if (isRoomNPC && sourceRoomListID >= 0)
+                                if (isRoomNPC && sourceRoomListID >= 0)
+                                {
+                                    Room room = RoomList[sourceRoomListID];
+                                    Rectangle potentialTeleportRect = new Rectangle((int)((targetBlock.X * 16f) + 8) - (npc.width / 2), (int)(targetBlock.Y * 16f) - npc.height, npc.width, npc.height);
+                                    if (potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
                                     {
-                                        Room room = RoomList[sourceRoomListID];
-                                        Rectangle potentialTeleportRect = new Rectangle((int)((targetBlock.X * 16f) + 8) - (npc.width / 2), (int)(targetBlock.Y * 16f) - npc.height, npc.width, npc.height);
-                                        if (potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
-                                        {
-                                            continue;
-                                        }
+                                        continue;
                                     }
+                                }
 
-                                    if (pass)
-                                    {
-                                        Vector2 potentialTeleportPos = new Vector2(targetBlock.X * 16f + 8, targetBlock.Y * 16f);
-                                        if ((potentialTeleportPos - target.Center).Length() < minTeleportDist)
-                                            continue;
+                                if (pass)
+                                {
+                                    Vector2 potentialTeleportPos = new Vector2(targetBlock.X * 16f + 8, targetBlock.Y * 16f);
+                                    if ((potentialTeleportPos - target.Center).Length() < minTeleportDist)
+                                        continue;
 
-                                        teleportPos = potentialTeleportPos;
-                                        break;
-                                    }
-                                    else if (i == 11)
-                                        teleportPos = npc.Bottom;
+                                    teleportPos = potentialTeleportPos;
+                                    break;
+                                }
+                                else if (i == 11)
+                                    teleportPos = npc.Bottom;
                             }
                         }
                         npc.Bottom = teleportPos;
@@ -1936,7 +1936,7 @@ namespace TerRoguelike.NPCs
                     npc.ai[1] = 1;
                 }
             }
-            
+
             if (npc.ai[1] == 2)
             {
                 if (target != null)
@@ -2022,40 +2022,40 @@ namespace TerRoguelike.NPCs
             if (npc.ai[2] < 0)
                 npc.ai[2]++;
 
-                if (npc.ai[0] <= 0)
+            if (npc.ai[0] <= 0)
+            {
+                if (npc.direction == 0)
                 {
-                    if (npc.direction == 0)
-                    {
-                        npc.direction = Main.rand.NextBool() ? -1 : 1;
-                    }
-
-                    if (Math.Abs(npc.velocity.X) < speedCap)
-                        npc.velocity.X += acceleration * npc.direction;
-                    if (Math.Abs(npc.velocity.X) > speedCap)
-                        npc.velocity.X = speedCap * npc.direction;
-
-                    Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
-
-                    if (npc.collideX && npc.ai[2] >= 0)
-                    {
-                        npc.ai[0]++;
-                    }
-                    else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && npc.ai[2] >= 0)
-                    {
-                        npc.ai[0]++;
-                    }
+                    npc.direction = Main.rand.NextBool() ? -1 : 1;
                 }
-                else
+
+                if (Math.Abs(npc.velocity.X) < speedCap)
+                    npc.velocity.X += acceleration * npc.direction;
+                if (Math.Abs(npc.velocity.X) > speedCap)
+                    npc.velocity.X = speedCap * npc.direction;
+
+                Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
+
+                if (npc.collideX && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
-                    npc.velocity.X *= 0.8f;
-                    if (npc.ai[0] >= waitTime)
-                    {
-                        npc.ai[2] = -60;
-                        npc.ai[0] = 0;
-                        npc.direction *= -1;
-                    }
                 }
+                else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && npc.ai[2] >= 0)
+                {
+                    npc.ai[0]++;
+                }
+            }
+            else
+            {
+                npc.ai[0]++;
+                npc.velocity.X *= 0.8f;
+                if (npc.ai[0] >= waitTime)
+                {
+                    npc.ai[2] = -60;
+                    npc.ai[0] = 0;
+                    npc.direction *= -1;
+                }
+            }
         }
         public void RogueCrawlerShooterAI(NPC npc, float speedCap, float acceleration, int waitTime, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
         {
@@ -2351,7 +2351,7 @@ namespace TerRoguelike.NPCs
                     npc.direction = Main.rand.NextBool() ? -1 : 1;
                     npc.spriteDirection = npc.direction;
                 }
-                
+
             }
             if (npc.ai[0] < 0)
                 npc.ai[0]++;
@@ -2388,7 +2388,7 @@ namespace TerRoguelike.NPCs
                 if (npc.velocity.Y == 0f && target.Bottom.Y < npc.Top.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
                 {
 
-                    if (npc.velocity.Y == 0f && (canJumpShoot || ((npc.ai[1] <= 0 ) && (npc.ai[2] <= 0))))
+                    if (npc.velocity.Y == 0f && (canJumpShoot || ((npc.ai[1] <= 0) && (npc.ai[2] <= 0))))
                     {
                         int padding = 6;
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
@@ -2548,7 +2548,7 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[0]++;
                 }
-                
+
                 if (npc.ai[0] >= attackTelegraph)
                 {
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) * projSpeed, projType, projDamage, 0f);
@@ -2612,6 +2612,119 @@ namespace TerRoguelike.NPCs
             else
             {
                 npc.ai[0] = -attackCooldown;
+            }
+        }
+        public void RogueFlierAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired)
+        {
+            Entity target = GetTarget(npc, false, false);
+
+            npc.ai[3]++;
+            npc.stairFall = true;
+            if (npc.collideY)
+            {
+                int fluff = 6;
+                int bottomtilepointx = (int)(npc.Center.X / 16f);
+                int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
+                int floor = bottomtilepointY - fluff;
+                for (int i = bottomtilepointY; i > floor - 1; i--)
+                {
+                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    {
+                        npc.position.Y += 1;
+                        npc.velocity.Y += 0.01f;
+                        break;
+                    }
+                    if (i == floor)
+                    {
+                        npc.velocity.Y = -npc.oldVelocity.Y * 0.15f;
+                    }
+                }
+            }
+            if (npc.collideX)
+            {
+                npc.velocity.X = -npc.oldVelocity.X * 0.15f;
+            }
+
+            if (npc.direction == 0)
+            {
+                if (target == null)
+                {
+                    npc.direction = 1;
+                    npc.spriteDirection = 1;
+                }
+
+                else
+                {
+                    if (npc.Center.X >= target.Center.X)
+                    {
+                        npc.direction = -1;
+                        npc.spriteDirection = -1;
+                    }
+                    else
+                    {
+                        npc.direction = 1;
+                        npc.spriteDirection = 1;
+                    }
+                }
+            }
+
+
+            bool LoSCheck = false;
+
+            if (target != null)
+            {
+                if (!LoSRequired || Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1))
+                    LoSCheck = true;
+            }
+
+            if (LoSCheck)
+            {
+                Vector2 desiredPos = target.Center;
+                npc.velocity += (desiredPos - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
+
+                if (npc.Center.X >= target.Center.X)
+                {
+                    npc.direction = -1;
+                    npc.spriteDirection = -1;
+                }
+                else
+                {
+                    npc.direction = 1;
+                    npc.spriteDirection = 1;
+                }
+            }
+            else
+            {
+
+                if (Math.Abs(npc.velocity.X) < xCap)
+                {
+                    npc.velocity.X += acceleration * npc.direction;
+                }
+                if (Math.Abs(npc.velocity.X) > xCap)
+                {
+                    npc.velocity.X *= 0.98f;
+                }
+                if (Math.Abs(npc.velocity.Y) < yCap)
+                {
+                    npc.velocity.Y += (target == null ? 1f : 0.75f) * acceleration * (float)Math.Cos((npc.ai[3] / 60f) * MathHelper.Pi) + (target == null ? 0 : (target.Center.Y >= npc.Center.Y ? 1 : -1) * acceleration * 0.25f);
+                }
+                if (Math.Abs(npc.velocity.Y) > yCap)
+                {
+                    npc.velocity.Y *= 0.98f;
+                }
+
+                if (npc.collideX)
+                    npc.ai[0]++;
+                else
+                    npc.ai[0] = 0;
+
+                if (npc.ai[0] >= 90)
+                {
+                    npc.ai[0] = 0;
+                    npc.direction *= -1;
+                    npc.spriteDirection *= -1;
+                }
+
             }
         }
         public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
@@ -2769,11 +2882,14 @@ namespace TerRoguelike.NPCs
                 }
                 else if (friendlyFireHitCooldown > 0)
                     friendlyFireHitCooldown--;
-                
+
             }
         }
         public void IgniteHit(int hitDamage, NPC npc, int owner)
         {
+            if (npc.immortal || npc.dontTakeDamage)
+                return;
+
             TerRoguelikePlayer modPlayer = Main.player[owner].GetModPlayer<TerRoguelikePlayer>();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center));
@@ -2797,6 +2913,9 @@ namespace TerRoguelike.NPCs
         }
         public void BleedingHit(int hitDamage, NPC npc, int owner)
         {
+            if (npc.immortal || npc.dontTakeDamage)
+                return;
+
             TerRoguelikePlayer modPlayer = Main.player[owner].GetModPlayer<TerRoguelikePlayer>();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center));
@@ -2850,7 +2969,7 @@ namespace TerRoguelike.NPCs
                 NPCLoader.blockLoot.Add(itemID);
             }
             npc.value = 0;
-            
+
             return true;
         }
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
@@ -2919,7 +3038,7 @@ namespace TerRoguelike.NPCs
             if (bleedingStacks != null && bleedingStacks.Any())
             {
                 DrawRotatlingBloodParticles(true, npc);
-                
+
             }
         }
         /// <summary>
@@ -2938,7 +3057,7 @@ namespace TerRoguelike.NPCs
                 float rotationCompletionOffset = MathHelper.TwoPi / bleedingStacks.Count * i;
                 rotation += rotationCompletionOffset;
                 specificPosition += new Vector2(0, 16).RotatedBy(rotation);
-                specificPosition += (specificPosition - position) * new Vector2((npc.frame.Width * npc.scale) / 32f, -0.5f) ;
+                specificPosition += (specificPosition - position) * new Vector2((npc.frame.Width * npc.scale) / 32f, -0.5f);
                 if (specificPosition.Y >= position.Y && inFront)
                     Main.EntitySpriteDraw(texture, specificPosition - Main.screenPosition, null, color, 0f, texture.Size() * 0.5f, 1f, SpriteEffects.None);
                 else if (!inFront)
@@ -3022,7 +3141,7 @@ namespace TerRoguelike.NPCs
             {
                 if (!Main.npc[targetNPC].GetGlobalNPC<TerRoguelikeGlobalNPC>().CanBeChased(false, false) || !npc.friendly)
                 {
-                    
+
                     targetNPC = -1;
                 }
             }
