@@ -78,7 +78,8 @@ namespace TerRoguelike.Managers
                 new Corruptor(),
                 new Crimator(),
                 new Clinger(),
-                new BloodthirstyAxe()
+                new BloodthirstyAxe(),
+                new IceSpirit()
             };
         }
         internal static void Unload()
