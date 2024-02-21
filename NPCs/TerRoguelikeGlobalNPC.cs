@@ -2743,7 +2743,7 @@ namespace TerRoguelike.NPCs
 
                 WormSegment oldSeg = segments[i - 1];
 
-                segment.Position = oldSeg.Position - (Vector2.UnitX * oldSeg.Height).RotatedBy(oldSeg.Rotation.AngleLerp((oldSeg.Position - segment.Position).ToRotation(), 0.95f));
+                segment.Position = oldSeg.Position - (Vector2.UnitX * (i == 1 ? segment.Height : oldSeg.Height)).RotatedBy(oldSeg.Rotation.AngleLerp((oldSeg.Position - segment.Position).ToRotation(), 0.95f));
 
                 Vector2 difference = oldSeg.Position - segment.Position;
 
@@ -2763,6 +2763,8 @@ namespace TerRoguelike.NPCs
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
 
+            if (npc.type == NPCID.OldMan || npc.type == NPCID.Guide)
+                npc.active = false;
             SpawnManager.ApplyNPCDifficultyScaling(npc, this);
         }
         public override bool PreAI(NPC npc)

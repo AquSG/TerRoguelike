@@ -1049,6 +1049,7 @@ namespace TerRoguelike.TerPlayer
         #region On Kill Enemy
         public void OnKillEffects(NPC target)
         {
+            //Main.NewText("Killed " + target.FullName);
             TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
 
             if (hotPepper > 0 && !modTarget.activatedHotPepper)
@@ -1058,7 +1059,7 @@ namespace TerRoguelike.TerPlayer
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (npc == null || !npc.active)
+                    if (npc == null || !npc.active || npc.friendly)
                         continue;
 
                     if (npc.Center.Distance(target.Center) <= radius)

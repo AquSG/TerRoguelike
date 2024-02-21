@@ -79,7 +79,9 @@ namespace TerRoguelike.Managers
                 new Crimator(),
                 new Clinger(),
                 new BloodthirstyAxe(),
-                new IceSpirit()
+                new IceSpirit(),
+                new LavaBat(),
+                new BoneSerpent()
             };
         }
         internal static void Unload()

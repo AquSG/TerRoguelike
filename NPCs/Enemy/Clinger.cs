@@ -176,7 +176,7 @@ namespace TerRoguelike.NPCs.Enemy
                     Vector2 drawPos = start + (Vector2.UnitX * i).RotatedBy(direction);
                     Texture2D tex = i % segmentLength < segmentLength / 2 ? segment1Tex : segment2Tex;
 
-                    spriteBatch.Draw(tex, drawPos - Main.screenPosition, null, modNPC.ignitedStacks.Any() ? Color.Orange : Lighting.GetColor((int)(drawPos.X / 16), (int)(drawPos.Y / 16)), direction, tex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally, 0);
+                    spriteBatch.Draw(tex, drawPos - Main.screenPosition, null, modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor((int)(drawPos.X / 16), (int)(drawPos.Y / 16)), direction, tex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally, 0);
                 }
             }
             return true;
