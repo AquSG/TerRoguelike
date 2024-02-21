@@ -868,6 +868,12 @@ namespace TerRoguelike.TerPlayer
                 Player.controlUseItem = false;
                 Player.controlUseTile = false;
                 Player.controlJump = false;
+                Player.controlDownHold = false;
+                Player.controlThrow = false;
+                Player.gravControl = false;
+                Player.gravControl2 = false;
+                Player.pulley = false;
+                Player.pulleyDir = 1;
                 Player.itemTime = 1;
                 Player.itemAnimation = 1;
             }
@@ -1280,7 +1286,10 @@ namespace TerRoguelike.TerPlayer
 
                         Player.statLife = Player.statLifeMax2;
                         barrierHealth = Player.statLifeMax2;
-                        Player.immuneTime = 360;
+                        for (int i = -1; i < 5; i++)
+                        {
+                            Player.AddImmuneTime(i, 360);
+                        }
                         Player.immune = true;
                         Player.immuneNoBlink = true;
                         deathEffectTimer += 120;
@@ -1456,6 +1465,33 @@ namespace TerRoguelike.TerPlayer
         #endregion
 
         #region Draw Effects
+        public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
+        {
+            if (deathEffectTimer > 0) // FUCK ALL OF IT
+            {
+                drawInfo.hideEntirePlayer = true;
+                drawInfo.colorArmorBody = Color.Transparent;
+                drawInfo.colorArmorHead = Color.Transparent;
+                drawInfo.colorArmorLegs = Color.Transparent;
+                drawInfo.colorBodySkin = Color.Transparent;
+                drawInfo.colorDisplayDollSkin = Color.Transparent;
+                drawInfo.colorElectricity = Color.Transparent;
+                drawInfo.colorEyes = Color.Transparent;
+                drawInfo.colorEyeWhites = Color.Transparent;
+                drawInfo.colorHair = Color.Transparent;
+                drawInfo.colorHead = Color.Transparent;
+                drawInfo.colorLegs = Color.Transparent;
+                drawInfo.colorMount = Color.Transparent;
+                drawInfo.colorPants = Color.Transparent;
+                drawInfo.colorShirt = Color.Transparent;
+                drawInfo.colorShoes = Color.Transparent;
+                drawInfo.colorUnderShirt = Color.Transparent;
+                drawInfo.armGlowColor = Color.Transparent;
+                drawInfo.bodyGlowColor = Color.Transparent;
+                drawInfo.headGlowColor = Color.Transparent;
+                drawInfo.floatingTubeColor = Color.Transparent;
+            }
+        }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
             if (deathEffectTimer > 0 || Player.dead)
@@ -1464,6 +1500,7 @@ namespace TerRoguelike.TerPlayer
                 g = 0f;
                 b = 0f;
                 a = 0f;
+                fullBright = false;
                 return;
             }
 
