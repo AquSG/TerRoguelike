@@ -725,4 +725,5 @@ NPCs: {
 	IceSpirit.DisplayName: Ice Spirit
 	LavaBat.DisplayName: Lava Bat
 	BoneSerpent.DisplayName: Bone Serpent
+	FireImp.DisplayName: Fire Imp
 }
