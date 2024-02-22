@@ -52,7 +52,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.position.Y -= TextureAssets.Npc[modNPCID].Value.Size().Y * 0.5f;
+            NPC.position.Y -= -NPC.height + TextureAssets.Npc[modNPCID].Value.Size().Y * 0.5f;
             NPC.velocity = Vector2.UnitY * -1f;
             NPC.rotation = -MathHelper.PiOver2;
             int segCount = 10;

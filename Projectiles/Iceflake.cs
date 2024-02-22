@@ -58,6 +58,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnKill(int timeLeft)
         {
+            SoundEngine.PlaySound(SoundID.Item27 with { Volume = 0.6f }, Projectile.Center);
             for (int i = 0; i < 16; i++)
             {
                 int dust = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, 92, 0f, 0f, 0, default(Color), 1.5f);
