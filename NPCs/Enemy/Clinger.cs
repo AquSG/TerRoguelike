@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void OnSpawn(IEntitySource source)
         {
             Point spawnTile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
-            if (!ParanoidTileRetrieval(spawnTile.X, spawnTile.Y).IsTileSolidGround())
+            if (!ParanoidTileRetrieval(spawnTile.X, spawnTile.Y).IsTileSolidGround(true))
             {
                 for (int i = 0; i < 100; i++)
                 {
@@ -61,7 +61,7 @@ namespace TerRoguelike.NPCs.Enemy
                     if (Math.Abs(direction) == 2)
                     {
                         direction /= 2;
-                        if (!ParanoidTileRetrieval(spawnTile.X, spawnTile.Y + ((i / 4) * direction)).IsTileSolidGround())
+                        if (!ParanoidTileRetrieval(spawnTile.X, spawnTile.Y + ((i / 4) * direction)).IsTileSolidGround(true))
                             continue;
 
                         NPC.Center = new Vector2(spawnTile.X, spawnTile.Y + ((i / 4) * direction)) * 16f + new Vector2(8, 8);
@@ -69,7 +69,7 @@ namespace TerRoguelike.NPCs.Enemy
                     }
                     else
                     {
-                        if (!ParanoidTileRetrieval(spawnTile.X + ((i / 4) * direction), spawnTile.Y).IsTileSolidGround())
+                        if (!ParanoidTileRetrieval(spawnTile.X + ((i / 4) * direction), spawnTile.Y).IsTileSolidGround(true))
                             continue;
 
                         NPC.Center = new Vector2(spawnTile.X + ((i / 4) * direction), spawnTile.Y) * 16f + new Vector2(8, 8);
@@ -150,6 +150,10 @@ namespace TerRoguelike.NPCs.Enemy
                     spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                     for (int j = 0; j < tetherLength; j += segmentLength)
                     {
+                        bool end = false;
+                        if (j + segmentLength > tetherLength)
+                            end = true;
+
                         Vector2 drawPos = start + (Vector2.UnitX * j).RotatedBy(direction);
                         Texture2D tex = j % segmentLength < segmentLength / 2 ? segment1Tex : segment2Tex;
 
@@ -165,7 +169,7 @@ namespace TerRoguelike.NPCs.Enemy
                         Vector2 position = drawPos + (Vector2.UnitY * NPC.gfxOffY);
                         for (float k = 0; k < 1; k += 0.125f)
                         {
-                            spriteBatch.Draw(tex, position + (k * MathHelper.TwoPi + direction).ToRotationVector2() * outlineThickness - Main.screenPosition, null, color, direction, tex.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
+                            spriteBatch.Draw(tex, position + (k * MathHelper.TwoPi + direction).ToRotationVector2() * outlineThickness - Main.screenPosition, !end ? null : new Rectangle(tex.Width - (tetherLength % segmentLength), 0, tex.Width - (tex.Width - (tetherLength % segmentLength)), tex.Height), color, direction, tex.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
                         }
                     }
                     spriteBatch.End();
@@ -173,10 +177,13 @@ namespace TerRoguelike.NPCs.Enemy
                 }
                 for (int i = 0; i < tetherLength; i += segmentLength)
                 {
+                    bool end = false;
+                    if (i + segmentLength > tetherLength)
+                        end = true;
+
                     Vector2 drawPos = start + (Vector2.UnitX * i).RotatedBy(direction);
                     Texture2D tex = i % segmentLength < segmentLength / 2 ? segment1Tex : segment2Tex;
-
-                    spriteBatch.Draw(tex, drawPos - Main.screenPosition, null, modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor((int)(drawPos.X / 16), (int)(drawPos.Y / 16)), direction, tex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally, 0);
+                    spriteBatch.Draw(tex, drawPos - Main.screenPosition, !end ? null : new Rectangle(tex.Width - (tetherLength % segmentLength), 0, tex.Width - (tex.Width - (tetherLength % segmentLength)), tex.Height), modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor((int)(drawPos.X / 16), (int)(drawPos.Y / 16)), direction, tex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally, 0);
                 }
             }
             return true;
