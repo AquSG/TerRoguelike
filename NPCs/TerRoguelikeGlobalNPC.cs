@@ -484,7 +484,7 @@ namespace TerRoguelike.NPCs
                                 {
                                     if (!Main.tile[targetBlock - new Point(0, y)].IsTileSolidGround())
                                     {
-                                        if (!Main.tile[targetBlock - new Point(0, y - npcBlockHeight)].IsTileSolidGround())
+                                        if (!Main.tile[targetBlock - new Point(0, y + npcBlockHeight)].IsTileSolidGround())
                                         {
                                             targetBlock -= new Point(0, y - 1);
                                             pass = true;

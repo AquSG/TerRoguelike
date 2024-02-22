@@ -25,6 +25,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 180;
             Projectile.penetrate = 1;
+            Projectile.ignoreWater = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
