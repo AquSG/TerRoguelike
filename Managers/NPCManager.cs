@@ -82,7 +82,9 @@ namespace TerRoguelike.Managers
                 new IceSpirit(),
                 new LavaBat(),
                 new BoneSerpent(),
-                new FireImp()
+                new FireImp(),
+                new Demon(),
+                new EliteDemon()
             };
         }
         internal static void Unload()
