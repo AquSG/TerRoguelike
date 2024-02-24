@@ -212,5 +212,12 @@ namespace TerRoguelike.Utilities
 
             return angle % MathHelper.TwoPi;
         }
+        public static bool? CircularHitboxCollision(Vector2 circleCenter, Rectangle targetHitbox, float radius)
+        {
+            if ((circleCenter - targetHitbox.ClosestPointInRect(circleCenter)).Length() <= radius)
+                return null;
+
+            return false;
+        }
     }
 }

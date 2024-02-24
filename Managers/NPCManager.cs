@@ -84,7 +84,8 @@ namespace TerRoguelike.Managers
                 new BoneSerpent(),
                 new FireImp(),
                 new Demon(),
-                new EliteDemon()
+                new EliteDemon(),
+                new GiantMoth()
             };
         }
         internal static void Unload()
