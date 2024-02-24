@@ -38,6 +38,7 @@ Projectiles: {
 	BloodClot.DisplayName: Blood Clot
 	BloodOrb.DisplayName: Blood Orb
 	Iceflake.DisplayName: Iceflake
+	MothDust.DisplayName: Moth Dust
 }
 
 Items: {
@@ -728,4 +729,5 @@ NPCs: {
 	FireImp.DisplayName: Fire Imp
 	Demon.DisplayName: Demon
 	EliteDemon.DisplayName: Elite Demon
+	GiantMoth.DisplayName: Giant Moth
 }
