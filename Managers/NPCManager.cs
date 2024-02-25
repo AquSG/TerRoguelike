@@ -85,7 +85,8 @@ namespace TerRoguelike.Managers
                 new FireImp(),
                 new Demon(),
                 new EliteDemon(),
-                new GiantMoth()
+                new GiantMoth(),
+                new OvergrownBat()
             };
         }
         internal static void Unload()

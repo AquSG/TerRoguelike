@@ -1279,13 +1279,20 @@ namespace TerRoguelike.NPCs
                 npc.velocity.Y *= -0.25f;
             }
         }
-        public void RogueFrostbiterAI(NPC npc, float distanceBeside, int dashTime, float dashVelocity, float passiveAccel, float passiveMaxVelocity, int attackTelegraph, int waitTimeAfterAttack, float attackDistance, int projType, float projVelocity, int projDamage, int projCount)
+        public void RogueFrostbiterAI(NPC npc, float distanceBeside, int dashTime, float dashVelocity, float passiveAccel, float passiveMaxVelocity, int attackTelegraph, int waitTimeAfterAttack, float attackDistance, int projType, float projVelocity, int projDamage, int projCount, bool LoSRequired = false, bool dontRelocateForProjectiles = false)
         {
             //ai0 is for attack timers.
             //ai1 is for attack state.
-            //ai2 and ai3 store a vector.
+            //ai2 and ai3 store a vector, unless dontRelocateForProjectiles is true
 
             Entity target = GetTarget(npc, false, false);
+
+            bool LosCheck = true;
+            if (target != null)
+                LosCheck = !LoSRequired || Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1);
+
+            if (dontRelocateForProjectiles)
+                npc.ai[2] += 0.2f;
 
             if (npc.ai[0] == 0)
             {
@@ -1309,11 +1316,14 @@ namespace TerRoguelike.NPCs
                 }
                 else if (npc.direction != 0)
                 {
-                    Vector2 nextTarget = Main.rand.NextVector2CircularEdge(attackDistance, attackDistance);
-                    nextTarget.X = Math.Abs(nextTarget.X) * -npc.direction;
-                    nextTarget += target == null ? npc.Center : target.Center;
-                    npc.ai[2] = nextTarget.X;
-                    npc.ai[3] = nextTarget.Y;
+                    Vector2 nextTarget = dontRelocateForProjectiles ? npc.Center : Main.rand.NextVector2CircularEdge(attackDistance, attackDistance);
+                    if (!dontRelocateForProjectiles)
+                    {
+                        nextTarget.X = Math.Abs(nextTarget.X) * -npc.direction;
+                        nextTarget += target == null ? npc.Center : target.Center;
+                        npc.ai[2] = nextTarget.X;
+                        npc.ai[3] = nextTarget.Y;
+                    }
                     if (target != null)
                         npc.direction = 0;
                 }
@@ -1326,9 +1336,13 @@ namespace TerRoguelike.NPCs
                     npc.velocity *= 0.93f;
             }
 
-            if (target != null)
+            if (npc.collideX)
+                npc.velocity.X = -npc.oldVelocity.X * 0.4f;
+            if (npc.collideY)
+                npc.velocity.Y = -npc.oldVelocity.Y * 0.4f;
+            if (target != null && LosCheck)
             {
-                Vector2 targetPos = npc.ai[1] == 0 ? new Vector2(distanceBeside * npc.direction, 0) + target.Center : new Vector2(npc.ai[2], npc.ai[3]);
+                Vector2 targetPos = npc.ai[1] == 0 ? new Vector2(distanceBeside * npc.direction, 0) + target.Center : (dontRelocateForProjectiles ? npc.Center : new Vector2(npc.ai[2], npc.ai[3]));
 
                 float greaterDist = attackDistance > distanceBeside ? attackDistance : distanceBeside;
                 if ((npc.Center - targetPos).Length() < 64f || ((npc.collideX || npc.collideY) && (npc.Center - target.Center).Length() < greaterDist))
@@ -1339,7 +1353,17 @@ namespace TerRoguelike.NPCs
                 else if (npc.ai[0] == 0)
                 {
                     npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * ((npc.Center - targetPos).Length() < 64f ? passiveAccel : passiveAccel * 2f);
+                    if (dontRelocateForProjectiles)
+                        npc.velocity.Y += (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 6 * passiveAccel;
                 }
+                if (npc.velocity.Length() > passiveMaxVelocity && npc.ai[0] < attackTelegraph)
+                    npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitY) * passiveMaxVelocity;
+            }
+            else if (!LosCheck)
+            {
+                float x = (npc.velocity.X / Math.Abs(npc.velocity.X)) * 0.5f;
+                float y = (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 2;
+                npc.velocity += new Vector2(x, y).SafeNormalize(Vector2.UnitY) * passiveAccel;
                 if (npc.velocity.Length() > passiveMaxVelocity && npc.ai[0] < attackTelegraph)
                     npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitY) * passiveMaxVelocity;
             }
