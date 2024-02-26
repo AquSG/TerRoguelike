@@ -734,4 +734,6 @@ NPCs: {
 	GiantMoth.DisplayName: Giant Moth
 	OvergrownBat.DisplayName: Overgrown Bat
 	UndeadHunter.DisplayName: Undead Hunter
+	FlyingSnake.DisplayName: Flying Snake
+	Lihzahrd.DisplayName: Lihzahrd
 }
