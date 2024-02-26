@@ -40,6 +40,7 @@ Projectiles: {
 	Iceflake.DisplayName: Iceflake
 	MothDust.DisplayName: Moth Dust
 	SporeCloud.DisplayName: Spore Cloud
+	HunterArrow.DisplayName: Hunter Arrow
 }
 
 Items: {
@@ -732,4 +733,5 @@ NPCs: {
 	EliteDemon.DisplayName: Elite Demon
 	GiantMoth.DisplayName: Giant Moth
 	OvergrownBat.DisplayName: Overgrown Bat
+	UndeadHunter.DisplayName: Undead Hunter
 }
