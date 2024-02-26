@@ -59,13 +59,6 @@ namespace TerRoguelike.Projectiles
             Projectile.frame = Projectile.frameCounter / 4 % Main.projFrames[Projectile.type];
             Projectile.frameCounter++;
         }
-        public override void OnKill(int timeLeft)
-        {
-            for (int i = 0; i < 8; i++)
-            {
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SolarFlare, Scale: 0.75f);
-            }
-        }
         public override bool? CanDamage() => Projectile.timeLeft == 20 ? (bool?)null : false; //hitbox only active for frame 1
         public override bool PreDraw(ref Color lightColor)
         {

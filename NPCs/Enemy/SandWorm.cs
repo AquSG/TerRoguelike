@@ -47,8 +47,10 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
-            modNPC.IgnoreRoomWallCollision = true;
             modNPC.drawCenter = new Vector2(0, -6);
+            modNPC.OverrideIgniteVisual = true;
+            modNPC.IgnoreRoomWallCollision = true;
+            modNPC.SpecialProjectileCollisionRules = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -60,7 +62,6 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * NPC.height * i), MathHelper.PiOver2 * 3f, NPC.height));
             }
-            modNPC.OverrideIgniteVisual = true;
         }
         public override void AI()
         {

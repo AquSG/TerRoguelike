@@ -89,7 +89,7 @@ namespace TerRoguelike.Managers
                 new OvergrownBat(),
                 new UndeadHunter(),
                 new FlyingSnake(),
-                new Lihzahrd(),
+                new Lihzahrd()
             };
         }
         internal static void Unload()

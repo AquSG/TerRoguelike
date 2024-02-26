@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             int attackTelegraph = 30;
             int dashTime = 40;
             NPC.frameCounter += 0.2d;
-            modNPC.RogueFrostbiterAI(NPC, 240, dashTime, 8f, 0.2f, 7f, attackTelegraph, attackCooldown, 180f, ModContent.ProjectileType<SporeCloud>(), 5f, NPC.damage, 11, true, true);
+            modNPC.RogueFrostbiterAI(NPC, 240, dashTime, 8f, 0.15f, 7f, attackTelegraph, attackCooldown, 180f, ModContent.ProjectileType<SporeCloud>(), 5f, NPC.damage, 11, true, true);
 
             NPC.rotation = NPC.rotation.AngleTowards((NPC.velocity.X / 18f) * MathHelper.PiOver2, 0.1f);
 
