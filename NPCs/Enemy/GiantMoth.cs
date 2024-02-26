@@ -38,7 +38,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.lifeMax = 1200;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
-            NPC.knockBackResist = 0.4f;
+            NPC.knockBackResist = 0.3f;
             modNPC.drawCenter = new Vector2(0, -9);
             NPC.noGravity = true;
         }
@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             int attackTelegraph = 30;
             int attackCooldown = 120;
             NPC.frameCounter += NPC.ai[2] > 0 ? 0.35d : 0.2d;
-            NPC.rotation = MathHelper.PiOver2 * NPC.velocity.Length() * 0.02f * NPC.direction;
+            NPC.rotation = MathHelper.PiOver2 * NPC.velocity.Length() * 0.03f * NPC.direction;
             modNPC.RogueFlyingShooterAI(NPC, 3.1f, 2f, 0.07f, 96f, 240f, attackTelegraph, attackCooldown, ModContent.ProjectileType<MothDust>(), 2f, Vector2.Zero, NPC.damage, true);
             if (NPC.ai[2] == -attackCooldown)
             {

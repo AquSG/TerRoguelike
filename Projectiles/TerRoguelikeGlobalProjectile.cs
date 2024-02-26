@@ -14,6 +14,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
+using TerRoguelike.NPCs;
 
 namespace TerRoguelike.Projectiles
 {
@@ -87,6 +88,9 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnKill(Projectile projectile, int timeLeft)
         {
+            if (projectile.hostile || !projectile.friendly)
+                return;
+
             TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
             if (modPlayer.volatileRocket > 0 && projectile.penetrate > 1 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
@@ -98,7 +102,7 @@ namespace TerRoguelike.Projectiles
             Vector2 position = projectile.Center;
             if (target != null)
             {
-                position = target.getRect().ClosestPointInRect(projectile.Center);
+                position = target.GetGlobalNPC<TerRoguelikeGlobalNPC>().SpecialProjectileCollisionRules ? projectile.Center + (Vector2.UnitX * (projectile.width > projectile.height ? projectile.height * 0.5f : projectile.height * 0.5f)).RotatedBy(projectile.rotation) : target.getRect().ClosestPointInRect(projectile.Center);
             }
             int spawnedProjectile = Projectile.NewProjectile(projectile.GetSource_FromThis(), position, Vector2.Zero, ModContent.ProjectileType<Explosion>(), (int)(projectile.damage * 0.6f), 0f, projectile.owner);
             Main.projectile[spawnedProjectile].scale = 1f * modPlayer.volatileRocket;

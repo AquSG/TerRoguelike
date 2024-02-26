@@ -47,10 +47,11 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
-            modNPC.IgnoreRoomWallCollision = true;
-            modNPC.OverrideIgniteVisual = true;
             NPC.lavaImmune = true;
             modNPC.drawCenter = new Vector2(0, -6);
+            modNPC.IgnoreRoomWallCollision = true;
+            modNPC.OverrideIgniteVisual = true;
+            modNPC.SpecialProjectileCollisionRules = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

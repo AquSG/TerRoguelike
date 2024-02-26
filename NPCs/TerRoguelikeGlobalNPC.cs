@@ -33,6 +33,7 @@ namespace TerRoguelike.NPCs
         public int sourceRoomListID = -1;
         public bool hostileTurnedAlly = false;
         public bool IgnoreRoomWallCollision = false;
+        public bool SpecialProjectileCollisionRules = false; // Makes certain things happen on the attacking projectile rather than the closest point in the NPC rect to the projectile
         public int baseMaxHP = 0;
         public int baseDamage = 0;
 
@@ -833,6 +834,15 @@ namespace TerRoguelike.NPCs
                         npc.direction = 1;
                         npc.spriteDirection = 1;
                     }
+
+                    if (Math.Abs(npc.velocity.X) > xCap)
+                    {
+                        npc.velocity.X *= 0.98f;
+                    }
+                    if (Math.Abs(npc.velocity.Y) > yCap)
+                    {
+                        npc.velocity.Y *= 0.98f;
+                    }
                 }
                 else
                 {
@@ -1361,7 +1371,7 @@ namespace TerRoguelike.NPCs
             }
             else if (!LosCheck)
             {
-                float x = (npc.velocity.X / Math.Abs(npc.velocity.X)) * 0.5f;
+                float x = npc.velocity.X == 0 ? -0.5f : (npc.velocity.X / Math.Abs(npc.velocity.X)) * 0.5f;
                 float y = (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 2;
                 npc.velocity += new Vector2(x, y).SafeNormalize(Vector2.UnitY) * passiveAccel;
                 if (npc.velocity.Length() > passiveMaxVelocity && npc.ai[0] < attackTelegraph)
@@ -2646,14 +2656,16 @@ namespace TerRoguelike.NPCs
             npc.stairFall = true;
             if (npc.collideY)
             {
-                int fluff = 6;
+                int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
                 int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
                 int floor = bottomtilepointY - fluff;
                 for (int i = bottomtilepointY; i > floor - 1; i--)
                 {
-                    if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
+                    Tile tile = Main.tile[bottomtilepointx, i];
+                    if (tile.HasUnactuatedTile && TileID.Sets.Platforms[tile.TileType] && tile.Slope == SlopeType.Solid)
                     {
+                        Main.NewText("PASS");
                         npc.position.Y += 1;
                         npc.velocity.Y += 0.01f;
                         break;
@@ -2715,6 +2727,14 @@ namespace TerRoguelike.NPCs
                 {
                     npc.direction = 1;
                     npc.spriteDirection = 1;
+                }
+                if (Math.Abs(npc.velocity.X) > xCap * 1.5f)
+                {
+                    npc.velocity.X *= 0.98f;
+                }
+                if (Math.Abs(npc.velocity.Y) > yCap * 1.5f)
+                {
+                    npc.velocity.Y *= 0.98f;
                 }
             }
             else
