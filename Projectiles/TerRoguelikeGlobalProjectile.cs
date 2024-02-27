@@ -176,23 +176,9 @@ namespace TerRoguelike.Projectiles
                 }
             }
 
-            Vector2 realDistanceVect = Main.npc[homingTarget].Center - projectile.Center;
-            float targetAngle = Math.Abs(projectile.velocity.ToRotation() - realDistanceVect.ToRotation());
-            float setAngle = homingStrength * MathHelper.TwoPi;
+            float maxChange = homingStrength * MathHelper.TwoPi;
 
-            if (setAngle > targetAngle)
-                setAngle = targetAngle;
-
-
-            if (Vector2.Dot(Vector2.Normalize(projectile.velocity).RotatedBy(MathHelper.PiOver2), Vector2.Normalize(realDistanceVect)) < 0)
-                setAngle *= -1;
-
-            setAngle += projectile.velocity.ToRotation();
-
-            Vector2 setVelocity = setAngle.ToRotationVector2() * projectile.velocity.Length(); // rotate projectile somwhat in the direction of the target
-
-
-            projectile.velocity = setVelocity;
+            projectile.velocity = (Vector2.UnitX * projectile.velocity.Length()).RotatedBy(projectile.velocity.ToRotation().AngleTowards((Main.npc[homingTarget].Center - projectile.Center).ToRotation(), maxChange));
         }
         public void InheritNPCProjValues(Projectile proj, Projectile parentProj)
         {

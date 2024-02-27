@@ -45,6 +45,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
         }
         public override void AI()
         {
+            NPC.ai[0]++;
             if (TerRoguelikeWorld.IsTerRoguelikeWorld && modNPC.isRoomNPC)
             {
                 if (RoomSystem.RoomList[modNPC.sourceRoomListID].awake)
@@ -52,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
                 else
                     NPC.immortal = true;
             }
-            NPC.velocity.Y = MathHelper.Lerp(0, 0.1f, (float)Math.Cos(Main.GlobalTimeWrappedHourly));
+            NPC.velocity.Y = MathHelper.Lerp(0, 0.1f, (float)Math.Cos(NPC.ai[0] / 60));
         }
         public override Color? GetAlpha(Color drawColor) => Color.White;
         public override bool? CanBeHitByItem(Player player, Item item)
