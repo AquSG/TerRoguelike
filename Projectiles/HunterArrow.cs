@@ -30,7 +30,7 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 10;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 300;
+            Projectile.timeLeft = 480;
             Projectile.penetrate = 2;
         }
         public override void OnSpawn(IEntitySource source)
@@ -148,7 +148,7 @@ namespace TerRoguelike.Projectiles
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + new Vector2(0, 0), null, Projectile.GetAlpha(lightColor), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
         }
 

@@ -42,6 +42,7 @@ Projectiles: {
 	SporeCloud.DisplayName: Spore Cloud
 	HunterArrow.DisplayName: Hunter Arrow
 	LihzahrdLaser.DisplayName: Lihzahrd Laser
+	SeekerArrow.DisplayName: Seeker Arrow
 }
 
 Items: {
@@ -739,4 +740,5 @@ NPCs: {
 	Lihzahrd.DisplayName: Lihzahrd
 	DomesticatedHornet.DisplayName: Domesticated Hornet
 	LihzahrdSentry.DisplayName: Lihzahrd Sentry
+	TempleDevotee.DisplayName: Temple Devotee
 }
