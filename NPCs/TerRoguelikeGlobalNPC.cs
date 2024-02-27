@@ -23,6 +23,7 @@ using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Systems.RoomSystem;
 using System.Threading.Tasks.Dataflow;
+using static log4net.Appender.ColoredConsoleAppender;
 
 namespace TerRoguelike.NPCs
 {
@@ -541,7 +542,7 @@ namespace TerRoguelike.NPCs
                 npc.Bottom = teleportPos;
             }
         }
-        public void RogueTurretAI(NPC npc, int attackTelegraph, int attackCooldown, float attackDist, int projType, int projDamage, float projVelocity, Vector2 projOffset, bool LoSRequired, float? directionOverride = null, float? attackCone = null)
+        public void RogueTurretAI(NPC npc, int attackTelegraph, int attackCooldown, float attackDist, int projType, int projDamage, float projVelocity, Vector2 projOffset, bool LoSRequired, float? directionOverride = null, float? attackCone = null, int attackDuration = 0, int attackTimeBetween = 0)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -549,7 +550,7 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[0] == 0)
                 {
-                    if ((!LoSRequired || Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1)) && (npc.Center - target.Center).Length() <= attackDist && (attackCone == null || Math.Abs(RadianSizeBetween((target.Center - npc.Center).ToRotation(), (float)directionOverride)) <= attackCone * 0.5f))
+                    if ((!LoSRequired || CanHitInLine(npc.Center + projOffset, target.Center) && (npc.Center - target.Center).Length() <= attackDist && (attackCone == null || Math.Abs(RadianSizeBetween((target.Center - npc.Center).ToRotation(), (float)directionOverride)) <= attackCone * 0.5f)))
                     {
                         npc.ai[0]++;
                     }
@@ -557,12 +558,13 @@ namespace TerRoguelike.NPCs
                 else
                 {
                     npc.ai[0]++;
-                    if (npc.ai[0] == attackTelegraph)
+                    if (attackDuration > 0 ? npc.ai[0] >= attackTelegraph && (npc.ai[0] - attackTelegraph) % attackTimeBetween == 0 : npc.ai[0] == attackTelegraph)
                     {
                         float direction = directionOverride == null ? (target.Center - (npc.Center + projOffset)).ToRotation() : (float)directionOverride;
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center + projOffset, Vector2.UnitX.RotatedBy(direction) * projVelocity, projType, projDamage, 0f);
                         SetUpNPCProj(npc, proj);
-                        npc.ai[0] = -attackCooldown;
+                        if (attackDuration <= 0 || (attackDuration > 0 && npc.ai[0] >= attackTelegraph + attackDuration))
+                            npc.ai[0] = -attackCooldown;
                     }
                 }
             }
@@ -780,6 +782,7 @@ namespace TerRoguelike.NPCs
 
                 if (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1))
                     LoSCheck = true;
+                Main.NewText(LoSCheck);
 
                 if (npc.ai[2] == 0 && LoSCheck && distanceCheck)
                 {
@@ -2671,7 +2674,6 @@ namespace TerRoguelike.NPCs
                     Tile tile = Main.tile[bottomtilepointx, i];
                     if (tile.HasUnactuatedTile && TileID.Sets.Platforms[tile.TileType] && tile.Slope == SlopeType.Solid)
                     {
-                        Main.NewText("PASS");
                         npc.position.Y += 1;
                         npc.velocity.Y += 0.01f;
                         break;
@@ -2681,10 +2683,6 @@ namespace TerRoguelike.NPCs
                         npc.velocity.Y = -npc.oldVelocity.Y * 0.15f;
                     }
                 }
-            }
-            if (npc.collideX)
-            {
-                npc.velocity.X = -npc.oldVelocity.X * 0.15f;
             }
 
             if (npc.direction == 0)
@@ -2717,6 +2715,16 @@ namespace TerRoguelike.NPCs
             {
                 if (!LoSRequired || Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1))
                     LoSCheck = true;
+            }
+
+            if (npc.collideX)
+            {
+                if (target != null)
+                {
+                    if (LoSCheck && !Collision.CanHit(npc.Bottom, 1, 1, target.Bottom, 1, 1))
+                        npc.velocity.Y += acceleration * -1;
+                }
+                npc.velocity.X = -npc.oldVelocity.X * 0.15f;
             }
 
             if (LoSCheck)

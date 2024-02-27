@@ -41,6 +41,7 @@ Projectiles: {
 	MothDust.DisplayName: Moth Dust
 	SporeCloud.DisplayName: Spore Cloud
 	HunterArrow.DisplayName: Hunter Arrow
+	LihzahrdLaser.DisplayName: Lihzahrd Laser
 }
 
 Items: {
@@ -737,4 +738,5 @@ NPCs: {
 	FlyingSnake.DisplayName: Flying Snake
 	Lihzahrd.DisplayName: Lihzahrd
 	DomesticatedHornet.DisplayName: Domesticated Hornet
+	LihzahrdSentry.DisplayName: Lihzahrd Sentry
 }

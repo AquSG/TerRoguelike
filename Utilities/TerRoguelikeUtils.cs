@@ -219,5 +219,60 @@ namespace TerRoguelike.Utilities
 
             return false;
         }
+        public static bool CanHitInLine(Vector2 start, Vector2 end)
+        {
+            float length = (start - end).Length();
+            Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
+            if (length < 1f)
+                return true;
+
+            Vector2 currentPos = start;
+            for (int i = 0; i < (int)length; i++)
+            {
+                currentPos += unitVect;
+
+                Point tilePos = new Point((int)(currentPos.X / 16), (int)(currentPos.Y / 16));
+                
+                if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
+                    return true;
+
+                Tile tile = Main.tile[tilePos.X, tilePos.Y];
+                if (!tile.IsTileSolidGround(true))
+                    continue;
+
+                if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
+                    return false;
+
+                Vector2 tileWorldPos = new Vector2(tilePos.X * 16, tilePos.Y * 16);
+                Vector2 currentPosInTile = currentPos - tileWorldPos;
+                if (tile.IsHalfBlock)
+                {
+                    if (currentPosInTile.Y >= 8f)
+                        return false;
+                }
+                else if (tile.Slope == SlopeType.SlopeDownLeft)
+                {
+                    if (currentPosInTile.X <= currentPosInTile.Y)
+                        return false;
+                }
+                else if (tile.Slope == SlopeType.SlopeDownRight)
+                {
+                    if ((16 - currentPosInTile.X) <= currentPosInTile.Y)
+                        return false;
+                }
+                else if (tile.Slope == SlopeType.SlopeUpLeft)
+                {
+                    if (currentPosInTile.X <= (16 - currentPosInTile.Y))
+                        return false;
+                }
+                else if (tile.Slope == SlopeType.SlopeUpRight)
+                {
+                    if ((16 - currentPosInTile.X) <= (16 - currentPosInTile.Y))
+                        return false;
+                }
+            }
+
+            return true;
+        }
     }
 }
