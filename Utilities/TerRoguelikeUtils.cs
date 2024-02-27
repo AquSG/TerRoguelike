@@ -219,22 +219,23 @@ namespace TerRoguelike.Utilities
 
             return false;
         }
-        public static bool CanHitInLine(Vector2 start, Vector2 end)
+        public static bool CanHitInLine(Vector2 start, Vector2 end, float lengthCap = 2000f)
         {
             float length = (start - end).Length();
             Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
             if (length < 1f)
                 return true;
-
+            if (length > lengthCap)
+                return false;
             Vector2 currentPos = start;
             for (int i = 0; i < (int)length; i++)
             {
                 currentPos += unitVect;
 
                 Point tilePos = new Point((int)(currentPos.X / 16), (int)(currentPos.Y / 16));
-                
+
                 if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
-                    return true;
+                    continue;
 
                 Tile tile = Main.tile[tilePos.X, tilePos.Y];
                 if (!tile.IsTileSolidGround(true))
@@ -267,7 +268,7 @@ namespace TerRoguelike.Utilities
                 }
                 else if (tile.Slope == SlopeType.SlopeUpRight)
                 {
-                    if ((16 - currentPosInTile.X) <= (16 - currentPosInTile.Y))
+                    if (currentPosInTile.X >= currentPosInTile.Y)
                         return false;
                 }
             }
