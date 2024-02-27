@@ -41,14 +41,21 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
+            if (Projectile.timeLeft % 15 == 0 && Main.rand.NextBool())
+            {
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.YellowTorch, Projectile.velocity.X * 0.5f,Projectile.velocity.Y * 0.5f, 0, default(Color), 1.3f);
+                Dust dust = Main.dust[d];
+                dust.noGravity = true;
+                dust.noLight = true;
+                dust.noLightEmittence = true;
+            }
         }
 
         public override Color? GetAlpha(Color lightColor)
         {
             return Color.Lerp(lightColor, Color.White, 0.4f);
         }
-
-        public override bool OnTileCollide(Vector2 oldVelocity)
+        public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 5; i++)
             {
@@ -57,9 +64,7 @@ namespace TerRoguelike.Projectiles
                 dust.noGravity = true;
                 dust.noLight = true;
                 dust.noLightEmittence = true;
-
             }
-            return true;
         }
         public override bool PreDraw(ref Color lightColor)
         {

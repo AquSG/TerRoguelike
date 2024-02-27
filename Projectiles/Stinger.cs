@@ -44,8 +44,10 @@ namespace TerRoguelike.Projectiles
         {
             for (int i = 0; i < 5; i++)
             {
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 18, 0f, 0f, 0, default(Color), 1.5f);
-                Main.dust[d].noGravity = true;
+                int d = Dust.NewDust(Projectile.Center, 1, 1, DustID.GreenTorch, 0f, 0f, 0, default(Color), 1f);
+                Dust dust = Main.dust[d];
+                dust.noLight = true;
+                dust.noLightEmittence = true;
             }
             return true;
         }
@@ -62,11 +64,12 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < 8; i++)
             {
                 Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
-                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + offset + new Vector2(4, 0), null, Color.White, Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + offset, null, Color.White, Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             }
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            return true;
+            Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+            return false;
         }
     }
 }

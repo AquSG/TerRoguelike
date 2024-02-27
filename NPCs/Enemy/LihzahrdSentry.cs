@@ -66,10 +66,29 @@ namespace TerRoguelike.NPCs.Enemy
             if (NPC.ai[0] >= attackTelegraph && NPC.ai[0] < attackTelegraph + attackDuration && (NPC.ai[0] - attackTelegraph) % attackTimeBetween == 0)
             {
                 SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.8f }, NPC.Center);
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(24f, 24f);
+                    Dust dust = Dust.NewDustPerfect(NPC.Center + offset, DustID.YellowTorch, -offset * 0.1f, 0, default, 1.5f);
+                    dust.noGravity = true;
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
+                }
             }
             else if (NPC.ai[0] == 15)
             {
                 SoundEngine.PlaySound(SoundID.Item15 with { Volume = 0.8f }, NPC.Center);
+            }
+            else if (NPC.ai[0] < attackTelegraph && NPC.ai[0] > 0)
+            {
+                if (Main.rand.NextBool(8))
+                {
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(24f, 24f);
+                    Dust dust = Dust.NewDustPerfect(NPC.Center + offset, DustID.YellowTorch, -offset * 0.1f, 0, default, 1.5f);
+                    dust.noGravity = true;
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
+                }
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

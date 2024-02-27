@@ -140,8 +140,8 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 int segmentLength = (int)(20 * NPC.scale);
                 int tetherLength = (int)(NPC.Center - AnchorPos).Length();
-                if (tetherLength <= segmentLength)
-                    tetherLength = segmentLength;
+                if (tetherLength < 1)
+                    tetherLength = 1;
                 float direction = (AnchorPos - NPC.Center).ToRotation();
                 Vector2 start = NPC.Center + (Vector2.UnitX * 10).RotatedBy(direction);
                 if (modNPC.ignitedStacks.Any())

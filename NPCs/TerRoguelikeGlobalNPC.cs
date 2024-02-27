@@ -73,7 +73,7 @@ namespace TerRoguelike.NPCs
                 npc.spriteDirection = 1;
             }
 
-            bool LoSBoredomCheck = target == null ? false : (Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1));
+            bool LoSBoredomCheck = target == null ? false : (Math.Abs(npc.Center.X - target.Center.X) < 96 && !CanHitInLine(npc.Center, target.Center));
             if (npc.ai[0] == 0 && target != null)
             {
                 if (npc.Center.X < target.Center.X)
@@ -234,7 +234,7 @@ namespace TerRoguelike.NPCs
             }
             else
             {
-                if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
+                if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || CanHitInLine(npc.Center + projOffset, target.Center)))
                 {
                     npc.ai[1]++;
                 }
@@ -257,7 +257,7 @@ namespace TerRoguelike.NPCs
                 }
             }
 
-            bool LoSBoredomCheck = target == null ? false : (LoSRequired && Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1));
+            bool LoSBoredomCheck = target == null ? false : (LoSRequired && Math.Abs(npc.Center.X - target.Center.X) < 96 && !CanHitInLine(npc.Center + projOffset, target.Center));
             if (target == null && npc.direction == 0)
             {
                 npc.direction = 1;
@@ -730,7 +730,7 @@ namespace TerRoguelike.NPCs
             npc.stairFall = true;
             if (npc.collideY)
             {
-                int fluff = 6;
+                int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
                 int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
                 for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
@@ -780,9 +780,14 @@ namespace TerRoguelike.NPCs
                 if (dist >= minAttackDist && dist <= maxAttackDist)
                     distanceCheck = true;
 
-                if (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1))
+                if (!LoSRequired || CanHitInLine(npc.Center + projOffset, target.Center))
                     LoSCheck = true;
-                Main.NewText(LoSCheck);
+
+                if (npc.collideX)
+                {
+                    if (LoSCheck && !CanHitInLine(npc.Bottom, target.Bottom))
+                        npc.velocity.Y += acceleration * -1;
+                }
 
                 if (npc.ai[2] == 0 && LoSCheck && distanceCheck)
                 {
@@ -1308,7 +1313,7 @@ namespace TerRoguelike.NPCs
 
             bool LosCheck = true;
             if (target != null)
-                LosCheck = !LoSRequired || Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1);
+                LosCheck = !LoSRequired || CanHitInLine(npc.Center, target.Center);
 
             if (dontRelocateForProjectiles)
                 npc.ai[2] += 0.2f;
@@ -1442,7 +1447,7 @@ namespace TerRoguelike.NPCs
                 }
                 else if (npc.ai[1] == attackCooldown && target != null)
                 {
-                    if (Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1) && (npc.Center - target.Center).Length() <= attackDist)
+                    if (CanHitInLine(npc.Center, target.Center) && (npc.Center - target.Center).Length() <= attackDist)
                     {
                         ball.Position = (Vector2.UnitX * 24 * npc.direction) + new Vector2(-ball.Width * 0.5f, -ball.Height * 0.5f) + npc.Center;
                         npc.ai[2] = npc.direction;
@@ -1464,7 +1469,7 @@ namespace TerRoguelike.NPCs
                 }
                 else if (npc.ai[2] == 0)
                 {
-                    bool LoSBoredomCheck = target == null ? false : (Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1));
+                    bool LoSBoredomCheck = target == null ? false : (Math.Abs(npc.Center.X - target.Center.X) < 96 && !CanHitInLine(npc.Center, target.Center));
                     if (target == null && npc.direction == 0)
                     {
                         npc.direction = 1;
@@ -1941,7 +1946,7 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[1] != 2)
                 {
-                    if (Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1) && (npc.Center - target.Center).Length() <= homeRadius * 6)
+                    if (CanHitInLine(npc.Center, target.Center) && (npc.Center - target.Center).Length() <= homeRadius * 6)
                     {
                         npc.ai[1] = 2;
                         npc.ai[0] = 1;
@@ -1949,7 +1954,7 @@ namespace TerRoguelike.NPCs
                 }
                 if (npc.ai[1] == 2)
                 {
-                    if (!Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1))
+                    if (!CanHitInLine(npc.Center, target.Center))
                     {
                         npc.ai[0]++;
                         if (npc.ai[0] >= boredomTime)
@@ -2146,7 +2151,7 @@ namespace TerRoguelike.NPCs
 
             if (target != null)
             {
-                if (npc.ai[1] == 0 && Collision.CanHit(target.Center, 1, 1, npc.Center, 1, 1))
+                if (npc.ai[1] == 0 && CanHitInLine(npc.Center, target.Center))
                 {
                     npc.ai[1]++;
                 }
@@ -2198,7 +2203,7 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[0] > 0)
                     npc.ai[0]++;
-                else if (Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1) && (npc.Center - target.Center).Length() <= attackDist)
+                else if (CanHitInLine(npc.Center, target.Center) && (npc.Center - target.Center).Length() <= attackDist)
                 {
                     npc.ai[0]++;
                 }
@@ -2330,7 +2335,7 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[2] <= 0)
                 {
-                    if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1)))
+                    if (npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && (npc.Center - target.Center).Length() <= attackDistance && (!LoSRequired || CanHitInLine(npc.Center + projOffset, target.Center)))
                     {
                         npc.ai[1]++;
                     }
@@ -2362,7 +2367,7 @@ namespace TerRoguelike.NPCs
                 }
             }
 
-            bool LoSBoredomCheck = target == null ? false : (LoSRequired && Math.Abs(npc.Center.X - target.Center.X) < 96 && !Collision.CanHit(npc.Center + projOffset, 1, 1, target.Center, 1, 1));
+            bool LoSBoredomCheck = target == null ? false : (LoSRequired && Math.Abs(npc.Center.X - target.Center.X) < 96 && !CanHitInLine(npc.Center + projOffset, target.Center));
             if (target == null && npc.direction == 0)
             {
                 npc.direction = 1;
@@ -2537,7 +2542,7 @@ namespace TerRoguelike.NPCs
             {
                 Vector2 velocityDirection = (target.Center - npc.Center);
                 float angle = velocityDirection.ToRotation();
-                bool LoS = Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1);
+                bool LoS = CanHitInLine(npc.Center, target.Center);
                 if (!LoS)
                 {
                     if (npc.ai[3] == 0)
@@ -2587,7 +2592,7 @@ namespace TerRoguelike.NPCs
 
             if (target != null)
             {
-                if (npc.ai[0] == 0 && Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1))
+                if (npc.ai[0] == 0 && CanHitInLine(npc.Center, target.Center))
                 {
                     npc.ai[0]++;
                 }
@@ -2713,7 +2718,7 @@ namespace TerRoguelike.NPCs
 
             if (target != null)
             {
-                if (!LoSRequired || Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1))
+                if (!LoSRequired || CanHitInLine(npc.Center, target.Center))
                     LoSCheck = true;
             }
 
@@ -2721,7 +2726,7 @@ namespace TerRoguelike.NPCs
             {
                 if (target != null)
                 {
-                    if (LoSCheck && !Collision.CanHit(npc.Bottom, 1, 1, target.Bottom, 1, 1))
+                    if (LoSCheck && !CanHitInLine(npc.Bottom, target.Bottom))
                         npc.velocity.Y += acceleration * -1;
                 }
                 npc.velocity.X = -npc.oldVelocity.X * 0.15f;
@@ -2795,7 +2800,7 @@ namespace TerRoguelike.NPCs
             npc.stairFall = true;
             if (npc.collideY)
             {
-                int fluff = 6;
+                int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
                 int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
                 int floor = bottomtilepointY - fluff;
@@ -2812,10 +2817,6 @@ namespace TerRoguelike.NPCs
                         npc.velocity.Y = -npc.oldVelocity.Y * 0.15f;
                     }
                 }
-            }
-            if (npc.collideX)
-            {
-                npc.velocity.X = -npc.oldVelocity.X * 0.15f;
             }
 
             if (npc.direction == 0)
@@ -2846,8 +2847,17 @@ namespace TerRoguelike.NPCs
 
             if (target != null)
             {
-                if (!LoSRequired || Collision.CanHit(npc.Center, 1, 1, target.Center, 1, 1))
+                if (!LoSRequired || CanHitInLine(npc.Center, target.Center))
                     LoSCheck = true;
+            }
+            if (npc.collideX)
+            {
+                if (target != null)
+                {
+                    if (LoSCheck && !CanHitInLine(npc.Bottom, target.Bottom))
+                        npc.velocity.Y += acceleration * -1;
+                }
+                npc.velocity.X = -npc.oldVelocity.X * 0.15f;
             }
 
             if (LoSCheck)
