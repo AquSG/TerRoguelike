@@ -91,7 +91,8 @@ namespace TerRoguelike.Managers
                 new FlyingSnake(),
                 new Lihzahrd(),
                 new DomesticatedHornet(),
-                new LihzahrdSentry()
+                new LihzahrdSentry(),
+                new TempleDevotee()
             };
         }
         internal static void Unload()

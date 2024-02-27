@@ -21,10 +21,10 @@ using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
-    public class UndeadHunter : BaseRoguelikeNPC
+    public class TempleDevotee : BaseRoguelikeNPC
     {
-        public override int modNPCID => ModContent.NPCType<UndeadHunter>();
-        public override List<int> associatedFloors => new List<int>() { FloorDict["Jungle"] };
+        public override int modNPCID => ModContent.NPCType<TempleDevotee>();
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Temple"] };
         public override int CombatStyle => 2;
 
         public Vector2 bulletPos = Vector2.Zero;
@@ -33,7 +33,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackTelegraph = 40;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 20;
+            Main.npcFrameCount[modNPCID] = 12;
             NPCID.Sets.MustAlwaysDraw[modNPCID] = true;
         }
         public override void SetDefaults()
@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit2;
             NPC.DeathSound = SoundID.NPCDeath2;
             NPC.knockBackResist = 0.4f;
-            modNPC.drawCenter = new Vector2(0, -6);
+            modNPC.drawCenter = new Vector2(0, -5);
         }
         public override void AI()
         {
@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
             int attackCooldown = 30;
             NPC.frameCounter += NPC.velocity.Length() * 0.2d;
             bulletPos = new Vector2(24, 2 * NPC.direction).RotatedBy(gunRot);
-            modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 320f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<HunterArrow>(), 9f, bulletPos, NPC.damage * 2, true, false, gunRot, 20);
+            modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 640f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SeekerArrow>(), 7f, bulletPos, NPC.damage * 2, true, false, gunRot, 20);
             if (NPC.ai[1] == attackTelegraph)
             {
                 SoundEngine.PlaySound(SoundID.Item5 with { Volume = 0.9f }, NPC.Center);
@@ -78,25 +78,20 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)(NPC.lifeMax * 50); i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, hit.HitDirection, -1f);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 5, hit.HitDirection, -1f);
                 }
             }
             else
             {
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 30; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, 2.5f * (float)hit.HitDirection, -2.5f);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 5, 2.5f * (float)hit.HitDirection, -2.5f);
                 }
-                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 42, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 130, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 130, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 43, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 131, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
-                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 44, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, Mod.Find<ModGore>("TempleDevotee1").Type, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, Mod.Find<ModGore>("TempleDevotee2").Type, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, Mod.Find<ModGore>("TempleDevotee2").Type, NPC.scale);
             }
         }
         public override void FindFrame(int frameHeight)
