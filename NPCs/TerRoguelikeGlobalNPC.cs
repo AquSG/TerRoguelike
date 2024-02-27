@@ -1100,7 +1100,7 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.velocity.X != 0)
                 {
-                    npc.direction = -(int)(npc.velocity.X / Math.Abs(npc.velocity.X));
+                    npc.direction = -Math.Sign(npc.velocity.X);
                 }
             }
 
@@ -1285,7 +1285,7 @@ namespace TerRoguelike.NPCs
                     SetUpNPCProj(npc, proj);
                 }
 
-                npc.velocity.X += (npc.velocity.X == 0 ? 1 : npc.velocity.X / Math.Abs(npc.velocity.X)) * acceleration;
+                npc.velocity.X += (npc.velocity.X == 0 ? 1 : Math.Sign(npc.velocity.X)) * acceleration;
                 npc.velocity.Y += Main.rand.NextFloat(-acceleration / 2f, acceleration / 2f);
 
                 if (npc.velocity.Length() > maxVelocity)
@@ -1385,7 +1385,7 @@ namespace TerRoguelike.NPCs
             }
             else if (!LosCheck)
             {
-                float x = npc.velocity.X == 0 ? -0.5f : (npc.velocity.X / Math.Abs(npc.velocity.X)) * 0.5f;
+                float x = npc.velocity.X == 0 ? -0.5f : Math.Sign(npc.velocity.X) * 0.5f;
                 float y = (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 2;
                 npc.velocity += new Vector2(x, y).SafeNormalize(Vector2.UnitY) * passiveAccel;
                 if (npc.velocity.Length() > passiveMaxVelocity && npc.ai[0] < attackTelegraph)
@@ -1994,11 +1994,11 @@ namespace TerRoguelike.NPCs
 
                 if (npc.collideX && ((npc.oldVelocity.X < 0 && (target.Center.X - npc.Center.X) < 0) || (npc.oldVelocity.X > 0 && (target.Center.X - npc.Center.X) > 0)))
                 {
-                    npc.velocity.X = 1f * (npc.oldVelocity.X / Math.Abs(npc.oldVelocity.X)) * -speedCap;
+                    npc.velocity.X = 1f * Math.Sign(npc.oldVelocity.X) * -speedCap;
                 }
                 if (npc.collideY && ((npc.oldVelocity.Y < 0 && (target.Center.Y - npc.Center.Y) < 0) || (npc.oldVelocity.Y > 0 && (target.Center.Y - npc.Center.Y) > 0)))
                 {
-                    npc.velocity.Y = 1f * (npc.oldVelocity.Y / Math.Abs(npc.oldVelocity.Y)) * -speedCap;
+                    npc.velocity.Y = 1f * Math.Sign(npc.oldVelocity.Y) * -speedCap;
                 }
             }
             else if (npc.ai[1] == 1)
@@ -2306,9 +2306,9 @@ namespace TerRoguelike.NPCs
             }
 
             if (Math.Abs(npc.velocity.X) > speedCap)
-                npc.velocity.X = speedCap * (npc.velocity.X / Math.Abs(npc.velocity.X));
+                npc.velocity.X = speedCap * Math.Sign(npc.velocity.X);
             if (Math.Abs(npc.velocity.Y) > speedCap)
-                npc.velocity.Y = speedCap * (npc.velocity.Y / Math.Abs(npc.velocity.Y));
+                npc.velocity.Y = speedCap * Math.Sign(npc.velocity.Y);
 
             if (attacking)
             {

@@ -75,7 +75,7 @@ namespace TerRoguelike.NPCs.Enemy
                 }
                 else
                 {
-                    NPC.spriteDirection = (int)(NPC.velocity.X / Math.Abs(NPC.velocity.X));
+                    NPC.spriteDirection = Math.Sign(NPC.velocity.X);
                 }
             }
             if (NPC.ai[0] == -attackCooldown && NPC.ai[1] == 0)
