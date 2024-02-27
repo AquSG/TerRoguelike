@@ -736,4 +736,5 @@ NPCs: {
 	UndeadHunter.DisplayName: Undead Hunter
 	FlyingSnake.DisplayName: Flying Snake
 	Lihzahrd.DisplayName: Lihzahrd
+	DomesticatedHornet.DisplayName: Domesticated Hornet
 }
