@@ -223,10 +223,12 @@ namespace TerRoguelike.Utilities
         {
             float length = (start - end).Length();
             Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
+
             if (length < 1f)
                 return true;
             if (length > lengthCap)
                 return false;
+
             Vector2 currentPos = start;
             for (int i = 0; i < (int)length; i++)
             {
