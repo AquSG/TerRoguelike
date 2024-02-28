@@ -743,4 +743,5 @@ NPCs: {
 	LihzahrdSentry.DisplayName: Lihzahrd Sentry
 	TempleDevotee.DisplayName: Temple Devotee
 	LihzahrdConstruct.DisplayName: Lihzahrd Construct
+	Corite.DisplayName: Corite
 }
