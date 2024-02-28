@@ -43,6 +43,7 @@ Projectiles: {
 	HunterArrow.DisplayName: Hunter Arrow
 	LihzahrdLaser.DisplayName: Lihzahrd Laser
 	SeekerArrow.DisplayName: Seeker Arrow
+	TempleBoulder.DisplayName: Temple Boulder
 }
 
 Items: {
@@ -741,4 +742,5 @@ NPCs: {
 	DomesticatedHornet.DisplayName: Domesticated Hornet
 	LihzahrdSentry.DisplayName: Lihzahrd Sentry
 	TempleDevotee.DisplayName: Temple Devotee
+	LihzahrdConstruct.DisplayName: Lihzahrd Construct
 }

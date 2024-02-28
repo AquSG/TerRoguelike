@@ -92,7 +92,8 @@ namespace TerRoguelike.Managers
                 new Lihzahrd(),
                 new DomesticatedHornet(),
                 new LihzahrdSentry(),
-                new TempleDevotee()
+                new TempleDevotee(),
+                new LihzahrdConstruct()
             };
         }
         internal static void Unload()

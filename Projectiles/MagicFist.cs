@@ -52,7 +52,7 @@ namespace TerRoguelike.Projectiles
                     Projectile.timeLeft = 6;
 
                 if (targetIndex != -1)
-                    Projectile.Center = Main.npc[(int)targetIndex].Center + new Vector2(0, -16f * (Projectile.timeLeft - 1));
+                    Projectile.Center = Main.npc[(int)targetIndex].Center + new Vector2(0, (-16f * (Projectile.timeLeft - 1)) + Main.npc[(int)targetIndex].gfxOffY);
                 else
                     Projectile.Center += new Vector2(0, 16f); //punch down
             }
