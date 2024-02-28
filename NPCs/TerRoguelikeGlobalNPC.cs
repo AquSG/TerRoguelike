@@ -1301,7 +1301,7 @@ namespace TerRoguelike.NPCs
                 npc.velocity.Y *= -0.25f;
             }
         }
-        public void RogueFrostbiterAI(NPC npc, float distanceBeside, int dashTime, float dashVelocity, float passiveAccel, float passiveMaxVelocity, int attackTelegraph, int waitTimeAfterAttack, float attackDistance, int projType, float projVelocity, int projDamage, int projCount, bool LoSRequired = false, bool dontRelocateForProjectiles = false)
+        public void RogueFrostbiterAI(NPC npc, float distanceBeside, int dashTime, float dashVelocity, float passiveAccel, float passiveMaxVelocity, int attackTelegraph, int waitTimeAfterAttack, float attackDistance, int projType, float projVelocity, int projDamage, int projCount, bool LoSRequired = false, bool dontRelocateForProjectiles = false, float attackActivationRadius = 64f)
         {
             //ai0 is for attack timers.
             //ai1 is for attack state.
@@ -1367,14 +1367,14 @@ namespace TerRoguelike.NPCs
                 Vector2 targetPos = npc.ai[1] == 0 ? new Vector2(distanceBeside * npc.direction, 0) + target.Center : (dontRelocateForProjectiles ? npc.Center : new Vector2(npc.ai[2], npc.ai[3]));
 
                 float greaterDist = attackDistance > distanceBeside ? attackDistance : distanceBeside;
-                if ((npc.Center - targetPos).Length() < 64f || ((npc.collideX || npc.collideY) && (npc.Center - target.Center).Length() < greaterDist))
+                if ((npc.Center - targetPos).Length() < attackActivationRadius || ((npc.collideX || npc.collideY) && (npc.Center - target.Center).Length() < greaterDist))
                 {
                     if (npc.ai[0] == 0)
                         npc.ai[0]++;
                 }
                 else if (npc.ai[0] == 0)
                 {
-                    npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * ((npc.Center - targetPos).Length() < 64f ? passiveAccel : passiveAccel * 2f);
+                    npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * ((npc.Center - targetPos).Length() < attackActivationRadius ? passiveAccel : passiveAccel * 2f);
                     if (dontRelocateForProjectiles)
                         npc.velocity.Y += (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 6 * passiveAccel;
                 }
@@ -1399,10 +1399,13 @@ namespace TerRoguelike.NPCs
                 else if (npc.ai[1] == 1)
                 {
                     float anglePerProj = MathHelper.TwoPi / projCount;
-                    for (int i = 0; i < projCount; i++)
+                    if (projType != ProjectileID.None)
                     {
-                        int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (-Vector2.UnitY * projVelocity).RotatedBy(anglePerProj * i), projType, projDamage, 0f);
-                        SetUpNPCProj(npc, proj);
+                        for (int i = 0; i < projCount; i++)
+                        {
+                            int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (-Vector2.UnitY * projVelocity).RotatedBy(anglePerProj * i), projType, projDamage, 0f);
+                            SetUpNPCProj(npc, proj);
+                        }
                     }
                 }
 
