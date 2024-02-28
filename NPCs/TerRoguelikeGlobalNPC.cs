@@ -22,8 +22,6 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Systems.RoomSystem;
-using System.Threading.Tasks.Dataflow;
-using static log4net.Appender.ColoredConsoleAppender;
 
 namespace TerRoguelike.NPCs
 {
@@ -2860,7 +2858,7 @@ namespace TerRoguelike.NPCs
                 npc.velocity.X = -npc.oldVelocity.X * 0.15f;
             }
 
-            if (LoSCheck)
+            if (LoSCheck || (target != null && npc.ai[1] > 0))
             {
                 if (npc.ai[1] == 0)
                 {

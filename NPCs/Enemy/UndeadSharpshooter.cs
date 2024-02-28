@@ -106,11 +106,10 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
             if (NPC.ai[1] > 1)
             {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 if (NPC.ai[1] < attackTelegraph - 30 || NPC.ai[1] % 6 < 3)
                 {
                     Vector2 anchorPos = bulletPos + NPC.Center;
@@ -164,10 +163,10 @@ namespace TerRoguelike.NPCs.Enemy
                         spriteBatch.Draw(gunTex, NPC.Center - Main.screenPosition + (j * MathHelper.TwoPi + gunRot).ToRotationVector2() * outlineThickness, null, drawColor, gunRot, new Vector2(gunTex.Size().X * 0.75f, gunTex.Size().Y * (spriteEffects == SpriteEffects.FlipVertically ? 0.35f : 0.65f)), NPC.scale, spriteEffects, 0f);
                     }
                 }
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
+            
             return true;
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
