@@ -157,6 +157,21 @@ namespace TerRoguelike.NPCs.Enemy
             CollisionPass = false;
             return false;
         }
+        public override bool CanHitNPC(NPC target)
+        {
+            for (int i = 0; i < Segments.Count; i++)
+            {
+                WormSegment segment = Segments[i];
+                float radius = i == 0 ? (NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2) : segment.Height / 2;
+                if (segment.Position.Distance(target.getRect().ClosestPointInRect(segment.Position)) <= radius)
+                {
+                    CollisionPass = true;
+                    return true;
+                }
+            }
+            CollisionPass = false;
+            return false;
+        }
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
             if (CollisionPass)
