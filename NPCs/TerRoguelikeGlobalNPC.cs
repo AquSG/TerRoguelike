@@ -136,7 +136,7 @@ namespace TerRoguelike.NPCs
 
                     if (npc.velocity.Y == 0f)
                     {
-                        int padding = 6;
+                        int padding = (int)(6 * (jumpVelocity / -7.9f));
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                         {
                             npc.velocity.Y = jumpVelocity;
@@ -326,7 +326,7 @@ namespace TerRoguelike.NPCs
 
                     if (npc.velocity.Y == 0f && (canJumpShoot || npc.ai[1] <= 0))
                     {
-                        int padding = 6;
+                        int padding = (int)(8 * (jumpVelocity / -7.9f));
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                         {
                             npc.velocity.Y = jumpVelocity;
@@ -1540,7 +1540,7 @@ namespace TerRoguelike.NPCs
 
                             if (npc.velocity.Y == 0f)
                             {
-                                int padding = 6;
+                                int padding = (int)(6 * (jumpVelocity / -7.9f));
                                 if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                                 {
                                     npc.velocity.Y = jumpVelocity;
@@ -1848,7 +1848,7 @@ namespace TerRoguelike.NPCs
 
                         if (npc.velocity.Y == 0f)
                         {
-                            int padding = 6;
+                            int padding = (int)(6 * (jumpVelocity / -7.9f));
                             if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                             {
                                 npc.velocity.Y = jumpVelocity;
@@ -2439,7 +2439,7 @@ namespace TerRoguelike.NPCs
 
                     if (npc.velocity.Y == 0f && (canJumpShoot || ((npc.ai[1] <= 0) && (npc.ai[2] <= 0))))
                     {
-                        int padding = 6;
+                        int padding = (int)(6 * (jumpVelocity / -7.9f));
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                         {
                             npc.velocity.Y = jumpVelocity;

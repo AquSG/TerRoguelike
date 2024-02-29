@@ -44,6 +44,7 @@ Projectiles: {
 	LihzahrdLaser.DisplayName: Lihzahrd Laser
 	SeekerArrow.DisplayName: Seeker Arrow
 	TempleBoulder.DisplayName: Temple Boulder
+	Daybreak.DisplayName: Daybreak
 }
 
 Items: {
@@ -744,4 +745,5 @@ NPCs: {
 	TempleDevotee.DisplayName: Temple Devotee
 	LihzahrdConstruct.DisplayName: Lihzahrd Construct
 	Corite.DisplayName: Corite
+	Daybreaker.DisplayName: Daybreaker
 }
