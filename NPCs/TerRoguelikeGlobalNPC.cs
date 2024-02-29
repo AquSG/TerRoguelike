@@ -216,7 +216,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0)
+        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0, int jumpDetectionPadding = 6)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -326,7 +326,7 @@ namespace TerRoguelike.NPCs
 
                     if (npc.velocity.Y == 0f && (canJumpShoot || npc.ai[1] <= 0))
                     {
-                        int padding = (int)(8 * (jumpVelocity / -7.9f));
+                        int padding = jumpDetectionPadding;
                         if (target.Bottom.Y > npc.Top.Y - (float)(padding * 16))
                         {
                             npc.velocity.Y = jumpVelocity;

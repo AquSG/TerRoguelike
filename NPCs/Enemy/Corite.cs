@@ -57,6 +57,17 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.spriteDirection = Math.Sign(NPC.velocity.X);
 
             NPC.rotation = NPC.rotation.AngleTowards((NPC.velocity.X / 18f) * MathHelper.PiOver2, 0.1f);
+
+            if (NPC.ai[0] > 0 && NPC.ai[0] < attackTelegraph - 5 && NPC.ai[1] == 0)
+            {
+                Vector2 offset = Main.rand.NextVector2CircularEdge(36f, 36f);
+                Dust d = Dust.NewDustPerfect(NPC.Center + offset, DustID.SolarFlare, -offset * 0.06f + NPC.velocity, 0, default, 1f);
+                d.noGravity = true;
+                d.noLight = true;
+                d.noLightEmittence = true;
+            }
+            else if (NPC.ai[0] == attackTelegraph && NPC.ai[1] == 0)
+                SoundEngine.PlaySound(SoundID.DD2_WyvernDiveDown with { Volume = 0.6f, Pitch = -0.25f }, NPC.Center);
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

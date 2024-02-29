@@ -66,17 +66,18 @@ namespace TerRoguelike.Projectiles
 
             Projectile.rotation = Projectile.velocity.ToRotation();
 
-            Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.OrangeTorch, 0, 0, 0, default, 1f);
+            Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.SolarFlare, 0, 0, 0, default, 0.5f);
             d.noGravity = true;
             d.noLight = true;
             d.noLightEmittence = true;
         }
         public override void OnKill(int timeLeft)
         {
+            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.5f }, Projectile.Center);
             for (int i = 0; i < 15; i++)
             {
                 Vector2 offset = (Main.rand.Next(2, 6) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
-                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.OrangeTorch, offset.SafeNormalize(Vector2.UnitX) + Projectile.oldVelocity, Projectile.alpha, default(Color), 1.5f);
+                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.SolarFlare, offset.SafeNormalize(Vector2.UnitX) + (Projectile.oldVelocity * 0.5f), Projectile.alpha, default(Color), 1f);
                 d.noGravity = true;
                 d.noLight = true;
                 d.noLightEmittence = true;

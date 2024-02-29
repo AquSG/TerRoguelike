@@ -61,10 +61,10 @@ namespace TerRoguelike.NPCs.Enemy
             SpriteEffects spriteEffects = SpriteEffects.None;
             GetWeaponPositionAndRotation(ref weaponPos, ref weaponRot, ref spriteEffects);
 
-            modNPC.RogueFighterShooterAI(NPC, 3f, -11.4f, 1000f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<Daybreak>(), 12f, weaponPos - NPC.Center, NPC.damage, true, false, weaponRot, attackExtendTime);
+            modNPC.RogueFighterShooterAI(NPC, 3f, -11.4f, 1000f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<Daybreak>(), 12f, weaponPos - NPC.Center, NPC.damage, true, false, weaponRot, attackExtendTime, 1, 0, 0, 13);
             if (NPC.ai[1] == attackTelegraph)
             {
-                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.6f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.67f }, NPC.Center);
             }
             if (NPC.ai[1] < -70 && (int)NPC.ai[1] % 2 == 0)
             {
@@ -81,7 +81,7 @@ namespace TerRoguelike.NPCs.Enemy
                 {
                     pos += (Vector2.UnitX * 3).RotatedBy(weaponRot);
 
-                    Dust d = Dust.NewDustPerfect(pos, DustID.SolarFlare, null, 0, Color.White, 0.4f);
+                    Dust d = Dust.NewDustPerfect(pos, DustID.SolarFlare, null, 0, Color.White, 0.6f);
                     d.noGravity = true;
                     d.noLight = true;
                     d.noLightEmittence = true;
