@@ -37,15 +37,15 @@ namespace TerRoguelike.NPCs.Enemy
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 22;
-            NPC.height = 47;
+            NPC.width = 60;
+            NPC.height = 40;
             NPC.aiStyle = -1;
             NPC.damage = 36;
             NPC.lifeMax = 1200;
             NPC.HitSound = SoundID.NPCHit21;
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0.2f;
-            modNPC.drawCenter = new Vector2(0, 0);
+            modNPC.drawCenter = new Vector2(0, -4);
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -55,7 +55,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             NPC.frameCounter += NPC.velocity.Length() * 0.08d;
 
-            modNPC.RogueFighterShooterAI(NPC, 2.4f, -7.9f, 1000f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SolarFlare>(), 4.5f, new Vector2(32 * NPC.direction, 0), NPC.damage, true, false, null, attackExtendTime, 5, MathHelper.Pi * 0.125f, 1.5f);
+            modNPC.RogueFighterShooterAI(NPC, 2.4f, -7.9f, 1000f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SolarFlare>(), 4.5f, new Vector2(32 * NPC.direction, 0), NPC.damage, true, false, null, attackExtendTime, 5, MathHelper.Pi * 0.125f, 1.1f);
             if (NPC.ai[1] == attackTelegraph)
             {
                 SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 0.6f }, NPC.Center);
