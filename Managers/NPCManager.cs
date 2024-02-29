@@ -95,7 +95,8 @@ namespace TerRoguelike.Managers
                 new TempleDevotee(),
                 new LihzahrdConstruct(),
                 new Corite(),
-                new Daybreaker()
+                new Daybreaker(),
+                new Soladile()
             };
         }
         internal static void Unload()

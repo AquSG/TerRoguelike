@@ -207,10 +207,11 @@ namespace TerRoguelike.Utilities
             float rad2 = angle2 % MathHelper.TwoPi;
 
             float angle = rad2 - rad1;
-            if (Math.Abs(angle) > MathHelper.Pi)
-                angle = MathHelper.TwoPi - angle;
 
-            return angle % MathHelper.TwoPi;
+            if (Math.Abs(angle) > MathHelper.Pi)
+                angle = (Math.Sign(angle) * MathHelper.TwoPi) - angle;
+
+            return angle;
         }
         public static bool? CircularHitboxCollision(Vector2 circleCenter, Rectangle targetHitbox, float radius)
         {
