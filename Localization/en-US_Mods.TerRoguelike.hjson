@@ -45,6 +45,7 @@ Projectiles: {
 	SeekerArrow.DisplayName: Seeker Arrow
 	TempleBoulder.DisplayName: Temple Boulder
 	Daybreak.DisplayName: Daybreak
+	SolarFlare.DisplayName: Solar Flare
 }
 
 Items: {
@@ -746,4 +747,5 @@ NPCs: {
 	LihzahrdConstruct.DisplayName: Lihzahrd Construct
 	Corite.DisplayName: Corite
 	Daybreaker.DisplayName: Daybreaker
+	Soladile.DisplayName: Soladile
 }
