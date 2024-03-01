@@ -17,6 +17,7 @@ using TerRoguelike.Projectiles;
 using Terraria.DataStructures;
 using Terraria.Graphics.Shaders;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -25,7 +26,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<Antlion>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 2;
-        public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/AntlionHead").Value;
+        public Texture2D headTex;
         public Texture2D texture;
         public int attackTelegraph = 120;
         public int attackCooldown = 60;
@@ -47,10 +48,10 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath34;
             NPC.knockBackResist = 0f;
             NPC.behindTiles = true;
-            texture = ModContent.Request<Texture2D>(Texture).Value;
             NPC.noGravity = false;
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.drawCenter = new Vector2(0, 0);
+            headTex = TexDict["AntlionHead"];
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -94,6 +95,7 @@ namespace TerRoguelike.NPCs.Enemy
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            texture = TextureAssets.Npc[Type].Value;
             int headFrameHeight = (int)(headTex.Size().Y * 0.2d);
             int headFrame = (int)(NPC.frameCounter % 5d);
             int frameHeight = (int)(texture.Size().Y * 0.5d);

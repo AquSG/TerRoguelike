@@ -17,14 +17,15 @@ using TerRoguelike.Projectiles;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Daybreaker : BaseRoguelikeNPC
     {
-        public Texture2D lightTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/DaybreakerGlow").Value;
-        public Texture2D armTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/DaybreakerArm").Value;
-        public Texture2D wepTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Daybreak").Value;
+        public Texture2D lightTex;
+        public Texture2D armTex;
+        public Texture2D wepTex;
         public override int modNPCID => ModContent.NPCType<Daybreaker>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => 2;
@@ -48,6 +49,9 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -6);
+            lightTex = TexDict["DaybreakerGlow"];
+            armTex = TexDict["DaybreakerArm"];
+            wepTex = TexDict["Daybreak"];
         }
         public override void OnSpawn(IEntitySource source)
         {

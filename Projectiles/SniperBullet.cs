@@ -10,6 +10,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Projectiles
 {
@@ -74,7 +75,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D lightTexture = ModContent.Request<Texture2D>(Texture).Value;
+            Texture2D lightTexture = TextureAssets.Projectile[Type].Value;
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
                 if (Projectile.timeLeft <= 60 && i + Projectile.timeLeft < 45)

@@ -16,6 +16,9 @@ using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
 using Terraria.Graphics.Shaders;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
+using Terraria.Audio;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -25,9 +28,9 @@ namespace TerRoguelike.NPCs.Enemy
         public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 0;
         public List<WormSegment> Segments = new List<WormSegment>();
-        public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormHead").Value;
-        public Texture2D bodyTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormBody").Value;
-        public Texture2D tailTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SandWormTail").Value;
+        public Texture2D headTex;
+        public Texture2D bodyTex;
+        public Texture2D tailTex;
         public bool CollisionPass = false;
         public override void SetStaticDefaults()
         {
@@ -51,6 +54,9 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.OverrideIgniteVisual = true;
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.SpecialProjectileCollisionRules = true;
+            headTex = TexDict["SandWormHead"];
+            bodyTex = TexDict["SandWormBody"];
+            tailTex = TexDict["SandWormTail"];
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -65,9 +71,29 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
+            if (NPC.ai[3] > 0)
+                NPC.ai[3]--;
             modNPC.RogueWormAI(NPC, 12f, MathHelper.Pi / 60f, 480);
             NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(ref Segments, NPC);
+            Point tile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
+            if (TerRoguelikeUtils.ParanoidTileRetrieval(tile.X, tile.Y).IsTileSolidGround(true))
+            {
+                if (NPC.ai[3] <= 0)
+                {
+                    SoundEngine.PlaySound(SoundID.WormDig with { Volume = 1f }, NPC.Center);
+                    NPC.ai[3] += 60 / NPC.velocity.Length();
+                    Color lightColor = Lighting.GetColor(tile);
+                    if (lightColor.R <= 30 && lightColor.G <= 30 && lightColor.B <= 30)
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            Dust d = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.SpelunkerGlowstickSparkle);
+                            d.velocity = NPC.velocity * 0.25f;
+                        }
+                    }
+                }
+            }
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

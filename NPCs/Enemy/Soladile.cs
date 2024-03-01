@@ -17,12 +17,13 @@ using TerRoguelike.Projectiles;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Soladile : BaseRoguelikeNPC
     {
-        public Texture2D lightTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/SoladileGlow").Value;
+        public Texture2D lightTex;
         public override int modNPCID => ModContent.NPCType<Soladile>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => 2;
@@ -46,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -4);
+            lightTex = TexDict["SoladileGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

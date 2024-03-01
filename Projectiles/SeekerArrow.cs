@@ -9,12 +9,13 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class SeekerArrow : ModProjectile, ILocalizedModType
     {
-        public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
+        public Texture2D glowTex;
 
         public override void SetDefaults()
         {
@@ -24,6 +25,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 480;
             Projectile.penetrate = 2;
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

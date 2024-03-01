@@ -10,6 +10,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Projectiles
 {
@@ -68,7 +69,7 @@ namespace TerRoguelike.Projectiles
                 spriteEffects = Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
                 Projectile.frame = Main.rand.Next(Main.projFrames[Projectile.type]);
             }
-            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+            Texture2D texture = TextureAssets.Projectile[Type].Value;
             int frameHeight = texture.Height / Main.projFrames[Projectile.type];
             Vector2 drawPosition = Projectile.Center - Main.screenPosition;
             Color color = Color.White * 0.5f;

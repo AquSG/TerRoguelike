@@ -14,13 +14,14 @@ using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class HunterArrow : ModProjectile, ILocalizedModType
     {
-        public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
-        public Texture2D lineTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/LerpLineGradient").Value;
+        public Texture2D glowTex;
+        public Texture2D lineTex;
 
         public int RedirectTelegraph = 60;
         public Vector2 origVelocity;
@@ -32,6 +33,8 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 480;
             Projectile.penetrate = 2;
+            glowTex = TexDict["CircularGlow"];
+            lineTex = TexDict["LerpLineGradient"];
         }
         public override void OnSpawn(IEntitySource source)
         {

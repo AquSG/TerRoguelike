@@ -18,13 +18,14 @@ using Terraria.Graphics.Shaders;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class UndeadSharpshooter : BaseRoguelikeNPC
     {
-        public Texture2D gunTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/UndeadSharpshooterGun").Value;
-        public Texture2D telegraphTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/LineGradient").Value;
+        public Texture2D gunTex;
+        public Texture2D telegraphTex;
         public int currentFrame = 0;
         public override int modNPCID => ModContent.NPCType<UndeadSharpshooter>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Dungeon"] };
@@ -51,6 +52,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath2;
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -6);
+            gunTex = TexDict["UndeadSharpshooterGun"];
+            telegraphTex = TexDict["LineGradient"];
         }
         public override void AI()
         {

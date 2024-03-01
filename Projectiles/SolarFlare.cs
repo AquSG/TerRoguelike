@@ -9,12 +9,12 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class SolarFlare : ModProjectile, ILocalizedModType
     {
-        public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
         public float turnMultiplier = 1f;
         public override void SetStaticDefaults()
         {

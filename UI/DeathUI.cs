@@ -22,6 +22,7 @@ using TerRoguelike.MainMenu;
 using TerRoguelike.World;
 using TerRoguelike.Systems;
 using Terraria.GameInput;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.UI
 {
@@ -35,9 +36,9 @@ namespace TerRoguelike.UI
         public static bool restartHover = false;
         internal static void Load()
         {
-            baseUITex = ModContent.Request<Texture2D>("TerRoguelike/UI/DeathUI", AssetRequestMode.ImmediateLoad).Value;
-            mainMenuButtonTex = ModContent.Request<Texture2D>("TerRoguelike/UI/MenuButton", AssetRequestMode.ImmediateLoad).Value;
-            mainMenuButtonHoverTex = ModContent.Request<Texture2D>("TerRoguelike/UI/MenuButtonHover", AssetRequestMode.ImmediateLoad).Value;
+            baseUITex = TexDict["DeathUI"];
+            mainMenuButtonTex = TexDict["MenuButton"];
+            mainMenuButtonHoverTex = TexDict["MenuButtonHover"];
             itemsToDraw = new List<Item>();
             Reset();
         }

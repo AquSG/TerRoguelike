@@ -11,12 +11,14 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
+using static TerRoguelike.Managers.TextureManager;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Projectiles
 {
     public class Snowflake : ModProjectile, ILocalizedModType
     {
-        public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
+        public Texture2D glowTex;
         public override void SetDefaults()
         {
             Projectile.width = 16;
@@ -28,6 +30,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 240;
             Projectile.direction = Main.rand.NextBool() ? -1 : 1;
             Projectile.penetrate = -1;
+            glowTex = TexDict["CircularGlow"];
         }
 
         public override void AI()
@@ -40,7 +43,7 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.timeLeft > 45 ? null : false;
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D flakeTex = ModContent.Request<Texture2D>(Texture).Value;
+            Texture2D flakeTex = TextureAssets.Projectile[Type].Value;
 
 
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, Projectile.timeLeft / 60f), 0, 1f);

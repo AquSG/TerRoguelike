@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -21,8 +22,8 @@ namespace TerRoguelike.Projectiles
         public List<int> starLifetimeOffsets = new List<int>(); // purely visual
         public float randomSmokeRotation = -100f; // purely visual
         public float MaxScale = -1f;
-        public Texture2D smokeTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Smoke").Value;
-        public Texture2D starTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CrossGlow").Value;
+        public Texture2D smokeTex;
+        public Texture2D starTex;
         public int maxTimeLeft = 240;
         public override void SetStaticDefaults()
         {
@@ -39,6 +40,8 @@ namespace TerRoguelike.Projectiles
             Projectile.localNPCHitCooldown = -1;
             Projectile.friendly = true;
             Projectile.hostile = false;
+            smokeTex = TexDict["Smoke"];
+            starTex = TexDict["CrossGlow"];
         }
 
         public override void OnSpawn(IEntitySource source)

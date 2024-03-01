@@ -14,12 +14,13 @@ using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.ModLoader.IO;
 using Terraria.GameContent;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class TempleBoulder : ModProjectile, ILocalizedModType
     {
-        public Texture2D lightTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/TempleBoulderGlow").Value;
+        public Texture2D lightTex;
         public override void SetDefaults()
         {
             Projectile.width = 30;
@@ -28,6 +29,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 240;
             Projectile.penetrate = -1;
+            lightTex = TexDict["TempleBoulderGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

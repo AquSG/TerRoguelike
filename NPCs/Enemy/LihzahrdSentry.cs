@@ -16,12 +16,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class LihzahrdSentry : BaseRoguelikeNPC
     {
-        public Texture2D lightTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/LihzahrdSentryGlow").Value;
+        public Texture2D lightTex;
         public override int modNPCID => ModContent.NPCType<LihzahrdSentry>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Temple"] };
         public override int CombatStyle => 1;
@@ -48,6 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, -10);
             NPC.noGravity = true;
             NPC.noTileCollide = true;
+            lightTex = TexDict["LihzahrdSentryGlow"];
         }
         public override void AI()
         {
