@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using TerRoguelike.TerPlayer;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -22,16 +24,16 @@ namespace TerRoguelike.Rooms
         public int SpawnCountdown = 0;
         public List<int> SpawnSelection = new List<int>()
         {
-            418,
-            518,
-            415,
-            416,
-            419,
-            417
+            ModContent.NPCType<Corite>(),
+            ModContent.NPCType<Soladile>(),
+            ModContent.NPCType<Daybreaker>()
         };
         public override void InitializeRoom()
         {
             base.InitializeRoom();
+            SpawnSelection = new List<int>() { ModContent.NPCType<Corite>(),
+            ModContent.NPCType<Soladile>(),
+            ModContent.NPCType<Daybreaker>() };
         }
         public override void Update()
         {

@@ -157,7 +157,7 @@ namespace TerRoguelike.NPCs.Enemy
                     spriteBatch.End();
                     spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-                    float opacity = NPC.ai[1] >= -attackCooldown + 60 ? MathHelper.Lerp(0, 1f, -NPC.ai[1] / 60) : MathHelper.Clamp(MathHelper.Lerp(1f, 0, (-NPC.ai[1] - 60) / ((attackCooldown - 110))), 0, 1f);
+                    float opacity = NPC.ai[1] >= -attackCooldown + 60 ? MathHelper.Lerp(0, 1f, -NPC.ai[1] / 60) : MathHelper.Clamp(MathHelper.Lerp(1f, 0, (-NPC.ai[1] - 60) / 10), 0, 1f);
                     Color color = Color.White * opacity;
                     Vector3 colorHSL = Main.rgbToHsl(color);
 

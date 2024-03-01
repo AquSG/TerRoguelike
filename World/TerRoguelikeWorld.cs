@@ -39,9 +39,9 @@ namespace TerRoguelike.World
 
                 RoomSystem.ResetRoomID(RoomSystem.RoomList[i].ID);
             }
-            MusicMode = 1;
+            SetMusicMode(MusicStyle.AllCalm);
             SetCalm(Escape with { Volume = 0.25f });
-            SetCombat(Silence with { Volume = 0f });
+            //SetCombat(Silence with { Volume = 0f });
         }
     }
     public class Chain
