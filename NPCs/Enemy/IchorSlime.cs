@@ -75,7 +75,7 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[1] >= attackTelegraph && ((int)NPC.ai[1] - attackTelegraph) % attackTimeBetween == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.7f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

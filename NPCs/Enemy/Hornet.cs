@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueFlyingShooterAI(NPC, 7f, 5.5f, 0.12f, 128f, 320f, attackTelegraph, attackCooldown, ModContent.ProjectileType<Stinger>(), 8f, new Vector2(12 * NPC.direction, 14).RotatedBy(NPC.rotation), NPC.damage, true);
             if (NPC.ai[2] == -attackCooldown)
             {
-                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.9f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

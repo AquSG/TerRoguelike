@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
                 d.noLightEmittence = true;
             }
             else if (NPC.ai[0] == attackTelegraph && NPC.ai[1] == 0)
-                SoundEngine.PlaySound(SoundID.DD2_WyvernDiveDown with { Volume = 0.6f, Pitch = -0.25f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_WyvernDiveDown with { Volume = 1f, Pitch = -0.25f }, NPC.Center);
         }
         public override void HitEffect(NPC.HitInfo hit)
         {

@@ -383,7 +383,7 @@ namespace TerRoguelike.TerPlayer
             if (sentientPutty > 0 && outOfDangerTime == 120)
             {
                 int healAmt = sentientPutty * 10;
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.12f }, Player.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.3f }, Player.Center);
                 ScaleableHeal(healAmt);
             }
             if (memoryFoam > 0 && outOfDangerTime >= 420)
@@ -458,9 +458,9 @@ namespace TerRoguelike.TerPlayer
                     {
                         storedDaggers++;
                         if (storedDaggers == maxStocks)
-                            SoundEngine.PlaySound(SoundID.Item63 with { Volume = 0.8f }, Player.Center);
+                            SoundEngine.PlaySound(SoundID.Item63 with { Volume = 1f }, Player.Center);
                         else
-                            SoundEngine.PlaySound(SoundID.Item64 with { Volume = 0.4f }, Player.Center);
+                            SoundEngine.PlaySound(SoundID.Item64 with { Volume = 0.5f }, Player.Center);
                     }
                 }
                 else if (Math.Abs(timeAttacking) % releaseCooldown == 0 && storedDaggers > 0)
@@ -882,7 +882,7 @@ namespace TerRoguelike.TerPlayer
                 if (DashDir != 0 && DashDelay == 0)
                 {
                     DashDirCache = DashDir;
-                    SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot with { Volume = 0.7f });
+                    SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot with { Volume = 1f });
                     Player.immuneTime += 7;
                     DashTime += 15;
                     int dashDelayAdd = (int)(600 * 4 / (float)(jetLeg + 3));
@@ -905,7 +905,7 @@ namespace TerRoguelike.TerPlayer
                 DashDelay--;
                 if (DashDelay == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.42f });
+                    SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.8f });
                 }
             }
 
@@ -1156,7 +1156,7 @@ namespace TerRoguelike.TerPlayer
 
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
-                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.075f }, Player.Center);
+                    SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.1f }, Player.Center);
                     CombatText.NewText(Player.getRect(), Color.LightGray, "blocked!");
                     Player.immuneTime += 40;
                     Player.immune = true;
@@ -1219,7 +1219,7 @@ namespace TerRoguelike.TerPlayer
         {
             if (protectiveBubble > 0 && outOfDangerTime >= 420)
             {
-                SoundEngine.PlaySound(SoundID.Item87 with { Volume = 0.75f }, Player.Center);
+                SoundEngine.PlaySound(SoundID.Item87 with { Volume = 1f }, Player.Center);
                 for (int i = 0; i < 15; i++)
                 {
                     Dust.NewDust(Player.MountedCenter + new Vector2(-16, -16), 32, 32, DustID.BlueTorch);
@@ -1249,7 +1249,7 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
                 if (playSound)
-                    SoundEngine.PlaySound(SoundID.Item105 with { Volume = 0.5f }, Player.Center);
+                    SoundEngine.PlaySound(SoundID.Item105 with { Volume = 0.7f }, Player.Center);
             }
             outOfDangerTime = 0;
         }
@@ -1269,7 +1269,7 @@ namespace TerRoguelike.TerPlayer
                     Player.immune = true;
                     soulOfLenaUses++;
                     soulOfLenaHurtVisual = true;
-                    SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.25f }, Player.Center);
+                    SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f }, Player.Center);
                 }
             }
         }

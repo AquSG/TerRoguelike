@@ -63,7 +63,7 @@ namespace TerRoguelike.Projectiles
             int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<Explosion>(), Projectile.damage, 0);
             TerRoguelikeGlobalProjectile modProj = Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
             modProj.InheritNPCProjValues(Main.projectile[proj], Projectile);
-            SoundEngine.PlaySound(SoundID.Item14 with { Volume = SoundID.Item41.Volume * 0.4f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item14 with { Volume = SoundID.Item41.Volume * 0.7f }, Projectile.Center);
             for (int i = 0; i < 15; i++)
             {
                 int d = Dust.NewDust(new Vector2(Projectile.position.X - 10, Projectile.position.Y - 10), Projectile.width + 20, Projectile.height + 20, DustID.Smoke, 0f, 0f, 0, default(Color), 1f);

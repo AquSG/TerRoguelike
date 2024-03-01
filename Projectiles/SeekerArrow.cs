@@ -81,7 +81,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.6f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Dig with { Volume = 1f }, Projectile.Center);
             return true;
         }
         public override bool PreDraw(ref Color lightColor)

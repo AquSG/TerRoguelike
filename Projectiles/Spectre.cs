@@ -37,7 +37,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.2f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f }, Projectile.Center);
             Projectile.rotation = Projectile.velocity.ToRotation();
             for (int i = 0; i < 8; i++)
             {

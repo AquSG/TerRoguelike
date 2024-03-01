@@ -59,7 +59,7 @@ namespace TerRoguelike.Projectiles
                 }
                 if (Math.Abs(RadianSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
                 {
-                    float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.008f * turnMultiplier);
+                    float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.006f * turnMultiplier);
                     Projectile.velocity = (Vector2.UnitX * Projectile.velocity.Length()).RotatedBy(newRot); 
                 }
             }
@@ -73,7 +73,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnKill(int timeLeft)
         {
-            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 1f }, Projectile.Center);
             for (int i = 0; i < 15; i++)
             {
                 Vector2 offset = (Main.rand.Next(2, 6) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));

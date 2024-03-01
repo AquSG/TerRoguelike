@@ -55,7 +55,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueTumbletwigAI(NPC, 2.5f, 0.02f, 400f, ModContent.ProjectileType<WoodSliver>(), 10f, NPC.damage, attackTelegraph, attackDuration, attackShootCooldown, 240, MathHelper.PiOver4 * 0.2f);
             if ((NPC.ai[0] - attackTelegraph) % attackShootCooldown == 0 && NPC.ai[0] <= attackTelegraph + attackDuration && NPC.ai[0] >= attackTelegraph)
             {
-                SoundEngine.PlaySound(SoundID.Item39 with { Volume = 0.8f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item39 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

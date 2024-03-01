@@ -50,7 +50,7 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[0] == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item8 with { Volume = 0.5f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
                 for (int i = 0; i < 50; i++)
                 {
                     int d = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, 174, 0f, 0f, 100, default(Color), 1.2f);

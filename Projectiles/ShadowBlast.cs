@@ -34,7 +34,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.ai[0] == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item60 with { Volume = 0.7f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.Item60 with { Volume = 1f }, Projectile.Center);
                 Projectile.ai[0] = 1;
             }
                 

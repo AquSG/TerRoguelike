@@ -57,7 +57,7 @@ namespace TerRoguelike.Projectiles
             if (Projectile.localAI[1] == 0)
             {
                 originalDirection = Projectile.velocity.SafeNormalize(-Vector2.UnitY);
-                SoundEngine.PlaySound(SoundID.Item39 with { Volume = 0.5f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.Item39 with { Volume = 1f }, Projectile.Center);
             }
             if (Projectile.timeLeft == 59)
             {
@@ -92,7 +92,7 @@ namespace TerRoguelike.Projectiles
             if (modPlayer.volatileRocket > 0)
                 modProj.SpawnExplosion(Projectile, modPlayer, originalHit: true);
             Projectile.rotation = Projectile.oldRot[1];
-            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.75f }, Projectile.Center);
             return false;
         }
         public override bool PreDraw(ref Color lightColor)
@@ -124,7 +124,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 60;
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;
-            SoundEngine.PlaySound(SoundID.NPCHit18 with { Volume = 0.3f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.NPCHit18 with { Volume = 0.6f }, Projectile.Center);
         }
     }
 }

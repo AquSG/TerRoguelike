@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueFlyingShooterAI(NPC, 2f, 2f, 0.03f, 120f, 180f, attackTelegraph, attackCooldown, ProjectileID.RockGolemRock, 8f, Vector2.Zero, NPC.damage, true);
             if (NPC.ai[2] == -attackCooldown)
             {
-                SoundEngine.PlaySound(SoundID.Item51 with { Volume = 0.4f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item51 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

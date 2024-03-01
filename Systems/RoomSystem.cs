@@ -665,7 +665,7 @@ namespace TerRoguelike.Systems
                 HealingPulse pulse = healingPulses[p];
                 if (pulse.Time == 30)
                 {
-                    SoundEngine.PlaySound(SoundID.DD2_BetsyWindAttack with { Volume = 0.15f });
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyWindAttack with { Volume = 0.3f });
                 }
                 if (pulse.Time == 0)
                 {
@@ -679,7 +679,7 @@ namespace TerRoguelike.Systems
 
                         TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                         modPlayer.ScaleableHeal((int)(player.statLifeMax2 / 2f));
-                        SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 0.75f });
+                        SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 1f });
                     }
                 }
                 pulse.Time--;

@@ -106,7 +106,7 @@ namespace TerRoguelike.Projectiles
             if (Projectile.timeLeft > 60)
             {
                 Projectile.timeLeft = 60;
-                SoundEngine.PlaySound(SoundID.NPCHit3 with { Volume = 0.15f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.NPCHit3 with { Volume = 0.3f }, Projectile.Center);
             }
                 
             ableToHit = false;

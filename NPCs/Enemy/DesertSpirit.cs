@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.velocity *= 0.95f;
             if (NPC.ai[0] == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item8 with { Volume = 0.5f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
                 for (int i = 0; i < 50; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, 27, 0f, 0f, 100, default(Color), 2.5f);
