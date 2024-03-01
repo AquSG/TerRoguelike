@@ -16,12 +16,13 @@ using Terraria.Audio;
 using Terraria.GameContent.Animations;
 using Terraria.Graphics.Shaders;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class IcyMerman : BaseRoguelikeNPC
     {
-        public Texture2D headTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/IcyMermanHead").Value;
+        public Texture2D headTex;
         public int currentFrame = 0;
         public List<int> offsetFrames = new List<int>() { 3, 4, 5, 10, 11, 12 };
         public override int modNPCID => ModContent.NPCType<IcyMerman>();
@@ -49,6 +50,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0.5f;
             modNPC.drawCenter = new Vector2(0, -6);
+            headTex = TexDict["IcyMermanHead"];
         }
         public override void AI()
         {

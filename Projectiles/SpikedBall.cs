@@ -13,12 +13,13 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class SpikedBall : ModProjectile, ILocalizedModType
     {
-        public Texture2D chainTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/SpikedBallChain").Value;
+        public Texture2D chainTex;
         public TerRoguelikeGlobalProjectile modProj;
         public override void SetDefaults()
         {
@@ -32,6 +33,7 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
             Projectile.hide = true;
+            chainTex = TexDict["SpikedBallChain"];
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {

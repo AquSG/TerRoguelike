@@ -12,12 +12,14 @@ using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
+using static TerRoguelike.Managers.TextureManager;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Projectiles
 {
     public class DesertSpiritCurse : ModProjectile, ILocalizedModType
     {
-        public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
+        public Texture2D glowTex;
         public Texture2D fireTex;
         public override void SetStaticDefaults()
         {
@@ -32,7 +34,7 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.timeLeft = 320;
-            fireTex = ModContent.Request<Texture2D>(Texture).Value;
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -69,6 +71,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            fireTex = TextureAssets.Projectile[Type].Value;
             int frameHeight = fireTex.Height / Main.projFrames[Type];
 
             Main.spriteBatch.End();

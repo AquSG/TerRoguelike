@@ -13,12 +13,13 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.DataStructures;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class SporeCloud : ModProjectile, ILocalizedModType
     {
-        public Texture2D glowTex = ModContent.Request<Texture2D>("TerRoguelike/ExtraTextures/CircularGlow").Value;
+        public Texture2D glowTex;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = 5;
@@ -34,6 +35,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 240;
             Projectile.direction = Main.rand.NextBool() ? -1 : 1;
             Projectile.penetrate = -1;
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

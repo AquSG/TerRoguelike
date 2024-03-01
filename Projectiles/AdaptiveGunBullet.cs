@@ -10,6 +10,8 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
+using Terraria.GameContent;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -83,7 +85,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D lightTexture = ModContent.Request<Texture2D>(Texture).Value;
+            Texture2D lightTexture = TextureAssets.Projectile[Type].Value;
             for (int i = 0; i < Projectile.oldPos.Length; i++)
             {
                 if (Projectile.timeLeft <= 60 && i + Projectile.timeLeft < 45)
@@ -100,7 +102,7 @@ namespace TerRoguelike.Projectiles
             {
                 if (modPlayer.volatileRocket > 0 && Projectile.velocity != Vector2.Zero)
                 {
-                    Texture2D rocketTexture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/VolatileRocket").Value;
+                    Texture2D rocketTexture = TexDict["VolatileRocket"];
                     Vector2 drawPosition = Projectile.Center - Main.screenPosition;
                     Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
                 }

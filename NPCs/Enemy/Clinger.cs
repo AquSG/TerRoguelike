@@ -19,6 +19,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.DataStructures;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Graphics.Shaders;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -28,8 +29,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override List<int> associatedFloors => new List<int>() { FloorDict["Corrupt"] };
         public override int CombatStyle => 2;
         public Vector2 AnchorPos = Vector2.Zero;
-        public Texture2D segment1Tex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/ClingerSegment1").Value;
-        public Texture2D segment2Tex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/ClingerSegment2").Value;
+        public Texture2D segment1Tex;
+        public Texture2D segment2Tex;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 5;
@@ -49,6 +50,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.behindTiles = true;
             NPC.noTileCollide = true;
+            segment1Tex = TexDict["ClingerSegment1"];
+            segment2Tex = TexDict["ClingerSegment2"];
         }
         public override void OnSpawn(IEntitySource source)
         {

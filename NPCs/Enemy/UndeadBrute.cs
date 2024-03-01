@@ -18,15 +18,16 @@ using Terraria.Graphics.Shaders;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class UndeadBrute : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<UndeadBrute>();
-        public Texture2D ballTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/SpikedBall").Value;
-        public Texture2D chainTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/SpikedBallChain").Value;
-        public Texture2D armTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/UndeadBruteArm").Value;
+        public Texture2D ballTex;
+        public Texture2D chainTex;
+        public Texture2D armTex;
         public override List<int> associatedFloors => new List<int>() { FloorDict["Dungeon"] };
         public override int CombatStyle => 2;
         public BallAndChain ball;
@@ -54,6 +55,9 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -4);
             ball = new BallAndChain(NPC.Center - (Vector2.UnitX * 32), 20, 20, 0);
+            ballTex = TexDict["SpikedBall"];
+            chainTex = TexDict["SpikedBallChain"];
+            armTex = TexDict["UndeadBruteArm"];
         }
         public override void AI()
         {

@@ -16,12 +16,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class LihzahrdConstruct : BaseRoguelikeNPC
     {
-        public Texture2D lightTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/LihzahrdConstructGlow").Value;
+        public Texture2D lightTex;
         public override int modNPCID => ModContent.NPCType<LihzahrdConstruct>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Temple"] };
         public override int CombatStyle => 2;
@@ -47,6 +48,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath43;
             NPC.knockBackResist = 0.1f;
             modNPC.drawCenter = new Vector2(0, -9);
+            lightTex = TexDict["LihzahrdConstructGlow"];
         }
         public override void AI()
         {

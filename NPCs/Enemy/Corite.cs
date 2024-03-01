@@ -15,12 +15,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class Corite : BaseRoguelikeNPC
     {
-        public Texture2D lightTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/CoriteGlow").Value;
+        public Texture2D lightTex;
         public override int modNPCID => ModContent.NPCType<Corite>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => 0;
@@ -46,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.noTileCollide = true;
             modNPC.drawCenter = new Vector2(0, -2);
+            lightTex = TexDict["CoriteGlow"];
         }
         public override void AI()
         {

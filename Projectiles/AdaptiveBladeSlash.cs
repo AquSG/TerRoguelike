@@ -11,6 +11,7 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using TerRoguelike.Utilities;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Projectiles
 {
@@ -80,7 +81,7 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.frame <= 3 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D texture = ModContent.Request<Texture2D>(Texture).Value;
+            Texture2D texture = TextureAssets.Projectile[Type].Value;
             int frameHeight = texture.Height / Main.projFrames[Projectile.type];
             SpriteEffects spriteEffects = modProj.swingDirection == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, texture.Width, frameHeight), Color.Lerp(lightColor, Color.White, 0.5f), Projectile.rotation + (MathHelper.Pi * modProj.swingDirection / 12f), new Vector2(texture.Width / 2f, (frameHeight / 2f)), Projectile.scale, spriteEffects);

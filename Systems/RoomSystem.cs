@@ -29,6 +29,7 @@ using TerRoguelike.NPCs.Enemy.Pillar;
 using static TerRoguelike.World.TerRoguelikeWorld;
 using static TerRoguelike.Systems.MusicSystem;
 using Terraria.DataStructures;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Systems
 {
@@ -418,7 +419,7 @@ namespace TerRoguelike.Systems
             if (RoomList == null)
                 return;
 
-            Texture2D lightTexture = ModContent.Request<Texture2D>("TerRoguelike/Tiles/TemporaryBlock").Value;
+            Texture2D lightTexture = TexDict["TemporaryBlock"];
             foreach (Room room in RoomList)
             {
                 if (room == null)
@@ -430,7 +431,7 @@ namespace TerRoguelike.Systems
                     {
                         Main.spriteBatch.Begin();
                         Vector2 position = (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f;
-                        Texture2D moonLordTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/StillMoonLord").Value;
+                        Texture2D moonLordTex = TexDict["StillMoonLord"];
                         Vector2 zoomOffset = (((position - Main.Camera.Center) * ZoomSystem.zoomOverride) - (position - Main.Camera.Center));
                         Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, ZoomSystem.zoomOverride, SpriteEffects.None);
                         Main.spriteBatch.End();
@@ -698,7 +699,7 @@ namespace TerRoguelike.Systems
             for (int p = 0; p < healingPulses.Count; p++)
             {
                 HealingPulse pulse = healingPulses[p];
-                Texture2D telegraphBase = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/InvisibleProj").Value;
+                Texture2D telegraphBase = TexDict["InvisibleProj"];
 
                 float scale;
                 float opacity;
@@ -778,8 +779,8 @@ namespace TerRoguelike.Systems
             if (!chainList.Any())
                 return;
 
-            Texture2D chain1Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain1").Value;
-            Texture2D chain2Tex = ModContent.Request<Texture2D>("TerRoguelike/World/Chain2").Value;
+            Texture2D chain1Tex = TexDict["Chain1"];
+            Texture2D chain2Tex = TexDict["Chain2"];
             Main.spriteBatch.Begin();
             for (int i = 0; i < chainList.Count; i++)
             {

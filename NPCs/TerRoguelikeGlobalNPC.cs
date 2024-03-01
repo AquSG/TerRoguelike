@@ -22,6 +22,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Systems.RoomSystem;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs
 {
@@ -3252,7 +3253,7 @@ namespace TerRoguelike.NPCs
         /// </summary>
         public void DrawRotatlingBloodParticles(bool inFront, NPC npc)
         {
-            Texture2D texture = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/AdaptiveGunBullet").Value;
+            Texture2D texture = TexDict["AdaptiveGunBullet"];
             Color color = Color.Red * 0.8f;
             Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
 

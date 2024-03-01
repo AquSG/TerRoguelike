@@ -15,6 +15,7 @@ namespace TerRoguelike
         public override void Load()
         {
             Instance = this;
+            TextureManager.Load();
             SchematicManager.Load();
             ItemManager.Load();
             NPCManager.Load();
@@ -38,6 +39,7 @@ namespace TerRoguelike
             DeathUI.Unload();
             ItemManager.Unload();
             NPCManager.Unload();
+            TextureManager.Unload();
         }
         public void LoadClient()
         {

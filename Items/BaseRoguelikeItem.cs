@@ -9,6 +9,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Items
 {
@@ -35,7 +36,6 @@ namespace TerRoguelike.Items
         {
             Item.width = 20;
             Item.height = 20;
-            texture = ModContent.Request<Texture2D>(Texture).Value;
         }
         /// <summary>
         /// Item Effects happen here. updated in UpdateInventory(Player player)
@@ -50,6 +50,7 @@ namespace TerRoguelike.Items
         }
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
+            texture = TextureAssets.Item[Type].Value;
             // Generalized drawing for all TerRoguelike Items. they all have the same 20x20 hitbox but have different offsets to account for their size.
             if (animationTicksPerFrame > 0 && animationFrameCount > 0)
             {

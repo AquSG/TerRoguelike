@@ -16,6 +16,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.Projectiles;
 using Terraria.Audio;
 using Terraria.Graphics.Shaders;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -27,7 +28,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackTelegraph = 10;
         public int attackCooldown = 170;
         public Texture2D texture;
-        public Texture2D baseTex = ModContent.Request<Texture2D>("TerRoguelike/NPCs/Enemy/BallistaBase").Value;
+        public Texture2D baseTex;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 7;
@@ -45,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.OverrideIgniteVisual = true;
-            texture = ModContent.Request<Texture2D>(Texture).Value;
+            baseTex = TexDict["BallistaBase"];
         }
         public override void AI()
         {
@@ -92,6 +93,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            texture = TextureAssets.Npc[Type].Value;
             int currentFrame = NPC.ai[0] >= -150 ? 1 : (NPC.ai[0] > 0 ? (int)(NPC.ai[0] / 5) + 2 : (int)((NPC.ai[0] + attackCooldown) / 5) + 3);
             int frameHeight = texture.Height / Main.npcFrameCount[modNPCID];
             SpriteEffects effects = Math.Abs(NPC.rotation) < MathHelper.PiOver2 ? SpriteEffects.None : SpriteEffects.FlipVertically;

@@ -12,6 +12,7 @@ using Terraria.UI;
 using TerRoguelike.World;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.UI
 {
@@ -21,8 +22,8 @@ namespace TerRoguelike.UI
         private static Texture2D barrierBarTex, barrierBorderTex;
         internal static void Load()
         {
-            barrierBarTex = ModContent.Request<Texture2D>("TerRoguelike/UI/BarrierBar", AssetRequestMode.ImmediateLoad).Value;
-            barrierBorderTex = ModContent.Request<Texture2D>("TerRoguelike/UI/BarrierBarBorder", AssetRequestMode.ImmediateLoad).Value;
+            barrierBarTex = TexDict["BarrierBar"];
+            barrierBorderTex = TexDict["BarrierBarBorder"];
 
             Reset();
         }

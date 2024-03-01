@@ -10,6 +10,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -74,9 +75,9 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.timeLeft <= 60 && Projectile.timeLeft >= 45 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D bombTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/SingularClusterBomb").Value;
-            Texture2D explosionTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Explosion").Value;
-            Texture2D smokeTex = ModContent.Request<Texture2D>("TerRoguelike/Projectiles/Smoke").Value;
+            Texture2D bombTex = TexDict["SingularClusterBomb"];
+            Texture2D explosionTex = TexDict["Explosion"];
+            Texture2D smokeTex = TexDict["Smoke"];
 
             if (randomSmokeRotation == -100f)
             {
