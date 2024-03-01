@@ -73,8 +73,10 @@ namespace TerRoguelike.Projectiles
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => Projectile.RotatingHitboxCollision(targetHitbox.TopLeft(), targetHitbox.Size(), Projectile.rotation.ToRotationVector2(), backCutoff: 0.3f);
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
-            float xVector = (target.Center - Main.player[Projectile.owner].Center).X;
-            modifiers.HitDirectionOverride = (int)(Math.Abs(xVector) / xVector);
+            int direction = Math.Sign((target.Center - Main.player[Projectile.owner].Center).X);
+            if (direction == 0)
+                direction = Main.rand.NextBool() ? 1 : -1;
+            modifiers.HitDirectionOverride = direction;
         }
 
         //only hit if in the first 3 frames of animation

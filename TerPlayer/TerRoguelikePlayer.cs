@@ -154,6 +154,8 @@ namespace TerRoguelike.TerPlayer
         public int killerNPCType = 0;
         public int killerProj = -1;
         public int killerProjType = 0;
+        public bool brainSucked = false;
+        public int brainSucklerTime = 0;
         #endregion
 
         #region Reset Variables
@@ -304,7 +306,24 @@ namespace TerRoguelike.TerPlayer
                         
                 }
             }
-            
+
+            if (!brainSucked)
+            {
+                if (brainSucklerTime > 0)
+                {
+                    brainSucklerTime -= 5;
+                    if (brainSucklerTime < 0)
+                        brainSucklerTime = 0;
+                }
+                    
+            }
+            else
+            {
+                if (brainSucklerTime < 600)
+                    brainSucklerTime++;
+            }
+            brainSucked = false;
+
             //max life effects happen before barrier calculations
             if (bottleOfVigor > 0)
             {
@@ -1778,6 +1797,36 @@ namespace TerRoguelike.TerPlayer
             {
                 DrawVisualFungi();
             }
+
+            if (brainSucklerTime > 0)
+            {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+
+                Texture2D telegraphBase = TexDict["InvisibleProj"];
+
+                float scale;
+                float opacity;
+                float interpolant = brainSucklerTime / 600f;
+                scale = MathHelper.Clamp(MathHelper.Lerp(4f, 1.5f, interpolant * interpolant), 1.5f, 8f);
+                //opacity = MathHelper.Clamp(MathHelper.Lerp(0, 0.75f, interpolant * (1 + interpolant * 6)), 0, 0.75f);
+                opacity = MathHelper.Clamp(MathHelper.SmoothStep(0, 0.75f, interpolant * (1 + interpolant * 1.1f)), 0, 0.75f);
+                
+                GameShaders.Misc["TerRoguelike:CircularGradientOuter"].UseOpacity(opacity);
+                GameShaders.Misc["TerRoguelike:CircularGradientOuter"].UseColor(Color.Black);
+                GameShaders.Misc["TerRoguelike:CircularGradientOuter"].UseSecondaryColor(Color.Black);
+                GameShaders.Misc["TerRoguelike:CircularGradientOuter"].UseSaturation(scale);
+                GameShaders.Misc["TerRoguelike:CircularGradientOuter"].Apply();
+
+                Vector2 drawPosition = new Vector2(Main.screenWidth * 0.5f, Main.screenHeight * 0.5f);
+                Main.EntitySpriteDraw(telegraphBase, drawPosition, null, Color.White, 0, telegraphBase.Size() / 2f, scale * 2000f, 0, 0);
+                
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            }
+            
+
             return;
 
             if (evilEye > 0)
