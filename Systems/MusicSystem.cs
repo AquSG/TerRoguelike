@@ -31,7 +31,16 @@ namespace TerRoguelike.Systems
         float CombatVolumeCache = 0;
         public static SlotId CalmMusic;
         public static SlotId CombatMusic;
-        public static int MusicMode = 0; // 0: Calm/Combat - 1: All Calm - 2: All Combat - 3: Silent
+        public static MusicStyle MusicMode = MusicStyle.Dynamic;
+        public enum MusicStyle
+        {
+            Dynamic = 0,
+            AllCalm = 1,
+            AllCombat = 2,
+            Silent = 3
+        }
+        public static bool BufferCalmSilence = false;
+        public static bool BufferCombatSilence = false;
 
         public static SoundStyle Silence = new("TerRoguelike/Tracks/Blank", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
         public static SoundStyle KeygenCalm = new("TerRoguelike/Tracks/Calm", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
@@ -56,6 +65,12 @@ namespace TerRoguelike.Systems
             {
                 combatMusic.Stop();
             }
+        }
+        public static void SetMusicMode(MusicStyle newMode)
+        {
+            MusicMode = newMode;
+            BufferCalmSilence = newMode == MusicStyle.AllCombat || newMode == MusicStyle.Silent;
+            BufferCombatSilence = newMode == MusicStyle.AllCalm || newMode == MusicStyle.Silent;
         }
         public override void PostDrawFullscreenMap(ref string mouseText)
         {
@@ -91,7 +106,7 @@ namespace TerRoguelike.Systems
             TerRoguelikePlayer modPlayer = Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>();
             if (!Initialized)
             {
-                MusicMode = 0;
+                SetMusicMode(MusicStyle.Dynamic);
                 CalmMusic = SoundEngine.PlaySound(KeygenCalm with { Volume = 0.25f });
                 CombatMusic = SoundEngine.PlaySound(KeygenCombat with { Volume = 0.25f });
                 if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
@@ -144,7 +159,7 @@ namespace TerRoguelike.Systems
                 }
             }
 
-            if (MusicMode == 0)
+            if (MusicMode == MusicStyle.Dynamic)
             {
                 if (modPlayer.currentRoom == -1)
                 {
@@ -185,7 +200,7 @@ namespace TerRoguelike.Systems
                 }
             }
             
-            if (MusicMode == 1)
+            if (MusicMode == MusicStyle.AllCalm)
             {
                 if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
                 {
@@ -202,10 +217,18 @@ namespace TerRoguelike.Systems
                     combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
                     combatMusic.Update();
                     CombatVolumeCache = combatMusic.Volume;
+                    if (BufferCombatSilence)
+                    {
+                        if (combatMusic.Volume <= 0)
+                        {
+                            SetCombat(Silence with { Volume = 0f });
+                            BufferCombatSilence = false;
+                        }
+                    }
                 }
             }
 
-            if (MusicMode == 2)
+            if (MusicMode == MusicStyle.AllCombat)
             {
                 if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
                 {
@@ -213,6 +236,14 @@ namespace TerRoguelike.Systems
                     calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
                     calmMusic.Update();
                     CalmVolumeCache = calmMusic.Volume;
+                    if (BufferCalmSilence)
+                    {
+                        if (calmMusic.Volume <= 0)
+                        {
+                            SetCalm(Silence with { Volume = 0f });
+                            BufferCalmSilence = false;
+                        }
+                    }
                 }
 
                 if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
@@ -224,7 +255,7 @@ namespace TerRoguelike.Systems
                 }
             }
 
-            if (MusicMode == 3)
+            if (MusicMode == MusicStyle.Silent)
             {
                 if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
                 {
@@ -232,8 +263,15 @@ namespace TerRoguelike.Systems
                     calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
                     calmMusic.Update();
                     CalmVolumeCache = calmMusic.Volume;
+                    if (BufferCalmSilence)
+                    {
+                        if (calmMusic.Volume <= 0)
+                        {
+                            SetCalm(Silence with { Volume = 0f });
+                            BufferCalmSilence = false;
+                        }
+                    }
                 }
-
 
                 if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
                 {
@@ -241,6 +279,14 @@ namespace TerRoguelike.Systems
                     combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
                     combatMusic.Update();
                     CombatVolumeCache = combatMusic.Volume;
+                    if (BufferCombatSilence)
+                    {
+                        if (combatMusic.Volume <= 0)
+                        {
+                            SetCombat(Silence with { Volume = 0f });
+                            BufferCombatSilence = false;
+                        }
+                    }
                 }
             }
         }

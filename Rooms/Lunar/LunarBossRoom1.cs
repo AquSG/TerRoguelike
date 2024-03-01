@@ -36,15 +36,15 @@ namespace TerRoguelike.Rooms
                     musicPlayed = false;
                     AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.MoonLordCore, 1, 1, 0.9f);
                     TerRoguelikeWorld.lunarBossSpawned = true;
-                    MusicMode = 3;
+                    SetMusicMode(MusicStyle.Silent);
                 }
                 else
                     awake = false;
             }
             if (awake && !musicPlayed)
             {
-                MusicMode = 2;
-                SetCalm(Silence with { Volume = 0f });
+                SetMusicMode(MusicStyle.AllCombat);
+                //SetCalm(Silence with { Volume = 0f });
                 SetCombat(FinalBoss with { Volume = 0.4f });
                 musicPlayed = true;
             }

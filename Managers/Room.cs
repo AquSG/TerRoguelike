@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.ModLoader;
 using TerRoguelike.NPCs;
@@ -6,6 +7,8 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Systems.MusicSystem;
 
 namespace TerRoguelike.Managers
 {
@@ -277,7 +280,7 @@ namespace TerRoguelike.Managers
                 return;
 
             if (Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage == 4 && IsBossRoom)
-                MusicSystem.MusicMode = 3;
+                SetMusicMode(MusicStyle.Silent);
 
             ClearRockets();
 
@@ -298,7 +301,7 @@ namespace TerRoguelike.Managers
                     itemType = ItemManager.GiveRare(false);
                     itemTier = 2;
                 }
-                SpawnManager.SpawnItem(itemType, (RoomPosition + (RoomDimensions / 2f)) * 16f, itemTier, 75, 0.5f);
+                SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f);
                 return;
             }
 
@@ -323,7 +326,7 @@ namespace TerRoguelike.Managers
                 itemType = ItemManager.GiveRare();
                 itemTier = 2;
             }
-            SpawnManager.SpawnItem(itemType, (RoomPosition + (RoomDimensions / 2f)) * 16f, itemTier, 75, 0.5f);
+            SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f);
         }
         public void PlayerItemsUpdate()
         {
@@ -393,6 +396,34 @@ namespace TerRoguelike.Managers
         public virtual bool StartCondition()
         {
             return awake;
+        }
+        public Vector2 FindAirNearRoomCenter()
+        {
+            Point centerTile = new Point((int)(RoomPosition.X + (RoomDimensions.X * 0.5f)), (int)(RoomPosition.Y + (RoomDimensions.Y * 0.5f)));
+            if (!ParanoidTileRetrieval(centerTile.X, centerTile.Y).IsTileSolidGround(true))
+                return RoomPosition16 + RoomCenter16;
+
+            for (int i = 0; i < 200; i++)
+            {
+                int direction = i % 4 > 1 ? (i % 2 == 0 ? 2 : -2) : (i % 2 == 0 ? 1 : -1);
+                if (Math.Abs(direction) == 2)
+                {
+                    direction = Math.Sign(direction);
+                    if (ParanoidTileRetrieval(centerTile.X, centerTile.Y + ((i / 4) * direction)).IsTileSolidGround(true))
+                        continue;
+
+                    return new Vector2(centerTile.X, centerTile.Y + ((i / 4) * direction)) * 16f + new Vector2(8, 8);
+                }
+                else
+                {
+                    if (ParanoidTileRetrieval(centerTile.X + ((i / 4) * direction), centerTile.Y).IsTileSolidGround(true))
+                        continue;
+
+                    return new Vector2(centerTile.X + ((i / 4) * direction), centerTile.Y) * 16f + new Vector2(8, 8);
+                }
+            }
+
+            return RoomPosition16 + RoomCenter16;
         }
     }
 }

@@ -60,7 +60,7 @@ namespace TerRoguelike.NPCs.Enemy
                     int direction = i % 4 > 1 ? (i % 2 == 0 ? 2 : -2) : (i % 2 == 0 ? 1 : -1);
                     if (Math.Abs(direction) == 2)
                     {
-                        direction /= 2;
+                        direction = Math.Sign(direction);
                         if (!ParanoidTileRetrieval(spawnTile.X, spawnTile.Y + ((i / 4) * direction)).IsTileSolidGround(true))
                             continue;
 

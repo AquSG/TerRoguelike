@@ -199,7 +199,7 @@ namespace TerRoguelike.Systems
                                 {
                                     ResetRoomID(RoomList[L].ID);
                                 }
-                                MusicMode = 3;
+                                SetMusicMode(MusicStyle.Silent);
 
                                 for (int n = 0; n < Main.maxNPCs; n++)
                                 {
@@ -241,9 +241,8 @@ namespace TerRoguelike.Systems
         #region Initialize Lunar Floor
         public static void InitializeLunarFloor()
         {
-            MusicMode = 1;
+            SetMusicMode(MusicStyle.AllCalm);
             SetCalm(FinalStage with { Volume = 0.4f });
-            SetCombat(Silence with { Volume = 0f });
 
             if (lunarFloorInitialized)
                 return;

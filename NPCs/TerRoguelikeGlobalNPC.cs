@@ -575,6 +575,7 @@ namespace TerRoguelike.NPCs
         {
             Entity target = GetTarget(npc, false, false);
 
+            npc.stairFall = true;
             npc.ai[0]++;
 
             if (target != null)
@@ -2938,6 +2939,7 @@ namespace TerRoguelike.NPCs
                 segment.OldRotation = segment.Rotation;
                 if (i == 0)
                 {
+                    segment.Position = npc.Center;
                     segment.Position += npc.velocity;
                     segment.Rotation = npc.rotation;
                     continue;

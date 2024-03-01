@@ -42,7 +42,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.lifeMax = 800;
             NPC.HitSound = SoundID.NPCHit3;
             NPC.DeathSound = SoundID.NPCDeath3;
-            NPC.knockBackResist = 0.4f;
+            NPC.knockBackResist = 0f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
             modNPC.drawCenter = new Vector2(0, -2);
@@ -118,10 +118,10 @@ namespace TerRoguelike.NPCs.Enemy
         {
             Vector2 offset = new Vector2(NPC.width * 0.5f, NPC.height * 0.5f);
             Texture2D tex = TextureAssets.Npc[Type].Value;
-            for (int i = 1; i < NPC.oldPos.Length; i++)
+            for (int i = 0; i < NPC.oldPos.Length; i++)
             {
                 Vector2 drawPos = NPC.oldPos[i] + offset;
-                Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition + modNPC.drawCenter, NPC.frame, Lighting.GetColor(new Point((int)(drawPos.X / 16f), (int)(drawPos.Y / 16f))) * MathHelper.Lerp(0.7f, 0, (float)i / NPC.oldPos.Length), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+                Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition + modNPC.drawCenter, NPC.frame, Color.Orange * MathHelper.Lerp(0.7f, 0, (float)i / NPC.oldPos.Length), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale * 1.2f, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             }
             return true;
         }
