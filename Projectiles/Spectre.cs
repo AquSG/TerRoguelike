@@ -99,7 +99,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            spectreTex = TextureAssets.Npc[Type].Value;
+            spectreTex = TextureAssets.Projectile[Type].Value;
             int frameHeight = spectreTex.Height / Main.projFrames[Type];
 
             Main.spriteBatch.End();
