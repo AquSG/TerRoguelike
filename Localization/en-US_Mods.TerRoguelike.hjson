@@ -46,6 +46,7 @@ Projectiles: {
 	TempleBoulder.DisplayName: Temple Boulder
 	Daybreak.DisplayName: Daybreak
 	SolarFlare.DisplayName: Solar Flare
+	NebulaLaser.DisplayName: Nebula Laser
 }
 
 Items: {
@@ -749,4 +750,5 @@ NPCs: {
 	Daybreaker.DisplayName: Daybreaker
 	Soladile.DisplayName: Soladile
 	BrainSuckler.DisplayName: Brain Suckler
+	Omniwatcher.DisplayName: Omniwatcher
 }

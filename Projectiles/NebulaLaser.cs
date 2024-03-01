@@ -14,7 +14,7 @@ using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
-    public class ShadowBlast : ModProjectile, ILocalizedModType
+    public class NebulaLaser : ModProjectile, ILocalizedModType
     {
         public TerRoguelikeGlobalProjectile modProj;
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
@@ -25,17 +25,25 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
-            Projectile.extraUpdates = 29;
+            Projectile.MaxUpdates = 30;
             Projectile.timeLeft = 5400;
             Projectile.penetrate = 1;
             modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Item60 with { Volume = 1f }, Projectile.Center);
+            Projectile.velocity /= Projectile.MaxUpdates;
+            for (int i = 0; i < 6; i++)
+            {
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
+                Dust dust = Main.dust[d];
+                dust.velocity *= 2f;
+                dust.noLight = true;
+                dust.noLightEmittence = true;
+            }
         }
         public override void AI()
-        { 
+        {  
             if (Main.rand.NextBool(3))
                 return;
 
@@ -49,17 +57,16 @@ namespace TerRoguelike.Projectiles
         
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            // If the projectile hits the left or right side of the tile, reverse the X velocity
-            if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
+            for (int i = 0; i < 12; i++)
             {
-                Projectile.velocity.X = -oldVelocity.X;
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
+                Dust dust = Main.dust[d];
+                dust.velocity *= 3f;
+                dust.noLight = true;
+                dust.noLightEmittence = true;
             }
-            // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
-            if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-            {
-                Projectile.velocity.Y = -oldVelocity.Y;
-            }
-            return false;
+            SoundEngine.PlaySound(SoundID.NPCHit3 with { Volume = 0.7f }, Projectile.Center);
+            return true;
         }
     }
 }

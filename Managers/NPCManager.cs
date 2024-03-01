@@ -96,7 +96,9 @@ namespace TerRoguelike.Managers
                 new LihzahrdConstruct(),
                 new Corite(),
                 new Daybreaker(),
-                new Soladile()
+                new Soladile(),
+                new BrainSuckler(),
+                new Omniwatcher(),
             };
         }
         internal static void Unload()
