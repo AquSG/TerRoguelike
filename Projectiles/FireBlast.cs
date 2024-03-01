@@ -29,7 +29,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Item73 with { Volume = 0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item73 with { Volume = 1f }, Projectile.Center);
         }
         public override void AI()
         {
@@ -37,7 +37,7 @@ namespace TerRoguelike.Projectiles
             {
                 int newWidth = 64;
                 int newHeight = 64;
-                SoundEngine.PlaySound(SoundID.Item74 with { Volume = 0.6f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.Item74 with { Volume = 1f }, Projectile.Center);
                 Projectile.velocity = Vector2.Zero;
                 Projectile.ai[0] = 2;
                 Projectile.position = Projectile.Center + new Vector2(-(newWidth * 0.5f), -(newHeight * 0.5f));

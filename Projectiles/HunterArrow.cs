@@ -66,7 +66,7 @@ namespace TerRoguelike.Projectiles
                 else
                 {
                     Projectile.velocity = (Vector2.UnitX * origVelocity.Length()).RotatedBy(Projectile.rotation);
-                    SoundEngine.PlaySound(SoundID.Item102 with { Volume = 0.4f }, Projectile.Center);
+                    SoundEngine.PlaySound(SoundID.Item102 with { Volume = 0.7f }, Projectile.Center);
                 }
                 Projectile.ai[0]++;
             }
@@ -107,7 +107,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.ai[0] == 0)
             {
-                SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.9f }, Projectile.Center);
                 Projectile.ai[0]++;
                 GetTarget();
                 Projectile.velocity = Vector2.Zero;
@@ -119,7 +119,7 @@ namespace TerRoguelike.Projectiles
             if (Projectile.ai[0] < RedirectTelegraph)
                 return false;
 
-            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.6f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.9f }, Projectile.Center);
             return true;
         }
         public override bool PreDraw(ref Color lightColor)

@@ -73,7 +73,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 720f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SniperBullet>(), 2f, bulletPos, NPC.damage * 2, true, false, gunRot + MathHelper.Pi);
             if (NPC.ai[1] == -attackCooldown)
             {
-                SoundEngine.PlaySound(SoundID.Item40 with { Volume = 0.75f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item40 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

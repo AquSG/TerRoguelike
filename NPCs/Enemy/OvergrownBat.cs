@@ -37,7 +37,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.lifeMax = 800;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath4;
-            NPC.knockBackResist = 0.5f;
+            NPC.knockBackResist = 0f;
             NPC.noGravity = true;
             modNPC.drawCenter = new Vector2(0, -2);
         }
@@ -80,7 +80,7 @@ namespace TerRoguelike.NPCs.Enemy
             }
             if (NPC.ai[0] == -attackCooldown && NPC.ai[1] == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item76 with { Volume = 0.6f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item76 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

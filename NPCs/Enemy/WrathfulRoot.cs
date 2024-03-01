@@ -73,7 +73,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueTurretAI(NPC, 10, attackCooldown, 300f, ModContent.ProjectileType<WoodSliver>(), NPC.damage, 12f, Vector2.UnitY * 7, true, NPC.direction == 1 ? 0f : MathHelper.Pi, MathHelper.PiOver4);
             if (NPC.ai[0] == -attackCooldown)
             {
-                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.8f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

@@ -36,7 +36,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item20 with { Volume = 1f }, Projectile.Center);
             for (int i = 0; i < 8; i++)
             {
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, 0, 0, 0, default, 1f);

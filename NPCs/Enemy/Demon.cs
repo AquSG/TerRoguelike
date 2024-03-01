@@ -54,7 +54,7 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 if (((int)NPC.ai[1] - attackTelegraph) % attackTimeBetween == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.Item8 with { Volume = 0.8f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
                 }
             }
         }

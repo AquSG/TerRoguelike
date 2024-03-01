@@ -64,7 +64,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueFighterShooterAI(NPC, 3f, -11.4f, 1000f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<Daybreak>(), 12f, weaponPos - NPC.Center, NPC.damage, true, false, weaponRot, attackExtendTime, 1, 0, 0, 13);
             if (NPC.ai[1] == attackTelegraph)
             {
-                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.67f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 1f }, NPC.Center);
             }
             if (NPC.ai[1] < -70 && (int)NPC.ai[1] % 2 == 0)
             {
@@ -86,7 +86,7 @@ namespace TerRoguelike.NPCs.Enemy
                     d.noLight = true;
                     d.noLightEmittence = true;
                 }
-                SoundEngine.PlaySound(SoundID.DD2_GhastlyGlaiveImpactGhost with { Volume = 0.55f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_GhastlyGlaiveImpactGhost with { Volume = 0.9f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

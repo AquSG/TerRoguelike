@@ -61,11 +61,11 @@ namespace TerRoguelike.NPCs.Enemy
             
             if (NPC.ai[1] == attackTelegraph)
             {
-                SoundEngine.PlaySound(SoundID.Item51 with { Volume = 0.4f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item51 with { Volume = 0.8f }, NPC.Center);
             }
             if (NPC.ai[2] == 17)
             {
-                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.9f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

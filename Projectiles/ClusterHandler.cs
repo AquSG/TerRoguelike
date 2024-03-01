@@ -57,12 +57,12 @@ namespace TerRoguelike.Projectiles
                     bombRotations.Add(Main.rand.NextFloat(-MathHelper.Pi, MathHelper.Pi + float.Epsilon));
                     bombDetonateOffset.Add(Main.rand.Next(12));
                 }
-                SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.6f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.8f }, Projectile.Center);
             }
 
             if (Projectile.timeLeft == 60)
             {
-                SoundEngine.PlaySound(SoundID.DD2_KoboldExplosion with { Volume = 0.5f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.DD2_KoboldExplosion with { Volume = 0.625f }, Projectile.Center);
             }
             if (Projectile.timeLeft <= 60)
             {

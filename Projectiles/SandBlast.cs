@@ -45,7 +45,7 @@ namespace TerRoguelike.Projectiles
             {
                 Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Sand, 0, 0, 0, default, 0.9f);
             } 
-            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.8f }, Projectile.Center);
             return true;
         }
     }

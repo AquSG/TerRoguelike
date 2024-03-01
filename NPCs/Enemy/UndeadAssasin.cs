@@ -55,7 +55,7 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[1] == attackTelegraph + attackCooldown + 1)
             {
-                SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack with { Volume = 0.7f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_DarkMageAttack with { Volume = 1f }, NPC.Center);
                 for (int i = 0; i < 50; i++)
                 {
                     int d = Dust.NewDust(new Vector2(NPC.position.X, NPC.position.Y), NPC.width, NPC.height, DustID.Bone, 0f, 0f, 100, default(Color), 2f);

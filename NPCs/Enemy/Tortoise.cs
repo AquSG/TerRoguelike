@@ -79,7 +79,7 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[1] < 0 && NPC.ai[1] > -dashTime && (NPC.collideX || (NPC.collideY && NPC.oldVelocity.Y > 3f)))
             {
-                SoundEngine.PlaySound(SoundID.Item70 with { Volume = 0.25f * Math.Abs(NPC.velocity.X / dashVelocity) }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item70 with { Volume = 0.5f * Math.Abs(NPC.velocity.X / dashVelocity) }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

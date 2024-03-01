@@ -63,8 +63,8 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[1] > attackCooldown && NPC.ai[1] <= attackWindup + attackCooldown + 1 && ((NPC.ai[1] - attackCooldown) % 0.66f < 0.02f) || NPC.ai[1] == attackWindup + attackCooldown + 1)
             {
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/chainHit") with { Volume = 0.4f }, NPC.Center);
-                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.3f, Pitch = -0.8f}, NPC.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/chainHit") with { Volume = 0.8f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.7f, Pitch = -0.8f}, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

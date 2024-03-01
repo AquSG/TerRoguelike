@@ -36,7 +36,7 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.rotation = Projectile.velocity.ToRotation() + MathHelper.PiOver2;
             startingSpeed = Projectile.velocity.Length();
-            SoundEngine.PlaySound(SoundID.Grass with { Volume = 0.8f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Grass with { Volume = 1f }, Projectile.Center);
             Projectile.ai[0] = -1;
         }
         public override void AI()

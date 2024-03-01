@@ -49,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.rotation = (NPC.velocity.X / 18f) * MathHelper.PiOver2;
             if (NPC.ai[0] == -attackCooldown)
             {
-                SoundEngine.PlaySound(SoundID.Item28 with { Volume = 0.45f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item28 with { Volume = 0.9f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

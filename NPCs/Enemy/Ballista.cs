@@ -52,11 +52,11 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueTurretAI(NPC, attackTelegraph, attackCooldown, 320f, ModContent.ProjectileType<BallistaShot>(), NPC.damage, 16f, Vector2.UnitY * -20, true, NPC.rotation, MathHelper.PiOver4);
             if (NPC.ai[0] == 1)
             {
-                SoundEngine.PlaySound(SoundID.DD2_BallistaTowerShot with { Volume = 0.6f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_BallistaTowerShot with { Volume = 1f }, NPC.Center);
             }
             else if (NPC.ai[0] == -attackCooldown + 60)
             {
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/creaking") with { Volume = 0.4f }, NPC.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/creaking") with { Volume = 1f }, NPC.Center);
             }
 
             if (modNPC.targetNPC >= 0)

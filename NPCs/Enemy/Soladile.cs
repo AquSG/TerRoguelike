@@ -58,7 +58,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueFighterShooterAI(NPC, 2.4f, -7.9f, 1000f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SolarFlare>(), 4.5f, new Vector2(32 * NPC.direction, 0), NPC.damage, true, false, null, attackExtendTime, 5, MathHelper.Pi * 0.125f, 1.1f);
             if (NPC.ai[1] == attackTelegraph)
             {
-                SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 0.6f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)
