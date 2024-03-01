@@ -19,6 +19,7 @@ namespace TerRoguelike.Shaders
 
         internal static Effect BasicTintShader;
         internal static Effect CircularGradientWithEdge;
+        internal static Effect CircularGradientOuter;
         internal static Effect ProtectiveBubbleShield;
 
         public static void LoadShaders()
@@ -35,6 +36,9 @@ namespace TerRoguelike.Shaders
 
             CircularGradientWithEdge = LoadShader("CircularGradientWithEdge"); //lifted from the Calamity Mod. Though I technically helped make the edited version of this one.
             RegisterMiscShader(CircularGradientWithEdge, "CircularGradientWithEdgePass", "CircularGradientWithEdge");
+
+            CircularGradientOuter = LoadShader("CircularGradientOuter"); //Edited version of other circle gradient
+            RegisterMiscShader(CircularGradientOuter, "CircularGradientOuterPass", "CircularGradientOuter");
 
             ProtectiveBubbleShield = LoadShader("ProtectiveBubbleShield"); //lifted from the Calamity Mod
             RegisterScreenShader(ProtectiveBubbleShield, "ShieldPass", "ProtectiveBubbleShield");

@@ -84,6 +84,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/UndeadBruteArm",
                 "TerRoguelike/NPCs/Enemy/UndeadSharpshooterGun",
                 "TerRoguelike/ExtraTextures/LineGradient",
+                "TerRoguelike/NPCs/Enemy/BrainSucklerGlow",
             };
             foreach (string path in pathList)
             {
