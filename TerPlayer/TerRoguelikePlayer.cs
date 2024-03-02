@@ -403,7 +403,7 @@ namespace TerRoguelike.TerPlayer
             if (sentientPutty > 0 && outOfDangerTime == 120)
             {
                 int healAmt = sentientPutty * 10;
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.3f }, Player.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.18f }, Player.Center);
                 ScaleableHeal(healAmt);
             }
             if (memoryFoam > 0 && outOfDangerTime >= 420)

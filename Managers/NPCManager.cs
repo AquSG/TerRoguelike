@@ -100,6 +100,7 @@ namespace TerRoguelike.Managers
                 new BrainSuckler(),
                 new Omniwatcher(),
                 new Predictor(),
+                new AlienHornet(),
             };
         }
         internal static void Unload()

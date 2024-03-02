@@ -48,6 +48,7 @@ Projectiles: {
 	SolarFlare.DisplayName: Solar Flare
 	NebulaLaser.DisplayName: Nebula Laser
 	NebulaSphere.DisplayName: Nebula Sphere
+	VortexLightning.DisplayName: Vortex Lightning
 }
 
 Items: {
@@ -753,4 +754,5 @@ NPCs: {
 	BrainSuckler.DisplayName: Brain Suckler
 	Omniwatcher.DisplayName: Omniwatcher
 	Predictor.DisplayName: Predictor
+	AlienHornet.DisplayName: Alien Hornet
 }
