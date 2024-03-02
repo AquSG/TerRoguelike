@@ -55,6 +55,11 @@ namespace TerRoguelike.Projectiles
         {
             return Color.Lerp(lightColor, Color.White, 0.4f);
         }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.7f }, Projectile.Center);
+            return true;
+        }
         public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 5; i++)

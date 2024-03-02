@@ -47,6 +47,7 @@ Projectiles: {
 	Daybreak.DisplayName: Daybreak
 	SolarFlare.DisplayName: Solar Flare
 	NebulaLaser.DisplayName: Nebula Laser
+	NebulaSphere.DisplayName: Nebula Sphere
 }
 
 Items: {
@@ -751,4 +752,5 @@ NPCs: {
 	Soladile.DisplayName: Soladile
 	BrainSuckler.DisplayName: Brain Suckler
 	Omniwatcher.DisplayName: Omniwatcher
+	Predictor.DisplayName: Predictor
 }

@@ -220,6 +220,13 @@ namespace TerRoguelike.Utilities
 
             return false;
         }
+        /// <summary>
+        /// Checks for tile collisions in a line from the start to end point
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="lengthCap">The max amount of units that will be checked before returning false</param>
+        /// <returns>True if there is a tile in the way of the line</returns> 
         public static bool CanHitInLine(Vector2 start, Vector2 end, float lengthCap = 2000f)
         {
             float length = (start - end).Length();
@@ -277,6 +284,69 @@ namespace TerRoguelike.Utilities
             }
 
             return true;
+        }
+        /// <summary>
+        /// Checks for tile collisions in a line from the start to end point
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="lengthCap">The max amount of units that will be checked before returning the end vector</param>
+        /// <returns>The position in the world where the line collided with a tile. Returns the end vector if nothing was in the way.</returns> 
+        public static Vector2 TileCollidePositionInLine(Vector2 start, Vector2 end, float lengthCap = 2000f)
+        {
+            float length = (start - end).Length();
+            Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
+
+            if (length < 1f || length > lengthCap)
+                return end;
+
+            Vector2 currentPos = start;
+            for (int i = 0; i < (int)length; i++)
+            {
+                currentPos += unitVect;
+
+                Point tilePos = new Point((int)(currentPos.X / 16), (int)(currentPos.Y / 16));
+
+                if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
+                    continue;
+
+                Tile tile = Main.tile[tilePos.X, tilePos.Y];
+                if (!tile.IsTileSolidGround(true))
+                    continue;
+
+                if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
+                    return currentPos;
+
+                Vector2 tileWorldPos = new Vector2(tilePos.X * 16, tilePos.Y * 16);
+                Vector2 currentPosInTile = currentPos - tileWorldPos;
+                if (tile.IsHalfBlock)
+                {
+                    if (currentPosInTile.Y >= 8f)
+                        return currentPos;
+                }
+                else if (tile.Slope == SlopeType.SlopeDownLeft)
+                {
+                    if (currentPosInTile.X <= currentPosInTile.Y)
+                        return currentPos;
+                }
+                else if (tile.Slope == SlopeType.SlopeDownRight)
+                {
+                    if ((16 - currentPosInTile.X) <= currentPosInTile.Y)
+                        return currentPos;
+                }
+                else if (tile.Slope == SlopeType.SlopeUpLeft)
+                {
+                    if (currentPosInTile.X <= (16 - currentPosInTile.Y))
+                        return currentPos;
+                }
+                else if (tile.Slope == SlopeType.SlopeUpRight)
+                {
+                    if (currentPosInTile.X >= currentPosInTile.Y)
+                        return currentPos;
+                }
+            }
+
+            return end;
         }
     }
 }
