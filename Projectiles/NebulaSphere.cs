@@ -13,7 +13,7 @@ using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
-    public class SolarFlare : ModProjectile, ILocalizedModType
+    public class NebulaSphere : ModProjectile, ILocalizedModType
     {
         public float turnMultiplier = 1f;
         public override void SetStaticDefaults()
@@ -36,17 +36,23 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.ai[2] = -1;
             Projectile.rotation = Projectile.velocity.ToRotation();
-            turnMultiplier = Projectile.velocity.Length() / 2.5f;
+            turnMultiplier = Projectile.velocity.Length();
+            for (int i = 0; i < 10; i++)
+            {
+                Vector2 offset = (Main.rand.Next(3, 6) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
+                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.ShadowbeamStaff, offset.SafeNormalize(Vector2.UnitX) * 2, Projectile.alpha, Color.Purple, 1.2f);
+                d.noGravity = true;
+            }
         }
         public override void AI()
         {
             Projectile.frameCounter++;
-            Projectile.frame = ((int)Projectile.frameCounter / 4) % Main.projFrames[Type];
+            Projectile.frame = ((int)Projectile.frameCounter / 6) % Main.projFrames[Type];
 
             if (Projectile.ai[2] == -1)
                 GetTarget();
 
-            if (Projectile.ai[2] != -1 && Projectile.timeLeft < 450)
+            if (Projectile.ai[2] != -1)
             {
                 float direction = 0;
                 if (Projectile.ai[1] == 0)
@@ -59,47 +65,31 @@ namespace TerRoguelike.Projectiles
                 }
                 if (Math.Abs(RadianSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
                 {
-                    float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.006f * turnMultiplier);
+                    float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.0013f * turnMultiplier);
                     Projectile.velocity = (Vector2.UnitX * Projectile.velocity.Length()).RotatedBy(newRot); 
                 }
             }
 
             Projectile.rotation = Projectile.velocity.ToRotation();
 
-            Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.SolarFlare, 0, 0, 0, default, 0.65f);
+            Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0, 0, 0, Color.Purple, 1.2f);
             d.noGravity = true;
             d.noLight = true;
             d.noLightEmittence = true;
+        }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 1f }, Projectile.Center);
+            return true;
         }
         public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 15; i++)
             {
-                Vector2 offset = (Main.rand.Next(2, 6) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
-                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.SolarFlare, offset.SafeNormalize(Vector2.UnitX) + (Projectile.oldVelocity * 0.5f), Projectile.alpha, default(Color), 1f);
+                Vector2 offset = (Main.rand.Next(3, 6) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
+                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.ShadowbeamStaff, offset.SafeNormalize(Vector2.UnitX) + (Projectile.oldVelocity * 0.6f), Projectile.alpha, Color.Purple, 1.5f);
                 d.noGravity = true;
-                d.noLight = true;
-                d.noLightEmittence = true;
             }
-        }
-        public override bool OnTileCollide(Vector2 oldVelocity)
-        {
-            if (Projectile.timeLeft >= 450)
-            {
-                // If the projectile hits the left or right side of the tile, reverse the X velocity
-                if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
-                {
-                    Projectile.velocity.X = -oldVelocity.X;
-                }
-                // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
-                if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
-                {
-                    Projectile.velocity.Y = -oldVelocity.Y;
-                }
-                return false;
-            }
-            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.7f }, Projectile.Center);
-            return true;
         }
         public override bool PreDraw(ref Color lightColor)
         {

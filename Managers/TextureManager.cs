@@ -86,6 +86,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/LineGradient",
                 "TerRoguelike/NPCs/Enemy/BrainSucklerGlow",
                 "TerRoguelike/NPCs/Enemy/OmniwatcherGlow",
+                "TerRoguelike/NPCs/Enemy/PredictorGlow",
             };
             foreach (string path in pathList)
             {

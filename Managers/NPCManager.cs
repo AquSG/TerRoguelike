@@ -99,6 +99,7 @@ namespace TerRoguelike.Managers
                 new Soladile(),
                 new BrainSuckler(),
                 new Omniwatcher(),
+                new Predictor(),
             };
         }
         internal static void Unload()

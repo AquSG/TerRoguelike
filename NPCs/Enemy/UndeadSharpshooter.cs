@@ -120,14 +120,12 @@ namespace TerRoguelike.NPCs.Enemy
                     Vector2 origin = telegraphTex.Size() * 0.5f;
                     float rotation = gunRot + MathHelper.Pi;
                     Vector2 offsetPerLoop = 2 * Vector2.UnitX;
-                    for (int i = 0; i < 1000; i++)
+                    Vector2 endPoint = TileCollidePositionInLine(anchorPos, anchorPos + (Vector2.UnitX * 2000).RotatedBy(rotation), 2001f);
+                    float length = (anchorPos - endPoint).Length();
+                    int maxLoops = (int)(length * 0.5f);
+                    for (int i = 0; i < maxLoops; i++)
                     {
                         Vector2 pos = anchorPos + (i * offsetPerLoop).RotatedBy(rotation);
-                        Tile tile = ParanoidTileRetrieval((int)(pos.X / 16), (int)(pos.Y / 16));
-                        if ((tile.IsTileSolidGround() && !TileID.Sets.Platforms[tile.TileType]))
-                        {
-                            break;
-                        }
 
                         float opacity = 1f;
                         if (i < 8)
