@@ -87,6 +87,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/BrainSucklerGlow",
                 "TerRoguelike/NPCs/Enemy/OmniwatcherGlow",
                 "TerRoguelike/NPCs/Enemy/PredictorGlow",
+                "TerRoguelike/NPCs/Enemy/AlienHornetGlow",
             };
             foreach (string path in pathList)
             {
