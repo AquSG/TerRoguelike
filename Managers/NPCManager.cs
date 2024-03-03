@@ -101,6 +101,7 @@ namespace TerRoguelike.Managers
                 new Omniwatcher(),
                 new Predictor(),
                 new AlienHornet(),
+                new StormDiver(),
             };
         }
         internal static void Unload()

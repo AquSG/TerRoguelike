@@ -26,7 +26,7 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D lightTex;
         public override int modNPCID => ModContent.NPCType<AlienHornet>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
-        public override int CombatStyle => 2;
+        public override int CombatStyle => 1;
         public int attackTelegraph = 20;
         public int attackCooldown = 90;
         int currentFrame;
@@ -57,6 +57,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             NPC.frameCounter += 0.25d;
             NPC.rotation = MathHelper.PiOver2 * NPC.velocity.Length() * 0.02f * NPC.direction;
+            NPC.velocity *= 0.995f;
             modNPC.RogueFlyingShooterAI(NPC, 7f, 5.5f, 0.12f, 96f, 216f, attackTelegraph, attackCooldown, ModContent.ProjectileType<VortexLightning>(), 10f, new Vector2(14 * NPC.direction, 16).RotatedBy(NPC.rotation), NPC.damage, true);
             if (NPC.ai[2] == -attackCooldown)
             {
