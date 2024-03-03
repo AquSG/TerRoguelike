@@ -24,6 +24,7 @@ namespace TerRoguelike.NPCs.Enemy
     public class StormDiver : BaseRoguelikeNPC
     {
         public Texture2D lightTex;
+        public Texture2D crossTex;
         public override int modNPCID => ModContent.NPCType<StormDiver>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => 2;
@@ -50,6 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             modNPC.drawCenter = new Vector2(0, -7);
             lightTex = TexDict["StormDiverGlow"];
+            crossTex = TexDict["CrossSpark"];
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -70,7 +72,7 @@ namespace TerRoguelike.NPCs.Enemy
                     d.noLightEmittence = true;
                 }
             }
-            modNPC.RogueStormDiverAI(NPC, 3f, -7.9f, 480f, attackTelegraph, attackCooldown, attackExtend, jetpackTelegraph, jetpackDuration, 300, 160f, 10f, 0f, MathHelper.Pi * 0.16f, ModContent.ProjectileType<VortexLaser>(), 10f, new Vector2(26f * NPC.spriteDirection, -6), NPC.damage, true, false, 5, MathHelper.Pi * 0.04f, 1.5f);
+            modNPC.RogueStormDiverAI(NPC, 3f, -7.9f, 480f, attackTelegraph, attackCooldown, attackExtend, jetpackTelegraph, jetpackDuration, 300, 160f, 10f, 0f, MathHelper.Pi * 0.16f, ModContent.ProjectileType<VortexLaser>(), 10f, new Vector2(26f * NPC.spriteDirection, -4), NPC.damage, true, false, 5, MathHelper.Pi * 0.04f, 1.5f);
             if (NPC.ai[1] == attackTelegraph)
                 SoundEngine.PlaySound(SoundID.Item36 with { Volume = 1f }, NPC.Center);
             else if (NPC.ai[2] == -(jetpackDuration + jetpackTelegraph) + 1)
@@ -157,6 +159,21 @@ namespace TerRoguelike.NPCs.Enemy
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Main.EntitySpriteDraw(lightTex, NPC.Center - Main.screenPosition + modNPC.drawCenter + (Vector2.UnitY * NPC.gfxOffY), NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            if (NPC.ai[1] > 0)
+            {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                Vector2 pos = NPC.Center + new Vector2(26f * NPC.spriteDirection, -2) - Main.screenPosition + (Vector2.UnitY * NPC.gfxOffY);
+                Vector2 origin = new Vector2(crossTex.Width * 0.78f, crossTex.Height * 0.5f);
+                float rotation = NPC.spriteDirection > 0 ? MathHelper.Pi : 0f;
+                float opacity = NPC.ai[1] < attackTelegraph ? MathHelper.Clamp(MathHelper.Lerp(0, 0.55f, NPC.ai[1] / (attackTelegraph * 0.85f)), 0, 0.55f) : MathHelper.Clamp(MathHelper.Lerp(1f, 0, (NPC.ai[1] - attackTelegraph) / (attackExtend * 0.75f)), 0f, 1f);
+
+                Main.EntitySpriteDraw(crossTex, pos, null, Color.LightSeaGreen * opacity, rotation, origin, new Vector2(0.25f, 0.6f), SpriteEffects.None);
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            }
         }
     }
 }
