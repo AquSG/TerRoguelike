@@ -136,7 +136,9 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.ai[2] < 0)
             {
-                currentFrame = NPC.ai[2] >= -jetpackDuration ? ((int)-NPC.ai[2] % 3) + 10 : 9;
+                currentFrame = NPC.ai[2] >= -jetpackDuration ? ((int)(-NPC.ai[2] * 0.25f) % 4) + 10 : 9;
+                if (currentFrame == 13)
+                    currentFrame = 11;
             }
             else if (NPC.ai[1] > 0)
             {
