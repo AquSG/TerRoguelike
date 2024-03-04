@@ -9,23 +9,25 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using TerRoguelike.TerPlayer;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class LunarPillarRoomBottomLeft : Room
     {
         //nebula
-        public override int AssociatedFloor => 10;
+        public override int AssociatedFloor => FloorDict["Lunar"];
         public override string Key => "LunarPillarRoomBottomLeft";
         public override string Filename => "Schematics/RoomSchematics/LunarPillarRoomBottomLeft.csch";
         public override bool IsPillarRoom => true;
         public int SpawnCountdown = 0;
         public List<int> SpawnSelection = new List<int>()
         {
-            421,
-            423,
-            420,
-            424
+            ModContent.NPCType<BrainSuckler>(),
+            ModContent.NPCType<Omniwatcher>(),
+            ModContent.NPCType<Predictor>()
         };
         public override void InitializeRoom()
         {

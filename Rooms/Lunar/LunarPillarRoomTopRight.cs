@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using TerRoguelike.TerPlayer;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -22,11 +24,9 @@ namespace TerRoguelike.Rooms
         public int SpawnCountdown = 0;
         public List<int> SpawnSelection = new List<int>()
         {
-            407,
-            405,
-            411,
-            409,
-            402
+            ModContent.NPCType<StarCell>(),
+            ModContent.NPCType<Omniwatcher>(),
+            ModContent.NPCType<Predictor>()
         };
         public override void InitializeRoom()
         {

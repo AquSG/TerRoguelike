@@ -166,7 +166,7 @@ namespace TerRoguelike.Projectiles
                 if (Main.rand.NextBool())
                 {
                     Vector2 rot = Projectile.ai[1].ToRotationVector2();
-                    Vector2 displace = rot.RotatedBy(1.5707963705062866, default(Vector2)) * (float)(Main.rand.NextBool()).ToDirectionInt() * (float)Main.rand.Next(10, 21);
+                    Vector2 displace = rot.RotatedBy(1.5707963705062866, default) * (float)(Main.rand.NextBool()).ToDirectionInt() * (float)Main.rand.Next(10, 21);
                     Vector2 randSpeed = rot * (float)Main.rand.Next(-160, 81);
                     Vector2 velocity = randSpeed - displace;
                     velocity /= 10f;

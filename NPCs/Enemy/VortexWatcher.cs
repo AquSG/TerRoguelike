@@ -28,7 +28,7 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D vortexTex;
         public override int modNPCID => ModContent.NPCType<VortexWatcher>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
-        public override int CombatStyle => 2;
+        public override int CombatStyle => 1;
         public int attackTelegraph = 300;
         public int attackExtendTime = 120;
         public int attackCooldown = 240;

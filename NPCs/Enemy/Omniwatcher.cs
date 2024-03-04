@@ -25,7 +25,7 @@ namespace TerRoguelike.NPCs.Enemy
     {
         public override int modNPCID => ModContent.NPCType<Omniwatcher>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
-        public override int CombatStyle => 0;
+        public override int CombatStyle => 1;
         public Texture2D lightTex;
         public override void SetStaticDefaults()
         {
@@ -66,7 +66,7 @@ namespace TerRoguelike.NPCs.Enemy
                 SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
                 for (int i = 0; i < 50; i++)
                 {
-                    int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.ShadowbeamStaff, 0f, 0f, 100, default(Color), 1.8f);
+                    int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.ShadowbeamStaff, 0f, 0f, 100, default, 1.8f);
                     Dust dust = Main.dust[d];
                     dust.velocity *= 3f;
                     dust.noGravity = true;
