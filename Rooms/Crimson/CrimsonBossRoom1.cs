@@ -8,12 +8,13 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class CrimsonBossRoom1 : Room
     {
-        public override int AssociatedFloor => 1;
+        public override int AssociatedFloor => FloorDict["Crimson"];
         public override string Key => "CrimsonBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/CrimsonBossRoom1.csch";
         public override bool IsBossRoom => true;

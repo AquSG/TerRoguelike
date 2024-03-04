@@ -139,7 +139,7 @@ namespace TerRoguelike.Systems
                 if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
                 {
                     combatMusic.Volume = 0;
-                    calmMusic.Update();
+                    combatMusic.Update();
                 }
                 return;
             }

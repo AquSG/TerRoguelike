@@ -8,12 +8,13 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class DungeonStartRoom : Room
     {
-        public override int AssociatedFloor => 8;
+        public override int AssociatedFloor => FloorDict["Dungeon"];
         public override string Key => "DungeonStartRoom";
         public override string Filename => "Schematics/RoomSchematics/DungeonStartRoom.csch";
         public override bool CanExitRight => true;

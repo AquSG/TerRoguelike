@@ -8,12 +8,13 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class LunarHallRoom2 : Room
     {
-        public override int AssociatedFloor => 10;
+        public override int AssociatedFloor => FloorDict["Lunar"];
         public override string Key => "LunarHallRoom2";
         public override string Filename => "Schematics/RoomSchematics/LunarHallRoom2.csch";
         public override bool CanExitRight => true;

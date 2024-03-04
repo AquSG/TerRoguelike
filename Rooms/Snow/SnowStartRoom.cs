@@ -8,12 +8,13 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class SnowStartRoom : Room
     {
-        public override int AssociatedFloor => 4;
+        public override int AssociatedFloor => FloorDict["Snow"];
         public override string Key => "SnowStartRoom";
         public override string Filename => "Schematics/RoomSchematics/SnowStartRoom.csch";
         public override bool CanExitRight => true;
