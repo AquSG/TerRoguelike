@@ -57,7 +57,7 @@ namespace TerRoguelike.Projectiles
                 {
                     direction = (Main.npc[(int)Projectile.ai[2]].Center - Projectile.Center).ToRotation();
                 }
-                if (Math.Abs(RadianSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
+                if (Math.Abs(AngleSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
                 {
                     float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.006f * turnMultiplier);
                     Projectile.velocity = (Vector2.UnitX * Projectile.velocity.Length()).RotatedBy(newRot); 
@@ -136,7 +136,7 @@ namespace TerRoguelike.Projectiles
                     float distance = (Projectile.Center - player.Center).Length();
                     if (distance <= closestTarget)
                     {
-                        if (Math.Abs(RadianSizeBetween(Projectile.rotation, (player.Center - Projectile.Center).ToRotation())) < MathHelper.PiOver2)
+                        if (Math.Abs(AngleSizeBetween(Projectile.rotation, (player.Center - Projectile.Center).ToRotation())) < MathHelper.PiOver2)
                         {
                             closestTarget = distance;
                             Projectile.ai[2] = i;
@@ -162,7 +162,7 @@ namespace TerRoguelike.Projectiles
                     float distance = (Projectile.Center - npc.Center).Length();
                     if (distance <= closestTarget)
                     {
-                        if (Math.Abs(RadianSizeBetween(Projectile.rotation, (npc.Center - Projectile.Center).ToRotation())) < MathHelper.PiOver2)
+                        if (Math.Abs(AngleSizeBetween(Projectile.rotation, (npc.Center - Projectile.Center).ToRotation())) < MathHelper.PiOver2)
                         {
                             closestTarget = distance;
                             Projectile.ai[2] = i;
