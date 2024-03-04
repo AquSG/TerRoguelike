@@ -549,7 +549,7 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[0] == 0)
                 {
-                    if ((!LoSRequired || CanHitInLine(npc.Center + projOffset, target.Center) && (npc.Center - target.Center).Length() <= attackDist && (attackCone == null || Math.Abs(RadianSizeBetween((target.Center - npc.Center).ToRotation(), (float)directionOverride)) <= attackCone * 0.5f)))
+                    if ((!LoSRequired || CanHitInLine(npc.Center + projOffset, target.Center) && (npc.Center - target.Center).Length() <= attackDist && (attackCone == null || Math.Abs(AngleSizeBetween((target.Center - npc.Center).ToRotation(), (float)directionOverride)) <= attackCone * 0.5f)))
                     {
                         npc.ai[0]++;
                     }
@@ -1202,7 +1202,7 @@ namespace TerRoguelike.NPCs
             float targetAngle = (targetPos - npc.Center).ToRotation();
             bool slowTurn = npc.ai[0] == 0;
             float newAngle = npc.rotation.AngleTowards(targetAngle, slowTurn ? turnRadians : turnRadians * 0.4f);
-            float angleChange = RadianSizeBetween(npc.rotation, newAngle);
+            float angleChange = AngleSizeBetween(npc.rotation, newAngle);
             if ((targetPos - npc.Center).Length() > slowTurnDist)
             {
                 npc.ai[0] = 0;
@@ -1627,7 +1627,7 @@ namespace TerRoguelike.NPCs
                 {
                     npc.velocity.X *= 0.9f;
                     float targetAngle = target != null ? (target.Center - npc.Center).ToRotation() : (npc.ai[2] * -MathHelper.PiOver2) + MathHelper.PiOver2;
-                    if (Math.Abs(RadianSizeBetween((ball.Center - npc.Center).ToRotation(), targetAngle - (MathHelper.PiOver2 * npc.ai[2]))) < MathHelper.Pi * 0.0625f)
+                    if (Math.Abs(AngleSizeBetween((ball.Center - npc.Center).ToRotation(), targetAngle - (MathHelper.PiOver2 * npc.ai[2]))) < MathHelper.Pi * 0.0625f)
                     {
                         npc.ai[3] = Projectile.NewProjectile(npc.GetSource_FromThis(), ball.Center, (Vector2.UnitX * launchVelocity).RotatedBy(targetAngle + (MathHelper.PiOver4 * npc.ai[2] * 0.4f)), ModContent.ProjectileType<SpikedBall>(), damage, 0f, -1, ball.Rotation);
                         SetUpNPCProj(npc, (int)npc.ai[3]);
@@ -2956,7 +2956,7 @@ namespace TerRoguelike.NPCs
             else
             {
                 bool attackDistanceCheck = (npc.Center - target.Center).Length() <= attackDistance;
-                if (npc.ai[2] >= 0 && npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && attackDistanceCheck && LosCheck && Math.Abs(RadianSizeBetween(npc.direction > 0 ? 0f : MathHelper.Pi, (target.Center - npc.Center + projOffset).ToRotation())) <= maxAimAngle)
+                if (npc.ai[2] >= 0 && npc.ai[1] == 0 && npc.ai[0] >= 0 && (canJumpShoot || npc.velocity.Y == 0) && attackDistanceCheck && LosCheck && Math.Abs(AngleSizeBetween(npc.direction > 0 ? 0f : MathHelper.Pi, (target.Center - npc.Center + projOffset).ToRotation())) <= maxAimAngle)
                 {
                     npc.ai[1]++;
                 }
@@ -2965,7 +2965,7 @@ namespace TerRoguelike.NPCs
                 {
                     Vector2 projSpawnPos = npc.Center + projOffset;
                     Vector2 velocityDirection = (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY);
-                    float angleBetween = RadianSizeBetween(npc.direction > 0 ? 0f : MathHelper.Pi, velocityDirection.ToRotation());
+                    float angleBetween = AngleSizeBetween(npc.direction > 0 ? 0f : MathHelper.Pi, velocityDirection.ToRotation());
                     if (Math.Abs(angleBetween) > maxAimAngle)
                     {
                         velocityDirection = Vector2.UnitX.RotatedBy((Math.Sign(angleBetween) * maxAimAngle) + (npc.direction > 0 ? 0f : MathHelper.Pi));

@@ -201,7 +201,7 @@ namespace TerRoguelike.Utilities
         /// Measures the radians between 2 values. angle1 is the primary angle, for directional purposes.
         /// </summary>
         /// <returns>The radians present between the 2 angles, positive or negative based on the closest direction</returns>
-        public static float RadianSizeBetween(float angle1, float angle2)
+        public static float AngleSizeBetween(float angle1, float angle2)
         {
             float rad1 = angle1 % MathHelper.TwoPi;
             float rad2 = angle2 % MathHelper.TwoPi;

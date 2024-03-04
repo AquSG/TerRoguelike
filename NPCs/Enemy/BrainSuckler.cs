@@ -97,11 +97,11 @@ namespace TerRoguelike.NPCs.Enemy
                 }
             }
         }
-        public override void OnHitPlayer(Player target, Player.HurtInfo hurtInfo)
+        public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
         {
             StickToTarget(target.whoAmI);
         }
-        public override void OnHitNPC(NPC target, NPC.HitInfo hit)
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
             StickToTarget(target.whoAmI);
         }

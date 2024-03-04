@@ -80,7 +80,7 @@ namespace TerRoguelike.Projectiles
                 {
                     newRot = direction;
                 }
-                else if (Math.Abs(RadianSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
+                else if (Math.Abs(AngleSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
                 {
                     turnMultiplier = Projectile.velocity.Length() / 2.2f;
                     newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.006f * turnMultiplier);
