@@ -10,14 +10,14 @@ using Terraria;
 using Terraria.ID;
 using TerRoguelike.World;
 using static TerRoguelike.Schematics.SchematicManager;
-using Terraria.Audio;
 using static TerRoguelike.Systems.MusicSystem;
+using Terraria.Audio;
 
 namespace TerRoguelike.Rooms
 {
     public class LunarBossRoom1 : Room
     {
-        public override int AssociatedFloor => 10;
+        public override int AssociatedFloor => FloorDict["Lunar"];
         public override string Key => "LunarBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/LunarBossRoom1.csch";
         public override bool IsBossRoom => true;

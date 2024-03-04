@@ -8,12 +8,13 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class JungleBossRoom1Transition : Room
     {
-        public override int AssociatedFloor => 6;
+        public override int AssociatedFloor => FloorDict["Jungle"];
         public override string Key => "JungleBossRoom1Transition";
         public override string Filename => "Schematics/RoomSchematics/JungleBossRoom1Transition.csch";
         public override int TransitionDirection => 0;

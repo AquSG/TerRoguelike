@@ -11,13 +11,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.NPCs.Enemy;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class LunarPillarRoomTopLeft : Room
     {
         //vortex
-        public override int AssociatedFloor => 10;
+        public override int AssociatedFloor => FloorDict["Lunar"];
         public override string Key => "LunarPillarRoomTopLeft";
         public override string Filename => "Schematics/RoomSchematics/LunarPillarRoomTopLeft.csch";
         public override bool IsPillarRoom => true;

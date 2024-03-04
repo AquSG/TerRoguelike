@@ -9,12 +9,13 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class ForestBossRoom1 : Room
     {
-        public override int AssociatedFloor => 2;
+        public override int AssociatedFloor => FloorDict["Forest"];
         public override string Key => "ForestBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/ForestBossRoom1.csch";
         public override bool IsBossRoom => true;
