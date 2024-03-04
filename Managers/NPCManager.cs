@@ -103,6 +103,7 @@ namespace TerRoguelike.Managers
                 new AlienHornet(),
                 new StormDiver(),
                 new VortexWatcher(),
+                new StarCell(),
             };
         }
         internal static void Unload()

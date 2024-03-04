@@ -17,13 +17,14 @@ using TerRoguelike.Projectiles;
 using Terraria.Graphics.Shaders;
 using TerRoguelike.Systems;
 using TerRoguelike.World;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.NPCs.Enemy.Pillar
 {
     public class StardustPillar : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<StardustPillar>();
-        public override List<int> associatedFloors => new List<int>() { 10 };
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
         public override void SetDefaults()

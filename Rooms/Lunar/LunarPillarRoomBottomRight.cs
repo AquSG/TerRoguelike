@@ -31,9 +31,6 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            SpawnSelection = new List<int>() { ModContent.NPCType<Corite>(),
-            ModContent.NPCType<Soladile>(),
-            ModContent.NPCType<Daybreaker>() };
         }
         public override void Update()
         {

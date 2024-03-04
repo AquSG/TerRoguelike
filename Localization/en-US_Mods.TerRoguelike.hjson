@@ -51,6 +51,7 @@ Projectiles: {
 	VortexLightning.DisplayName: Vortex Lightning
 	VortexLaser.DisplayName: Vortex Laser
 	BlackVortex.DisplayName: Black Vortex
+	SeekingStarCell.DisplayName: Seeking Star Cell
 }
 
 Items: {
@@ -759,4 +760,5 @@ NPCs: {
 	AlienHornet.DisplayName: Alien Hornet
 	StormDiver.DisplayName: Storm Diver
 	VortexWatcher.DisplayName: Vortex Watcher
+	StarCell.DisplayName: Star Cell
 }
