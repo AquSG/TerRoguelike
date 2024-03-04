@@ -217,7 +217,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0, int jumpDetectionPadding = 6)
+        public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0, int jumpDetectionPadding = 6, bool canShootFall = true)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -347,7 +347,7 @@ namespace TerRoguelike.NPCs
                         }
                     }
                 }
-                else if (npc.velocity.Y == 0f && target.Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target))
+                else if (npc.velocity.Y == 0f && target.Top.Y > npc.Bottom.Y && Math.Abs(npc.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(npc, target) && (canShootFall || npc.ai[1] <= 0))
                 {
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);

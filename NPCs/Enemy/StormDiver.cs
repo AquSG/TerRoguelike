@@ -167,7 +167,7 @@ namespace TerRoguelike.NPCs.Enemy
                 Vector2 pos = NPC.Center + new Vector2(26f * NPC.spriteDirection, -2) - Main.screenPosition + (Vector2.UnitY * NPC.gfxOffY);
                 Vector2 origin = new Vector2(crossTex.Width * 0.78f, crossTex.Height * 0.5f);
                 float rotation = NPC.spriteDirection > 0 ? MathHelper.Pi : 0f;
-                float opacity = NPC.ai[1] < attackTelegraph ? MathHelper.Clamp(MathHelper.Lerp(0, 0.55f, NPC.ai[1] / (attackTelegraph * 0.85f)), 0, 0.55f) : MathHelper.Clamp(MathHelper.Lerp(1f, 0, (NPC.ai[1] - attackTelegraph) / (attackExtend * 0.75f)), 0f, 1f);
+                float opacity = NPC.ai[1] < attackTelegraph ? MathHelper.Clamp(MathHelper.Lerp(0, 0.7f, NPC.ai[1] / (attackTelegraph)), 0, 0.7f) : MathHelper.Clamp(MathHelper.Lerp(1f, 0, (NPC.ai[1] - attackTelegraph) / (attackExtend * 0.75f)), 0f, 1f);
 
                 Main.EntitySpriteDraw(crossTex, pos, null, Color.LightSeaGreen * opacity, rotation, origin, new Vector2(0.25f, 0.6f), SpriteEffects.None);
 

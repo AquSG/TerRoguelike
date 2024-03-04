@@ -50,6 +50,7 @@ Projectiles: {
 	NebulaSphere.DisplayName: Nebula Sphere
 	VortexLightning.DisplayName: Vortex Lightning
 	VortexLaser.DisplayName: Vortex Laser
+	BlackVortex.DisplayName: Black Vortex
 }
 
 Items: {
@@ -757,4 +758,5 @@ NPCs: {
 	Predictor.DisplayName: Predictor
 	AlienHornet.DisplayName: Alien Hornet
 	StormDiver.DisplayName: Storm Diver
+	VortexWatcher.DisplayName: Vortex Watcher
 }
