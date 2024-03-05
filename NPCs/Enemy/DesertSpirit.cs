@@ -95,5 +95,7 @@ namespace TerRoguelike.NPCs.Enemy
             int currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] / 2)) + (NPC.ai[0] % (attackCooldown + attackTelegraph) <= attackTelegraph ? 8 : 0);
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
         }
+        public override bool CanHitNPC(NPC target) => false;
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;
     }
 }

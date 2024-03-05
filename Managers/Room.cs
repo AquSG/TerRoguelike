@@ -130,7 +130,7 @@ namespace TerRoguelike.Managers
             }
             
             // if there is still an enemy yet to be spawned, do not continue with room clear logic
-            bool cancontinue = true;
+            bool cancontinue = roomTime - waveClearGraceTime > lastTelegraphDuration;
             bool encourageNextWave = false;
             if (!haltSpawns)
             {
