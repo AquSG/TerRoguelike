@@ -86,7 +86,6 @@ namespace TerRoguelike.NPCs.Enemy
                 for (int p = 0; p < 4; p++)
                 {
                     int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Main.rand.NextVector2CircularEdge(5f, 5f) * Main.rand.NextFloat(0.5f, 1f), ModContent.ProjectileType<SeekingStarCell>(), NPC.damage, 0);
-                    modNPC.SetUpNPCProj(NPC, proj);
                 }
                 for (int i = 0; i < 60; i++)
                 {

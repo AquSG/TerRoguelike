@@ -75,8 +75,6 @@ namespace TerRoguelike.Projectiles
             Vector2 velocity = (Vector2.UnitX * Projectile.ai[2]).RotatedBy(direction);
             
             int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<BloodClot>(), Projectile.damage, 0);
-            TerRoguelikeGlobalProjectile modProj = Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
-            modProj.InheritNPCProjValues(Main.projectile[proj], Projectile);
 
             for (int i = 0; i < 9; i++)
             {
