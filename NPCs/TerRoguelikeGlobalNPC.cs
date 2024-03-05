@@ -246,7 +246,6 @@ namespace TerRoguelike.NPCs
                     {
                         Vector2 velocity = velocityDirection * (projSpeed + (maxVelocityDeviation == 0 ? 0 : Main.rand.NextFloat(-maxVelocityDeviation, maxVelocityDeviation + float.Epsilon)));
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, projMaxSpread == 0 ? velocity : velocity.RotatedBy(Main.rand.NextFloat(-projMaxSpread, projMaxSpread + float.Epsilon)), projType, projDamage, 0f);
-                        SetUpNPCProj(npc, proj);
                     }
                 }
 
@@ -437,7 +436,6 @@ namespace TerRoguelike.NPCs
                 Vector2 projPos = npc.Center + projOffset;
                 Vector2 projVel = target == null ? Vector2.UnitX * npc.direction * projSpeed : (target.Center - projPos).SafeNormalize(Vector2.UnitX * npc.direction) * projSpeed;
                 int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f, -1, target != null ? target.whoAmI : -1, targetPlayer != -1 ? 1 : (targetNPC != -1 ? 2 : 0));
-                SetUpNPCProj(npc, proj);
             }
 
             if (npc.ai[0] >= teleportCooldown)
@@ -561,7 +559,6 @@ namespace TerRoguelike.NPCs
                     {
                         float direction = directionOverride == null ? (target.Center - (npc.Center + projOffset)).ToRotation() : (float)directionOverride;
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center + projOffset, Vector2.UnitX.RotatedBy(direction) * projVelocity, projType, projDamage, 0f);
-                        SetUpNPCProj(npc, proj);
                         if (attackDuration <= 0 || (attackDuration > 0 && npc.ai[0] >= attackTelegraph + attackDuration))
                             npc.ai[0] = -attackCooldown;
                     }
@@ -596,7 +593,6 @@ namespace TerRoguelike.NPCs
                     float projSpeed = Main.rand.NextFloat(minProjVelocity, maxProjVelocity + float.Epsilon);
                     Vector2 projVel = (npc.rotation + MathHelper.Pi + Main.rand.NextFloat(-projSpread * 0.5f, projSpread * 0.5f + float.Epsilon)).ToRotationVector2() * projSpeed;
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projPos, projVel, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
                 }
 
             }
@@ -803,7 +799,6 @@ namespace TerRoguelike.NPCs
                         npc.ai[1] = 0;
 
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center + projOffset, (target.Center - npc.Center).SafeNormalize(Vector2.UnitX * npc.direction) * projSpeed, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
                 }
             }
 
@@ -1268,7 +1263,6 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[0] = -attackCooldown;
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
                 }
             }
             else
@@ -1282,7 +1276,6 @@ namespace TerRoguelike.NPCs
                 {
                     npc.ai[0] = -attackCooldown;
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
                 }
 
                 npc.velocity.X += (npc.velocity.X == 0 ? 1 : Math.Sign(npc.velocity.X)) * acceleration;
@@ -1406,7 +1399,6 @@ namespace TerRoguelike.NPCs
                         for (int i = 0; i < projCount; i++)
                         {
                             int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (-Vector2.UnitY * projVelocity).RotatedBy(anglePerProj * i), projType, projDamage, 0f);
-                            SetUpNPCProj(npc, proj);
                         }
                     }
                 }
@@ -1630,7 +1622,6 @@ namespace TerRoguelike.NPCs
                     if (Math.Abs(AngleSizeBetween((ball.Center - npc.Center).ToRotation(), targetAngle - (MathHelper.PiOver2 * npc.ai[2]))) < MathHelper.Pi * 0.0625f)
                     {
                         npc.ai[3] = Projectile.NewProjectile(npc.GetSource_FromThis(), ball.Center, (Vector2.UnitX * launchVelocity).RotatedBy(targetAngle + (MathHelper.PiOver4 * npc.ai[2] * 0.4f)), ModContent.ProjectileType<SpikedBall>(), damage, 0f, -1, ball.Rotation);
-                        SetUpNPCProj(npc, (int)npc.ai[3]);
                         Main.projectile[(int)npc.ai[3]].direction = (int)npc.ai[2];
                         npc.ai[2] = 2;
                         if (target != null)
@@ -2167,7 +2158,6 @@ namespace TerRoguelike.NPCs
                     {
                         Vector2 direction = projVelocityDirectionOverride == null ? (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) : Vector2.UnitX.RotatedBy((float)projVelocityDirectionOverride);
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, direction * projSpeed, projType, projDamage, 0);
-                        SetUpNPCProj(npc, proj);
                     }
 
                     if (npc.ai[1] >= attackTelegraph + attackDuration)
@@ -2217,7 +2207,6 @@ namespace TerRoguelike.NPCs
                 if ((npc.ai[0] - attackTelegraph) % attackShootCooldown == 0 && npc.ai[0] <= attackTelegraph + attackDuration && npc.ai[0] >= attackTelegraph)
                 {
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-attackSpread, attackSpread + float.Epsilon)) * projSpeed, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
                 }
                 if (npc.ai[0] > 0 && npc.ai[0] < attackTelegraph + attackDuration)
                     attacking = true;
@@ -2352,7 +2341,6 @@ namespace TerRoguelike.NPCs
                         Vector2 velocityDirection = (target.Center - projSpawnPos).SafeNormalize(Vector2.UnitY);
                         Vector2 velocity = velocityDirection * projSpeed;
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, velocity, projType, projDamage, 0f);
-                        SetUpNPCProj(npc, proj);
                     }
 
                     if (npc.ai[1] >= attackTelegraph + extendedAttackSlowdownTime)
@@ -2571,7 +2559,6 @@ namespace TerRoguelike.NPCs
                 if (npc.ai[0] >= attackTelegraph)
                 {
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, velocityDirection.SafeNormalize(Vector2.UnitX) * projSpeed, projType, projDamage, 0);
-                    SetUpNPCProj(npc, proj);
                     npc.ai[0] = -attackCooldown;
                 }
             }
@@ -2606,7 +2593,6 @@ namespace TerRoguelike.NPCs
                 if (npc.ai[0] >= attackTelegraph)
                 {
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) * projSpeed, projType, projDamage, 0f);
-                    SetUpNPCProj(npc, proj);
                     npc.ai[0] = -attackCooldown;
                 }
             }
@@ -2660,7 +2646,6 @@ namespace TerRoguelike.NPCs
                 if (((int)npc.ai[0] - attackTelegraph) % attackTimeBetween == 0)
                 {
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, target == null ? Vector2.UnitY * projSpeed : (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * projSpeed, projType, projDamage, 0);
-                    SetUpNPCProj(npc, proj);
                 }
             }
             else
@@ -2893,7 +2878,6 @@ namespace TerRoguelike.NPCs
                     if (((int)npc.ai[1] - attackTelegraph) % attackTimeBetween == 0)
                     {
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * projSpeed, projType, projDamage, 0);
-                        SetUpNPCProj(npc, proj);
                     }
                     if (npc.ai[1] >= attackTelegraph + attackDuration)
                         npc.ai[1] = -attackCooldown;
@@ -2978,7 +2962,6 @@ namespace TerRoguelike.NPCs
                     {
                         Vector2 velocity = velocityDirection * (projSpeed + (maxVelocityDeviation == 0 ? 0 : Main.rand.NextFloat(-maxVelocityDeviation, maxVelocityDeviation + float.Epsilon)));
                         int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), projSpawnPos, projMaxSpread == 0 ? velocity : velocity.RotatedBy(Main.rand.NextFloat(-projMaxSpread, projMaxSpread + float.Epsilon)), projType, projDamage, 0f);
-                        SetUpNPCProj(npc, proj);
                     }
                 }
 
@@ -3605,25 +3588,6 @@ namespace TerRoguelike.NPCs
                 }
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
-        }
-
-        public void SetUpNPCProj(NPC npc, int proj)
-        {
-            return;
-
-            Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
-            Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType = npc.type;
-            if (hostileTurnedAlly || npc.friendly)
-            {
-                Main.projectile[proj].friendly = true;
-                Main.projectile[proj].hostile = false;
-            }
-            else
-            {
-                Main.projectile[proj].friendly = false;
-                Main.projectile[proj].hostile = true;
-                Main.projectile[proj].damage /= 2;
-            }
         }
     }
 

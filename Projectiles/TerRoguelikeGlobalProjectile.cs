@@ -1,21 +1,16 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.ModLoader;
-using Terraria.GameContent.ItemDropRules;
-using TerRoguelike.World;
-using Microsoft.Xna.Framework;
-using TerRoguelike.Items.Rare;
-using TerRoguelike.TerPlayer;
 using Terraria.Audio;
-using Terraria.ID;
-using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
+using Terraria.ID;
+using Terraria.ModLoader;
 using TerRoguelike.NPCs;
+using TerRoguelike.TerPlayer;
+using TerRoguelike.World;
 using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -220,16 +215,6 @@ namespace TerRoguelike.Projectiles
             float maxChange = homingStrength * MathHelper.TwoPi;
 
             projectile.velocity = (Vector2.UnitX * projectile.velocity.Length()).RotatedBy(projectile.velocity.ToRotation().AngleTowards((Main.npc[homingTarget].Center - projectile.Center).ToRotation(), maxChange));
-        }
-        public void InheritNPCProjValues(Projectile proj, Projectile parentProj)
-        {
-            return;
-
-            TerRoguelikeGlobalProjectile parentModProj = parentProj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
-            npcOwner = parentModProj.npcOwner;
-            npcOwnerType = parentModProj.npcOwnerType;
-            proj.hostile = parentProj.hostile;
-            proj.friendly = parentProj.friendly;
         }
     }
     public class ProcChainBools
