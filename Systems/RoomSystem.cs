@@ -394,12 +394,17 @@ namespace TerRoguelike.Systems
             RoomID[id].awake = false;
             RoomID[id].roomTime = 0;
             RoomID[id].closedTime = 0;
+            RoomID[id].waveCount = 0;
+            RoomID[id].waveStartTime = 0;
+            RoomID[id].currentWave = 0;
+            RoomID[id].waveClearGraceTime = 0;
             RoomID[id].NPCSpawnPosition = new Vector2[Room.RoomSpawnCap];
             RoomID[id].NPCToSpawn = new int[Room.RoomSpawnCap];
             RoomID[id].TimeUntilSpawn = new int[Room.RoomSpawnCap];
             RoomID[id].TelegraphDuration = new int[Room.RoomSpawnCap];
             RoomID[id].TelegraphSize = new float[Room.RoomSpawnCap];
             RoomID[id].NotSpawned = new bool[Room.RoomSpawnCap];
+            RoomID[id].AssociatedWave = new int[Room.RoomSpawnCap];
             RoomID[id].anyAlive = true;
             RoomID[id].roomClearGraceTime = -1;
             RoomID[id].wallActive = false;

@@ -37,6 +37,10 @@ namespace TerRoguelike.Managers
         public Vector2 RoomDimensions; // dimensions of the room
         public int roomTime; // time the room has been active
         public int closedTime; // time the room has been completed
+        public int waveStartTime;
+        public int waveCount;
+        public int currentWave;
+        public int waveClearGraceTime;
         public const int RoomSpawnCap = 200;
         public Vector2 RoomPosition; //position of the room
         public Vector2 RoomPosition16
@@ -45,7 +49,11 @@ namespace TerRoguelike.Managers
         }
         public Vector2 RoomCenter16
         {
-            get { return new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f); }
+            get { return RoomDimensions * 8f; }
+        }
+        public Vector2 RoomDimensions16
+        {
+            get { return RoomDimensions * 16f; }
         }
 
         //potential NPC variables
@@ -55,12 +63,13 @@ namespace TerRoguelike.Managers
         public int[] TelegraphDuration = new int[RoomSpawnCap];
         public float[] TelegraphSize = new float[RoomSpawnCap];
         public bool[] NotSpawned = new bool[RoomSpawnCap];
+        public int[] AssociatedWave = new int[RoomSpawnCap];
 
         public bool anyAlive = true; // whether any associated npcs are alive
         public int roomClearGraceTime = -1; // time gap of 1 seconds after the last enemy has spawned where a room cannot be considered cleared to prevent any accidents happening
         public int lastTelegraphDuration; // used for roomClearGraceTime
         public bool wallActive = false; // whether the barriers of the room are active
-        public virtual void AddRoomNPC(Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0)
+        public virtual void AddRoomNPC(Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0, int wave = 0)
         {
             for (int i = 0; i < RoomSpawnCap; i++)
             {
@@ -74,6 +83,9 @@ namespace TerRoguelike.Managers
                         telegraphSize = 1f;
                     TelegraphSize[i] = telegraphSize;
                     NotSpawned[i] = true;
+                    AssociatedWave[i] = wave;
+                    if (wave > waveCount)
+                        waveCount = wave;
                     break;
                 }
             }
@@ -95,7 +107,6 @@ namespace TerRoguelike.Managers
                 closedTime++;
                 return;
             }
-                
             WallUpdate(); // update wall logic
             PlayerItemsUpdate(); // update items from all players
 
@@ -105,10 +116,14 @@ namespace TerRoguelike.Managers
             {
                 for (int i = 0; i < RoomSpawnCap; i++)
                 {
-                    if (TimeUntilSpawn[i] - roomTime == 0) //spawn pending enemy that has reached it's time
+                    if (AssociatedWave[i] > currentWave || !NotSpawned[i])
+                        continue;
+
+                    if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
                         SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
                         lastTelegraphDuration = TelegraphDuration[i];
+                        waveClearGraceTime = roomTime;
                         NotSpawned[i] = false;
                     }
                 }
@@ -116,11 +131,47 @@ namespace TerRoguelike.Managers
             
             // if there is still an enemy yet to be spawned, do not continue with room clear logic
             bool cancontinue = true;
+            bool encourageNextWave = false;
             if (!haltSpawns)
             {
+                if (currentWave < waveCount && roomTime - waveClearGraceTime > lastTelegraphDuration + 60)
+                {
+                    encourageNextWave = true;
+
+                    for (int j = 0; j < RoomSpawnCap; j++)
+                    {
+                        if (NotSpawned[j] == true && AssociatedWave[j] <= currentWave)
+                        {
+                            encourageNextWave = false;
+                            break;
+                        }
+                    }
+                    if (encourageNextWave)
+                    {
+                        for (int i = 0; i < Main.maxNPCs; i++)
+                        {
+                            NPC npc = Main.npc[i];
+                            if (npc == null)
+                                continue;
+                            if (!npc.active)
+                                continue;
+
+                            TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+
+                            if (!modNPC.isRoomNPC)
+                                continue;
+
+                            if (modNPC.sourceRoomListID == myRoom && !modNPC.hostileTurnedAlly)
+                            {
+                                encourageNextWave = false;
+                                break;
+                            }
+                        }
+                    }
+                }
                 for (int i = 0; i < RoomSpawnCap; i++)
                 {
-                    if (NotSpawned[i] == true)
+                    if (NotSpawned[i] == true || currentWave < waveCount)
                     {
                         cancontinue = false;
                         break;
@@ -128,6 +179,12 @@ namespace TerRoguelike.Managers
                 }
             }
 
+            if (encourageNextWave)
+            {
+                currentWave++;
+                waveStartTime = roomTime;
+                waveClearGraceTime = roomTime;
+            }
             if (cancontinue)
             {
                 // start checking if any npcs in the world are active and associated with this room
@@ -139,17 +196,20 @@ namespace TerRoguelike.Managers
                     roomClearGraceTime--;
 
                 anyAlive = false;
-                for (int npc = 0; npc < Main.maxNPCs; npc++)
+                for (int i = 0; i < Main.maxNPCs; i++)
                 {
-                    if (Main.npc[npc] == null)
+                    NPC npc = Main.npc[i];
+                    if (npc == null)
                         continue;
-                    if (!Main.npc[npc].active)
-                        continue;
-
-                    if (!Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC)
+                    if (!npc.active)
                         continue;
 
-                    if (Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID == myRoom && !Main.npc[npc].GetGlobalNPC<TerRoguelikeGlobalNPC>().hostileTurnedAlly)
+                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+
+                    if (!modNPC.isRoomNPC)
+                        continue;
+
+                    if (modNPC.sourceRoomListID == myRoom && !modNPC.hostileTurnedAlly)
                     {
                         anyAlive = true;
                         break;

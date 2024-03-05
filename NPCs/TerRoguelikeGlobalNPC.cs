@@ -23,6 +23,7 @@ using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Managers.TextureManager;
+using Terraria.ModLoader.IO;
 
 namespace TerRoguelike.NPCs
 {

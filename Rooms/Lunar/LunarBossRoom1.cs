@@ -12,6 +12,8 @@ using TerRoguelike.World;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using Terraria.Audio;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -24,7 +26,10 @@ namespace TerRoguelike.Rooms
         public bool musicPlayed = false;
         public override void InitializeRoom()
         {
-            base.InitializeRoom();
+            if (!TerRoguelikeWorld.lunarBossSpawned)
+                base.InitializeRoom();
+            else
+                initialized = true;
         }
         public override void Update()
         {
