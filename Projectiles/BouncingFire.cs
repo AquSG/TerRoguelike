@@ -34,8 +34,11 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             Projectile.rotation += 0.4f;
-            if (Projectile.timeLeft < 160)
-                Projectile.velocity.Y += 0.24f;
+            if (Projectile.velocity.Y < 9)
+                Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0, 0.24f, -(Projectile.timeLeft - 180) / 40f), 0, 0.24f);
+            else if (Projectile.velocity.Y > 0)
+                Projectile.velocity.Y = 9;
+
             for (int i = 0; i < 1; i++)
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Torch, 0, 0, Projectile.alpha, default(Color), 2.6f);
@@ -60,12 +63,12 @@ namespace TerRoguelike.Projectiles
             // If the projectile hits the left or right side of the tile, reverse the X velocity
             if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
             {
-                Projectile.velocity.X = -oldVelocity.X * 0.95f;
+                Projectile.velocity.X = -oldVelocity.X * 0.90f;
             }
             // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
             if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             {
-                Projectile.velocity.Y = -oldVelocity.Y * 0.95f;
+                Projectile.velocity.Y = -oldVelocity.Y * 0.9f;
                 Projectile.velocity.X *= 0.95f;
             }
             return false;

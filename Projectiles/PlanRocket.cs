@@ -48,7 +48,7 @@ namespace TerRoguelike.Projectiles
             modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
         }
 
-        public override bool? CanDamage() => ableToHit ? (bool?)null : false;
+        public override bool? CanDamage() => ableToHit && Projectile.localAI[1] >= 300 ? (bool?)null : false;
         public override bool? CanHitNPC(NPC target)
         {
             if (Projectile.penetrate == 1)
@@ -73,7 +73,7 @@ namespace TerRoguelike.Projectiles
             }
             if (Projectile.timeLeft == 59)
             {
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileHit", 4) with { Volume = 0.6f }, Projectile.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileHit", 4) with { Volume = 0.45f }, Projectile.Center);
                 for (int i = 0; i < 10; i++)
                 {
                     Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-16, -16), 32, 32, DustID.PinkTorch);

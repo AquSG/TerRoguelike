@@ -56,7 +56,7 @@ namespace TerRoguelike.Projectiles
 
                 int healAmt = (int)(player.statLifeMax2 * modPlayer.soulstealCoating * 0.1f);
                 modPlayer.ScaleableHeal(healAmt);
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.18f }, Projectile.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.12f }, Projectile.Center);
                 Projectile.Kill();
             }
             Projectile.velocity = ((playerVector.SafeNormalize(Vector2.UnitY) * 6f) + (player.velocity / 4)) * MathHelper.Lerp(0f, 1f, Projectile.localAI[0] / 240f);

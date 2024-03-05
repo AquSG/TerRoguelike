@@ -403,7 +403,7 @@ namespace TerRoguelike.TerPlayer
             if (sentientPutty > 0 && outOfDangerTime == 120)
             {
                 int healAmt = sentientPutty * 10;
-                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.18f }, Player.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.12f }, Player.Center);
                 ScaleableHeal(healAmt);
             }
             if (memoryFoam > 0 && outOfDangerTime >= 420)
@@ -1085,7 +1085,7 @@ namespace TerRoguelike.TerPlayer
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (npc == null || !npc.active || npc.friendly)
+                    if (npc == null || !npc.active || npc.friendly || npc.immortal)
                         continue;
 
                     if (npc.Center.Distance(target.Center) <= radius)

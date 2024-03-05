@@ -119,7 +119,7 @@ namespace TerRoguelike.Projectiles
                 return false;
             }
                 
-            SoundEngine.PlaySound(SoundID.Item88 with { Volume = 0.7f, Pitch = 0.125f, PitchVariance = 0.04f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item88 with { Volume = 0.5f, Pitch = 0.125f, PitchVariance = 0.04f }, Projectile.Center);
             return true;
         }
         public override bool PreDraw(ref Color lightColor)

@@ -95,6 +95,9 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/SeekingStarCellGlow",
                 "TerRoguelike/NPCs/Enemy/StarCellGlow",
                 "TerRoguelike/NPCs/Enemy/StarSpewerGlow",
+                "TerRoguelike/NPCs/Enemy/FlowInvaderGlow",
+                "TerRoguelike/Projectiles/Comet",
+                "TerRoguelike/Projectiles/FlowSpawnGlow",
             };
             foreach (string path in pathList)
             {

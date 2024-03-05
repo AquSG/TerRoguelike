@@ -27,7 +27,7 @@ namespace TerRoguelike.Rooms
         {
             ModContent.NPCType<StarCell>(),
             ModContent.NPCType<StarSpewer>(),
-            ModContent.NPCType<Predictor>()
+            ModContent.NPCType<FlowInvader>()
         };
         public override void InitializeRoom()
         {
