@@ -134,7 +134,7 @@ namespace TerRoguelike.NPCs.Enemy
 
                 Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
                 Vector3 colorHSL = Main.rgbToHsl(color);
-                float outlineThickness = 1f;
+                float outlineThickness = 2f;
 
                 GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
                 GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
@@ -142,7 +142,7 @@ namespace TerRoguelike.NPCs.Enemy
 
                 for (float j = 0; j < 1; j += 0.125f)
                 {
-                    spriteBatch.Draw(tex, NPC.Center - Main.screenPosition + (j * MathHelper.TwoPi * NPC.rotation).ToRotationVector2() * outlineThickness + (Vector2.UnitY * NPC.gfxOffY) + modNPC.drawCenter, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+                    spriteBatch.Draw(tex, NPC.Center - Main.screenPosition + ((j * MathHelper.TwoPi + NPC.rotation).ToRotationVector2() * outlineThickness) + (Vector2.UnitY * NPC.gfxOffY) + modNPC.drawCenter, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, SpriteEffects.None, 0f);
                 }
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

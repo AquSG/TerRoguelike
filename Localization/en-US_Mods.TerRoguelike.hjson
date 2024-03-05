@@ -761,4 +761,5 @@ NPCs: {
 	StormDiver.DisplayName: Storm Diver
 	VortexWatcher.DisplayName: Vortex Watcher
 	StarCell.DisplayName: Star Cell
+	StarSpewer.DisplayName: Star Spewer
 }

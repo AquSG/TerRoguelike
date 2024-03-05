@@ -143,7 +143,7 @@ namespace TerRoguelike.NPCs.Enemy
 
                 for (float j = 0; j < 1; j += 0.125f)
                 {
-                    spriteBatch.Draw(tex, NPC.Center - Main.screenPosition + (j * MathHelper.TwoPi * NPC.rotation).ToRotationVector2() * outlineThickness + modNPC.drawCenter, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
+                    spriteBatch.Draw(tex, NPC.Center - Main.screenPosition + ((j * MathHelper.TwoPi + NPC.rotation).ToRotationVector2() * outlineThickness) + modNPC.drawCenter, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
                 }
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
