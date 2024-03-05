@@ -26,7 +26,7 @@ namespace TerRoguelike.Rooms
         public List<int> SpawnSelection = new List<int>()
         {
             ModContent.NPCType<StarCell>(),
-            ModContent.NPCType<Omniwatcher>(),
+            ModContent.NPCType<StarSpewer>(),
             ModContent.NPCType<Predictor>()
         };
         public override void InitializeRoom()

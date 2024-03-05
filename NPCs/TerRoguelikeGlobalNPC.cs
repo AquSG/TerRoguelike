@@ -2108,7 +2108,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueCrawlerShooterAI(NPC npc, float speedCap, float acceleration, int waitTime, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
+        public void RogueCrawlerShooterAI(NPC npc, float speedCap, float acceleration, int waitTime, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage, float speedMultiWhenAttacking = 1f, float? projVelocityDirectionOverride = null)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -2124,10 +2124,12 @@ namespace TerRoguelike.NPCs
                     npc.direction = Main.rand.NextBool() ? -1 : 1;
                 }
 
-                if (Math.Abs(npc.velocity.X) < speedCap)
+                float speedMulti = npc.ai[1] > 0 ? speedMultiWhenAttacking : 1f;
+
+                if (Math.Abs(npc.velocity.X) < speedCap * speedMulti)
                     npc.velocity.X += acceleration * npc.direction;
-                if (Math.Abs(npc.velocity.X) > speedCap)
-                    npc.velocity.X = speedCap * npc.direction;
+                if (Math.Abs(npc.velocity.X) > speedCap * speedMulti)
+                    npc.velocity.X = speedCap * npc.direction * speedMulti;
 
                 Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
 
@@ -2154,7 +2156,7 @@ namespace TerRoguelike.NPCs
 
             if (target != null)
             {
-                if (npc.ai[1] == 0 && CanHitInLine(npc.Center, target.Center))
+                if (npc.ai[1] == 0 && (npc.Center - target.Center).Length() <= attackDist && CanHitInLine(npc.Center, target.Center))
                 {
                     npc.ai[1]++;
                 }
@@ -2163,7 +2165,8 @@ namespace TerRoguelike.NPCs
                 {
                     if (((int)npc.ai[1] - attackTelegraph) % attackTimeBetween == 0)
                     {
-                        int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) * projSpeed, projType, projDamage, 0);
+                        Vector2 direction = projVelocityDirectionOverride == null ? (target.Center - npc.Center).SafeNormalize(-Vector2.UnitY) : Vector2.UnitX.RotatedBy((float)projVelocityDirectionOverride);
+                        int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, direction * projSpeed, projType, projDamage, 0);
                         SetUpNPCProj(npc, proj);
                     }
 
