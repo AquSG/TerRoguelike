@@ -62,21 +62,23 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 150.0; i++)
+                for (int i = 0; (double)i < hit.Damage / 20.0; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, hit.HitDirection, -1f);
                 }
-                return;
             }
-            for (int num475 = 0; num475 < 75; num475++)
+            else
             {
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, 2 * hit.HitDirection, -2f);
-            }
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 273, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 274, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 274, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 275, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 275, NPC.scale);
+                for (int i = 0; i < 35; i++)
+                {
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, 2 * hit.HitDirection, -2f);
+                }
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 273, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 274, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 274, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 275, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 34f), NPC.velocity, 275, NPC.scale);
+            }   
         }
         public override void FindFrame(int frameHeight)
         {

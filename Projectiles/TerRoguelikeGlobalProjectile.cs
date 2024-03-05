@@ -15,6 +15,7 @@ using Terraria.ID;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.NPCs;
+using static TerRoguelike.Managers.NPCManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -88,6 +89,43 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
+            if (source is EntitySource_Parent parentSource)
+            {
+                if (parentSource.Entity is NPC)
+                {
+                    NPC npc = Main.npc[parentSource.Entity.whoAmI];
+                    npcOwner = npc.whoAmI;
+                    npcOwnerType = npc.type;
+
+                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                    if (modNPC.hostileTurnedAlly || npc.friendly)
+                    {
+                        projectile.friendly = true;
+                        projectile.hostile = false;
+                    }
+                    else
+                    {
+                        projectile.friendly = false;
+                        projectile.hostile = true;
+                        projectile.damage /= 2;
+                    }
+                }
+                else if (parentSource.Entity is Projectile)
+                {
+                    Projectile parentProj = Main.projectile[parentSource.Entity.whoAmI];
+                    TerRoguelikeGlobalProjectile parentModProj = parentProj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+                    npcOwner = parentModProj.npcOwner;
+                    npcOwnerType = parentModProj.npcOwnerType;
+                    if (npcOwnerType != -1)
+                    {
+                        if (AllNPCs.Exists(x => x.modNPCID == npcOwnerType))
+                        {
+                            projectile.hostile = parentProj.hostile;
+                            projectile.friendly = parentProj.friendly;
+                        }
+                    }
+                }
+            }
         }
         public override void OnKill(Projectile projectile, int timeLeft)
         {
@@ -185,6 +223,8 @@ namespace TerRoguelike.Projectiles
         }
         public void InheritNPCProjValues(Projectile proj, Projectile parentProj)
         {
+            return;
+
             TerRoguelikeGlobalProjectile parentModProj = parentProj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
             npcOwner = parentModProj.npcOwner;
             npcOwnerType = parentModProj.npcOwnerType;
