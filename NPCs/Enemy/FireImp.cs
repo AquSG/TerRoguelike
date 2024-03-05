@@ -103,5 +103,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             return Color.White;
         }
+        public override bool CanHitNPC(NPC target) => false;
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;
     }
 }
