@@ -130,5 +130,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             return true;
         }
+        public override bool CanHitNPC(NPC target) => false;
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;
     }
 }

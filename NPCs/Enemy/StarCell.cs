@@ -59,7 +59,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < 10.0 + hit.Damage / 10.0; i++)
+                for (int i = 0; (double)i < 5.0 + hit.Damage / 10.0; i++)
                 {
                     int width = NPC.width / 4;
                     int dust = Dust.NewDust(NPC.Center - Vector2.One * (float)width, width * 2, width * 2, DustID.Clentaminator_Cyan);
@@ -85,7 +85,7 @@ namespace TerRoguelike.NPCs.Enemy
                 SoundEngine.PlaySound(SoundID.NPCDeath7 with { Volume = 0.5f }, NPC.Center);
                 for (int p = 0; p < 4; p++)
                 {
-                    int proj = Projectile.NewProjectile(NPC.GetSource_Death(), NPC.Center, Main.rand.NextVector2CircularEdge(5f, 5f) * Main.rand.NextFloat(0.5f, 1f), ModContent.ProjectileType<SeekingStarCell>(), NPC.damage, 0);
+                    int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Main.rand.NextVector2CircularEdge(5f, 5f) * Main.rand.NextFloat(0.5f, 1f), ModContent.ProjectileType<SeekingStarCell>(), NPC.damage, 0);
                     modNPC.SetUpNPCProj(NPC, proj);
                 }
                 for (int i = 0; i < 60; i++)

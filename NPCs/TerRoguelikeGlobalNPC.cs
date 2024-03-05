@@ -3609,6 +3609,8 @@ namespace TerRoguelike.NPCs
 
         public void SetUpNPCProj(NPC npc, int proj)
         {
+            return;
+
             Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner = npc.whoAmI;
             Main.projectile[proj].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType = npc.type;
             if (hostileTurnedAlly || npc.friendly)

@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 100.0; i++)
+                for (int i = 0; (double)i < hit.Damage / 10.0; i++)
                 {
                     int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, 67, hit.HitDirection, -1f);
                     Main.dust[dust].noGravity = true;
@@ -75,7 +75,7 @@ namespace TerRoguelike.NPCs.Enemy
             }
             else
             {
-                for (int i = 0; i < 60; i++)
+                for (int i = 0; i < 35; i++)
                 {
                     int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.SnowflakeIce, 2 * hit.HitDirection, -2f);
                     Main.dust[dust].noGravity = false;
