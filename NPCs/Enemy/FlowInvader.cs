@@ -19,49 +19,46 @@ using Terraria.Audio;
 
 namespace TerRoguelike.NPCs.Enemy
 {
-    public class StarSpewer : BaseRoguelikeNPC
+    public class FlowInvader : BaseRoguelikeNPC
     {
         public Texture2D lightTex;
-        public override int modNPCID => ModContent.NPCType<StarSpewer>();
+        public override int modNPCID => ModContent.NPCType<FlowInvader>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => 1;
-        public int attackTelegraph = 20;
-        public int attackExtend = 20;
-        public int attackCooldown = 90;
+        public int attackTelegraph = 30;
+        public int attackCooldown = 30;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 11;
+            Main.npcFrameCount[modNPCID] = 5;
         }
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 28;
-            NPC.height = 32;
+            NPC.width = 40;
+            NPC.height = 60;
             NPC.aiStyle = -1;
             NPC.damage = 35;
-            NPC.lifeMax = 800;
+            NPC.lifeMax = 1200;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 1);
-            lightTex = TexDict["StarSpewerGlow"];
+            modNPC.drawCenter = new Vector2(0, -3);
+            lightTex = TexDict["FlowInvaderGlow"];
+            NPC.noGravity = true;
         }
         public override void AI()
         {
-            modNPC.RogueCrawlerShooterAI(NPC, 1.3f, 0.04f, 20, 500f, attackTelegraph, attackExtend, attackExtend + 1, attackCooldown, ModContent.ProjectileType<SeekingStarCell>(), 5f, NPC.damage, 0f, -MathHelper.PiOver2);
-            NPC.frameCounter += Math.Abs(NPC.velocity.X) * 0.1d;
+            modNPC.RogueFlyingShooterAI(NPC, 4f, 4f, 0.13f, 120f, 400f, attackTelegraph, attackCooldown, ModContent.ProjectileType<FlowSpawn>(), 12f, Vector2.Zero, NPC.damage, true);
+            NPC.frameCounter += 0.18d;
+            NPC.rotation = NPC.velocity.X * 0.06f;
 
-            if (NPC.ai[0] == 0)
+            if (NPC.ai[2] == -attackCooldown)
             {
-                NPC.frameCounter += 0.1d;
-            }
-            if (NPC.ai[1] == attackTelegraph)
-            {
-                SoundEngine.PlaySound(SoundID.Item114 with { Volume = 1f, Pitch = 0f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.NPCDeath7 with { Volume = 0.6f }, NPC.Center);
                 for (int i = 0; i < 10; i++)
                 {
                     Vector2 offset = Main.rand.NextVector2CircularEdge(8f, 8f);
-                    Dust d = Dust.NewDustPerfect(NPC.Center + (offset * 0.5f), DustID.Clentaminator_Cyan, offset * 0.15f + (-Vector2.UnitY), 0, default, 1f);
+                    Dust d = Dust.NewDustPerfect(NPC.Center + (offset * 0.5f), DustID.Clentaminator_Cyan, null, 0, default, 1f);
                     d.noGravity = true;
                     d.noLight = true;
                     d.noLightEmittence = true;
@@ -72,12 +69,12 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / 50.0; i++)
+                for (int i = 0; (double)i < hit.Damage / 10.0; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 17, hit.HitDirection, -1f);
-                    if (Main.rand.NextBool(4))
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 17, hit.HitDirection, -1f, 0, Color.Transparent, 0.75f);
+                    if (Main.rand.NextBool())
                     {
-                        Dust d = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, 229)];
+                        Dust d = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Clentaminator_Cyan)];
                         d.noGravity = true;
                     }
                 }
@@ -86,42 +83,34 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 for (int i = 0; i < 20; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 17, hit.HitDirection, -1f);
+                    if (!Main.rand.NextBool())
+                    {
+                        Dust.NewDust(NPC.position, NPC.width, NPC.height, 17, hit.HitDirection, -1f);
+                    }
                     Dust d = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Clentaminator_Cyan)];
                     d.noGravity = true;
                     d.velocity *= 3f;
                 }
-                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.8f, 775);
-                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.8f, 776);
-                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.9f, 777);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Top, NPC.velocity * 0.8f, 778);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Top, NPC.velocity * 0.8f, 779);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.9f, 780);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.9f, 781);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.9f, 780);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center, NPC.velocity * 0.9f, 781);
             }
         }
         public override void FindFrame(int frameHeight)
         {
-            int frameCount = Main.npcFrameCount[modNPCID];
-            int currentFrame = (int)(NPC.frameCounter % (frameCount - 3)) + 1;
-            if (NPC.ai[1] > 0 && NPC.ai[1] < attackTelegraph + attackExtend)
-            {
-                int selector = ((int)NPC.ai[1] / 8) % 5;
-                if (selector == 2)
-                    currentFrame = frameCount - 1;
-                else if (selector % 2 == 1)
-                    currentFrame = frameCount - 2;
-                else
-                    currentFrame = 0;
-                NPC.frameCounter = 0;
-            }
-            else if (Math.Abs(NPC.velocity.X) < 0.5f)
-            {
-                currentFrame = 0;
-                NPC.frameCounter = 0;
-            }
-
+            int currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID]));
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Main.EntitySpriteDraw(lightTex, NPC.Center - Main.screenPosition + modNPC.drawCenter + (Vector2.UnitY * NPC.gfxOffY), NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+        }
+        public override bool? CanFallThroughPlatforms()
+        {
+            return true;
         }
     }
 }

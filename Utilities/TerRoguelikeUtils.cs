@@ -348,5 +348,24 @@ namespace TerRoguelike.Utilities
 
             return end;
         }
+        public static void StartAdditiveSpritebatch(bool end = true)
+        {
+            if (end)
+                Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+        }
+        public static void StartAlphaBlendSpritebatch(bool end = true)
+        {
+            if (end)
+                Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        }
+        public static void StartVanillaSpritebatch(bool end = true)
+        {
+            if (end)
+                Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        }
     }
 }

@@ -52,6 +52,7 @@ Projectiles: {
 	VortexLaser.DisplayName: Vortex Laser
 	BlackVortex.DisplayName: Black Vortex
 	SeekingStarCell.DisplayName: Seeking Star Cell
+	FlowSpawn.DisplayName: Flow Spawn
 }
 
 Items: {
@@ -762,4 +763,5 @@ NPCs: {
 	VortexWatcher.DisplayName: Vortex Watcher
 	StarCell.DisplayName: Star Cell
 	StarSpewer.DisplayName: Star Spewer
+	FlowInvader.DisplayName: Flow Invader
 }
