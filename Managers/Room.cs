@@ -55,6 +55,7 @@ namespace TerRoguelike.Managers
         {
             get { return RoomDimensions * 16f; }
         }
+        public Vector2 PercentPosition(float x, float y) => new Vector2(RoomDimensions.X * 16f * x, RoomDimensions.Y * 16f * y);
 
         //potential NPC variables
         public Vector2[] NPCSpawnPosition = new Vector2[RoomSpawnCap];
@@ -130,7 +131,7 @@ namespace TerRoguelike.Managers
             }
             
             // if there is still an enemy yet to be spawned, do not continue with room clear logic
-            bool cancontinue = roomTime - waveClearGraceTime > lastTelegraphDuration;
+            bool cancontinue = roomTime - waveClearGraceTime > 60;
             bool encourageNextWave = false;
             if (!haltSpawns)
             {

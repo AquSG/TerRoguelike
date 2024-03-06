@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueTeleportingShooterAI(NPC, 96f, 240f, 315, attackTelegraph, attackCooldown, ModContent.ProjectileType<BouncingFire>(), 4f, new Vector2(12 * NPC.direction, -12), NPC.damage, true, true);
+            modNPC.RogueTeleportingShooterAI(NPC, 96f, 240f, 315, attackTelegraph, attackCooldown, ModContent.ProjectileType<BouncingFire>(), 4f, new Vector2(12 * NPC.direction, -8), NPC.damage, true, true);
             NPC.frameCounter += 0.25d;
 
             NPC.velocity.X *= 0.8f;

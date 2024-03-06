@@ -11,6 +11,8 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
+using Terraria.GameContent;
+using Terraria.Graphics.Shaders;
 
 namespace TerRoguelike.Projectiles
 {
@@ -47,6 +49,27 @@ namespace TerRoguelike.Projectiles
             } 
             SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.8f }, Projectile.Center);
             return true;
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Texture2D tex = TextureAssets.Projectile[Type].Value;
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Vector3 colorHSL = Main.rgbToHsl(Color.Gold);
+
+            GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+            GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+            GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+            for (int i = 0; i < 8; i++)
+            {
+                Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
+                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + offset, null, Color.White, Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+            }
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+            return false;
         }
     }
 }
