@@ -17,6 +17,7 @@ using TerRoguelike.Projectiles;
 using Terraria.Audio;
 using Terraria.Graphics.Shaders;
 using static TerRoguelike.Managers.TextureManager;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -47,6 +48,11 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.OverrideIgniteVisual = true;
             baseTex = TexDict["BallistaBase"];
+        }
+        public override void OnSpawn(IEntitySource source)
+        {
+            NPC.ai[0] = -attackCooldown + 1;
+            NPC.rotation = MathHelper.Pi * Main.rand.Next(2);
         }
         public override void AI()
         {

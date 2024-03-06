@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using TerRoguelike.Projectiles;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -23,6 +24,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<CursedSlime>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Corrupt"] };
         public override int CombatStyle => 1;
+        public int attackCooldown = 190;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 2;
@@ -41,6 +43,10 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, 0);
             NPC.alpha = 60;
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            NPC.ai[1] = -attackCooldown + 1;
+        }
         public override void AI()
         {
             if (Main.rand.NextBool(5))
@@ -53,7 +59,7 @@ namespace TerRoguelike.NPCs.Enemy
             }
 
             int attackTelegraph = 60;
-            modNPC.RogueCrawlerShooterAI(NPC, 1.2f, 0.04f, 90, 320f, attackTelegraph, 31, 30, 190, ModContent.ProjectileType<CursedFlame>(), 9f, NPC.damage);
+            modNPC.RogueCrawlerShooterAI(NPC, 1.2f, 0.04f, 90, 320f, attackTelegraph, 31, 30, attackCooldown, ModContent.ProjectileType<CursedFlame>(), 9f, NPC.damage);
             if (NPC.ai[0] == 0)
             {
                 NPC.frameCounter += 0.1d;

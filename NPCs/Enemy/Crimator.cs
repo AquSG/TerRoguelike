@@ -25,6 +25,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<Crimator>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Crimson"] };
         public override int CombatStyle => 2;
+        public int attackColdown = 135;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 2;
@@ -45,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueCorruptorAI(NPC, 4.5f, 0.035f, 30, 135, ModContent.ProjectileType<BloodClot>(), 8f, NPC.damage);
+            modNPC.RogueCorruptorAI(NPC, 4.5f, 0.035f, 30, attackColdown, ModContent.ProjectileType<BloodClot>(), 8f, NPC.damage);
 
             NPC.frameCounter += 0.1d;
             float direction = NPC.velocity.ToRotation();
@@ -81,6 +82,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void OnSpawn(IEntitySource source)
         {
             NPC.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+            NPC.ai[0] = -attackColdown + 1;
         }
         public override bool? CanFallThroughPlatforms()
         {
