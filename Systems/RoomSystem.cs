@@ -30,6 +30,7 @@ using static TerRoguelike.World.TerRoguelikeWorld;
 using static TerRoguelike.Systems.MusicSystem;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Systems
 {
@@ -39,6 +40,7 @@ namespace TerRoguelike.Systems
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static bool obtainedRoomListFromServer = false;
+        public static Vector2 DrawBehindTilesOffset = new Vector2(190, 150);
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -410,16 +412,19 @@ namespace TerRoguelike.Systems
             RoomID[id].wallActive = false;
             RoomID[id].haltSpawns = false;
         }
+        public static void PostDrawWalls()
+        {
+            DrawChains();
+        }
         public override void PostDrawTiles()
         {
             Player player = Main.player[Main.myPlayer];
-            if (TerRoguelikeWorld.IsTerRoguelikeWorld && player.dead)
+            if (IsTerRoguelikeWorld && player.dead)
                 player.respawnTimer = 60;
 
             DrawDeathScene();
             DrawPendingEnemies();
             DrawHealingPulse();
-            DrawChains();
 
             if (RoomList == null)
                 return;
@@ -434,11 +439,10 @@ namespace TerRoguelike.Systems
                 {
                     if (room.ID == RoomDict["LunarBossRoom1"])
                     {
-                        Main.spriteBatch.Begin();
+                        StartAlphaBlendSpritebatch(false);
                         Vector2 position = (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f;
                         Texture2D moonLordTex = TexDict["StillMoonLord"];
-                        Vector2 zoomOffset = (((position - Main.Camera.Center) * ZoomSystem.zoomOverride) - (position - Main.Camera.Center));
-                        Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, ZoomSystem.zoomOverride, SpriteEffects.None);
+                        Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
                         Main.spriteBatch.End();
                     }
                 }
@@ -776,7 +780,7 @@ namespace TerRoguelike.Systems
             }
             chainList.RemoveAll(x => x.TimeLeft <= 0);
         }
-        public void DrawChains()
+        public static void DrawChains()
         {
             if (chainList == null)
                 return;
@@ -786,21 +790,18 @@ namespace TerRoguelike.Systems
 
             Texture2D chain1Tex = TexDict["Chain1"];
             Texture2D chain2Tex = TexDict["Chain2"];
-            Main.spriteBatch.Begin();
             for (int i = 0; i < chainList.Count; i++)
             {
                 Chain chain = chainList[i];
-                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f) * ZoomSystem.zoomOverride);
+                Vector2 visualStart = chain.Start + ((chain.End - chain.Start).SafeNormalize(Vector2.UnitX) * (chain2Tex.Height * 0.5f));
                 float rotation = (chain.End - visualStart).ToRotation();
                 int visualLength = (int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft));
-                Vector2 zoomOffset = (((chain.Start - Main.Camera.Center) * ZoomSystem.zoomOverride) - (chain.Start - Main.Camera.Center));
                 for (int j = 0; j < visualLength; j++)
                 {
-                    Vector2 position = ((chain.End - visualStart) * (j / (float)chain.Length) * ZoomSystem.zoomOverride);
-                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.Camera.UnscaledPosition + zoomOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f * ZoomSystem.zoomOverride, SpriteEffects.None);
+                    Vector2 position = ((chain.End - visualStart) * (j / (float)chain.Length));
+                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.screenPosition + DrawBehindTilesOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f, SpriteEffects.None);
                 }
             }
-            Main.spriteBatch.End();
         }
         #endregion
 

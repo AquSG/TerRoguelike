@@ -725,7 +725,7 @@ namespace TerRoguelike.NPCs
 
             npc.ai[3]++;
             npc.stairFall = true;
-            if (npc.collideY)
+            if (npc.collideY && CanFallThroughPlatforms(npc) != true)
             {
                 int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
@@ -2660,7 +2660,7 @@ namespace TerRoguelike.NPCs
 
             npc.ai[3]++;
             npc.stairFall = true;
-            if (npc.collideY)
+            if (npc.collideY && CanFallThroughPlatforms(npc) != true)
             {
                 int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
@@ -2790,7 +2790,7 @@ namespace TerRoguelike.NPCs
 
             npc.ai[3]++;
             npc.stairFall = true;
-            if (npc.collideY)
+            if (npc.collideY && CanFallThroughPlatforms(npc) != true)
             {
                 int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);

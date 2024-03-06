@@ -125,6 +125,7 @@ namespace TerRoguelike.Managers
                         SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
                         lastTelegraphDuration = TelegraphDuration[i];
                         waveClearGraceTime = roomTime;
+                        roomClearGraceTime = -1;
                         NotSpawned[i] = false;
                     }
                 }

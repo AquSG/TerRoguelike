@@ -16,11 +16,13 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.NPCs.Enemy
 {
     public class StoneDrone : BaseRoguelikeNPC
     {
+        public Texture2D lightTex;
         public override int modNPCID => ModContent.NPCType<StoneDrone>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Base"] };
         public override int CombatStyle => 1;
@@ -43,12 +45,13 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.8f;
             modNPC.drawCenter = new Vector2(0, -10);
             NPC.noGravity = true;
+            lightTex = TexDict["StoneDroneGlow"];
         }
         public override void AI()
         {
             NPC.frameCounter += 0.25d;
             NPC.rotation = MathHelper.PiOver2 * NPC.velocity.Length() * 0.02f * NPC.direction;
-            modNPC.RogueFlyingShooterAI(NPC, 2f, 2f, 0.03f, 120f, 180f, attackTelegraph, attackCooldown, ProjectileID.RockGolemRock, 8f, Vector2.Zero, NPC.damage, true);
+            modNPC.RogueFlyingShooterAI(NPC, 2f, 2f, 0.05f, 120f, 200f, attackTelegraph, attackCooldown, ModContent.ProjectileType<Rock>(), 8f, Vector2.Zero, NPC.damage, true);
             if (NPC.ai[2] == -attackCooldown)
             {
                 SoundEngine.PlaySound(SoundID.Item51 with { Volume = 1f }, NPC.Center);
@@ -89,6 +92,11 @@ namespace TerRoguelike.NPCs.Enemy
                 currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 10));
             }
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+        }
+        public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
+        {
+            if (!modNPC.ignitedStacks.Any())
+                Main.EntitySpriteDraw(lightTex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
     }
 }
