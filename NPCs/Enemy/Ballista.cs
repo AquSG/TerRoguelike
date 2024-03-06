@@ -56,7 +56,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueTurretAI(NPC, attackTelegraph, attackCooldown, 320f, ModContent.ProjectileType<BallistaShot>(), NPC.damage, 16f, Vector2.UnitY * -20, true, NPC.rotation, MathHelper.PiOver4);
+            modNPC.RogueTurretAI(NPC, attackTelegraph, attackCooldown, 480f, ModContent.ProjectileType<BallistaShot>(), NPC.damage, 16f, Vector2.UnitY * -20, true, NPC.rotation, MathHelper.PiOver4);
             if (NPC.ai[0] == 1)
             {
                 SoundEngine.PlaySound(SoundID.DD2_BallistaTowerShot with { Volume = 1f }, NPC.Center);

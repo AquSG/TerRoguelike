@@ -325,14 +325,19 @@ namespace TerRoguelike.TerPlayer
             brainSucked = false;
 
             //max life effects happen before barrier calculations
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                int maxLifeIncrease = TerRoguelikeWorld.currentStage * 20;
+                Player.statLifeMax2 += maxLifeIncrease;
+            }
             if (bottleOfVigor > 0)
             {
-                int maxLifeIncrease = bottleOfVigor * 10;
+                int maxLifeIncrease = bottleOfVigor * 15;
                 Player.statLifeMax2 += maxLifeIncrease;
             }
             if (steamEngine > 0)
             {
-                int maxLifeIncrease = steamEngine * steamEngineStacks.Count;
+                int maxLifeIncrease = steamEngine * steamEngineStacks.Count * 2;
                 Player.statLifeMax2 += maxLifeIncrease;
                 for (int i = 0; i < steamEngineStacks.Count; i++)
                 {
@@ -1126,7 +1131,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (steamEngine > 0 && !modTarget.activatedSteamEngine)
             {
-                steamEngineStacks.Add(3600);
+                steamEngineStacks.Add(7200);
                 modTarget.activatedSteamEngine = true;
             }
             if (nutritiousSlime > 0 && !modTarget.activatedNutritiousSlime)

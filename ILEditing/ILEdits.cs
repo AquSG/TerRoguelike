@@ -24,6 +24,7 @@ using MonoMod.Cil;
 using Mono.Cecil.Cil;
 using Terraria.ModLoader.Core;
 using static Terraria.Collision;
+using Terraria.GameContent.Drawing;
 
 namespace TerRoguelike.ILEditing
 {
@@ -43,7 +44,14 @@ namespace TerRoguelike.ILEditing
             On_SoundPlayer.PauseAll += On_SoundPlayer_PauseAll;
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
+            On_WallDrawing.DrawWalls += On_WallDrawing_DrawWalls;
         }
+
+        private void On_WallDrawing_DrawWalls(On_WallDrawing.orig_DrawWalls orig, WallDrawing self)
+        {
+			orig.Invoke(self);
+			RoomSystem.PostDrawWalls();
+		}
 
         private void On_NPC_UpdateCollision(On_NPC.orig_UpdateCollision orig, NPC self)
         {
