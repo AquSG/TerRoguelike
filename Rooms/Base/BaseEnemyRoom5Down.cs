@@ -8,11 +8,14 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class BaseEnemyRoom5Down : Room
     {
+        public override int AssociatedFloor => FloorDict["Base"];
         public override string Key => "BaseEnemyRoom5Down";
         public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom5Down.csch";
         public override bool CanExitRight => true;
@@ -20,9 +23,13 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(48f, 72f), NPCID.BoneLee, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 48f, 72f), NPCID.BoneLee, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2(RoomDimensions.X / 2f * 16f, 32f), NPCID.Crimslime, 380, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.5f, 0.10f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.92f, 0.45f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.92f, 0.85f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
+
+            AddRoomNPC(PercentPosition(0.08f, 0.45f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 1);
+            AddRoomNPC(PercentPosition(0.92f, 0.45f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 1);
+            AddRoomNPC(PercentPosition(0.5f, 0.10f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f, 1);
         }
     }
 }

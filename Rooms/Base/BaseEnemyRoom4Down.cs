@@ -8,11 +8,16 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
     public class BaseEnemyRoom4Down : Room
     {
+        public override int AssociatedFloor => FloorDict["Base"];
         public override string Key => "BaseEnemyRoom4Down";
         public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom4Down.csch";
         public override bool CanExitRight => true;
@@ -20,10 +25,10 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(48f, 64f), NPCID.MartianTurret, 60, 30, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 48f, 64f), NPCID.MartianTurret, 60, 30, 0.45f);
-            AddRoomNPC(new Vector2(48f, (RoomDimensions.Y * 16f) / 2f), NPCID.MartianTurret, 60, 30, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 48f, (RoomDimensions.Y * 16f) / 2f), NPCID.MartianTurret, 60, 30, 0.45f);
+            AddRoomNPC(PercentPosition(0.1f, 0.45f), ModContent.NPCType<Ballista>(), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.9f, 0.45f), ModContent.NPCType<Ballista>(), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.1f, 0.10f), ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.9f, 0.10f), ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueCrawlerAI(NPC, 1.2f, 0.04f, 90);
+            modNPC.RogueCrawlerAI(NPC, 2.2f, 0.04f, 90);
             if (NPC.ai[0] == 0)
             {
                 NPC.frameCounter += 0.1d;

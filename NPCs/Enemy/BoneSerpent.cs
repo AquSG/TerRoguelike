@@ -210,6 +210,9 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {
+            if ((projectile.hostile && !NPC.friendly) || (projectile.friendly && NPC.friendly))
+                return false;
+
             float radius = NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2;
             for (int i = 0; i < Segments.Count; i++)
             {

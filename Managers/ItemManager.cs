@@ -26,7 +26,7 @@ namespace TerRoguelike.Managers
         //ITEM TIERS: 0 - Common, 1 - Uncommon, 2 - Rare
         public static int RoomRewardCooldown = 0;
         public static List<int> PastRoomRewardCategories = new List<int>();
-        public static int GiveCommon(bool giveCooldown = true)
+        public static int GiveCommon(bool giveCooldown = false)
         {
             BaseRoguelikeItem chosenItem;
             int category = ChooseCategory(0);
@@ -39,7 +39,7 @@ namespace TerRoguelike.Managers
 
             return chosenItem.modItemID;
         }
-        public static int GiveUncommon(bool giveCooldown = true)
+        public static int GiveUncommon(bool giveCooldown = false)
         {
             if (giveCooldown)
                 RoomRewardCooldown += 1;
@@ -56,7 +56,7 @@ namespace TerRoguelike.Managers
 
             return chosenItem.modItemID;
         }
-        public static int GiveRare(bool giveCooldown = true)
+        public static int GiveRare(bool giveCooldown = false)
         {
             if (giveCooldown)
                 RoomRewardCooldown += 2;

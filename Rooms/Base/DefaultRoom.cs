@@ -8,6 +8,7 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
 using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
