@@ -52,11 +52,12 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.drawCenter = new Vector2(0, 0);
             headTex = TexDict["AntlionHead"];
+            modNPC.OverrideIgniteVisual = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
             NPC.rotation = MathHelper.PiOver2;
-            modNPC.OverrideIgniteVisual = true;
+            
         }
         public override void AI()
         {

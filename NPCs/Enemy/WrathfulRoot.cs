@@ -25,6 +25,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<WrathfulRoot>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Forest"] };
         public override int CombatStyle => 1;
+        public int attackCooldown = 80;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 1;
@@ -45,6 +46,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
+            NPC.ai[0] = -attackCooldown + 1;
             Point spawnTile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
             if (!ParanoidTileRetrieval(spawnTile.X, spawnTile.Y).IsTileSolidGround())
             {
@@ -69,7 +71,6 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.velocity.X += 0.5f * -NPC.direction;
-            int attackCooldown = 80;
             modNPC.RogueTurretAI(NPC, 10, attackCooldown, 300f, ModContent.ProjectileType<WoodSliver>(), NPC.damage, 12f, Vector2.UnitY * 7, true, NPC.direction == 1 ? 0f : MathHelper.Pi, MathHelper.PiOver4);
             if (NPC.ai[0] == -attackCooldown)
             {

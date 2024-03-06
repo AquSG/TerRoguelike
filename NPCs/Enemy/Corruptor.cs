@@ -25,6 +25,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<Corruptor>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Corrupt"] };
         public override int CombatStyle => 2;
+        public int attackCooldown = 120;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 3;
@@ -45,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueCorruptorAI(NPC, 4f, 0.03f, 30, 120, ModContent.ProjectileType<VileSpit>(), 8f, NPC.damage);
+            modNPC.RogueCorruptorAI(NPC, 4f, 0.03f, 30, attackCooldown, ModContent.ProjectileType<VileSpit>(), 8f, NPC.damage);
 
             NPC.frameCounter += 0.2d;
             float direction = NPC.velocity.ToRotation();
@@ -85,6 +86,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void OnSpawn(IEntitySource source)
         {
             NPC.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+            NPC.ai[0] = -attackCooldown + 1;
         }
         public override bool? CanFallThroughPlatforms()
         {

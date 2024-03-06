@@ -14,6 +14,7 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Audio;
+using TerRoguelike.Projectiles;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -22,9 +23,9 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<UndeadPrisoner>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Base"] };
         public override int CombatStyle => 2;
-        public int attackTelegraph = 24;
+        public int attackTelegraph = 30;
         public int attackCooldown = 150;
-        public int extendedAttackSlowdown = 8;
+        public int extendedAttackSlowdown = 18;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 19;
@@ -45,8 +46,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.frameCounter += NPC.velocity.Length() * 0.25d;
-            modNPC.RogueFighterShooterAI(NPC, 1.4f, -7.9f, 200f, attackTelegraph, attackCooldown, 0f, ProjectileID.Bone, 8f, Vector2.Zero, NPC.damage, true, false, null, extendedAttackSlowdown);
-            if (NPC.ai[1] == -attackCooldown)
+            modNPC.RogueFighterShooterAI(NPC, 1.4f, -7.9f, 240f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<Bone>(), 8f, Vector2.Zero, NPC.damage, true, false, null, extendedAttackSlowdown);
+            if (NPC.ai[1] == attackTelegraph)
             {
                 SoundEngine.PlaySound(SoundID.Item1 with { Volume = 0.9f }, NPC.Center);
             }
