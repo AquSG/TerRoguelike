@@ -43,7 +43,8 @@ namespace TerRoguelike.Projectiles
 
             if (stuckNPC != -1)
             {
-                if (!Main.npc[stuckNPC].active || Main.npc[stuckNPC].life <= 0)
+                NPC npc = Main.npc[stuckNPC];
+                if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage)
                 {
                     stuckNPC = -1;
                     stuckPosition = Vector2.Zero;
@@ -55,7 +56,8 @@ namespace TerRoguelike.Projectiles
             {
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
-                    if (Main.npc[i].active && Main.npc[i].life > 0 && Projectile.getRect().Intersects(Main.npc[i].getRect()))
+                    NPC npc = Main.npc[i];
+                    if (npc.active && npc.life > 0 && !npc.dontTakeDamage && !npc.immortal && Projectile.getRect().Intersects(npc.getRect()))
                     {
                         stuckNPC = i;
                         stuckPosition = Projectile.Center - Main.npc[i].Center;

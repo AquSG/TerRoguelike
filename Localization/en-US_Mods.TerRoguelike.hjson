@@ -57,6 +57,7 @@ Projectiles: {
 	Rock.DisplayName: Rock
 	Shockwave.DisplayName: Shockwave
 	PaladinHammer.DisplayName: Paladin Hammer
+	RockDebris.DisplayName: Rock Debris
 }
 
 Items: {
