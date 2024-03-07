@@ -24,4 +24,17 @@ namespace TerRoguelike.NPCs
             return false;
         }
     }
+    public class Attack
+    {
+        public int Id;
+        public int Weight;
+        public int Duration;
+
+        public Attack(int id, int weight, int duration)
+        {
+            Id = id;
+            Weight = weight;
+            Duration = duration;
+        }
+    }
 }
