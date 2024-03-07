@@ -28,6 +28,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float chargeSpeed = 8f;
         public int chargeTelegraph = 60;
         public float jumpVelocity = -7.9f;
+        public int slamTelegraph = 40;
+        public int slamRise = 60;
+        public int slamFall = 60;
+        public bool ableToHit = true;
         public override int modNPCID => ModContent.NPCType<Paladin>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Base"] };
         public override int CombatStyle => -1;
@@ -61,9 +65,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
+            NPC.ai[2] = Slam.Id;
         }
         public override void AI()
         {
+            ableToHit = !(NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise + slamFall);
+
             if (NPC.collideY)
                 NPC.localAI[1] = 0;
             else
@@ -71,6 +78,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.localAI[0] < 0)
             {
+                spawnPos = NPC.Center;
                 if (NPC.localAI[0] == -210)
                 {
                     CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
@@ -78,27 +86,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.localAI[0] == -150)
                 {
-                    SoundEngine.PlaySound(SoundID.DeerclopsRubbleAttack with { Volume = 0.75f, Pitch = 0.5f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.DeerclopsIceAttack with { Volume = 0.375f, Pitch = -0.2f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.Item70 with { Volume = 0.375f, Pitch = -0.2f }, NPC.Center);
-                    for (int i = -15; i <= 15; i++)
-                    {
-                        Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(3 * i, 0), DustID.Smoke, null, 0, Color.LightGray, 1f);
-                        d.velocity.Y -= 1;
-                    }
-                    for (int i = -15; i <= 15; i++)
-                    {
-                        Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(0.75f * i, 0), DustID.Stone, new Vector2(Main.rand.NextFloat(0.05f, 0.15f) * i + (Math.Sign(i) * 1.5f), Main.rand.NextFloat(-4f, -2f)), 0, default, 1.2f);
-                    }
-                    for (int i = -2; i <= 2; i++)
-                    {
-                        int goreid = Main.rand.NextFromCollection(new List<int>() { GoreID.Smoke1, GoreID.Smoke2, GoreID.Smoke3 });
-                        Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Bottom + new Vector2(16 * i + (24 * NPC.direction), -16), new Vector2(Main.rand.NextFloat(-0.08f, 0.35f) * i, Main.rand.NextFloat(-1.2f, -0.7f)), goreid);
-                    }
-                    for (int i = -1; i <= 1; i += 2)
-                    {
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 10), new Vector2(i * 6, 16), ModContent.ProjectileType<Shockwave>(), NPC.damage, 0f);
-                    }
+                    SlamEffect();
                 }
                 NPC.localAI[0]++;
                 if (NPC.localAI[0] == -30)
@@ -114,16 +102,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
         }
         public Attack None = new Attack(0, 0, 300);
-        public Attack Charge = new Attack(1, 30, 180);
+        public Attack Charge = new Attack(1, 30, 210);
         public Attack Throw = new Attack(2, 30, 180);
-        public Attack Slam = new Attack(3, 20, 240);
+        public Attack Slam = new Attack(3, 20, 280);
         public Attack Summon = new Attack(4, 20, 150);
         public void BossAI()
         {
             target = modNPC.GetTarget(NPC, false, false);
 
             acceleration = 0.05f;
-            deceleration = 0.93f;
+            deceleration = 0.88f;
             xCap = target == null ? 0 : 2f;
             chargeSpeed = 8f;
             chargeTelegraph = 60;
@@ -235,6 +223,35 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.ai[1] += 2;
                         NPC.velocity.X = -chargeSpeed * NPC.direction * 0.55f;
                         NPC.velocity.Y = -chargeSpeed * 0.4f;
+
+                        for (int i = 0; i < 12; i++)
+                        {
+                            Point tilePos = Point.Zero;
+                            int valid = -1;
+                            for (int j = 0; j < 5; j++)
+                            {
+                                tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(-800, 60) * NPC.direction, -480)).ToTileCoordinates();
+                                Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
+                                if (!tile.IsTileSolidGround(true))
+                                    continue;
+
+                                for (int k = 1; k < 25; k++)
+                                {
+                                    Tile belowTile = ParanoidTileRetrieval(tilePos.X, tilePos.Y + k);
+                                    if (!belowTile.IsTileSolidGround())
+                                    {
+                                        valid = k;
+                                        break;
+                                    }
+                                }
+                                if (valid != -1)
+                                    break;
+                            }
+                            if (valid != -1)
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
+                            }
+                        }
                     }
                     else
                     {
@@ -266,6 +283,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.ai[0] = 0;
                     NPC.ai[1] = 0;
+                    NPC.ai[2] = Charge.Id;
                 }
                 NPC.frameCounter += 0.05d * Math.Abs(NPC.velocity.X);
             }
@@ -276,15 +294,71 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.ai[0] = 0;
                     NPC.ai[1] = 0;
+                    NPC.ai[2] = Throw.Id;
                 }
             }
             else if (NPC.ai[0] == Slam.Id)
             {
                 NPC.velocity.X *= deceleration;
+                if (NPC.ai[1] >= slamTelegraph)
+                    NPC.velocity.X = 0;
+                
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.35f, Pitch = -0.2f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.05f, Pitch = -0.9f, PitchVariance = 0.08f }, NPC.Center);
+                }
+                if (NPC.ai[1] == slamTelegraph)
+                {
+                    NPC.immortal = true;
+                    NPC.dontTakeDamage = true;
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Volume = 0.72f, Pitch = -0.25f }, NPC.Center);
+                    for (int i = -9; i <= 9; i++)
+                    {
+                        Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(3 * i, 0), DustID.Smoke, null, 0, Color.LightGray, 1f);
+                        d.velocity.Y -= 1;
+                    }
+                    for (int i = -9; i <= 9; i++)
+                    {
+                        Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(0.75f * i, 0), DustID.Stone, new Vector2(Main.rand.NextFloat(0.05f, 0.15f) * i + (Math.Sign(i) * 1.5f), Main.rand.NextFloat(-4f, -2f)), 0, default, 1.2f);
+                    }
+
+                    for (int i = -2; i <= 2; i++)
+                    {
+                        if (i == 0)
+                            continue;
+
+                        int direction = Math.Sign(i);
+                        Vector2 particleVelocity = new Vector2(5f * direction, Math.Abs(i) == 1 ? -0.4f : -1.6f);
+                        Vector2 particleScale = new Vector2(0.7f);
+                        particleScale *= Main.rand.NextFloat(0.8f, 1f);
+                        int timeLeft = Main.rand.Next(20, 26);
+                        ParticleManager.AddParticle(new Spark(NPC.Bottom + new Vector2(NPC.width * 0.2f * direction, Math.Abs(i) == 1 ? 0f : -4f), particleVelocity, timeLeft, Color.LightGray * 0.8f, particleScale, particleVelocity.ToRotation()));
+                    }
+                    
+                }
+                if (NPC.ai[1] == slamTelegraph + slamRise)
+                {
+                    NPC.Center = spawnPos;
+                    NPC.direction = -1;
+                    NPC.spriteDirection = -1;
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f, Pitch = -1.3f }, NPC.Center);
+                }
+                if (NPC.ai[1] == slamTelegraph + slamRise + 30)
+                {
+                    SoundEngine.PlaySound(SoundID.Tink with { Volume = 0.5f }, NPC.Center);
+                }
+                if (NPC.ai[1] == slamTelegraph + slamRise + slamFall)
+                {
+                    SlamEffect();
+                    NPC.immortal = false;
+                    NPC.dontTakeDamage = false;
+                }
                 if (NPC.ai[1] >= Slam.Duration)
                 {
                     NPC.ai[0] = 0;
                     NPC.ai[1] = 0;
+                    NPC.ai[2] = Slam.Id;
                 }
             }
             else if (NPC.ai[0] == Summon.Id)
@@ -294,6 +368,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.ai[0] = 0;
                     NPC.ai[1] = 0;
+                    NPC.ai[2] = Summon.Id;
                 }
             }
 
@@ -392,7 +467,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             NPC.ai[1] = 0;
             List<Attack> potentialAttacks = new List<Attack>() { Charge, Throw, Slam, Summon };
-            potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[0]);
+            potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
             {
@@ -410,7 +485,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Charge.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -423,14 +497,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         if (NPC.direction == -1)
                         {
-                            if ((NPC.Center.X > target.Center.X - 120f && NPC.Bottom.Y >= target.Bottom.Y))
+                            if ((NPC.Center.X > target.Center.X - 104f && NPC.Bottom.Y >= target.Bottom.Y))
                                 return false;
                             else
                                 return true;
                         }
                         else
                         {
-                            if ((NPC.Center.X < target.Center.X + 120f && NPC.Bottom.Y >= target.Bottom.Y))
+                            if ((NPC.Center.X < target.Center.X + 104f && NPC.Bottom.Y >= target.Bottom.Y))
                                 return false;
                             else
                                 return true;
@@ -439,6 +513,74 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             return null;
+        }
+        public void SlamEffect()
+        {
+            SoundEngine.PlaySound(SoundID.DeerclopsRubbleAttack with { Volume = 0.75f, Pitch = 0.5f }, NPC.Center);
+            SoundEngine.PlaySound(SoundID.DeerclopsIceAttack with { Volume = 0.375f, Pitch = -0.2f }, NPC.Center);
+            SoundEngine.PlaySound(SoundID.Item70 with { Volume = 0.375f, Pitch = -0.2f }, NPC.Center);
+            for (int i = -15; i <= 15; i++)
+            {
+                Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(3 * i, 0), DustID.Smoke, null, 0, Color.LightGray, 1f);
+                d.velocity.Y -= 1;
+            }
+            for (int i = -15; i <= 15; i++)
+            {
+                Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(0.75f * i, 0), DustID.Stone, new Vector2(Main.rand.NextFloat(0.05f, 0.15f) * i + (Math.Sign(i) * 1.5f), Main.rand.NextFloat(-4f, -2f)), 0, default, 1.2f);
+            }
+            for (int i = -2; i <= 2; i++)
+            {
+                int goreid = Main.rand.NextFromCollection(new List<int>() { GoreID.Smoke1, GoreID.Smoke2, GoreID.Smoke3 });
+                Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Bottom + new Vector2(16 * i + (24 * NPC.direction), -16), new Vector2(Main.rand.NextFloat(-0.08f, 0.35f) * i, Main.rand.NextFloat(-1.2f, -0.7f)), goreid);
+            }
+            for (int i = -1; i <= 1; i += 2)
+            {
+                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 10), new Vector2(i * 6, 16), ModContent.ProjectileType<Shockwave>(), NPC.damage, 0f);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                Point tilePos = Point.Zero;
+                int valid = -1;
+                for (int j = 0; j < 5; j++)
+                {
+                    tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(-400, 400) * NPC.direction, -480)).ToTileCoordinates();
+                    Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
+                    if (!tile.IsTileSolidGround(true))
+                        continue;
+
+                    for (int k = 1; k < 25; k++)
+                    {
+                        Tile belowTile = ParanoidTileRetrieval(tilePos.X, tilePos.Y + k);
+                        if (!belowTile.IsTileSolidGround())
+                        {
+                            valid = k;
+                            break;
+                        }
+                    }
+                    if (valid != -1)
+                        break;
+                }
+                if (valid != -1)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
+                }
+            }
+        }
+        public override bool CanHitNPC(NPC target)
+        {
+            return ableToHit;
+        }
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
+        {
+            return ableToHit;
+        }
+        public override bool? CanBeHitByItem(Player player, Item item)
+        {
+            return ableToHit ? null : false;
+        }
+        public override bool? CanBeHitByProjectile(Projectile projectile)
+        {
+            return ableToHit ? null : false;
         }
         public override void OnKill()
         {
@@ -507,6 +649,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         currentFrame = 1;
                     }
                 }
+                else if (NPC.ai[0] == Slam.Id)
+                {
+                    int backOnGround = slamTelegraph + slamRise + slamFall;
+                    if (NPC.ai[1] < slamTelegraph)
+                    {
+                        currentFrame = frameCount - 4;
+                    }
+                    else if (NPC.ai[1] < slamTelegraph + slamRise)
+                    {
+                        currentFrame = 1;
+                    }
+                    else if (NPC.ai[1] < backOnGround)
+                    {
+                        currentFrame = frameCount - 1;
+                    }
+                    else if (NPC.ai[1] < backOnGround + 60)
+                    {
+                        currentFrame = frameCount - 2;
+                    }
+                    else if (NPC.ai[1] < backOnGround + 80)
+                    {
+                        currentFrame = frameCount - 4;
+                    }
+                    else if (NPC.ai[1] < backOnGround + 100)
+                    {
+                        currentFrame = frameCount - 3;
+                    }
+                    else if (NPC.ai[1] < backOnGround + 120)
+                    {
+                        currentFrame = 0;
+                    }
+                }
                 else
                 {
                     currentFrame = NPC.localAI[1] < 10 ? ((int)NPC.frameCounter % (frameCount - 9)) + 2 : 1;
@@ -525,12 +699,30 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 modNPC.drawCenter.Y += MathHelper.Lerp(0, -1000, Math.Abs(NPC.localAI[0] + 150) / 60f);
             }
+            if (NPC.ai[0] == Slam.Id)
+            {
+                if (NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise)
+                {
+                    modNPC.drawCenter.Y += MathHelper.Lerp(0, -500, (NPC.ai[1] - slamTelegraph) / 20f);
+                }
+                else if (NPC.ai[1] > slamTelegraph + slamRise && NPC.ai[1] <= slamTelegraph + slamRise + slamFall)
+                {
+                    modNPC.drawCenter.Y += MathHelper.Lerp(-1000, 0, (NPC.ai[1] - slamTelegraph - slamRise) / 60f);
+                }
+            }
             Vector2 drawPos = NPC.Center + modNPC.drawCenter + (Vector2.UnitY * NPC.gfxOffY);
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-            if (NPC.localAI[0] < -90)
+            if (NPC.localAI[0] < -90 || (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80))
             {
-                Vector2 hammerPos = new Vector2(-8f, 0) + NPC.Bottom;
-                Main.EntitySpriteDraw(hammerTex, hammerPos - Main.screenPosition, null, Lighting.GetColor(hammerPos.ToTileCoordinates()), MathHelper.Pi, hammerTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                Vector2 hammerPos = new Vector2(-8f, 0) + spawnPos + (NPC.Bottom - NPC.Center);
+                float hammerRot = MathHelper.Pi;
+                if (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80)
+                {
+                    float completion = MathHelper.Clamp((NPC.ai[1] - slamTelegraph - slamRise) / 30f, 0, 1f);
+                    hammerPos.Y += MathHelper.Lerp(-200, 0, completion);
+                    hammerRot += MathHelper.Lerp(MathHelper.TwoPi * 2, 0, completion);
+                }
+                Main.EntitySpriteDraw(hammerTex, hammerPos - Main.screenPosition, null, Lighting.GetColor(hammerPos.ToTileCoordinates()), hammerRot, hammerTex.Size() * 0.5f, 1f, SpriteEffects.None);
             }
             return false;
         }
