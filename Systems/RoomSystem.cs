@@ -391,26 +391,28 @@ namespace TerRoguelike.Systems
         /// </summary>
         public static void ResetRoomID(int id)
         {
-            RoomID[id].active = true;
-            RoomID[id].initialized = false;
-            RoomID[id].awake = false;
-            RoomID[id].roomTime = 0;
-            RoomID[id].closedTime = 0;
-            RoomID[id].waveCount = 0;
-            RoomID[id].waveStartTime = 0;
-            RoomID[id].currentWave = 0;
-            RoomID[id].waveClearGraceTime = 0;
-            RoomID[id].NPCSpawnPosition = new Vector2[Room.RoomSpawnCap];
-            RoomID[id].NPCToSpawn = new int[Room.RoomSpawnCap];
-            RoomID[id].TimeUntilSpawn = new int[Room.RoomSpawnCap];
-            RoomID[id].TelegraphDuration = new int[Room.RoomSpawnCap];
-            RoomID[id].TelegraphSize = new float[Room.RoomSpawnCap];
-            RoomID[id].NotSpawned = new bool[Room.RoomSpawnCap];
-            RoomID[id].AssociatedWave = new int[Room.RoomSpawnCap];
-            RoomID[id].anyAlive = true;
-            RoomID[id].roomClearGraceTime = -1;
-            RoomID[id].wallActive = false;
-            RoomID[id].haltSpawns = false;
+            Room room = RoomID[id];
+            room.active = true;
+            room.initialized = false;
+            room.awake = false;
+            room.roomTime = 0;
+            room.closedTime = 0;
+            room.waveCount = 0;
+            room.waveStartTime = 0;
+            room.currentWave = 0;
+            room.waveClearGraceTime = 0;
+            room.NPCSpawnPosition = new Vector2[Room.RoomSpawnCap];
+            room.NPCToSpawn = new int[Room.RoomSpawnCap];
+            room.TimeUntilSpawn = new int[Room.RoomSpawnCap];
+            room.TelegraphDuration = new int[Room.RoomSpawnCap];
+            room.TelegraphSize = new float[Room.RoomSpawnCap];
+            room.NotSpawned = new bool[Room.RoomSpawnCap];
+            room.AssociatedWave = new int[Room.RoomSpawnCap];
+            room.anyAlive = true;
+            room.roomClearGraceTime = -1;
+            room.wallActive = false;
+            room.haltSpawns = false;
+            room.bossSpawnPos = Vector2.Zero;
         }
         public static void PostDrawWalls()
         {
@@ -429,6 +431,16 @@ namespace TerRoguelike.Systems
             if (RoomList == null)
                 return;
 
+            Rectangle screenRect = new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
+            StartAlphaBlendSpritebatch(false);
+            for (int i = 0; i < RoomList.Count; i++)
+            {
+                Room room = RoomList[i];
+                if (room.GetRect().Intersects(screenRect))
+                    room.PostDrawTilesRoom();
+            }
+            Main.spriteBatch.End();
+
             Texture2D lightTexture = TexDict["TemporaryBlock"];
             foreach (Room room in RoomList)
             {
@@ -446,7 +458,6 @@ namespace TerRoguelike.Systems
                         Main.spriteBatch.End();
                     }
                 }
-                
 
                 if (!room.StartCondition())
                     continue;

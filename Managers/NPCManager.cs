@@ -21,6 +21,7 @@ using TerRoguelike.NPCs.Enemy;
 using TerRoguelike.NPCs.Enemy.Pillar;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Managers
 {
@@ -106,6 +107,7 @@ namespace TerRoguelike.Managers
                 new StarCell(),
                 new StarSpewer(),
                 new FlowInvader(),
+                new Paladin(),
             };
         }
         internal static void Unload()

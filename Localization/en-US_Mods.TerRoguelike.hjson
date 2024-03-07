@@ -766,4 +766,5 @@ NPCs: {
 	StarCell.DisplayName: Star Cell
 	StarSpewer.DisplayName: Star Spewer
 	FlowInvader.DisplayName: Flow Invader
+	Paladin.DisplayName: Paladin
 }

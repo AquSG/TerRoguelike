@@ -9,6 +9,7 @@ using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.MusicSystem;
+using static TerRoguelike.Managers.SpawnManager;
 
 namespace TerRoguelike.Managers
 {
@@ -42,7 +43,14 @@ namespace TerRoguelike.Managers
         public int currentWave;
         public int waveClearGraceTime;
         public const int RoomSpawnCap = 200;
+        public Vector2 bossSpawnPos;
         public Vector2 RoomPosition; //position of the room
+        public Rectangle GetRect()
+        {
+            Vector2 pos = RoomPosition16;
+            Vector2 dimensions = RoomDimensions16;
+            return new Rectangle((int)pos.X, (int)pos.Y, (int)dimensions.X, (int)dimensions.Y);
+        }
         public Vector2 RoomPosition16
         {
             get { return RoomPosition * 16f; }
@@ -92,6 +100,10 @@ namespace TerRoguelike.Managers
             }
             
         }
+        public virtual void AddBoss(Vector2 npcSpawnPosition, int npcToSpawn)
+        {
+            SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), npcSpawnPosition + RoomPosition16, npcToSpawn, myRoom);
+        }
         public virtual void Update()
         {
             if (!StartCondition()) // not been touched yet? return
@@ -122,7 +134,7 @@ namespace TerRoguelike.Managers
 
                     if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
-                        SpawnManager.SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
+                        SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
                         lastTelegraphDuration = TelegraphDuration[i];
                         waveClearGraceTime = roomTime;
                         roomClearGraceTime = -1;
@@ -450,6 +462,10 @@ namespace TerRoguelike.Managers
                     proj.timeLeft = 60;
                 }
             }
+        }
+        public virtual void PostDrawTilesRoom()
+        {
+
         }
         public virtual bool ClearCondition()
         {
