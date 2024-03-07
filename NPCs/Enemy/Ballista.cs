@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.ai[0] = -attackCooldown + 1;
+            NPC.ai[0] = -attackCooldown + 30;
             NPC.rotation = MathHelper.Pi * Main.rand.Next(2);
         }
         public override void AI()

@@ -55,6 +55,7 @@ Projectiles: {
 	FlowSpawn.DisplayName: Flow Spawn
 	Bone.DisplayName: Bone
 	Rock.DisplayName: Rock
+	Shockwave.DisplayName: Shockwave
 }
 
 Items: {
