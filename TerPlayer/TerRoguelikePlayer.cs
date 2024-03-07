@@ -902,6 +902,28 @@ namespace TerRoguelike.TerPlayer
                 Player.itemTime = 1;
                 Player.itemAnimation = 1;
             }
+            else if (CutsceneSystem.cutsceneDisableControl)
+            {
+                Player.velocity.X = 0;
+                Player.immuneTime = 60;
+                Player.immune = true;
+                Player.immuneNoBlink = true;
+                Player.controlDown = false;
+                Player.controlUp = false;
+                Player.controlRight = false;
+                Player.controlLeft = false;
+                Player.controlMount = false;
+                Player.controlHook = false;
+                Player.controlInv = false;
+                Player.controlCreativeMenu = false;
+                Player.controlUseItem = false;
+                Player.controlUseTile = false;
+                Player.controlJump = false;
+                Player.controlDownHold = false;
+                Player.controlThrow = false;
+                Player.gravControl = false;
+                Player.gravControl2 = false;
+            }
             if (jetLeg > 0)
             {
                 if (DashDir != 0 && DashDelay == 0)

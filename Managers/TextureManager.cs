@@ -99,6 +99,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/Comet",
                 "TerRoguelike/Projectiles/FlowSpawnGlow",
                 "TerRoguelike/NPCs/Enemy/StoneDroneGlow",
+                "TerRoguelike/Projectiles/PaladinHammer",
             };
             foreach (string path in pathList)
             {

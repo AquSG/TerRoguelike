@@ -49,11 +49,7 @@ namespace TerRoguelike.Managers
                     dummyNpc.type = enemy.NPCType;
                     dummyNpc.SetDefaults(dummyNpc.type);
                     enemy.TelegraphSize *= 2f;
-                    int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)enemy.Position.X, (int)enemy.Position.Y + (int)(dummyNpc.height / 2f), enemy.NPCType);
-                    NPC npc = Main.npc[spawnedNpc];
-                    TerRoguelikeGlobalNPC modNpc = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
-                    modNpc.isRoomNPC = true;
-                    modNpc.sourceRoomListID = enemy.RoomListID;
+                    SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), new Vector2(enemy.Position.X, enemy.Position.Y + (dummyNpc.height / 2f)), enemy.NPCType, enemy.RoomListID);
 
                     for (int i = 0; i < 15; i++)
                     {
@@ -64,6 +60,18 @@ namespace TerRoguelike.Managers
                 }
             }
             pendingEnemies.RemoveAll(enemy => enemy.spent);
+        }
+        public static NPC SpawnNPCTerRoguelike(IEntitySource source, Vector2 position,  int type, int roomListID = -1)
+        {
+            int spawnedNpc = NPC.NewNPC(source, (int)position.X, (int)position.Y, type);
+            NPC npc = Main.npc[spawnedNpc];
+            TerRoguelikeGlobalNPC modNpc = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+            if (roomListID > -1)
+            {
+                modNpc.isRoomNPC = true;
+                modNpc.sourceRoomListID = roomListID;
+            }
+            return npc;
         }
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {
