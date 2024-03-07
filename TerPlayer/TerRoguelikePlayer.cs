@@ -23,6 +23,7 @@ using TerRoguelike.Utilities;
 using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -265,6 +266,7 @@ namespace TerRoguelike.TerPlayer
         #region Always Active Effects
         public override void UpdateEquips()
         {
+
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 Player.noFallDmg = true;
@@ -874,6 +876,27 @@ namespace TerRoguelike.TerPlayer
             if (barrierHealth < 0)
                 barrierHealth = 0;
         }
+        public override void SetControls()
+        {
+            if (CutsceneSystem.cutsceneDisableControl)
+            {
+                Player.controlDown = false;
+                Player.controlUp = false;
+                Player.controlRight = false;
+                Player.controlLeft = false;
+                Player.controlMount = false;
+                Player.controlHook = false;
+                Player.controlInv = false;
+                Player.controlCreativeMenu = false;
+                Player.controlUseItem = false;
+                Player.controlUseTile = false;
+                Player.controlJump = false;
+                Player.controlDownHold = false;
+                Player.controlThrow = false;
+                Player.gravControl = false;
+                Player.gravControl2 = false;
+            }
+        }
         public override void PreUpdateMovement()
         {
             if (deathEffectTimer > 0)
@@ -904,7 +927,6 @@ namespace TerRoguelike.TerPlayer
             }
             else if (CutsceneSystem.cutsceneDisableControl)
             {
-                Player.velocity.X = 0;
                 Player.immuneTime = 60;
                 Player.immune = true;
                 Player.immuneNoBlink = true;

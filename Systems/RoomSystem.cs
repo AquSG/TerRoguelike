@@ -427,6 +427,7 @@ namespace TerRoguelike.Systems
             DrawDeathScene();
             DrawPendingEnemies();
             DrawHealingPulse();
+            ParticleManager.DrawParticles();
 
             if (RoomList == null)
                 return;
@@ -813,6 +814,11 @@ namespace TerRoguelike.Systems
                     Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.screenPosition + DrawBehindTilesOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f, SpriteEffects.None);
                 }
             }
+        }
+
+        public override void PostUpdateEverything()
+        {
+            ParticleManager.UpdateParticles();
         }
         #endregion
 

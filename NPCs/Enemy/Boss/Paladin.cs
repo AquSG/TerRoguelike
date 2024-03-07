@@ -34,7 +34,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 15;
+            Main.npcFrameCount[modNPCID] = 16;
         }
         public override void SetDefaults()
         {
@@ -43,7 +43,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 47;
             NPC.aiStyle = -1;
             NPC.damage = 25;
-            NPC.lifeMax = 600;
+            NPC.lifeMax = 20000;
             NPC.HitSound = SoundID.NPCHit4;
             NPC.DeathSound = SoundID.NPCDeath6;
             NPC.knockBackResist = 0f;
@@ -55,27 +55,43 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             currentFrame = Main.npcFrameCount[Type] - 1;
-            NPC.localAI[0] = -210;
+            NPC.localAI[0] = -270;
             NPC.direction = -1;
             NPC.spriteDirection = -1;
-            CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
+            
         }
         public override void AI()
         {
-            if (NPC.localAI[0] < 30)
+            if (NPC.localAI[0] < 0)
             {
+                if (NPC.localAI[0] == -210)
+                    CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
                 if (NPC.localAI[0] == -150)
                 {
-                    SoundEngine.PlaySound(SoundID.DeerclopsRubbleAttack with { Volume = 1f, Pitch = 0.5f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.DeerclopsIceAttack with { Volume = 0.5f, Pitch = -0.2f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DeerclopsRubbleAttack with { Volume = 0.75f, Pitch = 0.5f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DeerclopsIceAttack with { Volume = 0.375f, Pitch = -0.2f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.Item70 with { Volume = 0.375f, Pitch = -0.2f }, NPC.Center);
                     for (int i = -15; i <= 15; i++)
                     {
                         Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(3 * i, 0), DustID.Smoke, null, 0, Color.LightGray, 1f);
                         d.velocity.Y -= 1;
                     }
+                    for (int i = -15; i <= 15; i++)
+                    {
+                        Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(0.75f * i, 0), DustID.Stone, new Vector2(Main.rand.NextFloat(0.05f, 0.15f) * i + (Math.Sign(i) * 1.5f), Main.rand.NextFloat(-4f, -2f)), 0, default, 1.2f);
+                    }
+                    for (int i = -2; i <= 2; i++)
+                    {
+                        int goreid = Main.rand.NextFromCollection(new List<int>() { GoreID.Smoke1, GoreID.Smoke2, GoreID.Smoke3 });
+                        Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Bottom + new Vector2(16 * i + (24 * NPC.direction), -16), new Vector2(Main.rand.NextFloat(-0.08f, 0.35f) * i, Main.rand.NextFloat(-1.2f, -0.7f)), goreid);
+                    }
+                    for (int i = -1; i <= 1; i += 2)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, new Vector2(i * 6, 16), ModContent.ProjectileType<Shockwave>(), NPC.damage, 0f);
+                    }
                 }
                 NPC.localAI[0]++;
-                if (NPC.localAI[0] == 30)
+                if (NPC.localAI[0] == -30)
                 {
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
@@ -89,7 +105,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public void BossAI()
         {
             NPC.ai[3]++;
-            if (NPC.ai[3] > 180)
+            if (NPC.ai[3] > -1)
             {
                 modNPC.RogueFighterAI(NPC, 2f, -7f);
                 NPC.frameCounter += 0.15d;
@@ -128,27 +144,29 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int frameCount = Main.npcFrameCount[Type];
             bool swing = false;
             int swingTime = 0;
-            if (NPC.localAI[0] < 0)
+            if (NPC.localAI[0] < -30)
             {
-                if (NPC.localAI[0] < -120)
+                if (NPC.localAI[0] < -150)
                     currentFrame = frameCount - 1;
+                else if (NPC.localAI[0] < -120)
+                    currentFrame = frameCount - 2;
                 else if (NPC.localAI[0] >= -50)
                     currentFrame = 0;
                 else if (NPC.localAI[0] >= -70)
-                    currentFrame = frameCount - 2;
-                else if (NPC.localAI[0] >= -90)
                     currentFrame = frameCount - 3;
+                else if (NPC.localAI[0] >= -90)
+                    currentFrame = frameCount - 4;
             }
             else
             {
                 if (swing)
                 {
-                    currentFrame = swingTime < 0 ? frameCount - 6 : (swingTime < 10 ? frameCount - 5 : frameCount - 4);
+                    currentFrame = swingTime < 0 ? frameCount - 7 : (swingTime < 10 ? frameCount - 6 : frameCount - 5);
                     NPC.frameCounter = 0;
                 }
                 else
                 {
-                    currentFrame = NPC.velocity.Y == 0 ? ((int)NPC.frameCounter % (frameCount - 8)) + 2 : 1;
+                    currentFrame = NPC.velocity.Y == 0 ? ((int)NPC.frameCounter % (frameCount - 9)) + 2 : 1;
                 }
             }
             
