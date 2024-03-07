@@ -49,7 +49,7 @@ namespace TerRoguelike.Projectiles
             {
                 Vector2 particleVelocity = new Vector2(-8f * Math.Sign(Projectile.velocity.X), 0.2f);
                 Vector2 particleScale = new Vector2(0.45f, 0.34f);
-                particleScale *= MathHelper.Clamp(MathHelper.Lerp(1f, 0.5f, (Projectile.timeLeft - 280) / 20f), 0, 1f);
+                particleScale *= MathHelper.Clamp(MathHelper.Lerp(1f, 0.5f, (Projectile.timeLeft - 260) / 40f), 0, 1f);
 
                 ParticleManager.AddParticle(new Spark(Projectile.Bottom + new Vector2(Projectile.width * 0.5f * Math.Sign(Projectile.velocity.X), 0), particleVelocity, 30, Color.DarkGray * 0.75f, particleScale, particleVelocity.ToRotation()));
 
@@ -80,6 +80,10 @@ namespace TerRoguelike.Projectiles
             if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             {
                 Projectile.ai[1] = 0;
+            }
+            else
+            {
+                Projectile.velocity.X = 0;
             }
             return false;
         }

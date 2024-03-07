@@ -1404,7 +1404,8 @@ namespace TerRoguelike.TerPlayer
                 if (Player.statLife + healAmt > Player.statLifeMax2)
                 {
                     int barrierHealAmt = (int)((Player.statLife + healAmt - Player.statLifeMax2) * barrierSynthesizer * 0.5f);
-                    AddBarrierHealth(barrierHealAmt);
+                    if (barrierHealAmt > 0)
+                        AddBarrierHealth(barrierHealAmt);
                 }
             }
             Player.Heal(healAmt);
