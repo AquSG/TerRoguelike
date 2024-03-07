@@ -65,7 +65,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.localAI[0] < 0)
             {
                 if (NPC.localAI[0] == -210)
+                {
                     CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f, Pitch = -1.3f }, NPC.Center);
+                }
                 if (NPC.localAI[0] == -150)
                 {
                     SoundEngine.PlaySound(SoundID.DeerclopsRubbleAttack with { Volume = 0.75f, Pitch = 0.5f }, NPC.Center);
