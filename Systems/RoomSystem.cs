@@ -413,6 +413,7 @@ namespace TerRoguelike.Systems
             room.wallActive = false;
             room.haltSpawns = false;
             room.bossSpawnPos = Vector2.Zero;
+            room.bossDead = false;
         }
         public static void PostDrawWalls()
         {
@@ -663,10 +664,13 @@ namespace TerRoguelike.Systems
             for (int i = 0; i < SpawnManager.pendingEnemies.Count; i++)
             {
                 PendingEnemy enemy = SpawnManager.pendingEnemies[i];
-                Texture2D texture = TextureAssets.Npc[enemy.NPCType].Value;
+                Texture2D texture = enemy.dummyTex;
                 int frameCount = Main.npcFrameCount[enemy.NPCType];
-                Color color = Color.HotPink * (0.75f * (1 - enemy.TelegraphDuration / 60f));
-                Main.EntitySpriteDraw(texture, enemy.Position - Main.screenPosition, new Rectangle(0, 0, texture.Width, (int)(texture.Height / frameCount)), color, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
+                int height = (int)(texture.Height / frameCount);
+                Color color = Color.HotPink * (0.9f);
+                float completion = enemy.TelegraphDuration / (float)enemy.MaxTelegraphDuration;
+                int cutoff = (int)(completion * height);
+                Main.EntitySpriteDraw(texture, enemy.Position + new Vector2(0, cutoff) - Main.screenPosition, new Rectangle(0, cutoff, texture.Width, height - cutoff), color, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
             }
 
             Main.spriteBatch.End();

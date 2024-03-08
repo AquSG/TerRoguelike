@@ -719,13 +719,13 @@ namespace TerRoguelike.NPCs
                 npc.ai[3] = burrowPos.Y;
             }
         }
-        public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, float deceleration = 0.93f, int attackSuperCooldown = 0, int attacksToSuperCooldown = 0)
+        public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, float deceleration = 0.93f, int attackSuperCooldown = 0, int attacksToSuperCooldown = 0, bool ignorePlatforms = false)
         {
             Entity target = GetTarget(npc, false, false);
 
             npc.ai[3]++;
             npc.stairFall = true;
-            if (npc.collideY && CanFallThroughPlatforms(npc) != true)
+            if (npc.collideY && !ignorePlatforms)
             {
                 int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
@@ -2654,13 +2654,13 @@ namespace TerRoguelike.NPCs
                 npc.ai[0] = -attackCooldown;
             }
         }
-        public void RogueFlierAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired)
+        public void RogueFlierAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired, bool ignorePlatforms = false)
         {
             Entity target = GetTarget(npc, false, false);
 
             npc.ai[3]++;
             npc.stairFall = true;
-            if (npc.collideY && CanFallThroughPlatforms(npc) != true)
+            if (npc.collideY && !ignorePlatforms)
             {
                 int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);
@@ -2781,7 +2781,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void RogueDemonAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
+        public void RogueDemonAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage, bool ignorePlatforms = false)
         {
             Entity target = GetTarget(npc, false, false);
 
@@ -2790,7 +2790,7 @@ namespace TerRoguelike.NPCs
 
             npc.ai[3]++;
             npc.stairFall = true;
-            if (npc.collideY && CanFallThroughPlatforms(npc) != true)
+            if (npc.collideY && !ignorePlatforms)
             {
                 int fluff = 1;
                 int bottomtilepointx = (int)(npc.Center.X / 16f);

@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.frameCounter += 0.18d;
-            modNPC.RogueFlierAI(NPC, 6f, 6f, 0.12f, true);
+            modNPC.RogueFlierAI(NPC, 6f, 6f, 0.12f, true, true);
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
