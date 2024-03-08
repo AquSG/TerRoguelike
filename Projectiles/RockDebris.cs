@@ -45,7 +45,7 @@ namespace TerRoguelike.Projectiles
         {
             startVelocity = Projectile.velocity;
             Projectile.frame = Main.rand.Next(Main.projFrames[Type]);
-            Projectile.velocity = new Vector2(0, 1.7f);
+            Projectile.velocity = new Vector2(0, 2f);
             dir = Main.rand.NextBool() ? 1 : -1;
         }
         public override void AI()
@@ -77,8 +77,8 @@ namespace TerRoguelike.Projectiles
         public override Color? GetAlpha(Color lightColor)
         {
             Color color = new Color(170, 170, 170);
-            if (Projectile.ai[0] < 30)
-                color *= (Projectile.ai[0] / 30);
+            if (Projectile.timeLeft > 580)
+                color *= ((Projectile.timeLeft - 580) / 20f);
             return color;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
@@ -90,6 +90,7 @@ namespace TerRoguelike.Projectiles
             SoundEngine.PlaySound(SoundID.Item70 with { Volume = 0.4f, MaxInstances = 3 }, Projectile.Center);
             return true;
         }
+        public override bool? CanDamage() => Projectile.ai[0] > 60 ? null : false;
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = TextureAssets.Projectile[Type].Value;

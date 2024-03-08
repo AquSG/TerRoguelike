@@ -103,7 +103,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public Attack None = new Attack(0, 0, 300);
         public Attack Charge = new Attack(1, 30, 210);
-        public Attack Throw = new Attack(2, 30, 180);
+        public Attack Throw = new Attack(2, 30, 240);
         public Attack Slam = new Attack(3, 20, 280);
         public Attack Summon = new Attack(4, 20, 150);
         public void BossAI()
@@ -281,18 +281,62 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= Charge.Duration)
                 {
-                    NPC.ai[0] = 0;
-                    NPC.ai[1] = 0;
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 120;
                     NPC.ai[2] = Charge.Id;
                 }
                 NPC.frameCounter += 0.05d * Math.Abs(NPC.velocity.X);
             }
             else if (NPC.ai[0] == Throw.Id)
             {
+                if (target != null && NPC.localAI[3] <= 0)
+                {
+                    if (NPC.Center.X < target.Center.X)
+                    {
+                        NPC.direction = 1;
+                        NPC.spriteDirection = 1;
+                    }
+                    else
+                    {
+                        NPC.direction = -1;
+                        NPC.spriteDirection = -1;
+                    }
+                }
+
+                int[] attackTimes = new int[] { 40, 120, 180, 220 };
+
+                if (NPC.localAI[2] > 0)
+                    NPC.localAI[2]--;
+                if (NPC.localAI[3] > 0)
+                    NPC.localAI[3]--;
+
+                for (int i = 0; i < attackTimes.Length; i++)
+                {
+                    int attackTime = attackTimes[i];
+                    if (NPC.ai[1] == attackTime - 20)
+                    {
+                        NPC.localAI[3] += 12;
+                        for (int j = 0; j < 2; j++)
+                        {
+                            ParticleManager.AddParticle(new Spark(NPC.Center + new Vector2(12 * NPC.direction, -22), Vector2.Zero, 25, Color.Red, new Vector2(0.25f, 0.17f), MathHelper.PiOver2 * j, true, SpriteEffects.None, true, false));
+                        }
+                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.06f, MaxInstances = 3, Pitch = -0.5f, PitchVariance = 0.025f }, NPC.Center);
+                        continue;
+                    }
+                    if (NPC.ai[1] == attackTime)
+                    {
+                        NPC.localAI[2] += 20;
+                        SoundEngine.PlaySound(SoundID.Item1 with { Volume = 1f, MaxInstances = 3 }, NPC.Center);
+                        Vector2 projPos = NPC.Center + new Vector2(0 * NPC.direction, -16);
+                        Vector2 velocityDirection = target == null ? Vector2.UnitX * NPC.direction : (target.Center - projPos).SafeNormalize(Vector2.UnitX * NPC.direction);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, velocityDirection * 8f, ModContent.ProjectileType<PaladinHammer>(), NPC.damage, 0f);
+                    }
+                }
+
                 NPC.velocity.X *= deceleration;
                 if (NPC.ai[1] >= Throw.Duration)
                 {
-                    NPC.ai[0] = 0;
+                    NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Throw.Id;
                 }
@@ -307,6 +351,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.35f, Pitch = -0.2f }, NPC.Center);
                     SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.05f, Pitch = -0.9f, PitchVariance = 0.08f }, NPC.Center);
+                    for (int i = -1; i <= 1; i += 2)
+                    {
+                        Vector2 particleVelocity = new Vector2(0, 0.4f);
+                        Vector2 particleScale = new Vector2(0.3f, 0.38f);
+                        int timeLeft = 30;
+                        ParticleManager.AddParticle(new Spark(NPC.Bottom + new Vector2((NPC.width * 0.25f * i) + (8 * NPC.direction), 12), particleVelocity + NPC.velocity * 0.5f, timeLeft, Color.Yellow * 0.85f, particleScale, particleVelocity.ToRotation(), true, SpriteEffects.None, false, false));
+                    }
                 }
                 if (NPC.ai[1] == slamTelegraph)
                 {
@@ -356,8 +407,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= Slam.Duration)
                 {
-                    NPC.ai[0] = 0;
-                    NPC.ai[1] = 0;
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 120;
                     NPC.ai[2] = Slam.Id;
                 }
             }
@@ -366,7 +417,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity.X *= deceleration;
                 if (NPC.ai[1] >= Summon.Duration)
                 {
-                    NPC.ai[0] = 0;
+                    NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Summon.Id;
                 }
@@ -468,6 +519,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             List<Attack> potentialAttacks = new List<Attack>() { Charge, Throw, Slam, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+
+            if (target != null)
+            {
+                if ((target.Center - NPC.Center).Length() > 450f)
+                    potentialAttacks.RemoveAll(x => x.Id == Throw.Id);
+            }
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
             {
@@ -613,7 +670,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void FindFrame(int frameHeight)
         {
             int frameCount = Main.npcFrameCount[Type];
-            int swingTime = 0;
+
             if (NPC.localAI[0] < -30)
             {
                 if (NPC.localAI[0] < -150)
@@ -631,7 +688,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[0] == Throw.Id)
                 {
-                    currentFrame = swingTime < 0 ? frameCount - 7 : (swingTime < 10 ? frameCount - 6 : frameCount - 5);
+                    if (NPC.localAI[2] > 0)
+                    {
+                        currentFrame = NPC.localAI[2] > 10 ?  frameCount - 6 : frameCount - 5;
+                    }
+                    else
+                    {
+                        currentFrame = frameCount - 7;
+                    }
+
                     NPC.frameCounter = 0;
                 }
                 else if (NPC.ai[0] == Charge.Id)
@@ -701,14 +766,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (NPC.ai[0] == Slam.Id)
             {
-                if (NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise)
-                {
-                    modNPC.drawCenter.Y += MathHelper.Lerp(0, -500, (NPC.ai[1] - slamTelegraph) / 20f);
-                }
-                else if (NPC.ai[1] > slamTelegraph + slamRise && NPC.ai[1] <= slamTelegraph + slamRise + slamFall)
-                {
-                    modNPC.drawCenter.Y += MathHelper.Lerp(-1000, 0, (NPC.ai[1] - slamTelegraph - slamRise) / 60f);
-                }
+                modNPC.drawCenter.Y += AddedYOffset();
             }
             Vector2 drawPos = NPC.Center + modNPC.drawCenter + (Vector2.UnitY * NPC.gfxOffY);
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
@@ -725,6 +783,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Main.EntitySpriteDraw(hammerTex, hammerPos - Main.screenPosition, null, Lighting.GetColor(hammerPos.ToTileCoordinates()), hammerRot, hammerTex.Size() * 0.5f, 1f, SpriteEffects.None);
             }
             return false;
+        }
+        public float AddedYOffset()
+        {
+            if (NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise)
+            {
+                return MathHelper.Lerp(0, -500, (NPC.ai[1] - slamTelegraph) / 20f);
+            }
+            if (NPC.ai[1] > slamTelegraph + slamRise && NPC.ai[1] <= slamTelegraph + slamRise + slamFall)
+            {
+                return MathHelper.Lerp(-1000, 0, (NPC.ai[1] - slamTelegraph - slamRise) / 60f);
+            }
+            return 0;
         }
     }
 }
