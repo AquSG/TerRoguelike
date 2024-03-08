@@ -833,10 +833,10 @@ namespace TerRoguelike.TerPlayer
             if (sniperComponent > 0)
             {
                 float finalAttackSpeedMultiplier = 1f;
-                float finalDamageMultiplier = 8f * sniperComponent;
+                float finalDamageMultiplier = 6f * sniperComponent;
                 for (int i = 0; i < sniperComponent; i++)
                 {
-                    finalAttackSpeedMultiplier *= 1 - (4f / (4f + sniperComponent));
+                    finalAttackSpeedMultiplier *= 1 - (2f / (2.5f + sniperComponent));
                 }
                 Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
                 Player.GetDamage(DamageClass.Generic) *= finalDamageMultiplier;

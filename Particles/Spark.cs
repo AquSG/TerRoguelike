@@ -38,7 +38,9 @@ namespace TerRoguelike.Particles
     {
         public Color startColor;
         public Vector2 startScale;
-        public Spark(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, bool Additive = true, SpriteEffects SpriteEffects = SpriteEffects.None)
+        public bool noGravity;
+        public bool velocityToRotaion;
+        public Spark(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, bool Additive = true, SpriteEffects SpriteEffects = SpriteEffects.None, bool NoGravity = false, bool VelocityToRotation = true)
         {
             texture = TexDict["Spark"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
@@ -53,12 +55,16 @@ namespace TerRoguelike.Particles
             startScale = Scale;
             spriteEffects = SpriteEffects;
             timeLeft = TimeLeft;
+            noGravity = NoGravity;
+            velocityToRotaion = VelocityToRotation;
         }
         public override void AI()
         {
             velocity *= 0.96f;
-            velocity.Y += 0.04f;
-            rotation = velocity.ToRotation();
+            if (!noGravity)
+                velocity.Y += 0.04f;
+            if (velocityToRotaion)
+                rotation = velocity.ToRotation();
             if (timeLeft < 30)
             {
                 color = startColor * (timeLeft / 30f);

@@ -31,13 +31,15 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            Projectile.direction = Math.Sign(Projectile.velocity.X);
-            if (Projectile.direction == 0)
-                Projectile.direction = 1;
+            Projectile.velocity.Y -= 2;
         }
         public override void AI()
         {
-            Projectile.rotation += 0.2f * Projectile.direction;
+            Projectile.direction = Math.Sign(Projectile.velocity.X);
+            if (Projectile.direction == 0)
+                Projectile.direction = 1;
+
+            Projectile.rotation += 0.3f * Projectile.direction;
             if (Projectile.velocity.Y < 9)
                 Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0, 0.24f, -(Projectile.timeLeft - 300) / 27f), 0, 0.24f);
             else if (Projectile.velocity.Y > 0)
@@ -46,15 +48,16 @@ namespace TerRoguelike.Projectiles
     
         public override Color? GetAlpha(Color lightColor)
         {
-            return Color.Lerp(lightColor, Color.White, 0.4f);
+            return lightColor;
         }
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = TextureAssets.Projectile[Type].Value;
+            /*
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-            Vector3 colorHSL = Main.rgbToHsl(Color.LightGray);
+            Vector3 colorHSL = Main.rgbToHsl(Color.Goldenrod);
 
             GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
             GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
@@ -66,6 +69,7 @@ namespace TerRoguelike.Projectiles
             }
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            */
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, Projectile.direction == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             return false;
         }
