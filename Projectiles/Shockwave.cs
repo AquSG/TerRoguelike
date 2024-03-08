@@ -11,6 +11,7 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
+using ReLogic.Utilities;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
@@ -22,6 +23,8 @@ namespace TerRoguelike.Projectiles
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public bool ableToHit = true;
         public Vector2 spawnVelocity;
+        public SlotId crumblingSoundSlot;
+        public static readonly SoundStyle crumblingLoop = new SoundStyle("TerRoguelike/Sounds/Shockwave", 3);
         public override void SetDefaults()
         {
             Projectile.width = 24;
@@ -36,9 +39,20 @@ namespace TerRoguelike.Projectiles
         {
             spawnVelocity = Projectile.velocity;
             Projectile.ai[1] = 1;
+            crumblingSoundSlot = SoundEngine.PlaySound(crumblingLoop with { Volume = 0.175f, MaxInstances = 4 }, Projectile.Center);
         }
         public override void AI()
         {
+            if (SoundEngine.TryGetActiveSound(crumblingSoundSlot, out var crumbleSound) && crumbleSound.IsPlaying)
+            {
+                crumbleSound.Position = Projectile.Center;
+                if (Projectile.timeLeft < 240)
+                {
+                    crumbleSound.Volume -= 0.0055f;
+                }
+                crumbleSound.Update();
+            }
+
             if (Projectile.ai[1] == 0)
                 Projectile.velocity.X = spawnVelocity.X;
 
@@ -86,6 +100,14 @@ namespace TerRoguelike.Projectiles
                 Projectile.velocity.X = 0;
             }
             return false;
+        }
+        public override bool PreKill(int timeLeft)
+        {
+            if (SoundEngine.TryGetActiveSound(crumblingSoundSlot, out var crumbleSound) && crumbleSound.IsPlaying)
+            {
+                crumbleSound.Stop();
+            }
+            return true;
         }
     }
 }
