@@ -12,6 +12,8 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using TerRoguelike.World;
+using TerRoguelike.Particles;
+using static TerRoguelike.Systems.RoomSystem;
 
 namespace TerRoguelike.Managers
 {
@@ -26,7 +28,7 @@ namespace TerRoguelike.Managers
             UpdatePendingItems();
         }
 
-        public static void SpawnEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 1f)
+        public static void SpawnEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.45f)
         {
             pendingEnemies.Add(new PendingEnemy(npcType, position, roomListID, telegraphDuration, telegraphSize));
         }
@@ -40,22 +42,37 @@ namespace TerRoguelike.Managers
             foreach (PendingEnemy enemy in pendingEnemies)
             {
                 loopcount++;
-                
-                Dust.NewDustDirect(enemy.Position - new Vector2(15f * enemy.TelegraphSize, 15f * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), DustID.CrystalPulse, Scale: 0.5f);
+
+                Texture2D dummyTex = enemy.dummyTex;
+                int width = dummyTex.Width;
+                int height = dummyTex.Height / Main.npcFrameCount[enemy.NPCType];
+                float completion = enemy.TelegraphDuration / (float)enemy.MaxTelegraphDuration;
+                int y = (int)(completion * height);
+                Vector2 topLeftPos = enemy.Position + new Vector2(-width * 0.5f, -height * 0.5f);
+                int time = enemy.TelegraphDuration < 15 ? 13 : 20;
+                for (int i = 0; i < width; i += 100)
+                {
+                    int x = Main.rand.Next(width);
+                    Vector2 pos = topLeftPos + new Vector2(x, y);
+                    ParticleManager.AddParticle(new Square(pos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * enemy.TelegraphSize), 0, 0.96f, time, true));
+                }
+
                 enemy.TelegraphDuration--;
+                if (enemy.RoomListID != -1)
+                {
+                    if (RoomList[enemy.RoomListID].bossDead)
+                    {
+                        enemy.spent = true;
+                        continue;
+                    }
+                }
                 if (enemy.TelegraphDuration <= 0)
                 {
                     NPC dummyNpc = new NPC();
                     dummyNpc.type = enemy.NPCType;
                     dummyNpc.SetDefaults(dummyNpc.type);
-                    enemy.TelegraphSize *= 2f;
                     SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), new Vector2(enemy.Position.X, enemy.Position.Y + (dummyNpc.height / 2f)), enemy.NPCType, enemy.RoomListID);
 
-                    for (int i = 0; i < 15; i++)
-                    {
-                        Dust dust = Dust.NewDustDirect(enemy.Position - new Vector2(15f * enemy.TelegraphSize, 15f * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), (int)(30 * enemy.TelegraphSize), DustID.CrystalPulse, Scale: 1f);
-                        dust.noGravity = true;
-                    }
                     enemy.spent = true;
                 }
             }
@@ -135,15 +152,19 @@ namespace TerRoguelike.Managers
         public Vector2 Position;
         public int RoomListID;
         public int TelegraphDuration;
+        public int MaxTelegraphDuration;
         public float TelegraphSize;
         public bool spent = false;
+        public Texture2D dummyTex;
         public PendingEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.5f)
         {
             NPCType = npcType;
             Position = position;
             RoomListID = roomListID;
             TelegraphDuration = telegraphDuration;
+            MaxTelegraphDuration = telegraphDuration;
             TelegraphSize = telegraphSize;
+            dummyTex = TextureAssets.Npc[NPCType].Value;
         }
     }
     public class PendingItem

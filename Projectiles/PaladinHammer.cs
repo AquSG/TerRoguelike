@@ -41,7 +41,7 @@ namespace TerRoguelike.Projectiles
 
             Projectile.rotation += 0.3f * Projectile.direction;
             if (Projectile.velocity.Y < 9)
-                Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0, 0.24f, -(Projectile.timeLeft - 300) / 27f), 0, 0.24f);
+                Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0, 0.24f, -(Projectile.timeLeft - 300) / 45f), 0, 0.24f);
             else if (Projectile.velocity.Y > 0)
                 Projectile.velocity.Y = 9;
         }
@@ -53,23 +53,6 @@ namespace TerRoguelike.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = TextureAssets.Projectile[Type].Value;
-            /*
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
-            Vector3 colorHSL = Main.rgbToHsl(Color.Goldenrod);
-
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
-            GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
-            for (int i = 0; i < 8; i++)
-            {
-                Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
-                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + offset, null, Color.Goldenrod, Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, Projectile.direction == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-            }
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            */
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, Projectile.direction == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             return false;
         }

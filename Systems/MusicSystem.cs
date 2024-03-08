@@ -27,6 +27,7 @@ namespace TerRoguelike.Systems
     public class MusicSystem : ModSystem
     {
         public static bool Initialized = false;
+        public static bool PlayedAllSounds = false;
         float CalmVolumeCache = 0;
         float CombatVolumeCache = 0;
         public static SlotId CalmMusic;
@@ -48,9 +49,12 @@ namespace TerRoguelike.Systems
         public static SoundStyle FinalStage = new("TerRoguelike/Tracks/FinalStage", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
         public static SoundStyle FinalBoss = new("TerRoguelike/Tracks/FinalBoss", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
         public static SoundStyle Escape = new("TerRoguelike/Tracks/Escape", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
-        public override void OnModLoad()
+        public static void PlayAllSounds()
         {
-            MusicLoader.AddMusic(TerRoguelike.Instance, "Tracks/Blank");
+            if (PlayedAllSounds)
+                return;
+
+            PlayedAllSounds = true;
             CalmMusic = SoundEngine.PlaySound(KeygenCalm with { Volume = 0f });
             CalmMusic = SoundEngine.PlaySound(Silence with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(KeygenCombat with { Volume = 0f });
@@ -65,6 +69,14 @@ namespace TerRoguelike.Systems
             {
                 combatMusic.Stop();
             }
+        }
+        public override void OnModLoad()
+        {
+            MusicLoader.AddMusic(TerRoguelike.Instance, "Tracks/Blank");
+        }
+        public override void SetStaticDefaults()
+        {
+            PlayAllSounds();
         }
         public static void SetMusicMode(MusicStyle newMode)
         {

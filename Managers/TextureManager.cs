@@ -101,6 +101,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/StoneDroneGlow",
                 "TerRoguelike/Projectiles/PaladinHammer",
                 "TerRoguelike/Particles/Spark",
+                "TerRoguelike/Particles/Square",
             };
             foreach (string path in pathList)
             {

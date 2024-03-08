@@ -45,6 +45,7 @@ namespace TerRoguelike.Managers
         public const int RoomSpawnCap = 200;
         public Vector2 bossSpawnPos;
         public Vector2 RoomPosition; //position of the room
+        public bool bossDead;
         public Rectangle GetRect()
         {
             Vector2 pos = RoomPosition16;

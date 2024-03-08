@@ -176,7 +176,7 @@ namespace TerRoguelike.Projectiles
             if (homingTarget == -1)
             {
                 //create a list of each npc's homing rating relative to the projectile's position and velocity direction to try and choose the best target.
-                float prefferedDistance = 480f;
+                float prefferedDistance = 640f;
                 List<float> npcHomingRating = new List<float>(new float[Main.maxNPCs]);
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
