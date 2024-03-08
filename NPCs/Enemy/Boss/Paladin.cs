@@ -21,8 +21,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 {
     public class Paladin : BaseRoguelikeNPC
     {
-        Entity target;
-        Vector2 spawnPos;
+        public Entity target;
+        public Vector2 spawnPos;
         public Vector2[] SummonSpawnPositions = new Vector2[] {new Vector2(-1), new Vector2(-1) };
         public float acceleration = 0.05f;
         public float deceleration = 0.95f;
@@ -36,6 +36,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int summonTelegraph = 60;
         public int desiredEnemy;
         public bool ableToHit = true;
+        public static readonly SoundStyle HammerRaise = new SoundStyle("TerRoguelike/Sounds/HammerRaise", 4);
+        public static readonly SoundStyle HammerLand = new SoundStyle("TerRoguelike/Sounds/HammerLand", 5);
         public override int modNPCID => ModContent.NPCType<Paladin>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Base"] };
         public override int CombatStyle => -1;
@@ -325,7 +327,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             ParticleManager.AddParticle(new Spark(NPC.Center + new Vector2(12 * NPC.direction, -22), Vector2.Zero, 25, Color.Red, new Vector2(0.25f, 0.17f), MathHelper.PiOver2 * j, true, SpriteEffects.None, true, false));
                         }
-                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.06f, MaxInstances = 3, Pitch = -0.5f, PitchVariance = 0.025f }, NPC.Center);
+                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.075f, MaxInstances = 3, Pitch = -0.5f, PitchVariance = 0.025f }, NPC.Center);
                         continue;
                     }
                     if (NPC.ai[1] == attackTime)
@@ -402,7 +404,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] == slamTelegraph + slamRise + 30)
                 {
-                    SoundEngine.PlaySound(SoundID.Tink with { Volume = 0.5f }, NPC.Center);
+                    SoundEngine.PlaySound(HammerLand with { Volume = 0.24f }, NPC.Center);
                 }
                 if (NPC.ai[1] == slamTelegraph + slamRise + slamFall)
                 {
@@ -422,6 +424,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity.X *= deceleration;
                 if (NPC.ai[1] == 0)
                 {
+                    SoundEngine.PlaySound(HammerRaise with { Volume = 0.24f }, NPC.Center);
+
                     NPC dummyNPC = new NPC();
                     dummyNPC.type = desiredEnemy;
                     dummyNPC.SetDefaults(desiredEnemy);
@@ -502,6 +506,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else if (NPC.ai[1] == summonTelegraph)
                 {
+                    SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 0.6f }, NPC.Center);
                     for (int i = 0; i < SummonSpawnPositions.Length; i++)
                     {
                         Vector2 pos = SummonSpawnPositions[i];
@@ -911,13 +917,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             Vector2 drawPos = NPC.Center + modNPC.drawCenter + (Vector2.UnitY * NPC.gfxOffY);
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-            if (NPC.localAI[0] < -90 || (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80))
+            if (NPC.localAI[0] < -90 || (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise - 60 && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80))
             {
                 Vector2 hammerPos = new Vector2(-8f, 0) + spawnPos + (NPC.Bottom - NPC.Center);
                 float hammerRot = MathHelper.Pi;
-                if (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80)
+                if (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise - 60 && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80)
                 {
-                    float completion = MathHelper.Clamp((NPC.ai[1] - slamTelegraph - slamRise) / 30f, 0, 1f);
+                    float completion = MathHelper.Clamp((NPC.ai[1] - slamTelegraph - slamRise) / 30f, -1, 1f);
                     hammerPos.Y += MathHelper.Lerp(-200, 0, completion);
                     hammerRot += MathHelper.Lerp(MathHelper.TwoPi * 2, 0, completion);
                 }
