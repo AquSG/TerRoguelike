@@ -2166,9 +2166,10 @@ namespace TerRoguelike.TerPlayer
                 offset = new Vector2(0, MathHelper.Lerp(0, -80f, posInterpolant));
                 opacity = MathHelper.Clamp(MathHelper.Lerp(0f, 1f, (deathEffectTimer) / 60f), 0f, 1f);
             }
-            
-            
-            Main.EntitySpriteDraw(ghostTex, Player.Center - Main.screenPosition + (offset * ZoomSystem.zoomOverride), new Rectangle(0, frameHeight * frame, ghostTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(ghostTex.Width * 0.5f, (frameHeight * 0.5f)), ZoomSystem.zoomOverride, SpriteEffects.None);
+
+            StartAlphaBlendSpritebatch(false);
+            Main.EntitySpriteDraw(ghostTex, Player.Center - Main.screenPosition + (offset), new Rectangle(0, frameHeight * frame, ghostTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(ghostTex.Width * 0.5f, (frameHeight * 0.5f)), 1f, SpriteEffects.None);
+            Main.spriteBatch.End();
 
             deathEffectTimer--;
             if (deathEffectTimer <= 0)

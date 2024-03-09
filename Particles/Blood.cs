@@ -61,10 +61,10 @@ namespace TerRoguelike.Particles
             velocity.Y += 0.08f;
 
             rotation = velocity.ToRotation();
-            if (timeLeft < 20)
+            if (timeLeft < 30)
             {
-                color = startColor * (timeLeft / 20f);
-                scale = startScale * (timeLeft / 40f);
+                color = startColor * (timeLeft / 30f);
+                scale = startScale * (timeLeft / 30f);
             }
         }
     }

@@ -646,9 +646,7 @@ namespace TerRoguelike.Systems
                 TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                 if (modPlayer.deathEffectTimer > 0)
                 {
-                    Main.spriteBatch.Begin();
                     modPlayer.DoDeathEffect();
-                    Main.spriteBatch.End();
                 }
                 if (player.dead)
                 {

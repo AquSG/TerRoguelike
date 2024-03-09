@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.Graphics;
 using Terraria.Graphics.CameraModifiers;
 using Terraria.ModLoader;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Systems
 {
@@ -58,7 +59,14 @@ namespace TerRoguelike.Systems
                     cutsceneDisableControl = false;
                     if (!easeOutActivated)
                     {
-                        ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, easeOutTime);
+                        if (Main.player[Main.myPlayer].dead)
+                        {
+                            ZoomSystem.SetZoomAnimation(2.5f, easeOutTime);
+                        }
+                        else
+                        {
+                            ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, easeOutTime);
+                        }
                         easeOutActivated = true;
                     }
                     float completion = MathHelper.SmoothStep(0, 1f, cutsceneTimer / (float)(easeOutTime));
