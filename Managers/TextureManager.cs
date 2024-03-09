@@ -102,6 +102,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/PaladinHammer",
                 "TerRoguelike/Particles/Spark",
                 "TerRoguelike/Particles/Square",
+                "TerRoguelike/ExtraTextures/GodRay",
             };
             foreach (string path in pathList)
             {
