@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -22,6 +23,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 {
     public class Paladin : BaseRoguelikeNPC
     {
+        List<GodRay> deathGodRays = new List<GodRay>();
         public Entity target;
         public Vector2 spawnPos;
         public Vector2[] SummonSpawnPositions = new Vector2[] { new Vector2(-1), new Vector2(-1) };
@@ -44,7 +46,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int CombatStyle => -1;
         public int currentFrame;
         public Texture2D hammerTex;
+        public Texture2D godRayTex;
         public int deadTime = 0;
+
+        public Attack None = new Attack(0, 0, 300);
+        public Attack Charge = new Attack(1, 30, 210);
+        public Attack Throw = new Attack(2, 40, 240);
+        public Attack Slam = new Attack(3, 20, 280);
+        public Attack Summon = new Attack(4, 20, 150);
 
         public override void SetStaticDefaults()
         {
@@ -56,13 +65,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.width = 32;
             NPC.height = 56;
             NPC.aiStyle = -1;
-            NPC.damage = 25;
+            NPC.damage = 40;
             NPC.lifeMax = 20000;
             NPC.HitSound = SoundID.NPCHit4;
             NPC.DeathSound = SoundID.NPCDeath6;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, -12);
             hammerTex = TexDict["PaladinHammer"];
+            godRayTex = TexDict["GodRay"];
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -119,11 +129,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 BossAI();
             }
         }
-        public Attack None = new Attack(0, 0, 300);
-        public Attack Charge = new Attack(1, 30, 210);
-        public Attack Throw = new Attack(2, 30, 240);
-        public Attack Slam = new Attack(3, 20, 280);
-        public Attack Summon = new Attack(4, 20, 150);
         public void BossAI()
         {
             target = modNPC.GetTarget(NPC, false, false);
@@ -762,11 +767,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 return true;
             }
+            NPC.ai[0] = None.Id;
+            NPC.ai[1] = 1;
 
+            modNPC.OverrideIgniteVisual = true;
             NPC.velocity.X = 0;
             NPC.life = 1;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
+            NPC.active = true;
             if (deadTime == 0)
             {
                 CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
@@ -776,6 +785,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     RoomList[modNPC.sourceRoomListID].bossDead = true;
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
+                        if (i == NPC.whoAmI)
+                            continue;
+
                         NPC childNPC = Main.npc[i];
                         if (childNPC == null)
                             continue;
@@ -793,6 +805,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
+            if (deadTime % 20 == 0 || (deadTime > 90 && deadTime % 14 == 0))
+            {
+                if (deadTime != 0)
+                    deathGodRays.Add(new GodRay(Main.rand.NextFloat(MathHelper.TwoPi), deadTime, new Vector2(0.16f + Main.rand.NextFloat(-0.02f, 0.02f), 0.025f)));
+                SoundEngine.PlaySound(HammerLand with { Volume = 0.15f, MaxInstances = 10, Pitch = 0.67f, PitchVariance = 0.06f }, NPC.Center); ;
+            }
             deadTime++;
 
             if (deadTime >= 150)
@@ -806,28 +824,27 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            for (int i = 0; i < 10; i++)
+            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+            SoundEngine.PlaySound(HammerLand with { Volume = 0.5f, MaxInstances = 10 }, NPC.Center);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(14 * NPC.direction, 0), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin1").Type);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(0, -14), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin2").Type);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-14 * NPC.direction, 14), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin3").Type);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(10 * NPC.direction, 14), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin4").Type);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, -8), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin5").Type);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(1 * NPC.direction, 0), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin6").Type);
+            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, 0), (-Vector2.UnitX * NPC.direction * 3) + (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin7").Type);
+            for (int i = 0; i < 60; i++)
             {
-                int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, 16, 0f, 0f, 0, default(Color), 1.5f);
-                Dust d = Main.dust[dust];
-                d.velocity *= 2f;
-                d.noGravity = true;
+                Vector2 pos = NPC.Center + new Vector2(0, 16);
+                Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                velocity *= Main.rand.NextFloat(0.3f, 1f);
+                if (Main.rand.NextBool(5))
+                    velocity *= 1.5f;
+                Vector2 scale = new Vector2(0.25f, 0.4f);
+                int time = 110 + Main.rand.Next(70);
+                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red* 0.65f, scale, velocity.ToRotation(), true));
             }
-            Vector2 pos = new Vector2(NPC.position.X, NPC.position.Y);
-            Vector2 velocity = default(Vector2);
-            int gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
-            Gore g = Main.gore[gore];
-            g.velocity *= 0.5f;
-
-            pos = new Vector2(NPC.position.X, NPC.position.Y + 20f);
-            gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
-            g = Main.gore[gore];
-            g.velocity *= 0.5f;
-
-            pos = new Vector2(NPC.position.X, NPC.position.Y + 40f);
-            gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
-            g = Main.gore[gore];
-            g.velocity *= 0.5f;
         }
         public override void FindFrame(int frameHeight)
         {
@@ -938,6 +955,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int frameHeight = tex.Height / Main.npcFrameCount[Type];
             modNPC.drawCenter = new Vector2(0, -((frameHeight - NPC.height) * 0.5f) + 16);
 
+            if (deadTime > 0)
+            {
+                if (deathGodRays.Any())
+                {
+                    StartAdditiveSpritebatch();
+                    for (int i = 0; i < deathGodRays.Count; i++)
+                    {
+                        int direction = i == 0 ? -1 : 1;
+                        GodRay ray = deathGodRays[i];
+                        float rotation = ray.rotation;
+                        Vector2 scale = ray.scale;
+                        int time = ray.time;
+                        rotation += (deadTime - time) * 0.0033f * direction * ((i + 5) / 5);
+                        float opacity = MathHelper.Clamp(MathHelper.Lerp(1f, 0.5f, (deadTime - time) / 60f), 0.5f, 1f);
+                        Main.EntitySpriteDraw(godRayTex, NPC.Center - Main.screenPosition, null, Color.White * opacity, rotation, new Vector2(0, tex.Height * 0.33f), scale, SpriteEffects.None);
+                    }
+                    StartVanillaSpritebatch();
+                }
+            }
+
             if (NPC.ai[0] == Summon.Id)
             {
                 if (NPC.ai[1] <= summonTelegraph + 75)
@@ -982,6 +1019,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 return MathHelper.Lerp(-1000, 0, (NPC.ai[1] - slamTelegraph - slamRise) / 60f);
             }
             return 0;
+        }
+    }
+    public class GodRay
+    {
+        public float rotation;
+        public int time;
+        public Vector2 scale;
+        public GodRay(float Rotation, int Time, Vector2 Scale)
+        {
+            rotation = Rotation;
+            time = Time;
+            scale = Scale;
         }
     }
 }
