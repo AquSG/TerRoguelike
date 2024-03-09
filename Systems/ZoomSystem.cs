@@ -3,6 +3,7 @@ using System;
 using Terraria;
 using Terraria.Graphics;
 using Terraria.ModLoader;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Systems
 {
