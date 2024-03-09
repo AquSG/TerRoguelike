@@ -148,6 +148,15 @@ namespace TerRoguelike.Systems
                             player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                             modPlayer.currentFloor = nextFloor;
 
+                            if (nextFloor.Name != "Lunar")
+                            {
+                                SetCalm(nextFloor.Soundtrack.CalmTrack);
+                                SetCombat(nextFloor.Soundtrack.CombatTrack);
+                                SetMusicMode(MusicStyle.Dynamic);
+                                CombatVolumeCache = 0;
+                                CalmVolumeCache = 0;
+                            }
+                            
                             NewFloorEffects(targetRoom, modPlayer);
                         }
 

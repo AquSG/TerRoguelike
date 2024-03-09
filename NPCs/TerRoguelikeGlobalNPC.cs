@@ -3445,7 +3445,7 @@ namespace TerRoguelike.NPCs
             if (ballAndChainSlow > 0)
             {
                 drawColor = drawColor.MultiplyRGB(Color.LightGray);
-                Dust.NewDust(npc.BottomLeft + new Vector2(0, -4f), npc.width, 1, DustID.t_Slime, newColor: Color.Gray, Scale: 0.5f);
+                //Dust.NewDust(npc.BottomLeft + new Vector2(0, -4f), npc.width, 1, DustID.t_Slime, newColor: Color.Gray, Scale: 0.5f);
             }
         }
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

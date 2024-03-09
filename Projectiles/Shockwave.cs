@@ -39,7 +39,7 @@ namespace TerRoguelike.Projectiles
         {
             spawnVelocity = Projectile.velocity;
             Projectile.ai[1] = 1;
-            crumblingSoundSlot = SoundEngine.PlaySound(crumblingLoop with { Volume = 0.175f, MaxInstances = 4 }, Projectile.Center);
+            crumblingSoundSlot = SoundEngine.PlaySound(crumblingLoop with { Volume = 0.25f, MaxInstances = 4 }, Projectile.Center);
         }
         public override void AI()
         {

@@ -28,39 +28,53 @@ namespace TerRoguelike.Systems
     {
         public static bool Initialized = false;
         public static bool PlayedAllSounds = false;
-        float CalmVolumeCache = 0;
-        float CombatVolumeCache = 0;
+        public static float CalmVolumeCache = 0;
+        public static float CombatVolumeCache = 0;
         public static SlotId CalmMusic;
         public static SlotId CombatMusic;
+        public static BossTheme ActiveBossTheme;
         public static MusicStyle MusicMode = MusicStyle.Dynamic;
         public enum MusicStyle
         {
             Dynamic = 0,
             AllCalm = 1,
             AllCombat = 2,
-            Silent = 3
+            Silent = 3,
+            Boss = 4,
         }
         public static bool BufferCalmSilence = false;
         public static bool BufferCombatSilence = false;
 
         public static SoundStyle Silence = new("TerRoguelike/Tracks/Blank", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
-        public static SoundStyle KeygenCalm = new("TerRoguelike/Tracks/Calm", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
-        public static SoundStyle KeygenCombat = new("TerRoguelike/Tracks/Combat", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
         public static SoundStyle FinalStage = new("TerRoguelike/Tracks/FinalStage", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
         public static SoundStyle FinalBoss = new("TerRoguelike/Tracks/FinalBoss", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
         public static SoundStyle Escape = new("TerRoguelike/Tracks/Escape", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
+
+        public static FloorSoundtrack BaseTheme = new(
+            new("TerRoguelike/Tracks/Calm", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.18f }, 
+            new("TerRoguelike/Tracks/Combat", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.18f });
+
+        public static BossTheme PaladinTheme = new(
+            new("TerRoguelike/Tracks/PaladinTheme", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.33f },
+            new("TerRoguelike/Tracks/PaladinThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.33f },
+            new("TerRoguelike/Tracks/PaladinThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.33f });
+
         public static void PlayAllSounds()
         {
             if (PlayedAllSounds)
                 return;
 
             PlayedAllSounds = true;
-            CalmMusic = SoundEngine.PlaySound(KeygenCalm with { Volume = 0f });
             CalmMusic = SoundEngine.PlaySound(Silence with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(KeygenCombat with { Volume = 0f });
+            CalmMusic = SoundEngine.PlaySound(BaseTheme.CalmTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(BaseTheme.CombatTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(FinalStage with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(FinalBoss with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(Escape with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(PaladinTheme.BattleTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(PaladinTheme.StartTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(PaladinTheme.EndTrack with { Volume = 0f });
+
             if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
             {
                 calmMusic.Stop();
@@ -78,37 +92,63 @@ namespace TerRoguelike.Systems
         {
             PlayAllSounds();
         }
+        public static void SetBossTrack(BossTheme bossTheme)
+        {
+            ActiveBossTheme = bossTheme;
+            ActiveBossTheme.startFlag = true;
+            SetCombat(PaladinTheme.StartTrack);
+            SetMusicMode(MusicStyle.Boss);
+        }
         public static void SetMusicMode(MusicStyle newMode)
         {
             MusicMode = newMode;
-            BufferCalmSilence = newMode == MusicStyle.AllCombat || newMode == MusicStyle.Silent;
+            if (newMode != MusicStyle.Boss)
+                ActiveBossTheme = null;
+
+            BufferCalmSilence = newMode == MusicStyle.AllCombat || newMode == MusicStyle.Silent || newMode == MusicStyle.Boss;
             BufferCombatSilence = newMode == MusicStyle.AllCalm || newMode == MusicStyle.Silent;
+        }
+        public override void PostUpdateEverything()
+        {
+            MusicUpdate();
         }
         public override void PostDrawFullscreenMap(ref string mouseText)
         {
-            MusicUpdate();
+            if (!Main.hasFocus || Main.gamePaused)
+                MusicUpdate();
         }
         public override void PostDrawTiles()
         {
-            MusicUpdate();
+            if (!Main.hasFocus || Main.gamePaused)
+                MusicUpdate();
         }
         public static void SetCalm(SoundStyle sound)
         {
             if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
             {
+                CalmVolumeCache = calmMusic.Volume;
                 calmMusic.Pause();
                 calmMusic.Stop();
             }
             CalmMusic = SoundEngine.PlaySound(sound);
+            if (SoundEngine.TryGetActiveSound(CalmMusic, out var newMusic))
+            {
+                newMusic.Volume = CalmVolumeCache;
+            }
         }
         public static void SetCombat(SoundStyle sound)
         {
             if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
             {
+                CombatVolumeCache = combatMusic.Volume;
                 combatMusic.Pause();
                 combatMusic.Stop();
             }
             CombatMusic = SoundEngine.PlaySound(sound);
+            if (SoundEngine.TryGetActiveSound(CombatMusic, out var newMusic))
+            {
+                newMusic.Volume = CombatVolumeCache;
+            }
         }
         public void MusicUpdate()
         {
@@ -116,11 +156,13 @@ namespace TerRoguelike.Systems
                 return;
 
             TerRoguelikePlayer modPlayer = Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>();
-            if (!Initialized)
+            if (!Initialized && modPlayer != null && modPlayer.currentFloor != null)
             {
                 SetMusicMode(MusicStyle.Dynamic);
-                CalmMusic = SoundEngine.PlaySound(KeygenCalm with { Volume = 0.25f });
-                CombatMusic = SoundEngine.PlaySound(KeygenCombat with { Volume = 0.25f });
+                FloorSoundtrack soundtrack = modPlayer.currentFloor.Soundtrack;
+
+                CalmMusic = SoundEngine.PlaySound(soundtrack.CalmTrack);
+                CombatMusic = SoundEngine.PlaySound(soundtrack.CombatTrack);
                 if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
                 {
                     calmMusic.Volume = 0f;
@@ -161,6 +203,7 @@ namespace TerRoguelike.Systems
                 {
                     calmMusic.Volume = CalmVolumeCache;
                     calmMusic.Update();
+                    //Main.NewText(calmMusic.Volume);
                 }
 
 
@@ -168,6 +211,7 @@ namespace TerRoguelike.Systems
                 {
                     combatMusic.Volume = CombatVolumeCache;
                     combatMusic.Update();
+                    //Main.NewText(combatMusic.Volume);
                 }
             }
 
@@ -301,6 +345,77 @@ namespace TerRoguelike.Systems
                     }
                 }
             }
+
+            if (MusicMode == MusicStyle.Boss)
+            {
+                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
+                {
+                    float interpolant = calmMusic.Volume - (1f / 60f);
+                    calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
+                    calmMusic.Update();
+                    CalmVolumeCache = calmMusic.Volume;
+                    if (BufferCalmSilence)
+                    {
+                        if (calmMusic.Volume <= 0)
+                        {
+                            SetCalm(Silence with { Volume = 0f });
+                            BufferCalmSilence = false;
+                        }
+                    }
+                }
+
+                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
+                {
+                    float interpolant = combatMusic.Volume + (1f / 60f);
+                    combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
+                    if (ActiveBossTheme.endFlag)
+                    {
+                        SetCombat(ActiveBossTheme.EndTrack);
+                        ActiveBossTheme.endFlag = false;
+                        ActiveBossTheme.startFlag = false;
+                    }
+                    combatMusic.Update();
+                    CombatVolumeCache = combatMusic.Volume;
+                }
+                else
+                {
+                    if (ActiveBossTheme.startFlag)
+                    {
+                        SetCombat(ActiveBossTheme.BattleTrack);
+                        ActiveBossTheme.startFlag = false;
+                    }
+                    else
+                    {
+                        SetCombat(Silence);
+                        CombatVolumeCache = 0;
+                        SetMusicMode(MusicStyle.Silent);
+                    }   
+                }
+            }
+        }
+    }
+    public class BossTheme
+    {
+        public SoundStyle BattleTrack;
+        public SoundStyle EndTrack;
+        public SoundStyle StartTrack;
+        public bool endFlag = false;
+        public bool startFlag = true;
+        public BossTheme(SoundStyle battleTrack, SoundStyle startTrack, SoundStyle endTrack)
+        {
+            BattleTrack = battleTrack;
+            StartTrack = startTrack;
+            EndTrack = endTrack;
+        }
+    }
+    public class FloorSoundtrack
+    {
+        public SoundStyle CalmTrack;
+        public SoundStyle CombatTrack;
+        public FloorSoundtrack(SoundStyle calmTrack, SoundStyle combatTrack)
+        {
+            CalmTrack = calmTrack;
+            CombatTrack = combatTrack;
         }
     }
 }
