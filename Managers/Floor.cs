@@ -23,5 +23,6 @@ namespace TerRoguelike.Managers
         public virtual int Stage => -1;
         public virtual bool InHell => false;
         public virtual string Name => "";
+        public FloorSoundtrack Soundtrack = MusicSystem.BaseTheme;
     }
 }

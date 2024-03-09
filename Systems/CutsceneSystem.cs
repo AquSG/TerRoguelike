@@ -9,14 +9,14 @@ namespace TerRoguelike.Systems
 {
     public class CutsceneSystem : ModSystem
     {
-        private static int cutsceneTimer;
-        private static int cutsceneDuration;
+        public static int cutsceneTimer;
+        public static int cutsceneDuration;
         private static float cutsceneZoom;
-        private static Vector2 cameraTargetCenter;
+        public static Vector2 cameraTargetCenter;
         private static Vector2 overrideCameraCenter;
         private static int easeInTime;
         private static int easeOutTime;
-        private static bool cutsceneActive;
+        public static bool cutsceneActive;
         private static bool easeInActivated;
         private static bool easeOutActivated;
         public static bool cutsceneDisableControl;

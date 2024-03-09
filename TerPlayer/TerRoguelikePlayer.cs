@@ -886,8 +886,6 @@ namespace TerRoguelike.TerPlayer
                 Player.controlLeft = false;
                 Player.controlMount = false;
                 Player.controlHook = false;
-                Player.controlInv = false;
-                Player.controlCreativeMenu = false;
                 Player.controlUseItem = false;
                 Player.controlUseTile = false;
                 Player.controlJump = false;

@@ -8,14 +8,15 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerRoguelike.Managers;
+using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
-using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using TerRoguelike.Particles;
-using TerRoguelike.Managers;
+using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -23,7 +24,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
     {
         public Entity target;
         public Vector2 spawnPos;
-        public Vector2[] SummonSpawnPositions = new Vector2[] {new Vector2(-1), new Vector2(-1) };
+        public Vector2[] SummonSpawnPositions = new Vector2[] { new Vector2(-1), new Vector2(-1) };
         public float acceleration = 0.05f;
         public float deceleration = 0.95f;
         public float xCap = 2f;
@@ -43,6 +44,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int CombatStyle => -1;
         public int currentFrame;
         public Texture2D hammerTex;
+        public int deadTime = 0;
 
         public override void SetStaticDefaults()
         {
@@ -75,6 +77,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            if (deadTime > 0)
+            {
+                CheckDead();
+                return;
+            }
+            if (modNPC.isRoomNPC && NPC.localAI[0] == -270)
+            {
+                SetBossTrack(PaladinTheme);
+            }
+
             ableToHit = !(NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise + slamFall);
 
             if (NPC.collideY)
@@ -265,8 +277,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.velocity.X = chargeSpeed * NPC.direction;
                         if ((int)NPC.localAI[0] % 9 == 0)
                         {
-                            SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.35f, Pitch = -0.1f, MaxInstances = 8 }, NPC.Center);
-                            SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.05f, Pitch = -0.9f, PitchVariance = 0.08f, MaxInstances = 8 }, NPC.Center);
+                            SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.7f, Pitch = -0.1f, MaxInstances = 8 }, NPC.Center);
+                            SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.10f, Pitch = -0.9f, PitchVariance = 0.08f, MaxInstances = 8 }, NPC.Center);
                         }
                         if ((int)NPC.localAI[0] % 3 == 0)
                         {
@@ -327,7 +339,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             ParticleManager.AddParticle(new Spark(NPC.Center + new Vector2(12 * NPC.direction, -22), Vector2.Zero, 25, Color.Red, new Vector2(0.25f, 0.17f), MathHelper.PiOver2 * j, true, SpriteEffects.None, true, false));
                         }
-                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.075f, MaxInstances = 3, Pitch = -0.5f, PitchVariance = 0.025f }, NPC.Center);
+                        SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Ding") with { Volume = 0.12f, MaxInstances = 3, Pitch = -0.5f, PitchVariance = 0.025f }, NPC.Center);
                         continue;
                     }
                     if (NPC.ai[1] == attackTime)
@@ -353,11 +365,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity.X *= deceleration;
                 if (NPC.ai[1] >= slamTelegraph)
                     NPC.velocity.X = 0;
-                
+
                 if (NPC.ai[1] == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.35f, Pitch = -0.2f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.05f, Pitch = -0.9f, PitchVariance = 0.08f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.62f, Pitch = -0.2f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.08f, Pitch = -0.9f, PitchVariance = 0.08f }, NPC.Center);
                     for (int i = -1; i <= 1; i += 2)
                     {
                         Vector2 particleVelocity = new Vector2(0, 0.4f);
@@ -370,7 +382,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.immortal = true;
                     NPC.dontTakeDamage = true;
-                    SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Volume = 0.72f, Pitch = -0.25f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Volume = 1f, Pitch = -0.25f }, NPC.Center);
                     for (int i = -9; i <= 9; i++)
                     {
                         Dust d = Dust.NewDustPerfect(NPC.Bottom + new Vector2(3 * i, 0), DustID.Smoke, null, 0, Color.LightGray, 1f);
@@ -393,7 +405,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         int timeLeft = Main.rand.Next(20, 26);
                         ParticleManager.AddParticle(new Spark(NPC.Bottom + new Vector2(NPC.width * 0.2f * direction, Math.Abs(i) == 1 ? 0f : -4f), particleVelocity, timeLeft, Color.LightGray * 0.8f, particleScale, particleVelocity.ToRotation()));
                     }
-                    
+
                 }
                 if (NPC.ai[1] == slamTelegraph + slamRise)
                 {
@@ -404,7 +416,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] == slamTelegraph + slamRise + 30)
                 {
-                    SoundEngine.PlaySound(HammerLand with { Volume = 0.24f }, NPC.Center);
+                    SoundEngine.PlaySound(HammerLand with { Volume = 0.38f }, NPC.Center);
                 }
                 if (NPC.ai[1] == slamTelegraph + slamRise + slamFall)
                 {
@@ -424,7 +436,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity.X *= deceleration;
                 if (NPC.ai[1] == 0)
                 {
-                    SoundEngine.PlaySound(HammerRaise with { Volume = 0.24f }, NPC.Center);
+                    SoundEngine.PlaySound(HammerRaise with { Volume = 0.6f }, NPC.Center);
 
                     NPC dummyNPC = new NPC();
                     dummyNPC.type = desiredEnemy;
@@ -507,7 +519,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else if (NPC.ai[1] == summonTelegraph)
                 {
                     SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 0.6f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f }, NPC.Center);
                     for (int i = 0; i < SummonSpawnPositions.Length; i++)
                     {
                         Vector2 pos = SummonSpawnPositions[i];
@@ -744,54 +756,78 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return ableToHit ? null : false;
         }
-        public override void OnKill()
+        public override bool CheckDead()
         {
-            if (modNPC.isRoomNPC)
+            if (deadTime >= 150)
             {
-                RoomList[modNPC.sourceRoomListID].bossDead = true;
-                for (int i = 0; i < Main.maxNPCs; i++)
-                {
-                    NPC childNPC = Main.npc[i];
-                    if (childNPC == null)
-                        continue;
-                    if (!childNPC.active)
-                        continue;
+                return true;
+            }
 
-                    TerRoguelikeGlobalNPC modChildNPC = childNPC.GetGlobalNPC<TerRoguelikeGlobalNPC>();
-                    if (modChildNPC == null)
-                        continue;
-                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+            NPC.velocity.X = 0;
+            NPC.life = 1;
+            NPC.immortal = true;
+            NPC.dontTakeDamage = true;
+            if (deadTime == 0)
+            {
+                CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
+                if (modNPC.isRoomNPC)
+                {
+                    ActiveBossTheme.endFlag = true;
+                    RoomList[modNPC.sourceRoomListID].bossDead = true;
+                    for (int i = 0; i < Main.maxNPCs; i++)
                     {
-                        childNPC.StrikeInstantKill();
-                        childNPC.active = false;
+                        NPC childNPC = Main.npc[i];
+                        if (childNPC == null)
+                            continue;
+                        if (!childNPC.active)
+                            continue;
+
+                        TerRoguelikeGlobalNPC modChildNPC = childNPC.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                        if (modChildNPC == null)
+                            continue;
+                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                        {
+                            childNPC.StrikeInstantKill();
+                            childNPC.active = false;
+                        }
                     }
                 }
             }
-            if (NPC.life <= 0)
+            deadTime++;
+
+            if (deadTime >= 150)
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, 16, 0f, 0f, 0, default(Color), 1.5f);
-                    Dust d = Main.dust[dust];
-                    d.velocity *= 2f;
-                    d.noGravity = true;
-                }
-                Vector2 pos = new Vector2(NPC.position.X, NPC.position.Y);
-                Vector2 velocity = default(Vector2);
-                int gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
-                Gore g = Main.gore[gore];
-                g.velocity *= 0.5f;
-
-                pos = new Vector2(NPC.position.X, NPC.position.Y + 20f);
-                gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
-                g = Main.gore[gore];
-                g.velocity *= 0.5f;
-
-                pos = new Vector2(NPC.position.X, NPC.position.Y + 40f);
-                gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
-                g = Main.gore[gore];
-                g.velocity *= 0.5f;
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+                NPC.StrikeInstantKill();
             }
+                
+            return deadTime >= 150;
+        }
+        public override void OnKill()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, 16, 0f, 0f, 0, default(Color), 1.5f);
+                Dust d = Main.dust[dust];
+                d.velocity *= 2f;
+                d.noGravity = true;
+            }
+            Vector2 pos = new Vector2(NPC.position.X, NPC.position.Y);
+            Vector2 velocity = default(Vector2);
+            int gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
+            Gore g = Main.gore[gore];
+            g.velocity *= 0.5f;
+
+            pos = new Vector2(NPC.position.X, NPC.position.Y + 20f);
+            gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
+            g = Main.gore[gore];
+            g.velocity *= 0.5f;
+
+            pos = new Vector2(NPC.position.X, NPC.position.Y + 40f);
+            gore = Gore.NewGore(NPC.GetSource_Death(), pos, velocity, Main.rand.Next(11, 14), NPC.scale);
+            g = Main.gore[gore];
+            g.velocity *= 0.5f;
         }
         public override void FindFrame(int frameHeight)
         {
@@ -810,13 +846,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else if (NPC.localAI[0] >= -90)
                     currentFrame = frameCount - 4;
             }
+            else if (deadTime > 0)
+            {
+                currentFrame = 1;
+            }
             else
             {
                 if (NPC.ai[0] == Throw.Id)
                 {
                     if (NPC.localAI[2] > 0)
                     {
-                        currentFrame = NPC.localAI[2] > 10 ?  frameCount - 6 : frameCount - 5;
+                        currentFrame = NPC.localAI[2] > 10 ? frameCount - 6 : frameCount - 5;
                     }
                     else
                     {
@@ -829,7 +869,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     if (NPC.ai[1] < chargeTelegraph)
                     {
-                        currentFrame = frameCount - 4; 
+                        currentFrame = frameCount - 4;
                     }
                     else if (NPC.ai[1] >= chargeTelegraph && NPC.ai[1] <= chargeTelegraph + 1)
                     {
