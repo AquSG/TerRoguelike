@@ -60,9 +60,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             lightTex = TexDict["BrambleHollowGlow"];
+            NPC.behindTiles = true;
+            NPC.noGravity = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
+            //NPC ai 3 is used for the current cardinal direction the npc is.
+            NPC.ai[3] = 0;
+
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             currentFrame = Main.npcFrameCount[Type] - 1;
@@ -79,12 +84,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 CheckDead();
                 return;
             }
-            if (modNPC.isRoomNPC && NPC.localAI[0] == -270)
+            if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
                 SetBossTrack(PaladinTheme);
             }
 
-            ableToHit = !(NPC.ai[0] == Burrow.Id);
+            ableToHit = !(NPC.ai[0] == Burrow.Id && NPC.ai[1] > 30 && NPC.ai[1] < Burrow.Duration - 30);
+
+            NPC.velocity += new Vector2(0, 0.1f).RotatedBy(MathHelper.PiOver2 * NPC.ai[3]);
 
             if (NPC.localAI[0] < 0)
             {
@@ -126,6 +133,72 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Burrow.Id)
             {
+                if (NPC.ai[1] == (int)(Burrow.Duration * 0.5f))
+                {
+                    NPC.velocity = Vector2.Zero;
+                    List<int> directions = new List<int>() { -1, 0, 1, 2} ;
+                    directions.RemoveAll(x => x == (int)NPC.ai[3]);
+                    int newDir = directions[Main.rand.Next(directions.Count)];
+                    NPC.ai[3] = newDir;
+                    if (newDir % 2 != 0)
+                    {
+                        newDir *= -1;
+                        Room room = RoomList[modNPC.sourceRoomListID];
+                        Vector2 checkPos = room.RoomPosition16 + room.RoomCenter16 + (new Vector2(((room.RoomDimensions16.X * 0.5f) - 16) * newDir, room.RoomDimensions16.Y * 0.17f));
+                        Point tilePos = checkPos.ToTileCoordinates();
+                        if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                        {
+                            for (int i = 1; i < 25; i++)
+                            {
+                                if (!ParanoidTileRetrieval(tilePos.X + (i  * -newDir), tilePos.Y).IsTileSolidGround(true))
+                                {
+                                    tilePos.X += (i * -newDir);
+                                    break;
+                                }
+                            }
+                        }
+                        checkPos = tilePos.ToVector2() * 16f;
+                        if (newDir == 1)
+                        {
+                            checkPos.X += 16;
+                            NPC.Right = checkPos;
+                        }
+                        else
+                        {
+                            NPC.Left = checkPos;
+                        }
+                    }
+                    else
+                    {
+                        newDir -= 1;
+                        newDir *= -1;
+                        Room room = RoomList[modNPC.sourceRoomListID];
+                        Vector2 checkPos = room.RoomPosition16 + room.RoomCenter16 + ((new Vector2(0, (room.RoomDimensions16.Y * 0.5f) - 16) * newDir));
+                        Point tilePos = checkPos.ToTileCoordinates();
+                        if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                        {
+                            for (int i = 1; i < 25; i++)
+                            {
+                                if (!ParanoidTileRetrieval(tilePos.X, tilePos.Y + (i * -newDir)).IsTileSolidGround(true))
+                                {
+                                    tilePos.Y += (i * -newDir);
+                                    break;
+                                }
+                            }
+                        }
+                        checkPos = tilePos.ToVector2() * 16f;
+                        if (newDir == 1)
+                        {
+                            checkPos.Y += 16;
+                            NPC.Bottom = checkPos;
+                        }
+                        else
+                        {
+                            NPC.Top = checkPos;
+                        }
+                            
+                    }
+                }
                 if (NPC.ai[1] >= Burrow.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -175,6 +248,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+            if (!modNPC.isRoomNPC)
+            {
+                potentialAttacks.RemoveAll(x => x.Id == Burrow.Id);
+            }
 
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
@@ -193,6 +270,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
+            chosenAttack = Burrow.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -272,10 +350,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+            //SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
         }
         public override void FindFrame(int frameHeight)
         {
+            NPC.rotation = MathHelper.PiOver2 * NPC.ai[3];
+            modNPC.drawCenter = (NPC.Bottom - NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + 2)).RotatedBy(NPC.rotation);
+
             int frameCount = Main.npcFrameCount[Type];
 
             currentFrame = (int)NPC.frameCounter % (frameCount - 5);
@@ -285,11 +366,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
-            int frameHeight = tex.Height / Main.npcFrameCount[Type];
-            modNPC.drawCenter = NPC.Bottom - NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + 2);
+
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
             float glowOpacity = 0.8f + (float)(Math.Cos(Main.GlobalTimeWrappedHourly) * 0.2f);
-            Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             Main.EntitySpriteDraw(lightTex, drawPos - Main.screenPosition, NPC.frame, Color.White * glowOpacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             return false;
         }

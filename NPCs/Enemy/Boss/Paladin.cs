@@ -970,7 +970,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         int time = ray.time;
                         rotation += (deadTime - time) * 0.0033f * direction * ((i + 5) / 5);
                         float opacity = MathHelper.Clamp(MathHelper.Lerp(1f, 0.5f, (deadTime - time) / 60f), 0.5f, 1f);
-                        Main.EntitySpriteDraw(godRayTex, NPC.Center - Main.screenPosition, null, Color.White * opacity, rotation, new Vector2(0, tex.Height * 0.33f), scale, SpriteEffects.None);
+                        Main.EntitySpriteDraw(godRayTex, NPC.Center - Main.screenPosition, null, Color.White * opacity, rotation, new Vector2(0, godRayTex.Height * 0.5f), scale, SpriteEffects.None);
                     }
                     StartVanillaSpritebatch();
                 }
