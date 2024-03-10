@@ -1001,7 +1001,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float hammerRot = MathHelper.Pi;
                 if (NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph + slamRise - 60 && NPC.ai[1] < slamTelegraph + slamRise + slamFall + 80)
                 {
-                    float completion = MathHelper.Clamp((NPC.ai[1] - slamTelegraph - slamRise) / 30f, -1, 1f);
+                    float completion = MathHelper.Clamp((NPC.ai[1] - slamTelegraph - slamRise) / 30f, -5, 1f);
                     hammerPos.Y += MathHelper.Lerp(-200, 0, completion);
                     hammerRot += MathHelper.Lerp(MathHelper.TwoPi * 2, 0, completion);
                 }

@@ -78,7 +78,7 @@ namespace TerRoguelike.Projectiles
         {
             Color color = new Color(170, 170, 170);
             if (Projectile.timeLeft > 580)
-                color *= ((Projectile.timeLeft - 580) / 20f);
+                color *= 1f - ((Projectile.timeLeft - 580) / 20f);
             return color;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
