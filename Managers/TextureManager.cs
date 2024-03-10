@@ -103,6 +103,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Particles/Spark",
                 "TerRoguelike/Particles/Square",
                 "TerRoguelike/ExtraTextures/GodRay",
+                "TerRoguelike/NPCs/Enemy/Boss/BrambleHollowGlow",
             };
             foreach (string path in pathList)
             {

@@ -770,4 +770,5 @@ NPCs: {
 	StarSpewer.DisplayName: Star Spewer
 	FlowInvader.DisplayName: Flow Invader
 	Paladin.DisplayName: Paladin
+	BrambleHollow.DisplayName: Bramble Hollow
 }
