@@ -10,6 +10,9 @@ using Terraria;
 using Terraria.ID;
 using static TerRoguelike.Managers.NPCManager;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Rooms
 {
@@ -22,7 +25,14 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f) - 160f), NPCID.MourningWood, 60, 120, 0.9f);
+            if (!TerRoguelikeWorld.escape)
+                AddBoss(bossSpawnPos, ModContent.NPCType<BrambleHollow>());
+        }
+        public override void Update()
+        {
+            if (bossSpawnPos == Vector2.Zero)
+                bossSpawnPos = new Vector2(RoomDimensions16.X * 0.5f, RoomDimensions16.Y - 160f);
+            base.Update();
         }
     }
 }
