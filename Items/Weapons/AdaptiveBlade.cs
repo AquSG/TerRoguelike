@@ -43,7 +43,7 @@ namespace TerRoguelike.Items.Weapons
         public override void UseItemFrame(Player player)
         {
 
-            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = player.ModPlayer();
 
             if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
