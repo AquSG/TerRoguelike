@@ -220,7 +220,7 @@ namespace TerRoguelike.NPCs.Enemy
                 bool pass = projectile.Colliding(projectile.getRect(), new Rectangle((int)(segment.Position.X - ((i == 0 ? NPC.width : segment.Height) / 2)), (int)(segment.Position.Y - ((i == 0 ? NPC.height : segment.Height) / 2)), NPC.width, NPC.height));
                 if (pass)
                 {
-                    projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().ultimateCollideOverride = true;
+                    projectile.ModProj().ultimateCollideOverride = true;
                     return null;
                 }
             }

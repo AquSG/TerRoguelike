@@ -171,7 +171,7 @@ namespace TerRoguelike.Managers
                             if (!npc.active)
                                 continue;
 
-                            TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                            TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
 
                             if (!modNPC.isRoomNPC)
                                 continue;
@@ -219,7 +219,7 @@ namespace TerRoguelike.Managers
                     if (!npc.active)
                         continue;
 
-                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                    TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
 
                     if (!modNPC.isRoomNPC)
                         continue;
@@ -287,11 +287,13 @@ namespace TerRoguelike.Managers
                     continue;
                 if (!npc.active)
                     continue;
-                if (!npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC)
+                TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
+
+                if (!modNPC.isRoomNPC)
                     continue;
-                if (npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID != myRoom)
+                if (modNPC.sourceRoomListID != myRoom)
                     continue;
-                if (npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().IgnoreRoomWallCollision)
+                if (modNPC.IgnoreRoomWallCollision)
                     continue;
 
                 bool boundLeft = (npc.position.X + npc.velocity.X) < (RoomPosition.X + 1f) * 16f;
@@ -354,7 +356,7 @@ namespace TerRoguelike.Managers
             if (TerRoguelikeWorld.escape)
                 return;
 
-            if (Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>().currentFloor.Stage == 4 && IsBossRoom)
+            if (Main.player[Main.myPlayer].ModPlayer().currentFloor.Stage == 4 && IsBossRoom)
                 SetMusicMode(MusicStyle.Silent);
 
             ClearRockets();

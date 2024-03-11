@@ -43,7 +43,7 @@ namespace TerRoguelike.Projectiles
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
             Player player = Main.player[projectile.owner];
-            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = player.ModPlayer();
 
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
@@ -76,7 +76,7 @@ namespace TerRoguelike.Projectiles
             if (projectile.hostile || !projectile.friendly)
                 return;
 
-            TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = Main.player[projectile.owner].ModPlayer();
             if (modPlayer.volatileRocket > 0 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
                 SpawnExplosion(projectile, modPlayer, target, crit: hit.Crit);
@@ -92,7 +92,7 @@ namespace TerRoguelike.Projectiles
                     npcOwner = npc.whoAmI;
                     npcOwnerType = npc.type;
 
-                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                    TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
                     if (modNPC.hostileTurnedAlly || npc.friendly)
                     {
                         projectile.friendly = true;
@@ -108,7 +108,7 @@ namespace TerRoguelike.Projectiles
                 else if (parentSource.Entity is Projectile)
                 {
                     Projectile parentProj = Main.projectile[parentSource.Entity.whoAmI];
-                    TerRoguelikeGlobalProjectile parentModProj = parentProj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+                    TerRoguelikeGlobalProjectile parentModProj = parentProj.ModProj();
                     npcOwner = parentModProj.npcOwner;
                     npcOwnerType = parentModProj.npcOwnerType;
                     if (npcOwnerType != -1)
@@ -127,7 +127,7 @@ namespace TerRoguelike.Projectiles
             if (projectile.hostile || !projectile.friendly)
                 return;
 
-            TerRoguelikePlayer modPlayer = Main.player[projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = Main.player[projectile.owner].ModPlayer();
             if (modPlayer.volatileRocket > 0 && projectile.penetrate > 1 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
                 SpawnExplosion(projectile, modPlayer, originalHit: true); //Explosions not spawned from hits are counted as original hits, to calculate crit themselves.
@@ -138,12 +138,12 @@ namespace TerRoguelike.Projectiles
             Vector2 position = projectile.Center;
             if (target != null)
             {
-                position = target.GetGlobalNPC<TerRoguelikeGlobalNPC>().SpecialProjectileCollisionRules ? projectile.Center + (Vector2.UnitX * (projectile.width > projectile.height ? projectile.height * 0.5f : projectile.height * 0.5f)).RotatedBy(projectile.rotation) : target.getRect().ClosestPointInRect(projectile.Center);
+                position = target.ModNPC().SpecialProjectileCollisionRules ? projectile.Center + (Vector2.UnitX * (projectile.width > projectile.height ? projectile.height * 0.5f : projectile.height * 0.5f)).RotatedBy(projectile.rotation) : target.getRect().ClosestPointInRect(projectile.Center);
             }
             int spawnedProjectile = Projectile.NewProjectile(projectile.GetSource_FromThis(), position, Vector2.Zero, ModContent.ProjectileType<Explosion>(), (int)(projectile.damage * 0.6f), 0f, projectile.owner);
             Main.projectile[spawnedProjectile].scale = 1f * modPlayer.volatileRocket;
-            TerRoguelikeGlobalProjectile modProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
-            modProj.procChainBools = new ProcChainBools(projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools);
+            TerRoguelikeGlobalProjectile modProj = Main.projectile[spawnedProjectile].ModProj();
+            modProj.procChainBools = new ProcChainBools(projectile.ModProj().procChainBools);
             if (!originalHit)
                 modProj.procChainBools.originalHit = false;
             if (crit)

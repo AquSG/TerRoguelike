@@ -179,7 +179,7 @@ namespace TerRoguelike.Utilities
                 if (!npc.active)
                     continue;
 
-                TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
                 
                 if (modNPC.CanBeChased(false, chaseFriendly))
                 {

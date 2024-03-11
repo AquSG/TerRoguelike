@@ -29,7 +29,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 10000;
             Projectile.penetrate = -1;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
             Projectile.hide = true;

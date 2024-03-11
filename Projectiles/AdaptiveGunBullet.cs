@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -40,7 +41,7 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = 2;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
         }
 
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;
@@ -66,7 +67,7 @@ namespace TerRoguelike.Projectiles
             }
 
             if (modPlayer == null)
-                modPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
+                modPlayer = Main.player[Projectile.owner].ModPlayer();
 
             if (modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / 25000f);

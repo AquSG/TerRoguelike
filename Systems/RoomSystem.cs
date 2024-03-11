@@ -193,7 +193,7 @@ namespace TerRoguelike.Systems
                                     if (npc.life <= 0)
                                         continue;
 
-                                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                                    TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
                                     if (!modNPC.isRoomNPC)
                                         continue;
                                     if (modNPC.sourceRoomListID < 0)
@@ -223,7 +223,7 @@ namespace TerRoguelike.Systems
                                     if (npc.life <= 0)
                                         continue;
 
-                                    TerRoguelikeGlobalNPC modNPC = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                                    TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
                                     if (!modNPC.isRoomNPC)
                                         continue;
                                     if (modNPC.sourceRoomListID < 0)
@@ -274,8 +274,8 @@ namespace TerRoguelike.Systems
                 if (room.ID == RoomDict["LunarPillarRoomTopLeft"])
                 {
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<VortexPillar>());
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    Main.npc[spawnedNpc].ModNPC().isRoomNPC = true;
+                    Main.npc[spawnedNpc].ModNPC().sourceRoomListID = i;
                     chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
@@ -283,8 +283,8 @@ namespace TerRoguelike.Systems
                 if (room.ID == RoomDict["LunarPillarRoomTopRight"])
                 {
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<StardustPillar>());
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    Main.npc[spawnedNpc].ModNPC().isRoomNPC = true;
+                    Main.npc[spawnedNpc].ModNPC().sourceRoomListID = i;
                     chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
@@ -292,8 +292,8 @@ namespace TerRoguelike.Systems
                 if (room.ID == RoomDict["LunarPillarRoomBottomLeft"])
                 {
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<NebulaPillar>());
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    Main.npc[spawnedNpc].ModNPC().isRoomNPC = true;
+                    Main.npc[spawnedNpc].ModNPC().sourceRoomListID = i;
                     chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;
@@ -301,8 +301,8 @@ namespace TerRoguelike.Systems
                 if (room.ID == RoomDict["LunarPillarRoomBottomRight"])
                 {
                     int spawnedNpc = NPC.NewNPC(NPC.GetSource_NaturalSpawn(), (int)((room.RoomPosition.X + (room.RoomDimensions.X * 0.5f)) * 16f), (int)((room.RoomPosition.Y + (room.RoomDimensions.Y * 0.5f)) * 16f) + 160, ModContent.NPCType<SolarPillar>());
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().isRoomNPC = true;
-                    Main.npc[spawnedNpc].GetGlobalNPC<TerRoguelikeGlobalNPC>().sourceRoomListID = i;
+                    Main.npc[spawnedNpc].ModNPC().isRoomNPC = true;
+                    Main.npc[spawnedNpc].ModNPC().sourceRoomListID = i;
                     chainList.Add(new Chain(chainStart, Main.npc[spawnedNpc].Center, 24, 120, spawnedNpc));
                     pillarCount++;
                     continue;

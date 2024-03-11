@@ -986,8 +986,8 @@ namespace TerRoguelike.TerPlayer
         #region On Hit Enemy
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            TerRoguelikeGlobalProjectile modProj = proj.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
-            TerRoguelikeGlobalNPC modNPC = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+            TerRoguelikeGlobalProjectile modProj = proj.ModProj();
+            TerRoguelikeGlobalNPC modNPC = target.ModNPC();
 
             if (previousBonusDamageMulti != 1f)
                 hit.Damage = (int)(hit.Damage / previousBonusDamageMulti);
@@ -1016,7 +1016,7 @@ namespace TerRoguelike.TerPlayer
                         damage /= 2;
 
                     int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<StuckClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
-                    TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+                    TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].ModProj();
 
                     spawnedModProj.procChainBools = new ProcChainBools(modProj.procChainBools);
                     spawnedModProj.procChainBools.originalHit = false;
@@ -1046,7 +1046,7 @@ namespace TerRoguelike.TerPlayer
                         damage /= 2;
 
                     int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, direction * 2.2f, ModContent.ProjectileType<Missile>(), damage, 0f, proj.owner, target.whoAmI);
-                    TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+                    TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].ModProj();
 
                     spawnedModProj.procChainBools = new ProcChainBools(modProj.procChainBools);
                     spawnedModProj.procChainBools.originalHit = false;
@@ -1123,7 +1123,7 @@ namespace TerRoguelike.TerPlayer
         public void OnKillEffects(NPC target)
         {
             //Main.NewText("Killed " + target.FullName);
-            TerRoguelikeGlobalNPC modTarget = target.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+            TerRoguelikeGlobalNPC modTarget = target.ModNPC();
 
             if (hotPepper > 0 && !modTarget.activatedHotPepper)
             {
@@ -1137,7 +1137,7 @@ namespace TerRoguelike.TerPlayer
 
                     if (npc.Center.Distance(target.Center) <= radius)
                     {
-                        npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                        npc.ModNPC().ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
                     }
                 }
                 modTarget.activatedHotPepper = true;
@@ -1375,10 +1375,11 @@ namespace TerRoguelike.TerPlayer
             }
             if (damageSource.SourceProjectileLocalIndex > -1 && damageSource.SourceProjectileLocalIndex < Main.maxProjectiles)
             {
-                if (Main.projectile[damageSource.SourceProjectileLocalIndex].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner > -1)
+                TerRoguelikeGlobalProjectile modProj = Main.projectile[damageSource.SourceProjectileLocalIndex].ModProj();
+                if (modProj.npcOwner > -1)
                 {
-                    killerNPC = Main.projectile[damageSource.SourceProjectileLocalIndex].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwner;
-                    killerNPCType = Main.projectile[damageSource.SourceProjectileLocalIndex].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().npcOwnerType;
+                    killerNPC = modProj.npcOwner;
+                    killerNPCType = modProj.npcOwnerType;
                 }
                 else
                 {

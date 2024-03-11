@@ -11,6 +11,7 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using Terraria.GameContent;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -39,7 +40,7 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = 2;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
         }
 
         public override bool? CanDamage() => ableToHit ? (bool?)null : false;

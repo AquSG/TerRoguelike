@@ -39,7 +39,7 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = 20;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
             maxTimeLeft = Projectile.timeLeft;
             maxScale = Projectile.scale;
             glowTex = TexDict["CircularGlow"];
