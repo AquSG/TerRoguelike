@@ -33,6 +33,13 @@ namespace TerRoguelike.Projectiles
             Projectile.localAI[0] = Math.Sign(Projectile.velocity.X);
             if (Projectile.localAI[0] == 0)
                 Projectile.localAI[0] = 1;
+            for (int i = 0; i < 8; i++)
+            {
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Grass, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, default(Color), 1f);
+                Dust dust = Main.dust[d];
+                dust.noLightEmittence = true;
+                dust.noLight = true;
+            }
         }
         public override void AI()
         {
@@ -61,7 +68,7 @@ namespace TerRoguelike.Projectiles
             {
                 Gore.NewGore(Projectile.GetSource_FromThis(), Projectile.Center, new Vector2(0, 0.5f) + (Projectile.velocity * 0.5f), GoreID.TreeLeaf_Normal, 1f);
             }
-            float rot = Projectile.ai[0] * -MathHelper.PiOver2;
+            float rot = Projectile.ai[0] * MathHelper.PiOver2;
             Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + new Vector2(0, -22).RotatedBy(rot), new Vector2(0, 2).RotatedBy(rot), ModContent.ProjectileType<VineWall>(), Projectile.damage, 0f, -1, Projectile.ai[0]);
         }
         public override bool PreDraw(ref Color lightColor)

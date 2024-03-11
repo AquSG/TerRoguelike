@@ -108,6 +108,7 @@ namespace TerRoguelike.Managers
                 new StarSpewer(),
                 new FlowInvader(),
                 new Paladin(),
+                new BrambleHollow(),
             };
         }
         internal static void Unload()

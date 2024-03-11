@@ -20,6 +20,10 @@ namespace TerRoguelike.Projectiles
     {
         Vector2 spawnPos;
         Vector2 startVel;
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1600;
+        }
         public override void SetDefaults()
         {
             Projectile.width = 18;
@@ -65,7 +69,7 @@ namespace TerRoguelike.Projectiles
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             int length = (int)Projectile.ai[0] % 2 == 0 ? (int)Math.Abs(Projectile.Center.Y - spawnPos.Y) : (int)Math.Abs(Projectile.Center.X - spawnPos.X);
             Vector2 pos = spawnPos;
-            float rot = Projectile.ai[0] * -MathHelper.PiOver2;
+            float rot = Projectile.ai[0] * MathHelper.PiOver2;
             int endEase = length - 8;
             for (int i = 0; i < length; i += 4)
             {
@@ -81,11 +85,8 @@ namespace TerRoguelike.Projectiles
                     SoundEngine.PlaySound(SoundID.Dig with { Volume = 1f }, realPos);
                     SoundEngine.PlaySound(SoundID.Grass with { Volume = 1f }, realPos);
                 }
-                for (int j = 0; j < 2; j++)
-                {
-                    Dust.NewDustPerfect(realPos, DustID.Grass);
-                }
-                
+
+                Dust.NewDustPerfect(realPos, DustID.Grass);
                 if (i % 8 == 0)
                     Gore.NewGore(Projectile.GetSource_FromThis(), realPos, Vector2.Zero, GoreID.TreeLeaf_Normal);
             }
@@ -95,7 +96,7 @@ namespace TerRoguelike.Projectiles
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             int length = (int)Projectile.ai[0] % 2 == 0 ? (int)Math.Abs(Projectile.Center.Y - spawnPos.Y) : (int)Math.Abs(Projectile.Center.X - spawnPos.X);
             Vector2 pos = spawnPos;
-            float rot = Projectile.ai[0] * -MathHelper.PiOver2;
+            float rot = Projectile.ai[0] * MathHelper.PiOver2;
             int endEase = length - 8;
             for (int i = 0; i < length; i += 8)
             {
@@ -121,7 +122,7 @@ namespace TerRoguelike.Projectiles
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             int length = (int)Projectile.ai[0] % 2 == 0 ? (int)Math.Abs(Projectile.Center.Y - spawnPos.Y) : (int)Math.Abs(Projectile.Center.X - spawnPos.X);
             Vector2 pos = spawnPos;
-            float rot = Projectile.ai[0] * -MathHelper.PiOver2;
+            float rot = Projectile.ai[0] * MathHelper.PiOver2;
             int endEase = length - 8;
             for (int i = 0; i < length; i++)
             {
