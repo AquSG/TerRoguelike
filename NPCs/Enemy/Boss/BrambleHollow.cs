@@ -23,7 +23,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 {
     public class BrambleHollow : BaseRoguelikeNPC
     {
-        List<GodRay> deathGodRays = new List<GodRay>();
         public Entity target;
         public Vector2 spawnPos;
         public bool ableToHit = true;
@@ -32,7 +31,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override List<int> associatedFloors => new List<int>() { FloorDict["Forest"] };
         public override int CombatStyle => -1;
         public int currentFrame;
+        public int horizontalFrame;
         public Texture2D lightTex;
+        public Texture2D ballTex;
         public int deadTime = 0;
         public int cutsceneDuration = 180;
         public int deathCutsceneDuration = 150;
@@ -43,6 +44,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Attack RootLift = new Attack(3, 40, 280);
         public Attack SeedBarrage = new Attack(4, 40, 150);
         public Attack Summon = new Attack(5, 20, 150);
+        public int ballAttack1;
+        public int ballAttack2;
+        public Vector2 ballAttack1Pos;
+        public Vector2 ballAttack2Pos;
 
         public override void SetStaticDefaults()
         {
@@ -54,13 +59,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.width = 128;
             NPC.height = 128;
             NPC.aiStyle = -1;
-            NPC.damage = 40;
+            NPC.damage = 30;
             NPC.lifeMax = 20000;
             NPC.HitSound = SoundID.NPCHit7;
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             lightTex = TexDict["BrambleHollowGlow"];
+            ballTex = TexDict["LeafBall"];
             NPC.behindTiles = true;
             NPC.noGravity = true;
         }
@@ -71,7 +77,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
-            currentFrame = Main.npcFrameCount[Type] - 1;
+            currentFrame = 0;
+            horizontalFrame = 0;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
             NPC.spriteDirection = -1;
@@ -121,6 +128,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             NPC.ai[1]++;
             NPC.frameCounter += 0.18d;
+
+            ballAttack1 = 60;
+            ballAttack2 = 120;
+            ballAttack1Pos = NPC.Center + modNPC.drawCenter + new Vector2(100, 0).RotatedBy(NPC.rotation);
+            ballAttack2Pos = NPC.Center + modNPC.drawCenter + new Vector2(-100, 0).RotatedBy(NPC.rotation);
+
+
             if (NPC.ai[0] == None.Id)
             {
                 if (NPC.ai[1] >= None.Duration)
@@ -212,13 +226,31 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= Burrow.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = None.Duration - 30;
+                    NPC.ai[1] = None.Duration - 60;
                     NPC.ai[2] = Burrow.Id;
                 }
             }
             else if (NPC.ai[0] == VineWall.Id)
             {
-                if (NPC.ai[1] >= VineWall.Duration)
+                float attackHorizSpeedMulti = (int)NPC.ai[3] % 2 == 0 ? 3f : 0.6f;
+                if (NPC.ai[1] == 0)
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Dust.NewDust(ballAttack1Pos, 1, 1, DustID.Grass);
+                        Dust.NewDust(ballAttack2Pos, 1, 1, DustID.Grass);
+                    }
+                    SoundEngine.PlaySound(SoundID.Item76 with { Volume = 1f }, NPC.Center);
+                }
+                else if (NPC.ai[1] == ballAttack1)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), ballAttack1Pos, new Vector2(attackHorizSpeedMulti, -6).RotatedBy(NPC.rotation), ModContent.ProjectileType<LeafBall>(), NPC.damage, 0f, -1, NPC.ai[3]);
+                }
+                else if (NPC.ai[1] == ballAttack2)
+                {
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), ballAttack2Pos, new Vector2(-attackHorizSpeedMulti, -6).RotatedBy(NPC.rotation), ModContent.ProjectileType<LeafBall>(), NPC.damage, 0f, -1, NPC.ai[3]);
+                }
+                else if (NPC.ai[1] >= VineWall.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -256,7 +288,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public void ChooseAttack()
         {
             NPC.ai[1] = 0;
-            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
+            //List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
             {
@@ -280,7 +313,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Burrow.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -408,10 +441,35 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.drawCenter = (NPC.Bottom - NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + 2)).RotatedBy(NPC.rotation);
 
             int frameCount = Main.npcFrameCount[Type];
+            int frameWidth = TextureAssets.Npc[Type].Value.Width / 2;
+            currentFrame = (int)NPC.frameCounter % (frameCount - 5);
+            horizontalFrame = 0;
 
-            currentFrame = (int)NPC.frameCounter % (frameCount - 5) + (NPC.ai[0] == Burrow.Id ? 5 : 0);
+            if (NPC.ai[0] == Burrow.Id)
+                currentFrame += 5;
+            else if (NPC.ai[0] == VineWall.Id && NPC.ai[1] < ballAttack2 + 48)
+            {
+                horizontalFrame = 1;
+                if (NPC.ai[1] < ballAttack1)
+                    currentFrame = 0;
+                else if (NPC.ai[1] < ballAttack1 + 12)
+                    currentFrame = 1;
+                else if (NPC.ai[1] < ballAttack1 + 24)
+                    currentFrame = 2;
+                else if (NPC.ai[1] < ballAttack2)
+                    currentFrame = 0;
+                else if (NPC.ai[1] < ballAttack2 + 12)
+                    currentFrame = 3;
+                else if (NPC.ai[1] < ballAttack2 + 24)
+                    currentFrame = 4;
+                else
+                    currentFrame = 0;
 
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[Type].Value.Width, frameHeight);
+                NPC.frameCounter = 3;
+            }
+
+            NPC.frame = new Rectangle(horizontalFrame * frameWidth, currentFrame * frameHeight, frameWidth, frameHeight);
+
             if (NPC.ai[0] == Burrow.Id)
             {
                 float offset = GetOffset();
@@ -455,6 +513,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
+
+            if ((int)NPC.ai[0] == VineWall.Id && NPC.ai[1] < 120)
+            {
+                float interpolant = MathHelper.Clamp(MathHelper.SmoothStep(0, 1f, NPC.ai[1] / ballAttack1), 0, 1f);
+                float offset = -32f * (1f - interpolant);
+                if (NPC.ai[1] < ballAttack1)
+                {
+                    Main.EntitySpriteDraw(ballTex, ballAttack1Pos + new Vector2(0, offset).RotatedBy(NPC.rotation) - Main.screenPosition, null, Color.White * interpolant, NPC.rotation, ballTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                }
+                Main.EntitySpriteDraw(ballTex, ballAttack2Pos + new Vector2(0, offset).RotatedBy(NPC.rotation) - Main.screenPosition, null, Color.White * interpolant, NPC.rotation, ballTex.Size() * 0.5f, 1f, SpriteEffects.None);
+            }
 
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
             float glowOpacity = 0.8f + (float)(Math.Cos(Main.GlobalTimeWrappedHourly) * 0.2f);

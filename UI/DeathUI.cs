@@ -145,8 +145,14 @@ namespace TerRoguelike.UI
             {
                 Texture2D enemyTex = TextureAssets.Npc[modPlayer.killerNPCType].Value;
                 int frameHeight = enemyTex.Height / Main.npcFrameCount[modPlayer.killerNPCType];
-                float horizontalScale = 180f / (float)enemyTex.Width;
-                float verticalScale = 250f / (float)frameHeight;
+                NPC dummyNPC = new NPC();
+                dummyNPC.type = modPlayer.killerNPCType;
+                dummyNPC.SetDefaults(dummyNPC.type);
+                dummyNPC.FindFrame();
+                Rectangle frame = dummyNPC.frame;
+                //Rectangle frame = new Rectangle(0, 0, enemyTex.Width, frameHeight);
+                float horizontalScale = 180f / (float)frame.Width;
+                float verticalScale = 250f / (float)frame.Height;
                 float scale;
                 if (horizontalScale > verticalScale)
                     scale = verticalScale;
@@ -154,7 +160,7 @@ namespace TerRoguelike.UI
                     scale = horizontalScale;
                 if (scale > 4f)
                     scale = 4f;
-                spriteBatch.Draw(enemyTex, screenPos + new Vector2(240, -40), new Rectangle(0, 0, enemyTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(enemyTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
+                spriteBatch.Draw(enemyTex, screenPos + new Vector2(240, -40), frame, Color.White * opacity, 0f, frame.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
             else if (modPlayer.killerProj != -1)
             {
