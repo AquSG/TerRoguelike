@@ -794,7 +794,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (!childNPC.active)
                             continue;
 
-                        TerRoguelikeGlobalNPC modChildNPC = childNPC.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+                        TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                         if (modChildNPC == null)
                             continue;
                         if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)

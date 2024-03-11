@@ -11,6 +11,7 @@ using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using Terraria.DataStructures;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -28,7 +29,7 @@ namespace TerRoguelike.Projectiles
             Projectile.MaxUpdates = 30;
             Projectile.timeLeft = 5400;
             Projectile.penetrate = 1;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
         }
         public override void OnSpawn(IEntitySource source)
         {

@@ -84,7 +84,7 @@ namespace TerRoguelike.Items.Weapons
 
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
-            TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = player.ModPlayer();
 
             if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {

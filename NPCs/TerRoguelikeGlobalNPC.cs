@@ -3275,7 +3275,7 @@ namespace TerRoguelike.NPCs
                         NPC target = Main.npc[i];
                         if (!target.active)
                             continue;
-                        if (!target.GetGlobalNPC<TerRoguelikeGlobalNPC>().CanBeChased(false, false))
+                        if (!target.ModNPC().CanBeChased(false, false))
                             continue;
 
                         if (npc.getRect().Intersects(target.getRect()))
@@ -3305,7 +3305,7 @@ namespace TerRoguelike.NPCs
             if (npc.immortal || npc.dontTakeDamage)
                 return;
 
-            TerRoguelikePlayer modPlayer = Main.player[owner].GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center));
 
@@ -3331,7 +3331,7 @@ namespace TerRoguelike.NPCs
             if (npc.immortal || npc.dontTakeDamage)
                 return;
 
-            TerRoguelikePlayer modPlayer = Main.player[owner].GetModPlayer<TerRoguelikePlayer>();
+            TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center));
 
@@ -3439,7 +3439,7 @@ namespace TerRoguelike.NPCs
                 for (int i = 0; i < ignitedStacks.Count; i++)
                 {
                     if (Main.rand.NextBool(5))
-                        Dust.NewDust(npc.position + npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().drawCenter, npc.width, npc.height, DustID.Torch);
+                        Dust.NewDust(npc.position + npc.ModNPC().drawCenter, npc.width, npc.height, DustID.Torch);
                 }
             }
             if (ballAndChainSlow > 0)
@@ -3554,7 +3554,7 @@ namespace TerRoguelike.NPCs
             }
             if (targetNPC != -1)
             {
-                if (!Main.npc[targetNPC].GetGlobalNPC<TerRoguelikeGlobalNPC>().CanBeChased(false, false) || !npc.friendly)
+                if (!Main.npc[targetNPC].ModNPC().CanBeChased(false, false) || !npc.friendly)
                 {
 
                     targetNPC = -1;
@@ -3630,7 +3630,7 @@ namespace TerRoguelike.NPCs
         public IgnitedStack(int damageToDeal, int owner)
         {
             Owner = owner;
-            damageToDeal *= Main.player[owner].GetModPlayer<TerRoguelikePlayer>().forgottenBioWeapon + 1;
+            damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
             DamageToDeal = damageToDeal;
         }
         public int DamageToDeal = 0;
@@ -3641,7 +3641,7 @@ namespace TerRoguelike.NPCs
         public BleedingStack(int damageToDeal, int owner)
         {
             Owner = owner;
-            damageToDeal *= Main.player[owner].GetModPlayer<TerRoguelikePlayer>().forgottenBioWeapon + 1;
+            damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
             DamageToDeal = damageToDeal;
         }
         public int DamageToDeal = 0;

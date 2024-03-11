@@ -14,6 +14,7 @@ using Terraria.GameContent;
 using TerRoguelike.World;
 using TerRoguelike.Particles;
 using static TerRoguelike.Systems.RoomSystem;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Managers
 {
@@ -82,7 +83,7 @@ namespace TerRoguelike.Managers
         {
             int spawnedNpc = NPC.NewNPC(source, (int)position.X, (int)position.Y, type);
             NPC npc = Main.npc[spawnedNpc];
-            TerRoguelikeGlobalNPC modNpc = npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+            TerRoguelikeGlobalNPC modNpc = npc.ModNPC();
             if (roomListID > -1)
             {
                 modNpc.isRoomNPC = true;

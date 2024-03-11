@@ -9,6 +9,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -82,7 +83,7 @@ namespace TerRoguelike.Projectiles
         {
             int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.Zero, ModContent.ProjectileType<Explosion>(), Projectile.damage, 0f, Projectile.owner);
             Main.projectile[spawnedProjectile].scale = 1f;
-            Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>().procChainBools;
+            Main.projectile[spawnedProjectile].ModProj().procChainBools = Projectile.ModProj().procChainBools;
 
             SoundEngine.PlaySound(SoundID.Item110, Projectile.Center);
             return true;

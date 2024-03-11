@@ -38,7 +38,7 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
         }
 
         public override void AI()
@@ -54,7 +54,7 @@ namespace TerRoguelike.Projectiles
             if (player == null)
                 player = Main.player[Projectile.owner];
             if (modPlayer == null)
-                modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                modPlayer = player.ModPlayer();
 
             if (stuckPosition == Vector2.Zero)
             {

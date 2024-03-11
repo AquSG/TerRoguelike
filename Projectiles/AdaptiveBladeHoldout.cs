@@ -49,7 +49,7 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             if (modPlayer == null)
-                modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
+                modPlayer = Owner.ModPlayer();
 
             if (Charge >= 60f && !autoRelease) //cap chargetime if no autorelease
             {
@@ -104,7 +104,7 @@ namespace TerRoguelike.Projectiles
             if ((Charge <= 60f || (Owner.channel && autoRelease)) && modPlayer.swingAnimCompletion == 0)
                 modPlayer.swingAnimCompletion += 0.00001f; // start the swing anim
 
-            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire; //multishot support
+            int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             int damage = Charge >= 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
             SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
             for (int i = 0; i < shotsToFire; i++)
@@ -129,7 +129,7 @@ namespace TerRoguelike.Projectiles
                 int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), Vector2.Zero, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
                 Main.projectile[spawnedProjectile].rotation = direction.ToRotation();
                 Main.projectile[spawnedProjectile].scale = modPlayer.scaleMultiplier;
-                Main.projectile[spawnedProjectile].GetGlobalProjectile<TerRoguelikeGlobalProjectile>().swingDirection = Owner.direction;
+                Main.projectile[spawnedProjectile].ModProj().swingDirection = Owner.direction;
             }
             Charge -= 60f;
             if (Charge > 60f) // support for swinging more than once a frame if one has that much attack speed

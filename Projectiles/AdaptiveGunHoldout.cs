@@ -50,7 +50,7 @@ namespace TerRoguelike.Projectiles
         {
             if (modPlayer == null)
             {
-                modPlayer = Owner.GetModPlayer<TerRoguelikePlayer>();
+                modPlayer = Owner.ModPlayer();
             }
 
             if (Owner.channel) //Keep the player's hands full relative to attack speed
@@ -80,7 +80,7 @@ namespace TerRoguelike.Projectiles
         public void ShootBullet()
         {
             float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
-            int shotsToFire = Owner.GetModPlayer<TerRoguelikePlayer>().shotsToFire; //multishot support
+            int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             if (modPlayer.shotgunComponent > 0)
             {
                 SoundEngine.PlaySound(SoundID.Item36 with { Volume = SoundID.Item36.Volume * 0.6f });

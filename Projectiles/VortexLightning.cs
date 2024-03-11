@@ -13,6 +13,7 @@ using Terraria.Graphics.Renderers;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.DataStructures;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
 {
@@ -39,7 +40,7 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
-            modProj = Projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
+            modProj = Projectile.ModProj();
         }
         public override void OnSpawn(IEntitySource source)
         {
