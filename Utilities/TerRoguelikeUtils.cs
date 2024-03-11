@@ -16,6 +16,8 @@ namespace TerRoguelike.Utilities
 {
     public static partial class TerRoguelikeUtils
     {
+        public static TerRoguelikePlayer ModPlayer(this Player player) => player.GetModPlayer<TerRoguelikePlayer>();
+
         /// <summary>
         /// Properly sets the player's held item rotation and position by doing the annoying math for you, since vanilla decided to be wholly inconsistent about it!
         /// This all assumes the player is facing right. All the flip stuff is automatically handled in here

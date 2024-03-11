@@ -38,7 +38,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 150;
 
         public Attack None = new Attack(0, 0, 180);
-        public Attack Burrow = new Attack(1, 15, 360);
+        public Attack Burrow = new Attack(1, 40, 360);
         public Attack VineWall = new Attack(2, 30, 240);
         public Attack RootLift = new Attack(3, 40, 280);
         public Attack SeedBarrage = new Attack(4, 40, 150);
@@ -280,6 +280,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
+            chosenAttack = Burrow.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()

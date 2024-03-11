@@ -58,6 +58,8 @@ Projectiles: {
 	Shockwave.DisplayName: Shockwave
 	PaladinHammer.DisplayName: Paladin Hammer
 	RockDebris.DisplayName: Rock Debris
+	LeafBall.DisplayName: Leaf Ball
+	VineWall.DisplayName: Vine Wall
 }
 
 Items: {
