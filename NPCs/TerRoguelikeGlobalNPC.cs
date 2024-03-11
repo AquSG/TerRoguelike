@@ -3439,7 +3439,7 @@ namespace TerRoguelike.NPCs
                 for (int i = 0; i < ignitedStacks.Count; i++)
                 {
                     if (Main.rand.NextBool(5))
-                        Dust.NewDust(npc.position, npc.width, npc.height, DustID.Torch);
+                        Dust.NewDust(npc.position + npc.GetGlobalNPC<TerRoguelikeGlobalNPC>().drawCenter, npc.width, npc.height, DustID.Torch);
                 }
             }
             if (ballAndChainSlow > 0)

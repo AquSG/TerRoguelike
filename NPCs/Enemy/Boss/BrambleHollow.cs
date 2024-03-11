@@ -27,6 +27,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Entity target;
         public Vector2 spawnPos;
         public bool ableToHit = true;
+        public bool canBeHit = true;
         public override int modNPCID => ModContent.NPCType<BrambleHollow>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Forest"] };
         public override int CombatStyle => -1;
@@ -37,7 +38,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 150;
 
         public Attack None = new Attack(0, 0, 180);
-        public Attack Burrow = new Attack(1, 15, 180);
+        public Attack Burrow = new Attack(1, 15, 360);
         public Attack VineWall = new Attack(2, 30, 240);
         public Attack RootLift = new Attack(3, 40, 280);
         public Attack SeedBarrage = new Attack(4, 40, 150);
@@ -89,7 +90,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(PaladinTheme);
             }
 
-            ableToHit = !(NPC.ai[0] == Burrow.Id && NPC.ai[1] > 30 && NPC.ai[1] < Burrow.Duration - 30);
+            ableToHit = !(NPC.ai[0] == Burrow.Id && NPC.ai[1] > Burrow.Duration * 0.5f);
+            canBeHit = !(NPC.ai[0] == Burrow.Id && Math.Abs(NPC.ai[1] - (Burrow.Duration * 0.5f)) < 60);
 
             NPC.velocity += new Vector2(0, 0.1f).RotatedBy(MathHelper.PiOver2 * NPC.ai[3]);
 
@@ -133,6 +135,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Burrow.Id)
             {
+                if (NPC.ai[1] < 80 || NPC.ai[1] > (int)(Burrow.Duration * 0.5f) + 1)
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Vector2 pos = new Vector2(Main.rand.NextFloat(-NPC.width * 0.5f, NPC.width * 0.5f), NPC.height * 0.5f).RotatedBy(NPC.rotation) + NPC.Center;
+                        Dust d = Dust.NewDustPerfect(pos, DustID.WoodFurniture, null, 0, default, 1);
+                    }
+                }
                 if (NPC.ai[1] == (int)(Burrow.Duration * 0.5f))
                 {
                     NPC.velocity = Vector2.Zero;
@@ -270,7 +280,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Burrow.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -285,13 +294,53 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return ableToHit;
         }
-        public override bool? CanBeHitByItem(Player player, Item item)
-        {
-            return ableToHit ? null : false;
-        }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {
-            return ableToHit ? null : false;
+            return projectile.Colliding(projectile.getRect(), ModifiedHitbox()) && canBeHit ? null : false;
+        }
+        public override bool? CanBeHitByItem(Player player, Item item)
+        {
+            return item.Hitbox.Intersects(ModifiedHitbox()) && canBeHit ? null : false;
+        }
+        public override bool CanBeHitByNPC(NPC attacker)
+        {
+            return true;
+        }
+        public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
+        {
+            npcHitbox = ModifiedHitbox();
+            
+            return false;
+        }
+        public Rectangle ModifiedHitbox()
+        {
+            if (NPC.ai[0] != Burrow.Id)
+                return NPC.Hitbox;
+            Rectangle npcHitbox = NPC.Hitbox;
+            int lesser = npcHitbox.Width < npcHitbox.Height ? npcHitbox.Width : npcHitbox.Height;
+            int offset = (int)GetOffset();
+            if (offset > lesser)
+                offset = lesser;
+
+            if (NPC.ai[3] == 0)
+            {
+                npcHitbox.Y += offset;
+                npcHitbox.Height -= offset;
+            }
+            else if (NPC.ai[3] == 2)
+            {
+                npcHitbox.Height -= offset;
+            }
+            else if (NPC.ai[3] == 1)
+            {
+                npcHitbox.Width -= offset;
+            }
+            else if (NPC.ai[3] == -1)
+            {
+                npcHitbox.Width -= -offset;
+                npcHitbox.X += offset;
+            }
+            return npcHitbox;
         }
         public override bool CheckDead()
         {
@@ -359,9 +408,48 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             int frameCount = Main.npcFrameCount[Type];
 
-            currentFrame = (int)NPC.frameCounter % (frameCount - 5);
+            currentFrame = (int)NPC.frameCounter % (frameCount - 5) + (NPC.ai[0] == Burrow.Id ? 5 : 0);
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[Type].Value.Width, frameHeight);
+            if (NPC.ai[0] == Burrow.Id)
+            {
+                float offset = GetOffset();
+                int rectCutoff = (int)offset - 40;
+                if (rectCutoff > NPC.frame.Height)
+                    rectCutoff = NPC.frame.Height;
+                if (rectCutoff > 0)
+                {
+                    NPC.frame.Height -= rectCutoff;
+                }
+
+                
+                modNPC.drawCenter += (Vector2.UnitY * offset * 0.5f).RotatedBy(NPC.rotation);
+            }
+        }
+        public float GetOffset()
+        {
+            int halfTime = (int)(Burrow.Duration * 0.5f);
+            float maxOffset = 240;
+            float offset;
+            if (NPC.ai[1] < halfTime)
+            {
+                offset = MathHelper.SmoothStep(0, maxOffset, NPC.ai[1] / halfTime);
+            }
+            else
+            {
+                offset = MathHelper.SmoothStep(maxOffset, 0, (NPC.ai[1] - halfTime) / halfTime);
+            }
+            return offset;
+        }
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            position += modNPC.drawCenter + new Vector2(0, 28);
+            if (NPC.ai[0] == Burrow.Id)
+            {
+                float halfTime = (Burrow.Duration * 0.5f);
+                scale = MathHelper.Clamp(MathHelper.SmoothStep(0, 1f, Math.Abs((NPC.ai[1] - halfTime) / (halfTime))), 0, 1f);
+            }
+            return true;
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
