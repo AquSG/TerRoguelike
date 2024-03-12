@@ -60,6 +60,7 @@ Projectiles: {
 	RockDebris.DisplayName: Rock Debris
 	LeafBall.DisplayName: Leaf Ball
 	VineWall.DisplayName: Vine Wall
+	RootPillar.DisplayName: Root Pillar
 }
 
 Items: {
