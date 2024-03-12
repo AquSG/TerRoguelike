@@ -45,6 +45,8 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.hostile = true;
+            Projectile.friendly = false;
             if (Projectile.ai[1] <= 2)
                 Projectile.velocity = startVel;
         }
@@ -74,9 +76,10 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < length; i += 4)
             {
                 Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 1f) * 0.5f;
-                float depth = MathHelper.Lerp(0.7f, 1f, interpolant);
-                posOffset += (Vector2.UnitX * MathHelper.Lerp(-12.5f, 12.5f, interpolant)).RotatedBy(rot);
+                float interpolant = ((float)Math.Sin((float)i / tex.Height));
+                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
+                float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
+                posOffset += (Vector2.UnitX * MathHelper.Lerp(-8.5f, 8.5f, interpolant)).RotatedBy(rot);
                 Vector2 realPos = pos + posOffset;
 
                 if (!soundPlayed && i > length * 0.5f)
@@ -102,16 +105,17 @@ namespace TerRoguelike.Projectiles
             {
                 Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
                 Vector2 scale = new Vector2(1f);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 1f) * 0.5f;
-                float depth = MathHelper.Lerp(0.7f, 1f, interpolant);
+                float interpolant = ((float)Math.Sin((float)i / tex.Height));
+                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
+                float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
                 scale.X *= depth;
-                posOffset += (Vector2.UnitX * MathHelper.Lerp(-12.5f, 12.5f, interpolant)).RotatedBy(rot);
-                if (i > endEase)
-                {
-                    scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
-                }
+                posOffset += (Vector2.UnitX * MathHelper.Lerp(-8.5f, 8.5f, interpolant)).RotatedBy(rot);
+                //if (i > endEase)
+                //{
+                    //scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
+                //}
                 Vector2 realPos = pos + posOffset;
-                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.5f * scale.X)
+                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.25f * scale.X)
                     return true;
             }
 
@@ -130,12 +134,13 @@ namespace TerRoguelike.Projectiles
                 int rectY = i % tex.Height;
                 Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
                 Vector2 scale = new Vector2(1f);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 1f) * 0.5f;
-                float depth = MathHelper.Lerp(0.7f, 1f, interpolant);
-                float colorDepth = MathHelper.Lerp(0.2f, 1f, interpolant);
+                float interpolant = ((float)Math.Sin((float)i / tex.Height));
+                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
+                float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
+                float colorDepth = MathHelper.Lerp(0f, 1f, depthInterpolant);
                 scale.X *= depth;
                 Color color = Color.Lerp(Color.DarkGreen, Color.White, colorDepth);
-                posOffset += (Vector2.UnitX * MathHelper.Lerp(-12.5f, 12.5f, interpolant)).RotatedBy(rot);
+                posOffset += (Vector2.UnitX * MathHelper.Lerp(-8.5f, 8.5f, interpolant)).RotatedBy(rot);
                 if (i > endEase)
                 {
                     scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
