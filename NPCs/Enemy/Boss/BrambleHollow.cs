@@ -41,13 +41,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Attack None = new Attack(0, 0, 180);
         public Attack Burrow = new Attack(1, 40, 360);
         public Attack VineWall = new Attack(2, 30, 240);
-        public Attack RootLift = new Attack(3, 40, 280);
+        public Attack RootLift = new Attack(3, 40, 180);
         public Attack SeedBarrage = new Attack(4, 40, 150);
         public Attack Summon = new Attack(5, 20, 150);
         public int ballAttack1;
         public int ballAttack2;
         public Vector2 ballAttack1Pos;
         public Vector2 ballAttack2Pos;
+        public int rootAttack1;
+        public int rootAttack2;
 
         public override void SetStaticDefaults()
         {
@@ -133,6 +135,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             ballAttack2 = 120;
             ballAttack1Pos = NPC.Center + modNPC.drawCenter + new Vector2(100, 0).RotatedBy(NPC.rotation);
             ballAttack2Pos = NPC.Center + modNPC.drawCenter + new Vector2(-100, 0).RotatedBy(NPC.rotation);
+            rootAttack1 = 90;
+            rootAttack2 = 150;
 
 
             if (NPC.ai[0] == None.Id)
@@ -259,7 +263,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == RootLift.Id)
             {
-                if (NPC.ai[1] >= RootLift.Duration)
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.4f, Pitch = 0 }, NPC.Center);
+                }
+                if (NPC.ai[1] == rootAttack1 || NPC.ai[1] == rootAttack2)
+                {
+                    float rotateBy = (NPC.ai[3] * MathHelper.PiOver2) + MathHelper.Pi;
+                    Vector2 checkDirection = new Vector2(0, -16).RotatedBy(rotateBy);
+                    Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(NPC.ai[1] == rootAttack1 ? 320f : -320f, 0);
+                    for (int i = 0; i < 100; i++)
+                    {
+                        Vector2 offsetTargetPos = (targetPos + (checkDirection * i));
+                        Point targetTilePos = offsetTargetPos.ToTileCoordinates();
+                        if (ParanoidTileRetrieval(targetTilePos.X, targetTilePos.Y).IsTileSolidGround(true))
+                        {
+                            float ai0 = (int)NPC.ai[3] % 2 != 0 ? -NPC.ai[3] : (NPC.ai[3] == 2 ? 0 : 2);
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), targetTilePos.ToWorldCoordinates() + new Vector2(0, -32).RotatedBy(rotateBy), new Vector2(0, 12).RotatedBy(rotateBy), ModContent.ProjectileType<RootPillar>(), NPC.damage, 0f, -1, ai0);
+                            break;
+                        }
+                    }
+                }
+                else if (NPC.ai[1] >= RootLift.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -289,7 +314,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             NPC.ai[1] = 0;
             //List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall };
+            List<Attack> potentialAttacks = new List<Attack>() { Burrow, RootLift };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
             {
