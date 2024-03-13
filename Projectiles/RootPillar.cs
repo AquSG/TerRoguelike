@@ -48,9 +48,6 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            Projectile.damage = 1;
-            Projectile.hostile = true;
-            Projectile.friendly = false;
             float rot = Projectile.ai[0] * MathHelper.PiOver2;
             if (Projectile.ai[1] <= 0)
             {
@@ -109,7 +106,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (Projectile.timeLeft < maxTimeLeft - 50)
+            if (Projectile.timeLeft < maxTimeLeft - 35)
             {
                 Projectile.localAI[0] = Projectile.Center.X;
                 Projectile.localAI[1] = Projectile.Center.Y;
@@ -167,15 +164,17 @@ namespace TerRoguelike.Projectiles
             List<StoredDraw> drawList = new List<StoredDraw>();
 
             bool changeup = Projectile.ai[1] > 0;
-            for (int r = 0; r < 4; r++)
+            
+            for (int i = 0; i < length; i++)
             {
-                float periodOffset = (r * MathHelper.PiOver2) + (length * 0.006f);
-                for (int i = 0; i < length; i++)
+                int rectY = ((length - 1 - i) % tex.Height);
+                Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
+                List<StoredDraw> miniDrawList = new List<StoredDraw>();
+                for (int r = 0; r < 4; r++)
                 {
-                    float period = (float)Math.Sin(((float)i / tex.Height) + periodOffset);
+                    float periodOffset = (r * MathHelper.PiOver2) + (length * 0.006f);
                     Vector2 posOffset = (Vector2.UnitY * (i + 18 + (tex.Height * 0.5f))).RotatedBy(rot);
-                    int rectY = ((length - 1 - i) % tex.Height);
-                    Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
+                    
                     Vector2 scale = new Vector2(0.8f, 1f);
                     float interpolant = (float)Math.Sin(((float)i / tex.Height) + periodOffset);
                     float depthInterpolant = 1f - Math.Abs((float)Math.Sin(((float)i * 0.5f / tex.Height) + (periodOffset * 0.5f)));
@@ -208,15 +207,15 @@ namespace TerRoguelike.Projectiles
                                 over = 1f;
                             potentialOffset.X *= MathHelper.SmoothStep(1f, 3f * over, endEaseInterpolant);
                         }
-                        
+
                     }
                     posOffset += potentialOffset.RotatedBy(rot);
 
-                    drawList.Add(new StoredDraw(pos + posOffset - Main.screenPosition, rect, color, rot, scale, depthInterpolant));
+                    miniDrawList.Add(new StoredDraw(pos + posOffset - Main.screenPosition, rect, color, rot, scale, depthInterpolant));
                 }
+                miniDrawList.Sort((x, y) => x.depth.CompareTo(y.depth));
+                drawList.AddRange(miniDrawList);
             }
-
-            drawList.Sort((x, y) => x.depth.CompareTo(y.depth));
             for (int i = 0; i < drawList.Count; i++)
             {
                 StoredDraw d = drawList[i];
