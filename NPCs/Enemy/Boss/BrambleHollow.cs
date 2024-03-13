@@ -37,6 +37,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deadTime = 0;
         public int cutsceneDuration = 180;
         public int deathCutsceneDuration = 150;
+        public SoundStyle BramblePunch = new SoundStyle("TerRoguelike/Sounds/BramblePunch");
 
         public Attack None = new Attack(0, 0, 180);
         public Attack Burrow = new Attack(1, 40, 360);
@@ -265,7 +266,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[1] == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.4f, Pitch = 0 }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DeerclopsScream with { Volume = 0.4f, Pitch = -0.7f }, NPC.Center);
+                }
+                if (NPC.ai[1] == rootAttack1 - 35 || NPC.ai[1] == rootAttack2 - 35)
+                {
+                    SoundEngine.PlaySound(BramblePunch with { Volume = 0.7f, MaxInstances = 2 }, NPC.Center);
                 }
                 if (NPC.ai[1] == rootAttack1 || NPC.ai[1] == rootAttack2)
                 {
