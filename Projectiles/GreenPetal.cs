@@ -28,7 +28,7 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 16;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 160;
+            Projectile.timeLeft = 300;
             Projectile.penetrate = 1;
             Projectile.tileCollide = false;
         }
@@ -41,7 +41,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            if (Projectile.timeLeft % 4 == 0)
+            if (Projectile.timeLeft % 4 == 0 && Main.rand.NextBool())
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Grass, 0, 0, 0, default(Color), 0.9f);
                 Main.dust[d].velocity *= 0.4f;
@@ -49,13 +49,13 @@ namespace TerRoguelike.Projectiles
                 
             Projectile.frame = (Projectile.timeLeft / 4) % 2;
             Projectile.rotation = Projectile.rotation.AngleTowards(Projectile.velocity.ToRotation() + MathHelper.PiOver2, 0.3f);
-            if (Projectile.timeLeft > 120)
+            if (Projectile.timeLeft > 260)
             {
-                Projectile.velocity.Y *= 0.924f;
+                Projectile.velocity *= 0.924f;
                 return;
             }
 
-            if (Projectile.timeLeft == 120)
+            if (Projectile.timeLeft == 260)
             {
                 GetTarget();
                 float direction = MathHelper.PiOver2;
