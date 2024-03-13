@@ -34,6 +34,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int horizontalFrame;
         public Texture2D lightTex;
         public Texture2D ballTex;
+        float oldOpacity = 0;
         public int deadTime = 0;
         public int cutsceneDuration = 180;
         public int deathCutsceneDuration = 150;
@@ -279,7 +280,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         Vector2 particleVel = new Vector2(0, -2).RotatedBy(rotateBy + (i / 10f * MathHelper.TwoPi) + Main.rand.NextFloat(-0.08f, 0.08f));
                         Vector2 scale = new Vector2(0.07f);
                         particlePos += particleVel * -10f;
-                        ParticleManager.AddParticle(new ThinSpark(particlePos, particleVel, 25, Color.SandyBrown * 0.55f, scale, particleVel.ToRotation(), true));
+                        ParticleManager.AddParticle(new ThinSpark(particlePos, particleVel, 25, Color.SandyBrown * 0.60f, scale, particleVel.ToRotation(), true));
                     }
                 }
                 if (NPC.ai[1] == rootAttack1 || NPC.ai[1] == rootAttack2)
@@ -311,7 +312,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else if (NPC.ai[1] >= RootLift.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = None.Duration - 60;
+                    NPC.ai[1] = 0;
                     NPC.ai[2] = RootLift.Id;
                 }
             }
@@ -606,7 +607,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
-            float glowOpacity = 0.8f + (float)(Math.Cos(Main.GlobalTimeWrappedHourly) * 0.2f);
+            float newOpacity = 0.7f + (float)(Math.Cos(Main.GlobalTimeWrappedHourly) * 0.2f); ;
+            if (NPC.ai[0] == Burrow.Id)
+            {
+                float halfBurrowTime = (Burrow.Duration * 0.5f);
+                newOpacity = MathHelper.Lerp(-0.75f, newOpacity, Math.Abs((NPC.ai[1] - halfBurrowTime) / halfBurrowTime));
+            }
+            else if (NPC.ai[0] == RootLift.Id && NPC.ai[1] < rootAttack1 - 20)
+            {
+                newOpacity = 1f;
+            }
+
+            float glowOpacity = MathHelper.Lerp(oldOpacity, newOpacity, 0.1f);
+            oldOpacity = glowOpacity;
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             Main.EntitySpriteDraw(lightTex, drawPos - Main.screenPosition, NPC.frame, Color.White * glowOpacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             return false;
