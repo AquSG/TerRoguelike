@@ -14,6 +14,8 @@ using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using System.Linq;
+using ReLogic.Utilities;
+using Microsoft.Xna.Framework.Audio;
 
 namespace TerRoguelike.Projectiles
 {
@@ -22,6 +24,9 @@ namespace TerRoguelike.Projectiles
         Vector2 spawnPos;
         Vector2 startVel;
         int maxTimeLeft;
+        SlotId RootSound;
+        SoundStyle RootLoop = new SoundStyle("TerRoguelike/Sounds/RootLoop");
+        SoundStyle RootImpact = new SoundStyle("TerRoguelike/Sounds/RootImpact", 12);
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1600;
@@ -45,9 +50,34 @@ namespace TerRoguelike.Projectiles
         {
             spawnPos = Projectile.Center;
             startVel = Projectile.velocity;
+            RootSound = SoundEngine.PlaySound(RootLoop with { Volume = 0.3f, MaxInstances = 3, IsLooped = true }, Projectile.Center);
         }
         public override void AI()
         {
+            if (SoundEngine.TryGetActiveSound(RootSound, out var rootSound))
+            {
+                rootSound.Position = Projectile.Center;
+                if (Projectile.timeLeft <= maxTimeLeft - 30 && Projectile.ai[1] == 0)
+                {
+                    rootSound.Sound.Volume = 0.7f;
+                }
+                if (Projectile.ai[1] > 0 && Projectile.localAI[2] == 0)
+                {
+                    Projectile.localAI[2] = 1;
+                    rootSound.Stop();
+                }
+                if (Projectile.localAI[2] == 2)
+                {
+                    rootSound.Volume = MathHelper.Clamp((Projectile.Center - spawnPos).Length() / 320f, 0, 1f);
+                }
+                rootSound.Update();
+            }
+            if (Projectile.localAI[2] == 1)
+            {
+                Projectile.localAI[2] = 2;
+                RootSound = SoundEngine.PlaySound(RootLoop with { Volume = 0.3f, Pitch = -1f, MaxInstances = 3, IsLooped = true }, Projectile.Center);
+            }
+            
             float rot = Projectile.ai[0] * MathHelper.PiOver2;
             if (Projectile.ai[1] <= 0)
             {
@@ -113,6 +143,13 @@ namespace TerRoguelike.Projectiles
                 Projectile.ai[2] = Projectile.timeLeft;
 
                 Projectile.ai[1] += 10;
+
+                SoundEngine.PlaySound(RootImpact with { Volume = 0.5f, MaxInstances = 2, Pitch = -0.5f }, Projectile.Center);
+                for (int i = 0; i < 15; i++)
+                {
+                    Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.WoodFurniture, 0, 0, 0, default, 1.6f);
+                    d.velocity *= 1.5f;
+                }
                 if (Projectile.ai[1] > 0)
                 {
                     Projectile.velocity = Vector2.Zero;
@@ -152,6 +189,13 @@ namespace TerRoguelike.Projectiles
             }
 
             return false;
+        }
+        public override void OnKill(int timeLeft)
+        {
+            if (SoundEngine.TryGetActiveSound(RootSound, out var rootSound))
+            {
+                rootSound.Stop();
+            }
         }
         public override bool PreDraw(ref Color lightColor)
         {
