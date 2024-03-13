@@ -115,7 +115,7 @@ namespace TerRoguelike.Projectiles
                     //scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
                 //}
                 Vector2 realPos = pos + posOffset;
-                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.33f * scale.X)
+                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.5f * scale.X)
                     return true;
             }
 

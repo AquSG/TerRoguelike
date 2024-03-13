@@ -44,7 +44,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Attack Burrow = new Attack(1, 40, 360);
         public Attack VineWall = new Attack(2, 30, 240);
         public Attack RootLift = new Attack(3, 40, 180);
-        public Attack SeedBarrage = new Attack(4, 40, 150);
+        public Attack SeedBarrage = new Attack(4, 40, 90);
         public Attack Summon = new Attack(5, 20, 150);
         public int ballAttack1;
         public int ballAttack2;
@@ -143,6 +143,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                if (target != null)
+                {
+                    if (target.Center.X > NPC.Center.X)
+                        NPC.direction = 1;
+                    else
+                        NPC.direction = -1;
+                }
+                else
+                    NPC.direction = 1;
+
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -318,6 +328,29 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == SeedBarrage.Id)
             {
+                int attackStart = 30;
+                bool shoot = NPC.ai[1] % 5 == 0;
+                float rotOff = MathHelper.Pi * 0.20f;
+                int direction = NPC.direction * (NPC.ai[3] == 2 ? -1 : 1);
+                if (NPC.ai[1] >= 15 && NPC.ai[1] <= 75 && shoot)
+                {
+                    float progress = (NPC.ai[1] - 15) / (60);
+                    Vector2 pos = new Vector2(0, -48).RotatedBy(((-rotOff + (progress * rotOff * 2)) * direction) + NPC.rotation);
+                    Vector2 velocity = pos.SafeNormalize(Vector2.UnitY) * 3f;
+                    pos += NPC.Center;
+                    SoundEngine.PlaySound(SoundID.Item5 with { Volume = 0.6f }, pos);
+                    Vector2 scale = new Vector2(0.1f);
+                    ParticleManager.AddParticle(new ThinSpark(pos, velocity, 30, Color.Green, scale, velocity.ToRotation(), true));
+                }
+                if (NPC.ai[1] >= attackStart && shoot)
+                {
+                    
+                    float progress = (NPC.ai[1] - attackStart) / (SeedBarrage.Duration - attackStart);
+                    Vector2 pos = new Vector2(0, -72).RotatedBy(((-rotOff + (progress * rotOff * 2)) * direction) + NPC.rotation);
+                    Vector2 velocity = pos.SafeNormalize(Vector2.UnitY) * 7f;
+                    pos += NPC.Center;
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, velocity, ModContent.ProjectileType<GreenPetal>(), NPC.damage, 0);
+                }
                 if (NPC.ai[1] >= SeedBarrage.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -339,7 +372,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             NPC.ai[1] = 0;
             //List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift };
+            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
             {
