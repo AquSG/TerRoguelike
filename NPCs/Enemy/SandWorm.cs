@@ -134,11 +134,11 @@ namespace TerRoguelike.NPCs.Enemy
                     else
                         texture = bodyTex;
 
-                    Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
-                    Vector3 colorHSL = Main.rgbToHsl(color);
                     float outlineThickness = 1f;
                     SpriteEffects spriteEffects = NPC.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
+                    Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
+                    Vector3 colorHSL = Main.rgbToHsl(color);
                     GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
                     GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
                     GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
