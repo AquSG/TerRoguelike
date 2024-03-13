@@ -668,13 +668,17 @@ namespace TerRoguelike.Systems
                 return;
 
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Color color = Color.HotPink;
+            Vector3 colorHSL = Main.rgbToHsl(color);
+            GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(0.4f);
+            GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+            GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
             for (int i = 0; i < SpawnManager.pendingEnemies.Count; i++)
             {
                 PendingEnemy enemy = SpawnManager.pendingEnemies[i];
                 Texture2D texture = enemy.dummyTex;
                 int frameCount = Main.npcFrameCount[enemy.NPCType];
                 int height = (int)(texture.Height / frameCount);
-                Color color = Color.HotPink * (0.9f);
                 float completion = enemy.TelegraphDuration / (float)enemy.MaxTelegraphDuration;
                 int cutoff = (int)(completion * height);
                 Main.EntitySpriteDraw(texture, enemy.Position + new Vector2(0, cutoff) - Main.screenPosition, new Rectangle(0, cutoff, texture.Width, height - cutoff), color, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);

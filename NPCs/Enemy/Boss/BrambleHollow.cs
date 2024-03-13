@@ -270,13 +270,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] == rootAttack1 - 35 || NPC.ai[1] == rootAttack2 - 35)
                 {
+                    float rotateBy = (NPC.ai[3] * MathHelper.PiOver2) + MathHelper.Pi;
                     SoundEngine.PlaySound(BramblePunch with { Volume = 0.7f, MaxInstances = 2 }, NPC.Center);
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Vector2 particlePos = NPC.ai[1] < rootAttack2 - 35 ? new Vector2(108, 24).RotatedBy(rotateBy) : new Vector2(-108, 24).RotatedBy(rotateBy);
+                        particlePos += NPC.Center;
+                        Vector2 particleVel = new Vector2(0, -2).RotatedBy(rotateBy + (i / 10f * MathHelper.TwoPi) + Main.rand.NextFloat(-0.08f, 0.08f));
+                        Vector2 scale = new Vector2(0.07f);
+                        particlePos += particleVel * -10f;
+                        ParticleManager.AddParticle(new ThinSpark(particlePos, particleVel, 25, Color.SandyBrown * 0.55f, scale, particleVel.ToRotation(), true));
+                    }
                 }
                 if (NPC.ai[1] == rootAttack1 || NPC.ai[1] == rootAttack2)
                 {
                     float rotateBy = (NPC.ai[3] * MathHelper.PiOver2) + MathHelper.Pi;
                     Vector2 checkDirection = new Vector2(0, -16).RotatedBy(rotateBy);
-                    Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(NPC.ai[1] == rootAttack1 ? 320f : -320f, 0);
+                    Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(NPC.ai[1] == rootAttack1 ? -240f : 240f, 0).RotatedBy(NPC.rotation);
                     for (int i = 0; i < 100; i++)
                     {
                         Vector2 offsetTargetPos = (targetPos + (checkDirection * i));
@@ -288,11 +298,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             break;
                         }
                     }
+                    for (int i = -10; i <= 10; i++)
+                    {
+                        Vector2 particlePos = NPC.ai[1] < rootAttack2 ? new Vector2(48, -64).RotatedBy(rotateBy) : new Vector2(-48, -64).RotatedBy(rotateBy);
+                        particlePos += NPC.Center;
+                        Vector2 particleVel = new Vector2(0, 2).RotatedBy(rotateBy + (0.1f * i) + Main.rand.NextFloat(-0.08f, 0.08f));
+                        Vector2 scale = new Vector2(0.05f);
+                        particlePos += particleVel * 7.5f;
+                        ParticleManager.AddParticle(new ThinSpark(particlePos, particleVel, 30, Color.SandyBrown * 0.65f, scale, particleVel.ToRotation(), true));
+                    }
                 }
                 else if (NPC.ai[1] >= RootLift.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = None.Duration - 60;
                     NPC.ai[2] = RootLift.Id;
                 }
             }
@@ -319,7 +338,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             NPC.ai[1] = 0;
             //List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Burrow, RootLift };
+            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
             {
@@ -471,7 +490,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.drawCenter = (NPC.Bottom - NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + 2)).RotatedBy(NPC.rotation);
 
             int frameCount = Main.npcFrameCount[Type];
-            int frameWidth = TextureAssets.Npc[Type].Value.Width / 2;
+            int frameWidth = TextureAssets.Npc[Type].Value.Width / 3;
             currentFrame = (int)NPC.frameCounter % (frameCount - 5);
             horizontalFrame = 0;
 
@@ -496,6 +515,37 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     currentFrame = 0;
 
                 NPC.frameCounter = 3;
+            }
+            else if (NPC.ai[0] == RootLift.Id)
+            {
+                int animLength = 36;
+                int anim1Start = rootAttack1 - animLength;
+                int anim2Start = rootAttack2 - animLength;
+                if (NPC.ai[1] < anim1Start)
+                {
+                    horizontalFrame = 1;
+                    currentFrame = 5;
+                }
+                else if (NPC.ai[1] < rootAttack1)
+                {
+                    horizontalFrame = 2;
+                    currentFrame = NPC.ai[1] - anim1Start < 27 ? 0 : ((int)NPC.ai[1] - anim1Start - 27) / 3;
+                }
+                else if (NPC.ai[1] < anim2Start)
+                {
+                    horizontalFrame = 2;
+                    currentFrame = NPC.ai[1] - rootAttack1 < 17 ? 3 : 1;
+                }
+                else if (NPC.ai[1] < rootAttack2)
+                {
+                    horizontalFrame = 2;
+                    currentFrame = (NPC.ai[1] - anim2Start < 27 ? 0 : ((int)NPC.ai[1] - anim2Start - 27) / 3) + 4;
+                }
+                else
+                {
+                    horizontalFrame = 2;
+                    currentFrame = NPC.ai[1] - rootAttack2 < 20 ? 7 : 5;
+                }
             }
 
             NPC.frame = new Rectangle(horizontalFrame * frameWidth, currentFrame * frameHeight, frameWidth, frameHeight);

@@ -266,7 +266,6 @@ namespace TerRoguelike.TerPlayer
         #region Always Active Effects
         public override void UpdateEquips()
         {
-
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 Player.noFallDmg = true;

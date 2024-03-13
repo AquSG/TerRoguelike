@@ -101,6 +101,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/StoneDroneGlow",
                 "TerRoguelike/Projectiles/PaladinHammer",
                 "TerRoguelike/Particles/Spark",
+                "TerRoguelike/Particles/ThinSpark",
                 "TerRoguelike/Particles/Square",
                 "TerRoguelike/ExtraTextures/GodRay",
                 "TerRoguelike/NPCs/Enemy/Boss/BrambleHollowGlow",
