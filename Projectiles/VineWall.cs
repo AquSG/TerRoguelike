@@ -101,7 +101,7 @@ namespace TerRoguelike.Projectiles
             Vector2 pos = spawnPos;
             float rot = Projectile.ai[0] * MathHelper.PiOver2;
             int endEase = length - 8;
-            for (int i = 0; i < length; i += 8)
+            for (int i = 0; i < length; i += 6)
             {
                 Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
                 Vector2 scale = new Vector2(1f);
@@ -115,7 +115,7 @@ namespace TerRoguelike.Projectiles
                     //scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
                 //}
                 Vector2 realPos = pos + posOffset;
-                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.25f * scale.X)
+                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.33f * scale.X)
                     return true;
             }
 
