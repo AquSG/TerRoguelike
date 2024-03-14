@@ -38,6 +38,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 195;
         public int cutsceneBurrowFinish = -60;
         public int deathCutsceneDuration = 150;
+        public int deathBurnStartTime = 60;
         public SoundStyle BramblePunch = new SoundStyle("TerRoguelike/Sounds/BramblePunch");
 
         public Attack None = new Attack(0, 0, 180);
@@ -592,6 +593,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (deadTime > deathBurnStartTime)
+            {
+                int frameHeight = TextureAssets.Npc[Type].Value.Height / Main.npcFrameCount[Type];
+                float interpolant = (deadTime - deathBurnStartTime) / (deathCutsceneDuration - (float)deathBurnStartTime);
+                float offset = MathHelper.Lerp(0, frameHeight * 0.93f, interpolant);
+                Vector2 basePos = NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + offset - 19).RotatedBy(NPC.rotation);
+                //float halfFrameWidth = (TextureAssets.Npc[Type].Value.Width / 3f) * 0.5f;
+                float halfFrameWidth = (NPC.width) * 0.8f * MathHelper.SmoothStep(1f, 0.6f, Math.Abs(interpolant - 0.5f) * 2f);
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector2 particlePos = basePos + new Vector2(Main.rand.NextFloat(-halfFrameWidth, halfFrameWidth), 0).RotatedBy(NPC.rotation);
+                    Vector2 scale = new Vector2(1f);
+                    float randInterpolant = Main.rand.NextFloat(0.85f, 1f);
+                    Color color = Color.Lerp(Color.Brown, Color.Black, randInterpolant);
+                    ParticleManager.AddParticle(new Ash(particlePos, Vector2.Zero, 180, color, scale, 0, 0.96f, 0.04f, 30, Main.rand.Next(20, 40), false));
+                }
+            }
+
             if (deadTime >= deathCutsceneDuration)
             {
                 NPC.immortal = false;
@@ -678,6 +697,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 horizontalFrame = 1;
                 currentFrame = 5;
             }
+            if (deadTime > 0)
+            {
+                horizontalFrame = 1;
+                currentFrame = 5;
+            }
 
             NPC.frame = new Rectangle(horizontalFrame * frameWidth, currentFrame * frameHeight, frameWidth, frameHeight);
 
@@ -692,6 +716,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.frame.Height -= rectCutoff;
                 }
 
+
+                modNPC.drawCenter += (Vector2.UnitY * offset * 0.5f).RotatedBy(NPC.rotation);
+            }
+            else if (deadTime > deathBurnStartTime)
+            {
+                float offset = MathHelper.Lerp(0, frameHeight, (deadTime - deathBurnStartTime) / (deathCutsceneDuration - (float)deathBurnStartTime));
+                int rectCutoff = (int)offset;
+                if (rectCutoff > NPC.frame.Height)
+                    rectCutoff = NPC.frame.Height;
+                if (rectCutoff > 0)
+                {
+                    NPC.frame.Y += rectCutoff;
+                    NPC.frame.Height -= rectCutoff;
+                }
 
                 modNPC.drawCenter += (Vector2.UnitY * offset * 0.5f).RotatedBy(NPC.rotation);
             }
@@ -731,7 +769,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
-
             if ((int)NPC.ai[0] == VineWall.Id && NPC.ai[1] < 120)
             {
                 float interpolant = MathHelper.Clamp(MathHelper.SmoothStep(0, 1f, NPC.ai[1] / ballAttack1), 0, 1f);
@@ -761,6 +798,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             float glowOpacity = MathHelper.Lerp(oldOpacity, newOpacity, 0.1f);
             oldOpacity = glowOpacity;
+
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             Main.EntitySpriteDraw(lightTex, drawPos - Main.screenPosition, NPC.frame, Color.White * glowOpacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             return false;

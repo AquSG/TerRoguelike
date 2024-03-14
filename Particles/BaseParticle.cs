@@ -61,5 +61,11 @@ namespace TerRoguelike.Particles
         {
             Main.EntitySpriteDraw(texture, position - Main.screenPosition, frame, color, rotation, frame.Size() * 0.5f, scale, spriteEffects);
         }
+        public Vector2 CheckFutureTileCollision()
+        {
+            Vector2 end = position + velocity;
+            Vector2 potentialPos = TileCollidePositionInLine(position, end);
+            return potentialPos;
+        }
     }
 }
