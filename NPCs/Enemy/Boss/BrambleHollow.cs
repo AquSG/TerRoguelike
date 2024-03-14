@@ -35,7 +35,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D ballTex;
         float oldOpacity = 0;
         public int deadTime = 0;
-        public int cutsceneDuration = 180;
+        public int cutsceneDuration = 195;
+        public int cutsceneBurrowFinish = -60;
         public int deathCutsceneDuration = 150;
         public SoundStyle BramblePunch = new SoundStyle("TerRoguelike/Sounds/BramblePunch");
 
@@ -107,6 +108,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             canBeHit = !(NPC.ai[0] == Burrow.Id && Math.Abs(NPC.ai[1] - (Burrow.Duration * 0.5f)) < 60);
 
             NPC.velocity += new Vector2(0, 0.1f).RotatedBy(MathHelper.PiOver2 * NPC.ai[3]);
+            NPC.frameCounter += 0.18d;
 
             if (NPC.localAI[0] < 0)
             {
@@ -116,7 +118,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
-                if (NPC.localAI[0] == -30)
+                if (NPC.localAI[0] < cutsceneBurrowFinish)
+                {
+                    BurrowEffect();
+                }
+                else if (NPC.localAI[0] == cutsceneBurrowFinish)
+                {
+                    //SoundEngine.PlaySound(SoundID.DeerclopsScream with { Volume = 0.4f, Pitch = -0.7f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DeerclopsScream with { Volume = 0.4f, Pitch = -0.9f }, NPC.Center);
+                }
+                else if (NPC.localAI[0] == -30)
                 {
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
@@ -133,7 +144,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             target = modNPC.GetTarget(NPC, false, false);
 
             NPC.ai[1]++;
-            NPC.frameCounter += 0.18d;
 
             ballAttack1Pos = NPC.Center + modNPC.drawCenter + new Vector2(100, 0).RotatedBy(NPC.rotation);
             ballAttack2Pos = NPC.Center + modNPC.drawCenter + new Vector2(-100, 0).RotatedBy(NPC.rotation);
@@ -164,11 +174,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[1] < 80 || NPC.ai[1] > (int)(Burrow.Duration * 0.5f) + 1)
                 {
-                    for (int i = 0; i < 2; i++)
-                    {
-                        Vector2 pos = new Vector2(Main.rand.NextFloat(-NPC.width * 0.5f, NPC.width * 0.5f), NPC.height * 0.5f).RotatedBy(NPC.rotation) + NPC.Center;
-                        Dust d = Dust.NewDustPerfect(pos, DustID.WoodFurniture, null, 0, default, 1);
-                    }
+                    BurrowEffect();
                 }
                 if (NPC.ai[1] == (int)(Burrow.Duration * 0.5f))
                 {
@@ -294,7 +300,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     float rotateBy = (NPC.ai[3] * MathHelper.PiOver2) + MathHelper.Pi;
                     Vector2 checkDirection = new Vector2(0, -16).RotatedBy(rotateBy);
-                    Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(NPC.ai[1] == rootAttack1 ? -240f : 240f, 0).RotatedBy(NPC.rotation);
+                    Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(NPC.ai[1] == rootAttack1 ? -160f : 160f, 0).RotatedBy(NPC.rotation);
                     for (int i = 0; i < 100; i++)
                     {
                         Vector2 offsetTargetPos = (targetPos + (checkDirection * i));
@@ -472,6 +478,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             NPC.ai[0] = chosenAttack;
         }
+        public void BurrowEffect()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                Vector2 pos = new Vector2(Main.rand.NextFloat(-NPC.width * 0.5f, NPC.width * 0.5f), NPC.height * 0.5f).RotatedBy(NPC.rotation) + NPC.Center;
+                Dust d = Dust.NewDustPerfect(pos, DustID.WoodFurniture, null, 0, default, 1);
+            }
+        }
         public override bool? CanFallThroughPlatforms()
         {
             return true;
@@ -601,7 +615,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             currentFrame = (int)NPC.frameCounter % (frameCount - 5);
             horizontalFrame = 0;
 
-            if (NPC.ai[0] == Burrow.Id)
+            if (NPC.ai[0] == Burrow.Id || NPC.localAI[0] < cutsceneBurrowFinish)
                 currentFrame += 5;
             else if (NPC.ai[0] == VineWall.Id && NPC.ai[1] < ballAttack2 + 48)
             {
@@ -659,10 +673,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 horizontalFrame = 1;
                 currentFrame = 0;
             }
+            else if (NPC.localAI[0] < 0 && NPC.localAI[1] >= cutsceneBurrowFinish)
+            {
+                horizontalFrame = 1;
+                currentFrame = 5;
+            }
 
             NPC.frame = new Rectangle(horizontalFrame * frameWidth, currentFrame * frameHeight, frameWidth, frameHeight);
 
-            if (NPC.ai[0] == Burrow.Id)
+            if (NPC.ai[0] == Burrow.Id || NPC.localAI[0] < cutsceneBurrowFinish)
             {
                 float offset = GetOffset();
                 int rectCutoff = (int)offset - 40;
@@ -682,13 +701,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int halfTime = (int)(Burrow.Duration * 0.5f);
             float maxOffset = 240;
             float offset;
-            if (NPC.ai[1] < halfTime)
+            if (NPC.ai[0] == Burrow.Id)
             {
-                offset = MathHelper.SmoothStep(0, maxOffset, NPC.ai[1] / halfTime);
+                if (NPC.ai[1] < halfTime)
+                {
+                    offset = MathHelper.SmoothStep(0, maxOffset, NPC.ai[1] / halfTime);
+                }
+                else
+                {
+                    offset = MathHelper.SmoothStep(maxOffset, 0, (NPC.ai[1] - halfTime) / halfTime);
+                }
             }
             else
             {
-                offset = MathHelper.SmoothStep(maxOffset, 0, (NPC.ai[1] - halfTime) / halfTime);
+                offset = MathHelper.SmoothStep(0, maxOffset, -(NPC.localAI[0] - cutsceneBurrowFinish) / (cutsceneDuration + 30 + cutsceneBurrowFinish));
             }
             return offset;
         }
@@ -724,9 +750,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float halfBurrowTime = (Burrow.Duration * 0.5f);
                 newOpacity = MathHelper.Lerp(-0.75f, newOpacity, Math.Abs((NPC.ai[1] - halfBurrowTime) / halfBurrowTime));
             }
-            else if (NPC.ai[0] == RootLift.Id && NPC.ai[1] < rootAttack1 - 20)
+            else if ((NPC.ai[0] == RootLift.Id && NPC.ai[1] < rootAttack1 - 20) || (NPC.localAI[0] < 0 && NPC.localAI[1] >= cutsceneBurrowFinish))
             {
                 newOpacity = 1f;
+            }
+            else if (NPC.localAI[0] < cutsceneBurrowFinish)
+            {
+                newOpacity = MathHelper.Lerp(0, newOpacity, -(NPC.ai[1] - cutsceneBurrowFinish) / (cutsceneDuration + 30 + cutsceneBurrowFinish));
             }
 
             float glowOpacity = MathHelper.Lerp(oldOpacity, newOpacity, 0.1f);

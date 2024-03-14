@@ -13,6 +13,7 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -76,9 +77,8 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < length; i += 4)
             {
                 Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height));
-                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
-                float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
+                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 0.5f);
+
                 posOffset += (Vector2.UnitX * MathHelper.Lerp(-8.5f, 8.5f, interpolant)).RotatedBy(rot);
                 Vector2 realPos = pos + posOffset;
 
@@ -103,9 +103,9 @@ namespace TerRoguelike.Projectiles
             int endEase = length - 8;
             for (int i = 0; i < length; i += 6)
             {
-                Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
+                Vector2 posOffset = (Vector2.UnitY * (i)).RotatedBy(rot);
                 Vector2 scale = new Vector2(1f);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height));
+                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 0.5f);
                 float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
                 float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
                 scale.X *= depth;
@@ -115,7 +115,7 @@ namespace TerRoguelike.Projectiles
                     //scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
                 //}
                 Vector2 realPos = pos + posOffset;
-                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.5f * scale.X)
+                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.45f * scale.X)
                     return true;
             }
 
@@ -134,7 +134,7 @@ namespace TerRoguelike.Projectiles
                 int rectY = i % tex.Height;
                 Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
                 Vector2 scale = new Vector2(1f);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height));
+                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 0.5f);
                 float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
                 float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
                 float colorDepth = MathHelper.Lerp(0f, 1f, depthInterpolant);
@@ -147,6 +147,26 @@ namespace TerRoguelike.Projectiles
                 }
                 Main.EntitySpriteDraw(tex, pos + posOffset - Main.screenPosition, rect, color, rot, tex.Size() * 0.5f, scale, SpriteEffects.None);
             }
+
+            /* draws where collision is happening for debugging
+            Texture2D tempTex = TexDict["CircularGlow"];
+            for (int i = 0; i < length; i += 6)
+            {
+                Vector2 posOffset = (Vector2.UnitY * (i)).RotatedBy(rot);
+                Vector2 scale = new Vector2(1f);
+                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 0.5f);
+                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
+                float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
+                scale.X *= depth;
+                posOffset += (Vector2.UnitX * MathHelper.Lerp(-8.5f, 8.5f, interpolant)).RotatedBy(rot);
+                //if (i > endEase)
+                //{
+                //scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
+                //}
+                Vector2 realPos = pos + posOffset;
+                Main.EntitySpriteDraw(tempTex, realPos - Main.screenPosition, null, Color.White, 0f, tempTex.Size() * 0.5f, scale * 0.03f, SpriteEffects.None);
+            }
+            */
             return false;
         }
     }
