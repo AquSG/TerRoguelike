@@ -361,7 +361,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     bool onWall = NPC.ai[3] % 2 != 0;
                     desiredEnemy = onWall ? ModContent.NPCType<Tumbletwig>() : ModContent.NPCType<SeedLobber>();
-                    //SoundEngine.PlaySound(HammerRaise with { Volume = 0.6f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.5f, Pitch = -0.2f }, NPC.Center);
 
                     NPC dummyNPC = new NPC();
                     dummyNPC.type = desiredEnemy;

@@ -38,7 +38,7 @@ namespace TerRoguelike.Projectiles
             if (Projectile.velocity.Y > 7)
                 Projectile.velocity.Y = 7;
             else
-                Projectile.velocity.Y += 0.2f;
+                Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0.2f, 0, (Projectile.timeLeft - 170) / 10f), 0, 0.2f);
             Projectile.velocity.X *= 0.995f;
         }
 

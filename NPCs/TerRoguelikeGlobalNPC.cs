@@ -2170,7 +2170,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueTumbletwigAI(NPC npc, float speedCap, float acceleration, float attackDist, int projType, float projSpeed, int projDamage, int attackTelegraph, int attackDuration, int attackShootCooldown, int attackCooldown, float attackSpread)
         {
-            // I FUCKING HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATE SLOOOOOOOOOOOOOOOOOOOOOOOOOOOPES FUCK YOU RED FUUUUUUUUCK YOUUUUUUUUU I SWEAR TO FUCK WHY ARE SLOPES SO FUCKING JANK. I'LL JUST NEVER FUCKING USE THEM IN MY BUILDS
+            // I FUCKING HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATE SLOOOOOOOOOOOOOOOOOOOOOOOOOOOPES FUCK YOU RED FUUUUUUUUCK YOUUUUUUUUU I SWEAR TO FUCK WHY ARE SLOPES SO FUCKING JANK. I'LL JUST NEVER FUCKING USE THEM IN MY BUILDS. (edit- slopes should work now :] )
 
             Entity target = GetTarget(npc, false, false);
             //npc ai 3: 0 = right, 1 = down, 2 = left, 3 = up
