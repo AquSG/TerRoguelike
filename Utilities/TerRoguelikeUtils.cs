@@ -302,8 +302,16 @@ namespace TerRoguelike.Utilities
             float length = (start - end).Length();
             Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
 
-            if (length < 1f || length > lengthCap)
-                return end;
+            if (length < 1f)
+            {
+                Point endWorldPos = end.ToTileCoordinates();
+                return ParanoidTileRetrieval(endWorldPos.X, endWorldPos.Y).IsTileSolidGround(true) ? start : end;
+            }
+            else if (length > lengthCap)
+            {
+                length = lengthCap;
+            }
+                
 
             Vector2 currentPos = start;
             for (int i = 0; i < (int)length; i++)
