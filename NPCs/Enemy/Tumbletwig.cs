@@ -44,6 +44,28 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = false;
             NPC.noTileCollide = false;
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            NPC.direction = Main.rand.NextBool() ? 1 : -1; 
+            for (int i = 0; i < 4; i++)
+            {
+                float rot = MathHelper.PiOver2 * i;
+                Point checkPos = (NPC.Center + new Vector2((NPC.width * 0.5f) + 1, 0).RotatedBy(rot)).ToTileCoordinates();
+                if (ParanoidTileRetrieval(checkPos.X, checkPos.Y).IsTileSolidGround(true))
+                {
+                    NPC.ai[3] = i;
+                    NPC.ai[2] = 0;
+                    NPC.noGravity = true;
+                    NPC.velocity += new Vector2(16f, 0).RotatedBy(rot);
+                    NPC.position += new Vector2(0f, 0).RotatedBy(rot);
+                    if (i % 2 == 0)
+                        NPC.collideX = true;
+                    else
+                        NPC.collideY = true;
+                    break;
+                }
+            }
+        }
         public override void AI()
         {
             if (NPC.noGravity)
@@ -55,7 +77,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.RogueTumbletwigAI(NPC, 2.5f, 0.02f, 400f, ModContent.ProjectileType<WoodSliver>(), 10f, NPC.damage, attackTelegraph, attackDuration, attackShootCooldown, 240, MathHelper.PiOver4 * 0.2f);
             if ((NPC.ai[0] - attackTelegraph) % attackShootCooldown == 0 && NPC.ai[0] <= attackTelegraph + attackDuration && NPC.ai[0] >= attackTelegraph)
             {
-                SoundEngine.PlaySound(SoundID.Item39 with { Volume = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item39 with { Volume = 1f, MaxInstances = 8 }, NPC.Center);
             }
         }
         public override void HitEffect(NPC.HitInfo hit)

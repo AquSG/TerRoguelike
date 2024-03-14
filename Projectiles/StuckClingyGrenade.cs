@@ -45,7 +45,20 @@ namespace TerRoguelike.Projectiles
             if (stuckNPC != -1)
             {
                 NPC npc = Main.npc[stuckNPC];
-                if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage)
+                bool destick = false;
+
+                Rectangle npcRect = npc.Hitbox;
+                MultipliableFloat f = new MultipliableFloat();
+                int immunitySlot = 0;
+                if (npc.ModNPC != null)
+                {
+                    npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
+                    if (!Projectile.getRect().Intersects(npcRect))
+                    {
+                        destick = true;
+                    }
+                }
+                if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || destick)
                 {
                     stuckNPC = -1;
                     stuckPosition = Vector2.Zero;
@@ -58,11 +71,21 @@ namespace TerRoguelike.Projectiles
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (npc.active && npc.life > 0 && !npc.dontTakeDamage && !npc.immortal && Projectile.getRect().Intersects(npc.getRect()))
+                    if (npc.active && npc.life > 0 && !npc.dontTakeDamage && !npc.immortal)
                     {
-                        stuckNPC = i;
-                        stuckPosition = Projectile.Center - Main.npc[i].Center;
-                        break;
+                        Rectangle npcRect = npc.Hitbox;
+                        MultipliableFloat f = new MultipliableFloat();
+                        int immunitySlot = 0;
+                        if (npc.ModNPC != null)
+                        {
+                            npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
+                            if (Projectile.getRect().Intersects(npcRect))
+                            {
+                                stuckNPC = i;
+                                stuckPosition = Projectile.Center - Main.npc[i].Center;
+                                break;
+                            }
+                        }
                     }
                 }
             }
