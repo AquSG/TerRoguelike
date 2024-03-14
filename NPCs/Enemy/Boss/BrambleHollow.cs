@@ -2,7 +2,6 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -46,12 +45,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Attack RootLift = new Attack(3, 40, 180);
         public Attack SeedBarrage = new Attack(4, 40, 90);
         public Attack Summon = new Attack(5, 20, 150);
-        public int ballAttack1;
-        public int ballAttack2;
+        public int ballAttack1 = 60;
+        public int ballAttack2 = 120;
         public Vector2 ballAttack1Pos;
         public Vector2 ballAttack2Pos;
-        public int rootAttack1;
-        public int rootAttack2;
+        public int rootAttack1 = 90;
+        public int rootAttack2 = 150;
+        public Vector2[] SummonSpawnPositions = new Vector2[] { new Vector2(-1), new Vector2(-1) };
+        public int summonTelegraph = 60;
+        public int desiredEnemy;
 
         public override void SetStaticDefaults()
         {
@@ -76,7 +78,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
-            //NPC ai 3 is used for the current cardinal direction the npc is.
+            //NPC ai 3 is used for the current cardinal direction the npc is. 0 - down, 1 - left, -1 - right, 2 - up 
             NPC.ai[3] = 0;
 
             NPC.immortal = true;
@@ -133,13 +135,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1]++;
             NPC.frameCounter += 0.18d;
 
-            ballAttack1 = 60;
-            ballAttack2 = 120;
             ballAttack1Pos = NPC.Center + modNPC.drawCenter + new Vector2(100, 0).RotatedBy(NPC.rotation);
             ballAttack2Pos = NPC.Center + modNPC.drawCenter + new Vector2(-100, 0).RotatedBy(NPC.rotation);
-            rootAttack1 = 90;
-            rootAttack2 = 150;
-
 
             if (NPC.ai[0] == None.Id)
             {
@@ -176,7 +173,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] == (int)(Burrow.Duration * 0.5f))
                 {
                     NPC.velocity = Vector2.Zero;
-                    List<int> directions = new List<int>() { -1, 0, 1, 2} ;
+                    List<int> directions = new List<int>() { -1, 0, 1, 2 };
                     directions.RemoveAll(x => x == (int)NPC.ai[3]);
                     int newDir = directions[Main.rand.Next(directions.Count)];
                     NPC.ai[3] = newDir;
@@ -190,7 +187,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             for (int i = 1; i < 25; i++)
                             {
-                                if (!ParanoidTileRetrieval(tilePos.X + (i  * -newDir), tilePos.Y).IsTileSolidGround(true))
+                                if (!ParanoidTileRetrieval(tilePos.X + (i * -newDir), tilePos.Y).IsTileSolidGround(true))
                                 {
                                     tilePos.X += (i * -newDir);
                                     break;
@@ -236,7 +233,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             NPC.Top = checkPos;
                         }
-                            
+
                     }
                 }
                 if (NPC.ai[1] >= Burrow.Duration)
@@ -344,7 +341,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= attackStart && shoot)
                 {
-                    
+
                     float progress = (NPC.ai[1] - attackStart) / (SeedBarrage.Duration - attackStart);
                     Vector2 pos = new Vector2(0, -72).RotatedBy(((-rotOff + (progress * rotOff * 2)) * direction) + NPC.rotation);
                     Vector2 velocity = pos.SafeNormalize(Vector2.UnitY) * 7f;
@@ -360,6 +357,83 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                if (NPC.ai[1] == 0)
+                {
+                    bool onWall = NPC.ai[3] % 2 != 0;
+                    desiredEnemy = onWall ? ModContent.NPCType<Tumbletwig>() : ModContent.NPCType<SeedLobber>();
+                    //SoundEngine.PlaySound(HammerRaise with { Volume = 0.6f }, NPC.Center);
+
+                    NPC dummyNPC = new NPC();
+                    dummyNPC.type = desiredEnemy;
+                    dummyNPC.SetDefaults(desiredEnemy);
+                    Rectangle dummyRect = new Rectangle(0, 0, dummyNPC.width, dummyNPC.height);
+                    for (int i = 0; i < SummonSpawnPositions.Length; i++)
+                    {
+                        int direction = i == 0 ? -1 : 1;
+                        float rotateBy = onWall ? NPC.rotation : 0;
+                        float distanceBeside = 180f * direction;
+                        Vector2 potentialSpawnPos = NPC.Center + new Vector2(distanceBeside, 0).RotatedBy(rotateBy);
+
+                        Vector2 checkDirection = new Vector2(0, 16).RotatedBy(rotateBy);
+                        for (int b = 0; b < 25; b++)
+                        {
+                            Point tilePos = (potentialSpawnPos + (checkDirection * b)).ToTileCoordinates();
+                            if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(onWall))
+                            {
+                                potentialSpawnPos = tilePos.ToWorldCoordinates() - (checkDirection * 0.5f);
+                                if (onWall)
+                                {
+                                    potentialSpawnPos += new Vector2(((dummyNPC.width * 0.5f)) * NPC.ai[3], -dummyNPC.height * 0.5f);
+                                }
+                                else
+                                {
+                                    potentialSpawnPos += new Vector2(0, -dummyNPC.height + 10);
+                                }
+                                SummonSpawnPositions[i] = potentialSpawnPos;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (NPC.ai[1] < summonTelegraph)
+                {
+                    int time = 20;
+                    float completion = NPC.ai[1] / summonTelegraph;
+                    float curveMultiplier = 1f - (float)Math.Pow(Math.Abs(completion - 0.5f) * 2, 2);
+                    for (int i = 0; i < SummonSpawnPositions.Length; i++)
+                    {
+                        int dir = i == 0 ? -1 : 1;
+                        if (NPC.ai[3] == 2)
+                            dir *= -1;
+
+                        Vector2 startPos = NPC.Center + new Vector2(100 * dir, -16).RotatedBy(NPC.rotation);
+
+                        Vector2 endPos = SummonSpawnPositions[i];
+                        if (endPos == new Vector2(-1))
+                            continue;
+                        endPos += new Vector2(0, 16);
+
+                        Vector2 particlePos = startPos + ((endPos - startPos) * completion) + (Vector2.UnitY * -32 * curveMultiplier).RotatedBy(NPC.rotation);
+                        particlePos += new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
+
+                        ParticleManager.AddParticle(new Square(particlePos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * 0.45f), 0, 0.96f, time, true));
+                    }
+                }
+                else if (NPC.ai[1] == summonTelegraph)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f }, NPC.Center);
+                    for (int i = 0; i < SummonSpawnPositions.Length; i++)
+                    {
+                        Vector2 pos = SummonSpawnPositions[i];
+                        if (pos == new Vector2(-1))
+                            continue;
+
+                        SpawnManager.SpawnEnemy(desiredEnemy, pos, modNPC.sourceRoomListID, 60, 0.45f);
+
+                        SummonSpawnPositions[i] = new Vector2(-1);
+                    }
+                }
                 if (NPC.ai[1] >= Summon.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -371,8 +445,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public void ChooseAttack()
         {
             NPC.ai[1] = 0;
-            //List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage };
+            List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
             {
@@ -426,7 +499,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
             npcHitbox = ModifiedHitbox();
-            
+
             return false;
         }
         public Rectangle ModifiedHitbox()
@@ -511,7 +584,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();
             }
-                
+
             return deadTime >= cutsceneDuration;
         }
         public override void OnKill()
@@ -581,6 +654,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     currentFrame = NPC.ai[1] - rootAttack2 < 20 ? 7 : 5;
                 }
             }
+            else if (NPC.ai[0] == Summon.Id && NPC.ai[1] < 90)
+            {
+                horizontalFrame = 1;
+                currentFrame = 0;
+            }
 
             NPC.frame = new Rectangle(horizontalFrame * frameWidth, currentFrame * frameHeight, frameWidth, frameHeight);
 
@@ -595,7 +673,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.frame.Height -= rectCutoff;
                 }
 
-                
+
                 modNPC.drawCenter += (Vector2.UnitY * offset * 0.5f).RotatedBy(NPC.rotation);
             }
         }

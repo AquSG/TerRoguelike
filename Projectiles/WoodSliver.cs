@@ -35,7 +35,11 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.velocity.Y += 0.2f;
+            if (Projectile.velocity.Y > 7)
+                Projectile.velocity.Y = 7;
+            else
+                Projectile.velocity.Y += 0.2f;
+            Projectile.velocity.X *= 0.995f;
         }
 
         public override Color? GetAlpha(Color lightColor)
