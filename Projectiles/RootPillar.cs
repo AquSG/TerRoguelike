@@ -16,6 +16,7 @@ using Terraria.GameContent;
 using System.Linq;
 using ReLogic.Utilities;
 using Microsoft.Xna.Framework.Audio;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -265,6 +266,25 @@ namespace TerRoguelike.Projectiles
                 StoredDraw d = drawList[i];
                 Main.EntitySpriteDraw(tex, d.pos, d.rect, d.color, rot, tex.Size() * 0.5f, d.scale, SpriteEffects.None);
             }
+
+            // draws where collision is happening for debugging
+            /*
+            Texture2D tempTex = TexDict["CircularGlow"];
+            for (int i = 0; i < length; i += 15)
+            {
+                Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
+                Vector2 scale = new Vector2(1f);
+
+                if (i > endEase)
+                {
+                    float endEaseInterpolant = ((i - endEase) / (length - (float)endEase));
+                    scale *= MathHelper.SmoothStep(1f, 0.1f, endEaseInterpolant);
+                }
+
+                Vector2 realPos = pos + posOffset;
+                Main.EntitySpriteDraw(tempTex, realPos - Main.screenPosition, null, Color.White, 0f, tempTex.Size() * 0.5f, scale * 0.03f, SpriteEffects.None);
+            }
+            */
             return false;
         }
     }
