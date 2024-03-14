@@ -29,7 +29,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Grass with { Volume = 1f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.DD2_GoblinBomberThrow with { Volume = 1f }, Projectile.Center);
             Projectile.localAI[0] = Math.Sign(Projectile.velocity.X);
             if (Projectile.localAI[0] == 0)
                 Projectile.localAI[0] = 1;

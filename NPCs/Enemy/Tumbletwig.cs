@@ -46,7 +46,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.direction = Main.rand.NextBool() ? 1 : -1; 
+            NPC.direction = Main.rand.NextBool() ? 1 : -1;
+            NPC.ai[3] = 1;
             for (int i = 0; i < 4; i++)
             {
                 float rot = MathHelper.PiOver2 * i;
@@ -57,7 +58,6 @@ namespace TerRoguelike.NPCs.Enemy
                     NPC.ai[2] = 0;
                     NPC.noGravity = true;
                     NPC.velocity += new Vector2(16f, 0).RotatedBy(rot);
-                    NPC.position += new Vector2(0f, 0).RotatedBy(rot);
                     if (i % 2 == 0)
                         NPC.collideX = true;
                     else
