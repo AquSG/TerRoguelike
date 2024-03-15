@@ -98,6 +98,11 @@ namespace TerRoguelike.Systems
                 BarrierUI.Draw(Main.spriteBatch, Main.LocalPlayer);
                 return true;
             }, InterfaceScaleType.None));
+            layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Debug UI", () =>
+            {
+                DebugUI.Draw(Main.spriteBatch, Main.LocalPlayer);
+                return true;
+            }, InterfaceScaleType.None));
         }
     }
 }
