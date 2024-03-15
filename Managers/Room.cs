@@ -13,6 +13,7 @@ using static TerRoguelike.Managers.SpawnManager;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Shaders;
 using Terraria.GameContent;
+using Terraria.UI.Chat;
 
 namespace TerRoguelike.Managers
 {
@@ -485,6 +486,13 @@ namespace TerRoguelike.Managers
         }
         public virtual void PostDrawTilesRoom()
         {
+            if (TerRoguelikeWorld.IsDebugWorld)
+            {
+                string s = Key;
+                if (IsRoomVariant)
+                    s += "Var";
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, s, RoomPosition16 + (Top * 5) + new Vector2(0, -80) - Main.screenPosition, Color.White, 0f, Vector2.Zero, new Vector2(0.5f));
+            }
             if (RoomSystem.debugDrawNotSpawnedEnemies)
             {
                 if (!initialized && !IsBossRoom)

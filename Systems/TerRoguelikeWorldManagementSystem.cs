@@ -22,10 +22,14 @@ namespace TerRoguelike.Systems
 {
     public class TerRoguelikeWorldManagementSystem : ModSystem
     {
+        public static bool GenDebugWorld = false;
         //int taskCounter = 0;
         public override void PreWorldGen()
         {
-
+            if (WorldGen.currentWorldSeed == "TerRoguelikeMakeRoomDebugWorldPleaseTY")
+            {
+                GenDebugWorld = true;
+            }
         }
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
@@ -37,10 +41,17 @@ namespace TerRoguelike.Systems
                 progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
                 Main.worldSurface = 200;
                 Main.rockLayer = 225;
-                FillTheFuckingWorld(ref progress);
+                if (!GenDebugWorld)
+                    FillTheFuckingWorld(ref progress);
                 RoomManager.GenerateRoomStructure();
                 Main.spawnTileX = (Main.maxTilesX / 32) + 12;
                 Main.spawnTileY = (Main.maxTilesY / 2) + 12;
+                if (GenDebugWorld)
+                {
+                    Main.spawnTileY = (Main.maxTilesY / 12) + 12;
+                    GenDebugWorld = false;
+                    TerRoguelikeWorld.IsDebugWorld = true;
+                }
                 ItemManager.RoomRewardCooldown = 0;
                 TerRoguelikeWorld.IsTerRoguelikeWorld = true;
                 if (TerRoguelikeMenu.prepareForRoguelikeGeneration)

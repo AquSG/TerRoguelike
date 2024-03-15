@@ -13,6 +13,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.Floors;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Systems.TerRoguelikeWorldManagementSystem;
 
 namespace TerRoguelike.Managers
 {
@@ -33,7 +34,7 @@ namespace TerRoguelike.Managers
                 0,
                 2
             };
-            currentFloorGen = stage0Floors[Main.rand.Next(stage0Floors.Count)];
+            currentFloorGen = GenDebugWorld ? 0 : stage0Floors[Main.rand.Next(stage0Floors.Count)];
 
             FloorIDsInPlay = new List<int>();
             RoomSystem.RoomList = new List<Room>();
@@ -47,6 +48,10 @@ namespace TerRoguelike.Managers
 
             int startpositionX = Main.maxTilesX / 32;
             int startpositionY = Main.maxTilesY / 2;
+            if (GenDebugWorld)
+            {
+                startpositionY = Main.maxTilesY / 12;
+            }
 
             Point placementPoint = new Point(startpositionX, startpositionY);
 
@@ -60,6 +65,9 @@ namespace TerRoguelike.Managers
             RoomGenPool.Remove(firstRoom);
             
             PlaceSchematic(mapKey, placementPoint, anchorType);
+
+            if (GenDebugWorld)
+                roomCount = 200;
 
             PlaceRoom(roomCount, firstRoom);
         }
@@ -143,6 +151,9 @@ namespace TerRoguelike.Managers
             if (placementPoint.Y + selectedRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
                 placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y);
 
+            if (GenDebugWorld && !selectedRoom.HasTransition)
+                placementPoint.X += 3;
+
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;
             selectedRoom.RoomPosition = placementPoint.ToVector2();
 
@@ -170,6 +181,9 @@ namespace TerRoguelike.Managers
             if (placementPoint.Y + transitionRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
                 placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - transitionRoom.RoomDimensions.Y);
 
+            if (GenDebugWorld)
+                placementPoint.X += 3;
+
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;
             transitionRoom.RoomPosition = placementPoint.ToVector2();
 
@@ -194,12 +208,12 @@ namespace TerRoguelike.Managers
                 CheckDirAvailability(ref anyRight, ref anyDown, ref anyUp);
 
                 List<int> directionsAvailable = new List<int>();
-                if (previousRoom.CanExitRight && anyRight)
+                if ((previousRoom.CanExitRight || GenDebugWorld) && anyRight)
                 {
                     directionsAvailable.Add(0);
                 }
                     
-                if (previousRoom.CanExitDown && anyDown)
+                if ((previousRoom.CanExitDown || GenDebugWorld) && anyDown)
                 {
                     if (oldRoomDirections.Count > 2)
                     {
@@ -210,7 +224,7 @@ namespace TerRoguelike.Managers
                         directionsAvailable.Add(1);
                 }
                     
-                if (previousRoom.CanExitUp && anyUp)
+                if ((previousRoom.CanExitUp || GenDebugWorld) && anyUp)
                 {
                     if (oldRoomDirections.Count > 2)
                     {
@@ -221,13 +235,13 @@ namespace TerRoguelike.Managers
                         directionsAvailable.Add(2);
                 }
 
-                if (!directionsAvailable.Any() || directionsAvailable.Count == 0) //failsafe. if no directions available, just plop down the boss room
+                if ((!directionsAvailable.Any()) || directionsAvailable.Count == 0) //failsafe. if no directions available, just plop down the boss room
                 {
                     PlaceRoom(1, previousRoom);
                     return;
                 }
                     
-                int chosenDirection = directionsAvailable[Main.rand.Next(directionsAvailable.Count)];
+                int chosenDirection = GenDebugWorld ? 0 : directionsAvailable[Main.rand.Next(directionsAvailable.Count)];
 
                 if (chosenDirection == 1)
                 {
@@ -246,7 +260,9 @@ namespace TerRoguelike.Managers
                     placedRoom = PlaceRight(previousRoom);
                     oldRoomDirections.Add(0);
                 }
-                    
+
+                if (placedRoom == RoomID[0])
+                    roomCount = 1;
 
                 PlaceRoom(roomCount, placedRoom);
             }
@@ -254,6 +270,10 @@ namespace TerRoguelike.Managers
         public static Room PlaceRight(Room previousRoom)
         {
             Room selectedRoom = SelectRoom(0);
+            if (selectedRoom == RoomID[0])
+            {
+                return selectedRoom;
+            }
             
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -262,6 +282,9 @@ namespace TerRoguelike.Managers
             selectedRoom.RoomDimensions = schematicSize;
 
             Point placementPoint = new Point((int)(previousRoom.RoomPosition.X + previousRoom.RoomDimensions.X - 1), (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y));
+
+            if (GenDebugWorld)
+                placementPoint.X += 3;
 
             if (placementPoint.Y + selectedRoom.RoomDimensions.Y < (int)previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y)
                 placementPoint.Y = (int)(previousRoom.RoomPosition.Y + previousRoom.RoomDimensions.Y - selectedRoom.RoomDimensions.Y);
@@ -327,11 +350,21 @@ namespace TerRoguelike.Managers
 
             Room floorStartingRoom = RoomID[FloorID[currentFloorGen].StartRoomID];
             int roomCount = 8;
+            if (GenDebugWorld)
+                roomCount = 200;
 
             string mapKey = floorStartingRoom.Key;
             var schematic = TileMaps[mapKey];
 
-            Point placementPoint = new Point((int)previousRoom.RoomPosition.X + 200, FloorID[currentFloorGen].InHell ? Main.maxTilesY -  150 : Main.maxTilesY / 2);
+            Point placementPoint = new Point((int)previousRoom.RoomPosition.X + 200, Main.maxTilesY / 2);
+
+            if (GenDebugWorld)
+            {
+                placementPoint.X = Main.maxTilesX / 32;
+                placementPoint.Y = Main.maxTilesY / 12 * (currentFloorGen + (currentFloorGen > FloorDict["Hell"] ? 0 : 1));
+            }
+            if (FloorID[currentFloorGen].InHell)
+                placementPoint.Y = Main.maxTilesY - 150;
 
             Vector2 schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
             SchematicAnchor anchorType = SchematicAnchor.TopLeft;
@@ -480,9 +513,24 @@ namespace TerRoguelike.Managers
                     PlaceSchematic(mapKey, placementPoint, anchorType);
                 }
             }
+            if (GenDebugWorld)
+            {
+                ChooseNextFloor();
+                if (currentFloorGen != -1)
+                {
+                    GenerateNextFloor(previousRoom);
+                }
+            }
         }
         public static void ChooseNextFloor()
         {
+            if (GenDebugWorld)
+            {
+                currentFloorGen++;
+                if (currentFloorGen >= FloorID.Count)
+                    currentFloorGen = -1;
+                return;
+            }
             int currentStage = FloorID[currentFloorGen].Stage;
             List<Floor> nextFloors = FloorID.FindAll(x => x.Stage == currentStage + 1);
             if (nextFloors.Any())
@@ -516,7 +564,8 @@ namespace TerRoguelike.Managers
                 if (room.Key.Contains("Transition"))
                     continue;
 
-                bool containsDir = false;
+                bool containsDir = GenDebugWorld;
+
                 if (direction == 1 && room.Key.Contains("Down"))
                     containsDir = true;
                 else if (direction == 2 && room.Key.Contains("Up"))
@@ -527,11 +576,15 @@ namespace TerRoguelike.Managers
                 if (containsDir)
                 {
                     roomSelection.Add(room);
+                    //if (GenDebugWorld)
+                        //break;
                 }
             }
             if (roomSelection.Any())
             {
                 Room selectedRoom = roomSelection[Main.rand.Next(roomSelection.Count)];
+                if (GenDebugWorld)
+                    selectedRoom = roomSelection[0];
                 RoomGenPool.Remove(selectedRoom);
                 return selectedRoom;
             }

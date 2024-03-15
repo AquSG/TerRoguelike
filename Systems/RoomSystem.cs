@@ -317,8 +317,10 @@ namespace TerRoguelike.Systems
         {
             var isTerRoguelikeWorld = TerRoguelikeWorld.IsTerRoguelikeWorld;
             var isDeletableOnExit = TerRoguelikeWorld.IsDeletableOnExit;
+            var isDebugWorld = TerRoguelikeWorld.IsDebugWorld;
             tag["isTerRoguelikeWorld"] = isTerRoguelikeWorld;
             tag["isDeletableOnExit"] = isDeletableOnExit;
+            tag["isDebugWorld"] = isDebugWorld;
 
             if (RoomList == null)
                 return;
@@ -352,8 +354,10 @@ namespace TerRoguelike.Systems
             TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
+            var isDebugWorld = tag.GetBool("isDebugWorld");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
             TerRoguelikeWorld.IsDeletableOnExit = isDeletableOnExit;
+            TerRoguelikeWorld.IsDebugWorld = isDebugWorld;
             TerRoguelikeWorld.currentStage = 0;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
@@ -919,6 +923,7 @@ namespace TerRoguelike.Systems
             CutsceneSystem.cutsceneDisableControl = false;
             CutsceneSystem.cutsceneActive = false;
             Main.screenPosition = Main.Camera.UnscaledPosition;
+            TerRoguelikeWorld.IsDebugWorld = false;
         }
     }
     public class HealingPulse
