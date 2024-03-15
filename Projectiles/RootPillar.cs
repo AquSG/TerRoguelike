@@ -34,8 +34,8 @@ namespace TerRoguelike.Projectiles
         }
         public override void SetDefaults()
         {
-            Projectile.width = 18;
-            Projectile.height = 18;
+            Projectile.width = 16;
+            Projectile.height = 16;
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 660;
@@ -218,7 +218,7 @@ namespace TerRoguelike.Projectiles
                 for (int r = 0; r < 4; r++)
                 {
                     float periodOffset = (r * MathHelper.PiOver2) + (length * 0.006f);
-                    Vector2 posOffset = (Vector2.UnitY * (i + 18 + (tex.Height * 0.5f))).RotatedBy(rot);
+                    Vector2 posOffset = (Vector2.UnitY * (i + 16 + (tex.Height * 0.5f))).RotatedBy(rot);
                     
                     Vector2 scale = new Vector2(0.8f, 1f);
                     float interpolant = (float)Math.Sin(((float)i / tex.Height) + periodOffset);
