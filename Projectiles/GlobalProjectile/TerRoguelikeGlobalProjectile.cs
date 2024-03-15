@@ -24,6 +24,7 @@ namespace TerRoguelike.Projectiles
         public int homingCheckCooldown = 0;
         public int swingDirection = 0;
         public bool ultimateCollideOverride = false;
+        public bool killOnRoomClear = false;
         public int npcOwner = -1;
         public int npcOwnerType = -1;
         public override bool PreAI(Projectile projectile)
