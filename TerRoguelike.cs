@@ -21,6 +21,7 @@ namespace TerRoguelike
             NPCManager.Load();
             BarrierUI.Load();
             DeathUI.Load();
+            DebugUI.Load();
             if (!Main.dedServ)
             {
                 LoadClient();
@@ -37,6 +38,7 @@ namespace TerRoguelike
             pendingItems = null;
             BarrierUI.Unload();
             DeathUI.Unload();
+            DebugUI.Unload();
             ItemManager.Unload();
             NPCManager.Unload();
             TextureManager.Unload();
