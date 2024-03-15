@@ -40,6 +40,7 @@ namespace TerRoguelike.Rooms
         }
         public override void PostDrawTilesRoom()
         {
+            base.PostDrawTilesRoom();
             if (initialized)
                 return;
 

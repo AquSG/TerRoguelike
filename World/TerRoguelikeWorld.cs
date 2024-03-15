@@ -20,6 +20,7 @@ namespace TerRoguelike.World
     {
         public static bool IsTerRoguelikeWorld = false;
         public static bool IsDeletableOnExit = false;
+        public static bool IsDebugWorld = false;
         public static int currentStage = 0;
         public static bool lunarFloorInitialized = false;
         public static bool lunarBossSpawned = false;
