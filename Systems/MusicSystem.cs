@@ -59,6 +59,11 @@ namespace TerRoguelike.Systems
             new("TerRoguelike/Tracks/PaladinThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.33f },
             new("TerRoguelike/Tracks/PaladinThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.33f });
 
+        public static BossTheme BrambleHollowTheme = new(
+            new("TerRoguelike/Tracks/BrambleHollowTheme", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.4f },
+            new("TerRoguelike/Tracks/BrambleHollowThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.4f },
+            new("TerRoguelike/Tracks/BrambleHollowThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.4f });
+
         public static void PlayAllSounds()
         {
             if (PlayedAllSounds)
@@ -74,6 +79,9 @@ namespace TerRoguelike.Systems
             CombatMusic = SoundEngine.PlaySound(PaladinTheme.BattleTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(PaladinTheme.StartTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(PaladinTheme.EndTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.BattleTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.StartTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.EndTrack with { Volume = 0f });
 
             if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
             {
@@ -96,7 +104,7 @@ namespace TerRoguelike.Systems
         {
             ActiveBossTheme = bossTheme;
             ActiveBossTheme.startFlag = true;
-            SetCombat(PaladinTheme.StartTrack);
+            SetCombat(bossTheme.StartTrack);
             SetMusicMode(MusicStyle.Boss);
         }
         public static void SetMusicMode(MusicStyle newMode)
