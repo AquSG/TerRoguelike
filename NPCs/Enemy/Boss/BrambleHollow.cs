@@ -390,7 +390,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         int direction = i == 0 ? -1 : 1;
                         float rotateBy = onWall ? NPC.rotation : 0;
-                        float distanceBeside = 180f * direction;
+                        float distanceBeside = 196f * direction;
                         Vector2 potentialSpawnPos = NPC.Center + new Vector2(distanceBeside, 0).RotatedBy(rotateBy);
 
                         Vector2 checkDirection = new Vector2(0, 16).RotatedBy(rotateBy);
@@ -631,15 +631,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 int frameHeight = TextureAssets.Npc[Type].Value.Height / Main.npcFrameCount[Type];
                 float interpolant = (deadTime - deathDisintegrateStartTime) / (deathCutsceneDuration - (float)deathDisintegrateStartTime);
-                float offset = MathHelper.Lerp(0, frameHeight * 0.93f, interpolant);
-                Vector2 basePos = NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + offset - 19).RotatedBy(NPC.rotation);
+                float offset = MathHelper.Lerp(0, frameHeight * 0.96f, interpolant);
+                Vector2 basePos = NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + offset - 18).RotatedBy(NPC.rotation);
                 float halfFrameWidth = (NPC.width) * 0.8f * MathHelper.SmoothStep(1f, 0.6f, Math.Abs(interpolant - 0.5f) * 2f);
+                int count = 6;
                 if (interpolant > 0.51f && interpolant < 0.57f)
+                {
                     halfFrameWidth *= 1.28f;
-                for (int i = 0; i < 6; i++)
+                    count += 2;
+                }
+                for (int i = 0; i < count; i++)
                 {
                     Vector2 particlePos = basePos + new Vector2(Main.rand.NextFloat(-halfFrameWidth, halfFrameWidth), 0).RotatedBy(NPC.rotation);
-                    Vector2 scale = new Vector2(Main.rand.NextFloat(0.85f, 1f));
+                    Vector2 scale = new Vector2(Main.rand.NextFloat(0.24f, 1.5f) + MathHelper.Lerp(0, 0.3f, interpolant));
                     float randInterpolant = Main.rand.NextFloat(0.85f, 1f);
                     Color color = Color.Lerp(Color.Brown, Color.Black, randInterpolant);
                     ParticleManager.AddParticle(new Ash(particlePos, Vector2.Zero, 270, color, scale, 0, 0.96f, 0.04f, 30, Main.rand.Next(20, 40), false));

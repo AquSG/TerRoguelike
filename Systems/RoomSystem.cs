@@ -912,6 +912,12 @@ namespace TerRoguelike.Systems
             ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
 
             chainList.Clear();
+            ParticleManager.ActiveParticles.Clear();
+
+            CutsceneSystem.cutsceneTimer = 0;
+            CutsceneSystem.cutsceneDisableControl = false;
+            CutsceneSystem.cutsceneActive = false;
+            Main.screenPosition = Main.Camera.UnscaledPosition;
         }
     }
     public class HealingPulse

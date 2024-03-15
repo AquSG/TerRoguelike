@@ -52,19 +52,24 @@ namespace TerRoguelike.Managers
             Vector2 dimensions = RoomDimensions16;
             return new Rectangle((int)pos.X, (int)pos.Y, (int)dimensions.X, (int)dimensions.Y);
         }
-        public Vector2 RoomPosition16
-        {
-            get { return RoomPosition * 16f; }
-        }
-        public Vector2 RoomCenter16
-        {
-            get { return RoomDimensions * 8f; }
-        }
-        public Vector2 RoomDimensions16
-        {
-            get { return RoomDimensions * 16f; }
-        }
+        public Vector2 RoomPosition16 { get { return RoomPosition * 16f; } }
+        public Vector2 RoomCenter16 { get { return RoomDimensions * 8f; } }
+
+        public Vector2 RoomDimensions16 { get { return RoomDimensions * 16f; } }
+        public Vector2 TopLeft { get { return Vector2.One; } }
+        public Vector2 Top { get { return new Vector2((int)(RoomDimensions.X * 0.5f), 0); } }
+        public Vector2 TopRight { get { return new Vector2(RoomDimensions.X - 1, 0); } }
+        public Vector2 Left { get { return new Vector2(0, (int)(RoomDimensions.Y * 0.5f)); } }
+        public Vector2 Center { get { return new Vector2((int)(RoomDimensions.X * 0.5f), (int)(RoomDimensions.Y * 0.5f)); } }
+        public Vector2 Right { get { return new Vector2(RoomDimensions.X - 1, (int)(RoomDimensions.Y * 0.5f)); } }
+        public Vector2 BottomLeft { get { return new Vector2(0, RoomDimensions.Y - 1); } }
+        public Vector2 Bottom { get { return new Vector2((int)(RoomDimensions.X * 0.5f), RoomDimensions.Y - 1); } }
+        public Vector2 BottomRight { get { return new Vector2(RoomDimensions.X - 1, RoomDimensions.Y - 1); } }
         public Vector2 PercentPosition(float x, float y) => new Vector2(RoomDimensions.X * 16f * x, RoomDimensions.Y * 16f * y);
+        public Vector2 MakeEnemySpawnPos(Vector2 anchor, int addTileX, int addTileY, float autoAddX = 8f, float autoAddY = 8f)
+        {
+            return ((anchor + new Vector2(addTileX, addTileY)) * 16f) + new Vector2(autoAddX, autoAddY);
+        }
 
         //potential NPC variables
         public Vector2[] NPCSpawnPosition = new Vector2[RoomSpawnCap];
