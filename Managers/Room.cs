@@ -10,6 +10,9 @@ using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Managers.SpawnManager;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.Graphics.Shaders;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Managers
 {
@@ -56,7 +59,7 @@ namespace TerRoguelike.Managers
         public Vector2 RoomCenter16 { get { return RoomDimensions * 8f; } }
 
         public Vector2 RoomDimensions16 { get { return RoomDimensions * 16f; } }
-        public Vector2 TopLeft { get { return Vector2.One; } }
+        public Vector2 TopLeft { get { return Vector2.Zero; } }
         public Vector2 Top { get { return new Vector2((int)(RoomDimensions.X * 0.5f), 0); } }
         public Vector2 TopRight { get { return new Vector2(RoomDimensions.X - 1, 0); } }
         public Vector2 Left { get { return new Vector2(0, (int)(RoomDimensions.Y * 0.5f)); } }
@@ -364,7 +367,7 @@ namespace TerRoguelike.Managers
             if (Main.player[Main.myPlayer].ModPlayer().currentFloor.Stage == 4 && IsBossRoom)
                 SetMusicMode(MusicStyle.Silent);
 
-            ClearRockets();
+            ClearSpecificProjectiles();
 
             // reward. boss rooms give higher tiers.
             int chance = Main.rand.Next(1, 101);
@@ -460,11 +463,20 @@ namespace TerRoguelike.Managers
                 }
             }
         }
-        public void ClearRockets()
+        public void ClearSpecificProjectiles()
         {
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 Projectile proj = Main.projectile[i];
+                if (!proj.active)
+                    continue;
+
+                TerRoguelikeGlobalProjectile modProj = proj.ModProj();
+                if (modProj != null && modProj.killOnRoomClear)
+                {
+                    proj.Kill();
+                    continue;
+                }
                 if (proj.type == ModContent.ProjectileType<PlanRocket>() || proj.type == ModContent.ProjectileType<Missile>())
                 {
                     proj.timeLeft = 60;
@@ -473,7 +485,46 @@ namespace TerRoguelike.Managers
         }
         public virtual void PostDrawTilesRoom()
         {
+            if (RoomSystem.debugDrawNotSpawnedEnemies)
+            {
+                if (!initialized && !IsBossRoom)
+                    InitializeRoom();
 
+                StartAlphaBlendSpritebatch();
+                Color color = Color.HotPink;
+                Vector3 colorHSL = Main.rgbToHsl(color);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(0.4f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                for (int i = 0; i < NotSpawned.Length; i++)
+                {
+                    bool notSpawned = NotSpawned[i];
+                    if (!notSpawned)
+                        continue;
+
+                    int npcType = NPCToSpawn[i];
+
+                    Texture2D texture = TextureAssets.Npc[npcType].Value;
+                    int frameCount = Main.npcFrameCount[NPCToSpawn[i]];
+                    int height = (int)(texture.Height / frameCount);
+                    Rectangle frame = new Rectangle(0, 0, texture.Width, height);
+                    Main.EntitySpriteDraw(texture, NPCSpawnPosition[i] - Main.screenPosition, frame, color, 0f, frame.Size() * 0.5f, 1f, SpriteEffects.None);
+                }
+                StartAlphaBlendSpritebatch();
+            }
+
+            return;
+
+            Texture2D testTex = TextureManager.TexDict["TemporaryBlock"];
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Top * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 2, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Right * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 3, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (BottomRight * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 4, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Bottom * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 5, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (BottomLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 6, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Left * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 7, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Center * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 7, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
         }
         public virtual bool ClearCondition()
         {

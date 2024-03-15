@@ -41,6 +41,7 @@ namespace TerRoguelike.Systems
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static bool obtainedRoomListFromServer = false;
         public static Vector2 DrawBehindTilesOffset = new Vector2(190, 150);
+        public static bool debugDrawNotSpawnedEnemies = false;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);

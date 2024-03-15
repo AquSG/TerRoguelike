@@ -23,11 +23,11 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 8, 10) - Vector2.UnitX, ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
-            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -7, -9) + Vector2.UnitX, ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 8, 10, -1), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -7, -9, 17), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(BottomRight, -2, -3), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(Center, 2, -2), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
-            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 5, -3), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 1);
+            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 7, -3), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 1);
         }
     }
 }
