@@ -29,7 +29,8 @@ namespace TerRoguelike.Systems
         public override void ModifyScreenPosition()
         {
             UpdateCutscene();
-            Main.screenPosition = Main.Camera.UnscaledPosition + TranslationVector;
+            if (cutsceneActive)
+                Main.screenPosition = Main.Camera.UnscaledPosition + TranslationVector;
         }
         public static Vector2 TranslationVector => overrideCameraCenter;
         public void TickCutscene()
