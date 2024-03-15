@@ -49,19 +49,19 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.hostile = true;
             Projectile.friendly = false;
-            if (Projectile.ai[1] <= 2)
+            if (Projectile.ai[1] > 0)
+                Projectile.ai[1]++;
+            if (Projectile.ai[1] < 10)
                 Projectile.velocity = startVel;
+            else
+                Projectile.velocity = Vector2.Zero;
+                
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             if (Projectile.timeLeft < 720)
             {
                 Projectile.ai[1]++;
-                if (Projectile.ai[1] > 1)
-                {
-                    Projectile.velocity = Vector2.Zero;
-                    return false;
-                }
             }
             Projectile.velocity = oldVelocity;
             return false;

@@ -40,7 +40,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deadTime = 0;
         public int cutsceneDuration = 195;
         public int cutsceneBurrowFinish = -60;
-        //public int deathCutsceneDuration = 210;
         public int deathCutsceneDuration = 270;
         public int deathBurnStartTime = 90;
         public int deathDisintegrateStartTime = 150;
@@ -48,11 +47,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SoundStyle BurrowSound = new SoundStyle("TerRoguelike/Sounds/Shockwave", 3);
 
         public Attack None = new Attack(0, 0, 180);
-        public Attack Burrow = new Attack(1, 40, 360);
-        public Attack VineWall = new Attack(2, 30, 240);
+        public Attack Burrow = new Attack(1, 60, 360);
+        public Attack VineWall = new Attack(2, 40, 240);
         public Attack RootLift = new Attack(3, 40, 180);
         public Attack SeedBarrage = new Attack(4, 40, 90);
-        public Attack Summon = new Attack(5, 20, 150);
+        public Attack Summon = new Attack(5, 30, 150);
         public int ballAttack1 = 60;
         public int ballAttack2 = 120;
         public Vector2 ballAttack1Pos;
@@ -61,6 +60,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int rootAttack2 = 150;
         public Vector2[] SummonSpawnPositions = new Vector2[] { new Vector2(-1), new Vector2(-1) };
         public int summonTelegraph = 60;
+        public int vineWallCooldown = 0;
         public int desiredEnemy;
 
         public override void SetStaticDefaults()
@@ -78,7 +78,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.HitSound = SoundID.NPCHit7;
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 0);
+            modNPC.drawCenter = new Vector2(0, 240);
             lightTex = TexDict["BrambleHollowGlow"];
             ballTex = TexDict["LeafBall"];
             fireTex = TexDict["TallFire"];
@@ -109,7 +109,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(PaladinTheme);
+                SetBossTrack(BrambleHollowTheme);
             }
 
             ableToHit = !(NPC.ai[0] == Burrow.Id && NPC.ai[1] > Burrow.Duration * 0.5f);
@@ -152,6 +152,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             target = modNPC.GetTarget(NPC, false, false);
 
+            if (vineWallCooldown > 0)
+                vineWallCooldown--;
             NPC.ai[1]++;
 
             ballAttack1Pos = NPC.Center + modNPC.drawCenter + new Vector2(100, 0).RotatedBy(NPC.rotation);
@@ -284,6 +286,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else if (NPC.ai[1] >= VineWall.Duration)
                 {
+                    vineWallCooldown = 830;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = VineWall.Id;
@@ -390,7 +393,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         int direction = i == 0 ? -1 : 1;
                         float rotateBy = onWall ? NPC.rotation : 0;
-                        float distanceBeside = 196f * direction;
+                        float distanceBeside = 164f * direction;
                         Vector2 potentialSpawnPos = NPC.Center + new Vector2(distanceBeside, 0).RotatedBy(rotateBy);
 
                         Vector2 checkDirection = new Vector2(0, 16).RotatedBy(rotateBy);
@@ -466,6 +469,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+            if (vineWallCooldown > 0)
+                potentialAttacks.RemoveAll(x => x.Id == VineWall.Id);
             if (!modNPC.isRoomNPC)
             {
                 potentialAttacks.RemoveAll(x => x.Id == Burrow.Id);
