@@ -104,6 +104,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Particles/ThinSpark",
                 "TerRoguelike/Particles/Square",
                 "TerRoguelike/ExtraTextures/GodRay",
+                "TerRoguelike/ExtraTextures/TallFire",
                 "TerRoguelike/NPCs/Enemy/Boss/BrambleHollowGlow",
                 "TerRoguelike/Projectiles/LeafBall",
             };

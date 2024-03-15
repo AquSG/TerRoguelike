@@ -6,6 +6,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
@@ -33,13 +34,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int horizontalFrame;
         public Texture2D lightTex;
         public Texture2D ballTex;
+        public Texture2D fireTex;
+        public List<TallFireDraw> fireDraws = new List<TallFireDraw>();
         float oldOpacity = 0;
         public int deadTime = 0;
         public int cutsceneDuration = 195;
         public int cutsceneBurrowFinish = -60;
-        public int deathCutsceneDuration = 150;
-        public int deathBurnStartTime = 60;
+        //public int deathCutsceneDuration = 210;
+        public int deathCutsceneDuration = 270;
+        public int deathBurnStartTime = 90;
+        public int deathDisintegrateStartTime = 150;
         public SoundStyle BramblePunch = new SoundStyle("TerRoguelike/Sounds/BramblePunch");
+        public SoundStyle BurrowSound = new SoundStyle("TerRoguelike/Sounds/Shockwave", 3);
 
         public Attack None = new Attack(0, 0, 180);
         public Attack Burrow = new Attack(1, 40, 360);
@@ -75,6 +81,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.drawCenter = new Vector2(0, 0);
             lightTex = TexDict["BrambleHollowGlow"];
             ballTex = TexDict["LeafBall"];
+            fireTex = TexDict["TallFire"];
             NPC.behindTiles = true;
             NPC.noGravity = true;
         }
@@ -117,6 +124,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
                     CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
+                    SoundEngine.PlaySound(BurrowSound with { Volume = 0.1f, Pitch = 0.6f, MaxInstances = 2 }, NPC.Center);
                 }
                 NPC.localAI[0]++;
                 if (NPC.localAI[0] < cutsceneBurrowFinish)
@@ -173,6 +181,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Burrow.Id)
             {
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(BurrowSound with { Volume = 0.1f, Pitch = 0.5f, MaxInstances = 2 }, NPC.Center);
+                }
                 if (NPC.ai[1] < 80 || NPC.ai[1] > (int)(Burrow.Duration * 0.5f) + 1)
                 {
                     BurrowEffect();
@@ -240,8 +252,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             NPC.Top = checkPos;
                         }
-
                     }
+                    SoundEngine.PlaySound(BurrowSound with { Volume = 0.11f, Pitch = 0.5f, MaxInstances = 2 }, NPC.Center);
                 }
                 if (NPC.ai[1] >= Burrow.Duration)
                 {
@@ -564,7 +576,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             if (deadTime == 0)
             {
-                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration + 30, 30, 30, 2.5f);
+                SoundEngine.PlaySound(SoundID.DD2_OgreHurt with { Volume = 1f, Pitch = -0.5f }, NPC.Center);
+                NPC.HitSound = SoundID.Item1 with { Volume = 0f };
+                NPC.DeathSound = SoundID.Item1 with { Volume = 0f };
+                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {
                     ActiveBossTheme.endFlag = true;
@@ -593,21 +608,50 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
-            if (deadTime > deathBurnStartTime)
+            if (deadTime == 40)
+            {
+                Vector2 pos = NPC.Center + new Vector2(11, -17).RotatedBy(NPC.rotation);
+                SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.7f, MaxInstances = 2, Pitch = 0.3f }, pos);
+                fireDraws.Add(new TallFireDraw(pos, Main.rand.Next(17), false));
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/FireCrackle") with { Volume = 1f, Pitch = -0.6f }, NPC.Center);
+            }
+            else if (deadTime == 65)
+            {
+                Vector2 pos = NPC.Center + new Vector2(-11, -17).RotatedBy(NPC.rotation);
+                SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.7f, MaxInstances = 2, Pitch = 0.3f }, pos);
+                fireDraws.Add(new TallFireDraw(pos, Main.rand.Next(17), false));
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/FireCrackle") with { Volume = 0.8f, Pitch = -0.6f }, NPC.Center);
+            }
+            else if (deadTime == deathBurnStartTime)
+            {
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/FireExtinguish") with { Volume = 0.25f, Pitch = 0 }, NPC.Center);
+                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/FireCrackle") with { Volume = 0.4f, Pitch = -0.6f }, NPC.Center);
+            }
+            else if (deadTime > deathDisintegrateStartTime)
             {
                 int frameHeight = TextureAssets.Npc[Type].Value.Height / Main.npcFrameCount[Type];
-                float interpolant = (deadTime - deathBurnStartTime) / (deathCutsceneDuration - (float)deathBurnStartTime);
+                float interpolant = (deadTime - deathDisintegrateStartTime) / (deathCutsceneDuration - (float)deathDisintegrateStartTime);
                 float offset = MathHelper.Lerp(0, frameHeight * 0.93f, interpolant);
                 Vector2 basePos = NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + offset - 19).RotatedBy(NPC.rotation);
-                //float halfFrameWidth = (TextureAssets.Npc[Type].Value.Width / 3f) * 0.5f;
                 float halfFrameWidth = (NPC.width) * 0.8f * MathHelper.SmoothStep(1f, 0.6f, Math.Abs(interpolant - 0.5f) * 2f);
-                for (int i = 0; i < 5; i++)
+                if (interpolant > 0.51f && interpolant < 0.57f)
+                    halfFrameWidth *= 1.28f;
+                for (int i = 0; i < 6; i++)
                 {
                     Vector2 particlePos = basePos + new Vector2(Main.rand.NextFloat(-halfFrameWidth, halfFrameWidth), 0).RotatedBy(NPC.rotation);
-                    Vector2 scale = new Vector2(1f);
+                    Vector2 scale = new Vector2(Main.rand.NextFloat(0.85f, 1f));
                     float randInterpolant = Main.rand.NextFloat(0.85f, 1f);
                     Color color = Color.Lerp(Color.Brown, Color.Black, randInterpolant);
-                    ParticleManager.AddParticle(new Ash(particlePos, Vector2.Zero, 180, color, scale, 0, 0.96f, 0.04f, 30, Main.rand.Next(20, 40), false));
+                    ParticleManager.AddParticle(new Ash(particlePos, Vector2.Zero, 270, color, scale, 0, 0.96f, 0.04f, 30, Main.rand.Next(20, 40), false));
+                }
+            }
+            else if (deadTime > deathBurnStartTime)
+            {
+                if (deadTime % 3 == 0)
+                {
+                    float width = NPC.width * 0.235f;
+                    Vector2 pos = NPC.Center + new Vector2(Main.rand.NextFloat(-width, width) + 1, -34).RotatedBy(NPC.rotation);
+                    fireDraws.Add(new TallFireDraw(pos, Main.rand.Next(17), true));
                 }
             }
 
@@ -719,9 +763,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 modNPC.drawCenter += (Vector2.UnitY * offset * 0.5f).RotatedBy(NPC.rotation);
             }
-            else if (deadTime > deathBurnStartTime)
+            else if (deadTime > deathDisintegrateStartTime)
             {
-                float offset = MathHelper.Lerp(0, frameHeight, (deadTime - deathBurnStartTime) / (deathCutsceneDuration - (float)deathBurnStartTime));
+                float offset = MathHelper.Lerp(0, frameHeight, (deadTime - deathDisintegrateStartTime) / (deathCutsceneDuration - (float)deathDisintegrateStartTime));
                 int rectCutoff = (int)offset;
                 if (rectCutoff > NPC.frame.Height)
                     rectCutoff = NPC.frame.Height;
@@ -769,6 +813,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
+            bool deadBurnt = deadTime > deathBurnStartTime;
+
+            float deathDisintegrateCompletion = 1f - ((deadTime - deathDisintegrateStartTime) * 2.5f / (deathCutsceneDuration - (float)deathDisintegrateStartTime));
+            int fireFrameHeight = fireTex.Height / 17;
+            for (int i = 0; i < fireDraws.Count; i++)
+            {
+                TallFireDraw fire = fireDraws[i];
+                if (!fire.drawBehind)
+                    continue;
+
+                int currentFrame = ((int)((Main.GlobalTimeWrappedHourly * 17) + fire.animOffset) % 17);
+                Rectangle frame = new Rectangle(0, currentFrame * fireFrameHeight, fireTex.Width, fireFrameHeight);
+                Main.EntitySpriteDraw(fireTex, fire.position - Main.screenPosition, frame, Color.White * deathDisintegrateCompletion, NPC.rotation, new Vector2(frame.Width * 0.5f, frame.Height * 0.85f), 0.65f, SpriteEffects.None);
+            }
+
             if ((int)NPC.ai[0] == VineWall.Id && NPC.ai[1] < 120)
             {
                 float interpolant = MathHelper.Clamp(MathHelper.SmoothStep(0, 1f, NPC.ai[1] / ballAttack1), 0, 1f);
@@ -787,7 +846,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float halfBurrowTime = (Burrow.Duration * 0.5f);
                 newOpacity = MathHelper.Lerp(-0.75f, newOpacity, Math.Abs((NPC.ai[1] - halfBurrowTime) / halfBurrowTime));
             }
-            else if ((NPC.ai[0] == RootLift.Id && NPC.ai[1] < rootAttack1 - 20) || (NPC.localAI[0] < 0 && NPC.localAI[1] >= cutsceneBurrowFinish))
+            else if ((NPC.ai[0] == RootLift.Id && NPC.ai[1] < rootAttack1 - 20) || (NPC.localAI[0] < 0 && NPC.localAI[1] >= cutsceneBurrowFinish) || deadTime > 0)
             {
                 newOpacity = 1f;
             }
@@ -798,10 +857,46 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             float glowOpacity = MathHelper.Lerp(oldOpacity, newOpacity, 0.1f);
             oldOpacity = glowOpacity;
+            if (deadBurnt)
+            {
+                StartAlphaBlendSpritebatch();
+                Color color = Color.Black;
+                Vector3 colorHSL = Main.rgbToHsl(color);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+            }
 
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, Lighting.GetColor(drawPos.ToTileCoordinates()), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
-            Main.EntitySpriteDraw(lightTex, drawPos - Main.screenPosition, NPC.frame, Color.White * glowOpacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            if (!deadBurnt)
+                Main.EntitySpriteDraw(lightTex, drawPos - Main.screenPosition, NPC.frame, Color.White * glowOpacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+            else
+            {
+                StartVanillaSpritebatch();
+            }
+            for (int i = 0; i < fireDraws.Count; i++)
+            {
+                TallFireDraw fire = fireDraws[i];
+                if (fire.drawBehind)
+                    continue;
+
+                int currentFrame = ((int)((Main.GlobalTimeWrappedHourly * 17) + fire.animOffset) % 17);
+                Rectangle frame = new Rectangle(0, currentFrame * fireFrameHeight, fireTex.Width, fireFrameHeight);
+                Main.EntitySpriteDraw(fireTex, fire.position - Main.screenPosition, frame, Color.White * deathDisintegrateCompletion, NPC.rotation, new Vector2(frame.Width * 0.5f, frame.Height * 0.85f), 0.65f, SpriteEffects.None);
+            }
             return false;
+        }
+    }
+    public class TallFireDraw
+    {
+        public Vector2 position;
+        public int animOffset;
+        public bool drawBehind;
+        public TallFireDraw(Vector2 Position, int AnimOffset, bool DrawBehind)
+        {
+            position = Position;
+            animOffset = AnimOffset;
+            drawBehind = DrawBehind;
         }
     }
 }
