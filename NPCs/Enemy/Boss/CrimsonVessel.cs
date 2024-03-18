@@ -19,6 +19,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Managers.SpawnManager;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -71,6 +72,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
+            
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -84,6 +86,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[2] = None.Id;
             NPC.ai[1] = Heal.Duration - seerSpawnTime;
         }
+        public override void DrawBehind(int index)
+        {
+
+        }
         public override void AI()
         {
             if (deadTime > 0)
@@ -96,7 +102,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(BrambleHollowTheme);
             }
 
-            ableToHit = NPC.ai[3] == 0;
+            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportTime);
             canBeHit = true;
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
 
@@ -144,10 +150,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             target = modNPC.GetTarget(NPC, false, false);
 
             NPC.ai[1]++;
+            healCountdown--;
             if (NPC.localAI[0] == 1)
-            {
                 SpawnSeers();
-            }
 
             if (NPC.ai[0] == None.Id)
             {
@@ -193,11 +198,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (!trackedSeers.Any())
                         NPC.ai[1] = Heal.Duration - seerSpawnTime;
                 }
-                if (NPC.ai[1] > teleportTime && NPC.ai[1] < Heal.Duration - 100)
+                if (NPC.ai[1] > teleportTime && NPC.ai[1] < Heal.Duration - seerSpawnTime)
                 {
-
+                    for (int i = 0; i < trackedSeers.Count; i++)
+                    {
+                        TrackedSeer trackedSeer = trackedSeers[i];
+                        NPC seer = Main.npc[trackedSeer.whoAmI];
+                        if (seer.active && seer.life > 0 && (seer.Center - NPC.Center).Length() < 16)
+                        {
+                            seer.StrikeInstantKill();
+                            int healAmt = (int)(1000 * healthScalingMultiplier);
+                            NPC.life += healAmt;
+                            NPC.HealEffect(healAmt, true);
+                        }
+                    }
                 }
-                else if (NPC.ai[1] >= Heal.Duration - seerSpawnTime)
+                else if (NPC.ai[1] == Heal.Duration - seerSpawnTime)
+                {
+                    for (int i = 0; i < trackedSeers.Count; i++)
+                    {
+                        TrackedSeer trackedSeer = trackedSeers[i];
+                        NPC seer = Main.npc[trackedSeer.whoAmI];
+                        if (seer.active)
+                        {
+                            seer.StrikeInstantKill();
+                            int healAmt = (int)(1000 * healthScalingMultiplier);
+                            NPC.life += healAmt;
+                            NPC.HealEffect(healAmt, true);
+                        }
+                    }
+                    trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
+                }
+                if (NPC.ai[1] >= Heal.Duration - seerSpawnTime)
                 {
                     SpawnSeers();
                 }
@@ -208,6 +240,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Heal.Id;
                     NPC.ai[3] = 0;
+                    healCountdown = setHealTime;
                 }
             }
             else if (NPC.ai[0] == BouncyBall.Id)
@@ -276,6 +309,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else
                     NPC.velocity *= 0.98f;
             }
+
+            trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
         }
         public void TeleportAI(Vector2? forcedLocation = null)
         {
@@ -481,6 +516,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int frameCount = Main.npcFrameCount[Type];
             
             currentFrame = (int)NPC.frameCounter % (frameCount - 4);
+            if (NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportMoveTimestamp)
+                currentFrame += 4;
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }

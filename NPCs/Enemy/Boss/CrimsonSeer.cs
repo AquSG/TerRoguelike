@@ -41,7 +41,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 24;
             NPC.aiStyle = -1;
             NPC.damage = 35;
-            NPC.lifeMax = 800;
+            NPC.lifeMax = 600;
             NPC.HitSound = SoundID.NPCHit9;
             NPC.DeathSound = SoundID.NPCDeath11;
             NPC.knockBackResist = 0f;
@@ -50,6 +50,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
+            NPC.hide = true;
+        }
+        public override void DrawBehind(int index)
+        {
+            Main.instance.DrawCacheNPCProjectiles.Add(index);
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -84,16 +89,27 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public static void UpdateCrimsonSeer(NPC npc, int seerId, int seerCount)
         {
-            int spawnTime = 0;
-            //float spawnInterpolant = MathHelper.Clamp(MathHelper.SmoothStep(0, 1f, npc.localAI[2] / spawnTime), 0f, 1f);
             NPC parent = Main.npc[(int)npc.ai[0]];
-            float interpolant = MathHelper.Clamp((npc.localAI[2] - spawnTime) / 60, 0, 1f);
-            npc.rotation += 0.01f * interpolant;
-            
-            //float magnitude = (136 + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f))) * ((float)Math.Log(spawnInterpolant + 0.01f, 100) + 0.999f);
-            float magnitude = (136 + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f)));
 
-            npc.Center = parent.Center + parent.ModNPC().drawCenter + (npc.rotation.ToRotationVector2() * magnitude);
+            bool healMode = parent.ai[0] == 2 && parent.ai[1] > 40 && parent.ai[1] < 440 - 100;
+            bool ballMode = false;
+
+            if (healMode)
+            {
+                Vector2 direction = (parent.Center - npc.Center).SafeNormalize(Vector2.UnitY) * 1.2f;
+                float magnitude = 0.83f + (0.17f * (float)Math.Cos(npc.rotation * 68.692));
+                float healCompletion = (parent.ai[1] - 40) / (440 - 100 - 40);
+
+                npc.Center += direction * magnitude * healCompletion;
+            }
+            else
+            {
+                float interpolant = MathHelper.Clamp((npc.localAI[2]) / 60, 0, 1f);
+                npc.rotation += 0.01f * interpolant;
+                float magnitude = (136 + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f)));
+
+                npc.Center = parent.Center + parent.ModNPC().drawCenter + (npc.rotation.ToRotationVector2() * magnitude);
+            }
         }
         public override bool CanHitNPC(NPC target)
         {

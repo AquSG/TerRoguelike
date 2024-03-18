@@ -91,10 +91,12 @@ namespace TerRoguelike.Managers
             }
             return npc;
         }
+        public static double healthScalingMultiplier { get { return Math.Pow(1.2d, TerRoguelikeWorld.currentStage); } }
+        public static double damageScalingMultiplier { get { return Math.Pow(1.10d, TerRoguelikeWorld.currentStage); } }
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {
-            double healthMultiplier = Math.Pow(1.2d, TerRoguelikeWorld.currentStage);
-            double damageMultiplier = Math.Pow(1.10d, TerRoguelikeWorld.currentStage);
+            double healthMultiplier = healthScalingMultiplier;
+            double damageMultiplier = damageScalingMultiplier;
             npc.lifeMax = (int)(modNpc.baseMaxHP * healthMultiplier);
             npc.life = npc.lifeMax;
             npc.damage = (int)(modNpc.baseDamage * damageMultiplier);
