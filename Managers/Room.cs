@@ -523,7 +523,7 @@ namespace TerRoguelike.Managers
 
             return;
 
-            Texture2D testTex = TextureManager.TexDict["TemporaryBlock"];
+            Texture2D testTex = TextureManager.TexDict["TemporaryBlock"].Value;
             Main.EntitySpriteDraw(testTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None);
             Main.EntitySpriteDraw(testTex, RoomPosition16 + (Top * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
             Main.EntitySpriteDraw(testTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 2, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);

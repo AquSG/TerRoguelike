@@ -50,7 +50,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0.5f;
             modNPC.drawCenter = new Vector2(0, -6);
-            headTex = TexDict["IcyMermanHead"];
+            headTex = TexDict["IcyMermanHead"].Value;
         }
         public override void AI()
         {

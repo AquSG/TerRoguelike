@@ -37,8 +37,8 @@ namespace TerRoguelike.UI
         public static ButtonState oldButtonState = ButtonState.Released;
         internal static void Load()
         {
-            ButtonTex = TexDict["MenuButton"];
-            ButtonHoverTex = TexDict["MenuButtonHover"];
+            ButtonTex = TexDict["MenuButton"].Value;
+            ButtonHoverTex = TexDict["MenuButtonHover"].Value;
             Reset();
         }
 

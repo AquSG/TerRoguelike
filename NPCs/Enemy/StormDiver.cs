@@ -50,8 +50,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.4f;
             NPC.noGravity = true;
             modNPC.drawCenter = new Vector2(0, -7);
-            lightTex = TexDict["StormDiverGlow"];
-            crossTex = TexDict["CrossSpark"];
+            lightTex = TexDict["StormDiverGlow"].Value;
+            crossTex = TexDict["CrossSpark"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

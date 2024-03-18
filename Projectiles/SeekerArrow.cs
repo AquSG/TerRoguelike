@@ -25,7 +25,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 480;
             Projectile.penetrate = 2;
-            glowTex = TexDict["CircularGlow"];
+            glowTex = TexDict["CircularGlow"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

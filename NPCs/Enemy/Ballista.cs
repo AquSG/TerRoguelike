@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.OverrideIgniteVisual = true;
-            baseTex = TexDict["BallistaBase"];
+            baseTex = TexDict["BallistaBase"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

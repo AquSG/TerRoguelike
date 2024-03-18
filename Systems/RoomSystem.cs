@@ -457,7 +457,7 @@ namespace TerRoguelike.Systems
             }
             Main.spriteBatch.End();
 
-            Texture2D lightTexture = TexDict["TemporaryBlock"];
+            Texture2D lightTexture = TexDict["TemporaryBlock"].Value;
             foreach (Room room in RoomList)
             {
                 if (room == null)
@@ -469,7 +469,7 @@ namespace TerRoguelike.Systems
                     {
                         StartAlphaBlendSpritebatch(false);
                         Vector2 position = (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f;
-                        Texture2D moonLordTex = TexDict["StillMoonLord"];
+                        Texture2D moonLordTex = TexDict["StillMoonLord"].Value;
                         Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
                         Main.spriteBatch.End();
                     }
@@ -740,7 +740,7 @@ namespace TerRoguelike.Systems
             for (int p = 0; p < healingPulses.Count; p++)
             {
                 HealingPulse pulse = healingPulses[p];
-                Texture2D telegraphBase = TexDict["InvisibleProj"];
+                Texture2D telegraphBase = TexDict["InvisibleProj"].Value;
 
                 float scale;
                 float opacity;
@@ -820,8 +820,8 @@ namespace TerRoguelike.Systems
             if (!chainList.Any())
                 return;
 
-            Texture2D chain1Tex = TexDict["Chain1"];
-            Texture2D chain2Tex = TexDict["Chain2"];
+            Texture2D chain1Tex = TexDict["Chain1"].Value;
+            Texture2D chain2Tex = TexDict["Chain2"].Value;
             for (int i = 0; i < chainList.Count; i++)
             {
                 Chain chain = chainList[i];

@@ -3461,7 +3461,7 @@ namespace TerRoguelike.NPCs
         /// </summary>
         public void DrawRotatlingBloodParticles(bool inFront, NPC npc)
         {
-            Texture2D texture = TexDict["AdaptiveGunBullet"];
+            Texture2D texture = TexDict["AdaptiveGunBullet"].Value;
             Color color = Color.Red * 0.8f;
             Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
 

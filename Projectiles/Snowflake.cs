@@ -30,7 +30,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 240;
             Projectile.direction = Main.rand.NextBool() ? -1 : 1;
             Projectile.penetrate = -1;
-            glowTex = TexDict["CircularGlow"];
+            glowTex = TexDict["CircularGlow"].Value;
         }
 
         public override void AI()

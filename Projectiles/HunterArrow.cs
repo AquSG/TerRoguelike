@@ -33,8 +33,8 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 480;
             Projectile.penetrate = 2;
-            glowTex = TexDict["CircularGlow"];
-            lineTex = TexDict["LerpLineGradient"];
+            glowTex = TexDict["CircularGlow"].Value;
+            lineTex = TexDict["LerpLineGradient"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

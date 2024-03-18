@@ -43,7 +43,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, -3);
-            lightTex = TexDict["FlowInvaderGlow"];
+            lightTex = TexDict["FlowInvaderGlow"].Value;
             NPC.noGravity = true;
         }
         public override void AI()

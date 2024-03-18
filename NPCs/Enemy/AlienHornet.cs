@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.4f;
             NPC.noGravity = true;
             modNPC.drawCenter = new Vector2(0, 0);
-            lightTex = TexDict["AlienHornetGlow"];
+            lightTex = TexDict["AlienHornetGlow"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

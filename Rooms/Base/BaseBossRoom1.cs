@@ -45,7 +45,7 @@ namespace TerRoguelike.Rooms
                 return;
 
             if (paladinHammerTex == null)
-                paladinHammerTex = TexDict["PaladinHammer"];
+                paladinHammerTex = TexDict["PaladinHammer"].Value;
             Vector2 drawPos = bossSpawnPos + RoomPosition16 + new Vector2(-8, 0);
             Main.EntitySpriteDraw(paladinHammerTex, drawPos - Main.screenPosition, null, Lighting.GetColor(new Point((int)(drawPos.X / 16f), (int)(drawPos.Y / 16f))), MathHelper.Pi, paladinHammerTex.Size() * 0.5f, 1f, SpriteEffects.None);
         }
