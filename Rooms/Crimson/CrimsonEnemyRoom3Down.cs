@@ -8,11 +8,14 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class CrimsonEnemyRoom3Down : Room
     {
+        public override int AssociatedFloor => FloorDict["Crimson"];
         public override string Key => "CrimsonEnemyRoom3Down";
         public override string Filename => "Schematics/RoomSchematics/CrimsonEnemyRoom3Down.csch";
         public override bool CanExitRight => true;
@@ -20,12 +23,12 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 16f / 2f, RoomDimensions.Y * 16f / 2f), NPCID.FloatyGross, 60, 120, 0.6f);
-            AddRoomNPC(new Vector2(48f, RoomDimensions.Y * 16f / 4f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 48f, RoomDimensions.Y * 16f / 4f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f / 2f) + 64f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2(RoomDimensions.X * 16f / 2f, (RoomDimensions.Y * 16f / 2f) + 104f), NPCID.Crimera, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 48f, (RoomDimensions.Y * 16f) - 32f), NPCID.FaceMonster, 60, 120, 0.45f);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -4, -3), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 9, 28), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopRight, -5, 19), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Bottom, 0, -13), ChooseEnemy(AssociatedFloor, 2), 180, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 0, 1), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 3, -21), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
         }
     }
 }

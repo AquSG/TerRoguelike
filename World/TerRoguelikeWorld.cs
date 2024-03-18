@@ -39,6 +39,9 @@ namespace TerRoguelike.World
                     continue;
 
                 RoomSystem.ResetRoomID(RoomSystem.RoomList[i].ID);
+                if (RoomSystem.RoomList[i].IsStartRoom)
+                    RoomSystem.RoomList[i].awake = true;
+
             }
             SetMusicMode(MusicStyle.AllCalm);
             SetCalm(Escape with { Volume = 0.25f });

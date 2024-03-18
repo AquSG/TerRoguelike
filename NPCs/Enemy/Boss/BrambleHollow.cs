@@ -493,7 +493,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = Burrow.Id;
             NPC.ai[0] = chosenAttack;
         }
         public void BurrowEffect()
@@ -761,7 +761,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.ai[0] == Burrow.Id || NPC.localAI[0] < cutsceneBurrowFinish)
             {
                 float offset = GetOffset();
-                int rectCutoff = (int)offset - 40;
+                int rectCutoff = (int)offset - 28;
                 if (rectCutoff > NPC.frame.Height)
                     rectCutoff = NPC.frame.Height;
                 if (rectCutoff > 0)
