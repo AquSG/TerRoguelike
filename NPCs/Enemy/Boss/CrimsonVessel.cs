@@ -231,6 +231,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 if (!RoomList[modNPC.sourceRoomListID].GetRect().Contains(randPos.ToPoint()))
                                     continue;
                             }
+                            if ((randPos - NPC.Center).Length() < 120f)
+                                continue;
+
                             teleportLocation = randPos;
                             break;
                         }

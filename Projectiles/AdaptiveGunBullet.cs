@@ -13,6 +13,7 @@ using Terraria.Graphics.Renderers;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
@@ -21,11 +22,11 @@ namespace TerRoguelike.Projectiles
         public bool ableToHit = true;
         public TerRoguelikeGlobalProjectile modProj;
         TerRoguelikePlayer modPlayer;
-        public int setTimeLeft = 3000;
+        public int setTimeLeft = 400;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 2;
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 60;
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 9;
         }
         public override void SetDefaults()
         {
@@ -36,7 +37,7 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = false;
             Projectile.tileCollide = true;
             Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.extraUpdates = 29;
+            Projectile.MaxUpdates = 4;
             Projectile.timeLeft = setTimeLeft;
             Projectile.penetrate = 2;
             Projectile.usesLocalNPCImmunity = true;
@@ -54,28 +55,24 @@ namespace TerRoguelike.Projectiles
 
             return (bool?)null;
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            //scale support
+            Projectile.position = Projectile.Center + new Vector2(-2 * Projectile.scale, -2 * Projectile.scale);
+            Projectile.width = (int)(4 * Projectile.scale);
+            Projectile.height = (int)(4 * Projectile.scale);
 
+            modPlayer = Main.player[Projectile.owner].ModPlayer();
+        }
         public override void AI()
         {
-            if (Projectile.localAI[0] == 0)
-            {
-                //scale support
-                Projectile.position = Projectile.Center + new Vector2(-2 * Projectile.scale, -2 * Projectile.scale);
-                Projectile.width = (int)(4 * Projectile.scale);
-                Projectile.height = (int)(4 * Projectile.scale);
-                Projectile.localAI[0]++;
-            }
-
-            if (modPlayer == null)
-                modPlayer = Main.player[Projectile.owner].ModPlayer();
-
             if (modPlayer.heatSeekingChip > 0)
-                modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / 25000f);
+                modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / (833f * Projectile.MaxUpdates));
 
             if (modPlayer.bouncyBall > 0)
                 modProj.extraBounces += modPlayer.bouncyBall;
 
-            if (Projectile.timeLeft <= 60)
+            if (Projectile.timeLeft <= 2 * Projectile.MaxUpdates)
             {
                 ableToHit = false;
                 Projectile.velocity = Vector2.Zero;
@@ -87,17 +84,28 @@ namespace TerRoguelike.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D lightTexture = TextureAssets.Projectile[Type].Value;
-            for (int i = 0; i < Projectile.oldPos.Length; i++)
+            int deathTime = 2 * Projectile.MaxUpdates;
+            Vector2 innateOffset = (lightTexture.Size() * 0.5f * Projectile.scale) - Main.screenPosition;
+            for (int i = 0; i < Projectile.oldPos.Length - 1; i++)
             {
-                if (Projectile.timeLeft <= 60 && i + Projectile.timeLeft < 45)
-                    continue;
+                for (int j = 0; j < 8; j++)
+                {
+                    int progress = (i * 8) + j;
+                    if (Projectile.timeLeft <= deathTime)
+                    {
+                        if (Projectile.timeLeft > progress + 5)
+                            continue;
+                    }
+                    float jCompletion = j / 8f;
+                    float completion = (float)(progress) / 64;
+                    Color color = Color.Lerp(Color.Yellow, Color.White, (completion * 2));
+                    Vector2 drawPosition = Projectile.oldPos[i] + innateOffset;
+                    Vector2 offset = (Projectile.oldPos[i + 1] - Projectile.oldPos[i]) * jCompletion;
 
-                Color color = Color.Lerp(Color.Yellow, Color.White, (float)i / (Projectile.oldPos.Length / 2));
-                Vector2 drawPosition = Projectile.oldPos[i] + (lightTexture.Size() * 0.5f * Projectile.scale) - Main.screenPosition;
-                
-                // Become smaller the futher along the old positions we are.
-                Vector2 scale = new Vector2(1f) * MathHelper.Lerp(0.25f, 1f, 1f - i / (float)Projectile.oldPos.Length);
-                Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale * Projectile.scale, SpriteEffects.None, 0);
+                    // Become smaller the futher along the old positions we are.
+                    Vector2 scale = new Vector2(1.2f) * MathHelper.Lerp(0.25f, 1f, 1f - completion);
+                    Main.EntitySpriteDraw(lightTexture, drawPosition + offset, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale * Projectile.scale, SpriteEffects.None, 0);
+                }
             }
             if (modPlayer != null)
             {
@@ -113,7 +121,7 @@ namespace TerRoguelike.Projectiles
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
             //currently, no piercing is available for this.
-            Projectile.timeLeft = 60;
+            Projectile.timeLeft = 2 * Projectile.MaxUpdates;
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;
         }
@@ -122,8 +130,8 @@ namespace TerRoguelike.Projectiles
             modProj.bounceCount++;
             if (modProj.bounceCount >= 1 + modProj.extraBounces)
             {
-                if (Projectile.timeLeft > 60)
-                    Projectile.timeLeft = 60;
+                if (Projectile.timeLeft > 2 * Projectile.MaxUpdates)
+                    Projectile.timeLeft = 2 * Projectile.MaxUpdates;
                 ableToHit = false;
                 Projectile.velocity = Vector2.Zero;
 
