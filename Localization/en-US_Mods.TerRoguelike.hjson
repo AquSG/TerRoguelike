@@ -775,4 +775,5 @@ NPCs: {
 	Paladin.DisplayName: Paladin
 	BrambleHollow.DisplayName: Bramble Hollow
 	CrimsonVessel.DisplayName: Crimson Vessel
+	CrimsonSeer.DisplayName: Crimson Seer
 }
