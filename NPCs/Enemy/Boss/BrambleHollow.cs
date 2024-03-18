@@ -524,10 +524,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return item.Hitbox.Intersects(ModifiedHitbox()) && canBeHit ? null : false;
         }
-        public override bool CanBeHitByNPC(NPC attacker)
-        {
-            return true;
-        }
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
             npcHitbox = ModifiedHitbox();
@@ -672,10 +668,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             return deadTime >= cutsceneDuration;
-        }
-        public override void OnKill()
-        {
-            //SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
         }
         public override void FindFrame(int frameHeight)
         {
