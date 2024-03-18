@@ -493,7 +493,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Burrow.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public void BurrowEffect()
