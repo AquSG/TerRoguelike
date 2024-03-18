@@ -22,13 +22,14 @@ using TerRoguelike.NPCs.Enemy.Pillar;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 
 namespace TerRoguelike.Managers
 {
     public class TextureManager
     {
         public static bool TexturesLoaded = false;
-        public static Dictionary<string, Texture2D> TexDict = new Dictionary<string, Texture2D>();
+        public static Dictionary<string, Asset<Texture2D>> TexDict = new Dictionary<string, Asset<Texture2D>>();
         internal static void Load()
         {
             TexturesLoaded = true;
@@ -121,7 +122,7 @@ namespace TerRoguelike.Managers
         internal static void AddTex(string path)
         {
             string name = path.Substring(path.LastIndexOf("/") + 1);
-            TexDict.Add(name, ModContent.Request<Texture2D>(path, ReLogic.Content.AssetRequestMode.ImmediateLoad).Value);
+            TexDict.Add(name, ModContent.Request<Texture2D>(path, ReLogic.Content.AssetRequestMode.AsyncLoad));
         }
     }
 }

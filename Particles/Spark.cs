@@ -42,7 +42,7 @@ namespace TerRoguelike.Particles
         public bool velocityToRotaion;
         public Spark(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, bool Additive = true, SpriteEffects SpriteEffects = SpriteEffects.None, bool NoGravity = false, bool VelocityToRotation = true)
         {
-            texture = TexDict["Spark"];
+            texture = TexDict["Spark"].Value;
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = Additive;
             oldPosition = Position;

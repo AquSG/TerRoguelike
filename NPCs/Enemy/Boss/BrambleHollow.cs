@@ -79,9 +79,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 240);
-            lightTex = TexDict["BrambleHollowGlow"];
-            ballTex = TexDict["LeafBall"];
-            fireTex = TexDict["TallFire"];
+            lightTex = TexDict["BrambleHollowGlow"].Value;
+            ballTex = TexDict["LeafBall"].Value;
+            fireTex = TexDict["TallFire"].Value;
             NPC.behindTiles = true;
             NPC.noGravity = true;
         }

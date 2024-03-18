@@ -35,8 +35,8 @@ namespace TerRoguelike.Projectiles
             Projectile.MaxUpdates = 1;
             Projectile.timeLeft = 180;
             Projectile.penetrate = 1;
-            fireTex = TexDict["Comet"];
-            lightTex = TexDict["FlowSpawnGlow"];
+            fireTex = TexDict["Comet"].Value;
+            lightTex = TexDict["FlowSpawnGlow"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

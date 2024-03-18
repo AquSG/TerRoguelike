@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = false;
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.drawCenter = new Vector2(0, 0);
-            headTex = TexDict["AntlionHead"];
+            headTex = TexDict["AntlionHead"].Value;
             modNPC.OverrideIgniteVisual = true;
         }
         public override void OnSpawn(IEntitySource source)

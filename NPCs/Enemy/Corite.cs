@@ -49,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noTileCollide = true;
             modNPC.drawCenter = new Vector2(0, -2);
             modNPC.OverrideIgniteVisual = true;
-            lightTex = TexDict["CoriteGlow"];
+            lightTex = TexDict["CoriteGlow"].Value;
         }
         public override void AI()
         {

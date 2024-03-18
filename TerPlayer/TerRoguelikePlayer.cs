@@ -1605,7 +1605,7 @@ namespace TerRoguelike.TerPlayer
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-                Texture2D telegraphBase = TexDict["InvisibleProj"];
+                Texture2D telegraphBase = TexDict["InvisibleProj"].Value;
 
                 float scale = 1.64f;
                 float opacity = MathHelper.Lerp(0.08f, 0f, (closestNPCDistance - 128f) / 128f);
@@ -1664,7 +1664,7 @@ namespace TerRoguelike.TerPlayer
 
                 // Fetch shield noise overlay texture (this is the techy overlay fed to the shader)
                 Vector2 pos = Player.MountedCenter + Player.gfxOffY * Vector2.UnitY - Main.screenPosition;
-                Texture2D tex = TexDict["OverheadWaves"];
+                Texture2D tex = TexDict["OverheadWaves"].Value;
 
                 float scale = 0.115f * opacity;
                 Main.spriteBatch.Draw(tex, pos, null, Color.White, 0, tex.Size() / 2f, scale, 0, 0);
@@ -1711,8 +1711,8 @@ namespace TerRoguelike.TerPlayer
                 if (soulOfLenaUses < soulOfLena || soulOfLenaHurtVisual)
                 {
                     Vector2 desiredPos = Player.Top - new Vector2(32 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f + 12f);
-                    Texture2D lenaTex = TexDict["Lena"];
-                    Texture2D circleTex = TexDict["LenaGlow"];
+                    Texture2D lenaTex = TexDict["Lena"].Value;
+                    Texture2D circleTex = TexDict["LenaGlow"].Value;
                     int lenaFrame = hurtCheck ? 2 : (Main.GlobalTimeWrappedHourly % 1.1f >= 0.55f ? 1 : 0);
                     int frameHeight = lenaTex.Height / 3;
                     SpriteEffects spriteEffects = Player.direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
@@ -1769,7 +1769,7 @@ namespace TerRoguelike.TerPlayer
             if (droneBuddy > 0)
             {
                 Vector2 desiredPos = droneBuddyState != 1 ? Player.Center - new Vector2(48 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f) : Player.Center + ((Main.npc[droneTarget].Center - Player.Center).SafeNormalize(Vector2.UnitY) * 48);
-                Texture2D droneTex = TexDict["DroneBuddyMinion"];
+                Texture2D droneTex = TexDict["DroneBuddyMinion"].Value;
                 float fullAnimTime = Main.GlobalTimeWrappedHourly % 0.5f;
                 int droneFrame = fullAnimTime % 0.25f <= 0.125f ? 1 : (fullAnimTime <= 0.25f ? 0 : 2);
                 int faceFrame = droneBuddyState == 1 ? 5 : (Main.GlobalTimeWrappedHourly % 9f <= 0.4f ? 4 : 3);
@@ -1804,7 +1804,7 @@ namespace TerRoguelike.TerPlayer
                 if (droneBuddyState == 2)
                 {
                     float opacity = MathHelper.Clamp(MathHelper.Lerp(0f, 1f, (droneBuddyHealTime) / 30f), 0f, 1f);
-                    Texture2D squareTex = TexDict["AdaptiveGunBullet"];
+                    Texture2D squareTex = TexDict["AdaptiveGunBullet"].Value;
                     Vector2 projSpawnPos = droneBuddyVisualPosition + (new Vector2(0.4f * (droneBuddyVisualPosition.X > Player.Center.X ? -1 : 1), 1f).RotatedBy(droneSeenRot) * 11f * new Vector2(1.2f, 1));
                     for (int i = 0; i < 15; i++)
                     {
@@ -1852,7 +1852,7 @@ namespace TerRoguelike.TerPlayer
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
 
-                Texture2D telegraphBase = TexDict["InvisibleProj"];
+                Texture2D telegraphBase = TexDict["InvisibleProj"].Value;
 
                 float scale;
                 float opacity;
@@ -2100,7 +2100,7 @@ namespace TerRoguelike.TerPlayer
                 return;
             }
 
-            Texture2D fungTex = TexDict["HealingFungus"];
+            Texture2D fungTex = TexDict["HealingFungus"].Value;
             int frameHeight = fungTex.Height / Main.projFrames[ModContent.ProjectileType<HealingFungus>()];
             for (int i = 0; i < visualFungi.Count; i++)
             {

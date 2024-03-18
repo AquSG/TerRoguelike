@@ -50,9 +50,9 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0.3f;
             modNPC.drawCenter = new Vector2(0, -5);
-            lightTex = TexDict["VortexWatcherGlow"];
-            ballTex = TexDict["CircularGlow"];
-            vortexTex = TexDict["BlackVortex"];
+            lightTex = TexDict["VortexWatcherGlow"].Value;
+            ballTex = TexDict["CircularGlow"].Value;
+            vortexTex = TexDict["BlackVortex"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

@@ -49,9 +49,9 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -6);
-            lightTex = TexDict["DaybreakerGlow"];
-            armTex = TexDict["DaybreakerArm"];
-            wepTex = TexDict["Daybreak"];
+            lightTex = TexDict["DaybreakerGlow"].Value;
+            armTex = TexDict["DaybreakerArm"].Value;
+            wepTex = TexDict["Daybreak"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {

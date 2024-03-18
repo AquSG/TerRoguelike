@@ -36,9 +36,9 @@ namespace TerRoguelike.UI
         public static bool restartHover = false;
         internal static void Load()
         {
-            baseUITex = TexDict["DeathUI"];
-            mainMenuButtonTex = TexDict["MenuButton"];
-            mainMenuButtonHoverTex = TexDict["MenuButtonHover"];
+            baseUITex = TexDict["DeathUI"].Value;
+            mainMenuButtonTex = TexDict["MenuButton"].Value;
+            mainMenuButtonHoverTex = TexDict["MenuButtonHover"].Value;
             itemsToDraw = new List<Item>();
             Reset();
         }

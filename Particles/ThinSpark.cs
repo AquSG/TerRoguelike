@@ -42,7 +42,7 @@ namespace TerRoguelike.Particles
         public bool velocityToRotaion;
         public ThinSpark(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, bool NoGravity = false, bool VelocityToRotation = true)
         {
-            texture = TexDict["ThinSpark"];
+            texture = TexDict["ThinSpark"].Value;
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = true;
             oldPosition = Position;

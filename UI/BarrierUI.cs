@@ -22,8 +22,8 @@ namespace TerRoguelike.UI
         private static Texture2D barrierBarTex, barrierBorderTex;
         internal static void Load()
         {
-            barrierBarTex = TexDict["BarrierBar"];
-            barrierBorderTex = TexDict["BarrierBarBorder"];
+            barrierBarTex = TexDict["BarrierBar"].Value;
+            barrierBorderTex = TexDict["BarrierBarBorder"].Value;
 
             Reset();
         }
