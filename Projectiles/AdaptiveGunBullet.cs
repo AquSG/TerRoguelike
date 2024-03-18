@@ -74,6 +74,7 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.timeLeft <= 2 * Projectile.MaxUpdates)
             {
+                
                 ableToHit = false;
                 Projectile.velocity = Vector2.Zero;
                 return;
@@ -130,6 +131,8 @@ namespace TerRoguelike.Projectiles
             modProj.bounceCount++;
             if (modProj.bounceCount >= 1 + modProj.extraBounces)
             {
+                if (oldVelocity != Vector2.Zero)
+                    Projectile.Center = TileCollidePositionInLine(Projectile.Center, Projectile.Center + oldVelocity.SafeNormalize(Vector2.UnitY) * 16);
                 if (Projectile.timeLeft > 2 * Projectile.MaxUpdates)
                     Projectile.timeLeft = 2 * Projectile.MaxUpdates;
                 ableToHit = false;
