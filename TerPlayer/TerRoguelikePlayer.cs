@@ -654,7 +654,7 @@ namespace TerRoguelike.TerPlayer
                     {
                         Vector2 projSpawnPos = droneBuddyVisualPosition + (Vector2.UnitY.RotatedBy(droneSeenRot) * 11f * new Vector2(1.2f, 1));
                         droneBuddyAttackCooldown = 0;
-                        int spawnedProjectile = Projectile.NewProjectile(Player.GetSource_FromThis(), projSpawnPos, (Main.npc[droneTarget].Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), 100, 1f, Player.whoAmI);
+                        int spawnedProjectile = Projectile.NewProjectile(Player.GetSource_FromThis(), projSpawnPos, (Main.npc[droneTarget].Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), 100, 1f, Player.whoAmI);
                         Main.projectile[spawnedProjectile].scale = scaleMultiplier;
                         SoundEngine.PlaySound(SoundID.Item108 with { Volume = 0.3f }, droneBuddyVisualPosition);
                         Dust dust = Dust.NewDustDirect(projSpawnPos - new Vector2(2), 4, 4, DustID.YellowTorch);
@@ -832,7 +832,7 @@ namespace TerRoguelike.TerPlayer
             if (sniperComponent > 0)
             {
                 float finalAttackSpeedMultiplier = 1f;
-                float finalDamageMultiplier = 6f * sniperComponent;
+                float finalDamageMultiplier = 8f * sniperComponent;
                 for (int i = 0; i < sniperComponent; i++)
                 {
                     finalAttackSpeedMultiplier *= 1 - (2f / (2.5f + sniperComponent));

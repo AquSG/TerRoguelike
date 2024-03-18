@@ -658,9 +658,9 @@ Items: {
 		DisplayName: Sniper Component
 		Tooltip:
 			'''
-			6x damage
+			8x damage
 			Massively decreased attack speed by a multiplier
-			Extra copies of this item increase the damage multiplier by 6, and further decrease attack speed
+			Extra copies of this item increase the damage multiplier by 8, and further decrease attack speed
 			'''
 	}
 

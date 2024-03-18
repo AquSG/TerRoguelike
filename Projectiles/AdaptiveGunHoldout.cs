@@ -124,7 +124,7 @@ namespace TerRoguelike.Projectiles
                 }
                 
                 Vector2 direction = (mainAngle).ToRotationVector2();
-                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 1.5f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
+                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI);
                 Main.projectile[spawnedProjectile].scale = modPlayer.scaleMultiplier;
             }
             Charge -= 20f;

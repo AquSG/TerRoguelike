@@ -171,13 +171,14 @@ namespace TerRoguelike.Projectiles
             if (homingCheckCooldown > 0) //cooldown on homing checks as an attempt to stave off lag
             {
                 homingCheckCooldown--;
-                return;
+                if (homingTarget == -1)
+                    return;
             }
 
             if (homingTarget == -1)
             {
                 //create a list of each npc's homing rating relative to the projectile's position and velocity direction to try and choose the best target.
-                float prefferedDistance = 640f;
+                float prefferedDistance = 1000f;
                 List<float> npcHomingRating = new List<float>(new float[Main.maxNPCs]);
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
@@ -196,10 +197,12 @@ namespace TerRoguelike.Projectiles
                     }
                     else
                     {
-                        npcHomingRating[i] += 1f - (distance / 1000f);
+                        npcHomingRating[i] += 1f - (distance / 7000f);
+                        if (npcHomingRating[i] <= -10)
+                            npcHomingRating[i] = -9.9999f;
                     }
                 }
-                homingCheckCooldown = 10;
+                homingCheckCooldown = 10 * projectile.MaxUpdates;
 
                 if (npcHomingRating.All(x => x == -10f))
                     return;
