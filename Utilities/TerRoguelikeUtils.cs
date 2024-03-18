@@ -214,7 +214,7 @@ namespace TerRoguelike.Utilities
             float angle = rad2 - rad1;
 
             if (Math.Abs(angle) > MathHelper.Pi)
-                angle = (angle - (Math.Sign(angle) * MathHelper.Pi)) - (Math.Sign(angle) * MathHelper.Pi);
+                angle -= Math.Sign(angle) * MathHelper.TwoPi;
 
             return angle;
         }

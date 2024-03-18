@@ -8,11 +8,16 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
     public class CrimsonEnemyRoom2 : Room
     {
+        public override int AssociatedFloor => FloorDict["Crimson"];
         public override string Key => "CrimsonEnemyRoom2";
         public override string Filename => "Schematics/RoomSchematics/CrimsonEnemyRoom2.csch";
         public override bool CanExitRight => true;
@@ -21,14 +26,17 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) / 3f, (RoomDimensions.Y * 16f) - 32f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 64f, (RoomDimensions.Y * 16f) - 32f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f) - 128f, (RoomDimensions.Y * 16f) - 32f), NPCID.BloodCrawlerWall, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2(72f, 32f), NPCID.IchorSticker, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f) - 48f, (RoomDimensions.Y * 16f) / 4f), NPCID.Crimera, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f) - 96f, (RoomDimensions.Y * 16f / 4f) + 20f), NPCID.Crimera, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f), (RoomDimensions.Y * 16f / 4f) - 20f), NPCID.Crimera, 60, 120, 0.45f);
-            AddRoomNPC(new Vector2((RoomDimensions.X * 16f / 2f), (RoomDimensions.Y * 16f / 2f)), NPCID.CrimsonAxe, 60, 120, 0.6f);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -4, -3), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -16, -3), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 10, 3), ModContent.NPCType<IchorSticker>(), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Top, -5, 13), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Top, 4, 10), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Top, -20, 14), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Bottom, 12, -14), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Bottom, -4, -6), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+
+            AddRoomNPC(MakeEnemySpawnPos(TopRight, -9, 4), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
+            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 9, -2), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
         }
     }
 }
