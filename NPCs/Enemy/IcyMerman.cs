@@ -69,7 +69,7 @@ namespace TerRoguelike.NPCs.Enemy
             }
             else
             {
-                for (int i = 0; i < 35; i++)
+                for (int i = 0; i < 10; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, 2 * hit.HitDirection, -2f);
                 }

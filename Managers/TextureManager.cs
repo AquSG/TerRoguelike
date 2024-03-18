@@ -23,6 +23,7 @@ using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using Terraria.Audio;
 
 namespace TerRoguelike.Managers
 {

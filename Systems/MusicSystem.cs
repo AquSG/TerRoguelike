@@ -21,6 +21,7 @@ using Terraria.Audio;
 using ReLogic.Utilities;
 using TerRoguelike.TerPlayer;
 using Terraria.ModLoader.IO;
+using System.Threading;
 
 namespace TerRoguelike.Systems
 {
@@ -70,6 +71,11 @@ namespace TerRoguelike.Systems
                 return;
 
             PlayedAllSounds = true;
+
+            ThreadPool.QueueUserWorkItem(_ => PlayAllSoundsCallback());
+        }
+        private static void PlayAllSoundsCallback()
+        {
             CalmMusic = SoundEngine.PlaySound(Silence with { Volume = 0f });
             CalmMusic = SoundEngine.PlaySound(BaseTheme.CalmTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(BaseTheme.CombatTrack with { Volume = 0f });
@@ -82,7 +88,6 @@ namespace TerRoguelike.Systems
             CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.BattleTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.StartTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.EndTrack with { Volume = 0f });
-
             if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
             {
                 calmMusic.Stop();
