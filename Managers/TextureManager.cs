@@ -122,7 +122,7 @@ namespace TerRoguelike.Managers
         internal static void AddTex(string path)
         {
             string name = path.Substring(path.LastIndexOf("/") + 1);
-            TexDict.Add(name, ModContent.Request<Texture2D>(path, ReLogic.Content.AssetRequestMode.AsyncLoad));
+            TexDict.Add(name, ModContent.Request<Texture2D>(path, AssetRequestMode.AsyncLoad));
         }
     }
 }
