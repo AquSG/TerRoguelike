@@ -61,6 +61,7 @@ Projectiles: {
 	LeafBall.DisplayName: Leaf Ball
 	VineWall.DisplayName: Vine Wall
 	RootPillar.DisplayName: Root Pillar
+	SeerBallBase.DisplayName: Seer Ball Base
 }
 
 Items: {

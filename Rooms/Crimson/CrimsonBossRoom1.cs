@@ -30,7 +30,7 @@ namespace TerRoguelike.Rooms
         public override void Update()
         {
             if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f);
+                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f + 64);
             base.Update();
         }
     }

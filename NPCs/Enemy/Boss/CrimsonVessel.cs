@@ -20,6 +20,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.SpawnManager;
+using ReLogic.Utilities;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -33,15 +34,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override List<int> associatedFloors => new List<int>() { FloorDict["Crimson"] };
         public override int CombatStyle => -1;
         public int currentFrame;
+        public static readonly SoundStyle HellRumble = new SoundStyle("TerRoguelike/Sounds/HellRumble");
+        public static readonly SoundStyle CrimsonHeal = new SoundStyle("TerRoguelike/Sounds/CrimsonHeal");
+        public static readonly SoundStyle TeleportSound = new SoundStyle("TerRoguelike/Sounds/Teleport");
+        public SlotId RumbleSlot;
+        public SlotId TeleportSlot;
+        public Texture2D glowTex;
 
         public int deadTime = 0;
-        public int cutsceneDuration = 150;
+        public int cutsceneDuration = 240;
         public int deathCutsceneDuration = 150;
 
         public Attack None = new Attack(0, 0, 180);
         public Attack Teleport = new Attack(1, 20, 40);
-        public Attack Heal = new Attack(2, 0, 440);
-        public Attack BouncyBall = new Attack(3, 20, 180);
+        public Attack Heal = new Attack(2, 0, 385);
+        public Attack BouncyBall = new Attack(3, 20, 600);
         public Attack BloodSpread = new Attack(4, 20, 90);
         public Attack Charge = new Attack(5, 20, 150);
         public Attack BloodTrail = new Attack(6, 20, 150);
@@ -50,7 +57,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         List<TrackedSeer> trackedSeers = new List<TrackedSeer>();
         public int healCountdown = 1500;
         public int setHealTime = 1500;
-        public int seerSpawnTime = 100;
+        public int seerSpawnTime = 45;
+        public int ballLaunchTime = 130;
+        public Vector2 seerOrbitCenter;
+        public Vector2 ballPos;
+        public int ballEndLag = 120;
+        public int calculatedSeers = 0;
 
         public override void SetStaticDefaults()
         {
@@ -72,26 +84,30 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
-            
+            glowTex = TexDict["CircularGlow"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {
+            seerOrbitCenter = NPC.Center + modNPC.drawCenter;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
-            currentFrame = 0;
+            currentFrame = 4;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
             NPC.ai[2] = None.Id;
-            NPC.ai[1] = Heal.Duration - seerSpawnTime;
-        }
-        public override void DrawBehind(int index)
-        {
-
+            NPC.ai[1] = -48;
+            NPC.localAI[1] = -1;
         }
         public override void AI()
         {
+            if (NPC.localAI[1] >= 0 && !trackedSeers.Any())
+            {
+                Main.projectile[(int)NPC.localAI[1]].Kill();
+                NPC.localAI[1] = -1;
+            }
+
             if (deadTime > 0)
             {
                 CheckDead();
@@ -99,12 +115,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(BrambleHollowTheme);
+                SetBossTrack(CrimsonVesselTheme);
             }
 
             ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportTime);
             canBeHit = true;
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
+            seerOrbitCenter = NPC.Center + modNPC.drawCenter;
 
             NPC.frameCounter += 0.13d;
             if (NPC.localAI[0] < 0)
@@ -114,12 +131,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
                 }
-
                 NPC.localAI[0]++;
+                if (NPC.localAI[0] == -30 - seerSpawnTime - 120)
+                {
+                    RumbleSlot = RumbleSlot = SoundEngine.PlaySound(HellRumble with { Volume = 0.8f }, NPC.Center);
+                    if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+                    {
+                        rumbleSound.Volume = 0;
+                        rumbleSound.Update();
+                    }
+                }
+                if (NPC.localAI[0] < -30 - seerSpawnTime && NPC.localAI[0] > -30 - seerSpawnTime - 120)
+                {
+                    if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+                    {
+                        rumbleSound.Position = NPC.Center;
+                        if (rumbleSound.Volume < 1f)
+                            rumbleSound.Volume += 0.1f;
+                        if (rumbleSound.Volume > 1f)
+                            rumbleSound.Volume = 1f;
+                        rumbleSound.Update();
+                    }
+                }
                 if (NPC.localAI[0] < -30 && NPC.localAI[0] >= -30 - seerSpawnTime)
                 {
+                    if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+                    {
+                        rumbleSound.Volume -= 0.025f;
+                        rumbleSound.Update();
+                        if (rumbleSound.Volume <= 0)
+                            rumbleSound.Stop();
+                    }
                     SpawnSeers();
-                    NPC.ai[1]++;
                 }
                 if (NPC.localAI[0] == -30)
                 {
@@ -127,6 +170,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
                 }
+                if (NPC.localAI[0] < -30)
+                    NPC.ai[1]++;
             }
             else
             {
@@ -141,7 +186,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     TrackedSeer seer = trackedSeers[i];
                     NPC npc = Main.npc[seer.whoAmI];
                     npc.ai[3] = NPC.ai[3];
-                    CrimsonSeer.UpdateCrimsonSeer(npc, seer.seerId, trackedSeers.Count);
+                    CrimsonSeer.UpdateCrimsonSeer(npc, seer.seerId, calculatedSeers, seerOrbitCenter);
                 }
             }
         }
@@ -149,6 +194,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             target = modNPC.GetTarget(NPC, false, false);
 
+            if (NPC.localAI[1] >= 0)
+            {
+                Projectile ballproj = Main.projectile[(int)NPC.localAI[1]];
+                if (!ballproj.active)
+                    NPC.localAI[1] = -1;
+            }
             NPC.ai[1]++;
             healCountdown--;
             if (NPC.localAI[0] == 1)
@@ -176,6 +227,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            if (!(NPC.ai[0] == BouncyBall.Id && NPC.ai[1] > teleportTime) && trackedSeers.Any())
+            {
+                calculatedSeers = trackedSeers.Count;
+                for (int i = 0; i < trackedSeers.Count; i++)
+                {
+                    trackedSeers[i].seerId = i;
+                }
+            }
+
             if (NPC.ai[0] == Teleport.Id)
             {
                 TeleportAI();
@@ -189,6 +249,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Heal.Id)
             {
+                if (NPC.ai[1] == 0)
+                {
+                    RumbleSlot = RumbleSlot = SoundEngine.PlaySound(HellRumble with { Volume = 0.8f }, NPC.Center);
+                    if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+                    {
+                        rumbleSound.Volume = 0;
+                        rumbleSound.Update();
+                    }
+                } 
                 if (NPC.ai[1] <= teleportTime)
                     TeleportAI(spawnPos);
                 if (NPC.ai[1] >= teleportMoveTimestamp)
@@ -196,20 +265,32 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] == teleportTime + 1)
                 {
                     if (!trackedSeers.Any())
-                        NPC.ai[1] = Heal.Duration - seerSpawnTime;
+                        NPC.ai[1] = Heal.Duration - seerSpawnTime - 120;
+                }
+                if (NPC.ai[1] >= teleportTime - 10 && NPC.ai[1] <= teleportTime)
+                {
+                    if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+                    {
+                        rumbleSound.Position = NPC.Center;
+                        if (rumbleSound.Volume < 1f)
+                            rumbleSound.Volume += 0.1f;
+                        if (rumbleSound.Volume > 1f)
+                            rumbleSound.Volume = 1f;
+                        rumbleSound.Update();
+                    }
                 }
                 if (NPC.ai[1] > teleportTime && NPC.ai[1] < Heal.Duration - seerSpawnTime)
                 {
+                    modNPC.diminishingDR = 400;
                     for (int i = 0; i < trackedSeers.Count; i++)
                     {
                         TrackedSeer trackedSeer = trackedSeers[i];
                         NPC seer = Main.npc[trackedSeer.whoAmI];
                         if (seer.active && seer.life > 0 && (seer.Center - NPC.Center).Length() < 16)
                         {
+                            SoundEngine.PlaySound(CrimsonHeal with { Volume = 0.3f, MaxInstances = 8 }, NPC.Center);
                             seer.StrikeInstantKill();
-                            int healAmt = (int)(1000 * healthScalingMultiplier);
-                            NPC.life += healAmt;
-                            NPC.HealEffect(healAmt, true);
+                            SeerHeal();
                         }
                     }
                 }
@@ -221,16 +302,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC seer = Main.npc[trackedSeer.whoAmI];
                         if (seer.active)
                         {
+                            SoundEngine.PlaySound(CrimsonHeal with { Volume = 0.3f, MaxInstances = 2 }, NPC.Center);
                             seer.StrikeInstantKill();
-                            int healAmt = (int)(1000 * healthScalingMultiplier);
-                            NPC.life += healAmt;
-                            NPC.HealEffect(healAmt, true);
+                            SeerHeal();
                         }
                     }
                     trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
                 }
                 if (NPC.ai[1] >= Heal.Duration - seerSpawnTime)
                 {
+                    if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+                    {
+                        rumbleSound.Volume -= 0.025f;
+                        rumbleSound.Update();
+                        if (rumbleSound.Volume <= 0)
+                            rumbleSound.Stop();
+                    }
                     SpawnSeers();
                 }
 
@@ -240,18 +327,63 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Heal.Id;
                     NPC.ai[3] = 0;
-                    healCountdown = setHealTime;
+                    healCountdown = setHealTime + Main.rand.Next(-60, 0);
                 }
             }
             else if (NPC.ai[0] == BouncyBall.Id)
             {
                 if (NPC.ai[1] <= teleportTime)
                     TeleportAI();
+                else
+                {
+                    NPC.ai[3] = 0;
+                    float completion = (NPC.ai[1] - (teleportTime + 1)) / (ballLaunchTime - (teleportTime + 20));
+                    if (NPC.ai[1] >= teleportTime + 1 && NPC.ai[1] < ballLaunchTime)
+                    {
+                        float ballRot = MathHelper.PiOver2;
+                        if (target != null)
+                        {
+                            ballRot = (target.Center - NPC.Center).ToRotation();
+                        }
+                        ballPos = NPC.Center + modNPC.drawCenter + ballRot.ToRotationVector2() * 100f;
+
+                        if (NPC.ai[1] == teleportTime + 1)
+                        {
+                            //float scale = trackedSeers.Count / 4f;
+                            float scale = 2f;
+                            NPC.localAI[1] = Projectile.NewProjectile(NPC.GetSource_FromThis(), ballPos, ballRot.ToRotationVector2() * 8f, ModContent.ProjectileType<SeerBallBase>(), NPC.damage, 0, -1, 0, scale, ballLaunchTime - (teleportTime + 1));
+                        }
+
+                        if (NPC.localAI[1] >= 0)
+                        {
+                            Projectile ballproj = Main.projectile[(int)NPC.localAI[1]];
+                            ballproj.rotation = ballRot;
+                            ballproj.Center = ballPos;
+                        }
+                    }
+                    else if (NPC.localAI[1] >= 0)
+                    {
+                        ballPos = Main.projectile[(int)NPC.localAI[1]].Center;
+                        NPC.ai[1] = ballLaunchTime;
+                    }
+                    else if (NPC.ai[1] < BouncyBall.Duration - ballEndLag)
+                    {
+                        NPC.ai[1] = BouncyBall.Duration - ballEndLag;
+                    }
+
+                    if (NPC.ai[1] >= BouncyBall.Duration - ballEndLag)
+                    {
+                        completion = 1f - ((NPC.ai[1] - (BouncyBall.Duration - ballEndLag)) / ballEndLag); 
+                    }
+
+                    completion = MathHelper.Clamp(completion, 0, 1);
+                    seerOrbitCenter = NPC.Center + modNPC.drawCenter + ((ballPos - (NPC.Center + modNPC.drawCenter)) * MathHelper.SmoothStep(0, 1, completion));
+                }
 
                 if (NPC.ai[1] >= BouncyBall.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = None.Duration - 60;
                     NPC.ai[2] = BouncyBall.Id;
                     NPC.ai[3] = 0;
                 }
@@ -296,7 +428,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            bool defaultMovement = (NPC.ai[0] == 0 || NPC.ai[1] <= teleportTime) && !(NPC.ai[0] == Heal.Id && NPC.ai[1] >= teleportMoveTimestamp);
+            bool defaultMovement = (NPC.ai[0] == None.Id || NPC.ai[0] == BouncyBall.Id || NPC.ai[1] <= teleportTime) && !(NPC.ai[0] == Heal.Id && NPC.ai[1] >= teleportMoveTimestamp);
             if (defaultMovement)
             {
                 if (target != null)
@@ -314,6 +446,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void TeleportAI(Vector2? forcedLocation = null)
         {
+            if (NPC.ai[3] == 5)
+            {
+                TeleportSlot = SoundEngine.PlaySound(TeleportSound with { Volume = 0.4f }, NPC.Center);
+            }
             NPC.ai[3]++;
 
             if (NPC.ai[3] == teleportMoveTimestamp)
@@ -348,12 +484,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     teleportLocation = spawnPos + Main.rand.NextVector2CircularEdge(240, 240);
 
                 NPC.Center = teleportLocation;
+                if (SoundEngine.TryGetActiveSound(TeleportSlot, out var teleportSound) && teleportSound.IsPlaying)
+                {
+                    teleportSound.Position = NPC.Center;
+                    teleportSound.Update();
+                }
             }
-
             if (NPC.ai[3] == teleportTime)
             {
                 NPC.ai[3] = 0;
             }
+        }
+        public void SeerHeal()
+        {
+            int healAmt = (int)(900 * healthScalingMultiplier);
+            NPC.life += healAmt;
+            if (NPC.life > NPC.lifeMax)
+                NPC.life = NPC.lifeMax;
+            NPC.HealEffect(healAmt, true);
         }
         public void SpawnSeers()
         {
@@ -369,6 +517,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 seer.rotation = rotation;
                 seer.ai[3] = NPC.ai[3];
                 seer.localAI[2] = -(Heal.Duration - NPC.ai[1]);
+                if (NPC.localAI[0] < 0)
+                    seer.localAI[2] += 180;
                 seer.ModNPC().isRoomNPC = modNPC.isRoomNPC;
                 seer.ModNPC().sourceRoomListID = modNPC.sourceRoomListID;
                 trackedSeers.Add(new TrackedSeer(currentSeer, whoAmI));
@@ -389,7 +539,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge, BloodTrail };
                 potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
-                if (!trackedSeers.Any())
+                if (trackedSeers.Count < 4)
                     potentialAttacks.RemoveAll(x => x.Id == BouncyBall.Id || x.Id == BloodSpread.Id);
 
                 int totalWeight = 0;
@@ -409,9 +559,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         break;
                     }
                 }
-                chosenAttack = Teleport.Id;
+                chosenAttack = BouncyBall.Id;
             }
-            
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -431,6 +581,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
+            if (NPC.localAI[1] >= 0)
+            {
+                Main.projectile[(int)NPC.localAI[1]].Kill();
+                NPC.localAI[1] = -1;
+            }
+
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 return true;
@@ -445,6 +601,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             NPC.active = true;
+
+            if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
+            {
+                rumbleSound.Volume -= 0.05f;
+                rumbleSound.Update();
+                if (rumbleSound.Volume <= 0)
+                    rumbleSound.Stop();
+            }
 
             if (deadTime == 0)
             {
@@ -516,8 +680,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int frameCount = Main.npcFrameCount[Type];
             
             currentFrame = (int)NPC.frameCounter % (frameCount - 4);
-            if (NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportMoveTimestamp)
+            if ((NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportMoveTimestamp) || NPC.localAI[0] < -30)
                 currentFrame += 4;
+            if (deadTime > 0)
+                currentFrame = 5;
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }
@@ -537,6 +703,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 scale *= 1f - interpolant;
             }
+
             if (modNPC.ignitedStacks.Any())
             {
                 spriteBatch.End();
@@ -557,8 +724,35 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
-            Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             
+            Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+
+            if ((NPC.ai[0] == Heal.Id || NPC.localAI[0] < 0) && NPC.ai[1] > teleportTime - 10)
+            {
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                float interpolant = NPC.ai[1] > teleportTime ? 1f - ((NPC.ai[1] - (Heal.Duration - seerSpawnTime)) / seerSpawnTime) : (NPC.ai[1] - (teleportTime - 10)) / 10;
+                if (NPC.localAI[0] < 0)
+                    interpolant = -(NPC.localAI[0] + 30) / seerSpawnTime;
+                interpolant = MathHelper.Clamp(interpolant, 0, 1f);
+                float fadeInInterpolant = (NPC.ai[1] - (teleportTime - 10)) / 10;
+                fadeInInterpolant = MathHelper.Clamp(fadeInInterpolant, 0, 1f);
+
+
+                Vector3 colorHSL = Main.rgbToHsl(Color.Lerp(Color.DarkGreen, Color.Black, 1f - interpolant));
+                Main.EntitySpriteDraw(glowTex, drawPos - Main.screenPosition, null, Color.LimeGreen * 0.5f * (NPC.ai[1] > teleportTime + 40 ? interpolant : fadeInInterpolant), 0f, glowTex.Size() * 0.5f, NPC.scale + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 3) * 0.1f), SpriteEffects.None);
+
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
+                Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            }
+
             return false;
         }
     }

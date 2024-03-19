@@ -37,6 +37,11 @@ namespace TerRoguelike.NPCs
         public bool SpecialProjectileCollisionRules = false; // Makes certain things happen on the attacking projectile rather than the closest point in the NPC rect to the projectile
         public int baseMaxHP = 0;
         public int baseDamage = 0;
+        public float diminishingDR = 0;
+        public float effectiveDamageTakenMulti
+        {
+            get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR)));  }
+        }
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -3182,6 +3187,7 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreAI(NPC npc)
         {
+            diminishingDR = 0;
             if (ballAndChainSlow > 0) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
             {
                 npc.velocity /= 0.7f;
@@ -3307,7 +3313,7 @@ namespace TerRoguelike.NPCs
 
             TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
-            hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center));
+            hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
 
             if (npc.life - hitDamage <= 0)
             {
@@ -3333,7 +3339,7 @@ namespace TerRoguelike.NPCs
 
             TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
-            hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center));
+            hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
 
             if (npc.life - hitDamage <= 0)
             {
@@ -3393,6 +3399,8 @@ namespace TerRoguelike.NPCs
             {
                 modifiers.DefenseEffectiveness *= 0f;
             }
+
+            modifiers.SourceDamage *= effectiveDamageTakenMulti;
         }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

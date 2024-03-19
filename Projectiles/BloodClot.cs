@@ -33,7 +33,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            for (int i = 0; i < Main.rand.Next(1, 3); i++)
+            for (int i = 0; i < 1; i++)
             {
                 int d = Dust.NewDust(Projectile.position + Projectile.velocity, Projectile.width, Projectile.height, DustID.Crimson, 0, 0, Projectile.alpha, default(Color), 1.6f);
                 Dust dust = Main.dust[d];
@@ -42,7 +42,7 @@ namespace TerRoguelike.Projectiles
                 dust.noLightEmittence = true;
                 dust.noLight = true;
             }
-            if (Main.rand.NextBool())
+            if (Main.rand.NextBool(3))
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.CrimsonTorch, 0, 0, Projectile.alpha, Color.LimeGreen, 1.5f);
                 Dust dust = Main.dust[d];
@@ -54,7 +54,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnKill(int timeLeft)
         {
-            for (int i = 0; i < 24; i++)
+            for (int i = 0; i < 8; i++)
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Crimson, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, default(Color), 1f);
                 Dust dust = Main.dust[d];
