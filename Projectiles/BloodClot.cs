@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.Projectiles
 {
@@ -33,7 +34,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            for (int i = 0; i < 1; i++)
+            if (Main.rand.NextBool())
             {
                 int d = Dust.NewDust(Projectile.position + Projectile.velocity, Projectile.width, Projectile.height, DustID.Crimson, 0, 0, Projectile.alpha, default(Color), 1.6f);
                 Dust dust = Main.dust[d];
@@ -42,7 +43,7 @@ namespace TerRoguelike.Projectiles
                 dust.noLightEmittence = true;
                 dust.noLight = true;
             }
-            if (Main.rand.NextBool(3))
+            if (Main.rand.NextBool(5))
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.CrimsonTorch, 0, 0, Projectile.alpha, Color.LimeGreen, 1.5f);
                 Dust dust = Main.dust[d];
@@ -50,11 +51,20 @@ namespace TerRoguelike.Projectiles
                 dust.noLightEmittence = true;
                 dust.noLight = true;
             }
-            
+
+            Vector2 velocity = -Projectile.velocity.SafeNormalize(Vector2.UnitY) * 1;
+            velocity *= Main.rand.NextFloat(0.5f, 1f);
+            velocity.Y -= 0.8f;
+            if (Main.rand.NextBool(3))
+                velocity *= 1.5f;
+            Vector2 scale = new Vector2(0.25f, 0.4f) * 0.75f;
+            int time = 30 + Main.rand.Next(20);
+            ParticleManager.AddParticle(new Blood(Projectile.Center + Projectile.velocity, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+            ParticleManager.AddParticle(new Blood(Projectile.Center + Projectile.velocity, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
         }
         public override void OnKill(int timeLeft)
         {
-            for (int i = 0; i < 8; i++)
+            for (int i = 0; i < 4; i++)
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Crimson, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, default(Color), 1f);
                 Dust dust = Main.dust[d];
