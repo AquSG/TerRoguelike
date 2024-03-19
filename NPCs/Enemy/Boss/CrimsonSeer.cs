@@ -19,13 +19,18 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using TerRoguelike.Particles;
+using TerRoguelike.Managers;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
     public class CrimsonSeer : BaseRoguelikeNPC
     {
         public override int modNPCID => ModContent.NPCType<CrimsonSeer>();
+        public static readonly SoundStyle SeerSpawn = new SoundStyle("TerRoguelike/Sounds/SeerSpawn");
         public override List<int> associatedFloors => new List<int>() { FloorDict["Crimson"] };
+        Texture2D lightningTex;
+        List<LightningDraw> lightningPath = new List<LightningDraw>();
         public override int CombatStyle => -1;
 
         bool ableToHit = true;
@@ -51,6 +56,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
             NPC.hide = true;
+            lightningTex = TexDict["Square"].Value;
         }
         public override void DrawBehind(int index)
         {
@@ -58,6 +64,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
+            NPC.localAI[0] = Main.rand.NextFloat(-1, 1 + float.Epsilon);
+            SoundEngine.PlaySound(SeerSpawn with { Volume = 0.25f, MaxInstances = 3 }, NPC.Center);
+
             NPC.ai[0] = -1;
             NPC.localAI[1] += Main.rand.Next(50);
             if (source is EntitySource_Parent parentSource)
@@ -66,6 +75,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.ai[0] = parentSource.Entity.whoAmI;
                     NPC npc = Main.npc[(int)NPC.ai[0]];
+                    GenerateLightningPath();
                     if (!npc.active)
                     {
                         NPC.StrikeInstantKill();
@@ -77,30 +87,94 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.ai[0] == -1)
                 NPC.StrikeInstantKill();
         }
+        public void GenerateLightningPath()
+        {
+            float randRot = Main.rand.NextFloat(-MathHelper.Pi * 0.3f, MathHelper.Pi * 0.3f + float.Epsilon);
+            lightningPath.Add(new LightningDraw(Vector2.Zero, randRot));
+            for (int i = 1; i < 300; i++)
+            {
+                LightningDraw oldLightning = lightningPath[i - 1];
+                float rot = oldLightning.rotation;
+                if (i % 8 == 0)
+                {
+                    int sign = -Math.Sign(oldLightning.offset.Y);
+                    if (sign == 0)
+                        sign = Main.rand.NextBool() ? -1 : 1;
+                    rot = sign * Main.rand.NextFloat(MathHelper.Pi * 0.02f, MathHelper.Pi * 0.3f + float.Epsilon);
+                }
+                Vector2 offset = oldLightning.offset + (rot.ToRotationVector2() * 2);
+                lightningPath.Add(new LightningDraw(offset, rot));
+            }
+        }
         public override void AI()
         {
             NPC.localAI[1] += Main.rand.NextFloat(0.9f, 1f);
             NPC.localAI[2]++;
-
+            if (NPC.localAI[3] == 0)
+            {
+                for (int i = 0; i < 20; i++)
+                {
+                    float rot = (float)i / 20 * MathHelper.TwoPi;
+                    rot += Main.rand.NextFloat(-0.1f, 0.1f);
+                    Vector2 offset = rot.ToRotationVector2() * 6f;
+                    ParticleManager.AddParticle(new ThinSpark(NPC.Center + offset, rot.ToRotationVector2() * 1.3f, 20, Color.LimeGreen, new Vector2(0.08f, 0.36f), rot, true));
+                }
+                for (int i = 0; i < 3; i++)
+                {
+                    float rot = Main.rand.NextFloat(MathHelper.TwoPi);
+                    ParticleManager.AddParticle(new Square(NPC.Center + (rot.ToRotationVector2() * 12), rot.ToRotationVector2() * Main.rand.NextFloat(0.66f, 1f), Main.rand.Next(90, 131), Color.Green, new Vector2(0.5f), 0, 0.96f, 60));
+                }
+                NPC.localAI[3]++;
+            }
             ableToHit = false;
             NPC parent = Main.npc[(int)NPC.ai[0]];
+            if (parent.ai[0] == 3 && parent.ai[1] == 130)
+                ableToHit = true;
+
             if (!parent.active)
                 NPC.StrikeInstantKill();
         }
-        public static void UpdateCrimsonSeer(NPC npc, int seerId, int seerCount)
+        public static void UpdateCrimsonSeer(NPC npc, int seerId, int seerCount, Vector2 orbitCenter)
         {
             NPC parent = Main.npc[(int)npc.ai[0]];
 
-            bool healMode = parent.ai[0] == 2 && parent.ai[1] > 40 && parent.ai[1] < 440 - 100;
-            bool ballMode = false;
+            bool healMode = parent.ai[0] == 2 && parent.ai[1] > 40 && parent.ai[1] < 385 - 45;
+            bool ballMode = parent.ai[0] == 3 && parent.ai[1] > 40;
 
             if (healMode)
             {
                 Vector2 direction = (parent.Center - npc.Center).SafeNormalize(Vector2.UnitY) * 1.2f;
-                float magnitude = 0.83f + (0.17f * (float)Math.Cos(npc.rotation * 68.692));
-                float healCompletion = (parent.ai[1] - 40) / (440 - 100 - 40);
+                float magnitude = 0.83f + (0.17f * npc.localAI[0]);
+                float healCompletion = (parent.ai[1] - 40) / (385 - 45 - 40);
 
                 npc.Center += direction * magnitude * healCompletion;
+            }
+            else if (ballMode)
+            {
+                float interpolant = (parent.ai[1] - (40 + 1)) / (130 - (40 + 20)) * 0.4f;
+                float rotationOffset = 0;
+                rotationOffset = npc.localAI[2] / 60 * MathHelper.TwoPi;
+                if (parent.ai[1] == 130)
+                {
+                    
+                }
+                else
+                {
+                    if (parent.ai[1] > 130)
+                    {
+                        interpolant = ((parent.ai[1] - (600 - 120)) / (100)) * 0.4f;
+                    }
+                        
+                    npc.rotation += 0.01f * (1f - interpolant);
+                }
+                Vector2 offset = seerId == 0 ? Vector2.Zero : ((((seerId - 1f) / (seerCount - 1)) * MathHelper.TwoPi) + rotationOffset).ToRotationVector2() * 28f;
+                if (parent.ai[1] > 130)
+                {
+                    float magnitude = (136 + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f)));
+
+                    offset = (npc.rotation.ToRotationVector2() * magnitude);
+                }
+                npc.Center += MathHelper.SmoothStep(0, 1, interpolant) * (orbitCenter + offset - npc.Center);
             }
             else
             {
@@ -108,7 +182,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 npc.rotation += 0.01f * interpolant;
                 float magnitude = (136 + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f)));
 
-                npc.Center = parent.Center + parent.ModNPC().drawCenter + (npc.rotation.ToRotationVector2() * magnitude);
+                npc.Center = orbitCenter + (npc.rotation.ToRotationVector2() * magnitude);
             }
         }
         public override bool CanHitNPC(NPC target)
@@ -138,6 +212,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 5, 2 * hit.HitDirection, -2f);
                 }
                 Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 402);
+
+                for (int i = 0; i < 5; i++)
+                {
+                    Vector2 pos = NPC.Center + new Vector2(0, 16);
+                    Vector2 velocity = new Vector2(0, -3.3f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 0.7f, MathHelper.PiOver4 * 0.7f));
+                    velocity *= Main.rand.NextFloat(0.5f, 1f);
+                    velocity.X += hit.HitDirection;
+                    if (Main.rand.NextBool(5))
+                        velocity *= 1.5f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.75f;
+                    int time = 110 + Main.rand.Next(70);
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
+                }
             }
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -178,9 +266,79 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
-            Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, color, rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
             
+            Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, color, rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+
+            NPC parent = Main.npc[(int)NPC.ai[0]];
+            if (NPC.localAI[2] < 60 || (parent.ai[0] == 2 && parent.ai[1] > teleportTime))
+            {
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                float interpolant = 1f - (NPC.localAI[2] / 60);
+                if (NPC.localAI[2] >= 60)
+                    interpolant = 1f;
+
+                Vector3 colorHSL = Main.rgbToHsl(Color.Lerp(Color.Green, Color.Black, 1f - interpolant));
+
+
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
+                spriteBatch.Draw(tex, drawPos - Main.screenPosition, NPC.frame, color, rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0);
+
+                spriteBatch.End();
+                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            }
+
+            if ((int)(Main.GlobalTimeWrappedHourly * 60) % 3 == 0)
+            {
+                lightningPath.Clear();
+                GenerateLightningPath();
+            }
+                
+
+            if (parent.ai[0] == 2 && parent.ai[1] > 40 && parent.ai[1] < 385 - 45)
+            {
+                Vector2 parentVect = parent.Center - NPC.Center;
+                float baseRot = parentVect.ToRotation();
+                float length = (parentVect).Length();
+                if (length > lightningPath.Count)
+                    length = lightningPath.Count;
+
+                int easing = 24;
+                for (int i = 0; i < length; i++)
+                {
+                    LightningDraw lightning = lightningPath[i];
+                    if (lightning.offset.X > length)
+                        break;
+
+                    Vector2 realOffset = lightning.offset;
+                    if (i < easing)
+                        realOffset.Y *= (float)i / easing;
+                    else if (i >= length - easing)
+                        realOffset.Y *= (i - (length - (easing - 1))) / easing;
+
+                    Vector2 lightningPos = NPC.Center + realOffset.RotatedBy(baseRot);
+                    Color lightningColor = Color.Lerp(Color.LimeGreen, Color.LightGreen, i / length);
+                    Main.EntitySpriteDraw(lightningTex, lightningPos - Main.screenPosition, null, lightningColor * 0.5f, lightning.rotation + baseRot, lightningTex.Size() * 0.5f, 1f, SpriteEffects.None);
+
+                }
+            }
+
             return false;
+        }
+    }
+    public class LightningDraw
+    {
+        public Vector2 offset;
+        public float rotation;
+
+        public LightningDraw(Vector2 Offset, float Rotation)
+        {
+            offset = Offset;
+            rotation = Rotation;
         }
     }
 }

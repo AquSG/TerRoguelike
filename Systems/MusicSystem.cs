@@ -65,6 +65,11 @@ namespace TerRoguelike.Systems
             new("TerRoguelike/Tracks/BrambleHollowThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.4f },
             new("TerRoguelike/Tracks/BrambleHollowThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.4f });
 
+        public static BossTheme CrimsonVesselTheme = new(
+            new("TerRoguelike/Tracks/CrimsonVesselTheme", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.8f },
+            new("TerRoguelike/Tracks/CrimsonVesselThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.8f },
+            new("TerRoguelike/Tracks/CrimsonVesselThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.8f });
+
         public static void PlayAllSounds()
         {
             if (PlayedAllSounds)
@@ -88,6 +93,9 @@ namespace TerRoguelike.Systems
             CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.BattleTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.StartTrack with { Volume = 0f });
             CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.EndTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(CrimsonVesselTheme.BattleTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(CrimsonVesselTheme.StartTrack with { Volume = 0f });
+            CombatMusic = SoundEngine.PlaySound(CrimsonVesselTheme.EndTrack with { Volume = 0f });
             if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
             {
                 calmMusic.Stop();

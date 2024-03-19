@@ -30,11 +30,17 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             Projectile.ai[2] = Projectile.velocity.Length();
-            Projectile.velocity *= 0;
+            if (Projectile.ai[0] != 1)
+                Projectile.velocity *= 0;
+            else
+                Projectile.velocity *= 0.25f;
+                
+
             Projectile.ai[0] = -1;
         }
         public override void AI()
         {
+            Projectile.velocity *= 0.965f;
             for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < Main.rand.Next(1, 3); i++)
@@ -57,8 +63,16 @@ namespace TerRoguelike.Projectiles
                 }
             }
         }
+        public override bool OnTileCollide(Vector2 oldVelocity)
+        {
+            Projectile.localAI[0] = 1;
+            return true;
+        }
         public override void OnKill(int timeLeft)
         {
+            if (Projectile.localAI[0] == 1)
+                return;
+
             GetTarget();
             float direction = MathHelper.PiOver2;
             if (Projectile.ai[0] != -1)
