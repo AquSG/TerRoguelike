@@ -48,8 +48,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Attack None = new Attack(0, 0, 180);
         public Attack Teleport = new Attack(1, 20, 40);
         public Attack Heal = new Attack(2, 0, 385);
-        public Attack BouncyBall = new Attack(3, 20, 600);
-        public Attack BloodSpread = new Attack(4, 20, 90);
+        public Attack BouncyBall = new Attack(3, 40, 600);
+        public Attack BloodSpread = new Attack(4, 40, 90);
         public Attack Charge = new Attack(5, 20, 150);
         public Attack BloodTrail = new Attack(6, 20, 150);
         public int teleportTime = 40;
@@ -63,6 +63,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 ballPos;
         public int ballEndLag = 120;
         public int calculatedSeers = 0;
+        public int SeerBallType = ModContent.ProjectileType<SeerBallBase>();
 
         public override void SetStaticDefaults()
         {
@@ -75,7 +76,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 112;
             NPC.aiStyle = -1;
             NPC.damage = 35;
-            NPC.lifeMax = 25000;
+            NPC.lifeMax = 20000;
             NPC.HitSound = SoundID.NPCHit9;
             NPC.DeathSound = SoundID.NPCDeath11;
             NPC.knockBackResist = 0f;
@@ -85,6 +86,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
             glowTex = TexDict["CircularGlow"].Value;
+            NPC.hide = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -104,7 +106,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.localAI[1] >= 0 && !trackedSeers.Any())
             {
-                Main.projectile[(int)NPC.localAI[1]].Kill();
+                Projectile childProj = Main.projectile[(int)NPC.localAI[1]];
+                if (childProj.type == SeerBallType)
+                    Main.projectile[(int)NPC.localAI[1]].Kill();
                 NPC.localAI[1] = -1;
             }
 
@@ -118,7 +122,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(CrimsonVesselTheme);
             }
 
-            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportTime);
+            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id);
             canBeHit = true;
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;
@@ -132,6 +136,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
+                if (NPC.localAI[0] < seerSpawnTime - 230 && NPC.localAI[0] >= seerSpawnTime - 271)
+                {
+                    TeleportAI(spawnPos);
+                    if (NPC.localAI[0] >= seerSpawnTime - 271 + teleportMoveTimestamp)
+                        NPC.hide = false;
+
+                }
+                else if (NPC.localAI[0] >= seerSpawnTime - 230)
+                    NPC.ai[3] = 0;
+
                 if (NPC.localAI[0] == -30 - seerSpawnTime - 120)
                 {
                     RumbleSlot = RumbleSlot = SoundEngine.PlaySound(HellRumble with { Volume = 0.8f }, NPC.Center);
@@ -166,9 +180,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.localAI[0] == -30)
                 {
+                    NPC.hide = false;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
+                    NPC.ai[3] = 0;
                 }
                 if (NPC.localAI[0] < -30)
                     NPC.ai[1]++;
@@ -197,7 +213,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.localAI[1] >= 0)
             {
                 Projectile ballproj = Main.projectile[(int)NPC.localAI[1]];
-                if (!ballproj.active)
+                if (!ballproj.active || ballproj.type != SeerBallType)
                     NPC.localAI[1] = -1;
             }
             NPC.ai[1]++;
@@ -351,7 +367,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             //float scale = trackedSeers.Count / 4f;
                             float scale = 2f;
-                            NPC.localAI[1] = Projectile.NewProjectile(NPC.GetSource_FromThis(), ballPos, ballRot.ToRotationVector2() * 8f, ModContent.ProjectileType<SeerBallBase>(), NPC.damage, 0, -1, 0, scale, ballLaunchTime - (teleportTime + 1));
+                            NPC.localAI[1] = Projectile.NewProjectile(NPC.GetSource_FromThis(), ballPos, ballRot.ToRotationVector2() * 8f, SeerBallType, NPC.damage, 0, -1, 0, scale, ballLaunchTime - (teleportTime + 1));
                         }
 
                         if (NPC.localAI[1] >= 0)
@@ -537,7 +553,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
-                List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge, BloodTrail };
+                //List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge, BloodTrail };
+                List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall };
                 potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
                 if (trackedSeers.Count < 4)
                     potentialAttacks.RemoveAll(x => x.Id == BouncyBall.Id || x.Id == BloodSpread.Id);
@@ -559,7 +576,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         break;
                     }
                 }
-                chosenAttack = BouncyBall.Id;
+
             }
 
             NPC.ai[0] = chosenAttack;
@@ -583,7 +600,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.localAI[1] >= 0)
             {
-                Main.projectile[(int)NPC.localAI[1]].Kill();
+                Projectile childProj = Main.projectile[(int)NPC.localAI[1]];
+                if (childProj.type == SeerBallType)
+                    childProj.Kill();
                 NPC.localAI[1] = -1;
             }
 
