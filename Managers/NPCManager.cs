@@ -110,6 +110,7 @@ namespace TerRoguelike.Managers
                 new Paladin(),
                 new BrambleHollow(),
                 new CrimsonVessel(),
+                new CrimsonSeer(),
             };
         }
         internal static void Unload()
