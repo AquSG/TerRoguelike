@@ -30,6 +30,12 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
+            Point spawnTile = Projectile.Center.ToTileCoordinates();
+            if (TerRoguelikeUtils.ParanoidTileRetrieval(spawnTile.X, spawnTile.Y).IsTileSolidGround(true))
+            {
+                Projectile.active = false;
+                return;
+            }
             SoundEngine.PlaySound(SoundID.NPCDeath9 with { Volume = 1f }, Projectile.Center);
         }
         public override void AI()

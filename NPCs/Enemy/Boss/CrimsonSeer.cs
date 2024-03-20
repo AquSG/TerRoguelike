@@ -19,8 +19,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using TerRoguelike.Particles;
-using TerRoguelike.Managers;
+using static TerRoguelike.NPCs.Enemy.Boss.CrimsonVessel;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -35,9 +34,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         bool ableToHit = true;
         bool canBeHit = true;
-
-        public int teleportTime = 40;
-        public int teleportMoveTimestamp = 20;
 
         public override void SetDefaults()
         {
@@ -138,43 +134,69 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             NPC parent = Main.npc[(int)npc.ai[0]];
 
-            bool healMode = parent.ai[0] == 2 && parent.ai[1] > 40 && parent.ai[1] < 385 - 45;
-            bool ballMode = parent.ai[0] == 3 && parent.ai[1] > 40;
+            bool healMode = parent.ai[0] == Heal.Id && parent.ai[1] > teleportTime && parent.ai[1] < Heal.Duration - seerSpawnTime;
+            bool ballMode = parent.ai[0] == BouncyBall.Id && parent.ai[1] > teleportTime;
+            bool bloodSpreadMode = parent.ai[0] == BloodSpread.Id && parent.ai[1] > teleportTime;
 
             if (healMode)
             {
                 Vector2 direction = (parent.Center - npc.Center).SafeNormalize(Vector2.UnitY) * 1.2f;
                 float magnitude = 0.83f + (0.17f * npc.localAI[0]);
-                float healCompletion = (parent.ai[1] - 40) / (385 - 45 - 40);
+                float healCompletion = (parent.ai[1] - teleportTime) / (Heal.Duration - seerSpawnTime - teleportTime);
 
                 npc.Center += direction * magnitude * healCompletion;
             }
             else if (ballMode)
             {
-                float interpolant = (parent.ai[1] - (40 + 1)) / (130 - (40 + 20)) * 0.4f;
-                float rotationOffset = 0;
-                rotationOffset = npc.localAI[2] / 60 * MathHelper.TwoPi;
-                if (parent.ai[1] == 130)
-                {
-                    
-                }
-                else
-                {
-                    if (parent.ai[1] > 130)
-                    {
-                        interpolant = ((parent.ai[1] - (600 - 120)) / (100)) * 0.4f;
-                    }
-                        
-                    npc.rotation += 0.01f * (1f - interpolant);
-                }
+                float interpolant = (parent.ai[1] - (teleportTime + 1)) / (ballLaunchTime - (teleportTime + teleportMoveTimestamp)) * 0.4f;
+                float rotationOffset = npc.localAI[2] / 60 * MathHelper.TwoPi;
+                
                 Vector2 offset = seerId == 0 ? Vector2.Zero : ((((seerId - 1f) / (seerCount - 1)) * MathHelper.TwoPi) + rotationOffset).ToRotationVector2() * 28f;
-                if (parent.ai[1] > 130)
+                if (parent.ai[1] > ballLaunchTime)
                 {
+                    interpolant = ((parent.ai[1] - (BouncyBall.Duration - ballEndLag)) / (ballEndLag - 20)) * 0.4f;
+                    npc.rotation += 0.01f;
                     float magnitude = (136 + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f)));
 
                     offset = (npc.rotation.ToRotationVector2() * magnitude);
                 }
                 npc.Center += MathHelper.SmoothStep(0, 1, interpolant) * (orbitCenter + offset - npc.Center);
+            }
+            else if (bloodSpreadMode)
+            {
+                float interpolant = parent.ai[1] < (BloodSpread.Duration - bloodSpreadEndLag) ? (parent.ai[1] - teleportTime) / bloodSpreadStartup : 1f - ((parent.ai[1] - (BloodSpread.Duration - bloodSpreadEndLag)) / bloodSpreadEndLag);
+                interpolant = MathHelper.Clamp(interpolant, 0, 1f);
+                npc.rotation += 0.01f + (0.02f * interpolant);
+                float extraMagnitude = 0;
+                if (parent.ai[1] > teleportTime + bloodSpreadStartup && parent.ai[1] < BloodSpread.Duration - bloodSpreadEndLag)
+                {
+                    float start = parent.ai[1] - (teleportTime + bloodSpreadStartup);
+                    float radian = start / (2 * bloodSpreadRate) * MathHelper.TwoPi;
+                    radian %= MathHelper.TwoPi;
+                    float periodCompletion = (int)start % (2 * bloodSpreadRate);
+                    if (periodCompletion < 10)
+                        radian *= 2;
+                    else
+                    {
+                        radian /= 2f;
+                        radian += MathHelper.Pi;
+                    }
+                        
+
+                    extraMagnitude = ((-(float)Math.Cos(radian) * 0.5f) + 0.5f) * bloodSpreadSeerDistance;
+                    if ((int)periodCompletion == 10)
+                    {
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            float rot = npc.rotation + (i * MathHelper.PiOver4 * 0.33f);
+                            Vector2 offset = rot.ToRotationVector2() * (npc.width * 0.5f);
+                            Vector2 velocity = rot.ToRotationVector2() * 8f;
+                            Projectile.NewProjectile(parent.GetSource_FromThis(), npc.Center + offset, velocity, ModContent.ProjectileType<BloodClot>(), npc.damage, 0);
+                        }
+                    }
+                }
+                float magnitude = (136 + extraMagnitude + (10 * (float)Math.Cos(npc.localAI[1] * 0.05f)));
+                npc.Center = orbitCenter + (npc.rotation.ToRotationVector2() * magnitude);
             }
             else
             {

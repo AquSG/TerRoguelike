@@ -1010,7 +1010,7 @@ namespace TerRoguelike.TerPlayer
 
                     Vector2 direction = (proj.Center - target.Center).SafeNormalize(Vector2.UnitY);
                     Vector2 spawnPosition = (direction * radius) + target.Center;
-                    int damage = (int)(hit.Damage * 1.5f);
+                    int damage = (int)(hit.Damage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
                     if (hit.Crit)
                         damage /= 2;
 
@@ -1040,7 +1040,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     Vector2 spawnPosition = Main.player[proj.owner].Top;
                     Vector2 direction = -Vector2.UnitY;
-                    int damage = (int)(hit.Damage * 3f * lockOnMissile);
+                    int damage = (int)(hit.Damage * 3f * lockOnMissile / target.ModNPC().effectiveDamageTakenMulti);
                     if (hit.Crit)
                         damage /= 2;
 

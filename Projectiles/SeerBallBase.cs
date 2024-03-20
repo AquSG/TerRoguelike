@@ -57,7 +57,6 @@ namespace TerRoguelike.Projectiles
                     SoundEngine.PlaySound(SoundID.DD2_BookStaffCast with { Volume = 1f }, Projectile.Center);
                     Projectile.tileCollide = true;
                     Projectile.velocity = Projectile.rotation.ToRotationVector2() * startVelocity;
-                    //SpawnBlood();
                 }
             }
             if (Projectile.localAI[0] > 0)
