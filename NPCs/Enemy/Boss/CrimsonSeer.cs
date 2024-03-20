@@ -28,6 +28,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int modNPCID => ModContent.NPCType<CrimsonSeer>();
         public static readonly SoundStyle SeerSpawn = new SoundStyle("TerRoguelike/Sounds/SeerSpawn");
         public override List<int> associatedFloors => new List<int>() { FloorDict["Crimson"] };
+        Texture2D crossSparkTex;
         Texture2D lightningTex;
         List<LightningDraw> lightningPath = new List<LightningDraw>();
         public override int CombatStyle => -1;
@@ -53,6 +54,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.OverrideIgniteVisual = true;
             NPC.hide = true;
             lightningTex = TexDict["Square"].Value;
+            crossSparkTex = TexDict["CrossSpark"].Value;
         }
         public override void DrawBehind(int index)
         {
@@ -141,7 +143,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (healMode)
             {
                 Vector2 direction = (parent.Center - npc.Center).SafeNormalize(Vector2.UnitY) * 1.2f;
-                float magnitude = 0.83f + (0.17f * npc.localAI[0]);
+                float magnitude = 0.85f + (0.15f * npc.localAI[0]);
                 float healCompletion = (parent.ai[1] - teleportTime) / (Heal.Duration - seerSpawnTime - teleportTime);
 
                 npc.Center += direction * magnitude * healCompletion;
@@ -182,7 +184,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         radian += MathHelper.Pi;
                     }
                         
-
                     extraMagnitude = ((-(float)Math.Cos(radian) * 0.5f) + 0.5f) * bloodSpreadSeerDistance;
                     if ((int)periodCompletion == 10)
                     {
@@ -313,15 +314,27 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
+            if (parent.ai[0] == BloodSpread.Id && parent.ai[1] > teleportTime)
+            {
+                int time = (int)parent.ai[1] - teleportTime;
+                float interpolant = time <= bloodSpreadStartup ? (float)time / bloodSpreadStartup : 1f - ((parent.ai[1] - (BloodSpread.Duration - bloodSpreadEndLag)) / bloodSpreadEndLag);
+                interpolant = MathHelper.Clamp(interpolant, 0, 1);
+                float rot = NPC.rotation - 0.6f;
+                Vector2 pos = NPC.Center + (rot.ToRotationVector2() * NPC.width * 0.6f);
+                StartAdditiveSpritebatch();
 
-            if ((int)(Main.GlobalTimeWrappedHourly * 60) % 3 == 0)
+                Main.EntitySpriteDraw(crossSparkTex, pos - Main.screenPosition, null, Color.Red * 0.7f, rot, new Vector2(crossSparkTex.Width * 0.1f, crossSparkTex.Height * 0.5f), new Vector2(0.25f * interpolant, 0.2f + (0.1f * interpolant)), SpriteEffects.FlipHorizontally);
+
+                StartVanillaSpritebatch();
+            }
+
+            if (parent.ai[0] == Heal.Id && (int)(Main.GlobalTimeWrappedHourly * 60) % 3 == 0)
             {
                 lightningPath.Clear();
                 GenerateLightningPath();
             }
-                
 
-            if (parent.ai[0] == 2 && parent.ai[1] > 40 && parent.ai[1] < 385 - 45)
+            if (parent.ai[0] == Heal.Id && parent.ai[1] > teleportTime && parent.ai[1] < Heal.Duration - seerSpawnTime)
             {
                 Vector2 parentVect = parent.Center - NPC.Center;
                 float baseRot = parentVect.ToRotation();
