@@ -815,7 +815,7 @@ namespace TerRoguelike.TerPlayer
                 float finalAttackSpeedMultiplier = 1f;
                 for (int i = 0; i < spentShell; i++)
                 {
-                    finalAttackSpeedMultiplier *= 1 - (1f / (2f + (float)spentShell));
+                    finalAttackSpeedMultiplier *= 1 - (1f / (1.5f + (float)spentShell));
                 }
                 Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
             }

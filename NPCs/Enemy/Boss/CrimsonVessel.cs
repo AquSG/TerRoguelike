@@ -50,10 +50,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Heal = new Attack(2, 0, 385);
         public static Attack BouncyBall = new Attack(3, 40, 600);
         public static Attack BloodSpread = new Attack(4, 40, 265);
-        public static Attack Charge = new Attack(5, 20, 150);
+        public static Attack Charge = new Attack(5, 20, 330);
         public static Attack BloodTrail = new Attack(6, 20, 150);
+
         public static int teleportTime = 40;
         public static int teleportMoveTimestamp = 20;
+        public bool TeleportAIRunThisUpdate = false;
+        public int teleportAttackCooldown = 0;
+        public int setTeleportAttackCooldown = 60;
         List<TrackedSeer> trackedSeers = new List<TrackedSeer>();
         public int healCountdown = 1500;
         public static int setHealTime = 1500;
@@ -68,9 +72,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static int bloodSpreadStartup = 45;
         public static int bloodSpreadRate = 20;
         public static float bloodSpreadSeerDistance = 48f;
-        public bool TeleportAIRunThisUpdate = false;
-        public int teleportAttackCooldown = 0;
-        public int setTeleportAttackCooldown = 60;
+        public int chargeTelegraph = 30;
+        public int chargingDuration = 60;
+        public int chargeCount = 3;
 
         public override void SetStaticDefaults()
         {
@@ -108,11 +112,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[2] = None.Id;
             NPC.ai[1] = -48;
             NPC.localAI[1] = -1;
+            ableToHit = false;
         }
         public override void AI()
         {
             TeleportAIRunThisUpdate = false;
-            if (NPC.localAI[1] >= 0 && !trackedSeers.Any())
+            if (NPC.localAI[1] >= 0 && trackedSeers.Count <= 1)
             {
                 Projectile childProj = Main.projectile[(int)NPC.localAI[1]];
                 if (childProj.type == SeerBallType)
@@ -130,7 +135,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(CrimsonVesselTheme);
             }
 
-            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id);
+            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id) && NPC.localAI[0] >= 0;
             canBeHit = true;
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;
@@ -231,8 +236,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 healCountdown--;
             if (teleportAttackCooldown > 0)
                 teleportAttackCooldown--;
-            if (NPC.localAI[0] == 1)
-                SpawnSeers();
+            //if (NPC.localAI[0] == 1)
+                //SpawnSeers();
 
             if (NPC.ai[0] == None.Id)
             {
@@ -447,7 +452,42 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == Charge.Id)
             {
                 if (NPC.ai[1] <= teleportTime)
+                {
                     TeleportAI();
+                }
+                else if (NPC.ai[1] < Charge.Duration - teleportTime)
+                {
+                    Vector2 targetPos = target != null ? target.Center : spawnPos;
+                    Vector2 targetVect = targetPos - NPC.Center;
+                    int time = (int)NPC.ai[1] - teleportTime;
+                    int chargeTime = time % (chargeTelegraph + chargingDuration);
+                    if (chargeTime < chargeTelegraph)
+                    {
+                        NPC.velocity = -targetVect.SafeNormalize(Vector2.UnitY) * 3 * (1f - ((float)chargeTime / chargeTelegraph));
+                        if (time > teleportTime && chargeTime <= teleportTime - teleportMoveTimestamp)
+                        {
+                            TeleportAI();
+                        }
+                    }
+                    else if (chargeTime == chargeTelegraph)
+                    {
+                        NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 10;
+                    }
+                    else if (chargeTime >= (chargeTelegraph + chargingDuration) - (teleportTime - teleportMoveTimestamp))
+                    {
+                        TeleportAI();
+                    }
+                }
+                else
+                {
+                    TeleportAI();
+                }
+
+                if (NPC.ai[3] == teleportMoveTimestamp && target != null && NPC.ai[1] < Charge.Duration - teleportTime)
+                {
+                    Vector2 targetVect = (NPC.Center - target.Center);
+                    NPC.Center += targetVect * 0.25f;
+                }
 
                 if (NPC.ai[1] >= Charge.Duration)
                 {
@@ -471,7 +511,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            bool defaultMovement = (NPC.ai[0] == None.Id || NPC.ai[0] == BouncyBall.Id || NPC.ai[0] == BloodSpread.Id || NPC.ai[1] <= teleportTime) && !(NPC.ai[0] == Heal.Id && NPC.ai[1] >= teleportMoveTimestamp);
+            bool defaultMovement = 
+                NPC.ai[1] < teleportMoveTimestamp ||
+                NPC.ai[0] == None.Id ||
+                NPC.ai[0] == Teleport.Id ||
+                (NPC.ai[0] == Heal.Id && NPC.ai[1] < teleportMoveTimestamp) ||
+                NPC.ai[0] == BouncyBall.Id || 
+                NPC.ai[0] == BloodSpread.Id || 
+                (NPC.ai[0] == Charge.Id && NPC.ai[1] > Charge.Duration - (teleportTime - teleportMoveTimestamp));
+
             if (defaultMovement)
             {
                 if (target != null)
@@ -582,7 +630,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else
             {
                 //List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge, BloodTrail };
-                List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread };
+                List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge };
                 potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
                 if (trackedSeers.Count < 4)
                     potentialAttacks.RemoveAll(x => x.Id == BouncyBall.Id || x.Id == BloodSpread.Id);
@@ -728,7 +776,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int frameCount = Main.npcFrameCount[Type];
             
             currentFrame = (int)NPC.frameCounter % (frameCount - 4);
-            if ((NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportMoveTimestamp) || NPC.localAI[0] < -30)
+            if ((NPC.ai[0] == Heal.Id && NPC.ai[1] > teleportMoveTimestamp) || (NPC.ai[0] == Charge.Id && NPC.ai[1] >= teleportMoveTimestamp && NPC.ai[1] <= Charge.Duration - teleportTime + teleportMoveTimestamp) || NPC.localAI[0] < -30)
                 currentFrame += 4;
             if (deadTime > 0)
                 currentFrame = 5;

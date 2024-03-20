@@ -13,6 +13,8 @@ using Terraria.DataStructures;
 using Terraria.Audio;
 using ReLogic.Utilities;
 using TerRoguelike.Particles;
+using TerRoguelike.Utilities;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Projectiles
 {
@@ -48,6 +50,15 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            if (Projectile.ModProj().npcOwner >= 0)
+            {
+                NPC owner = Main.npc[Projectile.ModProj().npcOwner];
+                if (!owner.active || owner.type != ModContent.NPCType<CrimsonVessel>())
+                {
+                    Projectile.active = false;
+                    return;
+                }
+            }
             if (Projectile.ai[2] > 0)
             {
                 Projectile.velocity = Vector2.Zero;
