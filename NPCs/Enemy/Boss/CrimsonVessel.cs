@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +15,12 @@ using TerRoguelike.Managers;
 using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
+using static TerRoguelike.Managers.SpawnManager;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using static TerRoguelike.Managers.SpawnManager;
-using ReLogic.Utilities;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -42,10 +42,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SlotId ChargeSlot1;
         public SlotId ChargeSlot2;
         public Texture2D glowTex;
+        public Texture2D godRayTex;
 
+        List<GodRay> deathGodRays = new List<GodRay>();
         public int deadTime = 0;
         public int cutsceneDuration = 240;
         public int deathCutsceneDuration = 150;
+        public float deathGodRayRotOffset;
+        public int deathGodRayDirection;
 
         public static Attack None = new Attack(0, 0, 180);
         public static Attack Teleport = new Attack(1, 20, 40);
@@ -53,7 +57,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack BouncyBall = new Attack(3, 40, 600);
         public static Attack BloodSpread = new Attack(4, 40, 265);
         public static Attack Charge = new Attack(5, 20, 330);
-        public static Attack BloodTrail = new Attack(6, 20, 150);
+        public static Attack BloodTrail = new Attack(6, 20, 280);
 
         public static int teleportTime = 40;
         public static int teleportMoveTimestamp = 20;
@@ -77,6 +81,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int chargeTelegraph = 30;
         public int chargingDuration = 60;
         public int chargeCount = 3;
+        public int BloodTrailChargeTelegraph = 20;
+        public int BloodTrailChargeDuration = 40;
+        public int BloodTrailChargeCount = 4;
+        public int BloodTrailProjCount = 4;
+        public float BloodChargeDirection = -1;
 
         public override void SetStaticDefaults()
         {
@@ -99,10 +108,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
             glowTex = TexDict["CircularGlow"].Value;
+            godRayTex = TexDict["GodRay"].Value;
             NPC.hide = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
+            deathGodRayRotOffset = Main.rand.NextFloat(MathHelper.TwoPi);
+            deathGodRayDirection = Main.rand.NextBool() ? -1 : 1;
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
@@ -137,7 +149,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(CrimsonVesselTheme);
             }
 
-            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id) && NPC.localAI[0] >= 0;
+            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id) && NPC.localAI[0] >= 0 && !(NPC.ai[0] == BloodTrail.Id && NPC.ai[1] < BloodTrail.Duration - teleportTime);
             canBeHit = true;
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;
@@ -238,8 +250,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 healCountdown--;
             if (teleportAttackCooldown > 0)
                 teleportAttackCooldown--;
-            //if (NPC.localAI[0] == 1)
-                //SpawnSeers();
 
             if (NPC.ai[0] == None.Id)
             {
@@ -475,7 +485,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         ChargeSlot1 = SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -0.8f, PitchVariance = 0.1f,  MaxInstances = 3 }, NPC.Center);
                         ChargeSlot2 = SoundEngine.PlaySound(SoundID.NPCDeath33 with { Volume = 0.33f, Pitch = -0.27f, PitchVariance = 0f,  MaxInstances = 3 }, NPC.Center);
-                        NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 10;
+                        NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 11;
                     }
                     else if (chargeTime >= (chargeTelegraph + chargingDuration) - (teleportTime - teleportMoveTimestamp))
                     {
@@ -503,8 +513,85 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == BloodTrail.Id)
             {
+                int time = (int)NPC.ai[1] - (teleportTime - teleportMoveTimestamp);
+                int currentCharge = time / (BloodTrailChargeTelegraph + BloodTrailChargeDuration);
+
+                Vector2 teleportPos = spawnPos;
+                if (target != null && NPC.ai[3] == teleportMoveTimestamp - 1)
+                {
+                    float teleportDistance = 330;
+                    List<float> potentialRots = new List<float>() { MathHelper.PiOver4, MathHelper.PiOver4 * 3, MathHelper.PiOver4 * 5, MathHelper.PiOver4 * 7 };
+                    List<int> checkedIndex = new List<int>() { 0, 1, 2, 3 };
+
+                    for (int i = 0; i <= potentialRots.Count; i++)
+                    {
+                        int potentialIndex = checkedIndex.Any() ? checkedIndex[Main.rand.Next(checkedIndex.Count)] : -1;
+                        float chosenRot = checkedIndex.Any() ? potentialRots[potentialIndex] : potentialRots[Main.rand.Next(potentialRots.Count)];
+                        Vector2 potentialPos = target.Center + (chosenRot.ToRotationVector2() * teleportDistance);
+                        if (i < potentialRots.Count)
+                        {
+                            Point potentialTilePos = potentialPos.ToTileCoordinates();
+                            bool roomcheck = false;
+                            if (modNPC.isRoomNPC)
+                            {
+                                roomcheck = !RoomList[modNPC.sourceRoomListID].GetRect().Contains(potentialPos.ToPoint());
+                            }
+                            if (ParanoidTileRetrieval(potentialTilePos.X, potentialTilePos.Y).IsTileSolidGround(true) || roomcheck)
+                            {
+                                checkedIndex.Remove(potentialIndex);
+                                continue;
+                            }
+                        }
+                        teleportPos = potentialPos;
+                        float finalRot = chosenRot + (MathHelper.PiOver4 * 3);
+                        if (finalRot == BloodChargeDirection)
+                            finalRot = chosenRot + (MathHelper.PiOver4 * -3);
+                        BloodChargeDirection = finalRot;
+                        break;
+                    }
+                }
+
                 if (NPC.ai[1] <= teleportTime)
+                {
+                    TeleportAI(teleportPos);
+                }
+                if (NPC.ai[1] >= teleportMoveTimestamp && NPC.ai[1] < BloodTrail.Duration - (teleportTime - teleportMoveTimestamp))
+                {
+                    Vector2 targetPos = target != null ? target.Center : spawnPos;
+                    Vector2 chargeVect = BloodChargeDirection.ToRotationVector2();
+                    Vector2 targetVect = targetPos - NPC.Center;
+                    int chargeTime = time % (BloodTrailChargeTelegraph + BloodTrailChargeDuration);
+                    if (chargeTime < BloodTrailChargeTelegraph)
+                    {
+                        NPC.velocity = -(chargeVect).SafeNormalize(Vector2.UnitY) * 5 * (1f - ((float)chargeTime / chargeTelegraph));
+                        if (time > teleportTime && chargeTime <= teleportTime - teleportMoveTimestamp)
+                        {
+                            TeleportAI(teleportPos);
+                        }
+                    }
+                    else if (chargeTime == BloodTrailChargeTelegraph)
+                    {
+                        ChargeSlot1 = SoundEngine.PlaySound(SoundID.Zombie34 with { Volume = 0.5f, Pitch = -0.6f, PitchVariance = 0.1f, MaxInstances = 1 }, NPC.Center);
+                        ChargeSlot2 = SoundEngine.PlaySound(SoundID.NPCDeath33 with { Volume = 0.1f, Pitch = -0.3f, PitchVariance = 0f, MaxInstances = 1 }, NPC.Center);
+                        NPC.velocity = chargeVect.SafeNormalize(Vector2.UnitY) * 10;
+                    }
+                    else if (chargeTime >= (BloodTrailChargeTelegraph + BloodTrailChargeDuration) - (teleportTime - teleportMoveTimestamp))
+                    {
+                        TeleportAI(teleportPos);
+                    }
+                    if (chargeTime >= BloodTrailChargeTelegraph)
+                    {
+                        int projSpawnTime = BloodTrailChargeDuration / BloodTrailProjCount;
+                        if ((chargeTime - BloodTrailChargeTelegraph) % projSpawnTime == 0)
+                        {
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, targetVect.SafeNormalize(Vector2.UnitY) * 6f, ModContent.ProjectileType<BloodOrb>(), NPC.damage, 0);
+                        }
+                    }
+                }
+                else if (NPC.ai[1] >= BloodTrail.Duration - teleportTime)
+                {
                     TeleportAI();
+                }
 
                 if (NPC.ai[1] >= BloodTrail.Duration)
                 {
@@ -512,6 +599,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[1] = None.Duration - 90;
                     NPC.ai[2] = BloodTrail.Id;
                     NPC.ai[3] = 0;
+                    BloodChargeDirection = -1;
                 }
             }
 
@@ -521,8 +609,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.ai[0] == Teleport.Id ||
                 (NPC.ai[0] == Heal.Id && NPC.ai[1] < teleportMoveTimestamp) ||
                 NPC.ai[0] == BouncyBall.Id || 
-                NPC.ai[0] == BloodSpread.Id || 
-                (NPC.ai[0] == Charge.Id && NPC.ai[1] > Charge.Duration - (teleportTime - teleportMoveTimestamp));
+                NPC.ai[0] == BloodSpread.Id ||
+                (NPC.ai[0] == Charge.Id && NPC.ai[1] > Charge.Duration - (teleportTime - teleportMoveTimestamp)) || 
+                (NPC.ai[0] == BloodTrail.Id && NPC.ai[1] > BloodTrail.Duration - (teleportTime - teleportMoveTimestamp));
 
             if (defaultMovement)
             {
@@ -643,8 +732,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
-                //List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge, BloodTrail };
-                List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge };
+                List<Attack> potentialAttacks = new List<Attack>() { Teleport, BouncyBall, BloodSpread, Charge, BloodTrail };
                 potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
                 if (trackedSeers.Count < 4)
                     potentialAttacks.RemoveAll(x => x.Id == BouncyBall.Id || x.Id == BloodSpread.Id);
@@ -722,6 +810,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.5f }, NPC.Center);
                 CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {
@@ -751,6 +840,37 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (deadTime % 32 == 0)
+            {
+                int rayNumber = deadTime / 32;
+                float extraRotation = MathHelper.TwoPi * 0.33f * rayNumber * deathGodRayDirection;
+
+                deathGodRays.Add(new GodRay(Main.rand.NextFloat(-MathHelper.PiOver4, MathHelper.PiOver4) + deathGodRayRotOffset + extraRotation, deadTime, new Vector2(0.16f + Main.rand.NextFloat(-0.02f, 0.02f), 0.018f) * 1.6f));
+                SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundImpact with { Volume = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.NPCHit19 with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0.05f }, NPC.Center);
+            }
+
+            if (deadTime % 5 == 0)
+            {
+                for (int i = 0; i < deathGodRays.Count; i++)
+                {
+                    GodRay ray = deathGodRays[i];
+                    float rotation = ray.rotation;
+                    Vector2 pos = NPC.Center +  (rotation.ToRotationVector2() * new Vector2(NPC.width * 0.55f, NPC.height * 0.7f));
+                    Vector2 velocity = rotation.ToRotationVector2();
+                    int xDir = Math.Sign(pos.X - NPC.Center.X);
+                    if (xDir == 0)
+                        xDir = 1;
+                    velocity.X += xDir * 0.6f;
+                    velocity.Y -= 0.5f;
+                    int time = 40 + Main.rand.Next(20);
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.75f;
+
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
+                }
+            }
+            
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -772,16 +892,33 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            for (int i = 0; i < 150; i++)
+            if (SoundEngine.TryGetActiveSound(TeleportSlot, out var sound) && sound.IsPlaying)
             {
-                Dust.NewDust(NPC.position, NPC.width, NPC.height, 5, Main.rand.Next(-2, 2), -2f);
+                sound.Stop();
             }
+
+            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+            SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 396);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 397);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 398);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 399);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 400);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 401);
+            for (int i = 0; i < 90; i++)
+            {
+                Vector2 pos = NPC.Center + new Vector2(0, 16);
+                int width = (int)(NPC.width * 0.25f);
+                pos.X += Main.rand.Next(-width, width);
+                Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                velocity *= Main.rand.NextFloat(0.3f, 1f);
+                if (Main.rand.NextBool(5))
+                    velocity *= 1.5f;
+                Vector2 scale = new Vector2(0.25f, 0.4f);
+                int time = 110 + Main.rand.Next(70);
+                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
+            }
         }
         public override void FindFrame(int frameHeight)
         {
@@ -803,6 +940,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
             Color color = Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
             Vector2 scale = new Vector2(NPC.scale);
+
+            if (deadTime > 0)
+            {
+                if (deathGodRays.Any())
+                {
+                    StartAdditiveSpritebatch();
+                    for (int i = 0; i < deathGodRays.Count; i++)
+                    {
+                        GodRay ray = deathGodRays[i];
+                        float rotation = ray.rotation;
+                        Vector2 rayScale= ray.scale;
+                        int time = ray.time;
+                        float opacity = MathHelper.Clamp(MathHelper.Lerp(1f, 0.5f, (deadTime - time) / 60f), 0.5f, 1f);
+                        Main.EntitySpriteDraw(godRayTex, NPC.Center - Main.screenPosition, null, Color.Red * opacity, rotation, new Vector2(0, godRayTex.Height * 0.5f), rayScale, SpriteEffects.None);
+                    }
+                    StartVanillaSpritebatch();
+                }
+            }
+
             if (NPC.ai[3] > 0)
             {
                 float interpolant = NPC.ai[3] < teleportMoveTimestamp ? NPC.ai[3] / (teleportMoveTimestamp) : 1f - ((NPC.ai[3] - teleportMoveTimestamp) / (teleportTime - teleportMoveTimestamp));

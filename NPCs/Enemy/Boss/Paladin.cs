@@ -809,7 +809,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (deadTime != 0)
                     deathGodRays.Add(new GodRay(Main.rand.NextFloat(MathHelper.TwoPi), deadTime, new Vector2(0.16f + Main.rand.NextFloat(-0.02f, 0.02f), 0.025f)));
-                SoundEngine.PlaySound(HammerLand with { Volume = 0.15f, MaxInstances = 10, Pitch = 0.67f, PitchVariance = 0.06f }, NPC.Center); ;
+                SoundEngine.PlaySound(HammerLand with { Volume = 0.15f, MaxInstances = 10, Pitch = 0.67f, PitchVariance = 0.06f }, NPC.Center);
             }
             deadTime++;
 
