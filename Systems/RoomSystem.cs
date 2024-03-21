@@ -927,6 +927,8 @@ namespace TerRoguelike.Systems
             CutsceneSystem.cutsceneActive = false;
             Main.screenPosition = Main.Camera.UnscaledPosition;
             TerRoguelikeWorld.IsDebugWorld = false;
+            TerRoguelikeWorld.IsDeletableOnExit = false;
+            TerRoguelikeWorld.IsTerRoguelikeWorld = false;
         }
     }
     public class HealingPulse
