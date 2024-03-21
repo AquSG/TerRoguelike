@@ -157,6 +157,7 @@ namespace TerRoguelike.TerPlayer
         public int killerProjType = 0;
         public bool brainSucked = false;
         public int brainSucklerTime = 0;
+        public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
         #region Reset Variables
@@ -832,7 +833,7 @@ namespace TerRoguelike.TerPlayer
             if (sniperComponent > 0)
             {
                 float finalAttackSpeedMultiplier = 1f;
-                float finalDamageMultiplier = 8f * sniperComponent;
+                float finalDamageMultiplier = 6f * sniperComponent;
                 for (int i = 0; i < sniperComponent; i++)
                 {
                     finalAttackSpeedMultiplier *= 1 - (2f / (2.5f + sniperComponent));
@@ -1063,12 +1064,18 @@ namespace TerRoguelike.TerPlayer
             }
             if (bloodSiphon > 0)
             {
-                int healAmt = bloodSiphon;
+                float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
+                int healAmt = (int)(bloodSiphon * multiplier);
+                if (healAmt < 1)
+                    healAmt = 1;
                 ScaleableHeal(healAmt);
             }
             if (enchantingEye > 0 && hit.Crit)
             {
-                int healAmt = enchantingEye * 8;
+                float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
+                int healAmt = (int)(enchantingEye * 8 * multiplier);
+                if (healAmt < 1)
+                    healAmt = 1;
                 ScaleableHeal(healAmt);
             }
             if (ballAndChain > 0)
