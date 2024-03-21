@@ -90,6 +90,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 8;
+            SoundEngine.PlaySound(HellRumble with { Volume = 0 });
         }
         public override void SetDefaults()
         {
@@ -98,7 +99,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 112;
             NPC.aiStyle = -1;
             NPC.damage = 35;
-            NPC.lifeMax = 20000;
+            NPC.lifeMax = 24000;
             NPC.HitSound = SoundID.NPCHit9;
             NPC.DeathSound = SoundID.NPCDeath11;
             NPC.knockBackResist = 0f;
@@ -810,7 +811,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
-                TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.5f }, NPC.Center);
+                TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.7f }, NPC.Center);
                 CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {
@@ -846,7 +847,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float extraRotation = MathHelper.TwoPi * 0.33f * rayNumber * deathGodRayDirection;
 
                 deathGodRays.Add(new GodRay(Main.rand.NextFloat(-MathHelper.PiOver4, MathHelper.PiOver4) + deathGodRayRotOffset + extraRotation, deadTime, new Vector2(0.16f + Main.rand.NextFloat(-0.02f, 0.02f), 0.018f) * 1.6f));
-                SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundImpact with { Volume = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundImpact with { Volume = 0.5f, Pitch = -0.2f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.NPCHit19 with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0.05f }, NPC.Center);
             }
 
