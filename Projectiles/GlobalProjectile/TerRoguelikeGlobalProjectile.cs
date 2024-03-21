@@ -27,6 +27,7 @@ namespace TerRoguelike.Projectiles
         public bool killOnRoomClear = false;
         public int npcOwner = -1;
         public int npcOwnerType = -1;
+        public float notedBoostedDamage = 1f;
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0; // set bounces in projectile ai.

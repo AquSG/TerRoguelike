@@ -39,6 +39,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static readonly SoundStyle TeleportSound = new SoundStyle("TerRoguelike/Sounds/Teleport");
         public SlotId RumbleSlot;
         public SlotId TeleportSlot;
+        public SlotId ChargeSlot1;
+        public SlotId ChargeSlot2;
         public Texture2D glowTex;
 
         public int deadTime = 0;
@@ -471,6 +473,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     else if (chargeTime == chargeTelegraph)
                     {
+                        ChargeSlot1 = SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -0.8f, PitchVariance = 0.1f,  MaxInstances = 3 }, NPC.Center);
+                        ChargeSlot2 = SoundEngine.PlaySound(SoundID.NPCDeath33 with { Volume = 0.33f, Pitch = -0.27f, PitchVariance = 0f,  MaxInstances = 3 }, NPC.Center);
                         NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 10;
                     }
                     else if (chargeTime >= (chargeTelegraph + chargingDuration) - (teleportTime - teleportMoveTimestamp))
@@ -534,6 +538,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
+            if (SoundEngine.TryGetActiveSound(ChargeSlot1, out var sound1) && sound1.IsPlaying)
+            {
+                sound1.Position = NPC.Center;
+                sound1.Update();
+            }
+            if (SoundEngine.TryGetActiveSound(ChargeSlot2, out var sound2) && sound2.IsPlaying)
+            {
+                sound2.Position = NPC.Center;
+                sound2.Update();
+            }
         }
         public void TeleportAI(Vector2? forcedLocation = null)
         {

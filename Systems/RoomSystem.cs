@@ -429,6 +429,9 @@ namespace TerRoguelike.Systems
             room.bossSpawnPos = Vector2.Zero;
             room.bossDead = false;
         }
+        /// <summary>
+        /// DO NOT RESET SPRITEBATCH IN HERE. YOU ARE STUCK WITH ALPHABLEND AND ADDING 'DrawBehindTilesOffset' TO ALL THE DRAW POSITIONS
+        /// </summary>
         public static void PostDrawWalls()
         {
             DrawChains();

@@ -176,6 +176,7 @@ Items: {
 			'''
 			5% increased critical strike chance
 			+8 HP upon critically striking enemies
+			The healing amount is affected by bonus damage and main weapon damage multipliers
 			Extra copies of this item increase the healing amount by 8
 			'''
 	}
@@ -283,6 +284,7 @@ Items: {
 		Tooltip:
 			'''
 			+1 HP upon hitting enemies
+			The healing amount is affected by bonus damage and main weapon damage multipliers
 			Extra copies of this item increase the healing amount by 1
 			'''
 	}
@@ -659,9 +661,9 @@ Items: {
 		DisplayName: Sniper Component
 		Tooltip:
 			'''
-			8x damage
+			6x damage
 			Massively decreased attack speed by a multiplier
-			Extra copies of this item increase the damage multiplier by 8, and further decrease attack speed
+			Extra copies of this item increase the damage multiplier by 6, and further decrease attack speed
 			'''
 	}
 

@@ -105,7 +105,8 @@ namespace TerRoguelike.Projectiles
                 modPlayer.swingAnimCompletion += 0.00001f; // start the swing anim
 
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
-            int damage = Charge >= 60f ? (int)(Projectile.damage * 4f) : (int)(Projectile.damage * (1 + (Charge / 60f * 2f)));
+            float damageBoost = Charge >= 60f ? 4f : (1 + (Charge / 60f * 2f));
+            int damage = (int)(Projectile.damage * damageBoost);
             SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
             for (int i = 0; i < shotsToFire; i++)
             {
@@ -127,9 +128,11 @@ namespace TerRoguelike.Projectiles
                 
                 Vector2 direction = (mainAngle).ToRotationVector2();
                 int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), Vector2.Zero, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
-                Main.projectile[spawnedProjectile].rotation = direction.ToRotation();
-                Main.projectile[spawnedProjectile].scale = modPlayer.scaleMultiplier;
-                Main.projectile[spawnedProjectile].ModProj().swingDirection = Owner.direction;
+                Projectile spawnedProj = Main.projectile[spawnedProjectile];
+                spawnedProj.rotation = direction.ToRotation();
+                spawnedProj.scale = modPlayer.scaleMultiplier;
+                spawnedProj.ModProj().swingDirection = Owner.direction;
+                spawnedProj.ModProj().notedBoostedDamage = damageBoost;
             }
             Charge -= 60f;
             if (Charge > 60f) // support for swinging more than once a frame if one has that much attack speed

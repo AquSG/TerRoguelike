@@ -323,7 +323,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 pos = NPC.Center + (rot.ToRotationVector2() * NPC.width * 0.6f);
                 StartAdditiveSpritebatch();
 
-                Main.EntitySpriteDraw(crossSparkTex, pos - Main.screenPosition, null, Color.Red * 0.7f, rot, new Vector2(crossSparkTex.Width * 0.1f, crossSparkTex.Height * 0.5f), new Vector2(0.25f * interpolant, 0.2f + (0.1f * interpolant)), SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(crossSparkTex, pos - Main.screenPosition, null, Color.Red * 0.7f, rot, new Vector2(crossSparkTex.Width * 0.1f, crossSparkTex.Height * 0.5f), new Vector2(0.2f * interpolant, 0.2f + (0.1f * interpolant)), SpriteEffects.FlipHorizontally);
 
                 StartVanillaSpritebatch();
             }
