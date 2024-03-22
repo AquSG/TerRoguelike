@@ -1,4 +1,10 @@
 MapBuildingMessage: Forming the Dungeon
+DeathKilledBy: 'Killed by:'
+DeathItems: 'Items:'
+DeathMainMenu: 'Main Menu'
+DeathQuickRestart: 'Quick Restart'
+BlockedAlert: blocked!
+BarrierName: Barrier
 
 Projectiles: {
 	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile
@@ -175,9 +181,9 @@ Items: {
 		Tooltip:
 			'''
 			5% increased critical strike chance
-			+8 HP upon critically striking enemies
+			+4 HP upon critically striking enemies
 			The healing amount is affected by bonus damage and main weapon damage multipliers
-			Extra copies of this item increase the healing amount by 8
+			Extra copies of this item increase the healing amount by 4
 			'''
 	}
 

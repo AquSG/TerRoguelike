@@ -10,6 +10,8 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using System.Linq;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
@@ -18,6 +20,7 @@ namespace TerRoguelike.Projectiles
         public int target = -1;
         public int stuckNPC = -1;
         public Vector2 stuckPosition = Vector2.Zero;
+        public int stuckSegment = -1;
         public override void SetDefaults()
         {
             Projectile.width = 26;
@@ -29,16 +32,14 @@ namespace TerRoguelike.Projectiles
             Projectile.scale = 0.85f;
             Projectile.spriteDirection = Main.rand.NextBool() ? -1 : 1;
         }
-
+        public override void OnSpawn(IEntitySource source)
+        {
+            stuckNPC = (int)Projectile.ai[0];
+            stuckPosition = Projectile.Center - Main.npc[stuckNPC].Center;
+            stuckSegment = Main.npc[stuckNPC].ModNPC().Segments.Any() ? Main.npc[stuckNPC].ModNPC().hitSegment : -1;
+        }
         public override void AI()
         {
-            if (Projectile.localAI[0] != 1)
-            {
-                stuckNPC = (int)Projectile.ai[0];
-                stuckPosition = Projectile.Center - Main.npc[stuckNPC].Center;
-                Projectile.localAI[0] = 1;
-            }
-
             float fallSpeedCap = 25f;
             float downwardsAccel = 0.3f;
 
@@ -47,21 +48,28 @@ namespace TerRoguelike.Projectiles
                 NPC npc = Main.npc[stuckNPC];
                 bool destick = false;
 
-                Rectangle npcRect = npc.Hitbox;
-                MultipliableFloat f = new MultipliableFloat();
-                int immunitySlot = 0;
                 if (npc.ModNPC != null)
                 {
-                    npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
-                    if (!Projectile.getRect().Intersects(npcRect))
+                    if (npc.ModNPC.CanBeHitByProjectile(Projectile) == false)
                     {
-                        destick = true;
+                        if (!npc.ModNPC().Segments.Any())
+                        {
+                            Rectangle npcRect = npc.Hitbox;
+                            MultipliableFloat f = new MultipliableFloat();
+                            int immunitySlot = 0;
+                            npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
+                            if (!Projectile.getRect().Intersects(npcRect))
+                                destick = true;
+                        }
+                        else
+                            destick = true;
                     }
                 }
                 if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || destick)
                 {
                     stuckNPC = -1;
                     stuckPosition = Vector2.Zero;
+                    stuckSegment = -1;
                 }
             }
 
@@ -73,16 +81,28 @@ namespace TerRoguelike.Projectiles
                     NPC npc = Main.npc[i];
                     if (npc.active && npc.life > 0 && !npc.dontTakeDamage && !npc.immortal)
                     {
-                        Rectangle npcRect = npc.Hitbox;
-                        MultipliableFloat f = new MultipliableFloat();
-                        int immunitySlot = 0;
                         if (npc.ModNPC != null)
                         {
-                            npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
-                            if (Projectile.getRect().Intersects(npcRect))
+                            if (npc.ModNPC.CanBeHitByProjectile(Projectile) != false)
                             {
+                                if (!npc.ModNPC().Segments.Any())
+                                {
+                                    Rectangle npcRect = npc.Hitbox;
+                                    MultipliableFloat f = new MultipliableFloat();
+                                    int immunitySlot = 0;
+                                    npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
+                                    if (!Projectile.getRect().Intersects(npcRect))
+                                        continue;
+                                }
+                                Projectile.ModProj().ultimateCollideOverride = false;
                                 stuckNPC = i;
-                                stuckPosition = Projectile.Center - Main.npc[i].Center;
+                                bool anySegments = npc.ModNPC().Segments.Any();
+                                if (anySegments)
+                                {
+                                    stuckSegment = npc.ModNPC().hitSegment;
+                                }
+                                Vector2 pos = anySegments ? npc.ModNPC().Segments[stuckSegment].Position : npc.Center;
+                                stuckPosition = Projectile.Center - pos;
                                 break;
                             }
                         }
@@ -92,7 +112,9 @@ namespace TerRoguelike.Projectiles
             
             if (stuckNPC != -1)
             {
-                Projectile.Center = Main.npc[stuckNPC].Center + stuckPosition;
+                NPC npc = Main.npc[stuckNPC];
+                Vector2 pos = npc.ModNPC().Segments.Any() ? npc.ModNPC().Segments[stuckSegment].Position : npc.Center;
+                Projectile.Center = pos + stuckPosition;
                 return;
             }
 

@@ -24,6 +24,7 @@ using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Particles;
+using Terraria.Localization;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -1073,7 +1074,7 @@ namespace TerRoguelike.TerPlayer
             if (enchantingEye > 0 && hit.Crit)
             {
                 float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
-                int healAmt = (int)(enchantingEye * 8 * multiplier);
+                int healAmt = (int)(enchantingEye * 4 * multiplier);
                 if (healAmt < 1)
                     healAmt = 1;
                 ScaleableHeal(healAmt);
@@ -1229,8 +1230,9 @@ namespace TerRoguelike.TerPlayer
 
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
+                    string blocked = Language.GetOrRegister("Mods.TerRoguelike.BlockedAlert").Value;
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.1f }, Player.Center);
-                    CombatText.NewText(Player.getRect(), Color.LightGray, "blocked!");
+                    CombatText.NewText(Player.getRect(), Color.LightGray, blocked);
                     Player.immuneTime += 40;
                     Player.immune = true;
                     dodgeAttack = true;
