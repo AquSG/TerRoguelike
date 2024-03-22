@@ -38,6 +38,8 @@ namespace TerRoguelike.NPCs
         public int baseMaxHP = 0;
         public int baseDamage = 0;
         public float diminishingDR = 0;
+        public List<WormSegment> Segments = new List<WormSegment>();
+        public int hitSegment = 0;
         public float effectiveDamageTakenMulti
         {
             get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR)));  }
@@ -1202,13 +1204,13 @@ namespace TerRoguelike.NPCs
 
             float targetAngle = (targetPos - npc.Center).ToRotation();
             bool slowTurn = npc.ai[0] == 0;
-            float newAngle = npc.rotation.AngleTowards(targetAngle, slowTurn ? turnRadians : turnRadians * 0.4f);
+            float newAngle = npc.rotation.AngleTowards(targetAngle, slowTurn ? turnRadians : turnRadians * 0.3f);
             float angleChange = AngleSizeBetween(npc.rotation, newAngle);
             if ((targetPos - npc.Center).Length() > slowTurnDist)
             {
                 npc.ai[0] = 0;
             }
-            if (Math.Abs(angleChange) <= turnRadians * 0.39f || (targetPos - npc.Center).Length() < slowTurnDist * 0.75f)
+            if (Math.Abs(angleChange) <= turnRadians * 0.29f || (targetPos - npc.Center).Length() < slowTurnDist * 0.75f)
                 npc.ai[0] = 1;
 
             float velMultiplier = slowTurn ? Math.Abs(Vector2.Dot((npc.rotation + MathHelper.PiOver2).ToRotationVector2(), targetAngle.ToRotationVector2())) : 0;
@@ -3144,11 +3146,11 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void UpdateWormSegments(ref List<WormSegment> segments, NPC npc)
+        public void UpdateWormSegments(NPC npc)
         {
-            for (int i = 0; i < segments.Count; i++)
+            for (int i = 0; i < Segments.Count; i++)
             {
-                WormSegment segment = segments[i];
+                WormSegment segment = Segments[i];
                 segment.OldPosition = segment.Position;
                 segment.OldRotation = segment.Rotation;
                 if (i == 0)
@@ -3159,7 +3161,7 @@ namespace TerRoguelike.NPCs
                     continue;
                 }
 
-                WormSegment oldSeg = segments[i - 1];
+                WormSegment oldSeg = Segments[i - 1];
 
                 segment.Position = oldSeg.Position - (Vector2.UnitX * (i == 1 ? segment.Height : oldSeg.Height)).RotatedBy(oldSeg.Rotation.AngleLerp((oldSeg.Position - segment.Position).ToRotation(), 0.95f));
 

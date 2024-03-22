@@ -23,6 +23,7 @@ using TerRoguelike.World;
 using TerRoguelike.Systems;
 using Terraria.GameInput;
 using static TerRoguelike.Managers.TextureManager;
+using Terraria.Localization;
 
 namespace TerRoguelike.UI
 {
@@ -139,8 +140,10 @@ namespace TerRoguelike.UI
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (modPlayer.deadTime - 120) / 60f), 0, 1f);
             // Draw the border of the Barrier Bar first
             spriteBatch.Draw(baseUITex, screenPos, null, Color.White * 0.85f * opacity, 0f, baseUITex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Killed by:", screenPos + new Vector2(130, -250), Color.MediumPurple * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Items:", screenPos + new Vector2(-360, -250), Color.White * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
+            string deathKilledBy = Language.GetOrRegister("Mods.TerRoguelike.DeathKilledBy").Value;
+            string deathItems = Language.GetOrRegister("Mods.TerRoguelike.DeathItems").Value;
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathKilledBy, screenPos + new Vector2(130, -250), Color.MediumPurple * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathItems, screenPos + new Vector2(-360, -250), Color.White * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
             if (modPlayer.killerNPC != -1)
             {
                 Texture2D enemyTex = TextureAssets.Npc[modPlayer.killerNPCType].Value;
@@ -224,13 +227,14 @@ namespace TerRoguelike.UI
                     }
                 }
             }
-            
+            string deathMainMenu = Language.GetOrRegister("Mods.TerRoguelike.DeathMainMenu").Value;
+            string deathQuickRestart = Language.GetOrRegister("Mods.TerRoguelike.DeathQuickRestart").Value;
             Texture2D finalMainMenuButtonTex = mainMenuHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
             Texture2D finalRestartButtonTex = restartHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
             spriteBatch.Draw(finalMainMenuButtonTex, screenPos + mainMenuButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Main Menu", screenPos + (mainMenuHover ? new Vector2(-312, 182) : new Vector2(-300, 185)), (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, Vector2.Zero, new Vector2(mainMenuHover ? 1f : 0.9f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathMainMenu, screenPos + mainMenuButtonOffset, (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, mainMenuButtonTex.Size() * new Vector2(0.4f, 0.3f), new Vector2(mainMenuHover ? 1f : 0.9f));
             spriteBatch.Draw(finalRestartButtonTex, screenPos + restartButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Quick Restart", screenPos + (restartHover ? new Vector2(78 - 12, 182) : new Vector2(78, 185)), (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, Vector2.Zero, new Vector2(restartHover ? 1f : 0.9f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathQuickRestart, screenPos + restartButtonOffset, (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, mainMenuButtonTex.Size() * new Vector2(0.48f, 0.3f), new Vector2(restartHover ? 1f : 0.9f));
         }
         #endregion
     }

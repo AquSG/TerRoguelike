@@ -13,6 +13,7 @@ using TerRoguelike.World;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 using static TerRoguelike.Managers.TextureManager;
+using Terraria.Localization;
 
 namespace TerRoguelike.UI
 {
@@ -81,7 +82,8 @@ namespace TerRoguelike.UI
             {
 
                 // Add hover text if the mouse is over Barrier bar
-                Main.instance.MouseText($"Barrier " + "(" + ((int)modPlayer.barrierHealth).ToString() + "/" + player.statLifeMax2.ToString() + ")");
+                string barrierName = Language.GetOrRegister("Mods.TerRoguelike.BarrierName").Value;
+                Main.instance.MouseText(barrierName + $" " + "(" + ((int)modPlayer.barrierHealth).ToString() + "/" + player.statLifeMax2.ToString() + ")");
 
             }
         }

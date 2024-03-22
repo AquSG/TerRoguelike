@@ -27,7 +27,6 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<SandWorm>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Desert"] };
         public override int CombatStyle => 0;
-        public List<WormSegment> Segments = new List<WormSegment>();
         public Texture2D headTex;
         public Texture2D bodyTex;
         public Texture2D tailTex;
@@ -44,8 +43,6 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.aiStyle = -1;
             NPC.damage = 35;
             NPC.lifeMax = 1000;
-            NPC.HitSound = SoundID.NPCHit1;
-            NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0f;
             NPC.noGravity = true;
             NPC.noTileCollide = true;
@@ -66,7 +63,7 @@ namespace TerRoguelike.NPCs.Enemy
             int segCount = 10;
             for (int i = 0; i < segCount; i++)
             {
-                Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * NPC.height * i), MathHelper.PiOver2 * 3f, NPC.height));
+                modNPC.Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * NPC.height * i), MathHelper.PiOver2 * 3f, NPC.height));
             }
         }
         public override void AI()
@@ -75,7 +72,7 @@ namespace TerRoguelike.NPCs.Enemy
                 NPC.ai[3]--;
             modNPC.RogueWormAI(NPC, 12f, MathHelper.Pi / 60f, 480);
             NPC.rotation = NPC.velocity.ToRotation();
-            modNPC.UpdateWormSegments(ref Segments, NPC);
+            modNPC.UpdateWormSegments(NPC);
             Point tile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
             if (TerRoguelikeUtils.ParanoidTileRetrieval(tile.X, tile.Y).IsTileSolidGround(true))
             {
@@ -99,15 +96,17 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.life <= 0)
             {
-                for (int i = 0; i < Segments.Count; i++)
+                SoundEngine.PlaySound(SoundID.NPCHit1, modNPC.Segments[modNPC.hitSegment].Position);
+                SoundEngine.PlaySound(SoundID.NPCDeath1, modNPC.Segments[modNPC.hitSegment].Position);
+                for (int i = 0; i < modNPC.Segments.Count; i++)
                 {
-                    WormSegment segment = Segments[i];
+                    WormSegment segment = modNPC.Segments[i];
                     if (i == 0)
                     {
                         Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, GoreID.DuneSplicerHead, NPC.scale);
                         continue;
                     }
-                    if (i == Segments.Count - 1)
+                    if (i == modNPC.Segments.Count - 1)
                     {
                         Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, GoreID.DuneSplicerTail, NPC.scale);
                         continue;
@@ -115,7 +114,8 @@ namespace TerRoguelike.NPCs.Enemy
                     Gore.NewGore(NPC.GetSource_Death(), segment.Position, segment.Position - segment.OldPosition, GoreID.DuneSplicerBody, NPC.scale);
                 }
             }
-            
+            else
+                SoundEngine.PlaySound(SoundID.NPCHit1, modNPC.Segments[modNPC.hitSegment].Position);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
@@ -123,13 +123,13 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                for (int i = Segments.Count - 1; i >= 0; i--)
+                for (int i = modNPC.Segments.Count - 1; i >= 0; i--)
                 {
                     Texture2D texture;
-                    WormSegment segment = Segments[i];
+                    WormSegment segment = modNPC.Segments[i];
                     if (i == 0)
                         texture = headTex;
-                    else if (i == Segments.Count - 1)
+                    else if (i == modNPC.Segments.Count - 1)
                         texture = tailTex;
                     else
                         texture = bodyTex;
@@ -152,13 +152,13 @@ namespace TerRoguelike.NPCs.Enemy
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
-            for (int i = Segments.Count - 1; i >= 0; i--)
+            for (int i = modNPC.Segments.Count - 1; i >= 0; i--)
             {
                 Texture2D texture;
-                WormSegment segment = Segments[i];
+                WormSegment segment = modNPC.Segments[i];
                 if (i == 0)
                     texture = headTex;
-                else if (i == Segments.Count - 1)
+                else if (i == modNPC.Segments.Count - 1)
                     texture = tailTex;
                 else
                     texture = bodyTex;
@@ -171,9 +171,9 @@ namespace TerRoguelike.NPCs.Enemy
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
         {
             float radius = NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2;
-            for (int i = 0; i < Segments.Count; i++)
+            for (int i = 0; i < modNPC.Segments.Count; i++)
             {
-                WormSegment segment = Segments[i];
+                WormSegment segment = modNPC.Segments[i];
                 if (segment.Position.Distance(target.getRect().ClosestPointInRect(segment.Position)) <= radius)
                 {
                     CollisionPass = true;
@@ -185,9 +185,9 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool CanHitNPC(NPC target)
         {
-            for (int i = 0; i < Segments.Count; i++)
+            for (int i = 0; i < modNPC.Segments.Count; i++)
             {
-                WormSegment segment = Segments[i];
+                WormSegment segment = modNPC.Segments[i];
                 float radius = i == 0 ? (NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2) : segment.Height / 2;
                 if (segment.Position.Distance(target.getRect().ClosestPointInRect(segment.Position)) <= radius)
                 {
@@ -211,13 +211,14 @@ namespace TerRoguelike.NPCs.Enemy
             if ((projectile.hostile && !NPC.friendly) || (projectile.friendly && NPC.friendly))
                 return false;
 
-            float radius = NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2;
-            for (int i = 0; i < Segments.Count; i++)
+
+            for (int i = 0; i < modNPC.Segments.Count; i++)
             {
-                WormSegment segment = Segments[i];
+                WormSegment segment = modNPC.Segments[i];
                 if (projectile.Colliding(projectile.getRect(), new Rectangle((int)(segment.Position.X - (NPC.width / 2)), (int)(segment.Position.Y - (NPC.height / 2)), NPC.width, NPC.height)))
                 {
                     projectile.ModProj().ultimateCollideOverride = true;
+                    modNPC.hitSegment = i;
                     return null;
                 }
             }
