@@ -24,6 +24,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Particles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using ReLogic.Threading;
 
 namespace TerRoguelike.Managers
 {
@@ -41,11 +42,14 @@ namespace TerRoguelike.Managers
             if (!ActiveParticles.Any())
                 return;
 
-            for (int i = 0; i < ActiveParticles.Count; i++)
+            FastParallel.For(0, ActiveParticles.Count, delegate (int start, int end, object context)
             {
-                Particle particle = ActiveParticles[i];
-                particle.Update();
-            }
+                for (int i = start; i < end; i++)
+                {
+                    Particle particle = ActiveParticles[i];
+                    particle.Update();
+                }
+            });
             ActiveParticles.RemoveAll(x => x.timeLeft <= 0);
         }
         public static void DrawParticles()

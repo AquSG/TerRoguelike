@@ -397,7 +397,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (livingCrystal > 0)
             {
-                int regenIncrease = livingCrystal * 4;
+                int regenIncrease = livingCrystal * 2;
                 Player.lifeRegen += regenIncrease;
             }
             if (benignFungusCooldown > 0)
@@ -409,7 +409,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (sentientPutty > 0 && outOfDangerTime == 120)
             {
-                int healAmt = sentientPutty * 10;
+                int healAmt = sentientPutty * 5;
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/OrbHeal", 5) { Volume = 0.12f }, Player.Center);
                 ScaleableHeal(healAmt);
             }
