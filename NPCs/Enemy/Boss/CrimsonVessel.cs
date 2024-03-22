@@ -811,7 +811,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
-                TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.7f }, NPC.Center);
+                TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.5f }, NPC.Center);
                 CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {

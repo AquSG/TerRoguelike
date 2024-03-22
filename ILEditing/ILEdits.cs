@@ -50,7 +50,8 @@ namespace TerRoguelike.ILEditing
         private void On_WallDrawing_DrawWalls(On_WallDrawing.orig_DrawWalls orig, WallDrawing self)
         {
 			orig.Invoke(self);
-			RoomSystem.PostDrawWalls();
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+				RoomSystem.PostDrawWalls(Main.spriteBatch);
 		}
 
         private void On_NPC_UpdateCollision(On_NPC.orig_UpdateCollision orig, NPC self)

@@ -14,6 +14,9 @@ using static TerRoguelike.Systems.MusicSystem;
 using Terraria.Audio;
 using Terraria.ModLoader;
 using TerRoguelike.NPCs.Enemy;
+using Microsoft.Xna.Framework.Graphics;
+using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Systems.RoomSystem;
 
 namespace TerRoguelike.Rooms
 {
@@ -24,6 +27,7 @@ namespace TerRoguelike.Rooms
         public override string Filename => "Schematics/RoomSchematics/LunarBossRoom1.csch";
         public override bool IsBossRoom => true;
         public bool musicPlayed = false;
+        public static Texture2D moonLordTex;
         public override void InitializeRoom()
         {
             if (!TerRoguelikeWorld.lunarBossSpawned)
@@ -72,6 +76,16 @@ namespace TerRoguelike.Rooms
         {
             base.RoomClearReward();
             TerRoguelikeWorld.StartEscapeSequence();
+        }
+        public override void PostDrawTilesRoom()
+        {
+            if (TerRoguelikeWorld.lunarFloorInitialized && (!TerRoguelikeWorld.lunarBossSpawned || (!awake && closedTime <= 0)))
+            {
+                if (moonLordTex == null)
+                    moonLordTex = TexDict["StillMoonLord"].Value;
+                Main.EntitySpriteDraw(moonLordTex, (RoomPosition + (RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
+            }
+            base.PostDrawTilesRoom();
         }
     }
 }

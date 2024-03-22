@@ -147,8 +147,8 @@ Items: {
 		DisplayName: Living Crystal
 		Tooltip:
 			'''
-			+2 HP/s
-			Extra copies of this item also grant +2 HP/s
+			+1 HP/s
+			Extra copies of this item also grant +1 HP/s
 			'''
 	}
 
@@ -350,8 +350,8 @@ Items: {
 		DisplayName: Sentient Putty
 		Tooltip:
 			'''
-			+10 HP after being hit and then avoiding damage for 2 seconds
-			Extra copies of this item increase the healing amount by 10
+			+5 HP after being hit and then avoiding damage for 2 seconds
+			Extra copies of this item increase the healing amount by 5
 			'''
 	}
 

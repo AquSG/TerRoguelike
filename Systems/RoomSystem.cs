@@ -40,7 +40,7 @@ namespace TerRoguelike.Systems
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static bool obtainedRoomListFromServer = false;
-        public static Vector2 DrawBehindTilesOffset = new Vector2(192, 192);
+        public static Vector2 DrawBehindTilesOffset { get { return new Vector2(Main.offScreenRange); } }
         public static bool debugDrawNotSpawnedEnemies = false;
         public static void NewRoom(Room room)
         {
@@ -432,9 +432,81 @@ namespace TerRoguelike.Systems
         /// <summary>
         /// DO NOT RESET SPRITEBATCH IN HERE. YOU ARE STUCK WITH ALPHABLEND AND ADDING 'DrawBehindTilesOffset' TO ALL THE DRAW POSITIONS
         /// </summary>
-        public static void PostDrawWalls()
+        public static void PostDrawWalls(SpriteBatch spriteBatch)
         {
+            Main.tileBatch.End();
+            Main.tileBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
             DrawChains();
+            DrawRoomWalls(spriteBatch);
+            Main.tileBatch.End();
+            Main.tileBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+        }
+        public static void DrawRoomWalls(SpriteBatch spriteBatch)
+        {
+            if (RoomList == null)
+                return;
+
+            spriteBatch.End();
+            Texture2D lightTexture = TexDict["TemporaryBlock"].Value;
+            foreach (Room room in RoomList)
+            {
+                if (room == null)
+                    continue;
+
+                if (!room.StartCondition())
+                    continue;
+
+                if (room.closedTime > 60)
+                    continue;
+
+                if (room.wallActive)
+                {
+                    //Draw the pink borders indicating the bounds of the room
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+                    for (float side = 0; side < 2; side++)
+                    {
+                        for (float i = 0; i < room.RoomDimensions.X; i++)
+                        {
+                            Vector2 targetBlock = room.RoomPosition + new Vector2(i, side * room.RoomDimensions.Y - side);
+
+                            if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
+                                continue;
+
+                            Color color = Color.White;
+
+                            if (room.active)
+                                color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255f, room.roomTime / 60f), 0, 255f);
+                            else
+                                color.A = (byte)MathHelper.Lerp(255, 0, room.closedTime / 60f);
+
+                            Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, -16f * side);
+                            float rotation = MathHelper.Pi + (MathHelper.Pi * side);
+
+                            Main.EntitySpriteDraw(lightTexture, drawPosition + DrawBehindTilesOffset, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+                        }
+                        for (float i = 0; i < room.RoomDimensions.Y; i++)
+                        {
+                            Vector2 targetBlock = room.RoomPosition + new Vector2(side * room.RoomDimensions.X - side, i);
+                            if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
+                                continue;
+
+                            Color color = Color.White;
+
+                            if (room.active)
+                                color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255f, room.roomTime / 60f), 0, 255f);
+                            else
+                                color.A = (byte)MathHelper.Lerp(255, 0, room.closedTime / 60f);
+
+                            Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, (16f) * (side - 1f));
+                            float rotation = MathHelper.PiOver2 + (MathHelper.Pi * side);
+
+                            Main.EntitySpriteDraw(lightTexture, drawPosition + DrawBehindTilesOffset, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+                        }
+                    }
+                    spriteBatch.End();
+                }
+            }
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
         }
         public override void PostDrawTiles()
         {
@@ -459,173 +531,6 @@ namespace TerRoguelike.Systems
                     room.PostDrawTilesRoom();
             }
             Main.spriteBatch.End();
-
-            Texture2D lightTexture = TexDict["TemporaryBlock"].Value;
-            foreach (Room room in RoomList)
-            {
-                if (room == null)
-                    continue;
-                
-                if (lunarFloorInitialized && (!lunarBossSpawned || (!room.awake && room.closedTime <= 0)))
-                {
-                    if (room.ID == RoomDict["LunarBossRoom1"])
-                    {
-                        StartAlphaBlendSpritebatch(false);
-                        Vector2 position = (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f;
-                        Texture2D moonLordTex = TexDict["StillMoonLord"].Value;
-                        Main.EntitySpriteDraw(moonLordTex, (room.RoomPosition + (room.RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
-                        Main.spriteBatch.End();
-                    }
-                }
-
-                if (!room.StartCondition())
-                    continue;
-
-                if (room.IsStartRoom && escape)
-                {
-                    bool canDraw = false;
-                    for (int i = 0; i < Main.maxPlayers; i++)
-                    {
-                        if (Vector2.Distance(Main.player[i].Center, (room.RoomPosition + new Vector2(0, 0)) * 16f) < 2500f)
-                        {
-                            canDraw = true;
-                            break;
-                        }
-                    }
-                    if (!canDraw)
-                        continue;
-
-                    //Draw the blue wall portal
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                    for (float i = 0; i < room.RoomDimensions.Y; i++)
-                    {
-                        Vector2 targetBlock = room.RoomPosition + new Vector2(1, i);
-                        int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                        if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
-                        {
-                            if (Main.tile[targetBlock.ToPoint()].HasTile)
-                                continue;
-                        }
-
-                        Color color = Color.Cyan;
-
-                        color.A = 255;
-
-                        Vector2 drawPosition = targetBlock * 16f - Main.screenPosition + (Vector2.UnitX * 16f);
-                        float rotation = -MathHelper.PiOver2;
-
-                        Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-
-                        float scale = 0.75f;
-
-                        if (Main.rand.NextBool(8))
-                            Dust.NewDustDirect((targetBlock * 16f) + new Vector2(2f, 0), 2, 16, 206, Scale: scale);
-                    }
-                    Main.spriteBatch.End();
-                }
-
-                if (room.closedTime > 60)
-                {
-                    if (room.IsBossRoom && !escape)
-                    {
-                        bool canDraw = false;
-                        for (int i = 0; i < Main.maxPlayers; i++)
-                        {
-                            if (Vector2.Distance(Main.player[i].Center, (room.RoomPosition + new Vector2(room.RoomDimensions.X, 0)) * 16f) < 2500f)
-                            {
-                                canDraw = true;
-                                break;
-                            }
-                        }
-                        if (!canDraw)
-                            continue;
-
-                        //Draw the blue wall portal
-                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                        for (float i = 0; i < room.RoomDimensions.Y; i++)
-                        {
-                            Vector2 targetBlock = room.RoomPosition + new Vector2(room.RoomDimensions.X - 2, i);
-                            int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                            if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
-                            {
-                                if (Main.tile[targetBlock.ToPoint()].HasTile)
-                                    continue;
-                            }
-
-                            Color color = Color.Cyan;
-
-                            color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255, (room.closedTime - 120) / 60f), 0, 255);
-
-                            Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(0, -16f);
-                            float rotation = MathHelper.PiOver2;
-
-                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-
-                            float scale = MathHelper.Clamp(MathHelper.Lerp(0.85f, 0.75f, (room.closedTime - 120f) / 60f), 0.75f, 0.85f);
-
-                            if (Main.rand.NextBool((int)MathHelper.Clamp(MathHelper.Lerp(30f, 8f, (room.closedTime - 60f) / 120f), 8f, 20f)))
-                                Dust.NewDustDirect((targetBlock * 16f) + new Vector2(10f, 0), 2, 16, 206, Scale: scale);
-                        }
-                        Main.spriteBatch.End();
-                    }
-                    continue;
-                }
-
-                if (room.wallActive)
-                {
-                    //Draw the pink borders indicating the bounds of the room
-                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                    for (float side = 0; side < 2; side++)
-                    {
-                        for (float i = 0; i < room.RoomDimensions.X; i++)
-                        {
-                            Vector2 targetBlock = room.RoomPosition + new Vector2(i, side * room.RoomDimensions.Y - side);
-
-                            int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                            if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
-                            {
-                                if (Main.tile[targetBlock.ToPoint()].HasTile)
-                                    continue;
-                            }
-
-                            Color color = Color.White;
-
-                            if (room.active)
-                                color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255f, room.roomTime / 60f), 0, 255f);
-                            else
-                                color.A = (byte)MathHelper.Lerp(255, 0, room.closedTime / 60f);
-
-                            Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, -16f * side);
-                            float rotation = MathHelper.Pi + (MathHelper.Pi * side);
-
-                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-                        }
-                        for (float i = 0; i < room.RoomDimensions.Y; i++)
-                        {
-                            Vector2 targetBlock = room.RoomPosition + new Vector2(side * room.RoomDimensions.X - side, i);
-                            int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                            if (TileID.Sets.BlockMergesWithMergeAllBlock[tileType])
-                            {
-                                if (Main.tile[targetBlock.ToPoint()].HasTile)
-                                    continue;
-                            }
-
-                            Color color = Color.White;
-
-                            if (room.active)
-                                color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255f, room.roomTime / 60f), 0, 255f);
-                            else
-                                color.A = (byte)MathHelper.Lerp(255, 0, room.closedTime / 60f);
-
-                            Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, (16f) * (side - 1f));
-                            float rotation = MathHelper.PiOver2 + (MathHelper.Pi * side);
-
-                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
-                        }
-                    }
-                    Main.spriteBatch.End();
-                }
-            }
         }
         #region New Floor Effects
         public void NewFloorEffects(Room targetRoom, TerRoguelikePlayer modPlayer)

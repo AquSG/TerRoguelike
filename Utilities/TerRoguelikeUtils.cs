@@ -234,6 +234,7 @@ namespace TerRoguelike.Utilities
         /// <returns>True if there is a tile in the way of the line</returns> 
         public static bool CanHitInLine(Vector2 start, Vector2 end, float lengthCap = 2000f)
         {
+            
             float length = (start - end).Length();
             Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
 
@@ -243,18 +244,25 @@ namespace TerRoguelike.Utilities
                 return false;
 
             Vector2 currentPos = start;
+            Point lastAirPos = new Point(-1, -1);
             for (int i = 0; i < (int)length; i++)
             {
                 currentPos += unitVect;
 
-                Point tilePos = new Point((int)(currentPos.X / 16), (int)(currentPos.Y / 16));
+                Point tilePos = currentPos.ToTileCoordinates();
+
+                if (tilePos == lastAirPos)
+                    continue;
 
                 if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
                     continue;
 
                 Tile tile = Main.tile[tilePos.X, tilePos.Y];
                 if (!tile.IsTileSolidGround(true))
+                {
+                    lastAirPos = tilePos;
                     continue;
+                }
 
                 if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
                     return false;
@@ -311,21 +319,27 @@ namespace TerRoguelike.Utilities
             {
                 length = lengthCap;
             }
-                
 
             Vector2 currentPos = start;
+            Point lastAirPos = new Point(-1, -1);
             for (int i = 0; i < (int)length; i++)
             {
                 currentPos += unitVect;
 
-                Point tilePos = new Point((int)(currentPos.X / 16), (int)(currentPos.Y / 16));
+                Point tilePos = currentPos.ToTileCoordinates();
+
+                if (tilePos == lastAirPos)
+                    continue;
 
                 if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
                     continue;
 
                 Tile tile = Main.tile[tilePos.X, tilePos.Y];
                 if (!tile.IsTileSolidGround(true))
+                {
+                    lastAirPos = tilePos;
                     continue;
+                }
 
                 if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
                     return currentPos;

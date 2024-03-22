@@ -14,6 +14,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Shaders;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
+using Terraria.ID;
 
 namespace TerRoguelike.Managers
 {
@@ -521,18 +522,77 @@ namespace TerRoguelike.Managers
                 StartAlphaBlendSpritebatch();
             }
 
+            Texture2D wallTex = TextureManager.TexDict["TemporaryBlock"].Value;
+
+            if (IsStartRoom && TerRoguelikeWorld.escape)
+            {
+                //Draw the blue wall portal
+                StartAdditiveSpritebatch();
+                for (float i = 0; i < RoomDimensions.Y; i++)
+                {
+                    Vector2 targetBlock = RoomPosition + new Vector2(1, i);
+                    if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
+                        continue;
+
+                    Color color = Color.Cyan;
+
+                    color.A = 255;
+
+                    Vector2 drawPosition = targetBlock * 16f - Main.screenPosition + (Vector2.UnitX * 16f);
+                    float rotation = -MathHelper.PiOver2;
+
+                    Main.EntitySpriteDraw(wallTex, drawPosition, null, color, rotation, wallTex.Size(), 1f, SpriteEffects.None);
+
+                    float scale = 0.75f;
+
+                    if (Main.rand.NextBool(8))
+                        Dust.NewDustDirect((targetBlock * 16f) + new Vector2(2f, 0), 2, 16, 206, Scale: scale);
+                }
+                StartAlphaBlendSpritebatch();
+            }
+
+            if (closedTime > 60)
+            {
+                if (IsBossRoom && !TerRoguelikeWorld.escape)
+                {
+                    //Draw the blue wall portal
+                    StartAdditiveSpritebatch();
+                    for (float i = 0; i < RoomDimensions.Y; i++)
+                    {
+                        Vector2 targetBlock = RoomPosition + new Vector2(RoomDimensions.X - 2, i);
+                        int tileType = Main.tile[targetBlock.ToPoint()].TileType;
+                        if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
+                            continue;
+
+                        Color color = Color.Cyan;
+
+                        color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255, (closedTime - 120) / 60f), 0, 255);
+
+                        Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(0, -16f);
+                        float rotation = MathHelper.PiOver2;
+
+                        Main.EntitySpriteDraw(wallTex, drawPosition, null, color, rotation, wallTex.Size(), 1f, SpriteEffects.None);
+
+                        float scale = MathHelper.Clamp(MathHelper.Lerp(0.85f, 0.75f, (closedTime - 120f) / 60f), 0.75f, 0.85f);
+
+                        if (Main.rand.NextBool((int)MathHelper.Clamp(MathHelper.Lerp(30f, 8f, (closedTime - 60f) / 120f), 8f, 20f)))
+                            Dust.NewDustDirect((targetBlock * 16f) + new Vector2(10f, 0), 2, 16, 206, Scale: scale);
+                    }
+                    StartAlphaBlendSpritebatch();
+                }
+            }
+
             return;
 
-            Texture2D testTex = TextureManager.TexDict["TemporaryBlock"].Value;
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Top * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 2, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Right * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 3, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (BottomRight * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 4, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Bottom * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 5, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (BottomLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 6, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Left * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 7, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(testTex, RoomPosition16 + (Center * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 7, testTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Top * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 2, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Right * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 3, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (BottomRight * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 4, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Bottom * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 5, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (BottomLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 6, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Left * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 7, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Center * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 7, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
         }
         public virtual bool ClearCondition()
         {

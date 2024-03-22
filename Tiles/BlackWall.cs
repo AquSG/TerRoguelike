@@ -1,7 +1,9 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.Tiles
 {
@@ -18,5 +20,5 @@ namespace TerRoguelike.Tiles
 		{
 			num = fail ? 1 : 3;
 		}
-	}
+    }
 }

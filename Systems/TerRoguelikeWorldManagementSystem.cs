@@ -17,6 +17,7 @@ using Terraria.Localization;
 using TerRoguelike.World;
 using TerRoguelike.MainMenu;
 using Microsoft.Xna.Framework;
+using ReLogic.Threading;
 
 namespace TerRoguelike.Systems
 {
@@ -60,25 +61,30 @@ namespace TerRoguelike.Systems
         }
         public void FillTheFuckingWorld(ref GenerationProgress progress)
         {
-            double progPerTile = 0.98d / ((Main.maxTilesY - Main.worldSurface) * Main.maxTilesX);
-            for (int y = (int)Main.worldSurface; y < Main.maxTilesY; y++)
+            //Can't do progress updates with fast parallel, but fast parallel makes it twice as fast. who cares.
+            //double progPerTile = 0.98d / ((Main.maxTilesY - Main.worldSurface) * Main.maxTilesX);
+            FastParallel.For((int)Main.worldSurface, Main.maxTilesY, delegate (int start, int end, object context)
             {
-                for (int x = 1; x < Main.maxTilesX; x++)
+                for (int i = start; i < end; i++)
                 {
-                    progress.Value += progPerTile;
-                    if (x == 1 && y == (int)Main.worldSurface)
+                    for (int x = 1; x < Main.maxTilesX; x++)
                     {
-                        WorldGen.PlaceTile(x, y, ModContent.TileType<Tiles.BlackTile>(), true);
-                        continue;
+                        //progress.Value += progPerTile;
+                        if (x == 1 && i == (int)Main.worldSurface)
+                        {
+                            WorldGen.PlaceTile(x, i, ModContent.TileType<Tiles.BlackTile>(), true);
+                            continue;
+                        }
+                        Main.tile[x, i].CopyFrom(Main.tile[1, (int)Main.worldSurface]);
+                        if (i == (int)Main.worldSurface)
+                        {
+                            continue;
+                        }
+                        WorldGen.PlaceWall(x, i, ModContent.WallType<Tiles.BlackWall>(), true);
                     }
-                    Main.tile[x, y].CopyFrom(Main.tile[1, (int)Main.worldSurface]);
-                    if (y == (int)Main.worldSurface)
-                    {
-                        continue;
-                    }
-                    WorldGen.PlaceWall(x, y, ModContent.WallType<Tiles.BlackWall>(), true);
                 }
-            }
+            });
+            
         }
     }
 }
