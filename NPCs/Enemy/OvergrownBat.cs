@@ -33,7 +33,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.width = 38;
             NPC.height = 34;
             NPC.aiStyle = -1;
-            NPC.damage = 36;
+            NPC.damage = 32;
             NPC.lifeMax = 800;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath4;

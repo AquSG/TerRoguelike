@@ -25,6 +25,8 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Particles;
 using Terraria.Localization;
+using Terraria.ModLoader.IO;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -684,11 +686,47 @@ namespace TerRoguelike.TerPlayer
                             droneBuddyState = 0;
                     }
                 }
-                    
+                Vector2 desiredPos = droneBuddyState != 1 ? Player.Center - new Vector2(48 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f) : Player.Center + ((Main.npc[droneTarget].Center - Player.Center).SafeNormalize(Vector2.UnitY) * 48);
+                SpriteEffects spriteEffects = droneBuddyState != 1 ? (droneBuddyVisualPosition.X > Player.Center.X ? SpriteEffects.FlipHorizontally : SpriteEffects.None) : (Main.npc[droneTarget].Center.X >= droneBuddyVisualPosition.X ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                float idleRotation = MathHelper.Clamp(droneBuddyVisualPosition.Distance(desiredPos) / 500f, -MathHelper.PiOver4, MathHelper.PiOver4) * (spriteEffects == SpriteEffects.FlipHorizontally ? -1 : 1);
+                float desiredRot = droneBuddyState != 1 ? idleRotation + (spriteEffects == SpriteEffects.FlipHorizontally ? MathHelper.Pi : 0) : (Main.npc[droneTarget].Center - droneBuddyVisualPosition).ToRotation();
+
+                if (Math.Abs(droneBuddyRotation - desiredRot) > MathHelper.PiOver2 * 3f)
+                {
+                    if (droneBuddyRotation < desiredRot)
+                        droneBuddyRotation += MathHelper.TwoPi;
+                    else if (desiredRot < droneBuddyRotation)
+                        desiredRot += MathHelper.TwoPi;
+                }
+                if (droneBuddyVisualPosition == Vector2.Zero)
+                {
+                    droneBuddyVisualPosition = desiredPos;
+                    droneBuddyRotation = 0f;
+                }
+                else
+                {
+                    droneBuddyVisualPosition = Vector2.Lerp(droneBuddyVisualPosition, desiredPos, 0.03f);
+                    droneBuddyRotation = MathHelper.Lerp(droneBuddyRotation, desiredRot, 0.08f);
+
+                }
+                droneSeenRot = spriteEffects == SpriteEffects.FlipHorizontally ? droneBuddyRotation - MathHelper.Pi : droneBuddyRotation;
             }
             else
             {
                 droneBuddyHealTime = 0;
+            }
+
+            if (soulOfLenaUses < soulOfLena || soulOfLenaHurtVisual)
+            {
+                Vector2 desiredPos = Player.Top - new Vector2(32 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f + 12f);
+                if (lenaVisualPosition == Vector2.Zero)
+                {
+                    lenaVisualPosition = desiredPos;
+                }
+                else
+                {
+                    lenaVisualPosition = Vector2.Lerp(lenaVisualPosition, desiredPos, 0.02f);
+                }
             }
 
             if (overclocker > 0)
@@ -1254,7 +1292,7 @@ namespace TerRoguelike.TerPlayer
         {
             if (flimsyPauldron > 0)
             {
-                int reductedDamage = 5 * flimsyPauldron;
+                int reductedDamage = 3 * flimsyPauldron;
                 info.Damage -= reductedDamage;
             }
             if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)
@@ -1719,22 +1757,14 @@ namespace TerRoguelike.TerPlayer
                 }
                 if (soulOfLenaUses < soulOfLena || soulOfLenaHurtVisual)
                 {
-                    Vector2 desiredPos = Player.Top - new Vector2(32 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f + 12f);
                     Texture2D lenaTex = TexDict["Lena"].Value;
                     Texture2D circleTex = TexDict["LenaGlow"].Value;
                     int lenaFrame = hurtCheck ? 2 : (Main.GlobalTimeWrappedHourly % 1.1f >= 0.55f ? 1 : 0);
                     int frameHeight = lenaTex.Height / 3;
                     SpriteEffects spriteEffects = Player.direction == -1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
                     Color color = soulOfLenaHurtVisual && soulOfLenaUses == soulOfLena ? Color.White * MathHelper.Lerp(0, 1f, Player.immuneTime / 300f) : Color.White;
-                    if (lenaVisualPosition == Vector2.Zero)
-                    {
-                        lenaVisualPosition = desiredPos;
-                    }
-                    else
-                    {
-                        lenaVisualPosition = Vector2.Lerp(lenaVisualPosition, desiredPos, 0.02f);
-                    }
-                    Main.EntitySpriteDraw(circleTex, lenaVisualPosition - Main.screenPosition, null, color.MultiplyRGB(Color.Cyan) * 0.15f, 0f, circleTex.Size() * 0.5f, 0.75f, SpriteEffects.None);
+
+                    Main.EntitySpriteDraw(circleTex, lenaVisualPosition - Main.screenPosition, null, color.MultiplyRGB(Color.Cyan) * 0.2f, 0f, circleTex.Size() * 0.5f, 0.75f, SpriteEffects.None);
                     Main.EntitySpriteDraw(lenaTex, lenaVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * lenaFrame, lenaTex.Width, frameHeight), color, 0f, new Vector2(lenaTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
                 }
                 else
@@ -1777,38 +1807,16 @@ namespace TerRoguelike.TerPlayer
 
             if (droneBuddy > 0)
             {
-                Vector2 desiredPos = droneBuddyState != 1 ? Player.Center - new Vector2(48 * Player.direction, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 6f) * 8f) : Player.Center + ((Main.npc[droneTarget].Center - Player.Center).SafeNormalize(Vector2.UnitY) * 48);
                 Texture2D droneTex = TexDict["DroneBuddyMinion"].Value;
                 float fullAnimTime = Main.GlobalTimeWrappedHourly % 0.5f;
                 int droneFrame = fullAnimTime % 0.25f <= 0.125f ? 1 : (fullAnimTime <= 0.25f ? 0 : 2);
                 int faceFrame = droneBuddyState == 1 ? 5 : (Main.GlobalTimeWrappedHourly % 9f <= 0.4f ? 4 : 3);
                 int frameHeight = droneTex.Height / 6;
-                SpriteEffects spriteEffects = droneBuddyState != 1 ? (droneBuddyVisualPosition.X > Player.Center.X ? SpriteEffects.FlipHorizontally : SpriteEffects.None) : (Main.npc[droneTarget].Center.X >= droneBuddyVisualPosition.X ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-                float idleRotation = MathHelper.Clamp(droneBuddyVisualPosition.Distance(desiredPos) / 500f, -MathHelper.PiOver4, MathHelper.PiOver4) * (spriteEffects == SpriteEffects.FlipHorizontally ? -1 : 1);
-                float desiredRot = droneBuddyState != 1 ? idleRotation + (spriteEffects == SpriteEffects.FlipHorizontally ? MathHelper.Pi : 0) : (Main.npc[droneTarget].Center - droneBuddyVisualPosition).ToRotation();
                 Color color = Color.White;
+                SpriteEffects spriteEffects = droneBuddyState != 1 ? (droneBuddyVisualPosition.X > Player.Center.X ? SpriteEffects.FlipHorizontally : SpriteEffects.None) : (Main.npc[droneTarget].Center.X >= droneBuddyVisualPosition.X ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
                 
-                if (Math.Abs(droneBuddyRotation - desiredRot) > MathHelper.PiOver2 * 3f)
-                {
-                    if (droneBuddyRotation < desiredRot)
-                        droneBuddyRotation += MathHelper.TwoPi;
-                    else if (desiredRot < droneBuddyRotation)
-                        desiredRot += MathHelper.TwoPi;
-                }
-                if (droneBuddyVisualPosition == Vector2.Zero)
-                {
-                    droneBuddyVisualPosition = desiredPos;
-                    droneBuddyRotation = 0f;
-                }
-                else
-                {
-                    droneBuddyVisualPosition = Vector2.Lerp(droneBuddyVisualPosition, desiredPos, 0.03f);
-                    droneBuddyRotation = MathHelper.Lerp(droneBuddyRotation, desiredRot, 0.08f);
-                    
-                }
-                droneSeenRot = spriteEffects == SpriteEffects.FlipHorizontally ? droneBuddyRotation - MathHelper.Pi : droneBuddyRotation;
-                Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * droneFrame, droneTex.Width, frameHeight), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
-                Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * faceFrame, droneTex.Width, frameHeight), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
+                Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * droneFrame, droneTex.Width, frameHeight - 1), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
+                Main.EntitySpriteDraw(droneTex, droneBuddyVisualPosition - Main.screenPosition, new Rectangle(0, frameHeight * faceFrame, droneTex.Width, frameHeight - 1), color, droneSeenRot, new Vector2(droneTex.Width, frameHeight) * 0.5f, 1f, spriteEffects);
 
                 if (droneBuddyState == 2)
                 {
