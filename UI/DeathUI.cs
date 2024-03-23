@@ -106,6 +106,7 @@ namespace TerRoguelike.UI
                 }
                 modPlayer.killerNPC = -1;
                 modPlayer.killerProj = -1;
+                SystemLoader.PreSaveAndQuit();
                 WorldGen.SaveAndQuit();
             }
             else if (pressed && restartHover && modPlayer.deadTime > 150)

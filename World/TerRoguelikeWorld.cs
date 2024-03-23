@@ -44,7 +44,8 @@ namespace TerRoguelike.World
 
             }
             SetMusicMode(MusicStyle.AllCalm);
-            SetCalm(Escape with { Volume = 0.25f });
+            SetCalm(Escape);
+            CalmVolumeLevel = 0.25f;
             //SetCombat(Silence with { Volume = 0f });
         }
     }
