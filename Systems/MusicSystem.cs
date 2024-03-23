@@ -22,6 +22,9 @@ using ReLogic.Utilities;
 using TerRoguelike.TerPlayer;
 using Terraria.ModLoader.IO;
 using System.Threading;
+using ReLogic.Content;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.Systems
 {
@@ -29,12 +32,15 @@ namespace TerRoguelike.Systems
     {
         public static bool Initialized = false;
         public static bool PlayedAllSounds = false;
-        public static float CalmVolumeCache = 0;
-        public static float CombatVolumeCache = 0;
-        public static SlotId CalmMusic;
-        public static SlotId CombatMusic;
+        public static float CalmVolumeInterpolant = 0;
+        public static float CombatVolumeInterpolant = 0;
+        public static float CalmVolumeLevel = 1f;
+        public static float CombatVolumeLevel = 1f;
+        public static SoundEffectInstance CalmMusic;
+        public static SoundEffectInstance CombatMusic;
         public static BossTheme ActiveBossTheme;
         public static MusicStyle MusicMode = MusicStyle.Dynamic;
+        public static Dictionary<string, Asset<SoundEffect>> MusicDict = new Dictionary<string, Asset<SoundEffect>>();
         public enum MusicStyle
         {
             Dynamic = 0,
@@ -46,29 +52,34 @@ namespace TerRoguelike.Systems
         public static bool BufferCalmSilence = false;
         public static bool BufferCombatSilence = false;
 
-        public static SoundStyle Silence = new("TerRoguelike/Tracks/Blank", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
-        public static SoundStyle FinalStage = new("TerRoguelike/Tracks/FinalStage", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
-        public static SoundStyle FinalBoss = new("TerRoguelike/Tracks/FinalBoss", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
-        public static SoundStyle Escape = new("TerRoguelike/Tracks/Escape", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false };
+        public static string Silence = "TerRoguelike/Tracks/Blank";
+        public static string FinalStage = "TerRoguelike/Tracks/FinalStage";
+        public static string FinalBoss = "TerRoguelike/Tracks/FinalBoss";
+        public static string Escape = "TerRoguelike/Tracks/Escape";
 
         public static FloorSoundtrack BaseTheme = new(
-            new("TerRoguelike/Tracks/Calm", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.18f }, 
-            new("TerRoguelike/Tracks/Combat", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.18f });
+            "TerRoguelike/Tracks/Calm",
+            "TerRoguelike/Tracks/Combat",
+            0.18f);
 
         public static BossTheme PaladinTheme = new(
-            new("TerRoguelike/Tracks/PaladinTheme", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.33f },
-            new("TerRoguelike/Tracks/PaladinThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.33f },
-            new("TerRoguelike/Tracks/PaladinThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.33f });
+            "TerRoguelike/Tracks/PaladinTheme",
+            "TerRoguelike/Tracks/PaladinThemeStart",
+            "TerRoguelike/Tracks/PaladinThemeEnd",
+            0.33f);
 
         public static BossTheme BrambleHollowTheme = new(
-            new("TerRoguelike/Tracks/BrambleHollowTheme", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.4f },
-            new("TerRoguelike/Tracks/BrambleHollowThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.4f },
-            new("TerRoguelike/Tracks/BrambleHollowThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.4f });
+            "TerRoguelike/Tracks/BrambleHollowTheme",
+            "TerRoguelike/Tracks/BrambleHollowThemeStart",
+            "TerRoguelike/Tracks/BrambleHollowThemeEnd",
+            0.4f);
 
         public static BossTheme CrimsonVesselTheme = new(
-            new("TerRoguelike/Tracks/CrimsonVesselTheme", SoundType.Music) { IsLooped = true, PlayOnlyIfFocused = false, Volume = 0.8f },
-            new("TerRoguelike/Tracks/CrimsonVesselThemeStart", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.8f },
-            new("TerRoguelike/Tracks/CrimsonVesselThemeEnd", SoundType.Music) { IsLooped = false, PlayOnlyIfFocused = false, Volume = 0.8f });
+            "TerRoguelike/Tracks/CrimsonVesselTheme",
+            "TerRoguelike/Tracks/CrimsonVesselThemeStart",
+            "TerRoguelike/Tracks/CrimsonVesselThemeEnd",
+            0.8f);
+
 
         public static void PlayAllSounds()
         {
@@ -77,34 +88,34 @@ namespace TerRoguelike.Systems
 
             PlayedAllSounds = true;
 
-            ThreadPool.QueueUserWorkItem(_ => PlayAllSoundsCallback());
+            List<string> pathList = new List<string>()
+            {
+                Silence,
+                FinalStage,
+                FinalBoss,
+                Escape,
+                BaseTheme.CalmTrack,
+                BaseTheme.CombatTrack,
+                PaladinTheme.BattleTrack,
+                PaladinTheme.StartTrack,
+                PaladinTheme.EndTrack,
+                BrambleHollowTheme.BattleTrack,
+                BrambleHollowTheme.StartTrack,
+                BrambleHollowTheme.EndTrack,
+                CrimsonVesselTheme.BattleTrack,
+                CrimsonVesselTheme.StartTrack,
+                CrimsonVesselTheme.EndTrack,
+            };
+            foreach (string path in pathList)
+            {
+                AddMusic(path);
+            }
         }
-        private static void PlayAllSoundsCallback()
+        internal static void AddMusic(string path)
         {
-            CalmMusic = SoundEngine.PlaySound(Silence with { Volume = 0f });
-            CalmMusic = SoundEngine.PlaySound(BaseTheme.CalmTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(BaseTheme.CombatTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(FinalStage with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(FinalBoss with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(Escape with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(PaladinTheme.BattleTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(PaladinTheme.StartTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(PaladinTheme.EndTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.BattleTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.StartTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(BrambleHollowTheme.EndTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(CrimsonVesselTheme.BattleTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(CrimsonVesselTheme.StartTrack with { Volume = 0f });
-            CombatMusic = SoundEngine.PlaySound(CrimsonVesselTheme.EndTrack with { Volume = 0f });
-            if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-            {
-                calmMusic.Stop();
-            }
-            if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-            {
-                combatMusic.Stop();
-            }
+            MusicDict.Add(path, ModContent.Request<SoundEffect>(path, AssetRequestMode.AsyncLoad));
         }
+ 
         public override void OnModLoad()
         {
             MusicLoader.AddMusic(TerRoguelike.Instance, "Tracks/Blank");
@@ -117,8 +128,9 @@ namespace TerRoguelike.Systems
         {
             ActiveBossTheme = bossTheme;
             ActiveBossTheme.startFlag = true;
-            SetCombat(bossTheme.StartTrack);
+            SetCombat(bossTheme.StartTrack, false);
             SetMusicMode(MusicStyle.Boss);
+            CombatVolumeLevel = bossTheme.Volume;
         }
         public static void SetMusicMode(MusicStyle newMode)
         {
@@ -143,33 +155,25 @@ namespace TerRoguelike.Systems
             if (!Main.hasFocus || Main.gamePaused)
                 MusicUpdate();
         }
-        public static void SetCalm(SoundStyle sound)
+        public static void SetCalm(string track, bool loop = true)
         {
-            if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-            {
-                CalmVolumeCache = calmMusic.Volume;
-                calmMusic.Pause();
-                calmMusic.Stop();
-            }
-            CalmMusic = SoundEngine.PlaySound(sound);
-            if (SoundEngine.TryGetActiveSound(CalmMusic, out var newMusic))
-            {
-                newMusic.Volume = CalmVolumeCache;
-            }
+            if (CalmMusic != null)
+                CalmMusic.Dispose();
+
+            CalmMusic = MusicDict[track].Value.CreateInstance();
+            CalmMusic.IsLooped = loop;
+            CalmMusic.Play();
+            CalmMusic.Volume = 0;
         }
-        public static void SetCombat(SoundStyle sound)
+        public static void SetCombat(string track, bool loop = true)
         {
-            if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-            {
-                CombatVolumeCache = combatMusic.Volume;
-                combatMusic.Pause();
-                combatMusic.Stop();
-            }
-            CombatMusic = SoundEngine.PlaySound(sound);
-            if (SoundEngine.TryGetActiveSound(CombatMusic, out var newMusic))
-            {
-                newMusic.Volume = CombatVolumeCache;
-            }
+            if (CombatMusic != null)
+                CombatMusic.Dispose();
+
+            CombatMusic = MusicDict[track].Value.CreateInstance();
+            CombatMusic.IsLooped = loop;
+            CombatMusic.Play();
+            CombatMusic.Volume = 0;
         }
         public void MusicUpdate()
         {
@@ -182,221 +186,166 @@ namespace TerRoguelike.Systems
                 SetMusicMode(MusicStyle.Dynamic);
                 FloorSoundtrack soundtrack = modPlayer.currentFloor.Soundtrack;
 
-                CalmMusic = SoundEngine.PlaySound(soundtrack.CalmTrack);
-                CombatMusic = SoundEngine.PlaySound(soundtrack.CombatTrack);
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-                {
-                    calmMusic.Volume = 0f;
-                    calmMusic.Update();
-                    CalmVolumeCache = calmMusic.Volume;
-                }
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-                {
-                    combatMusic.Volume = 0f;
-                    combatMusic.Update();
-                    CombatVolumeCache = combatMusic.Volume;
-                }
+                SetCalm(soundtrack.CalmTrack);
+                SetCombat(soundtrack.CombatTrack);
+                CalmVolumeInterpolant = 0;
+                CombatVolumeInterpolant = 0;
+                CalmVolumeLevel = soundtrack.Volume;
+                CombatVolumeLevel = soundtrack.Volume;
                 Initialized = true;
             }
-
             if (!Initialized)
                 return;
 
             if (!Main.hasFocus)
             {
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-                {
-                    calmMusic.Volume = 0;
-                    calmMusic.Update();
-                }
-
-
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-                {
-                    combatMusic.Volume = 0;
-                    combatMusic.Update();
-                }
-                return;
+                if (CalmMusic.State == SoundState.Playing)
+                    CalmMusic.Pause();
+                if (CombatMusic.State == SoundState.Playing)
+                    CombatMusic.Pause();
             }
             else
             {
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-                {
-                    calmMusic.Volume = CalmVolumeCache;
-                    calmMusic.Update();
-                    //Main.NewText(calmMusic.Volume);
-                }
-
-
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-                {
-                    combatMusic.Volume = CombatVolumeCache;
-                    combatMusic.Update();
-                    //Main.NewText(combatMusic.Volume);
-                }
+                if (CalmMusic.State == SoundState.Paused)
+                    CalmMusic.Resume();
+                if (CombatMusic.State == SoundState.Paused)
+                    CombatMusic.Resume();
             }
-
+            
             if (MusicMode == MusicStyle.Dynamic)
             {
                 if (modPlayer.currentRoom == -1)
                 {
-                    if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-                    {
-                        float interpolant = calmMusic.Volume + (1f / 120f);
-                        calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                        calmMusic.Update();
-                        CalmVolumeCache = calmMusic.Volume;
-                    }
+                    float calmInterpolant = CalmVolumeInterpolant + (1f / 120f);
 
+                    CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
+                    CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel;
 
-                    if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-                    {
-                        float interpolant = combatMusic.Volume - (1f / 120f);
-                        combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                        combatMusic.Update();
-                        CombatVolumeCache = combatMusic.Volume;
-                    }
+                    float combatInterpolant = CombatVolumeInterpolant - (1f / 120f);
+
+                    CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
+                    CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel;
                 }
                 else
                 {
-                    if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-                    {
-                        float interpolant = calmMusic.Volume - (1f / 60f);
-                        calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                        calmMusic.Update();
-                        CalmVolumeCache = calmMusic.Volume;
-                    }
+                    float calmInterpolant = CalmVolumeInterpolant - (1f / 60f);
 
-                    if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-                    {
-                        float interpolant = combatMusic.Volume + (1f / 60f);
-                        combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                        combatMusic.Update();
-                        CombatVolumeCache = combatMusic.Volume;
-                    }
+                    CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
+                    CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel;
+
+                    float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
+
+                    CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
+                    CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel;
                 }
             }
+           
             
             if (MusicMode == MusicStyle.AllCalm)
             {
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
-                {
-                    float interpolant = calmMusic.Volume + (1f / 120f);
-                    calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    calmMusic.Update();
-                    CalmVolumeCache = calmMusic.Volume;
-                }
+                float calmInterpolant = CalmVolumeInterpolant + (1f / 120f);
+
+                CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
+                CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel;
 
 
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
+                float combatInterpolant = CombatVolumeInterpolant - (1f / 120f);
+
+                CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
+                CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel;
+
+                if (BufferCombatSilence)
                 {
-                    float interpolant = combatMusic.Volume - (1f / 120f);
-                    combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    combatMusic.Update();
-                    CombatVolumeCache = combatMusic.Volume;
-                    if (BufferCombatSilence)
+                    if (CombatMusic.Volume <= 0)
                     {
-                        if (combatMusic.Volume <= 0)
-                        {
-                            SetCombat(Silence with { Volume = 0f });
-                            BufferCombatSilence = false;
-                        }
+                        SetCombat(Silence);
+                        BufferCombatSilence = false;
                     }
                 }
             }
 
             if (MusicMode == MusicStyle.AllCombat)
             {
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
+                float calmInterpolant = CalmVolumeInterpolant - (1f / 60f);
+
+                CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
+                CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel;
+
+                if (BufferCalmSilence)
                 {
-                    float interpolant = calmMusic.Volume - (1f / 60f);
-                    calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    calmMusic.Update();
-                    CalmVolumeCache = calmMusic.Volume;
-                    if (BufferCalmSilence)
+                    if (CalmMusic.Volume <= 0)
                     {
-                        if (calmMusic.Volume <= 0)
-                        {
-                            SetCalm(Silence with { Volume = 0f });
-                            BufferCalmSilence = false;
-                        }
+                        SetCalm(Silence);
+                        BufferCalmSilence = false;
                     }
                 }
 
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
-                {
-                    float interpolant = combatMusic.Volume + (1f / 60f);
-                    combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    combatMusic.Update();
-                    CombatVolumeCache = combatMusic.Volume;
-                }
+                float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
+
+                CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
+                CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel;
             }
 
             if (MusicMode == MusicStyle.Silent)
             {
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
+                float calmInterpolant = CalmVolumeInterpolant - (1f / 180f);
+
+                CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
+                CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel;
+
+                if (BufferCalmSilence)
                 {
-                    float interpolant = calmMusic.Volume - (1f / 180f);
-                    calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    calmMusic.Update();
-                    CalmVolumeCache = calmMusic.Volume;
-                    if (BufferCalmSilence)
+                    if (CalmMusic.Volume <= 0)
                     {
-                        if (calmMusic.Volume <= 0)
-                        {
-                            SetCalm(Silence with { Volume = 0f });
-                            BufferCalmSilence = false;
-                        }
+                        SetCalm(Silence);
+                        BufferCalmSilence = false;
                     }
                 }
 
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
+                float combatInterpolant = CombatVolumeInterpolant - (1f / 180f);
+
+                CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
+                CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel;
+
+                if (BufferCombatSilence)
                 {
-                    float interpolant = combatMusic.Volume - (1f / 180f);
-                    combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    combatMusic.Update();
-                    CombatVolumeCache = combatMusic.Volume;
-                    if (BufferCombatSilence)
+                    if (CombatMusic.Volume <= 0)
                     {
-                        if (combatMusic.Volume <= 0)
-                        {
-                            SetCombat(Silence with { Volume = 0f });
-                            BufferCombatSilence = false;
-                        }
+                        SetCombat(Silence);
+                        BufferCombatSilence = false;
                     }
                 }
             }
 
             if (MusicMode == MusicStyle.Boss)
             {
-                if (SoundEngine.TryGetActiveSound(CalmMusic, out var calmMusic))
+                float calmInterpolant = CalmVolumeInterpolant - (1f / 60f);
+
+                CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
+                CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel;
+
+                if (BufferCalmSilence)
                 {
-                    float interpolant = calmMusic.Volume - (1f / 60f);
-                    calmMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
-                    calmMusic.Update();
-                    CalmVolumeCache = calmMusic.Volume;
-                    if (BufferCalmSilence)
+                    if (CalmMusic.Volume <= 0)
                     {
-                        if (calmMusic.Volume <= 0)
-                        {
-                            SetCalm(Silence with { Volume = 0f });
-                            BufferCalmSilence = false;
-                        }
+                        SetCalm(Silence);
+                        BufferCalmSilence = false;
                     }
                 }
 
-                if (SoundEngine.TryGetActiveSound(CombatMusic, out var combatMusic))
+                if (CombatMusic != null && !CombatMusic.IsDisposed && CombatMusic.State != SoundState.Stopped)
                 {
-                    float interpolant = combatMusic.Volume + (1f / 60f);
-                    combatMusic.Volume = MathHelper.Clamp(MathHelper.Lerp(0, 1f, interpolant), 0f, 1f);
+                    float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
+
+                    CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
+                    CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel;
+
                     if (ActiveBossTheme.endFlag)
                     {
-                        SetCombat(ActiveBossTheme.EndTrack);
+                        SetCombat(ActiveBossTheme.EndTrack, false);
                         ActiveBossTheme.endFlag = false;
                         ActiveBossTheme.startFlag = false;
                     }
-                    combatMusic.Update();
-                    CombatVolumeCache = combatMusic.Volume;
                 }
                 else
                 {
@@ -408,35 +357,55 @@ namespace TerRoguelike.Systems
                     else
                     {
                         SetCombat(Silence);
-                        CombatVolumeCache = 0;
+                        CombatVolumeInterpolant = 0;
                         SetMusicMode(MusicStyle.Silent);
                     }   
                 }
             }
         }
+        public override void PreSaveAndQuit()
+        {
+            ClearMusic();
+        }
+        public override void ClearWorld()
+        {
+            ClearMusic();
+        }
+        public static void ClearMusic()
+        {
+            Initialized = false;
+            if (CalmMusic != null)
+                CalmMusic.Dispose();
+            if (CombatMusic != null)
+                CombatMusic.Dispose();
+        }
     }
     public class BossTheme
     {
-        public SoundStyle BattleTrack;
-        public SoundStyle EndTrack;
-        public SoundStyle StartTrack;
+        public string BattleTrack;
+        public string EndTrack;
+        public string StartTrack;
         public bool endFlag = false;
         public bool startFlag = true;
-        public BossTheme(SoundStyle battleTrack, SoundStyle startTrack, SoundStyle endTrack)
+        public float Volume;
+        public BossTheme(string battleTrack, string startTrack, string endTrack, float volume)
         {
             BattleTrack = battleTrack;
             StartTrack = startTrack;
             EndTrack = endTrack;
+            Volume = volume;
         }
     }
     public class FloorSoundtrack
     {
-        public SoundStyle CalmTrack;
-        public SoundStyle CombatTrack;
-        public FloorSoundtrack(SoundStyle calmTrack, SoundStyle combatTrack)
+        public string CalmTrack;
+        public string CombatTrack;
+        public float Volume;
+        public FloorSoundtrack(string calmTrack, string combatTrack, float volume)
         {
             CalmTrack = calmTrack;
             CombatTrack = combatTrack;
+            Volume = volume;
         }
     }
 }

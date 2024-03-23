@@ -378,6 +378,7 @@ namespace TerRoguelike.ILEditing
 
         private void On_WorldGen_SaveAndQuit(On_WorldGen.orig_SaveAndQuit orig, Action callback)
         {
+			MusicSystem.ClearMusic();
 			if (TerRoguelikeWorld.IsDeletableOnExit && !TerRoguelikeMenu.wipeTempPlayer && !TerRoguelikeMenu.wipeTempWorld)
             {
 				TerRoguelikeMenu.wipeTempPlayer = true;

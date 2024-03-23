@@ -154,8 +154,10 @@ namespace TerRoguelike.Systems
                                 SetCalm(nextFloor.Soundtrack.CalmTrack);
                                 SetCombat(nextFloor.Soundtrack.CombatTrack);
                                 SetMusicMode(MusicStyle.Dynamic);
-                                CombatVolumeCache = 0;
-                                CalmVolumeCache = 0;
+                                CombatVolumeInterpolant = 0;
+                                CalmVolumeInterpolant = 0;
+                                CalmVolumeLevel = nextFloor.Soundtrack.Volume;
+                                CombatVolumeLevel = nextFloor.Soundtrack.Volume;
                             }
                             
                             NewFloorEffects(targetRoom, modPlayer);
@@ -255,7 +257,8 @@ namespace TerRoguelike.Systems
         public static void InitializeLunarFloor()
         {
             SetMusicMode(MusicStyle.AllCalm);
-            SetCalm(FinalStage with { Volume = 0.4f });
+            SetCalm(FinalStage);
+            CalmVolumeLevel = 0.4f;
 
             if (lunarFloorInitialized)
                 return;
@@ -347,7 +350,6 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
-            MusicSystem.Initialized = false;
             TerRoguelikeWorld.lunarFloorInitialized = false;
             TerRoguelikeWorld.lunarBossSpawned = false;
             TerRoguelikeWorld.escape = false;
@@ -811,7 +813,6 @@ namespace TerRoguelike.Systems
             obtainedRoomListFromServer = true;
         }
         #endregion
-
         public override void ClearWorld()
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)

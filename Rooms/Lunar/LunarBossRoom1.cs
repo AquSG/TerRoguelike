@@ -53,8 +53,8 @@ namespace TerRoguelike.Rooms
             if (awake && !musicPlayed)
             {
                 SetMusicMode(MusicStyle.AllCombat);
-                //SetCalm(Silence with { Volume = 0f });
-                SetCombat(FinalBoss with { Volume = 0.4f });
+                SetCombat(FinalBoss);
+                CombatVolumeLevel = 0.4f;
                 musicPlayed = true;
             }
         }
