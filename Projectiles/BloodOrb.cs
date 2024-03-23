@@ -63,6 +63,7 @@ namespace TerRoguelike.Projectiles
                 }
             }
         }
+        public override bool? CanDamage() => false;
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             Projectile.localAI[0] = 1;

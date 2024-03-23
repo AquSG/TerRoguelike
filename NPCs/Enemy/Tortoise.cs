@@ -34,7 +34,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             base.SetDefaults();
             NPC.width = 40;
-            NPC.height = 40;
+            NPC.height = 35;
             NPC.aiStyle = -1;
             NPC.damage = 45;
             NPC.lifeMax = 1200;

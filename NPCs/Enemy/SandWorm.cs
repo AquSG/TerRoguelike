@@ -41,7 +41,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.width = 34;
             NPC.height = 34;
             NPC.aiStyle = -1;
-            NPC.damage = 35;
+            NPC.damage = 25;
             NPC.lifeMax = 1000;
             NPC.knockBackResist = 0f;
             NPC.noGravity = true;

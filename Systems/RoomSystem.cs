@@ -351,14 +351,14 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.lunarFloorInitialized = false;
             TerRoguelikeWorld.lunarBossSpawned = false;
             TerRoguelikeWorld.escape = false;
-            TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
-            var isDeletableOnExit = tag.GetBool("isDeletableOnExit");
+            var isDeletableOnExit = TerRoguelikeMenu.prepareForRoguelikeGeneration ? tag.GetBool("isDeletableOnExit") : false;
             var isDebugWorld = tag.GetBool("isDebugWorld");
             TerRoguelikeWorld.IsTerRoguelikeWorld = isTerRoguelikeWorld;
             TerRoguelikeWorld.IsDeletableOnExit = isDeletableOnExit;
             TerRoguelikeWorld.IsDebugWorld = isDebugWorld;
             TerRoguelikeWorld.currentStage = 0;
+            TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 RoomList = new List<Room>();

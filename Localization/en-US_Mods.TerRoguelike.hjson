@@ -1,8 +1,8 @@
 MapBuildingMessage: Forming the Dungeon
-DeathKilledBy: 'Killed by:'
-DeathItems: 'Items:'
-DeathMainMenu: 'Main Menu'
-DeathQuickRestart: 'Quick Restart'
+DeathKilledBy: Killed by:
+DeathItems: Items:
+DeathMainMenu: Main Menu
+DeathQuickRestart: Quick Restart
 BlockedAlert: blocked!
 BarrierName: Barrier
 
@@ -393,8 +393,8 @@ Items: {
 		DisplayName: Flimsy Pauldron
 		Tooltip:
 			'''
-			Reduces damage taken by 5
-			Extra copies of this item further reduce damage taken by 5
+			Reduces damage taken by 3
+			Extra copies of this item further reduce damage taken by 3
 			'''
 	}
 
