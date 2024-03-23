@@ -45,6 +45,13 @@ namespace TerRoguelike.ILEditing
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
             On_WallDrawing.DrawWalls += On_WallDrawing_DrawWalls;
+            On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
+        }
+
+        private void StopOnKillHeartsAndMana(On_NPC.orig_NPCLoot_DropCommonLifeAndMana orig, NPC self, Player closestPlayer)
+        {
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+				orig.Invoke(self, closestPlayer);
         }
 
         private void On_WallDrawing_DrawWalls(On_WallDrawing.orig_DrawWalls orig, WallDrawing self)
