@@ -255,7 +255,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
-            Color color = Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
+            Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
             float rotation = 0;
             Vector2 scale = new Vector2(NPC.scale);
             if (NPC.ai[3] > 0)

@@ -939,7 +939,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
-            Color color = Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
+            bool igniteVisual = modNPC.ignitedStacks.Any() && deadTime == 0;
+            Color color = igniteVisual ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
             Vector2 scale = new Vector2(NPC.scale);
 
             if (deadTime > 0)
@@ -971,7 +972,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 scale *= 1f - interpolant;
             }
 
-            if (modNPC.ignitedStacks.Any())
+            if (igniteVisual)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
