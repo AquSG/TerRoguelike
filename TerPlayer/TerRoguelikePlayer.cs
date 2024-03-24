@@ -524,7 +524,7 @@ namespace TerRoguelike.TerPlayer
                         continue;
 
                     float requiredDistance = 128f;
-                    float npcDistance = Player.Center.Distance(npc.getRect().ClosestPointInRect(Player.Center));
+                    float npcDistance = Player.Center.Distance(npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.getRect().ClosestPointInRect(npc.Center));
                     if (npcDistance <= requiredDistance)
                     {
                         barbedLassoTargets.Add(i);
@@ -540,7 +540,7 @@ namespace TerRoguelike.TerPlayer
                     {
                         NPC target = Main.npc[barbedLassoTargets[i]];
                         int hitDamage = (int)(Player.statLifeMax2 * 0.02f);
-                        hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.getRect().ClosestPointInRect(Player.Center)));
+                        hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.ModNPC().Segments.Any() ? target.ModNPC().ClosestSegment(Player.Center) : target.getRect().ClosestPointInRect(Player.Center)));
 
                         if (target.life - hitDamage <= 0)
                         {
@@ -782,7 +782,7 @@ namespace TerRoguelike.TerPlayer
                         if (npc.life <= 0 || !npc.CanBeChasedBy())
                             continue;
 
-                        if (npc.getRect().Contains(Main.MouseWorld.ToPoint()))
+                        if (npc.ModNPC().Segments.Any() ? npc.ModNPC().IsPointInsideSegment(npc, Main.MouseWorld.ToPoint()) : npc.getRect().Contains(Main.MouseWorld.ToPoint()))
                         {
                             allSeeingEyeTarget = i;
                             break;
@@ -794,7 +794,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     NPC target = Main.npc[allSeeingEyeTarget];
                     int hitDamage = (int)(Player.statLifeMax2 * 0.02f * allSeeingEye);
-                    hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.getRect().ClosestPointInRect(Player.Center)));
+                    hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.ModNPC().Segments.Any() ? target.ModNPC().ClosestSegment(Player.Center) : target.getRect().ClosestPointInRect(Player.Center)));
 
                     if (target.life - hitDamage <= 0)
                     {
@@ -1144,7 +1144,8 @@ namespace TerRoguelike.TerPlayer
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {
-            modifiers.FinalDamage *= GetBonusDamageMulti(target, target.getRect().ClosestPointInRect(proj.Center), proj);
+
+            modifiers.FinalDamage *= GetBonusDamageMulti(target, proj.getRect().ClosestPointInRect(target.Center), proj);
         }
         public float GetBonusDamageMulti(NPC npc, Vector2 hitPosition, Projectile? projectile = null)
         {
@@ -1167,7 +1168,6 @@ namespace TerRoguelike.TerPlayer
         #region On Kill Enemy
         public void OnKillEffects(NPC target)
         {
-            //Main.NewText("Killed " + target.FullName);
             TerRoguelikeGlobalNPC modTarget = target.ModNPC();
 
             if (hotPepper > 0 && !modTarget.activatedHotPepper)
@@ -1180,7 +1180,8 @@ namespace TerRoguelike.TerPlayer
                     if (npc == null || !npc.active || npc.friendly || npc.immortal)
                         continue;
 
-                    if (npc.Center.Distance(target.Center) <= radius)
+                    Vector2 npcPos = npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(target.Center) : npc.Center;
+                    if (npcPos.Distance(target.Center) <= radius)
                     {
                         npc.ModNPC().ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
                     }
@@ -1629,11 +1630,11 @@ namespace TerRoguelike.TerPlayer
 
                 if (closestNPCDistance == -1f)
                 {
-                    closestNPCDistance = Vector2.Distance(Player.Center, npc.Center);
+                    closestNPCDistance = Vector2.Distance(Player.Center, npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.Center);
                 }
                 else if (Vector2.Distance(Player.Center, npc.Center) < closestNPCDistance)
                 {
-                    closestNPCDistance = Vector2.Distance(Player.Center, npc.Center);
+                    closestNPCDistance = Vector2.Distance(Player.Center, npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.Center);
                 }
             }
             if (closestNPCDistance == -1)
@@ -1781,7 +1782,7 @@ namespace TerRoguelike.TerPlayer
                     {
                         NPC npc = Main.npc[barbedLassoTargets[i]];
 
-                        Vector2 distanceVector = npc.Center - Player.MountedCenter;
+                        Vector2 distanceVector = (npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.Center) - Player.Center;
                         for (int d = 0; d < 1; d++)
                         {
                             Vector2 dustPosition = distanceVector.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(1f, distanceVector.Length());
@@ -1845,7 +1846,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     NPC npc = Main.npc[allSeeingEyeTarget];
 
-                    Vector2 distanceVector = npc.Center - Player.MountedCenter;
+                    Vector2 distanceVector = Main.MouseWorld - Player.Center;
                     for (int d = 0; d < 2; d++)
                     {
                         Vector2 placement = distanceVector.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(1f, distanceVector.Length());

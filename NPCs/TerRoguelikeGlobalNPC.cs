@@ -3600,6 +3600,55 @@ namespace TerRoguelike.NPCs
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="inputVect"></param>
+        /// <returns>The position of the closest segment to the input vector. Returns inputVect if you call this when there's no segment in the Segments list </returns>
+        public Vector2 ClosestSegment(Vector2 inputVect)
+        {
+            if (!Segments.Any())
+                return inputVect;
+
+            int closest = 0;
+            float closestLength = (inputVect - Segments[0].Position).Length();
+
+            for (int i = 1; i < Segments.Count; i++)
+            {
+                WormSegment segment = Segments[i];
+                float distance = (segment.Position - inputVect).Length();
+                if (distance < closestLength)
+                {
+                    closestLength = distance;
+                    closest = i;
+                }
+            }
+
+            Vector2 closestVect = Segments[closest].Position;
+            closestVect += (inputVect - closestVect).SafeNormalize(Vector2.UnitY) * Segments[closest].Height * 0.5f; 
+            return closestVect;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="npc"></param>
+        /// <param name="point"></param>
+        /// <returns>Whether or not the input point is inside any of the calculated segment rectangles</returns>
+        public bool IsPointInsideSegment(NPC npc, Point point)
+        {
+            bool pass = false;
+            for (int i = 0; i < Segments.Count; i++)
+            {
+                WormSegment segment = Segments[i];
+                Rectangle segRect = new Rectangle((int)(segment.Position.X - ((i == 0 ? npc.width : segment.Height) / 2)), (int)(segment.Position.Y - ((i == 0 ? npc.height : segment.Height) / 2)), npc.width, npc.height);
+                if (segRect.Contains(point))
+                {
+                    pass = true;
+                    break;
+                }
+            }
+            return pass;
+        }
     }
 
     public class BallAndChain
