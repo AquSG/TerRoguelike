@@ -34,6 +34,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 1;
+            NPCID.Sets.MustAlwaysDraw[modNPCID] = true;
         }
         public override void SetDefaults()
         {

@@ -111,6 +111,7 @@ namespace TerRoguelike.Managers
                 new BrambleHollow(),
                 new CrimsonVessel(),
                 new CrimsonSeer(),
+                new CorruptionParasite(),
             };
         }
         internal static void Unload()

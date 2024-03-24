@@ -3146,7 +3146,7 @@ namespace TerRoguelike.NPCs
                 }
             }
         }
-        public void UpdateWormSegments(NPC npc)
+        public void UpdateWormSegments(NPC npc, float segmentRotationInterpolant = 0.95f)
         {
             for (int i = 0; i < Segments.Count; i++)
             {
@@ -3163,7 +3163,7 @@ namespace TerRoguelike.NPCs
 
                 WormSegment oldSeg = Segments[i - 1];
 
-                segment.Position = oldSeg.Position - (Vector2.UnitX * (i == 1 ? segment.Height : oldSeg.Height)).RotatedBy(oldSeg.Rotation.AngleLerp((oldSeg.Position - segment.Position).ToRotation(), 0.95f));
+                segment.Position = oldSeg.Position - (Vector2.UnitX * (i == 1 ? segment.Height : oldSeg.Height)).RotatedBy(oldSeg.Rotation.AngleLerp((oldSeg.Position - segment.Position).ToRotation(), segmentRotationInterpolant));
 
                 Vector2 difference = oldSeg.Position - segment.Position;
 
@@ -3397,12 +3397,25 @@ namespace TerRoguelike.NPCs
         }
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
+            if (Segments.Any())
+                modifiers.HideCombatText();
+
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 modifiers.DefenseEffectiveness *= 0f;
             }
 
             modifiers.SourceDamage *= effectiveDamageTakenMulti;
+        }
+        public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
+        {
+            if (Segments.Any())
+            {
+                Vector2 position = Segments[hitSegment].Position;
+                int segHeight = (int)Segments[hitSegment].Height;
+                Rectangle segRect = new Rectangle((int)position.X - (segHeight / 2), (int)position.Y - (segHeight / 2), segHeight, segHeight);
+                CombatText.NewText(segRect, hit.Crit ? CombatText.DamagedHostileCrit : CombatText.DamagedHostile, hit.Damage, hit.Crit);
+            }
         }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

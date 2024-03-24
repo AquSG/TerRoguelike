@@ -109,6 +109,9 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/TallFire",
                 "TerRoguelike/NPCs/Enemy/Boss/BrambleHollowGlow",
                 "TerRoguelike/Projectiles/LeafBall",
+                "TerRoguelike/NPCs/Enemy/Boss/CorruptionParasiteHead",
+                "TerRoguelike/NPCs/Enemy/Boss/CorruptionParasiteBody",
+                "TerRoguelike/NPCs/Enemy/Boss/CorruptionParasiteTail",
             };
             foreach (string path in pathList)
             {
