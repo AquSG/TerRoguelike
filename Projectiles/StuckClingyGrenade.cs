@@ -58,6 +58,7 @@ namespace TerRoguelike.Projectiles
                             MultipliableFloat f = new MultipliableFloat();
                             int immunitySlot = 0;
                             npc.ModNPC.ModifyCollisionData(Projectile.getRect(), ref immunitySlot, ref f, ref npcRect);
+                            Main.NewText(npcRect);
                             if (!Projectile.getRect().Intersects(npcRect))
                                 destick = true;
                         }
@@ -65,6 +66,9 @@ namespace TerRoguelike.Projectiles
                             destick = true;
                     }
                 }
+                if (!npc.Hitbox.Intersects(Projectile.getRect()))
+                    destick = true;
+
                 if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || destick)
                 {
                     stuckNPC = -1;
@@ -105,6 +109,11 @@ namespace TerRoguelike.Projectiles
                                 stuckPosition = Projectile.Center - pos;
                                 break;
                             }
+                        }
+                        if (npc.Hitbox.Intersects(Projectile.getRect()))
+                        {
+                            stuckNPC = i;
+                            stuckPosition = Projectile.Center - npc.Center;
                         }
                     }
                 }
