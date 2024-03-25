@@ -40,10 +40,8 @@ namespace TerRoguelike.NPCs
         public float diminishingDR = 0;
         public List<WormSegment> Segments = new List<WormSegment>();
         public int hitSegment = 0;
-        public float effectiveDamageTakenMulti
-        {
-            get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR)));  }
-        }
+        public float effectiveDamageTakenMulti { get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR)));  } }
+        public int overheadArrowTime = 0;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -3407,6 +3405,10 @@ namespace TerRoguelike.NPCs
 
             modifiers.SourceDamage *= effectiveDamageTakenMulti;
         }
+        public override void HitEffect(NPC npc, NPC.HitInfo hit)
+        {
+            overheadArrowTime = -480;
+        }
         public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
             if (Segments.Any())
@@ -3476,7 +3478,21 @@ namespace TerRoguelike.NPCs
             if (bleedingStacks != null && bleedingStacks.Any())
             {
                 DrawRotatlingBloodParticles(true, npc);
-
+            }
+            if (isRoomNPC && sourceRoomListID >= 0)
+            {
+                Room room = RoomList[sourceRoomListID];
+                if (!room.IsBossRoom && !TerRoguelikeWorld.escape && (room.roomTime - room.waveClearGraceTime >= 480 || overheadArrowTime != 0))
+                {
+                    overheadArrowTime++;
+                }
+                if (!Main.hideUI && overheadArrowTime > 0)
+                {
+                    Texture2D arrowTex = TexDict["YellowArrow"].Value;
+                    float opacity = MathHelper.Clamp(overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
+                    Vector2 pos = npc.Top + drawCenter + ((npc.gfxOffY - 32 + (14 * opacity)) * Vector2.UnitY) - Main.screenPosition;
+                    Main.EntitySpriteDraw(arrowTex, pos, null, Color.White * opacity * 0.75f, MathHelper.PiOver2, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
+                }
             }
         }
         /// <summary>
