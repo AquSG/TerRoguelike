@@ -66,7 +66,7 @@ namespace TerRoguelike.Projectiles
                             destick = true;
                     }
                 }
-                if (!npc.Hitbox.Intersects(Projectile.getRect()))
+                else if (!npc.Hitbox.Intersects(Projectile.getRect()))
                     destick = true;
 
                 if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || destick)
@@ -110,7 +110,7 @@ namespace TerRoguelike.Projectiles
                                 break;
                             }
                         }
-                        if (npc.Hitbox.Intersects(Projectile.getRect()))
+                        else if (npc.Hitbox.Intersects(Projectile.getRect()))
                         {
                             stuckNPC = i;
                             stuckPosition = Projectile.Center - npc.Center;

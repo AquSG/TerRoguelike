@@ -39,7 +39,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 180);
-        public static Attack Charge = new Attack(1, 30, 180);
+        public static Attack Charge = new Attack(1, 30, 480);
+        public static Attack WaveTunnel = new Attack(2, 30, 180);
+        public static Attack Vomit = new Attack(3, 30, 180);
+        public static Attack ProjCharge = new Attack(4, 30, 180);
+        public static Attack Summon = new Attack(5, 30, 180);
         public float defaultMinVelociy = 2;
         public float defaultMaxVelociy = 7;
         public float defaultLookingAtThreshold = MathHelper.PiOver4 * 0.5f;
@@ -48,6 +52,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float defaultMinRotation = 0.015f;
         public float defaultMaxRotation = 0.05f;
         public int defaultLookingAtBuffer = 0;
+        public float segmentRotationInterpolant = 0.95f;
+        public float chargeDesiredDist = 1000;
+        public Vector2 chargeDesiredPos;
+        public int chargeCount = 3;
+        public int chargeTelegraph = 40;
+        public int chargingDuration = 120;
+        public float chargeSpeed = 11f;
 
         public override void SetStaticDefaults()
         {
@@ -98,10 +109,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void PostAI()
         {
             NPC.rotation = NPC.velocity.ToRotation();
-            modNPC.UpdateWormSegments(NPC);
+            modNPC.UpdateWormSegments(NPC, segmentRotationInterpolant);
         }
         public override void AI()
         {
+            chargeDesiredDist = 1300;
+            chargingDuration = 135;
+            Charge = new Attack(1, 30, (chargingDuration + chargeTelegraph) * chargeCount);
+            chargeSpeed = 20f;
             if (deadTime > 0)
             {
                 CheckDead();
@@ -171,16 +186,104 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Charge.Id)
             {
+                int chargeProgress = (int)NPC.ai[1] % (chargeTelegraph + chargingDuration);
+                if (chargeProgress == 0)
+                {
+                    ChooseChargeLocation();
+                }
+                if (chargeProgress <= 3)
+                {
+                    Vector2 targetPos = chargeDesiredPos;
+                    float rotToTarget = (targetPos - NPC.Center).ToRotation();
+
+                    float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, defaultMaxRotation * (NPC.velocity.Length() / 10f));
+
+                    if (NPC.velocity.Length() < defaultMaxVelociy * 2)
+                    {
+                        NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
+                        if (NPC.velocity.Length() > defaultMaxVelociy * 2)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy * 2;
+                    }
+
+                    NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
+
+                    if (chargeProgress == 3)
+                    {
+                        if ((NPC.Center - chargeDesiredPos).Length() > 70)
+                        {
+                            NPC.ai[1]--;
+                            chargeProgress--;
+                        }
+                    }
+                }
+                if (chargeProgress >= 3)
+                {
+                    Vector2 targetPos = target == null ? spawnPos : target.Center;
+
+                    if (chargeProgress == 3)
+                    {
+                        
+                    }
+
+                    if (chargeProgress < chargeTelegraph)
+                    {
+                        float rotToTarget = (targetPos - NPC.Center).ToRotation();
+                        float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, 0.3f);
+                        NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot) * 0.95f;
+                    }
+                    else
+                    {
+                        float completion = 1f - ((float)(chargeProgress - chargeTelegraph) / (chargingDuration));
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * chargeSpeed * (completion * 0.75f + 0.25f);
+                    }
+                }
+
                 if (NPC.ai[1] >= Charge.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = None.Duration - 30;
+                    NPC.ai[1] = 0;
                     NPC.ai[2] = Charge.Id;
+                }
+            }
+            else if (NPC.ai[0] == WaveTunnel.Id)
+            {
+                if (NPC.ai[1] >= WaveTunnel.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = WaveTunnel.Id;
+                }
+            }
+            else if (NPC.ai[0] == Vomit.Id)
+            {
+                if (NPC.ai[1] >= Vomit.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = Vomit.Id;
+                }
+            }
+            else if (NPC.ai[0] == ProjCharge.Id)
+            {
+                if (NPC.ai[1] >= ProjCharge.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = ProjCharge.Id;
+                }
+            }
+            else if (NPC.ai[0] == Summon.Id)
+            {
+                if (NPC.ai[1] >= Summon.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = Summon.Id;
                 }
             }
 
             defaultLookingAtThreshold = 0.1f;
-            bool defaultMovement = true;
+            bool defaultMovement = NPC.ai[0] != Charge.Id;
             if (defaultLookingAtBuffer > 0)
                 defaultLookingAtBuffer--;
 
@@ -237,8 +340,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = Charge.Id;
             NPC.ai[0] = chosenAttack;
+        }
+        public void ChooseChargeLocation()
+        {
+            if (target != null)
+                chargeDesiredPos = target.Center;
+            else
+                chargeDesiredPos = spawnPos;
+
+            float rot = (NPC.Center - chargeDesiredPos).ToRotation();
+
+            rot += Main.rand.NextFloat(-MathHelper.PiOver2, MathHelper.PiOver2 + float.Epsilon);
+            chargeDesiredPos += rot.ToRotationVector2() * chargeDesiredDist;
         }
         public override bool? CanFallThroughPlatforms()
         {
