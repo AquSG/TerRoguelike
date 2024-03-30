@@ -11,6 +11,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Systems;
+using TerRoguelike.Utilities;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
@@ -37,9 +38,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deadTime = 0;
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
+        public float diggingEffect = 0;
 
-        public static Attack None = new Attack(0, 0, 180);
-        public static Attack Charge = new Attack(1, 30, 480);
+        public static Attack None = new Attack(0, 0, 300);
+        public static Attack Charge = new Attack(1, 30, 525);
         public static Attack WaveTunnel = new Attack(2, 30, 180);
         public static Attack Vomit = new Attack(3, 30, 180);
         public static Attack ProjCharge = new Attack(4, 30, 180);
@@ -53,12 +55,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float defaultMaxRotation = 0.05f;
         public int defaultLookingAtBuffer = 0;
         public float segmentRotationInterpolant = 0.95f;
-        public float chargeDesiredDist = 1000;
+        public float chargeDesiredDist = 1300;
         public Vector2 chargeDesiredPos;
         public int chargeCount = 3;
         public int chargeTelegraph = 40;
-        public int chargingDuration = 120;
-        public float chargeSpeed = 11f;
+        public int chargingDuration = 135;
+        public float chargeSpeed = 20f;
 
         public override void SetStaticDefaults()
         {
@@ -110,13 +112,33 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(NPC, segmentRotationInterpolant);
+
+            if (NPC.localAI[0] >= 0 && deadTime <= 0)
+            {
+                if (diggingEffect > 0)
+                    diggingEffect--;
+                Point tile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
+                if (ParanoidTileRetrieval(tile.X, tile.Y).IsTileSolidGround(true))
+                {
+                    if (diggingEffect <= 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.WormDig with { Volume = 1f }, NPC.Center);
+                        diggingEffect += 60 / NPC.velocity.Length();
+                        Color lightColor = Lighting.GetColor(tile);
+                        if (lightColor.R <= 30 && lightColor.G <= 30 && lightColor.B <= 30)
+                        {
+                            for (int i = 0; i < 4; i++)
+                            {
+                                Dust d = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.SpelunkerGlowstickSparkle);
+                                d.velocity = NPC.velocity * 0.25f;
+                            }
+                        }
+                    }
+                }
+            }
         }
         public override void AI()
         {
-            chargeDesiredDist = 1300;
-            chargingDuration = 135;
-            Charge = new Attack(1, 30, (chargingDuration + chargeTelegraph) * chargeCount);
-            chargeSpeed = 20f;
             if (deadTime > 0)
             {
                 CheckDead();
@@ -352,7 +374,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             float rot = (NPC.Center - chargeDesiredPos).ToRotation();
 
-            rot += Main.rand.NextFloat(-MathHelper.PiOver2, MathHelper.PiOver2 + float.Epsilon);
+            rot += Main.rand.NextFloat(-MathHelper.PiOver4, MathHelper.PiOver4 + float.Epsilon);
             chargeDesiredPos += rot.ToRotationVector2() * chargeDesiredDist;
         }
         public override bool? CanFallThroughPlatforms()
@@ -424,10 +446,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             NPC.ai[0] = None.Id;
             NPC.ai[1] = 1;
-            NPC.ai[3] = 0;
 
             modNPC.OverrideIgniteVisual = true;
-            NPC.velocity *= 0;
+            NPC.velocity *= 0.98f;
             NPC.life = 1;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
@@ -465,6 +486,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (CutsceneSystem.cutsceneActive)
+            {
+                CutsceneSystem.cameraTargetCenter += (NPC.Center - CutsceneSystem.cameraTargetCenter) * 0.1f;
+            }
 
             if (deadTime >= deathCutsceneDuration - 30)
             {
@@ -505,7 +530,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (modNPC.OverrideIgniteVisual && modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Any() && deadTime <= 0)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
