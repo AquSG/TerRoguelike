@@ -1176,6 +1176,9 @@ namespace TerRoguelike.TerPlayer
                 int igniteDamage = 300 + (75 * (hotPepper - 1));
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
+                    if (i == target.whoAmI)
+                        continue;
+
                     NPC npc = Main.npc[i];
                     if (npc == null || !npc.active || npc.friendly || npc.immortal)
                         continue;
@@ -1355,7 +1358,9 @@ namespace TerRoguelike.TerPlayer
                     if (!npc.active || npc.life <= 0 || npc.friendly)
                         continue;
 
-                    if (Player.Center.Distance(npc.getRect().ClosestPointInRect(Player.Center)) <= requiredDistance)
+                    Vector2 npcPos = npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.getRect().ClosestPointInRect(Player.Center);
+
+                    if (Player.Center.Distance(npcPos) <= requiredDistance)
                     {
                         Projectile.NewProjectile(Player.GetSource_FromThis(), npc.Center + new Vector2(0, -96), Vector2.Zero, ModContent.ProjectileType<MagicFist>(), fistDamage, 0f, Player.whoAmI, i);
                         playSound = true;
