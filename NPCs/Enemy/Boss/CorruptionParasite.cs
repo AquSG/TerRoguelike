@@ -244,7 +244,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     if (chargeProgress == 3)
                     {
-                        
+                        SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.NPCDeath33 with { Volume = 0.35f, Pitch = -0.5f, PitchVariance = 0f, MaxInstances = 3 }, NPC.Center);
                     }
 
                     if (chargeProgress < chargeTelegraph)

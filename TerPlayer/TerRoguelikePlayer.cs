@@ -1180,7 +1180,7 @@ namespace TerRoguelike.TerPlayer
                         continue;
 
                     NPC npc = Main.npc[i];
-                    if (npc == null || !npc.active || npc.friendly || npc.immortal)
+                    if (npc == null || !npc.active || npc.friendly || npc.immortal || npc.dontTakeDamage)
                         continue;
 
                     Vector2 npcPos = npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(target.Center) : npc.Center;
@@ -1355,7 +1355,7 @@ namespace TerRoguelike.TerPlayer
                         break;
 
                     NPC npc = Main.npc[i];
-                    if (!npc.active || npc.life <= 0 || npc.friendly)
+                    if (!npc.active || npc.life <= 0 || npc.friendly || npc.immortal || npc.dontTakeDamage)
                         continue;
 
                     Vector2 npcPos = npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.getRect().ClosestPointInRect(Player.Center);
