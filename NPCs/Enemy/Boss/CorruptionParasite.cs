@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,6 +40,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D tailTex;
         public bool CollisionPass = false;
 
+        public SlotId chargeSlot;
         public int deadTime = 0;
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
@@ -47,7 +50,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Charge = new Attack(1, 30, 525);
         public static Attack WaveTunnel = new Attack(2, 30, 500);
         public static Attack Vomit = new Attack(3, 30, 150);
-        public static Attack ProjCharge = new Attack(4, 30, 180);
+        public static Attack ProjCharge = new Attack(4, 30, 275);
         public static Attack Summon = new Attack(5, 30, 180);
         public float defaultMinVelociy = 2;
         public float defaultMaxVelociy = 7;
@@ -71,6 +74,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int waveTunnelTelegraph = 40;
         public int waveTunnelTelegraphBurrowTime = 35;
         public int waveTunnelProjectileTelegraph = 88;
+        public int projChargeTelegraph = 40;
+        public int projChargingDuration = 135;
+        public int projChargeShootTelegraph = 88;
+        public float projChargeSpeed = 20f;
 
         public override void SetStaticDefaults()
         {
@@ -85,7 +92,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.width = 38;
             NPC.height = 38;
             NPC.aiStyle = -1;
-            NPC.damage = 35;
+            NPC.damage = 34;
             NPC.lifeMax = 32000;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
@@ -152,6 +159,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
+            if (SoundEngine.TryGetActiveSound(chargeSlot, out var sound) && sound.IsPlaying)
+            {
+                sound.Position = NPC.Center;
+                sound.Update();
+            }
         }
         public override void AI()
         {
@@ -197,6 +209,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public void BossAI()
         {
             target = modNPC.GetTarget(NPC, false, false);
+
 
             NPC.ai[1]++;
 
@@ -405,6 +418,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.ai[3] = -1;
                     }
                     int shootingSegments = Math.Clamp((int)((modNPC.Segments.Count - 8) * waveCompletion), 0, modNPC.Segments.Count - 1);
+                    if (shoot)
+                    {
+                        chargeSlot = SoundEngine.PlaySound(SoundID.DD2_WyvernHurt with { Volume = 0.3f, Pitch = -0.9f, PitchVariance = 0.05f }, NPC.Center);
+                    }
                     ProjectileShootingLogic(0, shootingSegments, NPC.ai[3] > 0, shoot);
                 }
 
@@ -476,7 +493,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         float randRot = Main.rand.NextFloat(-0.15f, 0.15f) + NPC.rotation;
                         randRot += 0.075f * i;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (NPC.rotation.ToRotationVector2() * 36), (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) + (NPC.velocity * 0.25f), ModContent.ProjectileType<CorruptVomit>(), NPC.damage, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (NPC.rotation.ToRotationVector2() * 36), (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) + (NPC.velocity * 0.25f) - Vector2.UnitY, ModContent.ProjectileType<CorruptVomit>(), NPC.damage, 0);
                     }
                 } 
                 if (NPC.ai[1] >= Vomit.Duration)
@@ -488,11 +505,75 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == ProjCharge.Id)
             {
-                if (NPC.ai[1] >= ProjCharge.Duration)
+                int projChargeProgress = (int)NPC.ai[1];
+                if (projChargeProgress == 0)
                 {
+                    ChooseChargeLocation();
+                }
+                if (projChargeProgress <= 3)
+                {
+                    Vector2 chargePos = chargeDesiredPos;
+                    float rotToChargePos = (chargePos - NPC.Center).ToRotation();
+
+                    float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToChargePos, defaultMaxRotation * (NPC.velocity.Length() / 10f));
+
+                    if (NPC.velocity.Length() < defaultMaxVelociy * 2)
+                    {
+                        NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
+                        if (NPC.velocity.Length() > defaultMaxVelociy * 2)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy * 2;
+                    }
+
+                    NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
+
+                    if (projChargeProgress == 3)
+                    {
+                        if ((NPC.Center - chargeDesiredPos).Length() > 70)
+                        {
+                            NPC.ai[1]--;
+                            projChargeProgress--;
+                        }
+                    }
+                }
+                Vector2 targetPos = target == null ? spawnPos : target.Center;
+                float rotToTarget = (targetPos - NPC.Center).ToRotation();
+                if (projChargeProgress >= 3 && projChargeProgress < projChargeTelegraph + projChargingDuration)
+                {
+
+                    if (projChargeProgress == 3)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
+                        chargeSlot = SoundEngine.PlaySound(SoundID.DD2_BetsyScream with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0f}, NPC.Center);
+                    }
+
+                    if (projChargeProgress < projChargeTelegraph)
+                    {
+                        float potentialVelToRot = NPC.velocity.ToRotation();
+
+                        float potentialRot = potentialVelToRot.AngleTowards(rotToTarget, 0.3f);
+                        NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot) * 0.95f;
+                    }
+                    else
+                    {
+                        float completion = 1f - ((float)(projChargeProgress - projChargeTelegraph) / (projChargingDuration));
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * projChargeSpeed * (completion * 0.75f + 0.25f);
+                    }
+                }
+                else if (projChargeProgress >= projChargeTelegraph + projChargingDuration)
+                {
+                    NPC.ai[3]++;
+                    NPC.velocity = NPC.velocity.ToRotation().AngleTowards(rotToTarget, 0.04f * (NPC.ai[3] / projChargeShootTelegraph)).ToRotationVector2() * NPC.velocity.Length();
+                    bool telegraph = projChargeProgress < projChargeTelegraph + projChargingDuration + projChargeShootTelegraph;
+                    bool shoot = projChargeProgress == projChargeTelegraph + projChargingDuration + projChargeShootTelegraph;
+                    ProjectileShootingLogic(0, modNPC.Segments.Count - 1, telegraph, shoot);
+                }
+                if (NPC.ai[1] >= ProjCharge.Duration)
+{
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelociy;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = ProjCharge.Id;
+                    NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == Summon.Id)
@@ -506,7 +587,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             defaultLookingAtThreshold = 0.1f;
-            bool defaultMovement = NPC.ai[0] != Charge.Id && NPC.ai[0] != WaveTunnel.Id && NPC.ai[0] != Vomit.Id;
+            bool defaultMovement = NPC.ai[0] != Charge.Id && NPC.ai[0] != WaveTunnel.Id && NPC.ai[0] != Vomit.Id && NPC.ai[0] != ProjCharge.Id;
             if (defaultLookingAtBuffer > 0)
                 defaultLookingAtBuffer--;
 
@@ -542,7 +623,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, WaveTunnel, Vomit };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, WaveTunnel, Vomit, ProjCharge };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
                 potentialAttacks.RemoveAll(x => x.Id == WaveTunnel.Id);

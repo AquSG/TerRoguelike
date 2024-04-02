@@ -97,6 +97,10 @@ namespace TerRoguelike.Utilities
 
             return Main.tile[x, y];
         }
+        public static Tile ParanoidTileRetrieval(Point coords)
+        {
+            return ParanoidTileRetrieval(coords.X, coords.Y);
+        }
         /// <summary>
         /// Performs collision based a rotating hitbox for an entity by treating the hitbox as a line. By default uses the velocity of the entity as a direction. This can be overriden.
         /// </summary>
