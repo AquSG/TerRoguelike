@@ -11,6 +11,8 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
+using TerRoguelike.Particles;
+using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
 using static TerRoguelike.Managers.TextureManager;
@@ -68,6 +70,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float waveTunnelAmplitude = 264f;
         public int waveTunnelTelegraph = 40;
         public int waveTunnelTelegraphBurrowTime = 35;
+        public int waveTunnelProjectileTelegraph = 88;
 
         public override void SetStaticDefaults()
         {
@@ -142,7 +145,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             for (int i = 0; i < 4; i++)
                             {
                                 Dust d = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.SpelunkerGlowstickSparkle);
-                                d.velocity = NPC.velocity * 0.25f;
+                                Vector2 dVelocity = NPC.velocity == Vector2.Zero ? NPC.position - NPC.oldPosition : NPC.velocity;
+                                d.velocity = dVelocity * 0.25f;
                             }
                         }
                     }
@@ -350,7 +354,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     float rotToTarget = (targetPos - NPC.Center).ToRotation();
                     bool close = true;
 
-                    float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, close ? 0.2f : defaultMaxRotation * (NPC.velocity.Length() / 10f));
+                    float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, close ? 0.3f : defaultMaxRotation * (NPC.velocity.Length() / 10f));
 
                     if (NPC.velocity.Length() < defaultMaxVelociy * 2)
                     {
@@ -377,22 +381,31 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int waveTime = (int)NPC.ai[1] - waveTunnelTelegraph;
                     int waveDuration = WaveTunnel.Duration - waveTunnelTelegraph;
                     float waveCompletion = waveTime / (float)waveDuration;
+
                     int horizontalDirection = -Math.Sign((waveTunnelDesiredPos - (room.RoomPosition16 + room.RoomCenter16)).X);
                     int verticalDirection = -Math.Sign((waveTunnelDesiredPos - (room.RoomPosition16 + room.RoomCenter16)).Y);
                     float horizontalPosition = waveTunnelDesiredPos.X + (horizontalDirection * waveCompletion * (room.RoomDimensions16.X + (waveTunnelCornerPosOffset * 1)));
                     float sinCalc = (float)Math.Sin(MathHelper.Pi * 5 * waveCompletion);
-                    /*
-                    if (sinCalc < 0)
-                    {
-                        float potentialMultiplier = (Math.Abs(((waveCompletion * 5) % 1f) - 0.5f) * 2f);
-                        float multiplier = (float)Math.Pow(potentialMultiplier, 2);
-                        sinCalc *= multiplier;
-
-                    }
-                    */
                     float verticalPosition = waveTunnelDesiredPos.Y +  (verticalDirection * sinCalc * waveTunnelAmplitude);
+
                     NPC.Center = new Vector2(horizontalPosition, verticalPosition);
                     NPC.rotation = (NPC.position - NPC.oldPosition).ToRotation();
+
+                    bool shoot = false;
+                    if (NPC.ai[3] == -1 && sinCalc <= 0)
+                        NPC.ai[3] = 0;
+                    if (NPC.ai[3] == 0 && sinCalc > 0)
+                        NPC.ai[3]++;
+                    else if (NPC.ai[3] > 0)
+                        NPC.ai[3]++;
+
+                    if (NPC.ai[3] >= waveTunnelProjectileTelegraph)
+                    {
+                        shoot = true;
+                        NPC.ai[3] = -1;
+                    }
+                    int shootingSegments = Math.Clamp((int)((modNPC.Segments.Count - 8) * waveCompletion), 0, modNPC.Segments.Count - 1);
+                    ProjectileShootingLogic(0, shootingSegments, NPC.ai[3] > 0, shoot);
                 }
 
                 if (NPC.ai[1] >= WaveTunnel.Duration)
@@ -402,6 +415,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = WaveTunnel.Id;
+                    NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == Vomit.Id)
@@ -505,6 +519,27 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             rot += Main.rand.NextFloat(-MathHelper.PiOver4, MathHelper.PiOver4 + float.Epsilon);
             chargeDesiredPos += rot.ToRotationVector2() * chargeDesiredDist;
+        }
+        public void ProjectileShootingLogic(int startSegment, int endSegment, bool telegraphActive, bool shoot)
+        {
+            for (int i = startSegment; i <= endSegment; i++)
+            {
+                WormSegment segment = modNPC.Segments[i];
+                Point tilePos = segment.Position.ToTileCoordinates();
+                if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                    continue; 
+
+                float opacity = NPC.ai[3] / waveTunnelProjectileTelegraph;
+                if (telegraphActive)
+                {
+                    Color color = Color.Lerp(Color.LimeGreen, Color.Yellow, Main.rand.NextFloat(0.75f));
+                    ParticleManager.AddParticle(new Square(segment.Position, Vector2.Zero, 4, color * opacity, new Vector2(2f, 0.8f), segment.Rotation, 0.96f, 4, false));
+                    Vector2 randomVect = Main.rand.NextVector2CircularEdge(16f, 16f);
+                    ParticleManager.AddParticle(new Square(segment.Position + randomVect, -randomVect * 0.07f, 10, color * ((0.25f * opacity) + 0.75f), new Vector2(0.65f), 0, 0.96f, 10, false));
+                }
+                if (shoot)
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), segment.Position, (target == null ? Vector2.UnitY : (target.Center - segment.Position)).SafeNormalize(Vector2.UnitY) * 8, ModContent.ProjectileType<CursedFlame>(), NPC.damage, 0);
+            }
         }
         public override bool? CanFallThroughPlatforms()
         {

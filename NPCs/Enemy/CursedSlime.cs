@@ -16,6 +16,8 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using TerRoguelike.Projectiles;
 using Terraria.DataStructures;
+using TerRoguelike.Managers;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -71,11 +73,12 @@ namespace TerRoguelike.NPCs.Enemy
 
             if (NPC.ai[1] > 0 && NPC.ai[1] < attackTelegraph)
             {
-                Vector2 offset = (Main.rand.Next(13, 19) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
+                Vector2 offset = (Main.rand.Next(15, 21) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
                 Dust d = Dust.NewDustPerfect(NPC.Center + offset + NPC.velocity, DustID.CursedTorch, -offset.SafeNormalize(Vector2.UnitX) + NPC.velocity, NPC.alpha, default(Color), 1.5f);
                 d.noGravity = true;
                 d.noLight = true;
                 d.noLightEmittence = true;
+                ParticleManager.AddParticle(new Square(NPC.Center + offset + NPC.velocity, -offset.SafeNormalize(Vector2.UnitX) + NPC.velocity, 20, Color.Lerp(Color.LimeGreen, Color.Yellow, Main.rand.NextFloat(0.75f)), new Vector2(Main.rand.NextFloat(0.9f, 1f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 20, false));
             }
         }
         public override void HitEffect(NPC.HitInfo hit)
