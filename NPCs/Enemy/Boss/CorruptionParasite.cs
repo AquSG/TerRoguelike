@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Animations;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -38,6 +39,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D headTex;
         public Texture2D bodyTex;
         public Texture2D tailTex;
+        public Texture2D eggTex;
         public bool CollisionPass = false;
 
         public SlotId chargeSlot;
@@ -78,6 +80,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int projChargingDuration = 135;
         public int projChargeShootTelegraph = 88;
         public float projChargeSpeed = 20f;
+        public int summonCount = 3;
+
 
         public override void SetStaticDefaults()
         {
@@ -105,6 +109,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             headTex = TexDict["CorruptionParasiteHead"].Value;
             bodyTex = TexDict["CorruptionParasiteBody"].Value;
             tailTex = TexDict["CorruptionParasiteTail"].Value;
+            eggTex = TexDict["ParasiticEgg"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -578,6 +583,27 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                int summonTime = Summon.Duration / summonCount;
+                if ((int)NPC.ai[1] % summonTime >= summonTime - 15)
+                {
+                    WormSegment tailSegment = modNPC.Segments[modNPC.Segments.Count - 1];
+                    Vector2 tailPos = tailSegment.Position;
+                    if (ParanoidTileRetrieval(tailPos.ToTileCoordinates()).IsTileSolidGround(true))
+                    {
+                        NPC.ai[1] = (((int)NPC.ai[1] / summonTime) * summonTime) + summonTime - 15;
+                    }
+                    else if ((int)NPC.ai[1] % summonTime == summonTime - 1)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, tailPos);
+                        int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)tailPos.X, (int)tailPos.Y, ModContent.NPCType<ParasiticEgg>());
+                        NPC npc = Main.npc[whoAmI];
+                        npc.ModNPC().isRoomNPC = modNPC.isRoomNPC;
+                        npc.ModNPC().sourceRoomListID = modNPC.sourceRoomListID;
+                        npc.velocity = -tailSegment.Rotation.ToRotationVector2() * 7f;
+                        npc.rotation = tailSegment.Rotation - MathHelper.PiOver2;
+                        npc.Center = tailPos + (-tailSegment.Rotation.ToRotationVector2() * 34);
+                    }
+                }
                 if (NPC.ai[1] >= Summon.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -587,7 +613,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             defaultLookingAtThreshold = 0.1f;
-            bool defaultMovement = NPC.ai[0] != Charge.Id && NPC.ai[0] != WaveTunnel.Id && NPC.ai[0] != Vomit.Id && NPC.ai[0] != ProjCharge.Id;
+            bool defaultMovement = NPC.ai[0] == None.Id || NPC.ai[0] == Summon.Id;
             if (defaultLookingAtBuffer > 0)
                 defaultLookingAtBuffer--;
 
@@ -623,7 +649,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, WaveTunnel, Vomit, ProjCharge };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, WaveTunnel, Vomit, ProjCharge, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
                 potentialAttacks.RemoveAll(x => x.Id == WaveTunnel.Id);
@@ -812,17 +838,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            SoundEngine.PlaySound(SoundID.NPCHit1, modNPC.Segments[modNPC.hitSegment].Position);
+            WormSegment segment = modNPC.Segments[modNPC.hitSegment];
+            SoundEngine.PlaySound(SoundID.NPCHit1, segment.Position);
             if (NPC.life > 0)
             {
                 for (int i = 0; (double)i < hit.Damage / 25.0; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 5, hit.HitDirection, -1f);
+                    Dust.NewDust(segment.Position + new Vector2(-segment.Height * 0.5f), (int)segment.Height, (int)segment.Height, 5, hit.HitDirection, -1f);
                 }
             }
             else
             {
-                SoundEngine.PlaySound(SoundID.NPCDeath1, modNPC.Segments[modNPC.hitSegment].Position);
+                SoundEngine.PlaySound(SoundID.NPCDeath1, segment.Position);
             }
         }
         public override void OnKill()
@@ -840,6 +867,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if (NPC.ai[0] == Summon.Id)
+            {
+                int summonTime = Summon.Duration / summonCount;
+                if ((int)NPC.ai[1] % summonTime < summonTime - 1)
+                {
+                    WormSegment segment = modNPC.Segments[modNPC.Segments.Count - 1];
+                    float interpolant = MathHelper.SmoothStep(0, 1, Math.Clamp((NPC.ai[1] % summonTime) / 45f, 0, 1));
+                    Vector2 drawPos = segment.Position;
+                    Vector2 offset = -segment.Rotation.ToRotationVector2() * ((interpolant * 34));
+                    Main.EntitySpriteDraw(eggTex, drawPos + offset - Main.screenPosition, null, Lighting.GetColor(drawPos.ToTileCoordinates()), segment.Rotation - MathHelper.PiOver2, eggTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                }
+            }
+
             if (modNPC.ignitedStacks.Any() && deadTime <= 0)
             {
                 spriteBatch.End();

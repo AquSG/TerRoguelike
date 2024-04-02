@@ -787,4 +787,5 @@ NPCs: {
 	CrimsonVessel.DisplayName: Crimson Vessel
 	CrimsonSeer.DisplayName: Crimson Seer
 	CorruptionParasite.DisplayName: Corruption Parasite
+	ParasiticEgg.DisplayName: Parasitic Egg
 }
