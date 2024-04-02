@@ -112,6 +112,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/CorruptionParasiteHead",
                 "TerRoguelike/NPCs/Enemy/Boss/CorruptionParasiteBody",
                 "TerRoguelike/NPCs/Enemy/Boss/CorruptionParasiteTail",
+                "TerRoguelike/NPCs/Enemy/Boss/ParasiticEgg",
                 "TerRoguelike/ExtraTextures/YellowArrow",
             };
             foreach (string path in pathList)
