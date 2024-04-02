@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack None = new Attack(0, 0, 300);
         public static Attack Charge = new Attack(1, 30, 525);
         public static Attack WaveTunnel = new Attack(2, 30, 500);
-        public static Attack Vomit = new Attack(3, 30, 180);
+        public static Attack Vomit = new Attack(3, 30, 150);
         public static Attack ProjCharge = new Attack(4, 30, 180);
         public static Attack Summon = new Attack(5, 30, 180);
         public float defaultMinVelociy = 2;
@@ -420,10 +420,69 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Vomit.Id)
             {
+                Vector2 targetPos = target == null ? NPC.Center - NPC.velocity : target.Center;
+                float rotToTarget = (targetPos - NPC.Center).ToRotation();
+                float angleBetween = Math.Abs(AngleSizeBetween(NPC.rotation, rotToTarget));
+                if (angleBetween < defaultLookingAtThreshold * 2)
+                    defaultLookingAtBuffer = 10;
+                else if (angleBetween > MathHelper.PiOver2 && targetPos.Distance(NPC.Center) < 48f)
+                    defaultLookingAtBuffer = 30;
+                bool lookingAtTarget = defaultLookingAtBuffer > 0;
+                float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, lookingAtTarget ? defaultMinRotation * 0.75f : defaultMaxRotation);
+
+                Point tilePos = NPC.Center.ToTileCoordinates();
+                if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true) || NPC.Center.Distance(targetPos) > 270 || (lookingAtTarget && target != null && !CanHitInLine(NPC.Center, target.Center)))
+                {
+                    if (NPC.ai[1] < Vomit.Duration - 31)
+                        NPC.ai[1] -= 0.5f;
+
+                    if (NPC.velocity.Length() < defaultMaxVelociy)
+                        NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 0.5f;
+                    if (NPC.velocity.Length() > defaultMaxVelociy)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy;
+                }
+                else
+                {
+                    if (NPC.velocity.Length() > defaultMinVelociy)
+                    {
+                        NPC.velocity -= NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultDecelertaion * 2;
+                        if (NPC.velocity.Length() < defaultMinVelociy)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelociy;
+                    }
+                    if (NPC.velocity.Length() > defaultMaxVelociy)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy;
+                }
+                
+
+                NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
+
+                if (NPC.ai[1] > 60 && NPC.ai[1] < Vomit.Duration - 30)
+                {
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(20, 20);
+                    Vector2 velocity = -offset.SafeNormalize(Vector2.UnitY) * 2;
+                    velocity *= Main.rand.NextFloat(0.5f, 1f);
+
+                    Vector2 scale = new Vector2(0.1f, 0.3f);
+                    int time = 30 + Main.rand.Next(5);
+                    Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.36f);
+                    offset += (NPC.rotation.ToRotationVector2() * 16);
+                    ParticleManager.AddParticle(new Spark(NPC.Center + NPC.velocity + offset, velocity + NPC.velocity, time, Color.Black, scale, velocity.ToRotation(), false, SpriteEffects.None, true, false));
+                    ParticleManager.AddParticle(new Spark(NPC.Center + NPC.velocity + offset, velocity + NPC.velocity, time, color, scale, velocity.ToRotation(), true, SpriteEffects.None, true, false));
+                }
+                if ((int)NPC.ai[1] == Vomit.Duration - 30)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.8f, Pitch = -0.1f }, NPC.Center);
+                    for (int i = -6; i <= 6; i++)
+                    {
+                        float randRot = Main.rand.NextFloat(-0.15f, 0.15f) + NPC.rotation;
+                        randRot += 0.075f * i;
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (NPC.rotation.ToRotationVector2() * 36), (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) + (NPC.velocity * 0.25f), ModContent.ProjectileType<CorruptVomit>(), NPC.damage, 0);
+                    }
+                } 
                 if (NPC.ai[1] >= Vomit.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = None.Duration - 120;
                     NPC.ai[2] = Vomit.Id;
                 }
             }
@@ -447,7 +506,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             defaultLookingAtThreshold = 0.1f;
-            bool defaultMovement = NPC.ai[0] != Charge.Id && NPC.ai[0] != WaveTunnel.Id;
+            bool defaultMovement = NPC.ai[0] != Charge.Id && NPC.ai[0] != WaveTunnel.Id && NPC.ai[0] != Vomit.Id;
             if (defaultLookingAtBuffer > 0)
                 defaultLookingAtBuffer--;
 
@@ -483,7 +542,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, WaveTunnel };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, WaveTunnel, Vomit };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (!modNPC.isRoomNPC)
                 potentialAttacks.RemoveAll(x => x.Id == WaveTunnel.Id);
@@ -505,7 +564,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = WaveTunnel.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public void ChooseChargeLocation()
