@@ -68,6 +68,7 @@ Projectiles: {
 	VineWall.DisplayName: Vine Wall
 	RootPillar.DisplayName: Root Pillar
 	SeerBallBase.DisplayName: Seer Ball Base
+	CorruptVomit.DisplayName: Corrupt Vomit
 }
 
 Items: {

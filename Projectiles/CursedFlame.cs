@@ -37,7 +37,7 @@ namespace TerRoguelike.Projectiles
                 NPC npc = Main.npc[parentSource.Entity.whoAmI];
                 if (npc.type == ModContent.NPCType<CorruptionParasite>())
                 {
-                    fireSound = SoundID.Item20 with { Volume = 0.17f, MaxInstances = 8 };
+                    fireSound = SoundID.Item20 with { Volume = 0.25f, MaxInstances = 8 };
                 }
             }
             if (fireSound == null)
