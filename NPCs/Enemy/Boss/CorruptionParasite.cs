@@ -40,12 +40,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D bodyTex;
         public Texture2D tailTex;
         public Texture2D eggTex;
+        public Texture2D godRayTex;
         public bool CollisionPass = false;
 
         public SlotId chargeSlot;
+        List<GodRay> deathGodRays = new List<GodRay>();
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
-        public int deathCutsceneDuration = 120;
+        public int cutsceneDuration = 180;
+        public int deathCutsceneDuration = 180;
         public float diggingEffect = 0;
 
         public static Attack None = new Attack(0, 0, 300);
@@ -53,9 +55,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack WaveTunnel = new Attack(2, 30, 500);
         public static Attack Vomit = new Attack(3, 30, 150);
         public static Attack ProjCharge = new Attack(4, 30, 275);
-        public static Attack Summon = new Attack(5, 30, 180);
-        public float defaultMinVelociy = 2;
-        public float defaultMaxVelociy = 7;
+        public static Attack Summon = new Attack(5, 20, 180);
+        public float defaultMinVelocity = 2;
+        public float defaultMaxVelocity = 6;
+        public float hastyMaxVelocity = 7;
         public float defaultLookingAtThreshold = MathHelper.PiOver4 * 0.5f;
         public float defaultAcceleration = 0.04f;
         public float defaultDecelertaion = 0.02f;
@@ -96,7 +99,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.width = 38;
             NPC.height = 38;
             NPC.aiStyle = -1;
-            NPC.damage = 34;
+            NPC.damage = 30;
             NPC.lifeMax = 32000;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
@@ -110,6 +113,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             bodyTex = TexDict["CorruptionParasiteBody"].Value;
             tailTex = TexDict["CorruptionParasiteTail"].Value;
             eggTex = TexDict["ParasiticEgg"].Value;
+            godRayTex = TexDict["GodRay"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -127,7 +131,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int segCount = 50;
             int segmentHeight = 38;
             NPC.position.Y += 320;
-            NPC.velocity.Y = -2;
+            NPC.velocity.Y = -5f;
             for (int i = 0; i < segCount; i++)
             {
                 modNPC.Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * segmentHeight * i), MathHelper.PiOver2 * 3f, i == 0 ? NPC.height : segmentHeight));
@@ -188,14 +192,27 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.frameCounter += 0.13d;
             if (NPC.localAI[0] < 0)
             {
+                target = modNPC.GetTarget(NPC, false, false);
+
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
                     CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
 
+                if (NPC.localAI[0] > -90 && NPC.localAI[0] < -30)
+                {
+                    float completion = 1f - (Math.Abs(NPC.localAI[0] + 60) / 30f);
+                    NPC.velocity = (NPC.velocity.ToRotation() - (0.07f * completion)).ToRotationVector2() * NPC.velocity.Length();
+                    if (NPC.localAI[0] == -40)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
+                        chargeSlot = SoundEngine.PlaySound(SoundID.DD2_BetsyScream with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0f }, NPC.Center);
+                    }
+                }
                 if (NPC.localAI[0] == -30)
                 {
+                    NPC.velocity = (NPC.velocity.ToRotation().AngleTowards(target != null ? (target.Center - NPC.Center).ToRotation() : NPC.velocity.ToRotation(), 0.02f)).ToRotationVector2() * NPC.velocity.Length();
                     NPC.hide = false;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
@@ -203,7 +220,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[3] = 0;
                 }
                 if (NPC.localAI[0] < -30)
+                {
+                    NPC.velocity *= 0.99f;
                     NPC.ai[1]++;
+                }
             }
             else
             {
@@ -250,15 +270,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (chargeProgress <= 3)
                 {
                     Vector2 targetPos = chargeDesiredPos;
+                    bool close = (NPC.Center - targetPos).Length() <= 160;
                     float rotToTarget = (targetPos - NPC.Center).ToRotation();
 
-                    float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, defaultMaxRotation * (NPC.velocity.Length() / 10f));
+                    float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, close ? 0.2f : defaultMaxRotation * (NPC.velocity.Length() / 10f));
 
-                    if (NPC.velocity.Length() < defaultMaxVelociy * 2)
+                    if (close)
+                    {
+                        if (NPC.velocity.Length() > defaultMinVelocity * 0.5f)
+                        {
+                            NPC.velocity -= NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 6;
+                            if (NPC.velocity.Length() < defaultMinVelocity * 0.5f)
+                                NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelocity * 0.5f;
+                        }
+                    }
+                    else if (NPC.velocity.Length() < hastyMaxVelocity * 2)
                     {
                         NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
-                        if (NPC.velocity.Length() > defaultMaxVelociy * 2)
-                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy * 2;
+                        if (NPC.velocity.Length() > hastyMaxVelocity * 2)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * hastyMaxVelocity * 2;
                     }
 
                     NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
@@ -342,18 +372,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     if (close)
                     {
-                        if (NPC.velocity.Length() > defaultMinVelociy * 0.5f)
+                        if (NPC.velocity.Length() > defaultMinVelocity * 0.5f)
                         {
                             NPC.velocity -= NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 6;
-                            if (NPC.velocity.Length() < defaultMinVelociy * 0.5f)
-                                NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelociy * 0.5f;
+                            if (NPC.velocity.Length() < defaultMinVelocity * 0.5f)
+                                NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelocity * 0.5f;
                         }
                     }
-                    else if (NPC.velocity.Length() < defaultMaxVelociy * 2)
+                    else if (NPC.velocity.Length() < hastyMaxVelocity * 2)
                     {
                         NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
-                        if (NPC.velocity.Length() > defaultMaxVelociy * 2)
-                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy * 2;
+                        if (NPC.velocity.Length() > hastyMaxVelocity * 2)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * hastyMaxVelocity * 2;
                     }
 
                     NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
@@ -374,11 +404,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, close ? 0.3f : defaultMaxRotation * (NPC.velocity.Length() / 10f));
 
-                    if (NPC.velocity.Length() < defaultMaxVelociy * 2)
+                    if (NPC.velocity.Length() < hastyMaxVelocity * 2)
                     {
                         NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
-                        if (NPC.velocity.Length() > defaultMaxVelociy * 2)
-                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy * 2;
+                        if (NPC.velocity.Length() > hastyMaxVelocity * 2)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * hastyMaxVelocity * 2;
                     }
 
                     NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
@@ -394,7 +424,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= waveTunnelTelegraph)
                 {
                     segmentRotationInterpolant = 0.98f;
-                    NPC.behindTiles = true;
                     NPC.velocity = Vector2.Zero;
                     int waveTime = (int)NPC.ai[1] - waveTunnelTelegraph;
                     int waveDuration = WaveTunnel.Duration - waveTunnelTelegraph;
@@ -458,21 +487,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[1] < Vomit.Duration - 31)
                         NPC.ai[1] -= 0.5f;
 
-                    if (NPC.velocity.Length() < defaultMaxVelociy)
+                    if (NPC.velocity.Length() < defaultMaxVelocity)
                         NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 0.5f;
-                    if (NPC.velocity.Length() > defaultMaxVelociy)
-                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy;
+                    if (NPC.velocity.Length() > defaultMaxVelocity)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelocity;
                 }
                 else
                 {
-                    if (NPC.velocity.Length() > defaultMinVelociy)
+                    if (NPC.velocity.Length() > defaultMinVelocity)
                     {
                         NPC.velocity -= NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultDecelertaion * 2;
-                        if (NPC.velocity.Length() < defaultMinVelociy)
-                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelociy;
+                        if (NPC.velocity.Length() < defaultMinVelocity)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelocity;
                     }
-                    if (NPC.velocity.Length() > defaultMaxVelociy)
-                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy;
+                    if (NPC.velocity.Length() > defaultMaxVelocity)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelocity;
                 }
                 
 
@@ -510,48 +539,46 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == ProjCharge.Id)
             {
-                int projChargeProgress = (int)NPC.ai[1];
-                if (projChargeProgress == 0)
+                if (NPC.ai[1] == 0)
                 {
                     ChooseChargeLocation();
                 }
-                if (projChargeProgress <= 3)
+                if (NPC.ai[1] <= 3)
                 {
                     Vector2 chargePos = chargeDesiredPos;
                     float rotToChargePos = (chargePos - NPC.Center).ToRotation();
 
                     float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToChargePos, defaultMaxRotation * (NPC.velocity.Length() / 10f));
 
-                    if (NPC.velocity.Length() < defaultMaxVelociy * 2)
+                    if (NPC.velocity.Length() < hastyMaxVelocity * 2)
                     {
                         NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
-                        if (NPC.velocity.Length() > defaultMaxVelociy * 2)
-                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy * 2;
+                        if (NPC.velocity.Length() > hastyMaxVelocity * 2)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * hastyMaxVelocity * 2;
                     }
 
                     NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
 
-                    if (projChargeProgress == 3)
+                    if (NPC.ai[1] == 3)
                     {
                         if ((NPC.Center - chargeDesiredPos).Length() > 70)
                         {
                             NPC.ai[1]--;
-                            projChargeProgress--;
                         }
                     }
                 }
                 Vector2 targetPos = target == null ? spawnPos : target.Center;
                 float rotToTarget = (targetPos - NPC.Center).ToRotation();
-                if (projChargeProgress >= 3 && projChargeProgress < projChargeTelegraph + projChargingDuration)
+                if (NPC.ai[1] >= 3 && NPC.ai[1] < projChargeTelegraph + projChargingDuration)
                 {
 
-                    if (projChargeProgress == 3)
+                    if (NPC.ai[1] == 3)
                     {
                         SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
                         chargeSlot = SoundEngine.PlaySound(SoundID.DD2_BetsyScream with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0f}, NPC.Center);
                     }
 
-                    if (projChargeProgress < projChargeTelegraph)
+                    if (NPC.ai[1] < projChargeTelegraph)
                     {
                         float potentialVelToRot = NPC.velocity.ToRotation();
 
@@ -560,21 +587,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     else
                     {
-                        float completion = 1f - ((float)(projChargeProgress - projChargeTelegraph) / (projChargingDuration));
+                        float completion = 1f - ((float)(NPC.ai[1] - projChargeTelegraph) / (projChargingDuration));
                         NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * projChargeSpeed * (completion * 0.75f + 0.25f);
                     }
                 }
-                else if (projChargeProgress >= projChargeTelegraph + projChargingDuration)
+                else if (NPC.ai[1] >= projChargeTelegraph + projChargingDuration)
                 {
                     NPC.ai[3]++;
                     NPC.velocity = NPC.velocity.ToRotation().AngleTowards(rotToTarget, 0.04f * (NPC.ai[3] / projChargeShootTelegraph)).ToRotationVector2() * NPC.velocity.Length();
-                    bool telegraph = projChargeProgress < projChargeTelegraph + projChargingDuration + projChargeShootTelegraph;
-                    bool shoot = projChargeProgress == projChargeTelegraph + projChargingDuration + projChargeShootTelegraph;
+                    bool telegraph = NPC.ai[1] < projChargeTelegraph + projChargingDuration + projChargeShootTelegraph;
+                    bool shoot = NPC.ai[1] == projChargeTelegraph + projChargingDuration + projChargeShootTelegraph;
                     ProjectileShootingLogic(0, modNPC.Segments.Count - 1, telegraph, shoot);
                 }
                 if (NPC.ai[1] >= ProjCharge.Duration)
 {
-                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelociy;
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelocity;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = ProjCharge.Id;
@@ -631,14 +658,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (lookingAtTarget)
                     NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration;
-                else if (NPC.velocity.Length() > defaultMinVelociy)
+                else if (NPC.velocity.Length() > defaultMinVelocity)
                 {
                     NPC.velocity -= NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultDecelertaion;
-                    if (NPC.velocity.Length() < defaultMinVelociy)
-                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelociy;
+                    if (NPC.velocity.Length() < defaultMinVelocity)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelocity;
                 }
-                if (NPC.velocity.Length() > defaultMaxVelociy)
-                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelociy;
+                if (NPC.velocity.Length() > defaultMaxVelocity)
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelocity;
 
                 NPC.velocity = (Vector2.UnitX * NPC.velocity.Length()).RotatedBy(potentialRot);
             }
@@ -770,7 +797,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
-            segmentRotationInterpolant = setSegmentRotationInterpolant;
+            segmentRotationInterpolant = 0.975f;
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 return true;
@@ -784,7 +811,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 1;
 
             modNPC.OverrideIgniteVisual = true;
-            NPC.velocity *= 0.98f;
+            NPC.velocity *= 0.975f;
             NPC.life = 1;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
@@ -797,7 +824,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (modNPC.isRoomNPC)
                 {
                     ActiveBossTheme.endFlag = true;
-                    RoomList[modNPC.sourceRoomListID].bossDead = true;
+                    Room room = RoomList[modNPC.sourceRoomListID];
+                    room.bossDead = true;
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         if (i == NPC.whoAmI)
@@ -818,10 +846,61 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             childNPC.active = false;
                         }
                     }
+
+                    Rectangle roomRect = room.GetRect();
+                    if (!roomRect.Contains(NPC.Center.ToPoint()))
+                    {
+                        float oobDistance = (roomRect.ClosestPointInRect(NPC.Center) - NPC.Center).Length();
+                        float speed = MathHelper.Clamp(oobDistance * 0.05f, 5, 20);
+                        NPC.velocity = (room.RoomCenter16 + room.RoomPosition16 - NPC.Center).SafeNormalize(Vector2.UnitY) * speed;
+                    }
                 }
             }
             deadTime++;
 
+            if (target != null)
+            {
+                NPC.velocity = NPC.velocity.ToRotation().AngleLerp(((modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID].RoomPosition16 + RoomList[modNPC.sourceRoomListID].RoomCenter16 : target.Center) - NPC.Center).ToRotation(), 0.0078f).ToRotationVector2() * NPC.velocity.Length();
+            }
+
+            if (deadTime < deathCutsceneDuration - 60)
+            {
+                for (int i = 0; i < modNPC.Segments.Count; i++)
+                {
+                    if (Main.rand.NextBool(40) || i == 0 && deadTime % 50 == 0)
+                    {
+                        deathGodRays.Add(new GodRay(Main.rand.NextFloat(MathHelper.TwoPi), deadTime, new Vector2(0.14f + Main.rand.NextFloat(-0.02f, 0.02f), 0.018f) * 1f, i));
+                        SoundEngine.PlaySound(SoundID.NPCHit19 with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0.05f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, modNPC.Segments[i].Position);
+                        break;
+                    }
+                    i += Main.rand.Next(4);
+                }
+            }
+            
+
+            if (deadTime % 5 == 0)
+            {
+                for (int i = 0; i < deathGodRays.Count; i++)
+                {
+                    GodRay ray = deathGodRays[i];
+                    WormSegment segment = modNPC.Segments[ray.segment];
+                    float rotation = ray.rotation;
+                    Vector2 pos = modNPC.Segments[ray.segment].Position + (rotation.ToRotationVector2() * new Vector2(NPC.width * 0.55f, NPC.height * 0.7f));
+                    Vector2 velocity = rotation.ToRotationVector2();
+                    int xDir = Math.Sign(pos.X - modNPC.Segments[ray.segment].Position.X);
+                    if (xDir == 0)
+                        xDir = 1;
+                    velocity.X += xDir * 0.6f;
+                    velocity.Y -= 0.5f;
+                    int time = 40 + Main.rand.Next(20);
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.75f;
+                    Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
+
+                    Vector2 segVel = segment.Position - segment.OldPosition; 
+                    ParticleManager.AddParticle(new Blood(pos, velocity + (segVel), time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity + (segVel), time, color * 0.65f, scale, velocity.ToRotation(), true));
+                }
+            }
             if (CutsceneSystem.cutsceneActive)
             {
                 CutsceneSystem.cameraTargetCenter += (NPC.Center - CutsceneSystem.cameraTargetCenter) * 0.1f;
@@ -849,12 +928,47 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
-                SoundEngine.PlaySound(SoundID.NPCDeath1, segment.Position);
+                
             }
         }
         public override void OnKill()
         {
-
+            SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
+            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+            for (int s = 0; s < modNPC.Segments.Count; s++)
+            {
+                WormSegment segment = modNPC.Segments[s];
+                for (int i = 0; i < 10; i++)
+                {
+                    Vector2 pos = segment.Position + new Vector2(0, 16);
+                    int width = (int)(NPC.width * 0.25f);
+                    pos.X += Main.rand.Next(-width, width);
+                    Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                    velocity *= Main.rand.NextFloat(0.3f, 1f);
+                    if (Main.rand.NextBool(5))
+                        velocity *= 1.5f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.7f;
+                    int time = 110 + Main.rand.Next(70);
+                    Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
+                }
+                if (s == 0)
+                {
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 24);
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 25);
+                }
+                else if (s == modNPC.Segments.Count - 1)
+                {
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 28);
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 29);
+                }
+                else
+                {
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 26);
+                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 27);
+                }
+            }
         }
         public override void FindFrame(int frameHeight)
         {
@@ -867,6 +981,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if (deadTime > 0)
+            {
+                if (deathGodRays.Any())
+                {
+                    StartAdditiveSpritebatch();
+                    for (int i = 0; i < deathGodRays.Count; i++)
+                    {
+                        GodRay ray = deathGodRays[i];
+                        float rotation = ray.rotation;
+                        Vector2 rayScale = ray.scale;
+                        int time = ray.time;
+                        float opacity = MathHelper.Clamp(MathHelper.Lerp(1f, 0.5f, (deadTime - time) / 60f), 0.5f, 1f) * 0.9f;
+                        Main.EntitySpriteDraw(godRayTex, modNPC.Segments[ray.segment].Position - Main.screenPosition, null, Color.DarkGreen * opacity, rotation, new Vector2(0, godRayTex.Height * 0.5f), rayScale, SpriteEffects.None);
+                    }
+                    StartVanillaSpritebatch();
+                }
+            }
+
             if (NPC.ai[0] == Summon.Id)
             {
                 int summonTime = Summon.Duration / summonCount;
