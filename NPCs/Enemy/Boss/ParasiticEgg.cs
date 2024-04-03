@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Utilities;
 using static TerRoguelike.Schematics.SchematicManager;
@@ -20,9 +21,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 28;
             NPC.aiStyle = -1;
             NPC.damage = 0;
-            NPC.lifeMax = 500;
+            NPC.lifeMax = 400;
+            NPC.HitSound = SoundID.NPCHit1;
+            NPC.DeathSound = SoundID.NPCDeath11;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 0);
+            modNPC.drawCenter = new Vector2(0, -3);
             modNPC.IgnoreRoomWallCollision = false;
         }
         public override void AI()
@@ -36,12 +39,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity *= 0;
             }
             NPC.ai[0]++;
-            if (NPC.ai[0] >= 300)
+            if (NPC.ai[0] >= 450)
             {
                 int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<Clinger>());
                 NPC npc = Main.npc[whoAmI];
                 npc.ModNPC().isRoomNPC = modNPC.isRoomNPC;
                 npc.ModNPC().sourceRoomListID = modNPC.sourceRoomListID;
+                npc.Center = NPC.Center;
                 NPC.StrikeInstantKill();
             }
         }
@@ -62,10 +66,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 237 + Main.rand.Next(2), 2.5f * (float)hit.HitDirection, -2.5f);
                 }
-                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, 684, NPC.scale);
-                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, 685, NPC.scale);
-                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, 686, NPC.scale);
-                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, 684 + Main.rand.Next(3), NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg1").Type, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg2").Type, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg3").Type, NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg1").Type + Main.rand.Next(3), NPC.scale);
             }
         }
     }
