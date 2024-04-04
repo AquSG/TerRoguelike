@@ -39,7 +39,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity *= 0;
             }
             NPC.ai[0]++;
-            if (NPC.ai[0] >= 450)
+            if (NPC.ai[0] >= 540)
             {
                 int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)NPC.Center.X, (int)NPC.Center.Y, ModContent.NPCType<Clinger>());
                 NPC npc = Main.npc[whoAmI];

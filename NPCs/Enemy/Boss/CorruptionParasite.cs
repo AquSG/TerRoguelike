@@ -42,6 +42,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D eggTex;
         public Texture2D godRayTex;
         public bool CollisionPass = false;
+        public Rectangle headFrame;
 
         public SlotId chargeSlot;
         List<GodRay> deathGodRays = new List<GodRay>();
@@ -57,7 +58,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack ProjCharge = new Attack(4, 30, 275);
         public static Attack Summon = new Attack(5, 20, 180);
         public float defaultMinVelocity = 2;
-        public float defaultMaxVelocity = 6;
+        public float defaultMaxVelocity = 5;
         public float hastyMaxVelocity = 7;
         public float defaultLookingAtThreshold = MathHelper.PiOver4 * 0.5f;
         public float defaultAcceleration = 0.04f;
@@ -183,7 +184,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(CrimsonVesselTheme);
+                SetBossTrack(CorruptionParasiteTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
@@ -204,7 +205,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     float completion = 1f - (Math.Abs(NPC.localAI[0] + 60) / 30f);
                     NPC.velocity = (NPC.velocity.ToRotation() - (0.07f * completion)).ToRotationVector2() * NPC.velocity.Length();
-                    if (NPC.localAI[0] == -40)
+                    if (NPC.localAI[0] == -50)
                     {
                         SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
                         chargeSlot = SoundEngine.PlaySound(SoundID.DD2_BetsyScream with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0f }, NPC.Center);
@@ -516,7 +517,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 scale = new Vector2(0.1f, 0.3f);
                     int time = 30 + Main.rand.Next(5);
                     Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.36f);
-                    offset += (NPC.rotation.ToRotationVector2() * 16);
+                    offset += (NPC.rotation.ToRotationVector2() * 24);
                     ParticleManager.AddParticle(new Spark(NPC.Center + NPC.velocity + offset, velocity + NPC.velocity, time, Color.Black, scale, velocity.ToRotation(), false, SpriteEffects.None, true, false));
                     ParticleManager.AddParticle(new Spark(NPC.Center + NPC.velocity + offset, velocity + NPC.velocity, time, color, scale, velocity.ToRotation(), true, SpriteEffects.None, true, false));
                 }
@@ -634,7 +635,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= Summon.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = None.Duration - 30;
                     NPC.ai[2] = Summon.Id;
                 }
             }
@@ -820,7 +821,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
-                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {
                     ActiveBossTheme.endFlag = true;
@@ -855,6 +855,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.velocity = (room.RoomCenter16 + room.RoomPosition16 - NPC.Center).SafeNormalize(Vector2.UnitY) * speed;
                     }
                 }
+                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
             }
             deadTime++;
 
@@ -875,6 +876,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     i += Main.rand.Next(4);
                 }
+            }
+            if (deadTime == deathCutsceneDuration - 90)
+            {
+                chargeSlot = SoundEngine.PlaySound(SoundID.DD2_WyvernHurt with { Volume = 0.6f, Pitch = -0.9f, PitchVariance = 0.05f }, NPC.Center);
             }
             
 
@@ -947,7 +952,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     velocity *= Main.rand.NextFloat(0.3f, 1f);
                     if (Main.rand.NextBool(5))
                         velocity *= 1.5f;
-                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.7f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.86f;
                     int time = 110 + Main.rand.Next(70);
                     Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
                     ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
@@ -973,11 +978,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void FindFrame(int frameHeight)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
-            int frameCount = Main.npcFrameCount[Type];
-
             currentFrame = 0;
-
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
+
+            int headFrameCounter = 0;
+
+            int chargeProgress = (int)NPC.ai[1] % (chargeTelegraph + chargingDuration);
+            bool open =
+                (NPC.localAI[0] < 0 && NPC.localAI[0] >= -50) ||
+                (deadTime > deathCutsceneDuration - 90) ||
+                (NPC.ai[0] == Charge.Id && chargeProgress >= 3 && chargeProgress < chargeTelegraph + chargingDuration - 20) ||
+                (NPC.ai[0] == ProjCharge.Id && NPC.ai[1] >= 3 && NPC.ai[1] < projChargeTelegraph + projChargingDuration - 20) ||
+                (NPC.ai[0] == Vomit.Id && NPC.ai[1] >= Vomit.Duration - 30);
+
+            if (open)
+                headFrameCounter = 1;
+
+            int headFrameHeight = headTex.Height / 2;
+            headFrame = new Rectangle(0, headFrameHeight * headFrameCounter, headTex.Width, headFrameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
@@ -1039,7 +1057,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 position = segment.Position + (Vector2.UnitY * NPC.gfxOffY);
                     for (float j = 0; j < 1; j += 0.125f)
                     {
-                        spriteBatch.Draw(texture, position + (j * MathHelper.TwoPi + segment.Rotation + MathHelper.PiOver2).ToRotationVector2() * outlineThickness - Main.screenPosition, null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
+                        spriteBatch.Draw(texture, position + (j * MathHelper.TwoPi + segment.Rotation + MathHelper.PiOver2).ToRotationVector2() * outlineThickness - Main.screenPosition, i == 0 ? headFrame : null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * new Vector2(0.5f, i == 0 ? 0.25f : 0.5f), NPC.scale, spriteEffects, 0f);
                     }
                 }
                 spriteBatch.End();
@@ -1057,7 +1075,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     texture = bodyTex;
 
                 Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor(new Point((int)(segment.Position.X / 16), (int)(segment.Position.Y / 16)));
-                spriteBatch.Draw(texture, segment.Position - screenPos, null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                spriteBatch.Draw(texture, segment.Position - screenPos, i == 0 ? headFrame : null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * new Vector2(0.5f, i == 0 ? 0.25f : 0.5f), 1f, SpriteEffects.None, 0);
             }
             return false;
         }
