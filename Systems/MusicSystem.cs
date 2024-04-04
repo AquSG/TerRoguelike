@@ -79,6 +79,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/CrimsonVesselThemeStart",
             "TerRoguelike/Tracks/CrimsonVesselThemeEnd",
             0.8f);
+        public static BossTheme CorruptionParasiteTheme = new(
+            "TerRoguelike/Tracks/CorruptionParasiteTheme",
+            "TerRoguelike/Tracks/CorruptionParasiteThemeStart",
+            "TerRoguelike/Tracks/CorruptionParasiteThemeEnd",
+            0.36f);
 
 
         public static void PlayAllSounds()
@@ -105,6 +110,9 @@ namespace TerRoguelike.Systems
                 CrimsonVesselTheme.BattleTrack,
                 CrimsonVesselTheme.StartTrack,
                 CrimsonVesselTheme.EndTrack,
+                CorruptionParasiteTheme.BattleTrack,
+                CorruptionParasiteTheme.StartTrack,
+                CorruptionParasiteTheme.EndTrack,
             };
             foreach (string path in pathList)
             {

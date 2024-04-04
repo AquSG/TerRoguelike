@@ -3419,6 +3419,23 @@ namespace TerRoguelike.NPCs
                 CombatText.NewText(segRect, hit.Crit ? CombatText.DamagedHostileCrit : CombatText.DamagedHostile, hit.Damage, hit.Crit);
             }
         }
+        public override void ModifyHoverBoundingBox(NPC npc, ref Rectangle boundingBox)
+        {
+            if (Segments.Any())
+            {
+                for (int i = 0; i < Segments.Count; i++)
+                {
+                    WormSegment segment = Segments[i];
+                    //bool pass = new Rectangle((int)(segment.Position.X - ((i == 0 ? npc.width : segment.Height) / 2)), (int)(segment.Position.Y - ((i == 0 ? npc.height : segment.Height) / 2)), npc.width, npc.height).Contains(Main.MouseWorld.ToPoint());
+                    bool pass = Main.MouseWorld.Distance(segment.Position) < segment.Height;
+                    if (pass)
+                    {
+                        boundingBox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+                        break;
+                    }
+                }
+            }
+        }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (ignitedStacks != null && ignitedStacks.Any() && !OverrideIgniteVisual)
@@ -3491,7 +3508,7 @@ namespace TerRoguelike.NPCs
                     Texture2D arrowTex = TexDict["YellowArrow"].Value;
                     float opacity = MathHelper.Clamp(overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
                     Vector2 pos = npc.Top + drawCenter + ((npc.gfxOffY - 32 + (14 * opacity)) * Vector2.UnitY) - Main.screenPosition;
-                    Main.EntitySpriteDraw(arrowTex, pos, null, Color.White * opacity * 0.75f, MathHelper.PiOver2, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(arrowTex, pos, null, Color.White * opacity * 0.9f, MathHelper.PiOver2, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                 }
             }
         }
