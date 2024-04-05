@@ -80,6 +80,7 @@ namespace TerRoguelike.Managers
                 new Crimator(),
                 new Clinger(),
                 new BloodthirstyAxe(),
+                new PossessedHammer(),
                 new IceSpirit(),
                 new LavaBat(),
                 new BoneSerpent(),

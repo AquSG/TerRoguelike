@@ -788,4 +788,5 @@ NPCs: {
 	CrimsonSeer.DisplayName: Crimson Seer
 	CorruptionParasite.DisplayName: Corruption Parasite
 	ParasiticEgg.DisplayName: Parasitic Egg
+	PossessedHammer.DisplayName: Possessed Hammer
 }

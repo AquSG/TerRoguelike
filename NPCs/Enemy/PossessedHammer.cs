@@ -20,34 +20,34 @@ using Terraria.DataStructures;
 
 namespace TerRoguelike.NPCs.Enemy
 {
-    public class BloodthirstyAxe : BaseRoguelikeNPC
+    public class PossessedHammer : BaseRoguelikeNPC
     {
-        public override int modNPCID => ModContent.NPCType<BloodthirstyAxe>();
-        public override List<int> associatedFloors => new List<int>() { FloorDict["Crimson"] };
-        public override int CombatStyle => 2;
+        public override int modNPCID => ModContent.NPCType<PossessedHammer>();
+        public override List<int> associatedFloors => new List<int>() { FloorDict["Corrupt"] };
+        public override int CombatStyle => 0;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 5;
+            Main.npcFrameCount[modNPCID] = 6;
         }
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 30;
-            NPC.height = 30;
+            NPC.width = 48;
+            NPC.height = 48;
             NPC.aiStyle = -1;
             NPC.damage = 27;
             NPC.lifeMax = 600;
             NPC.HitSound = SoundID.NPCHit4;
             NPC.DeathSound = SoundID.NPCDeath6;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, -14);
+            modNPC.drawCenter = new Vector2(0, -13);
             NPC.noGravity = true;
             NPC.noTileCollide = true;
         }
         public override void AI()
         {
             int attackTelegraph = 120;
-            modNPC.RogueEvilToolAI(NPC, 8f, attackTelegraph, 60, 12, 60, ModContent.ProjectileType<BloodOrb>(), 6f, NPC.damage);
+            modNPC.RogueEvilToolAI(NPC, 7f, attackTelegraph, 60, 12, 60, ProjectileID.None, 6f, NPC.damage);
 
             NPC.frameCounter += 0.1d;
             if (NPC.ai[0] >= 0 && NPC.ai[0] < attackTelegraph)
@@ -70,7 +70,7 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)
                 {
-                    int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.CrimsonTorch, 0f, 0f, 0, default(Color), 1.5f);
+                    int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.CorruptTorch, 0f, 0f, 0, default(Color), 1.5f);
                     Dust d = Main.dust[dust];
                     //d.noGravity = true;
                     d.noLight = true;
@@ -105,13 +105,13 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            NPC.gfxOffY = 16;
+            NPC.gfxOffY = 14;
             int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[modNPCID]);
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
         }
         public override Color? GetAlpha(Color drawColor)
         {
-            return Color.Lerp(Color.Pink, drawColor, 0.5f);
+            return Color.Lerp(Color.Purple, drawColor, 0.5f);
         }
     }
 }

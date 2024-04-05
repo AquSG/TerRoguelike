@@ -1,29 +1,21 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.ModLoader;
-using Terraria.ModLoader.Core;
-using Terraria.GameContent.ItemDropRules;
-using Terraria.ID;
-using TerRoguelike;
-using TerRoguelike.World;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework;
-using Terraria.Graphics;
+using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
-using TerRoguelike.TerPlayer;
+using Terraria.ID;
+using Terraria.ModLoader;
 using TerRoguelike.Managers;
-using System.IO;
-using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using Terraria.DataStructures;
 using TerRoguelike.Projectiles;
-using static TerRoguelike.Systems.RoomSystem;
+using TerRoguelike.TerPlayer;
+using TerRoguelike.World;
 using static TerRoguelike.Managers.TextureManager;
-using Terraria.ModLoader.IO;
+using static TerRoguelike.Systems.RoomSystem;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs
 {
@@ -40,7 +32,7 @@ namespace TerRoguelike.NPCs
         public float diminishingDR = 0;
         public List<WormSegment> Segments = new List<WormSegment>();
         public int hitSegment = 0;
-        public float effectiveDamageTakenMulti { get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR)));  } }
+        public float effectiveDamageTakenMulti { get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR))); } }
         public int overheadArrowTime = 0;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
@@ -2614,7 +2606,6 @@ namespace TerRoguelike.NPCs
         public void RogueEvilToolAI(NPC npc, float dashSpeed, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
         {
             Entity target = GetTarget(npc, false, false);
-
             if (npc.ai[0] != attackTelegraph)
                 npc.ai[0]++;
 
@@ -2627,7 +2618,6 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[0] == attackTelegraph)
                 {
-                    npc.ai[0]++;
                     npc.velocity = (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * dashSpeed;
 
                     if (npc.Center.X > target.Center.X)
@@ -2640,6 +2630,8 @@ namespace TerRoguelike.NPCs
                         npc.direction = 1;
                         npc.spriteDirection = 1;
                     }
+
+                    npc.ai[0]++;
                 }
             }
 
@@ -3481,7 +3473,12 @@ namespace TerRoguelike.NPCs
                 for (int i = 0; i < ignitedStacks.Count; i++)
                 {
                     if (Main.rand.NextBool(5))
-                        Dust.NewDust(npc.position + npc.ModNPC().drawCenter, npc.width, npc.height, DustID.Torch);
+                    {
+                        int d = Dust.NewDust(npc.position + npc.ModNPC().drawCenter, npc.width, npc.height, DustID.Torch);
+                        if (Segments.Any())
+                            Main.dust[d].noLight = true;
+                    }
+                        
                 }
             }
             if (ballAndChainSlow > 0)
@@ -3671,7 +3668,7 @@ namespace TerRoguelike.NPCs
             }
 
             Vector2 closestVect = Segments[closest].Position;
-            closestVect += (inputVect - closestVect).SafeNormalize(Vector2.UnitY) * Segments[closest].Height * 0.5f; 
+            closestVect += (inputVect - closestVect).SafeNormalize(Vector2.UnitY) * Segments[closest].Height * 0.5f;
             return closestVect;
         }
         /// <summary>

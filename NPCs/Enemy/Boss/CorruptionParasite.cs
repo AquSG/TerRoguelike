@@ -821,6 +821,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                modNPC.ignitedStacks.Clear();
                 if (modNPC.isRoomNPC)
                 {
                     ActiveBossTheme.endFlag = true;
@@ -1036,8 +1037,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 for (int i = modNPC.Segments.Count - 1; i >= 0; i--)
                 {
-                    Texture2D texture;
                     WormSegment segment = modNPC.Segments[i];
+                    Color blockColor = Lighting.GetColor(segment.Position.ToTileCoordinates());
+                    if (blockColor.R <= 30 && blockColor.G <= 30 && blockColor.B <= 30)
+                        continue;
+
+                    Texture2D texture;
                     if (i == 0)
                         texture = headTex;
                     else if (i == modNPC.Segments.Count - 1)
@@ -1065,8 +1070,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             for (int i = modNPC.Segments.Count - 1; i >= 0; i--)
             {
-                Texture2D texture;
                 WormSegment segment = modNPC.Segments[i];
+                Color blockColor = Lighting.GetColor(segment.Position.ToTileCoordinates());
+                if (blockColor.R <= 30 && blockColor.G <= 30 && blockColor.B <= 30)
+                    continue;
+
+                Texture2D texture;
                 if (i == 0)
                     texture = headTex;
                 else if (i == modNPC.Segments.Count - 1)
@@ -1074,7 +1083,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else
                     texture = bodyTex;
 
-                Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor(new Point((int)(segment.Position.X / 16), (int)(segment.Position.Y / 16)));
+                Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : blockColor;
                 spriteBatch.Draw(texture, segment.Position - screenPos, i == 0 ? headFrame : null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * new Vector2(0.5f, i == 0 ? 0.25f : 0.5f), 1f, SpriteEffects.None, 0);
             }
             return false;
