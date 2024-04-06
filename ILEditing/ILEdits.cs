@@ -25,6 +25,8 @@ using Mono.Cecil.Cil;
 using Terraria.ModLoader.Core;
 using static Terraria.Collision;
 using Terraria.GameContent.Drawing;
+using static Terraria.WorldGen;
+using ReLogic.Threading;
 
 namespace TerRoguelike.ILEditing
 {
@@ -46,7 +48,41 @@ namespace TerRoguelike.ILEditing
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
             On_WallDrawing.DrawWalls += On_WallDrawing_DrawWalls;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
+            On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
         }
+
+		//Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
+        private void On_WorldGen_SectionTileFrameWithCheck(On_WorldGen.orig_SectionTileFrameWithCheck orig, int startX, int startY, int endX, int endY)
+        {
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+				orig.Invoke(startX, startY, endX, endY);
+				return;
+            }
+
+			int sectionX3 = Netplay.GetSectionX(startX);
+			int sectionY = Netplay.GetSectionY(startY);
+			int sectionX2 = Netplay.GetSectionX(endX);
+			int sectionY2 = Netplay.GetSectionY(endY);
+
+			FastParallel.For(sectionX3, sectionX2 + 1, delegate (int start, int end, object context)
+			{
+				for (int i = start; i < end; i++)
+				{
+					for (int j = sectionY; j <= sectionY2; j++)
+					{
+						if (Main.sectionManager.SectionLoaded(i, j) && !Main.sectionManager.SectionFramed(i, j))
+						{
+							SectionTileFrame(i, j, i, j);
+							if (!Main.sectionManager.AnyUnfinishedSections)
+							{
+								return;
+							}
+						}
+					}
+				}
+			});
+		}
 
         private void StopOnKillHeartsAndMana(On_NPC.orig_NPCLoot_DropCommonLifeAndMana orig, NPC self, Player closestPlayer)
         {
