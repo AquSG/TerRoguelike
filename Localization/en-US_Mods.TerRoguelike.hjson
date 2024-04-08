@@ -789,4 +789,5 @@ NPCs: {
 	CorruptionParasite.DisplayName: Corruption Parasite
 	ParasiticEgg.DisplayName: Parasitic Egg
 	PossessedHammer.DisplayName: Possessed Hammer
+	IceQueen.DisplayName: Ice Queen
 }
