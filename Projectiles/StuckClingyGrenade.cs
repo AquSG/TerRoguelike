@@ -36,9 +36,9 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             stuckNPC = (int)Projectile.ai[0];
-            stuckPosition = Projectile.Center - Main.npc[stuckNPC].Center;
             var stuckModNPC = Main.npc[stuckNPC].ModNPC();
             stuckSegment = stuckModNPC.Segments.Any() ? stuckModNPC.hitSegment : -1;
+            stuckPosition = Projectile.Center - (stuckModNPC.Segments.Any() ? stuckModNPC.Segments[stuckSegment].Position : Main.npc[stuckNPC].Center);
 
             float potentialRot = (Projectile.Center - (stuckModNPC.Segments.Any() ? stuckModNPC.Segments[stuckSegment].Position : Main.npc[stuckNPC].Center)).ToRotation();
             origStuckRot = potentialRot - (stuckModNPC.Segments.Any() ? stuckModNPC.Segments[stuckSegment].Rotation : Main.npc[stuckNPC].rotation);
@@ -137,6 +137,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.velocity.Y += downwardsAccel;
             if (Projectile.velocity.Y > fallSpeedCap)
                 Projectile.velocity.Y = fallSpeedCap;
+
         }
 
         public override bool PreKill(int timeLeft)
