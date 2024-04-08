@@ -37,7 +37,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int CombatStyle => -1;
         public int currentFrame;
         public bool CollisionPass = false;
+        public List<ExtraHitbox> hitboxes = new List<ExtraHitbox>()
+        {
+            new ExtraHitbox(new Point(120, 120), new Vector2(0), false),
+            new ExtraHitbox(new Point(80, 80), new Vector2(0)),
+            new ExtraHitbox(new Point(40, 40), new Vector2(-55, -12)),
+            new ExtraHitbox(new Point(40, 40), new Vector2(55, -12)),
+            new ExtraHitbox(new Point(34, 34), new Vector2(-90, -20)),
+            new ExtraHitbox(new Point(34, 34), new Vector2(90, -20)),
+            new ExtraHitbox(new Point(60, 60), new Vector2(0, 66)),
+            new ExtraHitbox(new Point(40, 40), new Vector2(0, -84)),
+            new ExtraHitbox(new Point(26, 26), new Vector2(0, -54)),
+        };
         Texture2D glowTex;
+        Texture2D squareTex;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -62,8 +75,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 80;
-            NPC.height = 120;
+            NPC.width = 140;
+            NPC.height = 140;
             NPC.aiStyle = -1;
             NPC.damage = 30;
             NPC.lifeMax = 30000;
@@ -72,10 +85,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.IgnoreRoomWallCollision = true;
+            modNPC.SpecialProjectileCollisionRules = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
-            modNPC.OverrideIgniteVisual = true;
             glowTex = TexDict["IceQueenGlow"].Value;
+            squareTex = TexDict["Square"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -276,19 +290,67 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
         {
-            return ableToHit;
+            Rectangle targetBox = target.Hitbox;
+            for (int i = 0; i < hitboxes.Count; i++)
+            {
+                if (!hitboxes[i].active)
+                    continue;
+
+                bool pass = targetBox.Intersects(hitboxes[i].GetHitbox(NPC.Center, NPC.rotation));
+                if (pass)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            CollisionPass = false;
+            return false;
         }
         public override bool CanHitNPC(NPC target)
         {
-            return ableToHit;
+            Rectangle targetBox = target.Hitbox;
+            for (int i = 0; i < hitboxes.Count; i++)
+            {
+                if (!hitboxes[i].active)
+                    continue;
+
+                bool pass = targetBox.Intersects(hitboxes[i].GetHitbox(NPC.Center, NPC.rotation));
+                if (pass)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            CollisionPass = false;
+            return false;
         }
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
-            return true;
+            if (CollisionPass)
+            {
+                npcHitbox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+            }
+            return CollisionPass;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {
-            return canBeHit;
+            if ((projectile.hostile && !NPC.friendly) || (projectile.friendly && NPC.friendly))
+                return false;
+
+            for (int i = 0; i < hitboxes.Count; i++)
+            {
+                if (!hitboxes[i].active)
+                    continue;
+
+                bool pass = projectile.Colliding(projectile.getRect(), hitboxes[i].GetHitbox(NPC.Center, NPC.rotation));
+                if (pass)
+                {
+                    projectile.ModProj().ultimateCollideOverride = true;
+                    return canBeHit ? null : false;
+                }
+            }
+
+            return false;
         }
 
         public override bool CheckDead()
@@ -380,9 +442,56 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Color color = Color.Lerp(drawColor, Color.White, 0.2f);
 
             Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-            Main.EntitySpriteDraw(glowTex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            int trailLength = (int)MathHelper.Clamp(NPC.velocity.Length() * 0.4f, 0, 3);
+            for (int i = trailLength; i >= 0; i--)
+            {
+                Vector2 offset = (NPC.oldPosition - NPC.position).SafeNormalize(Vector2.UnitY) * 2 * i;
+                Main.EntitySpriteDraw(glowTex, NPC.Center + offset - Main.screenPosition, NPC.frame, i == 0 ? Color.White : (Color.White * 0.4f), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            }
+            
+
+
+            bool drawHitboxes = false;
+            if (drawHitboxes)
+            {
+                for (int i = 0; i < hitboxes.Count; i++)
+                {
+                    if (!hitboxes[i].active)
+                        continue;
+
+                    Rectangle hitbox = hitboxes[i].GetHitbox(NPC.Center, NPC.rotation);
+                    for (int d = 0; d <= 1; d++)
+                    {
+                        for (int x = 0; x < hitbox.Width; x++)
+                        {
+                            Main.EntitySpriteDraw(squareTex, hitbox.Location.ToVector2() + new Vector2(x, hitbox.Height * d) - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
+                        }
+                        for (int y = 0; y < hitbox.Height; y++)
+                        {
+                            Main.EntitySpriteDraw(squareTex, hitbox.Location.ToVector2() + new Vector2(hitbox.Width * d, y) - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
+                        }
+                    }
+                }
+            }
 
             return false;
+        }
+    }
+    public class ExtraHitbox
+    {
+        public Point dimensions;
+        public Vector2 offset;
+        public bool active;
+        public ExtraHitbox(Point Dimensions, Vector2 Offset, bool Active = true)
+        {
+            dimensions = Dimensions;
+            offset = Offset;
+            active = Active;
+        }
+        public Rectangle GetHitbox(Vector2 origin, float rotation)
+        {
+            Point hitboxPos = (offset.RotatedBy(rotation) + origin).ToPoint() - new Point(dimensions.X / 2, dimensions.Y / 2);
+            return new Rectangle(hitboxPos.X, hitboxPos.Y, dimensions.X, dimensions.Y);
         }
     }
 }
