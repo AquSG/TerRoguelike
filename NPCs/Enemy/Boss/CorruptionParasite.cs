@@ -190,7 +190,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             ableToHit = NPC.localAI[0] >= 0;
             canBeHit = true;
 
-            NPC.frameCounter += 0.13d;
             if (NPC.localAI[0] < 0)
             {
                 target = modNPC.GetTarget(NPC, false, false);
