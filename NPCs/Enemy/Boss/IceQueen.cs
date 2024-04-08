@@ -56,7 +56,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 300);
-        public static Attack IceWave = new Attack(1, 0, 300);
+        public static Attack IceWave = new Attack(1, 0, 480);
         public static Attack Snowflake = new Attack(2, 0, 300);
         public static Attack Spin = new Attack(3, 0, 300);
         public static Attack IceRain = new Attack(4, 0, 300);
@@ -158,14 +158,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
-                    NPC.ai[3] = 0;
                 }
             }
             else
             {
                 NPC.localAI[0]++;
                 BossAI();
-                NPC.rotation = NPC.rotation.AngleLerp(MathHelper.Clamp(NPC.velocity.X * 0.075f, -MathHelper.PiOver2 * 0.33f, MathHelper.PiOver2 * 0.33f), 0.25f);
+                NPC.rotation = NPC.rotation.AngleLerp(MathHelper.Clamp(NPC.velocity.X * 0.05f, -MathHelper.PiOver2 * 0.33f, MathHelper.PiOver2 * 0.33f), 0.25f);
             }
         }
         public void BossAI()
@@ -173,6 +172,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             target = modNPC.GetTarget(NPC, false, false);
 
             NPC.ai[1]++;
+            NPC.velocity *= 0.985f;
 
             if (NPC.ai[0] == None.Id)
             {
@@ -198,11 +198,48 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == IceWave.Id)
             {
+                bool outsideRoom = false;
+                if (modNPC.isRoomNPC)
+                {
+                    
+                    if (Math.Abs(NPC.ai[3]) > 10)
+                    {
+                        Room room = RoomList[modNPC.sourceRoomListID];
+                        Vector2 checkPos = new Vector2(NPC.Center.X, room.RoomPosition16.Y + room.RoomCenter16.Y);
+                        if (!room.GetRect().Contains((int)checkPos.X, (int)checkPos.Y))
+                            outsideRoom = true;
+                    }
+                }
+                if (Math.Abs(NPC.ai[3]) >= 60 || outsideRoom)
+                {
+                    NPC.direction *= -1;
+                    NPC.ai[3] = 0;
+                }
+                Vector2 targetPos = target == null ? spawnPos : target.Center;
+                if (NPC.ai[3] == 0)
+                    NPC.ai[3] += NPC.direction;
+                else if (Math.Sign(targetPos.X - NPC.Center.X) == -Math.Sign(NPC.ai[3]))
+                {
+                    NPC.ai[3] += Math.Sign(NPC.ai[3]);
+                }
+                if (NPC.ai[1] >= IceWave.Duration && Math.Abs(NPC.ai[3]) != 2)
+                    NPC.ai[1]--;
+
+                Vector2 wantedPos = targetPos + new Vector2(0, -282);
+                wantedPos.X = NPC.Center.X + Math.Sign(NPC.ai[3]) * 250;
+
+                if (NPC.velocity.Length() < defaultMaxSpeed)
+                    NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration;
+                if (NPC.velocity.Length() > defaultMaxSpeed)
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxSpeed;
+
                 if (NPC.ai[1] >= IceWave.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = IceWave.Id;
+                    NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == Snowflake.Id)
@@ -251,27 +288,35 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            NPC.velocity *= 0.985f;
-            if (target != null)
+            bool defaultMovement = NPC.ai[0] == None.Id;
+            bool sineWaveVelocity = true;
+            if (defaultMovement)
             {
-                Vector2 targetPos = target.Center + new Vector2(0, -250);
-                float targetRadius = 80f;
-                if (NPC.Center.Distance(targetPos) > targetRadius)
+                if (target != null)
                 {
-                    if (NPC.velocity.Length() < defaultMaxSpeed)
+                    Vector2 targetPos = target.Center + new Vector2(0, -250);
+                    float targetRadius = 80f;
+                    if (NPC.Center.Distance(targetPos) > targetRadius)
                     {
-                        NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration;
+                        if (NPC.velocity.Length() < defaultMaxSpeed)
+                        {
+                            NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration;
+                        }
+                    }
+                    else
+                    {
+                        NPC.velocity *= 0.98f;
+                    }
+
+                    if (NPC.velocity.Length() > defaultMaxSpeed)
+                    {
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxSpeed;
                     }
                 }
-                else
-                {
-                    NPC.velocity *= 0.98f;
-                }
-                
-                if (NPC.velocity.Length() > defaultMaxSpeed)
-                {
-                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxSpeed;
-                }
+            }
+            if (sineWaveVelocity)
+            {
+                NPC.velocity.Y += (float)Math.Cos(NPC.localAI[0] * 0.05f) * 0.033f;
             }
         }
 
@@ -300,7 +345,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            
+            chosenAttack = IceWave.Id;
             NPC.ai[0] = chosenAttack;
         }
 
@@ -452,7 +497,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void FindFrame(int frameHeight)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
-            currentFrame = 0;
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }
@@ -471,7 +515,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             
 
 
-            bool drawHitboxes = true;
+            bool drawHitboxes = false;
             if (drawHitboxes)
             {
                 for (int i = 0; i < hitboxes.Count; i++)
