@@ -39,13 +39,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool CollisionPass = false;
         public List<ExtraHitbox> hitboxes = new List<ExtraHitbox>()
         {
-            new ExtraHitbox(new Point(120, 120), new Vector2(0), false),
             new ExtraHitbox(new Point(80, 80), new Vector2(0)),
             new ExtraHitbox(new Point(40, 40), new Vector2(-55, -12)),
             new ExtraHitbox(new Point(40, 40), new Vector2(55, -12)),
             new ExtraHitbox(new Point(34, 34), new Vector2(-90, -20)),
             new ExtraHitbox(new Point(34, 34), new Vector2(90, -20)),
-            new ExtraHitbox(new Point(60, 60), new Vector2(0, 66)),
+            new ExtraHitbox(new Point(45, 45), new Vector2(0, 59)),
             new ExtraHitbox(new Point(40, 40), new Vector2(0, -84)),
             new ExtraHitbox(new Point(26, 26), new Vector2(0, -54)),
         };
@@ -105,7 +104,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            
+            switch (currentFrame)
+            {
+                default:
+                case 0:
+                    hitboxes[3].active = true;
+                    hitboxes[4].active = true;
+                    break;
+                case 1:
+                    hitboxes[3].active = false;
+                    hitboxes[4].active = true;
+                    break;
+                case 2:
+                    hitboxes[3].active = true;
+                    hitboxes[4].active = false;
+                    break;
+                case 3:
+                case 4:
+                case 5:
+                    hitboxes[3].active = false;
+                    hitboxes[4].active = false;
+                    break;
+            }
         }
         public override void AI()
         {
@@ -234,7 +254,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.velocity *= 0.985f;
             if (target != null)
             {
-                Vector2 targetPos = target.Center + new Vector2(0, -200);
+                Vector2 targetPos = target.Center + new Vector2(0, -250);
                 float targetRadius = 80f;
                 if (NPC.Center.Distance(targetPos) > targetRadius)
                 {
@@ -451,7 +471,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             
 
 
-            bool drawHitboxes = false;
+            bool drawHitboxes = true;
             if (drawHitboxes)
             {
                 for (int i = 0; i < hitboxes.Count; i++)
