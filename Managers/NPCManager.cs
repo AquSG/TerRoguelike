@@ -113,6 +113,8 @@ namespace TerRoguelike.Managers
                 new CrimsonVessel(),
                 new CrimsonSeer(),
                 new CorruptionParasite(),
+                new ParasiticEgg(),
+                new IceQueen(),
             };
         }
         internal static void Unload()

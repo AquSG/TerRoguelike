@@ -1048,8 +1048,10 @@ namespace TerRoguelike.TerPlayer
 
                     radius *= 0.4f;
 
-                    Vector2 direction = (proj.Center - target.Center).SafeNormalize(Vector2.UnitY);
-                    Vector2 spawnPosition = (direction * radius) + target.Center;
+                    var modtarget = target.ModNPC();
+                    Vector2 targetPos = modtarget.Segments.Any() ? modtarget.Segments[modtarget.hitSegment].Position : target.Center;
+                    Vector2 direction = (proj.Center - targetPos).SafeNormalize(Vector2.UnitY);
+                    Vector2 spawnPosition = (direction * radius) + (targetPos);
                     int damage = (int)(hit.Damage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
                     if (hit.Crit)
                         damage /= 2;
