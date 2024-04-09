@@ -69,6 +69,7 @@ Projectiles: {
 	RootPillar.DisplayName: Root Pillar
 	SeerBallBase.DisplayName: Seer Ball Base
 	CorruptVomit.DisplayName: Corrupt Vomit
+	IceWave.DisplayName: Ice Wave
 }
 
 Items: {

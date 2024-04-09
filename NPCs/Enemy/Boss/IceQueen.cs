@@ -249,7 +249,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (progress == 15)
                     {
                         Vector2 projSpawnPos = NPC.Center + new Vector2(Math.Sign(NPC.ai[3]) * 60, 0).RotatedBy(NPC.rotation);
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (targetPos - projSpawnPos).SafeNormalize(Vector2.UnitY) * 3, ProjectileID.FrostWave, NPC.damage, 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (targetPos - projSpawnPos).SafeNormalize(Vector2.UnitY) * 8, ModContent.ProjectileType<IceWave>(), NPC.damage, 0);
                         if (NPC.ai[1] == IceWave.Duration - 1 && Math.Abs(NPC.ai[3]) > 1)
                             NPC.ai[1]++;
                     }
