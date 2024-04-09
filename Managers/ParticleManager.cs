@@ -25,6 +25,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Particles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Threading;
+using System.Diagnostics;
 
 namespace TerRoguelike.Managers
 {
@@ -37,6 +38,7 @@ namespace TerRoguelike.Managers
         }
         public static void UpdateParticles()
         {
+            
             if (ActiveParticles == null)
                 return;
             if (!ActiveParticles.Any())
@@ -58,7 +60,6 @@ namespace TerRoguelike.Managers
                 return;
             if (!ActiveParticles.Any())
                 return;
-
             StartAlphaBlendSpritebatch(false);
             for (int i = 0; i < ActiveParticles.Count; i++)
             {
