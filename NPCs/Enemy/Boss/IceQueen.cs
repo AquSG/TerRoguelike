@@ -55,7 +55,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 300);
+        public static Attack None = new Attack(0, 0, 180);
         public static Attack IceWave = new Attack(1, 0, 480);
         public static Attack Snowflake = new Attack(2, 0, 300);
         public static Attack Spin = new Attack(3, 0, 300);
@@ -198,10 +198,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == IceWave.Id)
             {
+                NPC.localAI[1]++;
                 bool outsideRoom = false;
                 if (modNPC.isRoomNPC)
                 {
-                    
                     if (Math.Abs(NPC.ai[3]) > 10)
                     {
                         Room room = RoomList[modNPC.sourceRoomListID];
@@ -210,10 +210,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             outsideRoom = true;
                     }
                 }
-                if (Math.Abs(NPC.ai[3]) >= 60 || outsideRoom)
+                if (outsideRoom && Math.Abs(NPC.ai[3]) < 105)
+                    NPC.ai[3] = 105 * Math.Sign(NPC.ai[3]);
+
+                if (Math.Abs(NPC.ai[3]) >= 120)
                 {
                     NPC.direction *= -1;
                     NPC.ai[3] = 0;
+                    currentFrame = 0;
+                    NPC.localAI[1] = 1;
                 }
                 Vector2 targetPos = target == null ? spawnPos : target.Center;
                 if (NPC.ai[3] == 0)
@@ -222,19 +227,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.ai[3] += Math.Sign(NPC.ai[3]);
                 }
-                if (NPC.ai[1] >= IceWave.Duration && Math.Abs(NPC.ai[3]) != 2)
+                if (NPC.ai[1] >= IceWave.Duration)
                     NPC.ai[1]--;
 
                 Vector2 wantedPos = targetPos + new Vector2(0, -282);
                 wantedPos.X = NPC.Center.X + Math.Sign(NPC.ai[3]) * 250;
 
-                if (NPC.velocity.Length() < defaultMaxSpeed)
+                if (NPC.velocity.Length() < defaultMaxSpeed * 0.5f)
                     NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration;
-                if (NPC.velocity.Length() > defaultMaxSpeed)
-                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxSpeed;
+                if (NPC.velocity.Length() > defaultMaxSpeed * 0.5f)
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxSpeed * 0.5f;
+
+                
+                if (NPC.localAI[1] >= 30 && (Math.Abs(NPC.ai[3]) <= 105 || currentFrame != 0))
+                {
+                    int progress = ((int)NPC.localAI[1] - 30) % 30;
+                    if (progress < 15)
+                        currentFrame = Math.Sign(NPC.ai[3]) == -1 ? 1 : 2;
+                    else
+                        currentFrame = 0;
+                    if (progress == 15)
+                    {
+                        Vector2 projSpawnPos = NPC.Center + new Vector2(Math.Sign(NPC.ai[3]) * 60, 0).RotatedBy(NPC.rotation);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (targetPos - projSpawnPos).SafeNormalize(Vector2.UnitY) * 3, ProjectileID.FrostWave, NPC.damage, 0);
+                        if (NPC.ai[1] == IceWave.Duration - 1 && Math.Abs(NPC.ai[3]) > 1)
+                            NPC.ai[1]++;
+                    }
+                }
+                else
+                    currentFrame = 0;
 
                 if (NPC.ai[1] >= IceWave.Duration)
                 {
+                    NPC.localAI[1] = 0;
+                    NPC.localAI[2] = 0;
                     currentFrame = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -295,7 +321,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (target != null)
                 {
                     Vector2 targetPos = target.Center + new Vector2(0, -250);
-                    float targetRadius = 80f;
+                    float targetRadius = 64f;
                     if (NPC.Center.Distance(targetPos) > targetRadius)
                     {
                         if (NPC.velocity.Length() < defaultMaxSpeed)
