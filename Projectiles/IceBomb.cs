@@ -80,25 +80,24 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.velocity.Length() > 8)
                     Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.UnitY) * 8;
             }
+        }
+        public override void OnKill(int timeLeft)
+        {
+            SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 0.9f, Pitch = 1f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.9f, Pitch = 0 }, Projectile.Center);
 
-            if (Projectile.timeLeft == 1)
+            for (int i = 0; i < 8; i++)
             {
-                SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 0.9f, Pitch = 1f }, Projectile.Center);
-                SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.9f, Pitch = 0 }, Projectile.Center);
-
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.UnitX.RotatedBy(i * MathHelper.PiOver4) * 2f, ModContent.ProjectileType<Iceflake>(), Projectile.damage, 0);
+            }
+            if (!TerRoguelikeUtils.ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
+            {
                 for (int i = 0; i < 8; i++)
                 {
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.UnitX.RotatedBy(i * MathHelper.PiOver4) * 2f, ModContent.ProjectileType<Iceflake>(), Projectile.damage, 0);
+                    ParticleManager.AddParticle(new Snow(
+                        Projectile.Center, Main.rand.NextVector2CircularEdge(2, 2) * Main.rand.NextFloat(0.66f, 1f),
+                        300, Color.Cyan * 0.8f, new Vector2(Main.rand.NextFloat(0.03f, 0.04f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
                 }
-                if (!TerRoguelikeUtils.ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
-                {
-                    for (int i = 0; i < 8; i++)
-                    {
-                        ParticleManager.AddParticle(new Snow(
-                            Projectile.Center, Main.rand.NextVector2CircularEdge(2, 2) * Main.rand.NextFloat(0.66f, 1f),
-                            300, Color.Cyan * 0.8f, new Vector2(Main.rand.NextFloat(0.03f, 0.04f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
-                    }
-                }   
             }
         }
         public override bool PreDraw(ref Color lightColor)

@@ -67,7 +67,6 @@ namespace TerRoguelike.Projectiles
             if (Projectile.numUpdates != 0)
                 return;
 
-            //Lighting.AddLight(Projectile.Center, 0.65f, 0.9f, 1f);
             if ((Projectile.timeLeft / Projectile.MaxUpdates) % 2 == 0 && Main.rand.NextBool())
             {
                 int offset = 10;

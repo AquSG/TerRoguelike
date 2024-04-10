@@ -72,6 +72,8 @@ Projectiles: {
 	IceWave.DisplayName: Ice Wave
 	RoyalSnowflake.DisplayName: Royal Snowflake
 	IceBomb.DisplayName: Ice Bomb
+	IceCloud.DisplayName: Ice Cloud
+	IceCloudSpawner.DisplayName: Ice Cloud Spawner
 }
 
 Items: {
