@@ -56,9 +56,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 180);
-        public static Attack IceWave = new Attack(1, 40, 480);
+        public static Attack IceWave = new Attack(1, 40, 400);
         public static Attack Snowflake = new Attack(2, 40, 300);
-        public static Attack Spin = new Attack(3, 30, 300);
+        public static Attack Spin = new Attack(3, 30, 420);
         public static Attack IceRain = new Attack(4, 40, 300);
         public static Attack IceFog = new Attack(5, 40, 300);
         public static Attack Summon = new Attack(6, 30, 300);
@@ -71,8 +71,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int iceWaveStartupTime = 30;
         public int snowflakeShotTelegraph = 20;
         public List<int> snowflakeShootTimes = new List<int> { 50, -70, 110, -130, 190, 250 }; //sign indicates direction. last 2 are both directions. absolute value is the time shot relating to NPC.ai[1]
-        public int snowflakeCount = 20;
-        public float snowflaeMaxHorizontalVelocity = 16;
+        public int snowflakeCount = 14;
+        public float snowflakeMaxHorizontalVelocity = 38f;
+        public int spinWindUp = 60;
+        public int spinWindDown = 60;
+        public int spinFireRate = 8;
+        public int spinSuperProjCooldown = 35;
 
 
         public override void SetStaticDefaults()
@@ -172,7 +176,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.localAI[0]++;
                 BossAI();
-                NPC.rotation = NPC.rotation.AngleLerp(MathHelper.Clamp(NPC.velocity.X * 0.05f, -MathHelper.PiOver2 * 0.33f, MathHelper.PiOver2 * 0.33f), 0.25f);
+                bool defaultRotation = NPC.ai[0] != Spin.Id;
+                if (defaultRotation)
+                    NPC.rotation = NPC.rotation.AngleLerp(MathHelper.Clamp(NPC.velocity.X * 0.05f, -MathHelper.PiOver2 * 0.33f, MathHelper.PiOver2 * 0.33f), 0.25f);
             }
         }
         public void BossAI()
@@ -284,10 +290,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Room room = RoomList[modNPC.sourceRoomListID];
                     wantedPos = room.RoomPosition16 + new Vector2(room.RoomDimensions16.X * 0.5f, 160);
                 }
-                if (NPC.ai[1] < 30)
+                if (NPC.ai[1] < 50)
                 {
-                    NPC.velocity *= 0.98f;
-                    float targetRadius = 32f;
+                    NPC.velocity *= 0.96f;
+                    float targetRadius = 48f;
                     if (NPC.ai[1] == 1 && NPC.Center.Distance(wantedPos) > targetRadius)
                         NPC.ai[1]--;
 
@@ -299,7 +305,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     else
                     {
                         NPC.velocity *= 0.92f;
-                        NPC.Center += (wantedPos - NPC.Center) * 0.15f;
+                        NPC.Center += (wantedPos - NPC.Center) * 0.075f;
                     }
                         
 
@@ -315,14 +321,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     else
                         NPC.direction = 1;
+
+                    if (NPC.ai[1] == 30)
+                        currentFrame = 3;
                 }
                 else
                 {
-                    if (NPC.ai[1] == 30)
+                    if (NPC.ai[1] == 50)
                     {
                         NPC.localAI[0] = 30;
                         NPC.velocity = Vector2.Zero;
-                        currentFrame = 3;
                     }
 
                     int bothDirShootStart = snowflakeShootTimes.Count - 2;
@@ -338,7 +346,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             int start = direction == 0 ? -1 : direction;
                             for (int d = start; d <= (direction == 0 ? 1 : start); d += 2)
                             {
-                                snowflakeCount = 14;
                                 float extraVelocity = direction == 0 ? i % 2 : (i % 4 >= 2 ? 1 : 0);
                                 extraVelocity *= d * 1.4f;
                                 int skip = 0;
@@ -348,9 +355,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                     skip = 1;
                                 for (int j = skip; j < snowflakeCount; j++)
                                 {
-
-                                    snowflaeMaxHorizontalVelocity = 38f;
-                                    Vector2 projVel = new Vector2((snowflaeMaxHorizontalVelocity * d * (j / (float)snowflakeCount)) + extraVelocity, Main.rand.NextFloat(-0.14f, 0));
+                                    Vector2 projVel = new Vector2((snowflakeMaxHorizontalVelocity * d * (j / (float)snowflakeCount)) + extraVelocity, Main.rand.NextFloat(-0.14f, 0));
                                     Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 0), projVel, ModContent.ProjectileType<RoyalSnowflake>(), NPC.damage, 0);
 
                                     if (j % 5 == 0)
@@ -390,11 +395,61 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Spin.Id)
             {
+                NPC.velocity *= 0.95f;
+                currentFrame = 5;
+                float interpolant = 1f;
+                bool windUp = NPC.ai[1] < spinWindUp;
+                bool windDown = NPC.ai[1] > Spin.Duration - spinWindDown;
+                if (windUp)
+                {
+                    if (modNPC.isRoomNPC)
+                    {
+                        Room room = RoomList[modNPC.sourceRoomListID];
+                        if (!room.GetRect().Contains(NPC.getRect()))
+                            NPC.velocity += (spawnPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.4f;
+                    }
+                    interpolant = NPC.ai[1] / spinWindUp;
+                }
+                else if (windDown)
+                {
+                    interpolant = (Spin.Duration - NPC.ai[1]) / spinWindDown;
+                    currentFrame = 3;
+                }
+                NPC.rotation += 0.2f * NPC.direction * interpolant;
+                if (windDown)
+                    NPC.rotation = NPC.rotation.AngleLerp(0, MathHelper.Lerp(0.17f, 0, interpolant));
+
+                if (!windUp && !windDown)
+                {
+                    NPC.ai[3]++;
+                    int progress = (int)NPC.ai[1] - spinWindUp;
+                    spinFireRate = 2;
+                    if (progress % spinFireRate == 0)
+                    {
+                        int projType = ModContent.ProjectileType<Iceflake>();
+                        float speed = 2f;
+                        if (NPC.ai[3] >= spinSuperProjCooldown && Main.rand.NextBool())
+                        {
+                            projType = ModContent.ProjectileType<IceBomb>();
+                            NPC.ai[3] = Main.rand.Next(3);
+                            speed = 8f;
+                        }
+
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(NPC.rotation) * speed, projType, NPC.damage, 0);
+                    }
+
+                }
+
+
                 if (NPC.ai[1] >= Spin.Duration)
                 {
+                    NPC.ai[0] = 30;
+                    currentFrame = 0;
+                    NPC.rotation = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Spin.Id;
+                    NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == IceRain.Id)
@@ -426,7 +481,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             bool defaultMovement = NPC.ai[0] == None.Id;
-            bool sineWaveVelocity = true;
+            bool sineWaveVelocity = NPC.ai[0] != Spin.Id;
             if (defaultMovement)
             {
                 if (target != null)
@@ -463,7 +518,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake };
+            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;

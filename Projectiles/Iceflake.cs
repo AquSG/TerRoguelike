@@ -13,6 +13,7 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Projectiles
 {
@@ -39,6 +40,26 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             Projectile.frame = Main.rand.Next(0, Main.projFrames[Type]);
+            if (source is EntitySource_Parent parentSource)
+            {
+                if (parentSource.Entity is NPC)
+                {
+                    if (Main.npc[parentSource.Entity.whoAmI].type == ModContent.NPCType<IceQueen>())
+                        Projectile.localAI[0] = 1;
+                }
+                else if (parentSource.Entity is Projectile)
+                {
+                    if (Main.projectile[parentSource.Entity.whoAmI].type == ModContent.ProjectileType<IceBomb>())
+                    {
+                        Projectile.localAI[0] = 1;
+                        if (TerRoguelikeUtils.ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
+                        {
+                            Projectile.localAI[1] = 1;
+                            Projectile.Kill();
+                        }
+                    }
+                }
+            }
         }
 
         public override void AI()
@@ -46,25 +67,31 @@ namespace TerRoguelike.Projectiles
             if (Projectile.numUpdates != 0)
                 return;
 
-            Lighting.AddLight(Projectile.Center, 0.65f, 0.9f, 1f);
-            if ((Projectile.timeLeft / Projectile.MaxUpdates) % 2 == 0)
+            //Lighting.AddLight(Projectile.Center, 0.65f, 0.9f, 1f);
+            if ((Projectile.timeLeft / Projectile.MaxUpdates) % 2 == 0 && Main.rand.NextBool())
             {
                 int offset = 10;
-                int d = Dust.NewDust(Projectile.position - Projectile.velocity * 3f - new Vector2((float)offset, (float)offset), Projectile.width + offset * 2, Projectile.height + offset * 2, 135, Projectile.velocity.X * 0.4f, Projectile.velocity.Y * 0.4f, 50, default(Color), 1.2f);
+                int d = Dust.NewDust(Projectile.position - Projectile.velocity * 2f - new Vector2((float)offset, (float)offset), Projectile.width + offset * 2, Projectile.height + offset * 2, 92, Projectile.velocity.X * 0.4f, Projectile.velocity.Y * 0.4f, 50, default(Color), 0.45f);
                 Dust dust = Main.dust[d];
                 dust.velocity *= 0.5f;
                 dust.velocity += Projectile.velocity * 0.25f;
+                dust.noLight = true;
+                dust.noLightEmittence = true;
             }
         }
         public override void OnKill(int timeLeft)
         {
-            SoundEngine.PlaySound(SoundID.Item27 with { Volume = 0.9f }, Projectile.Center);
+            if (Projectile.localAI[1] == 0)
+                SoundEngine.PlaySound(SoundID.Item27 with { Volume = Projectile.localAI[0] == 1 ? 0.5f : 0.9f, MaxInstances = Projectile.localAI[0] == 1 ? 10 : 1}, Projectile.Center);
+
             for (int i = 0; i < 16; i++)
             {
                 int dust = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, 92, 0f, 0f, 0, default(Color), 1.5f);
                 Dust d = Main.dust[dust];
                 d.velocity *= 2f;
                 d.noGravity = true;
+                d.noLight = true;
+                d.noLightEmittence = true;
             }
         }
         public override Color? GetAlpha(Color lightColor)
