@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SlotId IceWindSlot;
 
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
+        public int cutsceneDuration = 180;
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 180);
@@ -82,8 +82,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int iceRainFireRate = 14;
         public int iceRainTelegraph = 42;
         public int iceFogTelegraph = 45;
-        public Vector2 summonPositionStartTelegraph = Vector2.Zero;
-        public Vector2 summonPosition = Vector2.Zero;
+        public Vector2 summonPositionStartTelegraph = -Vector2.One;
+        public Vector2 summonPosition = -Vector2.One;
         public List<int> summonTimes = new List<int> { 20, 60 };
 
         public override void SetStaticDefaults()
@@ -111,6 +111,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
+            NPC.Opacity = 0;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             currentFrame = 0;
@@ -146,9 +147,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     hitboxes[4].active = false;
                     break;
             }
-            if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
+            if (NPC.localAI[0] >= 0)
             {
-                sound.Volume -= deadTime > 0 ? 0.025f : 0.0015f;
+                if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Volume -= deadTime > 0 ? 0.025f : 0.0015f;
+                }
+            }
+            else
+            {
+                if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Volume += NPC.localAI[0] < -100 ? 0.02f : -0.0133f;
+                }
             }
         }
         public override void AI()
@@ -166,19 +177,46 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             ableToHit = NPC.localAI[0] >= 0;
             canBeHit = true;
 
-            NPC.frameCounter += 0.13d;
             if (NPC.localAI[0] < 0)
             {
                 target = modNPC.GetTarget(NPC, false, false);
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
+                    IceWindSlot = SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.8f, PitchVariance = 0.05f }, NPC.Center);
+                    if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
+                    {
+                        sound.Volume = 0;
+                    }
                     CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
 
-                if (NPC.localAI[0] == -30)
+                if (NPC.localAI[0] < -30)
                 {
+                    if (NPC.localAI[0] < -90)
+                    {
+                        Vector2 offset = NPC.localAI[0] % 2 == 0 ? new Vector2(Main.rand.NextFloat(-32, 32), Main.rand.NextFloat(-120, 120)) : new Vector2(Main.rand.NextFloat(-120, 120), Main.rand.NextFloat(-32, 0));
+                        ParticleManager.AddParticle(new Smoke(
+                            NPC.Center + offset, Main.rand.NextVector2CircularEdge(0.8f, 0.8f) * Main.rand.NextFloat(0.6f, 0.86f), 120, Color.LightCyan * 0.6f, new Vector2(0.4f),
+                            Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.98f));
+                        if (NPC.localAI[0] > -cutsceneDuration + 40 && NPC.localAI[0] % 3 == 0)
+                        {
+                            ParticleManager.AddParticle(new Snow(
+                            NPC.Center + offset, Main.rand.NextVector2CircularEdge(1, 1f) * Main.rand.NextFloat(2, 3),
+                            300, Color.White * 0.7f, new Vector2(Main.rand.NextFloat(0.02f, 0.035f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
+                        }
+                    }
+                    
+                    if (NPC.localAI[0] > -90)
+                    {
+                        NPC.Opacity = (NPC.localAI[0] + 90) / 60f;
+                    }
+                }
+                
+                else if (NPC.localAI[0] == -30)
+                {
+                    NPC.Opacity = 1;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
@@ -864,13 +902,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if (NPC.life > 0)
+            if (NPC.life <= 0 && deadTime > 0)
             {
-
-            }
-            else
-            {
-                
+                Vector2 goreOffset = new Vector2(-28);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Top + goreOffset, Vector2.Zero, 513, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Left + goreOffset, -Vector2.UnitX, 514, NPC.scale);
+                int g = Gore.NewGore(NPC.GetSource_Death(), NPC.Right + goreOffset + new Vector2(-32, 0), Vector2.UnitX, 514, NPC.scale);
+                Main.gore[g].rotation += MathHelper.Pi;
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Bottom + goreOffset + new Vector2(0, -24), Vector2.Zero, 515, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + goreOffset, -Vector2.UnitY, 516, NPC.scale);
             }
         }
         public override void OnKill()
@@ -888,15 +928,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Color color = Color.Lerp(drawColor, Color.White, 0.2f);
 
-            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-            int trailLength = (int)MathHelper.Clamp(NPC.velocity.Length() * 0.4f, 0, 3);
+            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, color * NPC.Opacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            int trailLength = (int)MathHelper.Clamp(NPC.velocity.Length() * 0.4f, 0, 2);
             for (int i = trailLength; i >= 0; i--)
             {
                 Vector2 offset = (NPC.oldPosition - NPC.position).SafeNormalize(Vector2.UnitY) * 2 * i;
-                Main.EntitySpriteDraw(glowTex, NPC.Center + offset - Main.screenPosition, NPC.frame, i == 0 ? Color.White : (Color.White * 0.4f), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(glowTex, NPC.Center + offset - Main.screenPosition, NPC.frame, i == 0 ? Color.White * NPC.Opacity : (Color.White * 0.4f * NPC.Opacity), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
-            
-
 
             bool drawHitboxes = false;
             if (drawHitboxes)

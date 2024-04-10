@@ -1360,13 +1360,14 @@ namespace TerRoguelike.NPCs
                 Vector2 targetPos = npc.ai[1] == 0 ? new Vector2(distanceBeside * npc.direction, 0) + target.Center : (dontRelocateForProjectiles ? npc.Center : new Vector2(npc.ai[2], npc.ai[3]));
 
                 float greaterDist = attackDistance > distanceBeside ? attackDistance : distanceBeside;
-                if ((npc.Center - targetPos).Length() < attackActivationRadius || ((npc.collideX || npc.collideY) && (npc.Center - target.Center).Length() < greaterDist))
+                if ((npc.Center - targetPos).Length() < attackActivationRadius || (npc.collideX || npc.collideY))
                 {
                     if (npc.ai[0] == 0)
                         npc.ai[0]++;
                 }
                 else if (npc.ai[0] == 0)
                 {
+                    npc.velocity *= 0.99f;
                     npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * ((npc.Center - targetPos).Length() < attackActivationRadius ? passiveAccel : passiveAccel * 2f);
                     if (dontRelocateForProjectiles)
                         npc.velocity.Y += (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 6 * passiveAccel;
