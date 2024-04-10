@@ -50,6 +50,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         };
         Texture2D glowTex;
         Texture2D squareTex;
+        public SlotId IceWindSlot;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -60,11 +61,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Snowflake = new Attack(2, 40, 300);
         public static Attack Spin = new Attack(3, 30, 420);
         public static Attack IceRain = new Attack(4, 40, 308);
-        public static Attack IceFog = new Attack(5, 40, 300);
+        public static Attack IceFog = new Attack(5, 40, 105);
         public static Attack Summon = new Attack(6, 30, 300);
         public float defaultMaxSpeed = 16f;
         public float defaultAcceleration = 0.2f;
         public float defaultDeceleration = 0.95f;
+        public float distanceAbove = -250f;
         public int iceWavePassTime = 120;
         public int iceWaveTimePerShot = 30;
         public int iceWaveShotTelegraph = 15;
@@ -79,6 +81,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int spinSuperProjCooldown = 35;
         public int iceRainFireRate = 14;
         public int iceRainTelegraph = 42;
+        public int iceFogTelegraph = 45;
 
         public override void SetStaticDefaults()
         {
@@ -138,6 +141,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     hitboxes[3].active = false;
                     hitboxes[4].active = false;
                     break;
+            }
+            if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
+            {
+                sound.Volume -= 0.0015f;
             }
         }
         public override void AI()
@@ -479,10 +486,69 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == IceFog.Id)
             {
+                Vector2 wantedPos = target == null ? spawnPos : target.Center + new Vector2(0, distanceAbove - 25);
+                if (wantedPos.Y > spawnPos.Y)
+                    wantedPos.Y = spawnPos.Y;
+
+                bool inRoom = true;
+                if (modNPC.isRoomNPC)
+                {
+                    Room room = RoomList[modNPC.sourceRoomListID];
+                    Rectangle roomRect = room.GetRect();
+                    roomRect.Inflate(-100, -100);
+                    if (!roomRect.Contains(wantedPos.ToPoint()))
+                    {
+                        wantedPos = roomRect.ClosestPointInRect(wantedPos);
+                    }
+                    inRoom = roomRect.Contains(NPC.Center.ToPoint());
+                }
+
+                float targetDist = 64f;
+                if (NPC.ai[1] <= 1 && (Math.Abs(NPC.Center.X - wantedPos.X) > targetDist || NPC.Center.Y > spawnPos.Y || !inRoom))
+                {
+                    NPC.velocity *= 0.98f;
+                    if (NPC.ai[1] == 1)
+                        NPC.ai[1]--;
+                    if (NPC.velocity.Length() < defaultMaxSpeed)
+                        NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration * 1.6f;
+                }
+                else
+                    NPC.velocity *= 0.95f;
+
+                if (NPC.velocity.Length() > defaultMaxSpeed)
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxSpeed;
+
+                if (NPC.ai[1] >= 1)
+                {
+                    if (NPC.ai[1] < iceFogTelegraph)
+                    {
+                        currentFrame = 3;
+                        if (NPC.ai[1] < iceFogTelegraph - 10)
+                        {
+                            Vector2 offset = Main.rand.NextVector2CircularEdge(120, 120) * Main.rand.NextFloat(0.7f, 1f);
+                            ParticleManager.AddParticle(new Smoke(
+                                NPC.Center + offset, -offset.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(5f, 7f) + NPC.velocity, 20, Color.LightCyan * 0.8f, new Vector2(0.05f),
+                                Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.96f, 10, 10));
+                        }
+                    }
+                    else if (NPC.ai[1] == iceFogTelegraph)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item43 with { Volume = 0.7f, Pitch = 0.2f }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.Item30 with { Volume = 0.5f }, NPC.Center);
+                        IceWindSlot = SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.9f, PitchVariance = 0.05f }, NPC.Center);
+                        currentFrame = 0;
+                        for (int d = -1; d <= 1; d += 2)
+                        {
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(4 * d, -16), (MathHelper.PiOver2 + (-d * MathHelper.PiOver2)).AngleTowards(MathHelper.PiOver2, MathHelper.PiOver2 * 0.25f).ToRotationVector2() * 10, ModContent.ProjectileType<IceCloudSpawner>(), NPC.damage, 0);
+                        }
+                    }
+                }
                 if (NPC.ai[1] >= IceFog.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    //NPC.ai[1] = None.Duration - 60;
+                    NPC.ai[1] = -240;
                     NPC.ai[2] = IceFog.Id;
                 }
             }
@@ -502,13 +568,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (target != null)
                 {
-                    float distanceAbove = -250f;
                     Vector2 targetPos = target.Center + new Vector2(0, distanceAbove);
                     bool LoS = CanHitInLine(new Vector2(targetPos.X, NPC.Bottom.Y), target.Center);
                     if (!LoS)
                         targetPos = target.Center + new Vector2(0, distanceAbove * 0.4f);
 
-                    float targetRadius = LoS ? 42f : 32f;
+                    float targetRadius = LoS ? ( NPC.ai[0] == None.Id ? 64f : 42f) : 32f;
                     if (NPC.Center.Distance(targetPos) > targetRadius)
                     {
                         if (NPC.velocity.Length() < defaultMaxSpeed)
@@ -539,7 +604,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain };
+            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -559,7 +624,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = IceFog.Id;
             NPC.ai[0] = chosenAttack;
         }
 
