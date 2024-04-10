@@ -13,6 +13,7 @@ using Terraria.Graphics.Renderers;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.Projectiles
 {
@@ -66,10 +67,7 @@ namespace TerRoguelike.Projectiles
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/MissileLaunch", 4) with { Volume = 0.15f }, Projectile.Center);
                 for (int i = 0; i < 5; i++)
                 {
-                    Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-8, -8), 16, 16, DustID.PinkTorch, -Projectile.velocity.X * 7, -Projectile.velocity.Y * 7);
-                    dust.noGravity = true;
-                    dust.noLight = true;
-                    dust.noLightEmittence = true;
+                    ParticleManager.AddParticle(new Square(Projectile.Center + (Projectile.velocity * 4), -Projectile.velocity.RotatedBy(Main.rand.NextFloat(-0.4f, 0.4f)) * Main.rand.NextFloat(2, 3), 20, Color.HotPink, new Vector2(0.8f), Projectile.velocity.ToRotation(), 0.9f, 20, true));
                 }
             }
             if (Projectile.timeLeft == 59)
