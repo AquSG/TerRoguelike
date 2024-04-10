@@ -25,10 +25,6 @@ namespace TerRoguelike.Projectiles
         public Texture2D smokeTex;
         public Texture2D starTex;
         public int maxTimeLeft = 240;
-        public override void SetStaticDefaults()
-        {
-            Main.projFrames[Projectile.type] = 5;
-        }
         public override void SetDefaults()
         {
             Projectile.width = 100;

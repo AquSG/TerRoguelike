@@ -62,12 +62,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Spin = new Attack(3, 30, 420);
         public static Attack IceRain = new Attack(4, 40, 308);
         public static Attack IceFog = new Attack(5, 40, 105);
-        public static Attack Summon = new Attack(6, 30, 300);
+        public static Attack Summon = new Attack(6, 30, 80);
         public float defaultMaxSpeed = 16f;
         public float defaultAcceleration = 0.2f;
         public float defaultDeceleration = 0.95f;
         public float distanceAbove = -250f;
-        public int iceWavePassTime = 120;
+        public int iceWavePassTime = 90;
         public int iceWaveTimePerShot = 30;
         public int iceWaveShotTelegraph = 15;
         public int iceWaveStartupTime = 30;
@@ -82,6 +82,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int iceRainFireRate = 14;
         public int iceRainTelegraph = 42;
         public int iceFogTelegraph = 45;
+        public Vector2 summonPositionStartTelegraph = Vector2.Zero;
+        public Vector2 summonPosition = Vector2.Zero;
+        public List<int> summonTimes = new List<int> { 20, 60 };
 
         public override void SetStaticDefaults()
         {
@@ -120,6 +123,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
+            Summon = new Attack(6, 30, 110);
             switch (currentFrame)
             {
                 default:
@@ -144,7 +148,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
             {
-                sound.Volume -= 0.0015f;
+                sound.Volume -= deadTime > 0 ? 0.025f : 0.0015f;
             }
         }
         public override void AI()
@@ -547,17 +551,117 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    //NPC.ai[1] = None.Duration - 60;
-                    NPC.ai[1] = -240;
+                    NPC.ai[1] = None.Duration - 60;
                     NPC.ai[2] = IceFog.Id;
                 }
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                NPC.velocity *= 0.97f;
+                for (int i = 0; i < summonTimes.Count; i++)
+                {
+                    int summonTime = summonTimes[i];
+                    if (summonTime - NPC.ai[1] == 20)
+                    {
+                        currentFrame = 3;
+                    }
+                    else if (NPC.ai[1] == summonTime)
+                    {
+                        currentFrame = 4;
+                        NPC dummyNPC = new NPC();
+                        dummyNPC.type = ModContent.NPCType<Frostbiter>();
+                        dummyNPC.SetDefaults(dummyNPC.type);
+                        Rectangle dummyRect = new Rectangle(0, 0, dummyNPC.width, dummyNPC.height);
+
+                        float distanceBelow = 220f;
+                        Rectangle plannedRect = new Rectangle((int)(NPC.Center.X - (dummyRect.Width * 0.5f)), (int)(NPC.Center.Y + distanceBelow - (dummyRect.Height * 0.5f)), dummyRect.Width, dummyRect.Height);
+                        if (modNPC.isRoomNPC)
+                        {
+                            plannedRect = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(plannedRect);
+                        }
+                        Vector2 position = plannedRect.Center.ToVector2();
+
+                        Point tilePos = new Vector2(position.X, plannedRect.Bottom).ToTileCoordinates();
+
+                        if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                        {
+                            bool found = false;
+                            for (int y = 0; y < 25; y++)
+                            {
+                                for (int d = -1; d <= 1; d += 2)
+                                {
+                                    if (!ParanoidTileRetrieval(tilePos.X, tilePos.Y + (y * d)).IsTileSolidGround(true))
+                                    {
+                                        float offset = y * d * 16f;
+                                        if (modNPC.isRoomNPC)
+                                        {
+                                            Rectangle rectCheck = new Rectangle(plannedRect.X, (int)(plannedRect.Y + offset), plannedRect.Width, plannedRect.Height);
+                                            rectCheck = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(rectCheck);
+                                            Vector2 posCheck = new Vector2(rectCheck.Center.X, rectCheck.Bottom);
+
+                                            Point tilePosCheck = posCheck.ToTileCoordinates();
+                                            if (!ParanoidTileRetrieval(tilePosCheck.X, tilePosCheck.Y).IsTileSolidGround(true))
+                                            {
+                                                found = true;
+                                                position.Y += rectCheck.Y - plannedRect.Y;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            found = true;
+                                            position.Y += offset;
+                                        }
+                                    }
+                                }
+                                if (found)
+                                    break;
+                            }
+                            if (found)
+                                summonPosition = position;
+                        }
+                        else
+                        {
+                            summonPosition = position;
+                        }
+                        summonPositionStartTelegraph = NPC.Center + new Vector2(0, 80).RotatedBy(NPC.rotation);
+
+                    }
+                    if (NPC.ai[1] - summonTime >= 0 && NPC.ai[1] - summonTime <= 20)
+                    {
+                        int time = 20;
+                        Vector2 startPos = summonPositionStartTelegraph;
+                        float completion = (NPC.ai[1] - summonTime) / 20f;
+                        float curveMultiplier = 1f - (float)Math.Pow(Math.Abs(completion - 0.5f) * 2, 2);
+                        Vector2 endPos = summonPosition;
+                        if (endPos != new Vector2(-1))
+                        {
+                            endPos += new Vector2(0, 16);
+
+                            Vector2 particlePos = startPos + ((endPos - startPos) * completion);
+                            particlePos += new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
+
+                            ParticleManager.AddParticle(new Square(particlePos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * 0.45f), 0, 0.96f, time, true));
+                        }
+                        
+                        if (NPC.ai[1] - summonTime == 20)
+                        {
+                            SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+                            SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+
+                            if (summonPosition != new Vector2(-1))
+                                SpawnManager.SpawnEnemy(ModContent.NPCType<Frostbiter>(), summonPosition, modNPC.sourceRoomListID, 60, 0.45f);
+                            summonPosition = new Vector2(-1);
+                        }
+                    }
+                }
+                if (NPC.ai[1] == summonTimes[summonTimes.Count - 1] + 20)
+                    currentFrame = 3;
+
                 if (NPC.ai[1] >= Summon.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -60;
                     NPC.ai[2] = Summon.Id;
                 }
             }
@@ -603,8 +707,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog };
+            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -624,7 +727,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = IceFog.Id;
+
             NPC.ai[0] = chosenAttack;
         }
 
