@@ -59,7 +59,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack IceWave = new Attack(1, 40, 400);
         public static Attack Snowflake = new Attack(2, 40, 300);
         public static Attack Spin = new Attack(3, 30, 420);
-        public static Attack IceRain = new Attack(4, 40, 300);
+        public static Attack IceRain = new Attack(4, 40, 308);
         public static Attack IceFog = new Attack(5, 40, 300);
         public static Attack Summon = new Attack(6, 30, 300);
         public float defaultMaxSpeed = 16f;
@@ -77,7 +77,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int spinWindDown = 60;
         public int spinFireRate = 8;
         public int spinSuperProjCooldown = 35;
-
+        public int iceRainFireRate = 14;
+        public int iceRainTelegraph = 42;
 
         public override void SetStaticDefaults()
         {
@@ -300,7 +301,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[1] <= 0)
                     {
                         if (NPC.velocity.Length() < defaultMaxSpeed)
-                            NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
+                            NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2.6f;
                     }
                     else
                     {
@@ -454,10 +455,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == IceRain.Id)
             {
+                currentFrame = NPC.ai[1] % (iceRainFireRate * 2) < iceRainFireRate ? 3 : 4;
+                if (NPC.ai[1] < iceRainTelegraph)
+                {
+
+                }
+                else
+                {
+                    int progress = (int)NPC.ai[1] - iceRainTelegraph;
+                    if (progress % iceRainFireRate == 0)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.1f, 0.1f)) * 2, ModContent.ProjectileType<Iceflake>(), NPC.damage, 0);
+                    }
+                }
+                
                 if (NPC.ai[1] >= IceRain.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = None.Duration - 60;
                     NPC.ai[2] = IceRain.Id;
                 }
             }
@@ -480,14 +496,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            bool defaultMovement = NPC.ai[0] == None.Id;
+            bool defaultMovement = NPC.ai[0] == None.Id || NPC.ai[0] == IceRain.Id;
             bool sineWaveVelocity = NPC.ai[0] != Spin.Id;
             if (defaultMovement)
             {
                 if (target != null)
                 {
-                    Vector2 targetPos = target.Center + new Vector2(0, -250);
-                    float targetRadius = 64f;
+                    float distanceAbove = -250f;
+                    Vector2 targetPos = target.Center + new Vector2(0, distanceAbove);
+                    bool LoS = CanHitInLine(new Vector2(targetPos.X, NPC.Bottom.Y), target.Center);
+                    if (!LoS)
+                        targetPos = target.Center + new Vector2(0, distanceAbove * 0.4f);
+
+                    float targetRadius = LoS ? 42f : 32f;
                     if (NPC.Center.Distance(targetPos) > targetRadius)
                     {
                         if (NPC.velocity.Length() < defaultMaxSpeed)
@@ -518,7 +539,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain, IceFog, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin };
+            List<Attack> potentialAttacks = new List<Attack>() { IceWave, Snowflake, Spin, IceRain };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
