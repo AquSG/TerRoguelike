@@ -9,6 +9,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Managers;
 using TerRoguelike.Particles;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.Projectiles
 {
@@ -52,6 +53,11 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            var modProj = Projectile.ModProj();
+            if (maxTimeLeft - Projectile.timeLeft >= 30 && Projectile.timeLeft > 120 && modProj != null && modProj.npcOwner >= 0 && RoomSystem.RoomList[Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID].bossDead)
+                Projectile.timeLeft = 120;
+
+
             Projectile.velocity *= 0.98f;
             if (Projectile.timeLeft >= 90)
             {

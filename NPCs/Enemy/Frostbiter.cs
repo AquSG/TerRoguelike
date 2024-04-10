@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.collideY = false;
             if (NPC.ai[0] >= attackTelegraph && NPC.ai[1] == 0)
             {
-                NPC.rotation += 0.25f * -NPC.direction;
+                NPC.rotation += 0.25f * Math.Sign(NPC.velocity.X);
             }
             else
                 NPC.rotation = (NPC.velocity.X / 18f) * MathHelper.PiOver2;
@@ -69,16 +69,20 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 for (int i = 0; (double)i < hit.Damage / 10.0; i++)
                 {
-                    int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, 67, hit.HitDirection, -1f);
-                    Main.dust[dust].noGravity = true;
+                    Dust dust = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, 67, hit.HitDirection, -1f);
+                    dust.noGravity = true;
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
                 }
             }
             else
             {
                 for (int i = 0; i < 35; i++)
                 {
-                    int dust = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.SnowflakeIce, 2 * hit.HitDirection, -2f);
-                    Main.dust[dust].noGravity = false;
+                    Dust dust = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, DustID.SnowflakeIce, 2 * hit.HitDirection, -2f);
+                    dust.noGravity = false;
+                    dust.noLight = true;
+                    dust.noLightEmittence = true;
                 }
             }
         }

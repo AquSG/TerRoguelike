@@ -12,6 +12,7 @@ using TerRoguelike.Particles;
 using ReLogic.Utilities;
 using Terraria.Audio;
 using Terraria.ID;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.Projectiles
 {
@@ -20,7 +21,6 @@ namespace TerRoguelike.Projectiles
         //almost everything in this is just visuals. the hitbox is active for 1/4 of a second after 30 frames pass, and is a big square
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public int maxTimeLeft;
-        public SlotId IceWindSlot;
         public override void SetDefaults()
         {
             Projectile.width = 16;
@@ -39,10 +39,6 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
-            {
-                sound.Position = Projectile.Center;
-            }
             if ((int)Projectile.velocity.Length() > 0 && Projectile.timeLeft > 90 && Projectile.timeLeft % (int)(Projectile.velocity.Length() * 0.5f) == 0 && !ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
             {
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.04f, ModContent.ProjectileType<IceCloud>(), Projectile.damage, 0, -1, Projectile.timeLeft + ((maxTimeLeft - Projectile.timeLeft) * 0.75f));
