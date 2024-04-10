@@ -65,11 +65,12 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.4f, MaxInstances = 2, Pitch = -0.1f, PitchVariance = 0.05f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew}, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.4f, MaxInstances = 2, Pitch = -0.1f, PitchVariance = 0.05f, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item27 with { Volume = 0.15f, MaxInstances = 10 }, Projectile.Center);
             for (int i = 0; i < 6; i++)
             {
                 ParticleManager.AddParticle(new Snow(
-                        Projectile.Center, Main.rand.NextVector2CircularEdge(2, 1) * Main.rand.NextFloat(0.66f, 1f),
+                        Projectile.Bottom, Main.rand.NextVector2CircularEdge(2, 1.3f) * Main.rand.NextFloat(0.66f, 1f),
                         300, Color.White * 0.66f, new Vector2(Main.rand.NextFloat(0.035f, 0.045f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
             }
             return true;

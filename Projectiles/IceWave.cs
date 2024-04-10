@@ -14,6 +14,8 @@ namespace TerRoguelike.Projectiles
 {
     public class IceWave : ModProjectile, ILocalizedModType
     {
+        public Vector2 startVelocity;
+        public int maxTimeLeft;
         public override void SetDefaults()
         {
             Projectile.width = 48;
@@ -22,13 +24,14 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
-            Projectile.timeLeft = 600;
+            Projectile.timeLeft = maxTimeLeft = 600;
             Projectile.penetrate = -1;
         }
         public override void OnSpawn(IEntitySource source)
         {
-            SoundEngine.PlaySound(SoundID.Item8 with { Volume = 0.7f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item8 with { Volume = 0.9f }, Projectile.Center);
             Projectile.rotation = Projectile.velocity.ToRotation();
+            startVelocity = Projectile.velocity;
 
             for (int i = 0; i < 6; i++)
             {
@@ -39,9 +42,10 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.velocity = startVelocity * MathHelper.Clamp(MathHelper.Lerp(0.5f, 1f, (maxTimeLeft - Projectile.timeLeft) / 50f), 0.5f, 1f);
             Projectile.localAI[1]++;
             if (Projectile.localAI[1] == 5)
-                SoundEngine.PlaySound(SoundID.Item30 with { Volume = 0.3f }, Projectile.Center);
+                SoundEngine.PlaySound(SoundID.Item30 with { Volume = 0.4f }, Projectile.Center);
 
             Projectile.localAI[0]++;
             Projectile.rotation = Projectile.velocity.ToRotation();
@@ -81,6 +85,6 @@ namespace TerRoguelike.Projectiles
             Main.EntitySpriteDraw(texture, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, texture.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
         }
-        public override Color? GetAlpha(Color lightColor) => Color.White;
+        public override Color? GetAlpha(Color lightColor) => Color.Lerp(Color.White, lightColor, 0.15f);
     }
 }

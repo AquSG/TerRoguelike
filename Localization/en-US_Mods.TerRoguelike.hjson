@@ -71,6 +71,7 @@ Projectiles: {
 	CorruptVomit.DisplayName: Corrupt Vomit
 	IceWave.DisplayName: Ice Wave
 	RoyalSnowflake.DisplayName: Royal Snowflake
+	IceBomb.DisplayName: Ice Bomb
 }
 
 Items: {
