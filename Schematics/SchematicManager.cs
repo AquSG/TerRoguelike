@@ -12,7 +12,6 @@ using TerRoguelike.Floors;
 
 namespace TerRoguelike.Schematics
 {
-    // TODO -- This can be made into a ModSystem with simple OnModLoad and Unload hooks.
     public static class SchematicManager
     {
         //schematic code lifted from the Calamity Mod. Edits made in places to support the way we do things in TerRoguelike
