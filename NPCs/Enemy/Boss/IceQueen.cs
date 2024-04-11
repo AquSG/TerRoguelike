@@ -54,7 +54,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public int deadTime = 0;
         public int cutsceneDuration = 180;
-        public int deathCutsceneDuration = 120;
+        public int deathCutsceneDuration = 180;
 
         public static Attack None = new Attack(0, 0, 180);
         public static Attack IceWave = new Attack(1, 40, 400);
@@ -99,7 +99,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.damage = 30;
             NPC.lifeMax = 30000;
             NPC.HitSound = SoundID.NPCHit7;
-            NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.IgnoreRoomWallCollision = true;
@@ -890,7 +889,29 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
             }
             deadTime++;
-            
+
+            NPC.Opacity = 0.8f + ((float)Math.Cos(deadTime / 16f) * 0.2f);
+            if (deadTime % 20 == 0 || deadTime % 36 == 0)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit11 with { Volume = 0.6f, MaxInstances = 10 }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { Volume = 0.35f, MaxInstances = 10 }, NPC.Center);
+                float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+                for (int i = 0; i < 18; i++)
+                {
+                    ParticleManager.AddParticle(new Square(NPC.Center + (rotation.ToRotationVector2() * Main.rand.NextFloat(16, 20)),
+                        (rotation + Main.rand.NextFloat(-0.24f, 0.24f)).ToRotationVector2() * Main.rand.NextFloat(3, 4), 30, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 1f, new Vector2(0.6f), rotation
+                        ));
+                }
+            }
+            if (deadTime % 6 == 0)
+            {
+                int timeleft = (int)MathHelper.Clamp(cutsceneDuration - deadTime, 0, 120);
+                ParticleManager.AddParticle(new Square(NPC.Center + new Vector2(Main.rand.NextFloat(-100, 100), -32), -Vector2.UnitY * Main.rand.NextFloat(0.7f, 1f), timeleft, Color.Cyan, new Vector2(0.5f), 0, 0.98f, 60));
+                ParticleManager.AddParticle(new Snow(NPC.Center + new Vector2(Main.rand.NextFloat(-100, 100), -28), Vector2.UnitY * Main.rand.NextFloat(1f), 300, Color.White * 0.6f, new Vector2(Main.rand.NextFloat(0.018f, 0.024f)), 0, 0.96f, 0.05f, 30, 0, true));
+                ParticleManager.AddParticle(new Smoke(
+                            NPC.Center, Main.rand.NextVector2CircularEdge(1.8f, 1.8f) * Main.rand.NextFloat(0.6f, 0.86f), 120, Color.White * 0.4f * (timeleft / 120f), new Vector2(0.4f),
+                            Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.98f));
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -904,6 +925,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life <= 0 && deadTime > 0)
             {
+                SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 0.7f, Pitch = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.7f, Pitch = 0 }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_CrystalCartImpact with { Volume = 1f, Pitch = 0 }, NPC.Center);
+
                 Vector2 goreOffset = new Vector2(-28);
                 Gore.NewGore(NPC.GetSource_Death(), NPC.Top + goreOffset, Vector2.Zero, 513, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), NPC.Left + goreOffset, -Vector2.UnitX, 514, NPC.scale);
@@ -911,6 +936,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Main.gore[g].rotation += MathHelper.Pi;
                 Gore.NewGore(NPC.GetSource_Death(), NPC.Bottom + goreOffset + new Vector2(0, -24), Vector2.Zero, 515, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), NPC.Center + goreOffset, -Vector2.UnitY, 516, NPC.scale);
+
+                for (int j = 0; j < 5; j++)
+                {
+                    float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+                    for (int i = 0; i < 18; i++)
+                    {
+                        ParticleManager.AddParticle(new Square(NPC.Center + (rotation.ToRotationVector2() * Main.rand.NextFloat(5)),
+                            (rotation + Main.rand.NextFloat(-0.24f, 0.24f)).ToRotationVector2() * Main.rand.NextFloat(2, 4), 60, Color.Lerp(Color.White, Color.Cyan, Main.rand.NextFloat()) * 1f, new Vector2(0.6f), rotation, 0.96f, 60
+                            ));
+                    }
+                }
+                for (int i = 0; i < 80; i++)
+                {
+                    float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+                    Vector2 vel = rotation.ToRotationVector2() * -Main.rand.NextFloat(0.6f, 1.5f);
+                    vel.Y -= 1f;
+                    if (Main.rand.NextBool(10))
+                        vel.Y *= 2.5f;
+                    ParticleManager.AddParticle(new Snow(
+                        NPC.Center, vel,
+                        600, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 0.66f, new Vector2(Main.rand.NextFloat(0.02f, 0.027f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
+                }
             }
         }
         public override void OnKill()
