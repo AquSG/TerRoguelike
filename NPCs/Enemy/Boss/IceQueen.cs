@@ -23,6 +23,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.Graphics.Effects;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -896,10 +897,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SoundEngine.PlaySound(SoundID.NPCHit11 with { Volume = 0.6f, MaxInstances = 10 }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { Volume = 0.35f, MaxInstances = 10 }, NPC.Center);
                 float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
-                for (int i = 0; i < 18; i++)
+                for (int i = 0; i < 20; i++)
                 {
                     ParticleManager.AddParticle(new Square(NPC.Center + (rotation.ToRotationVector2() * Main.rand.NextFloat(16, 20)),
-                        (rotation + Main.rand.NextFloat(-0.24f, 0.24f)).ToRotationVector2() * Main.rand.NextFloat(3, 4), 30, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 1f, new Vector2(0.6f), rotation
+                        (rotation + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(4, 5), 30, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 1f, new Vector2(1f), rotation
                         ));
                 }
             }
@@ -927,7 +928,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 0.7f, Pitch = 1f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.7f, Pitch = 0 }, NPC.Center);
-                SoundEngine.PlaySound(SoundID.DD2_CrystalCartImpact with { Volume = 1f, Pitch = 0 }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_WitherBeastDeath with { Volume = 1f, Pitch = 0 }, NPC.Center);
 
                 Vector2 goreOffset = new Vector2(-28);
                 Gore.NewGore(NPC.GetSource_Death(), NPC.Top + goreOffset, Vector2.Zero, 513, NPC.scale);
@@ -1005,7 +1006,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
-
             return false;
         }
     }

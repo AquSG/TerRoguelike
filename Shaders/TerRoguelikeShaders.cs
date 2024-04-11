@@ -21,6 +21,7 @@ namespace TerRoguelike.Shaders
         internal static Effect CircularGradientWithEdge;
         internal static Effect CircularGradientOuter;
         internal static Effect ProtectiveBubbleShield;
+        internal static Effect MaskOverlay;
 
         public static void LoadShaders()
         {
@@ -42,6 +43,33 @@ namespace TerRoguelike.Shaders
 
             ProtectiveBubbleShield = LoadShader("ProtectiveBubbleShield"); //lifted from the Calamity Mod
             RegisterScreenShader(ProtectiveBubbleShield, "ShieldPass", "ProtectiveBubbleShield");
+
+            MaskOverlay = LoadShader("MaskOverlay");
+            RegisterScreenShader(MaskOverlay, "MaskOverlayPass", "MaskOverlay");
+            //This was some code I wrote to get it working on the ice queen boss I made
+            /*
+            Texture2D tex = TextureAssets.Npc[Type].Value;
+            Texture2D starTex = TexDict["StarrySky"].Value;
+
+            Main.spriteBatch.End();
+            Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+            Vector2 screenOff = (NPC.position);
+            screenOff.X %= tex.Width;
+            screenOff.Y %= tex.Height;
+            screenOff.X /= tex.Width;
+            screenOff.Y /= tex.Height;
+            screenOff.Y -= currentFrame * (1f / Main.npcFrameCount[Type]);
+
+            maskEffect.Parameters["screenOffset"].SetValue(screenOff);
+            maskEffect.Parameters["stretch"].SetValue(new Vector2(1f, Main.npcFrameCount[Type]));
+            maskEffect.Parameters["replacementTexture"].SetValue(starTex);
+
+            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, Color.White * NPC.Opacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+
+            StartVanillaSpritebatch();
+            */
 
         }
         private static void RegisterMiscShader(Effect shader, string passName, string registrationName)
