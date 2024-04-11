@@ -55,7 +55,7 @@ namespace TerRoguelike.Shaders
             Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
 
-            Vector2 screenOff = (NPC.position);
+            Vector2 screenOff = (NPC.Center);
             screenOff.X %= tex.Width;
             screenOff.Y %= tex.Height;
             screenOff.X /= tex.Width;

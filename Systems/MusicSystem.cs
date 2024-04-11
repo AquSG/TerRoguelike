@@ -84,6 +84,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/CorruptionParasiteThemeStart",
             "TerRoguelike/Tracks/CorruptionParasiteThemeEnd",
             0.36f);
+        public static BossTheme IceQueenTheme = new(
+            "TerRoguelike/Tracks/IceQueenTheme",
+            "TerRoguelike/Tracks/IceQueenThemeStart",
+            "TerRoguelike/Tracks/IceQueenThemeEnd",
+            0.6f);
 
 
         public static void PlayAllSounds()
@@ -113,6 +118,9 @@ namespace TerRoguelike.Systems
                 CorruptionParasiteTheme.BattleTrack,
                 CorruptionParasiteTheme.StartTrack,
                 CorruptionParasiteTheme.EndTrack,
+                IceQueenTheme.BattleTrack,
+                IceQueenTheme.StartTrack,
+                IceQueenTheme.EndTrack,
             };
             foreach (string path in pathList)
             {

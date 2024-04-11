@@ -158,7 +158,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
                 {
-                    sound.Volume += NPC.localAI[0] < -100 ? 0.02f : -0.0133f;
+                    sound.Volume += NPC.localAI[0] < -100 ? 2f : -1.5f;
+                    if (NPC.localAI[0] == -1)
+                        sound.Stop();
                 }
             }
         }
@@ -171,7 +173,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(CorruptionParasiteTheme);
+                SetBossTrack(IceQueenTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
@@ -183,7 +185,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    IceWindSlot = SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.8f, PitchVariance = 0.05f }, NPC.Center);
+                    IceWindSlot = SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.008f, PitchVariance = 0.05f }, NPC.Center);
                     if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
                     {
                         sound.Volume = 0;
@@ -892,14 +894,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             deadTime++;
 
             NPC.Opacity = 0.8f + ((float)Math.Cos(deadTime / 16f) * 0.2f);
-            if (deadTime % 20 == 0 || deadTime % 36 == 0)
+            if (deadTime % 20 == 0 || deadTime % 36 == 0 || (deadTime > 70 && deadTime % 12 == 0))
             {
                 SoundEngine.PlaySound(SoundID.NPCHit11 with { Volume = 0.6f, MaxInstances = 10 }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { Volume = 0.35f, MaxInstances = 10 }, NPC.Center);
                 float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
                 for (int i = 0; i < 20; i++)
                 {
-                    ParticleManager.AddParticle(new Square(NPC.Center + (rotation.ToRotationVector2() * Main.rand.NextFloat(16, 20)),
+                    ParticleManager.AddParticle(new Square(NPC.Center + (rotation.ToRotationVector2() * Main.rand.NextFloat(4, 20)),
                         (rotation + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(4, 5), 30, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 1f, new Vector2(1f), rotation
                         ));
                 }
@@ -908,10 +910,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 int timeleft = (int)MathHelper.Clamp(cutsceneDuration - deadTime, 0, 120);
                 ParticleManager.AddParticle(new Square(NPC.Center + new Vector2(Main.rand.NextFloat(-100, 100), -32), -Vector2.UnitY * Main.rand.NextFloat(0.7f, 1f), timeleft, Color.Cyan, new Vector2(0.5f), 0, 0.98f, 60));
-                ParticleManager.AddParticle(new Snow(NPC.Center + new Vector2(Main.rand.NextFloat(-100, 100), -28), Vector2.UnitY * Main.rand.NextFloat(1f), 300, Color.White * 0.6f, new Vector2(Main.rand.NextFloat(0.018f, 0.024f)), 0, 0.96f, 0.05f, 30, 0, true));
                 ParticleManager.AddParticle(new Smoke(
                             NPC.Center, Main.rand.NextVector2CircularEdge(1.8f, 1.8f) * Main.rand.NextFloat(0.6f, 0.86f), 120, Color.White * 0.4f * (timeleft / 120f), new Vector2(0.4f),
                             Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.98f));
+
+                Vector2 snowPos = NPC.Center + new Vector2(Main.rand.NextFloat(-100, 100), -28);
+                if (!ParanoidTileRetrieval(snowPos.ToTileCoordinates()).IsTileSolidGround(true))
+                    ParticleManager.AddParticle(new Snow(snowPos, Vector2.UnitY * Main.rand.NextFloat(1f), 300, Color.White * 0.6f, new Vector2(Main.rand.NextFloat(0.018f, 0.024f)), 0, 0.96f, 0.05f, 30, 0, true));
             }
             if (deadTime >= deathCutsceneDuration - 30)
             {
@@ -948,16 +953,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             ));
                     }
                 }
-                for (int i = 0; i < 80; i++)
+                if (!ParanoidTileRetrieval(NPC.Center.ToTileCoordinates()).IsTileSolidGround(true))
                 {
-                    float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
-                    Vector2 vel = rotation.ToRotationVector2() * -Main.rand.NextFloat(0.6f, 1.5f);
-                    vel.Y -= 1f;
-                    if (Main.rand.NextBool(10))
-                        vel.Y *= 2.5f;
-                    ParticleManager.AddParticle(new Snow(
-                        NPC.Center, vel,
-                        600, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 0.66f, new Vector2(Main.rand.NextFloat(0.02f, 0.027f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
+                    for (int i = 0; i < 80; i++)
+                    {
+                        float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+                        Vector2 vel = rotation.ToRotationVector2() * -Main.rand.NextFloat(0.6f, 1.5f);
+                        vel.Y -= 1f;
+                        if (Main.rand.NextBool(10))
+                            vel.Y *= 2.5f;
+                        ParticleManager.AddParticle(new Snow(
+                            NPC.Center, vel,
+                            600, Color.Lerp(Color.White, Color.LightCyan, Main.rand.NextFloat()) * 0.66f, new Vector2(Main.rand.NextFloat(0.02f, 0.027f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 0.04f, 180, 0));
+                    }
                 }
             }
         }
