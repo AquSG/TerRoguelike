@@ -36,6 +36,9 @@ namespace TerRoguelike.Systems
         public static float CombatVolumeInterpolant = 0;
         public static float CalmVolumeLevel = 1f;
         public static float CombatVolumeLevel = 1f;
+        public static double BossIntroDuration = 0;
+        public static double BossIntroProgress = 0;
+        public static float BossIntroPreviousGlobalTime = 0;
         public static SoundEffectInstance CalmMusic;
         public static SoundEffectInstance CombatMusic;
         public static BossTheme ActiveBossTheme;
@@ -142,9 +145,14 @@ namespace TerRoguelike.Systems
         }
         public static void SetBossTrack(BossTheme bossTheme)
         {
-            ActiveBossTheme = bossTheme;
+            ActiveBossTheme = new BossTheme(bossTheme);
             ActiveBossTheme.startFlag = true;
-            SetCombat(bossTheme.StartTrack, false);
+            SoundEffect introTrack = MusicDict[bossTheme.StartTrack].Value;
+            BossIntroDuration = introTrack.Duration.TotalSeconds;
+            BossIntroProgress = 0;
+            BossIntroPreviousGlobalTime = Main.GlobalTimeWrappedHourly;
+
+            SetCombat(introTrack, false);
             SetMusicMode(MusicStyle.Boss);
             CombatVolumeLevel = bossTheme.Volume;
         }
@@ -173,20 +181,28 @@ namespace TerRoguelike.Systems
         }
         public static void SetCalm(string track, bool loop = true)
         {
+            SetCalm(MusicDict[track].Value, loop);
+        }
+        public static void SetCalm(SoundEffect track, bool loop = true)
+        {
             if (CalmMusic != null)
                 CalmMusic.Dispose();
 
-            CalmMusic = MusicDict[track].Value.CreateInstance();
+            CalmMusic = track.CreateInstance();
             CalmMusic.IsLooped = loop;
             CalmMusic.Play();
             CalmMusic.Volume = 0;
         }
         public static void SetCombat(string track, bool loop = true)
         {
+            SetCombat(MusicDict[track].Value, loop);
+        }
+        public static void SetCombat(SoundEffect track, bool loop = true)
+        {
             if (CombatMusic != null)
                 CombatMusic.Dispose();
 
-            CombatMusic = MusicDict[track].Value.CreateInstance();
+            CombatMusic = track.CreateInstance();
             CombatMusic.IsLooped = loop;
             CombatMusic.Play();
             CombatMusic.Volume = 0;
@@ -349,6 +365,28 @@ namespace TerRoguelike.Systems
                     }
                 }
 
+                if (ActiveBossTheme.startFlag)
+                {
+                    float currentTime = Main.GlobalTimeWrappedHourly;
+                    if (currentTime < BossIntroPreviousGlobalTime)
+                        currentTime += 3600;
+                    float difference = currentTime - BossIntroPreviousGlobalTime;
+
+                    if (Main.hasFocus && !Main.gamePaused)
+                    {
+                        BossIntroProgress += difference;
+                        if (BossIntroProgress + difference >= BossIntroDuration)
+                        {
+                            int delay = (int)((BossIntroDuration - BossIntroProgress) * 1000);
+                            if (delay < 1)
+                                delay = 1;
+                            SetCombat(ActiveBossTheme.BattleTrack);
+                            ActiveBossTheme.startFlag = false;
+                        }
+                    }
+
+                    BossIntroPreviousGlobalTime = currentTime;
+                }
                 if (CombatMusic != null && !CombatMusic.IsDisposed && CombatMusic.State != SoundState.Stopped)
                 {
                     float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
@@ -411,6 +449,13 @@ namespace TerRoguelike.Systems
             EndTrack = endTrack;
             Volume = volume;
         }
+        public BossTheme(BossTheme bossTheme)
+        {
+            BattleTrack = bossTheme.BattleTrack;
+            StartTrack = bossTheme.StartTrack;
+            EndTrack = bossTheme.EndTrack;
+            Volume = bossTheme.Volume;
+        }
     }
     public class FloorSoundtrack
     {
@@ -422,6 +467,12 @@ namespace TerRoguelike.Systems
             CalmTrack = calmTrack;
             CombatTrack = combatTrack;
             Volume = volume;
+        }
+        public FloorSoundtrack (FloorSoundtrack floorSoundtrack)
+        {
+            CalmTrack = floorSoundtrack.CalmTrack;
+            CombatTrack = floorSoundtrack.CombatTrack;
+            Volume = floorSoundtrack.Volume;
         }
     }
 }
