@@ -8,11 +8,14 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class SnowEnemyRoom5 : Room
     {
+        public override int AssociatedFloor => FloorDict["Snow"];
         public override string Key => "SnowEnemyRoom5";
         public override string Filename => "Schematics/RoomSchematics/SnowEnemyRoom5.csch";
         public override bool CanExitRight => true;
@@ -21,7 +24,12 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.IcyMerman, 60, 120, 0.45f);
+            AddRoomNPC(MakeEnemySpawnPos(Right, -7, 1), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 5, -2), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -5, -2), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 5, 5), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 1);
+            AddRoomNPC(MakeEnemySpawnPos(TopRight, -5, 5), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 1);
         }
     }
 }
