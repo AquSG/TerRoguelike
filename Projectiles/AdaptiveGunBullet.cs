@@ -89,6 +89,13 @@ namespace TerRoguelike.Projectiles
             Vector2 innateOffset = (lightTexture.Size() * 0.5f * Projectile.scale) - Main.screenPosition;
             for (int i = 0; i < Projectile.oldPos.Length - 1; i++)
             {
+                if (Projectile.oldPos[i] == Vector2.Zero)
+                    continue;
+                if (i > 0)
+                {
+                    if (Projectile.oldPos[i + 1] == Vector2.Zero)
+                        continue;
+                }
                 for (int j = 0; j < 8; j++)
                 {
                     int progress = (i * 8) + j;
@@ -103,7 +110,6 @@ namespace TerRoguelike.Projectiles
                     Vector2 drawPosition = Projectile.oldPos[i] + innateOffset;
                     Vector2 offset = (Projectile.oldPos[i + 1] - Projectile.oldPos[i]) * jCompletion;
 
-                    // Become smaller the futher along the old positions we are.
                     Vector2 scale = new Vector2(1.2f) * MathHelper.Lerp(0.25f, 1f, 1f - completion);
                     Main.EntitySpriteDraw(lightTexture, drawPosition + offset, null, color, Projectile.oldRot[i], lightTexture.Size() * 0.5f, scale * Projectile.scale, SpriteEffects.None, 0);
                 }
