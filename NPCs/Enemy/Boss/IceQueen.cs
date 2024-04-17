@@ -63,7 +63,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Spin = new Attack(3, 30, 420);
         public static Attack IceRain = new Attack(4, 40, 308);
         public static Attack IceFog = new Attack(5, 40, 105);
-        public static Attack Summon = new Attack(6, 30, 80);
+        public static Attack Summon = new Attack(6, 30, 110);
         public float defaultMaxSpeed = 16f;
         public float defaultAcceleration = 0.2f;
         public float defaultDeceleration = 0.95f;
@@ -124,7 +124,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            Summon = new Attack(6, 30, 110);
             switch (currentFrame)
             {
                 default:
