@@ -80,7 +80,7 @@ namespace TerRoguelike.Utilities
                 }
             }
 
-            player.itemLocation = finalPosition;
+            player.itemLocation = finalPosition + new Vector2(spriteSize.X * 0.5f, 0);
         }
 
         /// <summary>
