@@ -983,6 +983,7 @@ namespace TerRoguelike.TerPlayer
                 Player.gravControl = false;
                 Player.gravControl2 = false;
             }
+
             if (jetLeg > 0)
             {
                 if (DashDir != 0 && DashDelay == 0)
