@@ -131,7 +131,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            target = modNPC.GetTarget(NPC, false, false);
+            target = modNPC.GetTarget(NPC);
 
             acceleration = 0.05f;
             deceleration = 0.88f;
