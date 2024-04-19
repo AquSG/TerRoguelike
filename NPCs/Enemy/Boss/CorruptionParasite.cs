@@ -192,7 +192,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.localAI[0] < 0)
             {
-                target = modNPC.GetTarget(NPC, false, false);
+                target = modNPC.GetTarget(NPC);
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
@@ -233,7 +233,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            target = modNPC.GetTarget(NPC, false, false);
+            target = modNPC.GetTarget(NPC);
 
 
             NPC.ai[1]++;

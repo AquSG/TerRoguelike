@@ -62,7 +62,7 @@ namespace TerRoguelike.NPCs
         #region Base AIs
         public void RogueFighterAI(NPC npc, float xCap, float jumpVelocity, float acceleration = 0.07f)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (target == null && npc.direction == 0)
             {
@@ -217,7 +217,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueFighterShooterAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenShooting, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = true, float? projVelocityDirectionOverride = null, int extendedAttackSlowdownTime = 0, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0, int jumpDetectionPadding = 6, bool canShootFall = true)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             float realXCap = npc.ai[1] > 0 ? xCap * speedMultiWhenShooting : xCap;
 
@@ -406,7 +406,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueTeleportingShooterAI(NPC npc, float minTeleportDist, float maxTeleportDist, int teleportCooldown, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool findAir = false, bool respectGravity = false)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (target == null && npc.direction == 0)
             {
@@ -539,7 +539,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueTurretAI(NPC npc, int attackTelegraph, int attackCooldown, float attackDist, int projType, int projDamage, float projVelocity, Vector2 projOffset, bool LoSRequired, float? directionOverride = null, float? attackCone = null, int attackDuration = 0, int attackTimeBetween = 0)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (target != null)
             {
@@ -569,7 +569,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueAntlionAI(NPC npc, float attackCone, float minBurrowDist, float maxBurrowDist, int burrowDownTime, int burrowUpTime, float burrowDepth, int burrowCooldown, int attackTelegraph, int attackCooldown, int projType, Vector2 projOffset, int projCount, int projDamage, float projSpread, float minProjVelocity, float maxProjVelocity)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             npc.stairFall = true;
             npc.ai[0]++;
@@ -718,7 +718,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, float deceleration = 0.93f, int attackSuperCooldown = 0, int attacksToSuperCooldown = 0, bool ignorePlatforms = false)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             npc.ai[3]++;
             npc.stairFall = true;
@@ -886,7 +886,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueTortoiseAI(NPC npc, float xCap, float jumpVelocity, int jumpTime, int dashTime, float dashVelocity, int attackCooldown, int attackTelegraph)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (npc.ai[1] < attackCooldown && npc.ai[1] >= 0 && npc.ai[1] != attackCooldown - attackTelegraph)
                 npc.ai[1]++;
@@ -1060,7 +1060,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueSpookrowAI(NPC npc, float xCap, float jumpVelocity)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             int slopeCheck1 = (int)Main.tile[(int)(npc.BottomLeft.X / 16f), (int)(npc.BottomLeft.Y / 16f)].Slope;
             int slopeCheck2 = (int)Main.tile[(int)(npc.BottomRight.X / 16f), (int)(npc.BottomRight.Y / 16f)].Slope;
@@ -1184,7 +1184,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueWormAI(NPC npc, float maxVelocity, float turnRadians, float slowTurnDist)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             Vector2 targetPos = npc.Center + Vector2.UnitX.RotatedBy(-npc.rotation);
             if (target != null)
@@ -1211,7 +1211,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueGiantBatAI(NPC npc, float distanceAbove, float acceleration, float maxVelocity, int attackTelegraph, int attackCooldown, float attackDistance, int projType, Vector2 projVelocity, int projDamage)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             npc.stairFall = true;
 
@@ -1300,7 +1300,7 @@ namespace TerRoguelike.NPCs
             //ai1 is for attack state.
             //ai2 and ai3 store a vector, unless dontRelocateForProjectiles is true
 
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             bool LosCheck = true;
             if (target != null)
@@ -1414,7 +1414,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueDungeonSpiritAI(NPC npc, float acceleration, float speedCap)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (target != null)
             {
@@ -1431,7 +1431,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueBallAndChainThrowerAI(NPC npc, float xCap, float jumpVelocity, float acceleration, int attackWindUpTime, int attackExhaustTime, int attackCooldown, ref BallAndChain ball, float launchVelocity, float ballTetherDist, int damage, float attackDist)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (npc.ai[2] != 2)
             {
@@ -1658,7 +1658,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueAssasinAI(NPC npc, float xCap, float jumpVelocity, float acceleration, int teleportTelegraph, int teleportCooldown, int teleportExhaustTime, float minTeleportDist, float maxTeleportDist)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             bool teleporting = false;
             if (npc.ai[1] < teleportCooldown)
@@ -1924,7 +1924,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueSpiderAI(NPC npc, float speedCap, float acceleration, int passiveRoamCooldown, int passiveRoamTime, int boredomTime, float homeRadius)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
             npc.stairFall = true;
 
             Vector2 homePos = new Vector2(npc.ai[2], npc.ai[3]);
@@ -2059,7 +2059,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueCrawlerAI(NPC npc, float speedCap, float acceleration, int waitTime)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
             if (npc.ai[2] < 0)
                 npc.ai[2]++;
 
@@ -2100,7 +2100,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueCrawlerShooterAI(NPC npc, float speedCap, float acceleration, int waitTime, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage, float speedMultiWhenAttacking = 1f, float? projVelocityDirectionOverride = null)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (npc.ai[1] != 0)
                 npc.ai[1]++;
@@ -2170,7 +2170,7 @@ namespace TerRoguelike.NPCs
         {
             // I FUCKING HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATE SLOOOOOOOOOOOOOOOOOOOOOOOOOOOPES FUCK YOU RED FUUUUUUUUCK YOUUUUUUUUU I SWEAR TO FUCK WHY ARE SLOPES SO FUCKING JANK. I'LL JUST NEVER FUCKING USE THEM IN MY BUILDS. (edit- slopes should work now :] )
 
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
             //npc ai 3: 0 = right, 1 = down, 2 = left, 3 = up
 
             if (npc.direction == 0)
@@ -2311,7 +2311,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueRockGolemAI(NPC npc, float xCap, float jumpVelocity, float meleeDistance, int meleeDuration, int meleeCooldown, float attackDistance, int attackTelegraph, int attackCooldown, float speedMultiWhenAttacking, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = false, int extendedAttackSlowdownTime = 0)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             float realXCap = (npc.ai[1] > 0 || npc.ai[2] > 0) ? xCap * speedMultiWhenAttacking : xCap;
 
@@ -2513,7 +2513,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueCorruptorAI(NPC npc, float speedCap, float acceleration, int attackTelegraph, int attackCooldown, int projType, float projSpeed, int projDamage)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (npc.ai[3] > 0)
                 npc.ai[3] -= npc.collideX || npc.collideY ? 10 : 1;
@@ -2575,7 +2575,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueClingerAI(NPC npc, float speedCap, float acceleration, Vector2 anchorPos, float maxDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, int projDamage)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (npc.ai[0] != 0)
                 npc.ai[0]++;
@@ -2606,7 +2606,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueEvilToolAI(NPC npc, float dashSpeed, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
             if (npc.ai[0] != attackTelegraph)
                 npc.ai[0]++;
 
@@ -2654,7 +2654,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueFlierAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired, bool ignorePlatforms = false)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             npc.ai[3]++;
             npc.stairFall = true;
@@ -2781,7 +2781,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueDemonAI(NPC npc, float xCap, float yCap, float acceleration, bool LoSRequired, float attackDist, int attackTelegraph, int attackDuration, int attackTimeBetween, int attackCooldown, int projType, float projSpeed, int projDamage, bool ignorePlatforms = false)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             if (npc.ai[1] != 0)
                 npc.ai[1]++;
@@ -2919,7 +2919,7 @@ namespace TerRoguelike.NPCs
         }
         public void RogueStormDiverAI(NPC npc, float xCap, float jumpVelocity, float attackDistance, int attackTelegraph, int attackCooldown, int extendedAttackSlowdownTime, int jetpackTelegraph, int jetpackDuration, int jetpackCooldown, float jetpackDistBeside, float jetpackSpeed, float speedMultiWhenShooting, float maxAimAngle, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, bool canJumpShoot = false, int projectileCount = 1, float projMaxSpread = 0, float maxVelocityDeviation = 0, int jumpDetectionPadding = 6)
         {
-            Entity target = GetTarget(npc, false, false);
+            Entity target = GetTarget(npc);
 
             float realXCap = npc.ai[1] > 0 || npc.ai[2] < -jetpackDuration ? xCap * speedMultiWhenShooting : xCap;
 
@@ -3597,7 +3597,7 @@ namespace TerRoguelike.NPCs
         /// <param name="resetDir"></param>
         /// <param name="resetSpriteDir"></param>
         /// <returns></returns>
-        public Entity GetTarget(NPC npc, bool resetDir = false, bool resetSpriteDir = false)
+        public Entity GetTarget(NPC npc)
         {
             if (targetPlayer != -1)
             {
@@ -3621,10 +3621,6 @@ namespace TerRoguelike.NPCs
                 {
                     targetNPC = ClosestNPC(npc.Center, 3200f, false);
                     targetPlayer = -1;
-                    if (resetDir)
-                        npc.direction = 1;
-                    if (resetSpriteDir)
-                        npc.spriteDirection = 1;
                 }
             }
             else
@@ -3636,10 +3632,6 @@ namespace TerRoguelike.NPCs
                         targetPlayer = -1;
 
                     targetNPC = -1;
-                    if (resetDir)
-                        npc.direction = 1;
-                    if (resetSpriteDir)
-                        npc.spriteDirection = 1;
                 }
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);

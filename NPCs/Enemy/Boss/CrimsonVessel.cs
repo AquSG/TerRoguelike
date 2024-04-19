@@ -238,7 +238,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            target = modNPC.GetTarget(NPC, false, false);
+            target = modNPC.GetTarget(NPC);
 
             if (NPC.localAI[1] >= 0)
             {

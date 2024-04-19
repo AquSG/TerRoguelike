@@ -150,7 +150,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            target = modNPC.GetTarget(NPC, false, false);
+            target = modNPC.GetTarget(NPC);
 
             if (vineWallCooldown > 0)
                 vineWallCooldown--;
