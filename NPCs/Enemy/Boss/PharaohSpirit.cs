@@ -37,9 +37,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int CombatStyle => -1;
         public int currentFrame;
         public bool CollisionPass = false;
+        public float eyeGlowInterpolant = 0;
 
         Texture2D glowTex;
-        public SlotId IceWindSlot;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -51,6 +51,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack SandTurret = new Attack(3, 30, 180);
         public static Attack Tendril = new Attack(4, 30, 180);
         public static Attack Summon = new Attack(5, 40, 180);
+        public float defaultMaxVelocity = 4;
+        public float defaultAcceleration = 0.08f;
 
         public override void SetStaticDefaults()
         {
@@ -88,6 +90,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void PostAI()
         {
             NPC.spriteDirection = NPC.direction;
+            if (currentFrame > 3)
+                eyeGlowInterpolant += 0.017f;
+            else
+                eyeGlowInterpolant -= 0.017f;
+            eyeGlowInterpolant = MathHelper.Clamp(eyeGlowInterpolant, 0, 1);
         }
         public override void AI()
         {
@@ -126,6 +133,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.localAI[0]++;
                 BossAI();
+                NPC.rotation = NPC.rotation.AngleLerp(MathHelper.Clamp(NPC.velocity.X * 0.1f, -MathHelper.PiOver2 * 0.15f, MathHelper.PiOver2 * 0.15f), 0.25f);
             }
         }
         public void BossAI()
@@ -152,7 +160,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-
+                    NPC.velocity *= 0.98f;
+                    if (target != null)
+                    {
+                        Vector2 targetPos = target.Center;
+                        NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * defaultAcceleration;
+                    }
+                    NPC.velocity.Y += (float)Math.Cos(NPC.localAI[0] / 20) * 0.04f;
+                    if (NPC.velocity.Length() > defaultMaxVelocity)
+                    {
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMaxVelocity;
+                    }
                 }
             }
 
@@ -201,6 +219,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[2] = Summon.Id;
                 }
             }
+
+            if (NPC.ai[0] != None.Id)
+            {
+                NPC.velocity *= 0.98f;
+            }
         }
 
         public void ChooseAttack()
@@ -228,7 +251,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = None.Id;
             NPC.ai[0] = chosenAttack;
         }
 
@@ -268,6 +291,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                NPC.rotation = 0;
+                NPC.velocity *= 0;
                 modNPC.ignitedStacks.Clear();
                 if (modNPC.isRoomNPC)
                 {
@@ -349,7 +374,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
 
-            currentFrame = (int)(Main.GlobalTimeWrappedHourly * 6) % Main.npcFrameCount[Type];
+            if (deadTime > 0)
+            {
+                currentFrame = 10;
+            }
+            else if (NPC.localAI[0] < 0)
+            {
+                currentFrame = 0;
+            }
+            else if (NPC.ai[0] == None.Id)
+            {
+                currentFrame = (int)(NPC.localAI[0] * 0.1f) % 4;
+            }
+            
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -357,10 +394,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Texture2D tex = TextureAssets.Npc[Type].Value;
 
             Vector2 drawPos = NPC.Center + modNPC.drawCenter - Main.screenPosition;
-            Main.EntitySpriteDraw(tex, drawPos, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            Main.EntitySpriteDraw(tex, drawPos, NPC.frame, Color.Lerp(drawColor, Color.White, 0.25f), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            float finalEyeGlowInterpolant = eyeGlowInterpolant * (0.3f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 16)) + 0.7f);
             for (int i = 0; i < 4; i++)
             {
-                Main.EntitySpriteDraw(glowTex, drawPos + (Vector2.UnitX * ((0.5f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 5) + 0.5f) * 1)).RotatedBy(i * MathHelper.PiOver2), NPC.frame, Color.White * 0.5f, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(glowTex, drawPos + (Vector2.UnitX * finalEyeGlowInterpolant * 1).RotatedBy(i * MathHelper.PiOver2), NPC.frame, Color.White * 0.5f, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
             
 
