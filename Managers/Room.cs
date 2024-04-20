@@ -281,7 +281,9 @@ namespace TerRoguelike.Managers
                 if (boundTop)
                 {
                     player.position.Y = (RoomPosition.Y + 1f) * 16f;
-                    player.velocity.Y = 0;
+                    player.velocity.Y = 0.01f;
+                    player.jump = 0;
+                    player.StopExtraJumpInProgress();
                 }
                 if (boundBottom)
                 {
