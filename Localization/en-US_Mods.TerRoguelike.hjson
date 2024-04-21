@@ -74,6 +74,7 @@ Projectiles: {
 	IceBomb.DisplayName: Ice Bomb
 	IceCloud.DisplayName: Ice Cloud
 	IceCloudSpawner.DisplayName: Ice Cloud Spawner
+	Sandnado.DisplayName: Sandnado
 }
 
 Items: {

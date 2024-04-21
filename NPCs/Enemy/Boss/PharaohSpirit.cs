@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 180);
-        public static Attack Sandnado = new Attack(1, 30, 180);
+        public static Attack Sandnado = new Attack(1, 30, 120);
         public static Attack Locust = new Attack(2, 30, 180);
         public static Attack SandTurret = new Attack(3, 30, 180);
         public static Attack Tendril = new Attack(4, 30, 180);
@@ -152,7 +152,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.direction = -1;
                 }
                 else
-                    NPC.direction = 1;
+                    NPC.direction = Math.Sign(NPC.velocity.X);
 
                 if (NPC.ai[1] >= None.Duration)
                 {
@@ -173,11 +173,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
-
             if (NPC.ai[0] == Sandnado.Id)
             {
+                if (NPC.ai[1] == 30)
+                {
+                    Room room = modNPC.sourceRoomListID >= 0 ? RoomList[modNPC.sourceRoomListID] : null;
+                    int nadoCount = 4;
+                    for (int i = 0; i < nadoCount; i++)
+                    {
+                        float completion = (i + 1f) / (nadoCount + 1f);
+                        Vector2 projPos = room != null ? room.RoomPosition16 + new Vector2(room.RoomDimensions16.X * completion, room.RoomDimensions16.Y * 0.5f) : spawnPos + new Vector2(-1000 + (2000 * completion), 0);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, Vector2.Zero, ModContent.ProjectileType<Sandnado>(), NPC.damage, 0);
+                    }
+                }
                 if (NPC.ai[1] >= Sandnado.Duration)
                 {
+                    currentFrame = 0;
+                    NPC.localAI[0] = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Sandnado.Id;
@@ -222,7 +234,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] != None.Id)
             {
-                NPC.velocity *= 0.98f;
+                NPC.velocity *= 0.95f;
             }
         }
 
@@ -251,7 +263,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = None.Id;
+            chosenAttack = Sandnado.Id;
             NPC.ai[0] = chosenAttack;
         }
 
@@ -385,6 +397,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == None.Id)
             {
                 currentFrame = (int)(NPC.localAI[0] * 0.1f) % 4;
+            }
+            else if (NPC.ai[0] == Sandnado.Id)
+            {
+                if (NPC.ai[1] < 30)
+                {
+                    currentFrame = (int)(NPC.ai[1] / 10) + 4;
+                }
+                else if (NPC.ai[1] >= 30 && NPC.ai[1] < 80)
+                {
+                    currentFrame = (int)((NPC.ai[1] / 10 + 2) % 4) + 5;
+                }
+                else if (NPC.ai[1] >= 80)
+                {
+                    currentFrame = (int)((NPC.ai[1] - 80) / 10) + 9;
+                }
             }
             
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
