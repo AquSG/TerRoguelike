@@ -119,6 +119,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/Snowflake",
                 "TerRoguelike/ExtraTextures/StarrySky",
                 "TerRoguelike/NPCs/Enemy/Boss/PharaohSpiritGlow",
+                "TerRoguelike/Projectiles/SandnadoLight",
             };
             foreach (string path in pathList)
             {
