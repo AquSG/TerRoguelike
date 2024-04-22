@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.Audio;
+using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TerRoguelike.Managers;
-using TerRoguelike.Systems;
-using TerRoguelike.TerPlayer;
-using Microsoft.Xna.Framework.Graphics;
-using TerRoguelike.Items.Common;
-using TerRoguelike.Utilities;
-using Terraria.GameContent;
-using Terraria.Graphics.Shaders;
-using static TerRoguelike.Managers.TextureManager;
-using Terraria.DataStructures;
 using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.Systems;
+using TerRoguelike.Utilities;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
@@ -82,29 +77,26 @@ namespace TerRoguelike.Projectiles
             if (Projectile.timeLeft < 50)
                 return;
 
-            //This is the vanilla sandnado dust code. Really liked the dust effect they had going but it's like, super specific. So I tried my best to make it suit the big sandnado.
+            //This is taken from the vanilla sandnado dust code. Really liked the dust effect they had going but it's like, super specific. So I tried my best to make it suit the big sandnado.
             Vector2 anchor = Projectile.Center;
             Vector2 dimensions = new Vector2((int)(Projectile.width * 2.5f), (int)(Projectile.height * 1.1f));
-            for (int i = 0; i < 1; i++)
+            float randFloat = Main.rand.NextFloat();
+            Vector2 dustOffset = new Vector2(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(-0.5f, 0.9f, randFloat));
+            dustOffset.X *= MathHelper.Lerp(2.2f, 0.6f, randFloat);
+            dustOffset.X *= -1f;
+            Vector2 dustMagnet = new Vector2(2f, 10f);
+            Vector2 dustSetPos = anchor + dimensions * dustOffset * 0.5f + dustMagnet;
+            Dust dust = Main.dust[Dust.NewDust(dustSetPos, 0, 0, DustID.Sandnado)];
+            dust.position = dustSetPos;
+            dust.customData = anchor + dustMagnet;
+            dust.fadeIn = 1f;
+            dust.scale = 0.3f;
+            dust.noLight = true;
+            if (dustOffset.X > -1.2f)
             {
-                float randFloat = Main.rand.NextFloat();
-                Vector2 dustOffset = new Vector2(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(-0.5f, 0.9f, randFloat));
-                dustOffset.X *= MathHelper.Lerp(2.2f, 0.6f, randFloat);
-                dustOffset.X *= -1f;
-                Vector2 dustMagnet = new Vector2(2f, 10f);
-                Vector2 dustPos = anchor + dimensions * dustOffset * 0.5f + dustMagnet;
-                Dust dust = Main.dust[Dust.NewDust(dustPos, 0, 0, DustID.Sandnado)];
-                dust.position = dustPos;
-                dust.customData = anchor + dustMagnet;
-                dust.fadeIn = 1f;
-                dust.scale = 0.3f;
-                dust.noLight = true;
-                if (dustOffset.X > -1.2f)
-                {
-                    dust.velocity.X = 1f + Main.rand.NextFloat();
-                }
-                dust.velocity.Y = Main.rand.NextFloat() * -0.5f - 3f;
+                dust.velocity.X = 1f + Main.rand.NextFloat();
             }
+            dust.velocity.Y = Main.rand.NextFloat() * -0.5f - 3f;
         }
         public override bool? CanDamage() => (maxTimeLeft - Projectile.timeLeft > 90 && Projectile.timeLeft > 50) ? null : false;
         public override bool PreDraw(ref Color lightColor)

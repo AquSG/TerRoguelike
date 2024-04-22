@@ -40,6 +40,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float eyeGlowInterpolant = 0;
 
         Texture2D glowTex;
+        public SoundStyle LocustSwarm = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
+        public SlotId LocustSlot;
+        public int soundMoveDirection = 0;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -47,12 +50,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 180);
         public static Attack Sandnado = new Attack(1, 30, 120);
-        public static Attack Locust = new Attack(2, 30, 180);
+        public static Attack Locust = new Attack(2, 30, 360);
         public static Attack SandTurret = new Attack(3, 30, 180);
         public static Attack Tendril = new Attack(4, 30, 180);
         public static Attack Summon = new Attack(5, 40, 180);
         public float defaultMaxVelocity = 4;
         public float defaultAcceleration = 0.08f;
+        public int sandnadoCooldown = 0;
+        public int locustTelegraph = 60;
+        public int locustFireRate = 5;
+        public int locustCount = 2;
 
         public override void SetStaticDefaults()
         {
@@ -95,6 +102,31 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else
                 eyeGlowInterpolant -= 0.017f;
             eyeGlowInterpolant = MathHelper.Clamp(eyeGlowInterpolant, 0, 1);
+            if (deadTime > 0)
+            {
+                if (SoundEngine.TryGetActiveSound(LocustSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Volume -= 0.016f;
+                }
+            }
+            else if (NPC.localAI[1] > 0)
+            {
+                if (SoundEngine.TryGetActiveSound(LocustSlot, out var sound) && sound.IsPlaying)
+                {
+                    if (NPC.localAI[1] < 150)
+                    {
+                        Vector2 pos = (Vector2)sound.Position;
+                        if (soundMoveDirection == -1 ? (pos.X > spawnPos.X) : (pos.X < spawnPos.X))
+                            sound.Position += new Vector2(4 * soundMoveDirection, 0);
+                    }
+                    else if (NPC.localAI[1] > 200)
+                    {
+                        sound.Position += new Vector2(3 * soundMoveDirection, 0);
+                        sound.Volume -= 0.0025f;
+                    }
+                    NPC.localAI[1]++;
+                }
+            }
         }
         public override void AI()
         {
@@ -105,7 +137,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(IceQueenTheme);
+                SetBossTrack(CrimsonVesselTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
@@ -141,6 +173,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             target = modNPC.GetTarget(NPC);
 
             NPC.ai[1]++;
+            if (sandnadoCooldown > 0)
+                sandnadoCooldown--;
 
             if (NPC.ai[0] == None.Id)
             {
@@ -152,7 +186,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.direction = -1;
                 }
                 else
+                {
                     NPC.direction = Math.Sign(NPC.velocity.X);
+                    if (NPC.direction == 0)
+                        NPC.direction = -1;
+                }
+                    
 
                 if (NPC.ai[1] >= None.Duration)
                 {
@@ -173,6 +212,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
+
             if (NPC.ai[0] == Sandnado.Id)
             {
                 if (NPC.ai[1] == 30)
@@ -188,6 +228,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= Sandnado.Duration)
                 {
+                    sandnadoCooldown = 540;
                     currentFrame = 0;
                     NPC.localAI[0] = 0;
                     NPC.ai[0] = None.Id;
@@ -197,6 +238,34 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Locust.Id)
             {
+                if (NPC.ai[1] < locustTelegraph)
+                {
+
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - locustTelegraph;
+                    if (time % locustFireRate == 0)
+                    {
+                        locustCount = 1;
+                        locustFireRate = 7;
+                        Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
+                        Vector2 anchor = room != null ? room.RoomPosition16 + new Vector2(NPC.direction > 0 ? 0 : room.RoomDimensions16.X, room.RoomDimensions16.Y * 0.5f) : spawnPos + new Vector2(NPC.direction > 0 ? 1500 : -1500, 0);
+                        if (NPC.ai[1] == locustTelegraph)
+                        {
+                            LocustSlot = SoundEngine.PlaySound(LocustSwarm with { Volume = 0.4f }, anchor);
+                            NPC.localAI[1] = 1;
+                            soundMoveDirection = NPC.direction;
+                        }
+                        Vector2 projVel = new Vector2(8 * NPC.direction, 0);
+                        float height = room != null ? (room.RoomDimensions16.Y - 48) * 0.5f : 500; 
+                        for (int i = 0; i < locustCount; i++)
+                        {
+                            Vector2 projPos = anchor + new Vector2(0, Main.rand.NextFloat(-height, height));
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, projVel, ModContent.ProjectileType<Locust>(), NPC.damage, 0);
+                        }
+                    }
+                }
                 if (NPC.ai[1] >= Locust.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -245,6 +314,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+            if (sandnadoCooldown > 0)
+                potentialAttacks.RemoveAll(x => x.Id == Sandnado.Id);
 
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
@@ -263,7 +334,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Sandnado.Id;
+
             NPC.ai[0] = chosenAttack;
         }
 
@@ -413,6 +484,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     currentFrame = (int)((NPC.ai[1] - 80) / 10) + 9;
                 }
             }
+            if (NPC.ai[0] == Locust.Id)
+            {
+                if (NPC.ai[1] < 15 || Locust.Duration - NPC.ai[1] < 15)
+                    currentFrame = 4;
+                else
+                    currentFrame = (int)((NPC.ai[1] / 10 - 2) % 4) + 5;
+
+                
+            }
             
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }
@@ -428,7 +508,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Main.EntitySpriteDraw(glowTex, drawPos + (Vector2.UnitX * finalEyeGlowInterpolant * 1).RotatedBy(i * MathHelper.PiOver2), NPC.frame, Color.White * 0.5f, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
             
-
             return false;
         }
     }
