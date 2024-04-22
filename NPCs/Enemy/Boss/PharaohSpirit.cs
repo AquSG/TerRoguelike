@@ -23,6 +23,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Graphics.Effects;
+using Steamworks;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -60,6 +61,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int locustTelegraph = 60;
         public int locustFireRate = 7;
         public int locustCount = 1;
+        public List<int> sandTurretFireTimes = new List<int>() { 0, 90 } ;
 
         public override void SetStaticDefaults()
         {
@@ -273,6 +275,29 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == SandTurret.Id)
             {
+                if (target != null)
+                {
+                    if (target.Center.X > NPC.Center.X)
+                        NPC.direction = 1;
+                    else
+                        NPC.direction = -1;
+                }
+                else
+                {
+                    NPC.direction = Math.Sign(NPC.velocity.X);
+                    if (NPC.direction == 0)
+                        NPC.direction = -1;
+                }
+
+                for (int i = 0; i < sandTurretFireTimes.Count; i++)
+                {
+                    int fireTime = sandTurretFireTimes[i];
+                    if (NPC.ai[1] == fireTime)
+                    {
+                        SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy with { Volume = 1f }, NPC.Top);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<SandTurret>(), NPC.damage, 0);
+                    }
+                }
                 if (NPC.ai[1] >= SandTurret.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -310,7 +335,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril, Summon };
+            //List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret};
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (sandnadoCooldown > 0)
                 potentialAttacks.RemoveAll(x => x.Id == Sandnado.Id);
@@ -482,14 +508,30 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     currentFrame = (int)((NPC.ai[1] - 80) / 10) + 9;
                 }
             }
-            if (NPC.ai[0] == Locust.Id)
+            else if (NPC.ai[0] == Locust.Id)
             {
                 if (NPC.ai[1] < 15 || Locust.Duration - NPC.ai[1] < 15)
                     currentFrame = 4;
                 else
                     currentFrame = (int)((NPC.ai[1] / 10 - 2) % 4) + 5;
+            }
+            else if (NPC.ai[0] == SandTurret.Id)
+            {
+                for (int i = 0; i < sandTurretFireTimes.Count; i++)
+                {
+                    int fireTime = sandTurretFireTimes[i];
+                    if (NPC.ai[1] < fireTime)
+                        continue;
 
-                
+                    if (NPC.ai[1] < fireTime + 60)
+                    {
+                        currentFrame = NPC.ai[1] - fireTime < 15 ? 9 : 10;
+                    }
+                    else if (NPC.ai[1] < fireTime + 90)
+                    {
+                        currentFrame = NPC.ai[1] - fireTime < 75 ? 6 : (i == (sandTurretFireTimes.Count - 1) ? 4 : 12);
+                    }
+                }
             }
             
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);

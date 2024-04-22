@@ -18,6 +18,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     }
     float2 totalUV = screenOffset + uv;
     float4 replacementColor = tex2D(Texture2Sampler, totalUV * stretch);
+    replacementColor.w = pixelColor.w;
     replacementColor *= tint;
     return replacementColor;
 }
