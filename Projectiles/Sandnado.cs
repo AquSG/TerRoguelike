@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -37,6 +38,11 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             lightTex = TexDict["SandnadoLight"].Value;
             glowTex = TexDict["CircularGlow"].Value;
+            Projectile.hide = true;
+        }
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            behindNPCs.Add(index);
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -49,7 +55,7 @@ namespace TerRoguelike.Projectiles
                 if (parentSource.Entity is NPC)
                 {
                     if (Main.npc[parentSource.Entity.whoAmI].type == ModContent.NPCType<PharaohSpirit>())
-                        parentPos = Main.npc[parentSource.Entity.whoAmI].Top + new Vector2(0, -20);
+                        parentPos = Main.npc[parentSource.Entity.whoAmI].Center + new Vector2(Main.npc[parentSource.Entity.whoAmI].direction * 28, -3);
                 }
             }
         }

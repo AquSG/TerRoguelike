@@ -253,7 +253,7 @@ namespace TerRoguelike.Projectiles
                 if (targetPlayer == -1 || targetNPC != -1)
                 {
                     targetPlayer = ClosestPlayer(proj.Center, 3200f);
-                    if (Main.player[targetPlayer].dead)
+                    if (targetPlayer >= 0 && Main.player[targetPlayer].dead)
                         targetPlayer = -1;
 
                     targetNPC = -1;

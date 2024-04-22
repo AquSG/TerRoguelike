@@ -77,7 +77,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.lifeMax = 30000;
             NPC.HitSound = SoundID.NPCHit23;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 0);
+            modNPC.drawCenter = new Vector2(0, 8);
             modNPC.IgnoreRoomWallCollision = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
