@@ -1,6 +1,7 @@
 float time;
 float2 screenOffset;
 float2 stretch;
+float4 tint;
 
 texture sampleTexture;
 texture replacementTexture;
@@ -17,6 +18,7 @@ float4 main(float2 uv : TEXCOORD) : COLOR
     }
     float2 totalUV = screenOffset + uv;
     float4 replacementColor = tex2D(Texture2Sampler, totalUV * stretch);
+    replacementColor *= tint;
     return replacementColor;
 }
 

@@ -28,6 +28,8 @@ namespace TerRoguelike.Projectiles
         public int npcOwner = -1;
         public int npcOwnerType = -1;
         public float notedBoostedDamage = 1f;
+        public int targetPlayer = -1;
+        public int targetNPC = -1;
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0; // set bounces in projectile ai.
@@ -220,6 +222,44 @@ namespace TerRoguelike.Projectiles
             float maxChange = homingStrength * MathHelper.TwoPi;
 
             projectile.velocity = (Vector2.UnitX * projectile.velocity.Length()).RotatedBy(projectile.velocity.ToRotation().AngleTowards((Main.npc[homingTarget].Center - projectile.Center).ToRotation(), maxChange));
+        }
+        public Entity GetTarget(Projectile proj)
+        {
+            if (targetPlayer != -1)
+            {
+                if (!Main.player[targetPlayer].active || Main.player[targetPlayer].dead || proj.friendly)
+                {
+                    targetPlayer = -1;
+                }
+            }
+            if (targetNPC != -1)
+            {
+                if (!Main.npc[targetNPC].ModNPC().CanBeChased(false, false) || !proj.friendly)
+                {
+                    targetNPC = -1;
+                }
+            }
+
+            if (proj.friendly)
+            {
+                if (targetNPC == -1 || targetPlayer != -1)
+                {
+                    targetNPC = ClosestNPC(proj.Center, 3200f, false);
+                    targetPlayer = -1;
+                }
+            }
+            else
+            {
+                if (targetPlayer == -1 || targetNPC != -1)
+                {
+                    targetPlayer = ClosestPlayer(proj.Center, 3200f);
+                    if (Main.player[targetPlayer].dead)
+                        targetPlayer = -1;
+
+                    targetNPC = -1;
+                }
+            }
+            return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
         }
     }
     public class ProcChainBools

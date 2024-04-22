@@ -40,8 +40,6 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            Projectile.damage = 17;
-            Projectile.hostile = true;
             SoundEngine.PlaySound(SoundID.Item60 with { Volume = 0.35f, MaxInstances = 10 }, Projectile.Center);
             Projectile.rotation += Main.rand.NextFloat(MathHelper.TwoPi);
             rotationSpeed = Main.rand.NextFloat(0.047f, 0.053f);

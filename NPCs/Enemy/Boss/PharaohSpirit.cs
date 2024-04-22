@@ -58,8 +58,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float defaultAcceleration = 0.08f;
         public int sandnadoCooldown = 0;
         public int locustTelegraph = 60;
-        public int locustFireRate = 5;
-        public int locustCount = 2;
+        public int locustFireRate = 7;
+        public int locustCount = 1;
 
         public override void SetStaticDefaults()
         {
@@ -247,8 +247,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int time = (int)NPC.ai[1] - locustTelegraph;
                     if (time % locustFireRate == 0)
                     {
-                        locustCount = 1;
-                        locustFireRate = 7;
                         Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
                         Vector2 anchor = room != null ? room.RoomPosition16 + new Vector2(NPC.direction > 0 ? 0 : room.RoomDimensions16.X, room.RoomDimensions16.Y * 0.5f) : spawnPos + new Vector2(NPC.direction > 0 ? 1500 : -1500, 0);
                         if (NPC.ai[1] == locustTelegraph)
