@@ -71,7 +71,7 @@ namespace TerRoguelike.Projectiles
                     NPC npc = Main.npc[modProj.npcOwner];
                     if (npc.active && npc.life > 0)
                     {
-                        Projectile.Center = npc.Top + new Vector2(0, -64).RotatedBy(npc.rotation);
+                        Projectile.Center = npc.Top + new Vector2(0, -56).RotatedBy(npc.rotation);
                     }
                 }
                 if ((time) == 60)
@@ -118,6 +118,7 @@ namespace TerRoguelike.Projectiles
                 }
             }
         }
+        public override bool? CanDamage() => (maxTimeLeft - Projectile.timeLeft > 60 && Projectile.timeLeft > 60) ? null : false;
         public override bool PreDraw(ref Color lightColor)
         {
             int time = maxTimeLeft - Projectile.timeLeft;
