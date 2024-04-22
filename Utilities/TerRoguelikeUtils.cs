@@ -198,6 +198,25 @@ namespace TerRoguelike.Utilities
             return furthest;
         }
 
+        public static int ClosestPlayer(Vector2 origin, float maxDistance)
+        {
+            int furthest = -1;
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+                if (!player.active || player.dead)
+                    continue;
+
+                float distance = (origin - player.getRect().ClosestPointInRect(origin)).Length();
+                if (distance < maxDistance)
+                {
+                    maxDistance = distance;
+                    furthest = i;
+                }
+            }
+            return furthest;
+        }
+
         /// <summary>
         /// Basically Main.mouseWorld but takes into account if you are on controller and locked on to an NPC
         /// </summary>

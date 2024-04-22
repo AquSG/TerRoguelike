@@ -120,6 +120,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/StarrySky",
                 "TerRoguelike/NPCs/Enemy/Boss/PharaohSpiritGlow",
                 "TerRoguelike/Projectiles/SandnadoLight",
+                "TerRoguelike/ExtraTextures/Crust",
             };
             foreach (string path in pathList)
             {
