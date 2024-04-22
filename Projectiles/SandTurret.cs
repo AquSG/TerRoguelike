@@ -17,6 +17,8 @@ using Terraria.Graphics.Effects;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
+using System.Threading;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.Projectiles
 {
@@ -24,7 +26,6 @@ namespace TerRoguelike.Projectiles
     {
         Entity target = null;
         public int maxTimeLeft;
-        public float timeOffset;
         public Texture2D noiseTex;
         public Texture2D glowTex;
         public Texture2D crossGlowTex;
@@ -49,9 +50,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            Projectile.damage = 1;
-            Projectile.hostile = true;
-            Projectile.friendly = false;
+
         }
         public override void AI()
         {
@@ -72,28 +71,37 @@ namespace TerRoguelike.Projectiles
                     NPC npc = Main.npc[modProj.npcOwner];
                     if (npc.active && npc.life > 0)
                     {
-                        Projectile.Center = npc.Top + new Vector2(0, -48).RotatedBy(npc.rotation);
+                        Projectile.Center = npc.Top + new Vector2(0, -64).RotatedBy(npc.rotation);
                     }
                 }
                 if ((time) == 60)
                 {
                     Projectile.velocity = (target != null ? (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY) : Main.rand.NextVector2CircularEdge(0.5f, 0.5f));
                     Projectile.velocity *= target == null ? 16f : (target.Center - Projectile.Center).Length() * 0.025f;
+                    SoundEngine.PlaySound(SoundID.Item76 with { Volume = 1f, Pitch = -0.5f }, Projectile.Center + Projectile.velocity * 10);
                 }
             }
             else
             {
                 if (Projectile.timeLeft > 60)
                 {
-                    if (time >= 90)
-                        {
+                    if (time >= 40)
                     {
+                        Vector2 randOff = Main.rand.NextVector2CircularEdge(38, 38);
+                        float dir = randOff.ToRotation() - MathHelper.PiOver2;
+                        ParticleManager.AddParticle(new Square(Projectile.Center + randOff, dir.ToRotationVector2() * 4 + Projectile.velocity, 20, Color.Goldenrod * 0.9f, new Vector2(1.5f), 0, 0.96f, 20));
+                    }
+                    if (time >= 90)
+                    {
+                        
+
                         if (Projectile.timeLeft % 8 == 0)
+                        { 
                             SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.2f, Pitch = 0.5f, PitchVariance = 0.08f }, Projectile.Center);
                             SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
                             Projectile.localAI[0] = 5;
                             Vector2 direction = target == null ? Vector2.UnitY : (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY);
-                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + direction * 24, direction * 6, ModContent.ProjectileType<Locust>(), Projectile.damage, 0);
+                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + direction * 36, direction * 6, ModContent.ProjectileType<ShiningSand>(), Projectile.damage, 0);
                         }
                     }
 
