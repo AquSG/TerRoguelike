@@ -54,7 +54,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Locust = new Attack(2, 30, 360);
         public static Attack SandTurret = new Attack(3, 30, 180);
         public static Attack Tendril = new Attack(4, 30, 510);
-        public static Attack Summon = new Attack(5, 40, 180);
+        public static Attack Summon = new Attack(5, 40, 120);
         public float defaultMaxVelocity = 4;
         public float defaultAcceleration = 0.08f;
         public int sandnadoCooldown = 0;
@@ -62,6 +62,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int locustFireRate = 7;
         public int locustCount = 1;
         public List<int> sandTurretFireTimes = new List<int>() { 0, 90 } ;
+        public Vector2[] summonSpawnPositions = { new Vector2(-1), new Vector2(-1) };
+        public int[] summonDesiredEnemies = { 0, 0 };
+        public int summonTelegraph = 60;
+        public int summonStartup = 15;
 
         public override void SetStaticDefaults()
         {
@@ -98,8 +102,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            Tendril = new Attack(4, 30, 510);
-
             NPC.spriteDirection = NPC.direction;
             if (currentFrame > 3)
                 eyeGlowInterpolant += 0.017f;
@@ -219,6 +221,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Sandnado.Id)
             {
+                NPC.velocity *= 0.9f;
                 if (NPC.ai[1] == 30)
                 {
                     Room room = modNPC.sourceRoomListID >= 0 ? RoomList[modNPC.sourceRoomListID] : null;
@@ -237,7 +240,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.localAI[0] = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Sandnado.Id;
+                    //NPC.ai[2] = Sandnado.Id;
                 }
             }
             else if (NPC.ai[0] == Locust.Id)
@@ -330,6 +333,106 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                NPC.velocity *= 0.9f;
+                if (NPC.ai[1] == summonStartup)
+                {
+                    SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.6f }, NPC.Center);
+
+                    for (int i = 0; i < summonSpawnPositions.Length; i++)
+                    {
+                        summonDesiredEnemies[i] = Main.rand.NextBool() ? ModContent.NPCType<DesertSpirit>() : ModContent.NPCType<Lamia>();
+                        NPC dummyNPC = new NPC();
+                        dummyNPC.type = summonDesiredEnemies[i];
+                        dummyNPC.SetDefaults(summonDesiredEnemies[i]);
+                        Rectangle dummyRect = new Rectangle(0, 0, dummyNPC.width, dummyNPC.height);
+
+                        int direction = i == 0 ? -1 : 1;
+                        float distanceBeside = 112f * direction;
+                        Rectangle plannedRect = new Rectangle((int)(NPC.Center.X + distanceBeside - (dummyRect.Width * 0.5f)), (int)(NPC.Center.Y - (dummyRect.Height * 0.5f)), dummyRect.Width, dummyRect.Height);
+                        if (modNPC.isRoomNPC)
+                        {
+                            plannedRect = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(plannedRect);
+                        }
+                        Vector2 position = plannedRect.Center.ToVector2();
+
+                        Point tilePos = new Vector2(position.X, plannedRect.Bottom).ToTileCoordinates();
+
+                        if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                        {
+                            bool found = false;
+                            for (int y = 0; y < 25; y++)
+                            {
+                                for (int d = -1; d <= 1; d += 2)
+                                {
+                                    if (!ParanoidTileRetrieval(tilePos.X, tilePos.Y + (y * d)).IsTileSolidGround(true))
+                                    {
+                                        float offset = y * d * 16f;
+                                        if (modNPC.isRoomNPC)
+                                        {
+                                            Rectangle rectCheck = new Rectangle(plannedRect.X, (int)(plannedRect.Y + offset), plannedRect.Width, plannedRect.Height);
+                                            rectCheck = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(rectCheck);
+                                            Vector2 posCheck = new Vector2(rectCheck.Center.X, rectCheck.Bottom);
+
+                                            Point tilePosCheck = posCheck.ToTileCoordinates();
+                                            if (!ParanoidTileRetrieval(tilePosCheck.X, tilePosCheck.Y).IsTileSolidGround(true))
+                                            {
+                                                found = true;
+                                                position.Y += rectCheck.Y - plannedRect.Y;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            found = true;
+                                            position.Y += offset;
+                                        }
+                                    }
+                                }
+                                if (found)
+                                    break;
+                            }
+                            if (found)
+                                summonSpawnPositions[i] = position;
+                        }
+                        else
+                        {
+                            summonSpawnPositions[i] = position;
+                        }
+                    }
+                }
+                if (NPC.ai[1] >= summonStartup && NPC.ai[1] < summonTelegraph + summonStartup)
+                {
+                    int time = 20;
+                    Vector2 startPos = NPC.Center + new Vector2(32 * NPC.direction, -4);
+                    float completion = (NPC.ai[1] - summonStartup) / summonTelegraph;
+                    float curveMultiplier = 1f - (float)Math.Pow(Math.Abs(completion - 0.5f) * 2, 2);
+                    for (int i = 0; i < summonSpawnPositions.Length; i++)
+                    {
+                        Vector2 endPos = summonSpawnPositions[i];
+                        if (endPos == new Vector2(-1))
+                            continue;
+                        endPos += new Vector2(0, 16);
+
+                        Vector2 particlePos = startPos + ((endPos - startPos) * completion) + (Vector2.UnitY * -32 * curveMultiplier);
+                        particlePos += new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
+
+                        ParticleManager.AddParticle(new Square(particlePos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * 0.45f), 0, 0.96f, time, true));
+                    }
+                }
+                else if (NPC.ai[1] == summonTelegraph + summonStartup)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f }, NPC.Center);
+                    for (int i = 0; i < summonSpawnPositions.Length; i++)
+                    {
+                        Vector2 pos = summonSpawnPositions[i];
+                        if (pos == new Vector2(-1))
+                            continue;
+
+                        SpawnManager.SpawnEnemy(summonDesiredEnemies[i], pos, modNPC.sourceRoomListID, 60, 0.45f);
+
+                        summonSpawnPositions[i] = new Vector2(-1);
+                    }
+                }
                 if (NPC.ai[1] >= Summon.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -349,8 +452,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril };
+            List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (sandnadoCooldown > 0)
                 potentialAttacks.RemoveAll(x => x.Id == Sandnado.Id);
@@ -372,7 +474,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
             NPC.ai[0] = chosenAttack;
         }
 
@@ -553,6 +654,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     currentFrame = 4;
                 else
                     currentFrame = (int)((NPC.ai[1] / 10 - 2) % 4) + 5;
+            }
+            else if (NPC.ai[0] == Summon.Id)
+            {
+                if (NPC.ai[1] < 30)
+                {
+                    currentFrame = (int)(NPC.ai[1] / 10) + 4;
+                }
+                else if (NPC.ai[1] >= 30 && NPC.ai[1] < 80)
+                {
+                    currentFrame = (int)((NPC.ai[1] / 10 + 2) % 4) + 5;
+                }
+                else if (NPC.ai[1] >= 80)
+                {
+                    currentFrame = (int)((NPC.ai[1] - 80) / 10) + 9;
+                }
             }
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
