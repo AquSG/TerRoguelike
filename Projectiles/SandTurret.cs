@@ -156,7 +156,6 @@ namespace TerRoguelike.Projectiles
                 Color crossColor = Color.Lerp(tint * 0.92f, Color.White, Projectile.localAI[0] / 5) * 0.97f;
                 Main.EntitySpriteDraw(crossGlowTex, Projectile.Center - Main.screenPosition + direction.ToRotationVector2() * 38 * scale * scaleInterpolant * Projectile.scale, null, crossColor * crossOpacity, direction, new Vector2(0, crossGlowTex.Size().Y * 0.5f), Projectile.scale * 0.3f * scale * scaleInterpolant * new Vector2(1f, 2f), SpriteEffects.FlipHorizontally);
             }
-            
 
             TerRoguelikeUtils.StartVanillaSpritebatch();
             return false;

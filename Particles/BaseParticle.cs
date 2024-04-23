@@ -57,8 +57,15 @@ namespace TerRoguelike.Particles
             position += velocity;
             timeLeft--;
         }
+        public virtual bool PreDraw()
+        {
+            return true;
+        }
         public void Draw()
         {
+            if (!PreDraw())
+                return;
+
             Main.EntitySpriteDraw(texture, position - Main.screenPosition, frame, color, rotation, frame.Size() * 0.5f, scale, spriteEffects);
         }
         public Vector2 CheckFutureTileCollision()

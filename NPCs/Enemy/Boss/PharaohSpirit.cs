@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Sandnado = new Attack(1, 30, 120);
         public static Attack Locust = new Attack(2, 30, 360);
         public static Attack SandTurret = new Attack(3, 30, 180);
-        public static Attack Tendril = new Attack(4, 30, 180);
+        public static Attack Tendril = new Attack(4, 30, 510);
         public static Attack Summon = new Attack(5, 40, 180);
         public float defaultMaxVelocity = 4;
         public float defaultAcceleration = 0.08f;
@@ -98,6 +98,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
+            Tendril = new Attack(4, 30, 510);
+
             NPC.spriteDirection = NPC.direction;
             if (currentFrame > 3)
                 eyeGlowInterpolant += 0.017f;
@@ -294,7 +296,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int fireTime = sandTurretFireTimes[i];
                     if (NPC.ai[1] == fireTime)
                     {
-                        SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy with { Volume = 1f }, NPC.Top);
+                        SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy with { Volume = 1f, Variants =  new ReadOnlySpan<int>(0) }, NPC.Top);
                         Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<SandTurret>(), NPC.damage, 0);
                     }
                 }
@@ -307,6 +309,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Tendril.Id)
             {
+                NPC.velocity *= 0.9f;
+                if (NPC.ai[1] == 15)
+                {
+                    Vector2 anchor = NPC.Center + new Vector2(NPC.direction * 16, 0);
+                    for (int i = -2; i <= 2; i++)
+                    {
+                        Vector2 offset = new Vector2(30 * NPC.direction, 0);
+                        offset = offset.RotatedBy(MathHelper.Pi * 0.15f * i);
+                        offset.X *= 0.5f;
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), anchor + offset, offset.SafeNormalize(Vector2.UnitX * NPC.direction) * 3, ModContent.ProjectileType<DarkTendril>(), NPC.damage, 0);
+                    }
+                }
                 if (NPC.ai[1] >= Tendril.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -336,7 +350,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret};
+            List<Attack> potentialAttacks = new List<Attack>() { Sandnado, Locust, SandTurret, Tendril };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (sandnadoCooldown > 0)
                 potentialAttacks.RemoveAll(x => x.Id == Sandnado.Id);
@@ -533,7 +547,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
-            
+            else if (NPC.ai[0] == Tendril.Id)
+            {
+                if (NPC.ai[1] < 15 || Tendril.Duration - NPC.ai[1] < 15)
+                    currentFrame = 4;
+                else
+                    currentFrame = (int)((NPC.ai[1] / 10 - 2) % 4) + 5;
+            }
+
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

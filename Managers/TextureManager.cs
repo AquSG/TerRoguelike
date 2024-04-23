@@ -121,6 +121,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/PharaohSpiritGlow",
                 "TerRoguelike/Projectiles/SandnadoLight",
                 "TerRoguelike/ExtraTextures/Crust",
+                "TerRoguelike/Projectiles/DarkTendril",
             };
             foreach (string path in pathList)
             {
