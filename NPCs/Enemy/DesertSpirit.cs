@@ -15,6 +15,8 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using static TerRoguelike.Schematics.SchematicManager;
+using TerRoguelike.Managers;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -52,12 +54,16 @@ namespace TerRoguelike.NPCs.Enemy
             if (NPC.ai[0] == 0)
             {
                 SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
-                for (int i = 0; i < 50; i++)
+                Color outlineColor = Color.Purple;
+                Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.6f);
+                for (int i = 0; i < 25; i++)
                 {
-                    int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, 27, 0f, 0f, 100, default(Color), 2.5f);
-                    Dust dust = Main.dust[d];
-                    dust.velocity *= 3f;
-                    dust.noGravity = true;
+                    Rectangle rect = NPC.getRect();
+                    rect.Inflate(-4, -4);
+                    Vector2 particlePos = Main.rand.NextVector2FromRectangle(rect);
+                    ParticleManager.AddParticle(new BallOutlined(
+                        particlePos, Main.rand.NextVector2Circular(2, 2),
+                        60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.25f, 0.5f)), 4, 0, 0.92f, 50));
                 }
             }
             
