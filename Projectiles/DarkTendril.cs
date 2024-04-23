@@ -27,6 +27,10 @@ namespace TerRoguelike.Projectiles
         public int maxTimeLeft;
         public float startRot;
         public SlotId rumbleSlot;
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
+        }
         public override void SetDefaults()
         {
             Projectile.width = 24;
@@ -112,19 +116,16 @@ namespace TerRoguelike.Projectiles
                 {
                     Projectile.velocity *= 0.97f;
                 }
-                if (target != null)
+                if (target != null && (maxTimeLeft - Projectile.timeLeft) >= 60)
                 {
-                    if ((maxTimeLeft - Projectile.timeLeft) < 60)
-                    {
-                        Projectile.velocity = Projectile.velocity.RotatedBy((float)(Math.Cos(Projectile.localAI[0] / 4 + Projectile.ai[1]) * 0.08f));
-                    }
-                    else
-                    {
-                        float direction = (target.Center - Projectile.Center).ToRotation() + (float)(Math.Cos(Projectile.localAI[0] / 10 + Projectile.ai[1]) * 0.3f);
+                    float direction = (target.Center - Projectile.Center).ToRotation() + (float)(Math.Cos(Projectile.localAI[0] / 10 + Projectile.ai[1]) * 0.3f);
 
-                        float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.006f * turnMultiplier);
-                        Projectile.velocity = (Vector2.UnitX * Projectile.velocity.Length()).RotatedBy(newRot);
-                    }
+                    float newRot = Projectile.velocity.ToRotation().AngleTowards(direction, 0.006f * turnMultiplier);
+                    Projectile.velocity = (Vector2.UnitX * Projectile.velocity.Length()).RotatedBy(newRot);
+                }
+                else
+                {
+                    Projectile.velocity = Projectile.velocity.RotatedBy((float)(Math.Cos(Projectile.localAI[0] / 4 + Projectile.ai[1]) * 0.08f));
                 }
             }
             else if (Projectile.ai[0] == 1)
@@ -133,13 +134,16 @@ namespace TerRoguelike.Projectiles
                 if (specialOldPos.Count <= 0)
                 {
                     Projectile.Kill();
-                    if (SoundEngine.TryGetActiveSound(rumbleSlot, out var sound2) && sound2.IsPlaying)
-                    {
-                        sound2.Stop();
-                    }
                     return;
                 }
                 Projectile.Center = specialOldPos[specialOldPos.Count - 1];
+            }
+        }
+        public override void OnKill(int timeLeft)
+        {
+            if (SoundEngine.TryGetActiveSound(rumbleSlot, out var sound) && sound.IsPlaying)
+            {
+                sound.Stop();
             }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

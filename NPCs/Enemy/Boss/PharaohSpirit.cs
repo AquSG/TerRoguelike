@@ -41,20 +41,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float eyeGlowInterpolant = 0;
 
         Texture2D glowTex;
+        public Texture2D noiseTex;
+        public Texture2D circleGlowTex;
         public SoundStyle LocustSwarm = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
         public SlotId LocustSlot;
         public int soundMoveDirection = 0;
+        public SlotId rumbleSlot;
 
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
-        public int deathCutsceneDuration = 120;
+        public int cutsceneDuration = 240;
+        public int deathCutsceneDuration = 180;
 
         public static Attack None = new Attack(0, 0, 180);
-        public static Attack Sandnado = new Attack(1, 30, 120);
+        public static Attack Sandnado = new Attack(1, 50, 120);
         public static Attack Locust = new Attack(2, 30, 360);
         public static Attack SandTurret = new Attack(3, 30, 180);
         public static Attack Tendril = new Attack(4, 30, 510);
-        public static Attack Summon = new Attack(5, 40, 120);
+        public static Attack Summon = new Attack(5, 20, 120);
         public float defaultMaxVelocity = 4;
         public float defaultAcceleration = 0.08f;
         public int sandnadoCooldown = 0;
@@ -82,13 +85,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.HitSound = SoundID.NPCHit23;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 8);
-            modNPC.IgnoreRoomWallCollision = true;
+            modNPC.RoomWallCollisionShrink = new Vector2(8, 24);
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             glowTex = TexDict["PharaohSpiritGlow"].Value;
+            noiseTex = TexDict["Crust"].Value;
+            circleGlowTex = TexDict["CircularGlow"].Value;
+        }
+        public override void DrawBehind(int index)
+        {
+            if (NPC.localAI[0] < -30 || deadTime > 0)
+                Main.instance.DrawCacheNPCsOverPlayers.Add(index);
         }
         public override void OnSpawn(IEntitySource source)
         {
+            rumbleSlot = SoundEngine.PlaySound(SoundID.DD2_EtherianPortalIdleLoop with { Volume = 0.03f, PitchVariance = 0f, Pitch = 0.8f }, NPC.Center);
+
             NPC.Opacity = 0;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
@@ -103,7 +115,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void PostAI()
         {
             NPC.spriteDirection = NPC.direction;
-            if (currentFrame > 3)
+            if (currentFrame > 3 || (NPC.localAI[0] < -90 && NPC.localAI[0] > -cutsceneDuration + 45))
                 eyeGlowInterpolant += 0.017f;
             else
                 eyeGlowInterpolant -= 0.017f;
@@ -136,6 +148,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.frameCounter++;
             if (deadTime > 0)
             {
                 CheckDead();
@@ -143,7 +156,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(CrimsonVesselTheme);
+                SetBossTrack(PharaohSpiritTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
@@ -159,6 +172,59 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 NPC.localAI[0]++;
                 
+                if (SoundEngine.TryGetActiveSound(rumbleSlot, out var sound) && sound.IsPlaying)
+                {
+                    if (NPC.localAI[0] > -90)
+                        sound.Volume -= 1.5f;
+                    else
+                    {
+                        if (sound.Volume < 100)
+                            sound.Volume += 2;
+                        if (sound.Volume > 100)
+                            sound.Volume = 100;
+                    }
+                    if (NPC.localAI[0] == -1)
+                        sound.Stop();
+                }
+
+                if (NPC.localAI[0] < -90)
+                {
+                    Color outlineColor = Color.Purple;
+                    Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.6f);
+                    for (int i = 0; i < 2; i++)
+                    {
+                        Rectangle rect = NPC.getRect();
+                        rect.Inflate(4, 4);
+                        rect.X += -5 * NPC.direction;
+                        Vector2 particlePos = Main.rand.NextVector2FromRectangle(rect);
+                        ParticleManager.AddParticle(new BallOutlined(
+                            particlePos, Main.rand.NextVector2Circular(2, 2),
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.25f, 0.5f)), 4, 0, 0.92f, 50));
+                    }
+                }
+                if (NPC.localAI[0] > -cutsceneDuration + 60 && NPC.localAI[0] < -120 && NPC.localAI[0] % 5 == 0)
+                {
+                    //This is taken from the vanilla sandnado dust code. Really liked the dust effect they had going but it's like, super specific.
+                    Vector2 anchor = NPC.Center + new Vector2(-5 * NPC.direction, 0);
+                    Vector2 dimensions = new Vector2((int)(NPC.width * 2.5f), (int)(NPC.height * 1.1f));
+                    float randFloat = Main.rand.NextFloat();
+                    Vector2 dustOffset = new Vector2(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(-0.5f, 0.9f, randFloat));
+                    dustOffset.X *= MathHelper.Lerp(2.2f, 0.6f, randFloat);
+                    dustOffset.X *= -0.8f;
+                    Vector2 dustMagnet = new Vector2(2f, 10f);
+                    Vector2 dustSetPos = anchor + dimensions * dustOffset * 0.5f + dustMagnet;
+                    Dust dust = Main.dust[Dust.NewDust(dustSetPos, 0, 0, DustID.Sandnado)];
+                    dust.position = dustSetPos;
+                    dust.customData = anchor + dustMagnet;
+                    dust.fadeIn = 1f;
+                    dust.scale = 0.3f;
+                    dust.noLight = true;
+                    if (dustOffset.X > -1.2f)
+                    {
+                        dust.velocity.X = 1f + Main.rand.NextFloat();
+                    }
+                    dust.velocity.Y = Main.rand.NextFloat() * -0.5f;
+                }
                 if (NPC.localAI[0] == -30)
                 {
                     NPC.Opacity = 1;
@@ -235,9 +301,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= Sandnado.Duration)
                 {
-                    sandnadoCooldown = 540;
+                    sandnadoCooldown = 1200;
                     currentFrame = 0;
                     NPC.localAI[0] = 0;
+                    NPC.frameCounter = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     //NPC.ai[2] = Sandnado.Id;
@@ -435,6 +502,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= Summon.Duration)
                 {
+                    NPC.frameCounter = 0;
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Summon.Id;
@@ -513,6 +582,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                rumbleSlot = SoundEngine.PlaySound(SoundID.DD2_EtherianPortalIdleLoop with { Volume = 0.03f, PitchVariance = 0f, Pitch = 0.8f }, NPC.Center);
+
                 NPC.rotation = 0;
                 NPC.velocity *= 0;
                 modNPC.ignitedStacks.Clear();
@@ -546,6 +617,58 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            Color outlineColor = Color.Purple;
+            Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.6f);
+            for (int i = 0; i < 2; i++)
+            {
+                Rectangle rect = NPC.getRect();
+                rect.Inflate(4, 4);
+                rect.X += -5 * NPC.direction;
+                Vector2 particlePos = Main.rand.NextVector2FromRectangle(rect);
+                ParticleManager.AddParticle(new BallOutlined(
+                    particlePos, Main.rand.NextVector2Circular(2, 2),
+                    60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.25f, 0.5f)), 4, 0, 0.92f, 50));
+            }
+
+            if (deadTime % 7 == 0 && deadTime < 60)
+            {
+                //This is taken from the vanilla sandnado dust code. Really liked the dust effect they had going but it's like, super specific.
+                Vector2 anchor = NPC.Center + new Vector2(-5 * NPC.direction, 0);
+                Vector2 dimensions = new Vector2((int)(NPC.width * 2.5f), (int)(NPC.height * 1.1f));
+                float randFloat = Main.rand.NextFloat();
+                Vector2 dustOffset = new Vector2(MathHelper.Lerp(0.1f, 1f, Main.rand.NextFloat()), MathHelper.Lerp(-0.5f, 0.9f, randFloat));
+                dustOffset.X *= MathHelper.Lerp(2.2f, 0.6f, randFloat);
+                dustOffset.X *= -0.8f;
+                Vector2 dustMagnet = new Vector2(2f, 10f);
+                Vector2 dustSetPos = anchor + dimensions * dustOffset * 0.5f + dustMagnet;
+                Dust dust = Main.dust[Dust.NewDust(dustSetPos, 0, 0, DustID.Sandnado)];
+                dust.position = dustSetPos;
+                dust.customData = anchor + dustMagnet;
+                dust.fadeIn = 1f;
+                dust.scale = 0.3f;
+                dust.noLight = true;
+                if (dustOffset.X > -1.2f)
+                {
+                    dust.velocity.X = 1f + Main.rand.NextFloat();
+                }
+                dust.velocity.Y = Main.rand.NextFloat() * -0.5f;
+            }
+
+            if (SoundEngine.TryGetActiveSound(rumbleSlot, out var sound) && sound.IsPlaying)
+            {
+                if (deadTime > 150)
+                    sound.Volume -= 1.5f;
+                else
+                {
+                    if (sound.Volume < 100)
+                        sound.Volume += 2;
+                    if (sound.Volume > 100)
+                        sound.Volume = 100;
+                }
+                if (deadTime >= deathCutsceneDuration - 30)
+                    sound.Stop();
+            }
+
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -560,7 +683,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Color color = new Color(222, 108, 48) * 0.7f;
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 400; i++)
+                for (int i = 0; i < hit.Damage / 33d; i++)
                 {
                     Dust d = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Sandstorm)];
                     d.color = color;
@@ -600,13 +723,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 currentFrame = 10;
             }
-            else if (NPC.localAI[0] < 0)
+            else if (NPC.ai[0] == None.Id || NPC.localAI[0] < 0)
             {
-                currentFrame = 0;
-            }
-            else if (NPC.ai[0] == None.Id)
-            {
-                currentFrame = (int)(NPC.localAI[0] * 0.1f) % 4;
+                currentFrame = (int)(NPC.frameCounter * 0.1f) % 4;
             }
             else if (NPC.ai[0] == Sandnado.Id)
             {
@@ -677,12 +796,60 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
 
+            float eyeOpacityMultiplier = 1;
+            float bodyOpacityMultiplier = 1;
+            float sandyOverlayOpacityMultiplier = 0;
+            if (NPC.localAI[0] < 0)
+            {
+                int cutsceneStart = -cutsceneDuration - 30;
+                int cutsceneTime = Math.Abs(cutsceneStart - (int)NPC.localAI[0]);
+                if (cutsceneTime < 120)
+                {
+                    eyeOpacityMultiplier = (cutsceneTime - 60) / 60f;
+                }
+                sandyOverlayOpacityMultiplier = cutsceneTime < 180 ? (cutsceneTime - 90) / 75f : 1f - ((cutsceneTime - 180) / 60f) ; 
+                if (cutsceneTime < 180)
+                {
+                    bodyOpacityMultiplier = 0f;
+                }
+            }
+            else if (deadTime > 0)
+            {
+                sandyOverlayOpacityMultiplier = deadTime / (deathCutsceneDuration - 90f);
+            }
+
             Vector2 drawPos = NPC.Center + modNPC.drawCenter - Main.screenPosition;
-            Main.EntitySpriteDraw(tex, drawPos, NPC.frame, Color.Lerp(drawColor, Color.White, 0.25f), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            Main.EntitySpriteDraw(tex, drawPos, NPC.frame, Color.Lerp(drawColor, Color.White, 0.25f) * bodyOpacityMultiplier, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+
+            if (sandyOverlayOpacityMultiplier > 0)
+            {
+                sandyOverlayOpacityMultiplier = MathHelper.Clamp(MathHelper.SmoothStep(0, 1, sandyOverlayOpacityMultiplier), 0, 1);
+
+                Main.spriteBatch.End();
+                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                Vector2 screenOff = new Vector2((float)NPC.frameCounter / 60f, 0);
+                Color wantedColor = deadTime == 0 ? Color.Goldenrod : Color.Lerp(Color.Goldenrod, Color.Purple, MathHelper.Clamp((deadTime - 35f) / (deathCutsceneDuration - 85f), 0, 1));
+                Color tint = wantedColor * sandyOverlayOpacityMultiplier;
+
+                maskEffect.Parameters["screenOffset"].SetValue(screenOff);
+                maskEffect.Parameters["stretch"].SetValue(new Vector2(1f, Main.npcFrameCount[Type]));
+                maskEffect.Parameters["replacementTexture"].SetValue(noiseTex);
+                maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+
+                Main.EntitySpriteDraw(tex, drawPos, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+
+                StartAdditiveSpritebatch();
+                Main.EntitySpriteDraw(circleGlowTex, NPC.Center + new Vector2(-5 * NPC.direction, 0) - Main.screenPosition, null, tint * 0.7f, NPC.rotation, circleGlowTex.Size() * 0.5f, NPC.scale * 0.2f * new Vector2(1, 1.5f), SpriteEffects.None);
+
+                StartVanillaSpritebatch();
+            }
+
             float finalEyeGlowInterpolant = eyeGlowInterpolant * (0.3f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 16)) + 0.7f);
             for (int i = 0; i < 4; i++)
             {
-                Main.EntitySpriteDraw(glowTex, drawPos + (Vector2.UnitX * finalEyeGlowInterpolant * 1).RotatedBy(i * MathHelper.PiOver2), NPC.frame, Color.White * 0.5f, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(glowTex, drawPos + (Vector2.UnitX * finalEyeGlowInterpolant * 1).RotatedBy(i * MathHelper.PiOver2), NPC.frame, Color.White * 0.5f * eyeOpacityMultiplier, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
             
             return false;

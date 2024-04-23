@@ -27,7 +27,7 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
             Projectile.extraUpdates = 29;
-            Projectile.timeLeft = 5400;
+            Projectile.timeLeft = 1800;
             Projectile.penetrate = 1;
             modProj = Projectile.ModProj();
         }

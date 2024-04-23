@@ -43,7 +43,6 @@ namespace TerRoguelike.ILEditing
             On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
             On_WorldGen.UpdateWorld_UndergroundTile += FuckUnderGroundUpdating;
             On_Main.DrawMenu += On_Main_DrawMenu;
-            On_SoundPlayer.PauseAll += On_SoundPlayer_PauseAll;
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
             On_WallDrawing.DrawWalls += On_WallDrawing_DrawWalls;
@@ -360,12 +359,6 @@ namespace TerRoguelike.ILEditing
 
 			passInNPC = -1;
 			return new Vector4(savedPosition, savedVelocity.X, savedVelocity.Y);
-		}
-
-        private void On_SoundPlayer_PauseAll(On_SoundPlayer.orig_PauseAll orig, SoundPlayer self)
-        {
-			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
-				orig.Invoke(self);
 		}
 
         private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)

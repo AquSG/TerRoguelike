@@ -93,6 +93,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/IceQueenThemeStart",
             "TerRoguelike/Tracks/IceQueenThemeEnd",
             0.6f);
+        public static BossTheme PharaohSpiritTheme = new(
+            "TerRoguelike/Tracks/PharaohSpiritTheme",
+            "TerRoguelike/Tracks/PharaohSpiritThemeStart",
+            "TerRoguelike/Tracks/PharaohSpiritThemeEnd",
+            0.67f);
 
 
         public static void PlayAllSounds()
@@ -125,6 +130,9 @@ namespace TerRoguelike.Systems
                 IceQueenTheme.BattleTrack,
                 IceQueenTheme.StartTrack,
                 IceQueenTheme.EndTrack,
+                PharaohSpiritTheme.BattleTrack,
+                PharaohSpiritTheme.StartTrack,
+                PharaohSpiritTheme.EndTrack,
             };
             foreach (string path in pathList)
             {
