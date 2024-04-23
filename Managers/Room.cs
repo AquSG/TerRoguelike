@@ -308,31 +308,33 @@ namespace TerRoguelike.Managers
                 if (modNPC.IgnoreRoomWallCollision)
                     continue;
 
-                bool boundLeft = (npc.position.X + npc.velocity.X) < (RoomPosition.X + 1f) * 16f;
-                bool boundRight = (npc.position.X + (float)npc.width + npc.velocity.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
-                bool boundTop = (npc.position.Y + npc.velocity.Y) < (RoomPosition.Y + 1f) * 16f;
-                bool boundBottom = (npc.position.Y + (float)npc.height + npc.velocity.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
+                Vector2 shrink = modNPC.RoomWallCollisionShrink;
+
+                bool boundLeft = (npc.position.X + npc.velocity.X + shrink.X) < (RoomPosition.X + 1f) * 16f;
+                bool boundRight = (npc.position.X + (float)npc.width + npc.velocity.X - shrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
+                bool boundTop = (npc.position.Y + npc.velocity.Y + shrink.Y) < (RoomPosition.Y + 1f) * 16f;
+                bool boundBottom = (npc.position.Y + (float)npc.height + npc.velocity.Y - shrink.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
                 if (boundLeft)
                 {
-                    npc.position.X = (RoomPosition.X + 1f) * 16f;
+                    npc.position.X = (RoomPosition.X + 1f) * 16f - shrink.X;
                     npc.velocity.X = 0;
                     npc.collideX = true;
                 }
                 if (boundRight)
                 {
-                    npc.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f) - (float)npc.width;
+                    npc.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f + shrink.X) - (float)npc.width;
                     npc.velocity.X = 0;
                     npc.collideX = true;
                 }
                 if (boundTop)
                 {
-                    npc.position.Y = (RoomPosition.Y + 1f) * 16f;
+                    npc.position.Y = (RoomPosition.Y + 1f) * 16f - shrink.Y;
                     npc.velocity.Y = 0;
                     npc.collideY = true;
                 }
                 if (boundBottom)
                 {
-                    npc.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - (float)npc.height;
+                    npc.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f + shrink.Y) - (float)npc.height;
                     npc.velocity.Y = 0;
                     npc.collideY = true;
                 }

@@ -25,6 +25,7 @@ namespace TerRoguelike.Projectiles
     public class SandTurret : ModProjectile, ILocalizedModType
     {
         Entity target = null;
+        public Vector2 aimingDirection;
         public int maxTimeLeft;
         public Texture2D noiseTex;
         public Texture2D glowTex;
@@ -50,7 +51,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-
+            aimingDirection = Projectile.velocity.SafeNormalize(Vector2.UnitY);
         }
         public override void AI()
         {
@@ -63,6 +64,9 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.localAI[0] > 0)
                 Projectile.localAI[0]--;
+
+            if (target != null)
+                aimingDirection = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY);
 
             if (time <= 60)
             {
@@ -78,6 +82,7 @@ namespace TerRoguelike.Projectiles
                 {
                     Projectile.velocity = (target != null ? (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY) : Main.rand.NextVector2CircularEdge(0.5f, 0.5f));
                     Projectile.velocity *= target == null ? 16f : (target.Center - Projectile.Center).Length() * 0.025f;
+                    aimingDirection = Projectile.velocity.SafeNormalize(Vector2.UnitY);
                     SoundEngine.PlaySound(SoundID.Item76 with { Volume = 1f, Pitch = -0.5f }, Projectile.Center + Projectile.velocity * 10);
                 }
             }
@@ -93,15 +98,13 @@ namespace TerRoguelike.Projectiles
                     }
                     if (time >= 90)
                     {
-                        
-
                         if (Projectile.timeLeft % 8 == 0)
                         { 
                             SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.2f, Pitch = 0.5f, PitchVariance = 0.08f }, Projectile.Center);
                             SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
                             Projectile.localAI[0] = 5;
-                            Vector2 direction = target == null ? Vector2.UnitY : (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY);
-                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + direction * 36, direction * 6, ModContent.ProjectileType<ShiningSand>(), Projectile.damage, 0);
+                            
+                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + aimingDirection * 36, aimingDirection * 6, ModContent.ProjectileType<ShiningSand>(), Projectile.damage, 0);
                         }
                     }
 
@@ -152,9 +155,8 @@ namespace TerRoguelike.Projectiles
             {
                 float crossOpacity = time < 120 ? (time - 45) / 45f : (Projectile.timeLeft - 20) / 40f;
                 crossOpacity = MathHelper.Clamp(crossOpacity, 0, 1);
-                float direction = target == null ? MathHelper.PiOver2 : (target.Center - Projectile.Center).ToRotation();
                 Color crossColor = Color.Lerp(tint * 0.92f, Color.White, Projectile.localAI[0] / 5) * 0.97f;
-                Main.EntitySpriteDraw(crossGlowTex, Projectile.Center - Main.screenPosition + direction.ToRotationVector2() * 38 * scale * scaleInterpolant * Projectile.scale, null, crossColor * crossOpacity, direction, new Vector2(0, crossGlowTex.Size().Y * 0.5f), Projectile.scale * 0.3f * scale * scaleInterpolant * new Vector2(1f, 2f), SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(crossGlowTex, Projectile.Center - Main.screenPosition + aimingDirection * 38 * scale * scaleInterpolant * Projectile.scale, null, crossColor * crossOpacity, aimingDirection.ToRotation(), new Vector2(0, crossGlowTex.Size().Y * 0.5f), Projectile.scale * 0.3f * scale * scaleInterpolant * new Vector2(1f, 2f), SpriteEffects.FlipHorizontally);
             }
 
             TerRoguelikeUtils.StartVanillaSpritebatch();
