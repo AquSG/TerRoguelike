@@ -10,11 +10,14 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.NPCs.Enemy;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class DesertEnemyRoom2Down : Room
     {
+        public override int AssociatedFloor => FloorDict["Desert"];
         public override string Key => "DesertEnemyRoom2Down";
         public override string Filename => "Schematics/RoomSchematics/DesertEnemyRoom2Down.csch";
         public override bool CanExitRight => true;
@@ -22,9 +25,10 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<DesertSpirit>(), 60, 120, 0.45f);
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<SandWorm>(), 180, 120, 0.45f);
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<Antlion>(), 300, 120, 0.45f);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -3, -12), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -6, -4), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 9, -4), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 0, 9), ChooseEnemy(AssociatedFloor, 0), 240, 120, 0.45f, 0);
         }
     }
 }
