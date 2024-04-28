@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Rooms
 {
@@ -22,7 +25,14 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.QueenBee, 60, 120, 0.9f);
+            if (!TerRoguelikeWorld.escape)
+                AddBoss(bossSpawnPos, ModContent.NPCType<QueenBee>());
+        }
+        public override void Update()
+        {
+            if (bossSpawnPos == Vector2.Zero)
+                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f);
+            base.Update();
         }
     }
 }
