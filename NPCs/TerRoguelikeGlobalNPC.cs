@@ -472,7 +472,8 @@ namespace TerRoguelike.NPCs
                         if (findAir)
                         {
                             bool pass = false;
-                            int npcBlockHeight = (int)(npc.height / 16f) + npc.height % 16 == 0 ? 0 : 1;
+                            int npcBlockHeight = npc.height / 16 + (npc.height % 16 == 0 ? 0 : 1);
+
                             Point targetBlock = new Point((int)(teleportPos.X / 16f), (int)(teleportPos.Y / 16f));
 
 
@@ -482,13 +483,13 @@ namespace TerRoguelike.NPCs
                                 {
                                     if (!Main.tile[targetBlock - new Point(0, y)].IsTileSolidGround())
                                     {
-                                        if (!Main.tile[targetBlock - new Point(0, y + npcBlockHeight)].IsTileSolidGround())
+                                        if (!Main.tile[targetBlock - new Point(0, y + 1)].IsTileSolidGround())
                                         {
                                             targetBlock -= new Point(0, y - 1);
                                             pass = true;
                                             break;
                                         }
-                                    }
+                                    } 
                                 }
                             }
                             else if (respectGravity)
@@ -499,7 +500,7 @@ namespace TerRoguelike.NPCs
                                     {
                                         if (!Main.tile[targetBlock + new Point(0, y - npcBlockHeight)].IsTileSolidGround())
                                         {
-                                            targetBlock += new Point(0, y + npcBlockHeight - 1);
+                                            targetBlock += new Point(0, y);
                                             pass = true;
                                             break;
                                         }
@@ -511,7 +512,7 @@ namespace TerRoguelike.NPCs
                             {
                                 Room room = RoomList[sourceRoomListID];
                                 Rectangle potentialTeleportRect = new Rectangle((int)((targetBlock.X * 16f) + 8) - (npc.width / 2), (int)(targetBlock.Y * 16f) - npc.height, npc.width, npc.height);
-                                if (potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
+                                if (room.wallActive && potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
                                 {
                                     continue;
                                 }

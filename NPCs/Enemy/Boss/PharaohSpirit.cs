@@ -709,6 +709,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 961, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 963, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 40f), NPC.velocity, 962, NPC.scale);
+                if (SoundEngine.TryGetActiveSound(LocustSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Stop();
+                }
             }
         }
         public override void OnKill()
