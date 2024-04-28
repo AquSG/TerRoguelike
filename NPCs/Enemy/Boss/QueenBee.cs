@@ -50,12 +50,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 180);
+        public static Attack None = new Attack(0, 0, 75);
         public static Attack Shotgun = new Attack(1, 30, 180);
         public static Attack BeeSwarm = new Attack(2, 30, 180);
         public static Attack Charge = new Attack(3, 30, 180);
         public static Attack HoneyVomit = new Attack(4, 30, 180);
         public static Attack Summon = new Attack(5, 30, 180);
+        public int shotgunFireRate = 24;
+        public float shotgunRecoilInterpolant = 0;
+        public Vector2 shotgunRecoilAnchorPos = Vector2.Zero;
 
         public override void SetStaticDefaults()
         {
@@ -97,7 +100,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 60;
             
             bool dashingFrames = false;
-            dashingFrames = Main.GlobalTimeWrappedHourly % 1 < 0.5f;
             if (dashingFrames)
             {
                 currentFrame = (int)NPC.frameCounter % 4 + 8;
@@ -165,6 +167,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.localAI[0]++;
                 BossAI();
+                if (NPC.ai[0] == None.Id)
+                {
+                    NPC.rotation = NPC.rotation.AngleLerp(0, 0.025f).AngleTowards(0, 0.015f);
+                }
             }
         }
         public void BossAI()
@@ -172,22 +178,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             target = modNPC.GetTarget(NPC);
 
             NPC.ai[1]++;
+            NPC.velocity *= 0.98f;
 
             if (NPC.ai[0] == None.Id)
             {
-                if (target != null)
-                {
-                    if (target.Center.X > NPC.Center.X)
-                        NPC.direction = 1;
-                    else
-                        NPC.direction = -1;
-                }
-                else
-                {
-                    NPC.direction = Math.Sign(NPC.velocity.X);
-                    if (NPC.direction == 0)
-                        NPC.direction = -1;
-                }
+                UpdateDirection();
 
                 if (NPC.ai[1] >= None.Duration)
                 {
@@ -195,14 +190,59 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-
+                    if (target != null)
+                    {
+                        Vector2 targetPos = target.Center + new Vector2(0, -240);
+                        if (NPC.velocity.Length() < 10)
+                            NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
+                        if (NPC.velocity.Length() > 10)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * 10;
+                    }
                 }
             }
 
             if (NPC.ai[0] == Shotgun.Id)
             {
+                NPC.velocity *= 0.97f;
+                UpdateDirection();
+                if (NPC.direction != NPC.oldDirection)
+                {
+                    NPC.rotation += MathHelper.PiOver2 * 0.4f * NPC.direction;
+                }
+                Vector2 targetPos = target == null ? NPC.Center : target.Center;
+                float buttRot = (MathHelper.PiOver2 * 0.8f * NPC.direction);
+                float targetAngle = target == null ? -buttRot : (target.Center - NPC.Center).ToRotation() - buttRot;
+                targetAngle -= (NPC.direction == -1 ? MathHelper.PiOver2 * 2f : 0);
+                NPC.rotation = NPC.rotation.AngleLerp(targetAngle, 0.05f).AngleTowards(targetAngle, 0.03f);
+                float fireDirection = NPC.rotation + buttRot + (NPC.direction == -1 ? MathHelper.PiOver2 * 2f : 0);
+
+                if (NPC.ai[1] > 0 && NPC.ai[1] % shotgunFireRate == 0)
+                {
+                    shotgunRecoilAnchorPos = NPC.Center;
+                    shotgunRecoilInterpolant = 1f;
+                    Vector2 baseOffset = new Vector2(6 * NPC.direction, 16);
+                    SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, NPC.Center);
+                    for (int i = 0; i < 12; i++)
+                    {
+                        Vector2 projSpawnPos = baseOffset + ((Vector2.UnitX * 16).RotatedBy(i * MathHelper.TwoPi / 12f) * new Vector2(1f, 0.6f));
+                        projSpawnPos = projSpawnPos.RotatedBy(NPC.rotation);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<Stinger>(), NPC.damage, 0, -1, 1);
+                    }
+                    NPC.Center -= fireDirection.ToRotationVector2() * 12;
+                }
+                if (shotgunRecoilInterpolant > 0)
+                {
+                    NPC.Center += (shotgunRecoilAnchorPos - NPC.Center) * (1 - shotgunRecoilInterpolant) * 0.25f;
+                    Vector2 offset = (targetPos - NPC.Center).SafeNormalize(Vector2.Zero) * 0.25f;
+                    shotgunRecoilAnchorPos += offset;
+                    NPC.Center += offset;
+
+                    shotgunRecoilInterpolant -= 0.05f;
+                }
+
                 if (NPC.ai[1] >= Shotgun.Duration)
                 {
+                    shotgunRecoilInterpolant = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Shotgun.Id;
@@ -245,7 +285,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
         }
-
         public void ChooseAttack()
         {
             NPC.ai[1] = 0;
@@ -271,10 +310,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = Shotgun.Id;
             NPC.ai[0] = chosenAttack;
         }
-
+        public void UpdateDirection()
+        {
+            if (target != null)
+            {
+                if (target.Center.X > NPC.Center.X)
+                    NPC.direction = 1;
+                else
+                    NPC.direction = -1;
+            }
+            else
+            {
+                NPC.direction = Math.Sign(NPC.velocity.X);
+                if (NPC.direction == 0)
+                    NPC.direction = -1;
+            }
+        }
         public override bool? CanFallThroughPlatforms()
         {
             return true;
