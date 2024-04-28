@@ -67,7 +67,7 @@ namespace TerRoguelike.Managers
                         continue;
                     }
                 }
-                if (enemy.TelegraphDuration <= 0)
+                if (enemy.TelegraphDuration <= 0 && !enemy.spent)
                 {
                     NPC dummyNpc = new NPC();
                     dummyNpc.type = enemy.NPCType;

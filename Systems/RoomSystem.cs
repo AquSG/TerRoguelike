@@ -205,6 +205,26 @@ namespace TerRoguelike.Systems
                                     if (modNPC.sourceRoomListID > targetRoom.myRoom)
                                         npc.active = false;
                                 }
+                                for (int t = targetRoom.myRoom + 1; t < RoomList.Count; t++)
+                                {
+                                    Room roomToClear = RoomList[t];
+                                    if (!roomToClear.active)
+                                        continue;
+
+                                    for (int p = 0; p < roomToClear.NotSpawned.Length; p++)
+                                    {
+                                        roomToClear.NotSpawned[p] = false;
+                                    }
+                                }
+                                for (int s = 0; s < SpawnManager.pendingEnemies.Count; s++)
+                                {
+                                    var pendingEnemy = SpawnManager.pendingEnemies[s];
+                                    if (pendingEnemy.RoomListID > targetRoom.myRoom)
+                                    {
+                                        pendingEnemy.spent = true;
+                                    }
+
+                                }
                             }
                             else
                             {
@@ -232,8 +252,14 @@ namespace TerRoguelike.Systems
                                     if (modNPC.sourceRoomListID < 0)
                                         continue;
 
-                                    if (modNPC.sourceRoomListID > targetRoom.myRoom)
-                                        npc.active = false;
+                                    npc.active = false;
+                                }
+
+                                for (int s = 0; s < SpawnManager.pendingEnemies.Count; s++)
+                                {
+                                    var pendingEnemy = SpawnManager.pendingEnemies[s];
+                                    pendingEnemy.spent = true;
+
                                 }
                             }
 

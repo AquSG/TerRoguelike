@@ -161,14 +161,17 @@ namespace TerRoguelike.Managers
             {
                 if (currentWave < waveCount && roomTime - waveClearGraceTime > lastTelegraphDuration + 60)
                 {
-                    encourageNextWave = true;
+                    encourageNextWave = !TerRoguelikeWorld.escape;
 
-                    for (int j = 0; j < RoomSpawnCap; j++)
+                    if (encourageNextWave)
                     {
-                        if (NotSpawned[j] == true && AssociatedWave[j] <= currentWave)
+                        for (int j = 0; j < RoomSpawnCap; j++)
                         {
-                            encourageNextWave = false;
-                            break;
+                            if (NotSpawned[j] == true && AssociatedWave[j] <= currentWave)
+                            {
+                                encourageNextWave = false;
+                                break;
+                            }
                         }
                     }
                     if (encourageNextWave)
@@ -196,6 +199,9 @@ namespace TerRoguelike.Managers
                 }
                 for (int i = 0; i < RoomSpawnCap; i++)
                 {
+                    if (TerRoguelikeWorld.escape && AssociatedWave[i] != 0)
+                        continue;
+
                     if (NotSpawned[i] == true || currentWave < waveCount)
                     {
                         cancontinue = false;
