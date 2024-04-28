@@ -13,6 +13,7 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
@@ -27,9 +28,19 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 180;
             Projectile.penetrate = 1;
         }
-
+        public override void OnSpawn(IEntitySource source)
+        {
+            if (Projectile.ai[0] == 1)
+            {
+                Projectile.tileCollide = false;
+                Projectile.timeLeft = 300;
+            }
+        }
         public override void AI()
         {
+            if (!Projectile.tileCollide && Projectile.ai[0] == 1 && Projectile.timeLeft <= 290)
+                Projectile.tileCollide = true;
+
             Projectile.rotation = Projectile.velocity.ToRotation();
             int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 18, 0f, 0f, 0, default(Color), 0.9f);
             Main.dust[d].noGravity = true;
@@ -42,9 +53,10 @@ namespace TerRoguelike.Projectiles
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
+            int dustID = Projectile.ai[0] == 0 ? DustID.GreenTorch : DustID.YellowTorch;
             for (int i = 0; i < 5; i++)
             {
-                int d = Dust.NewDust(Projectile.Center, 1, 1, DustID.GreenTorch, 0f, 0f, 0, default(Color), 1f);
+                int d = Dust.NewDust(Projectile.Center, 1, 1, dustID, 0f, 0f, 0, default(Color), 1f);
                 Dust dust = Main.dust[d];
                 dust.noLight = true;
                 dust.noLightEmittence = true;
@@ -56,7 +68,7 @@ namespace TerRoguelike.Projectiles
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-            Vector3 colorHSL = Main.rgbToHsl(Color.LimeGreen);
+            Vector3 colorHSL = Main.rgbToHsl(Projectile.ai[0] == 0 ? Color.LimeGreen : Color.Lerp(Color.Goldenrod, Color.White, 0.3f));
 
             GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
             GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));

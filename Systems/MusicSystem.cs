@@ -376,9 +376,6 @@ namespace TerRoguelike.Systems
                         BossIntroProgress += difference;
                         if (BossIntroProgress + difference >= BossIntroDuration)
                         {
-                            int delay = (int)((BossIntroDuration - BossIntroProgress) * 1000);
-                            if (delay < 1)
-                                delay = 1;
                             SetCombat(ActiveBossTheme.BattleTrack);
                             ActiveBossTheme.startFlag = false;
                         }
