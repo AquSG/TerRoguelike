@@ -79,6 +79,7 @@ Projectiles: {
 	SandTurret.DisplayName: Sand Turret
 	ShiningSand.DisplayName: Shining Sand
 	DarkTendril.DisplayName: Dark Tendril
+	Bee.DisplayName: Bee
 }
 
 Items: {
