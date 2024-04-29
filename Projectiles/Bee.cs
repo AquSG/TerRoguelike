@@ -32,7 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 4;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 300;
+            Projectile.timeLeft = maxTimeLeft = 300;
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
@@ -105,6 +105,7 @@ namespace TerRoguelike.Projectiles
             if (!pass)
                 return false;
 
+            float scaleMultiplier = MathHelper.Clamp((maxTimeLeft - Projectile.timeLeft) / 10f, 0, 1);
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
@@ -116,12 +117,12 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < 8; i++)
             {
                 Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
-                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + offset, frame, Color.White, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, Math.Sign(Projectile.velocity.X) == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + offset, frame, Color.White, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale * scaleMultiplier, Math.Sign(Projectile.velocity.X) == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
             }
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
-            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, Math.Sign(Projectile.velocity.X) == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, lightColor, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale * scaleMultiplier, Math.Sign(Projectile.velocity.X) == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
             return false;
         }
     }
