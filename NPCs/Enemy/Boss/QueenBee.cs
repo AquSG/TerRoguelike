@@ -61,6 +61,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int shotgunFireRate = 24;
         public float shotgunRecoilInterpolant = 0;
         public Vector2 shotgunRecoilAnchorPos = Vector2.Zero;
+        public int beeSwarmRotateDirection = 1;
 
         public override void SetStaticDefaults()
         {
@@ -210,6 +211,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (target != null)
                     {
                         Vector2 targetPos = target.Center + new Vector2(0, -240);
+                        targetPos = TileCollidePositionInLine(target.Center + new Vector2(0, -120), targetPos);
                         if (NPC.velocity.Length() < 10)
                             NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
                         if (NPC.velocity.Length() > 10)
@@ -230,7 +232,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float buttRot = (MathHelper.PiOver2 * 0.8f * NPC.direction);
                 float targetAngle = target == null ? -buttRot : (target.Center - NPC.Center).ToRotation() - buttRot;
                 targetAngle -= (NPC.direction == -1 ? MathHelper.PiOver2 * 2f : 0);
-                NPC.rotation = NPC.rotation.AngleLerp(targetAngle, 0.05f).AngleTowards(targetAngle, 0.03f);
+                NPC.rotation = NPC.rotation.AngleLerp(targetAngle, 0.04f).AngleTowards(targetAngle, 0.007f);
                 float fireDirection = NPC.rotation + buttRot + (NPC.direction == -1 ? MathHelper.PiOver2 * 2f : 0);
 
                 if (NPC.ai[1] > 0 && NPC.ai[1] % shotgunFireRate == 0)
@@ -277,10 +279,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.direction = -1;
 
                     float orbitMagnitude = room != null ? room.RoomDimensions16.X * 0.25f : 400;
-                    Vector2 targetPos = -rotToAnchor.ToRotationVector2() * orbitMagnitude + anchor;
-                    if (NPC.Center.Distance(targetPos) < 48)
+                    Vector2 wantedPos = -rotToAnchor.ToRotationVector2() * orbitMagnitude + anchor;
+                    Vector2 targetPos = target != null ? target.Center : NPC.Center;
+                    if (NPC.Center.Distance(wantedPos) < 48)
                     {
-
+                        float angleBetween = AngleSizeBetween((NPC.Center - anchor).ToRotation(), (targetPos - anchor).ToRotation());
+                        beeSwarmRotateDirection = -Math.Sign(angleBetween);
+                        if (beeSwarmRotateDirection == 0)
+                            beeSwarmRotateDirection = 1;
                     }
                     else
                     {
@@ -288,7 +294,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             NPC.ai[1]--;
 
                         if (NPC.velocity.Length() < 10)
-                            NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
+                            NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
                         if (NPC.velocity.Length() > 10)
                             NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * 10;
                     }
@@ -311,7 +317,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             NPC.velocity = Vector2.Zero;
                         if (NPC.ai[1] < 60)
                         {
-                            NPC.velocity += (rotToAnchor - MathHelper.PiOver2).ToRotationVector2() * 0.15f;
+                            NPC.velocity += (rotToAnchor - (MathHelper.PiOver2 * beeSwarmRotateDirection)).ToRotationVector2() * 0.15f;
                         }
                         else
                         {
@@ -323,7 +329,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             NPC.velocity += rotToAnchor.ToRotationVector2() * 0.051f;
                             if (NPC.ai[1] % 4 == 0)
                             {
-                                Vector2 projSpawnPos = -rotToAnchor.ToRotationVector2() * 460 + NPC.Center + new Vector2(0, Main.rand.NextFloat(-380, -60)).RotatedBy(rotToAnchor);
+                                Vector2 projSpawnPos = -rotToAnchor.ToRotationVector2() * 460 + NPC.Center + new Vector2(0, Main.rand.NextFloat(-380, -60) * beeSwarmRotateDirection).RotatedBy(rotToAnchor);
                                 Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rotToAnchor.ToRotationVector2() * 9, ModContent.ProjectileType<Bee>(), NPC.damage, 0);
                             }
                         }
@@ -394,7 +400,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = BeeSwarm.Id;
+            chosenAttack = Shotgun.Id;
             NPC.ai[0] = chosenAttack;
         }
         public void UpdateDirection()
