@@ -56,7 +56,7 @@ namespace TerRoguelike.Projectiles
             Projectile.frame = Projectile.frameCounter / 3 % Main.projFrames[Type];
             Projectile.rotation = Projectile.velocity.ToRotation();
 
-            float direction = (target.Center - Projectile.Center).ToRotation();
+            float direction = target != null ? (target.Center - Projectile.Center).ToRotation() : Projectile.rotation;
 
             if (Math.Abs(TerRoguelikeUtils.AngleSizeBetween(Projectile.velocity.ToRotation(), direction)) < MathHelper.PiOver2)
             {
