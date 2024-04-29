@@ -24,6 +24,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Graphics.Effects;
+using System.Runtime;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -47,6 +48,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D squareTex;
         public SoundStyle BeeSwarmSound = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
         public SlotId BeeSwarmSlot;
+        public SlotId ChargeSlot;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -55,13 +57,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack None = new Attack(0, 0, 75);
         public static Attack Shotgun = new Attack(1, 30, 180);
         public static Attack BeeSwarm = new Attack(2, 30, 600);
-        public static Attack Charge = new Attack(3, 30, 180);
+        public static Attack Charge = new Attack(3, 30, 200);
         public static Attack HoneyVomit = new Attack(4, 30, 180);
         public static Attack Summon = new Attack(5, 30, 180);
         public int shotgunFireRate = 24;
         public float shotgunRecoilInterpolant = 0;
         public Vector2 shotgunRecoilAnchorPos = Vector2.Zero;
         public int beeSwarmRotateDirection = 1;
+        public int chargingDuration = 25;
+        public int chargeWindup = 20;
 
         public override void SetStaticDefaults()
         {
@@ -117,8 +121,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.localAI[1]++;
                 }
             }
+            if (NPC.ai[0] == Charge.Id)
+            {
+                if (SoundEngine.TryGetActiveSound(ChargeSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Position = NPC.Center;
+                }
+            }
 
-            bool dashingFrames = false;
+            bool dashingFrames = NPC.ai[0] == Charge.Id;
             if (dashingFrames)
             {
                 currentFrame = (int)NPC.frameCounter % 4 + 8;
@@ -349,6 +360,66 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Charge.Id)
             {
+                float chargeStartDist = 240;
+                chargingDuration = 25;
+                int time = (int)NPC.ai[1] % (chargeWindup + chargingDuration);
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Vector2 wantedPos = (NPC.Center - targetPos).SafeNormalize(Vector2.UnitY) * chargeStartDist;
+                if (NPC.ai[1] < Charge.Duration - 20)
+                {
+                    if (time < chargeWindup)
+                    {
+                        float wantedRot = (targetPos - NPC.Center).ToRotation();
+                        if (NPC.direction == -1)
+                            wantedRot += MathHelper.Pi;
+
+                        if (NPC.Center.X > targetPos.X)
+                            NPC.direction = -1;
+                        else
+                            NPC.direction = 1;
+                        NPC.rotation = NPC.rotation.AngleLerp(wantedRot, 0.025f).AngleTowards(wantedRot, 0.015f);
+                    }
+                    if (time <= 1)
+                    {
+                        float distance = NPC.Center.Distance(targetPos);
+                        if (distance > chargeStartDist - 16 && distance < chargeStartDist + 16)
+                        {
+                            NPC.velocity *= 0.3f;
+                            NPC.velocity += (NPC.Center - targetPos).SafeNormalize(Vector2.UnitY) * 10;
+                        }
+                        else
+                        {
+                            if (time == 1)
+                                NPC.ai[1]--;
+
+                            NPC.velocity *= 0.97f;
+                            NPC.velocity += (wantedPos + targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.7f;
+                            if (NPC.velocity.Length() > 12)
+                            {
+                                NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * 13;
+                            }
+                        }
+                    }
+                    if (time >= 1)
+                    {
+                        if (time < chargeWindup)
+                        {
+                            NPC.velocity *= 0.98f;
+                        }
+                        else
+                        {
+                            if (time == chargeWindup)
+                            {
+                                NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 17;
+                                ChargeSlot = SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.65f, Pitch = 0.08f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest, MaxInstances = 4 }, NPC.Center);
+                            }
+                            NPC.rotation = NPC.velocity.ToRotation();
+                            if (NPC.direction == -1)
+                                NPC.rotation += MathHelper.Pi;
+                            NPC.velocity /= 0.975f;
+                        }
+                    }
+                }
                 if (NPC.ai[1] >= Charge.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -380,7 +451,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge, HoneyVomit, Summon };
+            //List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge, HoneyVomit, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -400,7 +472,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Shotgun.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public void UpdateDirection()
