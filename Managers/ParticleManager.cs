@@ -64,15 +64,17 @@ namespace TerRoguelike.Managers
             for (int i = 0; i < ActiveParticles.Count; i++)
             {
                 Particle particle = ActiveParticles[i];
-                if (!particle.additive)
-                    particle.Draw();
+                if (particle.additive)
+                    continue;
+                particle.Draw();
             }
             StartAdditiveSpritebatch();
             for (int i = 0; i < ActiveParticles.Count; i++)
             {
                 Particle particle = ActiveParticles[i];
-                if (particle.additive)
-                    particle.Draw();
+                if (!particle.additive)
+                    continue;
+                particle.Draw();
             }
             Main.spriteBatch.End();
         }

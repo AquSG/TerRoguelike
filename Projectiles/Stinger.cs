@@ -32,15 +32,11 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.ai[0] == 1)
             {
-                Projectile.tileCollide = false;
                 Projectile.timeLeft = 300;
             }
         }
         public override void AI()
         {
-            if (!Projectile.tileCollide && Projectile.ai[0] == 1 && Projectile.timeLeft <= 290)
-                Projectile.tileCollide = true;
-
             Projectile.rotation = Projectile.velocity.ToRotation();
             int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 18, 0f, 0f, 0, default(Color), 0.9f);
             Main.dust[d].noGravity = true;
