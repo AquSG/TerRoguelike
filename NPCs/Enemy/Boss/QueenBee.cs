@@ -45,6 +45,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             new ExtraHitbox(new Point(50, 50), new Vector2(46, 0)),
         };
         public Texture2D squareTex;
+        public SoundStyle BeeSwarmSound = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
+        public SlotId BeeSwarmSlot;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -52,7 +54,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 75);
         public static Attack Shotgun = new Attack(1, 30, 180);
-        public static Attack BeeSwarm = new Attack(2, 30, 180);
+        public static Attack BeeSwarm = new Attack(2, 30, 600);
         public static Attack Charge = new Attack(3, 30, 180);
         public static Attack HoneyVomit = new Attack(4, 30, 180);
         public static Attack Summon = new Attack(5, 30, 180);
@@ -67,8 +69,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 66;
-            NPC.height = 66;
+            NPC.width = 60;
+            NPC.height = 60;
             NPC.aiStyle = -1;
             NPC.damage = 30;
             NPC.lifeMax = 28000;
@@ -83,7 +85,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.Opacity = 0;
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             currentFrame = 0;
@@ -96,9 +97,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            NPC.width = 60;
-            NPC.height = 60;
-            
+            if (deadTime > 0)
+            {
+                if (SoundEngine.TryGetActiveSound(BeeSwarmSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Volume -= 0.016f;
+                }
+            }
+            else if (NPC.localAI[1] > 0)
+            {
+                if (SoundEngine.TryGetActiveSound(BeeSwarmSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Position = NPC.Center;
+                    if (NPC.localAI[1] > BeeSwarm.Duration - 180)
+                    {
+                        sound.Volume -= 0.0025f;
+                    }
+                    NPC.localAI[1]++;
+                }
+            }
+
             bool dashingFrames = false;
             if (dashingFrames)
             {
@@ -157,7 +175,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -30)
                 {
-                    NPC.Opacity = 1;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
@@ -250,10 +267,77 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == BeeSwarm.Id)
             {
+                Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
+                Vector2 anchor = room != null ? room.RoomPosition16 + room.RoomCenter16 : spawnPos;
+                float rotToAnchor = (anchor - NPC.Center).ToRotation();
+                if (NPC.ai[1] <= 2)
+                {
+                    NPC.direction = Math.Sign(NPC.velocity.X);
+                    if (NPC.direction == 0)
+                        NPC.direction = -1;
+
+                    float orbitMagnitude = room != null ? room.RoomDimensions16.X * 0.25f : 400;
+                    Vector2 targetPos = -rotToAnchor.ToRotationVector2() * orbitMagnitude + anchor;
+                    if (NPC.Center.Distance(targetPos) < 48)
+                    {
+
+                    }
+                    else
+                    {
+                        if (NPC.ai[1] == 2)
+                            NPC.ai[1]--;
+
+                        if (NPC.velocity.Length() < 10)
+                            NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
+                        if (NPC.velocity.Length() > 10)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * 10;
+                    }
+                    
+                }
+                if (NPC.ai[1] >= 2)
+                {
+                    if (anchor.X > NPC.Center.X)
+                        NPC.direction = 1;
+                    else
+                        NPC.direction = -1;
+
+
+                    if (NPC.ai[1] < 20)
+                        NPC.velocity *= 0.96f;
+                    else
+                    {
+                        NPC.velocity /= 0.98f;
+                        if (NPC.ai[1] == 20)
+                            NPC.velocity = Vector2.Zero;
+                        if (NPC.ai[1] < 60)
+                        {
+                            NPC.velocity += (rotToAnchor - MathHelper.PiOver2).ToRotationVector2() * 0.15f;
+                        }
+                        else
+                        {
+                            if (NPC.ai[1] == 60)
+                            {
+                                BeeSwarmSlot = SoundEngine.PlaySound(BeeSwarmSound with { Volume = 0.4f, PitchVariance = 0.03f }, anchor);
+                                NPC.localAI[1] = 1;
+                            }
+                            NPC.velocity += rotToAnchor.ToRotationVector2() * 0.051f;
+                            if (NPC.ai[1] % 4 == 0)
+                            {
+                                Vector2 projSpawnPos = -rotToAnchor.ToRotationVector2() * 460 + NPC.Center + new Vector2(0, Main.rand.NextFloat(-380, -60)).RotatedBy(rotToAnchor);
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rotToAnchor.ToRotationVector2() * 9, ModContent.ProjectileType<Bee>(), NPC.damage, 0);
+                            }
+                        }
+                    }
+                }
+                if (NPC.ai[1] > BeeSwarm.Duration - 45)
+                {
+                    NPC.velocity *= 0.98f;
+                }
+                
                 if (NPC.ai[1] >= BeeSwarm.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -60;
                     NPC.ai[2] = BeeSwarm.Id;
                 }
             }
@@ -310,7 +394,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Shotgun.Id;
+            chosenAttack = BeeSwarm.Id;
             NPC.ai[0] = chosenAttack;
         }
         public void UpdateDirection()
@@ -466,6 +550,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 SoundEngine.PlaySound(SoundID.NPCDeath66 with { Volume = 1f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, NPC.Center);
+                if (SoundEngine.TryGetActiveSound(BeeSwarmSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Stop();
+                }
             }
         }
         public override void OnKill()
@@ -485,7 +573,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             modNPC.drawCenter.X = -12 * NPC.spriteDirection;
 
-            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition + modNPC.drawCenter.RotatedBy(NPC.rotation), NPC.frame, color * NPC.Opacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition + modNPC.drawCenter.RotatedBy(NPC.rotation), NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
 
             bool drawHitboxes = false;
             if (drawHitboxes)

@@ -398,6 +398,49 @@ namespace TerRoguelike.Utilities
 
             return end;
         }
+        public static bool TileCollisionAtThisPosition(Vector2 position)
+        {
+            Point tilePos = position.ToTileCoordinates();
+
+            if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
+                return false;
+
+            Tile tile = Main.tile[tilePos.X, tilePos.Y];
+            if (!tile.IsTileSolidGround(true))
+                return false;
+
+            if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
+                return true;
+
+            Vector2 tileWorldPos = new Vector2(tilePos.X * 16, tilePos.Y * 16);
+            Vector2 currentPosInTile = position - tileWorldPos;
+            if (tile.IsHalfBlock)
+            {
+                if (currentPosInTile.Y >= 8f)
+                    return true;
+            }
+            else if (tile.Slope == SlopeType.SlopeDownLeft)
+            {
+                if (currentPosInTile.X <= currentPosInTile.Y)
+                    return true;
+            }
+            else if (tile.Slope == SlopeType.SlopeDownRight)
+            {
+                if ((16 - currentPosInTile.X) <= currentPosInTile.Y)
+                    return true;
+            }
+            else if (tile.Slope == SlopeType.SlopeUpLeft)
+            {
+                if (currentPosInTile.X <= (16 - currentPosInTile.Y))
+                    return true;
+            }
+            else if (tile.Slope == SlopeType.SlopeUpRight)
+            {
+                if (currentPosInTile.X >= currentPosInTile.Y)
+                    return true;
+            }
+            return false;
+        }
         public static void StartAdditiveSpritebatch(bool end = true)
         {
             if (end)
