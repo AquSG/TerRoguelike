@@ -46,7 +46,16 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            modNPC.RogueCorruptorAI(NPC, 4f, 0.03f, 30, attackCooldown, ModContent.ProjectileType<VileSpit>(), 8f, NPC.damage);
+            int attackTelegraph = 30;
+            modNPC.RogueCorruptorAI(NPC, 4f, 0.03f, attackTelegraph, attackCooldown, ModContent.ProjectileType<VileSpit>(), 8f, NPC.damage);
+            if (NPC.ai[0] > 0 && NPC.ai[0] <= attackTelegraph && NPC.ai[1] % 2 == 0)
+            {
+                Vector2 offset = Main.rand.NextVector2Circular(NPC.width * 0.4f, NPC.width * 0.4f);
+                Dust dust = Dust.NewDustPerfect(NPC.Center + offset + NPC.rotation.ToRotationVector2() * 10, DustID.GreenTorch, -offset * 0.01f + NPC.velocity, 0, Color.LimeGreen, 1.4f);
+                dust.noGravity = true;
+                dust.noLightEmittence = true;
+                dust.noLight = true;
+            }
 
             NPC.frameCounter += 0.2d;
             float direction = NPC.velocity.ToRotation();
