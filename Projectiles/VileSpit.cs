@@ -44,7 +44,7 @@ namespace TerRoguelike.Projectiles
             }
             if (Main.rand.NextBool())
             {
-                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.CursedTorch, 0, 0, Projectile.alpha, Color.LimeGreen, 1.5f);
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GreenTorch, 0, 0, Projectile.alpha, Color.LimeGreen, 1.5f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.noLightEmittence = true;
@@ -62,7 +62,7 @@ namespace TerRoguelike.Projectiles
                 dust.noLight = true;
                 if (Main.rand.NextBool())
                 {
-                    int d2 = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.CursedTorch, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, Color.LimeGreen, 1.5f);
+                    int d2 = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.GreenTorch, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, Color.LimeGreen, 1.5f);
                     Dust dust2 = Main.dust[d2];
                     dust2.noLightEmittence = true;
                     dust2.noLight = true;
