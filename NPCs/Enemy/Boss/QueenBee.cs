@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack BeeSwarm = new Attack(2, 20, 600);
         public static Attack Charge = new Attack(3, 30, 230);
         public static Attack HoneyVomit = new Attack(4, 30, 80);
-        public static Attack Summon = new Attack(5, 30, 180);
+        public static Attack Summon = new Attack(5, 30, 110);
         public int shotgunFireRate = 24;
         public float shotgunRecoilInterpolant = 0;
         public Vector2 shotgunRecoilAnchorPos = Vector2.Zero;
@@ -61,6 +61,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int chargingDuration = 25;
         public int chargeWindup = 20;
         public int chargeEndLag = 20;
+        public Vector2 summonPositionStartTelegraph = -Vector2.One;
+        public Vector2 summonPosition = -Vector2.One;
+        public List<int> summonTimes = new List<int> { 20, 60 };
 
         public override void SetStaticDefaults()
         {
@@ -73,7 +76,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 60;
             NPC.aiStyle = -1;
             NPC.damage = 30;
-            NPC.lifeMax = 28000;
+            NPC.lifeMax = 25000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, -32);
@@ -519,10 +522,107 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                NPC.velocity *= 0.97f;
+                for (int i = 0; i < summonTimes.Count; i++)
+                {
+                    int summonTime = summonTimes[i];
+                    if (NPC.ai[1] == summonTime)
+                    {
+                        UpdateDirection();
+
+                        NPC dummyNPC = new NPC();
+                        dummyNPC.type = ModContent.NPCType<Hornet>();
+                        dummyNPC.SetDefaults(dummyNPC.type);
+                        Rectangle dummyRect = new Rectangle(0, 0, dummyNPC.width, dummyNPC.height);
+
+                        Vector2 spawnPosOffset = new Vector2(48 * NPC.direction, 90);
+                        Rectangle plannedRect = new Rectangle((int)(NPC.Center.X - (dummyRect.Width * 0.5f)), (int)(NPC.Center.Y - (dummyRect.Height * 0.5f)), dummyRect.Width, dummyRect.Height);
+                        plannedRect.X += (int)spawnPosOffset.X;
+                        plannedRect.Y += (int)spawnPosOffset.Y;
+                        if (modNPC.isRoomNPC)
+                        {
+                            plannedRect = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(plannedRect);
+                        }
+                        Vector2 position = plannedRect.Center.ToVector2();
+
+                        Point tilePos = new Vector2(position.X, plannedRect.Bottom).ToTileCoordinates();
+
+                        if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                        {
+                            bool found = false;
+                            for (int y = 0; y < 25; y++)
+                            {
+                                for (int d = -1; d <= 1; d += 2)
+                                {
+                                    if (!ParanoidTileRetrieval(tilePos.X, tilePos.Y + (y * d)).IsTileSolidGround(true))
+                                    {
+                                        float offset = y * d * 16f;
+                                        if (modNPC.isRoomNPC)
+                                        {
+                                            Rectangle rectCheck = new Rectangle(plannedRect.X, (int)(plannedRect.Y + offset), plannedRect.Width, plannedRect.Height);
+                                            rectCheck = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(rectCheck);
+                                            Vector2 posCheck = new Vector2(rectCheck.Center.X, rectCheck.Bottom);
+
+                                            Point tilePosCheck = posCheck.ToTileCoordinates();
+                                            if (!ParanoidTileRetrieval(tilePosCheck.X, tilePosCheck.Y).IsTileSolidGround(true))
+                                            {
+                                                found = true;
+                                                position.Y += rectCheck.Y - plannedRect.Y;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            found = true;
+                                            position.Y += offset;
+                                        }
+                                    }
+                                }
+                                if (found)
+                                    break;
+                            }
+                            if (found)
+                                summonPosition = position;
+                        }
+                        else
+                        {
+                            summonPosition = position;
+                        }
+                        summonPositionStartTelegraph = NPC.Center + new Vector2(8 * NPC.direction, 26).RotatedBy(NPC.rotation) + NPC.velocity * 5;
+
+                    }
+                    if (NPC.ai[1] - summonTime >= 0 && NPC.ai[1] - summonTime <= 20)
+                    {
+                        int time = 20;
+                        Vector2 startPos = summonPositionStartTelegraph;
+                        float completion = (NPC.ai[1] - summonTime) / 20f;
+                        float curveMultiplier = 1f - (float)Math.Pow(Math.Abs(completion - 0.5f) * 2, 2);
+                        Vector2 endPos = summonPosition;
+                        if (endPos != new Vector2(-1))
+                        {
+                            endPos += new Vector2(0, 16);
+
+                            Vector2 particlePos = startPos + ((endPos - startPos) * completion);
+                            particlePos += new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
+
+                            ParticleManager.AddParticle(new Square(particlePos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * 0.45f), 0, 0.96f, time, true));
+                        }
+
+                        if (NPC.ai[1] - summonTime == 20)
+                        {
+                            SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+                            SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+
+                            if (summonPosition != new Vector2(-1))
+                                SpawnManager.SpawnEnemy(ModContent.NPCType<Hornet>(), summonPosition, modNPC.sourceRoomListID, 60, 0.45f);
+                            summonPosition = new Vector2(-1);
+                        }
+                    }
+                }
+
                 if (NPC.ai[1] >= Summon.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -90;
                     NPC.ai[2] = Summon.Id;
                 }
             }
