@@ -73,6 +73,7 @@ namespace TerRoguelike.Projectiles
                     }
                 }
             }
+            var modProj = Projectile.ModProj();
             if (Projectile.timeLeft > 60)
             {
                 if (Projectile.timeLeft % 10 == 0)
@@ -87,6 +88,8 @@ namespace TerRoguelike.Projectiles
                         projSpawnPos, particleVel,
                         60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.1f, 0.14f) * scaleMulti), 4, 0, 0.96f, 50));
                 }
+                if (Projectile.frame == 3 && modProj != null && modProj.npcOwner >= 0 && Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID >= 0 && RoomSystem.RoomList[Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID].bossDead)
+                    Projectile.timeLeft = 60;
             }
             
             
