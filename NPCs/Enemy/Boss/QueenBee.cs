@@ -1,16 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.GameContent.Animations;
-using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
@@ -23,8 +19,6 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using Terraria.Graphics.Effects;
-using System.Runtime;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -55,10 +49,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 75);
-        public static Attack Shotgun = new Attack(1, 30, 180);
-        public static Attack BeeSwarm = new Attack(2, 30, 600);
-        public static Attack Charge = new Attack(3, 30, 200);
-        public static Attack HoneyVomit = new Attack(4, 30, 180);
+        public static Attack Shotgun = new Attack(1, 30, 224);
+        public static Attack BeeSwarm = new Attack(2, 20, 600);
+        public static Attack Charge = new Attack(3, 30, 230);
+        public static Attack HoneyVomit = new Attack(4, 30, 80);
         public static Attack Summon = new Attack(5, 30, 180);
         public int shotgunFireRate = 24;
         public float shotgunRecoilInterpolant = 0;
@@ -66,6 +60,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int beeSwarmRotateDirection = 1;
         public int chargingDuration = 25;
         public int chargeWindup = 20;
+        public int chargeEndLag = 20;
 
         public override void SetStaticDefaults()
         {
@@ -213,6 +208,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 UpdateDirection();
 
+                if (NPC.ai[1] == None.Duration)
+                {
+                    Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
+                    if (room != null)
+                    {
+                        if (!room.GetRect().Contains(NPC.getRect()))
+                        {
+                            NPC.velocity += (room.GetRect().ClosestPointInRect(NPC.Center) - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.1f;
+                            NPC.ai[1]--;
+                        }
+                    }
+                }
+
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -239,25 +247,53 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.rotation += MathHelper.PiOver2 * 0.4f * NPC.direction;
                 }
-                Vector2 targetPos = target == null ? NPC.Center : target.Center;
+                Vector2 targetPos = target == null ? spawnPos: target.Center;
                 float buttRot = (MathHelper.PiOver2 * 0.8f * NPC.direction);
                 float targetAngle = target == null ? -buttRot : (target.Center - NPC.Center).ToRotation() - buttRot;
                 targetAngle -= (NPC.direction == -1 ? MathHelper.PiOver2 * 2f : 0);
-                NPC.rotation = NPC.rotation.AngleLerp(targetAngle, 0.04f).AngleTowards(targetAngle, 0.007f);
+                NPC.rotation = NPC.rotation.AngleLerp(targetAngle, 0.04f).AngleTowards(targetAngle, 0.04f);
                 float fireDirection = NPC.rotation + buttRot + (NPC.direction == -1 ? MathHelper.PiOver2 * 2f : 0);
+                Vector2 baseOffset = new Vector2(6 * NPC.direction, 16);
+                int startupTime = shotgunFireRate * 2;
+
+                if (NPC.ai[1] < startupTime)
+                {
+                    Vector2 potentialProjSpawnPos = baseOffset.RotatedBy(NPC.rotation) + NPC.Center;
+                    if (ParanoidTileRetrieval(potentialProjSpawnPos.ToTileCoordinates()).IsTileSolidGround(true))
+                    {
+                        NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.1f;
+                    }
+                }
 
                 if (NPC.ai[1] > 0 && NPC.ai[1] % shotgunFireRate == 0)
                 {
                     shotgunRecoilAnchorPos = NPC.Center;
                     shotgunRecoilInterpolant = 1f;
-                    Vector2 baseOffset = new Vector2(6 * NPC.direction, 16);
-                    SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, NPC.Center);
+                    if (NPC.ai[1] >= startupTime)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f, PitchVariance = 0.05f }, NPC.Center);
+                        ChargeSlot = SoundEngine.PlaySound(SoundID.Item38 with { Volume = 0.2f, Pitch = 0.2f, PitchVariance = 0.05f }, NPC.Center);
+                        for (int i = 0; i < 12; i++)
+                        {
+                            Vector2 projSpawnPos = baseOffset + ((Vector2.UnitX * 16).RotatedBy(i * MathHelper.TwoPi / 12f) * new Vector2(1f, 0.6f));
+                            projSpawnPos = projSpawnPos.RotatedBy(NPC.rotation);
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<Stinger>(), NPC.damage, 0, -1, 1);
+                        }
+                    }
+                    else
+                        SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.65f, Pitch = -0.15f, PitchVariance = 0.05f }, NPC.Center);
+                    Color outlineColor = Color.Goldenrod;
+                    Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.35f);
                     for (int i = 0; i < 12; i++)
                     {
-                        Vector2 projSpawnPos = baseOffset + ((Vector2.UnitX * 16).RotatedBy(i * MathHelper.TwoPi / 12f) * new Vector2(1f, 0.6f));
-                        projSpawnPos = projSpawnPos.RotatedBy(NPC.rotation);
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<Stinger>(), NPC.damage, 0, -1, 1);
+                        Vector2 particleSpawnPos = baseOffset + ((Vector2.UnitX * 16 * Main.rand.NextFloat(0.8f, 1f)).RotatedBy(i * MathHelper.TwoPi / 12f) * new Vector2(1f, 0.6f));
+                        particleSpawnPos = particleSpawnPos.RotatedBy(NPC.rotation);
+                        Vector2 particleVel = (fireDirection.ToRotationVector2() * Main.rand.NextFloat(3, 5)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f));
+                        ParticleManager.AddParticle(new BallOutlined(
+                            NPC.Center + particleSpawnPos, particleVel,
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.96f, 50));
                     }
+
                     NPC.Center -= fireDirection.ToRotationVector2() * 12;
                 }
                 if (shotgunRecoilInterpolant > 0)
@@ -269,6 +305,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     shotgunRecoilInterpolant -= 0.05f;
                 }
+
 
                 if (NPC.ai[1] >= Shotgun.Duration)
                 {
@@ -309,7 +346,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (NPC.velocity.Length() > 10)
                             NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * 10;
                     }
-                    
+
                 }
                 if (NPC.ai[1] >= 2)
                 {
@@ -350,7 +387,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.velocity *= 0.98f;
                 }
-                
+
                 if (NPC.ai[1] >= BeeSwarm.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -361,11 +398,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == Charge.Id)
             {
                 float chargeStartDist = 240;
-                chargingDuration = 25;
-                int time = (int)NPC.ai[1] % (chargeWindup + chargingDuration);
+                int chargeStartLag = 30;
+                int time = ((int)NPC.ai[1] - chargeStartLag) % (chargeWindup + chargingDuration);
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
                 Vector2 wantedPos = (NPC.Center - targetPos).SafeNormalize(Vector2.UnitY) * chargeStartDist;
-                if (NPC.ai[1] < Charge.Duration - 20)
+                if (NPC.ai[1] < Charge.Duration - chargeEndLag)
                 {
                     if (time < chargeWindup)
                     {
@@ -377,12 +414,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             NPC.direction = -1;
                         else
                             NPC.direction = 1;
-                        NPC.rotation = NPC.rotation.AngleLerp(wantedRot, 0.025f).AngleTowards(wantedRot, 0.015f);
+                        if (NPC.direction != NPC.oldDirection)
+                        {
+                            NPC.rotation += MathHelper.Pi;
+                        }
+
+                        NPC.rotation = NPC.rotation.AngleLerp(wantedRot, 0.032f).AngleTowards(wantedRot, 0.021f);
                     }
                     if (time <= 1)
                     {
                         float distance = NPC.Center.Distance(targetPos);
-                        if (distance > chargeStartDist - 16 && distance < chargeStartDist + 16)
+                        if (time == 1 && distance > chargeStartDist - 16 && distance < chargeStartDist + 16)
                         {
                             NPC.velocity *= 0.3f;
                             NPC.velocity += (NPC.Center - targetPos).SafeNormalize(Vector2.UnitY) * 10;
@@ -411,7 +453,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             if (time == chargeWindup)
                             {
                                 NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 17;
-                                ChargeSlot = SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.65f, Pitch = 0.08f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest, MaxInstances = 4 }, NPC.Center);
+                                ChargeSlot = SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.65f, Pitch = 0.04f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest, MaxInstances = 4 }, NPC.Center);
                             }
                             NPC.rotation = NPC.velocity.ToRotation();
                             if (NPC.direction == -1)
@@ -429,6 +471,45 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == HoneyVomit.Id)
             {
+                NPC.velocity *= 0.97f;
+                UpdateDirection();
+
+                Vector2 projSpawnPos = NPC.Center + new Vector2(16 * NPC.direction, -32).RotatedBy(NPC.rotation);
+                if (ParanoidTileRetrieval(projSpawnPos.ToTileCoordinates()).IsTileSolidGround(true))
+                {
+                    NPC.velocity += (spawnPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.2f;
+                }
+
+                Color outlineColor = Color.Goldenrod;
+                Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.35f);
+                if (NPC.ai[1] < 40 && NPC.ai[1] % 20 == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Item17 with { Volume = 0.5f, PitchVariance = 0.05f }, NPC.Center);
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Vector2 particleVel = (Vector2.UnitY * Main.rand.NextFloat(1f, 1.7f)).RotatedBy(MathHelper.PiOver2 * 1.3f * -NPC.direction + Main.rand.NextFloat(-0.6f, 0.6f));
+                        ParticleManager.AddParticle(new BallOutlined(
+                            projSpawnPos, particleVel,
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.96f, 50));
+                    }
+                }
+
+                else if (NPC.ai[1] == 40)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.75f }, NPC.Center);
+                    for (int i = 0; i < 7; i++)
+                    {
+                        Vector2 projVel = (Vector2.UnitY * Main.rand.NextFloat(2f, 3.5f)).RotatedBy(MathHelper.PiOver2 * 1.3f * -NPC.direction + Main.rand.NextFloat(-0.3f, 0.3f));
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);
+
+                        Vector2 particleVel = (Vector2.UnitY * Main.rand.NextFloat(1f, 1.7f)).RotatedBy(MathHelper.PiOver2 * 1.3f * -NPC.direction + Main.rand.NextFloat(-0.6f, 0.6f));
+                        ParticleManager.AddParticle(new BallOutlined(
+                            projSpawnPos, particleVel + NPC.velocity,
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.96f, 50));
+                    }
+
+                }
+
                 if (NPC.ai[1] >= HoneyVomit.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -451,8 +532,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge, HoneyVomit, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge };
+            List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge, HoneyVomit, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -612,7 +692,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
-            
+
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -636,7 +716,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            
+
         }
         public override void FindFrame(int frameHeight)
         {
