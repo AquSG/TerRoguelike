@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy
                 Vector2 offset = Main.rand.NextVector2Circular(NPC.width * 0.4f, NPC.width * 0.4f);
                 Dust dust = Dust.NewDustPerfect(NPC.Center + offset + NPC.rotation.ToRotationVector2() * 10, DustID.RedTorch, -offset * 0.01f + NPC.velocity, 0, Color.Red, 1.4f);
                 dust.noGravity = true;
-                dust.noLightEmittence = true;d
+                dust.noLightEmittence = true;
                 dust.noLight = true;
             }
 
