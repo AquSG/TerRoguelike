@@ -770,7 +770,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item173 with { Volume = 1f, Pitch = 0.2f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item173 with { Volume = 0.8f, Pitch = 0.2f }, NPC.Center);
                 ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(BeeSwarmSound with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center), 1, deathCutsceneDuration, 360));
                 NPC.velocity *= 0;
                 NPC.rotation = 0;
