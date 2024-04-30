@@ -80,6 +80,7 @@ Projectiles: {
 	ShiningSand.DisplayName: Shining Sand
 	DarkTendril.DisplayName: Dark Tendril
 	Bee.DisplayName: Bee
+	HoneyGlob.DisplayName: Honey Glob
 }
 
 Items: {
