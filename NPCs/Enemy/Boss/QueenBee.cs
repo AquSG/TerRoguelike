@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SlotId ChargeSlot;
 
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
+        public int cutsceneDuration = 180;
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 75);
@@ -95,9 +95,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
             NPC.spriteDirection = -1;
-            spawnPos = NPC.Center;
+            spawnPos = NPC.Center + new Vector2(48, 0);
             NPC.ai[2] = None.Id;
             ableToHit = false;
+            NPC.Center += new Vector2(2546, 0);
         }
         public override void PostAI()
         {
@@ -120,7 +121,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.localAI[1]++;
                 }
             }
-            if (NPC.ai[0] == Charge.Id)
+            if (NPC.ai[0] == Charge.Id || NPC.localAI[0] < 0)
             {
                 if (SoundEngine.TryGetActiveSound(ChargeSlot, out var sound) && sound.IsPlaying)
                 {
@@ -180,10 +181,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
+                    NPC.velocity.X = -27;
                     CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
 
+                if (NPC.localAI[0] > -120)
+                {
+                    NPC.velocity *= 0.972f;
+                }
+                if (NPC.localAI[0] == -90)
+                    ChargeSlot = SoundEngine.PlaySound(SoundID.Item173 with { Volume = 1f }, NPC.Center);
                 if (NPC.localAI[0] == -30)
                 {
                     NPC.immortal = false;
