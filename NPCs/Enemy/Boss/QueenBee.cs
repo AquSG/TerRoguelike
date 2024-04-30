@@ -20,6 +20,8 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Systems.ExtraSoundSystem;
+using Terraria.GameContent.Animations;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -47,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public int deadTime = 0;
         public int cutsceneDuration = 180;
-        public int deathCutsceneDuration = 120;
+        public int deathCutsceneDuration = 240;
 
         public static Attack None = new Attack(0, 0, 75);
         public static Attack Shotgun = new Attack(1, 30, 224);
@@ -169,7 +171,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(IceQueenTheme);
+                SetBossTrack(QueenBeeTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
@@ -768,6 +770,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                SoundEngine.PlaySound(SoundID.Item173 with { Volume = 1f, Pitch = 0.2f }, NPC.Center);
+                ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(BeeSwarmSound with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center), 1, deathCutsceneDuration, 360));
                 NPC.velocity *= 0;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
@@ -801,6 +805,36 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (deadTime < 60)
+            {
+                Vector2 anchor = NPC.Center + modNPC.drawCenter + new Vector2(7 * NPC.direction, 10);
+                for (int i = 0; i < 2; i++)
+                {
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(600, 600) * Main.rand.NextFloat(0.7f, 1f);
+                    Vector2 projectileTargettingPos = anchor + new Vector2(Main.rand.NextFloat(-32, 32), Main.rand.NextFloat(-40, 40));
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), anchor + offset, -offset.SafeNormalize(Vector2.UnitY) * 5, ModContent.ProjectileType<CutsceneBee>(), 0, 0, -1, projectileTargettingPos.X, projectileTargettingPos.Y, deadTime + Main.rand.Next(-90, 0));
+                }
+            }
+            if (deadTime > 85 && deadTime % 2 == 0)
+            {
+                int rate = 3 - ((deadTime - 85) / 60);
+                if (Main.rand.NextBool(rate < 1 ? 1 : rate))
+                {
+                    SoundEngine.PlaySound(SoundID.NPCHit1 with { Volume = 1f }, NPC.Center);
+                    Vector2 pos = NPC.Center;
+                    int width = (int)(NPC.width * 0.25f);
+                    pos.X += Main.rand.Next(-width, width);
+                    Vector2 velocity = new Vector2(0, -4.6f).RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi));
+                    velocity *= Main.rand.NextFloat(0.3f, 1f);
+                    if (Main.rand.NextBool(5))
+                        velocity *= 1.5f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.7f;
+                    int time = 130 + Main.rand.Next(70);
+                    Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.3f)), Color.Black, 0.48f);
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.3f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.8f, scale, velocity.ToRotation(), true));
+                }
+            }
 
             if (deadTime >= deathCutsceneDuration - 30)
             {
@@ -824,6 +858,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 SoundEngine.PlaySound(SoundID.NPCDeath66 with { Volume = 1f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
                 if (SoundEngine.TryGetActiveSound(BeeSwarmSlot, out var sound) && sound.IsPlaying)
                 {
                     sound.Stop();
@@ -838,6 +873,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 20f), NPC.velocity, 306, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y + 10f), NPC.velocity, 307, NPC.scale);
                 Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X, NPC.position.Y - 10f), NPC.velocity, 308, NPC.scale);
+                for (int i = 0; i < 60; i++)
+                {
+                    Vector2 pos = NPC.Center;
+                    int width = (int)(NPC.width * 0.25f);
+                    pos.X += Main.rand.Next(-width, width);
+                    Vector2 velocity = new Vector2(0, -4.6f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                    velocity *= Main.rand.NextFloat(0.3f, 1f);
+                    if (Main.rand.NextBool(5))
+                        velocity *= 1.5f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.7f;
+                    int time = 130 + Main.rand.Next(70);
+                    Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.3f)), Color.Black, 0.48f);
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.3f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.8f, scale, velocity.ToRotation(), true));
+                }
             }
         }
         public override void OnKill()
@@ -855,9 +905,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Color color = Color.Lerp(drawColor, Color.White, 0.2f);
 
-            modNPC.drawCenter.X = -12 * NPC.spriteDirection;
+            modNPC.drawCenter = new Vector2(-12 * NPC.spriteDirection, -32);
+            modNPC.drawCenter = modNPC.drawCenter.RotatedBy(NPC.rotation);
 
-            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition + modNPC.drawCenter.RotatedBy(NPC.rotation), NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition + modNPC.drawCenter, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
 
             bool drawHitboxes = false;
             if (drawHitboxes)

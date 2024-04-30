@@ -98,6 +98,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/PharaohSpiritThemeStart",
             "TerRoguelike/Tracks/PharaohSpiritThemeEnd",
             0.67f);
+        public static BossTheme QueenBeeTheme = new(
+            "TerRoguelike/Tracks/QueenBeeTheme",
+            "TerRoguelike/Tracks/QueenBeeThemeStart",
+            "TerRoguelike/Tracks/QueenBeeThemeEnd",
+            0.4f);
 
 
         public static void PlayAllSounds()
@@ -133,6 +138,9 @@ namespace TerRoguelike.Systems
                 PharaohSpiritTheme.BattleTrack,
                 PharaohSpiritTheme.StartTrack,
                 PharaohSpiritTheme.EndTrack,
+                QueenBeeTheme.BattleTrack,
+                QueenBeeTheme.StartTrack,
+                QueenBeeTheme.EndTrack,
             };
             foreach (string path in pathList)
             {
