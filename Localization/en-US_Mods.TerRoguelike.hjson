@@ -81,6 +81,7 @@ Projectiles: {
 	DarkTendril.DisplayName: Dark Tendril
 	Bee.DisplayName: Bee
 	HoneyGlob.DisplayName: Honey Glob
+	CutsceneBee.DisplayName: Cutscene Bee
 }
 
 Items: {
@@ -397,7 +398,7 @@ Items: {
 		Tooltip:
 			'''
 			Upon entering a room, deploy 8 homing rockets from the center of the room
-			Homing rockets deal 100 base damage
+			Homing rockets deal 70 base damage
 			Extra copies of this item increase the amount of homing rockets by 4
 			'''
 	}

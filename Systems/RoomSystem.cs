@@ -795,7 +795,7 @@ namespace TerRoguelike.Systems
 
                 if (bundle.Time % 12 == 0 && bundle.Count > 0)
                 {
-                    Projectile.NewProjectile(Projectile.GetSource_None(), bundle.Position + new Vector2(0, -32).RotatedBy(bundle.Rotation), (-Vector2.UnitY * 2.2f).RotatedBy(bundle.Rotation), ModContent.ProjectileType<PlanRocket>(), 100, 1f, bundle.Owner, -1);
+                    Projectile.NewProjectile(Projectile.GetSource_None(), bundle.Position + new Vector2(0, -32).RotatedBy(bundle.Rotation), (-Vector2.UnitY * 2.2f).RotatedBy(bundle.Rotation), ModContent.ProjectileType<PlanRocket>(), 70, 1f, bundle.Owner, -1);
                     bundle.Count--;
                     bundle.Rotation += MathHelper.PiOver4;
                 }
