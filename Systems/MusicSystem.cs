@@ -156,6 +156,10 @@ namespace TerRoguelike.Systems
         {
             MusicLoader.AddMusic(TerRoguelike.Instance, "Tracks/Blank");
         }
+        public override void Unload()
+        {
+            MusicDict = null;
+        }
         public override void SetStaticDefaults()
         {
             PlayAllSounds();
