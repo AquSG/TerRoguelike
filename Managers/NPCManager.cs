@@ -117,6 +117,7 @@ namespace TerRoguelike.Managers
                 new IceQueen(),
                 new PharaohSpirit(),
                 new QueenBee(),
+                new WallOfFlesh(),
             };
         }
         internal static void Unload()

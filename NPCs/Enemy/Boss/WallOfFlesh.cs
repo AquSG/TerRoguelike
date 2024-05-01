@@ -4,17 +4,22 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameContent.Animations;
+using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
+using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Managers;
 using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
+using static log4net.Appender.ColoredConsoleAppender;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
@@ -36,10 +41,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool CollisionPass = false;
         public List<ExtraHitbox> hitboxes = new List<ExtraHitbox>()
         {
-            new ExtraHitbox(new Point(128, 1000), new Vector2(0, 64)),
-            new ExtraHitbox(new Point(80, 80), new Vector2(0, 0)),
-            new ExtraHitbox(new Point(80, 80), new Vector2(0, -350)),
-            new ExtraHitbox(new Point(80, 80), new Vector2(0, 350)),
+            new ExtraHitbox(new Point(128, 1104), new Vector2(32, 0)),
+            new ExtraHitbox(new Point(64, 64), new Vector2(-32, -28)),
+            new ExtraHitbox(new Point(64, 64), new Vector2(-32, -331.2f)),
+            new ExtraHitbox(new Point(64, 64), new Vector2(-32, 303.6f)),
         };
         public Texture2D squareTex;
         public Texture2D bodyTex;
@@ -48,6 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float topEyeRotation = MathHelper.Pi;
         public float bottomEyeRotation = MathHelper.Pi;
         public float mouthRotation = MathHelper.Pi;
+        public bool positionsinitialized = false;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -55,11 +61,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 75);
         public static Attack Laser = new Attack(1, 30, 180);
-
-        public override void SetStaticDefaults()
-        {
-            Main.npcFrameCount[modNPCID] = 0;
-        }
         public override void SetDefaults()
         {
             base.SetDefaults();
@@ -70,7 +71,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.lifeMax = 25000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 0);
+            modNPC.drawCenter = new Vector2(0, -32);
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.SpecialProjectileCollisionRules = true;
             modNPC.OverrideIgniteVisual = true;
@@ -90,24 +91,57 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
             NPC.spriteDirection = -1;
+            NPC.Center += Vector2.UnitY * NPC.height * 0.5f;
             spawnPos = NPC.Center;
             NPC.ai[2] = None.Id;
             ableToHit = false;
-            if (modNPC.isRoomNPC)
-            {
-                Room room = RoomList[modNPC.sourceRoomListID];
-                hitboxes[0].dimensions.Y = (int)room.RoomDimensions16.Y;
-                hitboxes[2].offset.Y = hitboxes[0].dimensions.Y * -0.35f;
-                hitboxes[3].offset.Y = hitboxes[0].dimensions.Y * 0.35f;
-            }
         }
         public override void PostAI()
         {
+            if (target != null)
+            {
+                float angleBound = MathHelper.PiOver2 * 0.999f;
 
+                float angleToTarget = (target.Center - (NPC.Center + hitboxes[2].offset)).ToRotation();
+                angleToTarget = MathHelper.Clamp(AngleSizeBetween(MathHelper.Pi, angleToTarget), -angleBound, angleBound) + MathHelper.Pi;
+                topEyeRotation = topEyeRotation.AngleLerp(angleToTarget, 0.12f);
+
+                angleToTarget = (target.Center - (NPC.Center + hitboxes[3].offset)).ToRotation();
+                angleToTarget = MathHelper.Clamp(AngleSizeBetween(MathHelper.Pi, angleToTarget), -angleBound, angleBound) + MathHelper.Pi;
+                bottomEyeRotation = bottomEyeRotation.AngleLerp(angleToTarget, 0.12f);
+
+                angleToTarget = (target.Center - (NPC.Center + hitboxes[1].offset)).ToRotation();
+                angleToTarget = MathHelper.Clamp(AngleSizeBetween(MathHelper.Pi, angleToTarget), -angleBound, angleBound) + MathHelper.Pi;
+                mouthRotation = mouthRotation.AngleLerp(angleToTarget, 0.12f);
+            }
         }
         public override void AI()
         {
-            NPC.frameCounter += 0.125d;
+            if (!positionsinitialized)
+            {
+                positionsinitialized = true;
+                if (modNPC.isRoomNPC)
+                {
+                    Room room = RoomList[modNPC.sourceRoomListID];
+                    hitboxes[0].dimensions.Y = (int)room.RoomDimensions16.Y;
+                    hitboxes[1].offset.Y = -28;
+                    hitboxes[2].offset.Y = hitboxes[0].dimensions.Y * -0.3f;
+                    hitboxes[3].offset.Y = hitboxes[0].dimensions.Y * 0.275f;
+                }
+                Vector2 basePos = hitboxes[0].offset + hitboxes[0].dimensions.ToVector2() * -0.5f;
+                for (int i = 0; i < hitboxes[0].dimensions.Y; i += 32)
+                {
+                    modNPC.ExtraIgniteTargetPoints.Add(basePos + i * Vector2.UnitY);
+                }
+                for (int i = 1; i < hitboxes.Count; i++)
+                {
+                    for (int j = -1; j <= 1; j++)
+                    {
+                        modNPC.ExtraIgniteTargetPoints.Add(hitboxes[i].offset + hitboxes[i].dimensions.ToVector2() * new Vector2(-0.5f, -0.5f * j));
+                    }
+                }
+            }
+            NPC.frameCounter += 0.1d;
 
             if (deadTime > 0)
             {
@@ -339,6 +373,32 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
 
         }
+        public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers)
+        {
+            modifiers.HideCombatText();
+        }
+        public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
+        {
+            Rectangle rect = hitboxes[0].GetHitbox(NPC.Center, 0);
+            rect.Inflate(-16, -100);
+            rect.X -= 16;
+            rect.Y += (int)(rect.Height * 0.25f);
+            CombatText.NewText(rect, hit.Crit ? CombatText.DamagedHostileCrit : CombatText.DamagedHostile, hit.Damage, hit.Crit);
+        }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            for (int i = 0; i < hitboxes.Count; i++)
+            {
+                var hitbox = hitboxes[i];
+                bool pass = hitbox.GetHitbox(NPC.Center, 0).Contains(Main.MouseWorld.ToPoint());
+                if (pass)
+                {
+                    boundingBox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+                    break;
+                }
+                
+            }
+        }
         public override void FindFrame(int frameHeight)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
@@ -347,7 +407,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            Vector2 bodyDrawStart = NPC.Center + hitboxes[0].offset + new Vector2(0, hitboxes[0].dimensions.Y * -0.5f) - Main.screenPosition;
+            Vector2 bodyDrawStart = NPC.Center + hitboxes[0].offset + new Vector2(-16, hitboxes[0].dimensions.Y * -0.5f) + Vector2.UnitY * 16 + Vector2.UnitX * -8;
             int eyeFrameCount = 2;
             int eyeFrameHeight = eyeTex.Height / eyeFrameCount;
             int currentEyeFrame = (int)(NPC.frameCounter % eyeFrameCount);
@@ -357,23 +417,61 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int currentMouthFrame = (int)(NPC.frameCounter % eyeFrameCount);
             Rectangle mouthFrame = new Rectangle(0, currentMouthFrame * mouthFrameHeight, mouthTex.Width, mouthFrameHeight - 2);
             SpriteEffects spriteEffects = NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-
             Color bodyDrawColor = Lighting.GetColor(bodyDrawStart.ToTileCoordinates());
-            for (int i = 0; i < hitboxes[0].dimensions.Y; i += 4)
+            float offsetMagnitude = (float)Math.Sin(AngleSizeBetween(MathHelper.Pi, mouthRotation));
+
+            int bodyFrameYOff = ((int)(NPC.frameCounter * 2) % 3 * (bodyTex.Height / 3)) + (int)(-45 * offsetMagnitude);
+
+            if (modNPC.ignitedStacks.Any())
             {
-                Vector2 bodyDrawPos = bodyDrawStart + Vector2.UnitY * i;
-                Rectangle frame = new Rectangle(0, i, bodyTex.Width, 4);
-                if (i % 16 == 0)
-                    bodyDrawColor = Lighting.GetColor(bodyDrawPos.ToTileCoordinates());
-                Main.EntitySpriteDraw(bodyTex, bodyDrawPos, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects);
+                StartAlphaBlendSpritebatch();
+
+                Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
+                Vector3 colorHSL = Main.rgbToHsl(color);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
+                for (int i = 0; i < hitboxes[0].dimensions.Y - 32; i += 4)
+                {
+                    Vector2 bodyDrawPos = bodyDrawStart + Vector2.UnitY * i;
+                    int frameYPos = (i + bodyFrameYOff) % bodyTex.Height;
+                    Rectangle frame = new Rectangle(0, frameYPos, bodyTex.Width - 16, 4);
+                    for (int j = 0; j < 8; j++)
+                    {
+                        Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition + (j * MathHelper.PiOver4).ToRotationVector2() * 2, frame, Color.White, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects);
+                    }
+                    
+                }
+                for (int j = 0; j < 8; j++)
+                {
+                    Vector2 offset = (j * MathHelper.PiOver4).ToRotationVector2() * 2;
+                    Vector2 ignitedDrawPos = hitboxes[2].offset + NPC.Center;
+                    Main.EntitySpriteDraw(eyeTex, ignitedDrawPos - Main.screenPosition + offset, eyeFrame, Color.White, topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
+                    ignitedDrawPos = hitboxes[3].offset + NPC.Center;
+                    Main.EntitySpriteDraw(eyeTex, ignitedDrawPos - Main.screenPosition + offset, eyeFrame, Color.White, bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
+                    ignitedDrawPos = hitboxes[1].offset + NPC.Center;
+                    Main.EntitySpriteDraw(mouthTex, ignitedDrawPos - Main.screenPosition + offset, mouthFrame, Color.White, mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
+                }
+                
+
+                StartVanillaSpritebatch();
             }
 
+            for (int i = 0; i < hitboxes[0].dimensions.Y - 32; i += 4)
+            {
+                Vector2 bodyDrawPos = bodyDrawStart + Vector2.UnitY * i;
+                int frameYPos = (i + bodyFrameYOff) % bodyTex.Height;
+                Rectangle frame = new Rectangle(0, frameYPos, bodyTex.Width - 16, 4);
+                bodyDrawColor = Lighting.GetColor(bodyDrawPos.ToTileCoordinates());
+                Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects);
+            }
             Vector2 drawPos = hitboxes[2].offset + NPC.Center;
-            Main.EntitySpriteDraw(eyeTex, drawPos + Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.33f, 0.5f), 1f, spriteEffects);
+            Main.EntitySpriteDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
             drawPos = hitboxes[3].offset + NPC.Center;
-            Main.EntitySpriteDraw(eyeTex, drawPos + Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.33f, 0.5f), 1f, spriteEffects);
+            Main.EntitySpriteDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
             drawPos = hitboxes[1].offset + NPC.Center;
-            Main.EntitySpriteDraw(mouthTex, drawPos + Main.screenPosition, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, mouthFrame.Size() * new Vector2(0.33f, 0.5f), 1f, spriteEffects);
+            Main.EntitySpriteDraw(mouthTex, drawPos - Main.screenPosition, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
 
             bool drawHitboxes = false;
             if (drawHitboxes)
@@ -395,6 +493,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             Main.EntitySpriteDraw(squareTex, hitbox.Location.ToVector2() + new Vector2(hitbox.Width * d, y) - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                         }
                     }
+                }
+            }
+            if (false)
+            {
+                for (int i = 0; i < modNPC.ExtraIgniteTargetPoints.Count; i++)
+                {
+                    Main.EntitySpriteDraw(squareTex, modNPC.ExtraIgniteTargetPoints[i] + NPC.Center - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                 }
             }
             return false;

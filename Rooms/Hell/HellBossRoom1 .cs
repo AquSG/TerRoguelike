@@ -26,11 +26,12 @@ namespace TerRoguelike.Rooms
             base.InitializeRoom();
             if (!TerRoguelikeWorld.escape)
                 AddBoss(bossSpawnPos, ModContent.NPCType<WallOfFlesh>());
+                
         }
         public override void Update()
         {
             if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 16f - 200f, RoomDimensions.Y * 8f);
+                bossSpawnPos = new Vector2(RoomDimensions.X * 16f - 105f, RoomDimensions.Y * 8f);
             base.Update();
         }
     }
