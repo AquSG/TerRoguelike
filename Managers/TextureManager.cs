@@ -122,6 +122,9 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/SandnadoLight",
                 "TerRoguelike/ExtraTextures/Crust",
                 "TerRoguelike/Projectiles/DarkTendril",
+                "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshBody",
+                "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshEye",
+                "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshMouth",
             };
             foreach (string path in pathList)
             {
