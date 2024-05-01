@@ -31,7 +31,8 @@ namespace TerRoguelike.NPCs
         public int baseMaxHP = 0;
         public int baseDamage = 0;
         public float diminishingDR = 0;
-        public List<WormSegment> Segments = new List<WormSegment>();
+        public List<WormSegment> Segments = [];
+        public List<Vector2> ExtraIgniteTargetPoints = [];
         public int hitSegment = 0;
         public float effectiveDamageTakenMulti { get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR))); } }
         public int overheadArrowTime = 0;
@@ -47,9 +48,9 @@ namespace TerRoguelike.NPCs
         public bool activatedItemPotentiometer = false;
 
         //debuffs
-        public List<IgnitedStack> ignitedStacks = new List<IgnitedStack>();
+        public List<IgnitedStack> ignitedStacks = [];
         public int ignitedHitCooldown = 0;
-        public List<BleedingStack> bleedingStacks = new List<BleedingStack>();
+        public List<BleedingStack> bleedingStacks = [];
         public int bleedingHitCooldown = 0;
         public int ballAndChainSlow = 0;
         public Vector2 drawCenter = new Vector2(-1000);

@@ -1186,10 +1186,23 @@ namespace TerRoguelike.TerPlayer
                     if (npc == null || !npc.active || npc.friendly || npc.immortal || npc.dontTakeDamage)
                         continue;
 
-                    Vector2 npcPos = npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(target.Center) : npc.Center;
+                    var modNPC = npc.ModNPC();
+                    Vector2 npcPos = modNPC.Segments.Any() ? modNPC.ClosestSegment(target.Center) : npc.Center;
                     if (npcPos.Distance(target.Center) <= radius)
                     {
-                        npc.ModNPC().ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                        modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                    }
+                    else if (modNPC.ExtraIgniteTargetPoints.Any())
+                    {
+                        for (int p = 0; p < modNPC.ExtraIgniteTargetPoints.Count; p++)
+                        {
+                            Vector2 targetPoint = modNPC.ExtraIgniteTargetPoints[p] + npc.Center;
+                            if (targetPoint.Distance(target.Center) <= radius)
+                            {
+                                modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                                break;
+                            }
+                        }
                     }
                 }
                 modTarget.activatedHotPepper = true;
