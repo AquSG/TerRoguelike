@@ -42,9 +42,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public List<ExtraHitbox> hitboxes = new List<ExtraHitbox>()
         {
             new ExtraHitbox(new Point(128, 1104), new Vector2(32, 0)),
-            new ExtraHitbox(new Point(64, 64), new Vector2(-32, -28)),
-            new ExtraHitbox(new Point(64, 64), new Vector2(-32, -331.2f)),
-            new ExtraHitbox(new Point(64, 64), new Vector2(-32, 303.6f)),
+            new ExtraHitbox(new Point(80, 80), new Vector2(-32, -28)),
+            new ExtraHitbox(new Point(80, 80), new Vector2(-32, -331.2f)),
+            new ExtraHitbox(new Point(80, 80), new Vector2(-32, 303.6f)),
         };
         public Texture2D squareTex;
         public Texture2D bodyTex;
@@ -61,6 +61,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 75);
         public static Attack Laser = new Attack(1, 30, 180);
+        public static Attack Deathray = new Attack(2, 30, 180);
         public override void SetDefaults()
         {
             base.SetDefaults();
@@ -389,15 +390,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             for (int i = 0; i < hitboxes.Count; i++)
             {
-                var hitbox = hitboxes[i];
-                bool pass = hitbox.GetHitbox(NPC.Center, 0).Contains(Main.MouseWorld.ToPoint());
+                Rectangle hitbox = hitboxes[i].GetHitbox(NPC.Center, 0);
+                hitbox.Inflate(15, 16);
+                bool pass = hitbox.Contains(Main.MouseWorld.ToPoint());
                 if (pass)
                 {
                     boundingBox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
-                    break;
+                    return;
                 }
-                
             }
+            boundingBox = new Rectangle(0, 0, 0, 0);
         }
         public override void FindFrame(int frameHeight)
         {
@@ -417,10 +419,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int currentMouthFrame = (int)(NPC.frameCounter % eyeFrameCount);
             Rectangle mouthFrame = new Rectangle(0, currentMouthFrame * mouthFrameHeight, mouthTex.Width, mouthFrameHeight - 2);
             SpriteEffects spriteEffects = NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-            Color bodyDrawColor = Lighting.GetColor(bodyDrawStart.ToTileCoordinates());
-            float offsetMagnitude = (float)Math.Sin(AngleSizeBetween(MathHelper.Pi, mouthRotation));
+            Color bodyDrawColor;
+            float offsetMagnitude = (float)Math.Sin(NPC.localAI[0] * 0.03f);
+            int bodyFrameYOff = ((int)(NPC.frameCounter * 2) % 3 * (bodyTex.Height / 3)) + (int)(-10 * offsetMagnitude);
 
-            int bodyFrameYOff = ((int)(NPC.frameCounter * 2) % 3 * (bodyTex.Height / 3)) + (int)(-45 * offsetMagnitude);
+            List<StoredDraw> draws = [];
+
+            for (int i = 0; i < hitboxes[0].dimensions.Y - 32; i += 4)
+            {
+                Vector2 bodyDrawPos = bodyDrawStart + Vector2.UnitY * i;
+                int frameYPos = (i + bodyFrameYOff) % bodyTex.Height;
+                Rectangle frame = new Rectangle(0, frameYPos, bodyTex.Width - 16, 4);
+                bodyDrawColor = Lighting.GetColor(bodyDrawPos.ToTileCoordinates());
+                draws.Add(new StoredDraw(bodyTex, bodyDrawPos - Main.screenPosition, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects));
+            }
+            Vector2 drawPos = hitboxes[2].offset + NPC.Center;
+            draws.Add(new StoredDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
+            drawPos = hitboxes[3].offset + NPC.Center;
+            draws.Add(new StoredDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
+            drawPos = hitboxes[1].offset + NPC.Center;
+            draws.Add(new StoredDraw(mouthTex, drawPos - Main.screenPosition, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
 
             if (modNPC.ignitedStacks.Any())
             {
@@ -432,49 +450,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
                 GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
 
-                for (int i = 0; i < hitboxes[0].dimensions.Y - 32; i += 4)
+                for (int i = 0; i < draws.Count; i++)
                 {
-                    Vector2 bodyDrawPos = bodyDrawStart + Vector2.UnitY * i;
-                    int frameYPos = (i + bodyFrameYOff) % bodyTex.Height;
-                    Rectangle frame = new Rectangle(0, frameYPos, bodyTex.Width - 16, 4);
+                    var draw = draws[i];
                     for (int j = 0; j < 8; j++)
                     {
-                        Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition + (j * MathHelper.PiOver4).ToRotationVector2() * 2, frame, Color.White, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects);
+                        draw.Draw(Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
                     }
-                    
                 }
-                for (int j = 0; j < 8; j++)
-                {
-                    Vector2 offset = (j * MathHelper.PiOver4).ToRotationVector2() * 2;
-                    Vector2 ignitedDrawPos = hitboxes[2].offset + NPC.Center;
-                    Main.EntitySpriteDraw(eyeTex, ignitedDrawPos - Main.screenPosition + offset, eyeFrame, Color.White, topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
-                    ignitedDrawPos = hitboxes[3].offset + NPC.Center;
-                    Main.EntitySpriteDraw(eyeTex, ignitedDrawPos - Main.screenPosition + offset, eyeFrame, Color.White, bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
-                    ignitedDrawPos = hitboxes[1].offset + NPC.Center;
-                    Main.EntitySpriteDraw(mouthTex, ignitedDrawPos - Main.screenPosition + offset, mouthFrame, Color.White, mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
-                }
-                
 
                 StartVanillaSpritebatch();
             }
-
-            for (int i = 0; i < hitboxes[0].dimensions.Y - 32; i += 4)
+            for (int i = 0; i < draws.Count; i++)
             {
-                Vector2 bodyDrawPos = bodyDrawStart + Vector2.UnitY * i;
-                int frameYPos = (i + bodyFrameYOff) % bodyTex.Height;
-                Rectangle frame = new Rectangle(0, frameYPos, bodyTex.Width - 16, 4);
-                bodyDrawColor = Lighting.GetColor(bodyDrawPos.ToTileCoordinates());
-                Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects);
+                var draw = draws[i];
+                draw.Draw();
             }
-            Vector2 drawPos = hitboxes[2].offset + NPC.Center;
-            Main.EntitySpriteDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
-            drawPos = hitboxes[3].offset + NPC.Center;
-            Main.EntitySpriteDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
-            drawPos = hitboxes[1].offset + NPC.Center;
-            Main.EntitySpriteDraw(mouthTex, drawPos - Main.screenPosition, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally);
 
-            bool drawHitboxes = false;
-            if (drawHitboxes)
+            if (false)
             {
                 for (int i = 0; i < hitboxes.Count; i++)
                 {
@@ -503,6 +496,44 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             return false;
+        }
+    }
+    public class StoredDraw
+    {
+        public Texture2D texture;
+        public Vector2 position;
+        public Rectangle? frame;
+        public Color color;
+        public float rotation;
+        public Vector2 origin;
+        public Vector2 scale;
+        public SpriteEffects spriteEffects;
+        public StoredDraw(Texture2D texture, Vector2 position, Rectangle? frame, Color color, float rotation, Vector2 origin, float scale, SpriteEffects spriteEffects)
+        {
+            Create(texture, position, frame, color, rotation, origin, new Vector2(scale), spriteEffects);
+        }
+        public StoredDraw(Texture2D texture, Vector2 position, Rectangle? frame, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffects)
+        {
+            Create(texture, position, frame, color, rotation, origin, scale, spriteEffects);
+        }
+        void Create(Texture2D texture, Vector2 position, Rectangle? frame, Color color, float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffects)
+        {
+            this.texture = texture;
+            this.position = position;
+            this.frame = frame;
+            this.color = color;
+            this.rotation = rotation;
+            this.origin = origin;
+            this.scale = scale;
+            this.spriteEffects = spriteEffects;
+        }
+        public void Draw()
+        {
+            Main.EntitySpriteDraw(texture, position, frame, color, rotation, origin, scale, spriteEffects);
+        }
+        public void Draw(Vector2 offset)
+        {
+            Main.EntitySpriteDraw(texture, position + offset, frame, color, rotation, origin, scale, spriteEffects);
         }
     }
 }
