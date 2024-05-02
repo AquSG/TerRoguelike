@@ -53,6 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float bottomEyeRotation = MathHelper.Pi;
         public float mouthRotation = MathHelper.Pi;
         public bool positionsinitialized = false;
+        public double mouthFrameCounter = 0;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -85,7 +86,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 80;
             NPC.aiStyle = -1;
             NPC.damage = 30;
-            NPC.lifeMax = 25000;
+            NPC.lifeMax = 32000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, -32);
@@ -205,6 +206,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             NPC.frameCounter += 0.1d;
+            mouthFrameCounter += 0.1d;
 
             if (deadTime > 0)
             {
@@ -301,6 +303,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int vomitTime = (int)NPC.ai[1] - laserVomitStartTime;
                     if (vomitTime > -laserVomitStartup && vomitTime < 0)
                     {
+                        mouthFrameCounter = 1;
                         Vector2 pos = NPC.Center + hitboxes[1].offset;
                         float rot = mouthRotation;
                         pos += rot.ToRotationVector2() * 36;
@@ -312,6 +315,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     else if (vomitTime >= 0 && vomitTime % laserVomitFireRate == 0)
                     {
+                        mouthFrameCounter = 0;
                         Vector2 pos = NPC.Center + hitboxes[1].offset;
                         float rot = mouthRotation;
                         pos += rot.ToRotationVector2() * 36;
@@ -411,6 +415,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 int time = ((int)NPC.ai[1] % bouncyballFireRate);
                 if (NPC.ai[1] > 0 && time == 0)
                 {
+                    mouthFrameCounter = 0;
                     Vector2 pos = NPC.Center + hitboxes[1].offset;
                     float rot = mouthRotation;
                     pos += rot.ToRotationVector2() * 12;
@@ -418,8 +423,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.8f, Pitch = -0.1f }, NPC.Center);
                     Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 6, ModContent.ProjectileType<FleshBall>(), NPC.damage, 0);
                 }
-                if (time >= 20)
+                if (time >= 30)
                 {
+                    mouthFrameCounter = 1;
                     Vector2 pos = NPC.Center + hitboxes[1].offset;
                     float rot = mouthRotation;
                     pos += rot.ToRotationVector2() * 24;
@@ -432,7 +438,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= BouncyBall.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -180;
                     NPC.ai[2] = BouncyBall.Id;
                 }
             }
@@ -441,7 +447,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= Bloodball.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = -120;
+                    NPC.ai[1] = 0;
                     NPC.ai[2] = Bloodball.Id;
                 }
             }
@@ -662,7 +668,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Rectangle eyeFrame = new Rectangle(0, currentEyeFrame * eyeFrameHeight, eyeTex.Width, eyeFrameHeight - 2);
             int mouthFrameCount = 2;
             int mouthFrameHeight = mouthTex.Height / mouthFrameCount;
-            int currentMouthFrame = (int)(NPC.frameCounter % eyeFrameCount);
+            int currentMouthFrame = (int)(mouthFrameCounter % eyeFrameCount);
             Rectangle mouthFrame = new Rectangle(0, currentMouthFrame * mouthFrameHeight, mouthTex.Width, mouthFrameHeight - 2);
             SpriteEffects spriteEffects = NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
             Color bodyDrawColor;

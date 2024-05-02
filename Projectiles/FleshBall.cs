@@ -25,7 +25,6 @@ namespace TerRoguelike.Projectiles
         public override string Texture => "TerRoguelike/Projectiles/SandTurret";
         public float MaxScale = -1f;
         public Texture2D texture;
-        public float startVelocity;
         public int maxTimeLeft;
         public Texture2D noiseTex;
         public Texture2D glowTex;
@@ -45,24 +44,31 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
-            startVelocity = Projectile.velocity.Length();
+            float rot = Projectile.velocity.ToRotation();
+            for (int i = -10; i <= 10; i++)
+            {
+                if (i == 0)
+                    continue;
+
+                Vector2 pos = Projectile.Center + rot.ToRotationVector2() * Projectile.width * 0.5f;
+                pos += new Vector2(0, Math.Sign(i) * 1 + i).RotatedBy(rot); 
+                Vector2 velocity = (rot + (i * MathHelper.PiOver4 * 0.1f) + (Math.Sign(i) * MathHelper.PiOver4 * 0.5f)).ToRotationVector2() * Main.rand.NextFloat(1.9f, 2.3f);
+
+                if (Main.rand.NextBool(3))
+                    velocity *= 1.5f;
+                //velocity.X += Math.Sign(velocity.X) * Main.rand.NextFloat(0.25f, 1f);
+                Vector2 scale = new Vector2(0.25f, 0.4f) * 0.75f;
+                int time = 110 + Main.rand.Next(70);
+                Color color = Color.Lerp(Color.Red * 0.65f, Color.Purple, Main.rand.NextFloat());
+                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                ParticleManager.AddParticle(new Blood(pos, velocity, time, color, scale, velocity.ToRotation(), true));
+            }
         }
         public override void AI()
         {
             Projectile.rotation += 0.06f * Projectile.direction;
             Projectile.frameCounter -= 1 * Projectile.direction;
 
-            if (Projectile.ai[2] > 0)
-            {
-                Projectile.velocity = Vector2.Zero;
-                Projectile.ai[2]--;
-                if (Projectile.ai[2] <= 0)
-                {
-                    SoundEngine.PlaySound(SoundID.DD2_BookStaffCast with { Volume = 1f }, Projectile.Center);
-                    Projectile.tileCollide = true;
-                    Projectile.velocity = Projectile.rotation.ToRotationVector2() * startVelocity;
-                }
-            }
             if (Projectile.localAI[0] > 0)
                 Projectile.localAI[0]--;
 
@@ -118,13 +124,13 @@ namespace TerRoguelike.Projectiles
                 Projectile.velocity.Y = -oldVelocity.Y;
             }
             SpawnProjectiles();
-            if (Projectile.ai[0] >= 3)
+            if (Projectile.ai[0] >= 2)
             {
                 Projectile.Kill();
                 SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.4f }, Projectile.Center);
             }
 
-            return Projectile.ai[0] >= 3;
+            return Projectile.ai[0] >= 2;
         }
         public void SpawnProjectiles()
         {
@@ -135,11 +141,11 @@ namespace TerRoguelike.Projectiles
             Projectile.ai[0]++;
             SoundEngine.PlaySound(SoundID.DD2_MonkStaffGroundImpact with { Volume = 1f }, Projectile.Center);
             SoundEngine.PlaySound(SoundID.NPCHit19 with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0.05f }, Projectile.Center);
-            int projCount = 10;
+            int projCount = 8;
             for (int i = 0; i < projCount; i++)
             {
                 float rot = (float)i / projCount * MathHelper.TwoPi;
-                Vector2 offset = rot.ToRotationVector2() * Projectile.width * 0.5f;
+                Vector2 offset = rot.ToRotationVector2() * Projectile.width * 0.25f;
                 Vector2 velocity = rot.ToRotationVector2() * 8f;
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + offset, velocity, ModContent.ProjectileType<BloodOrb>(), Projectile.damage, 0f, -1, 1);
             }
