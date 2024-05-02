@@ -219,14 +219,18 @@ namespace TerRoguelike.Projectiles
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
             int cap = draws.Count - 1;
-            for (int i = 0; i <= cap; i += 16)
+            for (int i = 0; i <= cap; i += 1)
             {
                 var draw = draws[i];
-                if (draw.scale.Y < 1f || i == cap)
+                if (draw.scale.Y < 1f || i >= cap - 4 || i < 4)
                     continue;
                 Vector2 pos = draw.position;
                 if (pos.Distance(draws[i + 1].position) > 24)
                     continue;
+                if (draws[i + 4].scale.Y < 1f || draws[i - 4].scale.Y < 1f)
+                    continue;
+                int width = ((Rectangle)draw.frame).Width;
+                i += 8 - Math.Clamp(width, 0, 8);
                 if (targetHitbox.ClosestPointInRect(pos).Distance(pos) < 24)
                     return true;
             }
@@ -252,18 +256,21 @@ namespace TerRoguelike.Projectiles
             if (false)
             {
                 int cap = draws.Count - 1;
-                for (int i = 0; i <= cap; i += 32)
+                for (int i = 0; i <= cap; i += 1)
                 {
                     var draw = draws[i];
-                    if (draw.scale.Y < 1f || i == cap)
+                    if (draw.scale.Y < 1f || i >= cap - 4 || i < 4)
                         continue;
                     Vector2 pos = draw.position;
                     if (pos.Distance(draws[i + 1].position) > 24)
                         continue;
-
+                    if (draws[i + 4].scale.Y < 1f || draws[i - 4].scale.Y < 1f)
+                        continue;
+                    int width = ((Rectangle)draw.frame).Width;
+                    i += 8 - Math.Clamp(width, 0, 8);
                     for (int j = 0; j < 60; j++)
                     {
-                        Main.EntitySpriteDraw(squareTex, pos + Main.screenPosition + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Cyan, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                        Main.EntitySpriteDraw(squareTex, pos - Main.screenPosition + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Cyan, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
                     }
                 }
             }
