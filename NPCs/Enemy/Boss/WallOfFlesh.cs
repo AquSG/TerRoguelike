@@ -147,7 +147,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (sound.Pitch > -0.15f)
                         sound.Pitch -= 0.008f;
                     else
-                        sound.Pitch -= 0.0014f;
+                        sound.Pitch -= 0.003f;
                     sound.Volume -= 0.008f;
                     if (sound.Volume <= 0)
                         sound.Stop();
