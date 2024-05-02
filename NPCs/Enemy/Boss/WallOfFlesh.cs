@@ -71,6 +71,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int laserVomitFireRate = 21;
         public int deathrayTrackedProjId1 = -1;
         public int deathrayTrackedProjId2 = -1;
+        public int bouncyballFireRate = 60;
+        public int bouncyballWindup = 40;
 
         public override void SetStaticDefaults()
         {
@@ -404,13 +406,62 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[2] = Deathray.Id;
                 }
             }
+            else if (NPC.ai[0] == BouncyBall.Id)
+            {
+                int time = ((int)NPC.ai[1] % bouncyballFireRate);
+                if (NPC.ai[1] > 0 && time == 0)
+                {
+                    Vector2 pos = NPC.Center + hitboxes[1].offset;
+                    float rot = mouthRotation;
+                    pos += rot.ToRotationVector2() * 12;
+
+                    SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.8f, Pitch = -0.1f }, NPC.Center);
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 6, ModContent.ProjectileType<FleshBall>(), NPC.damage, 0);
+                }
+                if (time >= 20)
+                {
+                    Vector2 pos = NPC.Center + hitboxes[1].offset;
+                    float rot = mouthRotation;
+                    pos += rot.ToRotationVector2() * 24;
+
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(16, 24).RotatedBy(rot);
+                    ParticleManager.AddParticle(new Square(
+                        pos + offset, -offset.SafeNormalize(Vector2.UnitY) * 1f,
+                        20, Color.OrangeRed, new Vector2(1), offset.ToRotation(), 0.96f, 10, true));
+                }
+                if (NPC.ai[1] >= BouncyBall.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = BouncyBall.Id;
+                }
+            }
+            else if (NPC.ai[0] == Bloodball.Id)
+            {
+                if (NPC.ai[1] >= Bloodball.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = -120;
+                    NPC.ai[2] = Bloodball.Id;
+                }
+            }
+            else if (NPC.ai[0] == Summon.Id)
+            {
+                if (NPC.ai[1] >= Summon.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = Summon.Id;
+                }
+            }
         }
         public void ChooseAttack()
         {
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray };
+            //List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray, BouncyBall, Bloodball, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray, BouncyBall };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
