@@ -85,6 +85,7 @@ Projectiles: {
 	HellBeam.DisplayName: Hell Beam
 	DemonLaser.DisplayName: Demon Laser
 	FleshVomit.DisplayName: Flesh Vomit
+	FleshBall.DisplayName: Flesh Ball
 }
 
 Items: {
