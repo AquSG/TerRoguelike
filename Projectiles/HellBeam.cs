@@ -65,7 +65,7 @@ namespace TerRoguelike.Projectiles
             int maxSpecialPos = 240;
 
             if (specialOldPos.Count < maxSpecialPos)
-            { 
+            {
                 Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
                 Color fillColor = Color.Lerp(outlineColor, Color.DarkRed, 0.2f);
                 for (int j = -6; j <= 6; j++)
@@ -117,10 +117,10 @@ namespace TerRoguelike.Projectiles
                     for (int j = -1; j <= 1; j += 2)
                     {
                         ParticleManager.AddParticle(new ThinSpark(
-                            particlePos + (rot + MathHelper.PiOver2 * j).ToRotationVector2() * 24, specialOldVel[i], 
+                            particlePos + (rot + MathHelper.PiOver2 * j).ToRotationVector2() * 24 - specialOldVel[i], specialOldVel[i],
                             10, Color.Red, new Vector2(0.1f, 0.4f) * 5, rot + (MathHelper.PiOver4 * 0.1f * j), true, false));
                     }
-                    
+
                 }
             }
             if (deadCount >= maxSpecialPos)
@@ -128,7 +128,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.Kill();
             }
 
-              
+
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             int frameWidth = tex.Width;
             float frameProgress = 0;
@@ -168,14 +168,34 @@ namespace TerRoguelike.Projectiles
                     }
                     if (backDead)
                     {
-                        if (pos.Distance(backPos) < 10)
-                            scale.Y *= ((int)(12 - distance) / 2) / 5f;
+                        scale.Y *= ((int)(12 - distance) / 2) / 5f;
                     }
-                    frame = new Rectangle((int)frameProgress % frameWidth, 0, 2, tex.Height);
-                    frameProgress += 2;
-                    draws.Add(new StoredDraw(tex, pos, frame, Color.White, rot, frame.Size() * 0.5f, scale, SpriteEffects.None));
+                    int progress = 1;
+                    if (!frontDead && !backDead) //This extends the frame drawn somewhat relative to distance to reduce the amount of draw calls
+                    {
+                        progress = (int)distance;
+                        if (progress <= 1)
+                            progress = 1;
+                        else
+                        {
+                            int currentFramePos = (int)frameProgress % frameWidth;
+                            if (currentFramePos + progress >= frameWidth)
+                            {
+                                progress = (frameWidth) - currentFramePos;
+                                if (progress < 1)
+                                    progress = 1;
+                            }
+                        }
+                    }
 
-                    Vector2 step = rot.ToRotationVector2() * 1;
+
+
+                    frame = new Rectangle((int)frameProgress % frameWidth, 0, progress + 1, tex.Height);
+
+
+                    draws.Add(new StoredDraw(tex, pos, frame, Color.White, rot, new Vector2(0, tex.Size().Y * 0.5f), scale, SpriteEffects.None));
+                    frameProgress += progress;
+                    Vector2 step = rot.ToRotationVector2() * progress;
                     if (distance <= 1f)
                     {
                         pos = frontPos;
@@ -186,13 +206,14 @@ namespace TerRoguelike.Projectiles
                         pos += step;
                     }
 
+
                     giveUp++;
                     if (giveUp >= 400)
                     {
                         pos = frontPos;
                     }
                 }
-                
+
             }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -201,17 +222,17 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i <= cap; i += 16)
             {
                 var draw = draws[i];
-                    if (draw.scale.Y < 1f || i == cap)
-                        continue;
-                    Vector2 pos = draw.position;
-                    if (pos.Distance(draws[i + 1].position) > 24)
-                        continue;
+                if (draw.scale.Y < 1f || i == cap)
+                    continue;
+                Vector2 pos = draw.position;
+                if (pos.Distance(draws[i + 1].position) > 24)
+                    continue;
                 if (targetHitbox.ClosestPointInRect(pos).Distance(pos) < 24)
                     return true;
             }
             return false;
         }
-        
+
         public override bool PreDraw(ref Color lightColor)
         {
             Main.spriteBatch.End();
@@ -228,7 +249,6 @@ namespace TerRoguelike.Projectiles
                 draw.Draw(-Main.screenPosition);
             }
             StartVanillaSpritebatch();
-
             if (false)
             {
                 int cap = draws.Count - 1;
@@ -247,7 +267,7 @@ namespace TerRoguelike.Projectiles
                     }
                 }
             }
-            
+
             return false;
         }
     }
