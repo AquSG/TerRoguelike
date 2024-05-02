@@ -59,9 +59,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 75);
+        public static Attack None = new Attack(0, 0, 180);
         public static Attack Laser = new Attack(1, 30, 180);
-        public static Attack Deathray = new Attack(2, 30, 180);
+        public static Attack Deathray = new Attack(2, 30, 300);
+        public int deathrayTrackedProjId1 = -1;
+        public int deathrayTrackedProjId2 = -1;
         public override void SetDefaults()
         {
             base.SetDefaults();
@@ -101,23 +103,42 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (target != null)
             {
+                bool hellbeam = NPC.ai[0] == Deathray.Id && NPC.ai[1] >= 90;
+                float angleLerpSpeed = 0.12f;
                 float angleBound = MathHelper.PiOver2 * 0.999f;
+
 
                 float angleToTarget = (target.Center - (NPC.Center + hitboxes[2].offset)).ToRotation();
                 angleToTarget = MathHelper.Clamp(AngleSizeBetween(MathHelper.Pi, angleToTarget), -angleBound, angleBound) + MathHelper.Pi;
-                topEyeRotation = topEyeRotation.AngleLerp(angleToTarget, 0.12f);
+                AngleCalculation(ref topEyeRotation);
 
                 angleToTarget = (target.Center - (NPC.Center + hitboxes[3].offset)).ToRotation();
                 angleToTarget = MathHelper.Clamp(AngleSizeBetween(MathHelper.Pi, angleToTarget), -angleBound, angleBound) + MathHelper.Pi;
-                bottomEyeRotation = bottomEyeRotation.AngleLerp(angleToTarget, 0.12f);
+                AngleCalculation(ref bottomEyeRotation);
 
                 angleToTarget = (target.Center - (NPC.Center + hitboxes[1].offset)).ToRotation();
                 angleToTarget = MathHelper.Clamp(AngleSizeBetween(MathHelper.Pi, angleToTarget), -angleBound, angleBound) + MathHelper.Pi;
-                mouthRotation = mouthRotation.AngleLerp(angleToTarget, 0.12f);
+                AngleCalculation(ref mouthRotation);
+
+                void AngleCalculation(ref float setAngle)
+                {
+                    if (hellbeam)
+                    {
+                        float potentialAngle = setAngle.AngleLerp(angleToTarget, 0.07f);
+                        float clamp = 0.01f;
+                        float addAngle = MathHelper.Clamp(AngleSizeBetween(setAngle, potentialAngle), -clamp, clamp);
+                        setAngle += addAngle;
+                    }
+                    else
+                    {
+                        setAngle = setAngle.AngleLerp(angleToTarget, angleLerpSpeed);
+                    }
+                }
             }
         }
         public override void AI()
         {
+            Deathray = new Attack(2, 30, 330);
             if (!positionsinitialized)
             {
                 positionsinitialized = true;
@@ -209,6 +230,73 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[2] = Laser.Id;
                 }
             }
+            else if (NPC.ai[0] == Deathray.Id)
+            {
+                if (NPC.ai[1] < 90)
+                {
+                    Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
+                    Color fillColor = Color.Lerp(outlineColor, Color.DarkRed, 0.2f);
+                    for (int j = -6; j <= 6; j++)
+                    {
+                        if (!Main.rand.NextBool(12) || j == 0)
+                            continue;
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(16, 24);
+                        Vector2 particleSpawnPos = NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 44 + offset.RotatedBy(topEyeRotation);
+                        Vector2 particleVel = -offset.RotatedBy(topEyeRotation).SafeNormalize(Vector2.UnitX) * 0.8f;
+                        ParticleManager.AddParticle(new BallOutlined(
+                            particleSpawnPos, particleVel,
+                            20, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.99f, 10));
+
+                        offset = Main.rand.NextVector2CircularEdge(16, 24);
+                        particleSpawnPos = NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 44 + offset.RotatedBy(bottomEyeRotation);
+                        particleVel = -offset.RotatedBy(bottomEyeRotation).SafeNormalize(Vector2.UnitX) * 0.8f;
+                        ParticleManager.AddParticle(new BallOutlined(
+                            particleSpawnPos, particleVel,
+                            20, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.99f, 10));
+                    }
+                }
+                if (NPC.ai[1] == 90)
+                {
+                    deathrayTrackedProjId1 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
+                    Main.projectile[deathrayTrackedProjId1].rotation = topEyeRotation;
+                    deathrayTrackedProjId2 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
+                    Main.projectile[deathrayTrackedProjId2].rotation = bottomEyeRotation;
+                }
+                if (deathrayTrackedProjId1 >= 0)
+                {
+                    var proj = Main.projectile[deathrayTrackedProjId1];
+                    if (proj.type != ModContent.ProjectileType<HellBeam>())
+                    {
+                        deathrayTrackedProjId1 = -1;
+                    }
+                    else
+                    {
+                        proj.Center = NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42;
+                        proj.rotation = topEyeRotation;
+                    }
+                }
+                if (deathrayTrackedProjId2 >= 0)
+                {
+                    var proj = Main.projectile[deathrayTrackedProjId2];
+                    if (proj.type != ModContent.ProjectileType<HellBeam>())
+                    {
+                        deathrayTrackedProjId2 = -1;
+                    }
+                    else
+                    {
+                        proj.Center = NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42;
+                        proj.rotation = bottomEyeRotation;
+                    }
+                }
+                if (NPC.ai[1] >= Deathray.Duration)
+                {
+                    deathrayTrackedProjId1 = -1;
+                    deathrayTrackedProjId2 = -1;
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = Deathray.Id;
+                }
+            }
         }
         public void ChooseAttack()
         {
@@ -235,7 +323,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = Deathray.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -433,9 +521,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 bodyDrawColor = Lighting.GetColor(bodyDrawPos.ToTileCoordinates());
                 draws.Add(new StoredDraw(bodyTex, bodyDrawPos - Main.screenPosition, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects));
             }
-            Vector2 drawPos = hitboxes[2].offset + NPC.Center;
+            Vector2 drawPos = hitboxes[2].offset + NPC.Center - Vector2.UnitY * 4;
             draws.Add(new StoredDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
-            drawPos = hitboxes[3].offset + NPC.Center;
+            drawPos = hitboxes[3].offset + NPC.Center - Vector2.UnitY * 4;
             draws.Add(new StoredDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
             drawPos = hitboxes[1].offset + NPC.Center;
             draws.Add(new StoredDraw(mouthTex, drawPos - Main.screenPosition, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));

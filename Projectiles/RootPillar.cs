@@ -17,6 +17,7 @@ using System.Linq;
 using ReLogic.Utilities;
 using Microsoft.Xna.Framework.Audio;
 using static TerRoguelike.Managers.TextureManager;
+using System.Diagnostics;
 
 namespace TerRoguelike.Projectiles
 {
@@ -205,8 +206,8 @@ namespace TerRoguelike.Projectiles
             Vector2 pos = spawnPos;
             float rot = Projectile.ai[0] * MathHelper.PiOver2;
             int endEase = length - 40;
-            
-            List<StoredDraw> drawList = new List<StoredDraw>();
+
+            List<StoredRootDraw> drawList = new List<StoredRootDraw>();
 
             bool changeup = Projectile.ai[1] > 0;
             
@@ -214,7 +215,7 @@ namespace TerRoguelike.Projectiles
             {
                 int rectY = ((length - 1 - i) % tex.Height);
                 Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
-                List<StoredDraw> miniDrawList = new List<StoredDraw>();
+                List<StoredRootDraw> miniDrawList = new List<StoredRootDraw>();
                 for (int r = 0; r < 4; r++)
                 {
                     float periodOffset = (r * MathHelper.PiOver2) + (length * 0.006f);
@@ -256,17 +257,16 @@ namespace TerRoguelike.Projectiles
                     }
                     posOffset += potentialOffset.RotatedBy(rot);
 
-                    miniDrawList.Add(new StoredDraw(pos + posOffset - Main.screenPosition, rect, color, rot, scale, depthInterpolant));
+                    miniDrawList.Add(new StoredRootDraw(pos + posOffset - Main.screenPosition, rect, color, rot, scale, depthInterpolant));
                 }
                 miniDrawList.Sort((x, y) => x.depth.CompareTo(y.depth));
                 drawList.AddRange(miniDrawList);
             }
             for (int i = 0; i < drawList.Count; i++)
             {
-                StoredDraw d = drawList[i];
+                StoredRootDraw d = drawList[i];
                 Main.EntitySpriteDraw(tex, d.pos, d.rect, d.color, rot, tex.Size() * 0.5f, d.scale, SpriteEffects.None);
             }
-
             // draws where collision is happening for debugging
             /*
             Texture2D tempTex = TexDict["CircularGlow"];
@@ -288,7 +288,7 @@ namespace TerRoguelike.Projectiles
             return false;
         }
     }
-    public class StoredDraw
+    public class StoredRootDraw
     {
         public Vector2 pos;
         public Rectangle rect;
@@ -296,7 +296,7 @@ namespace TerRoguelike.Projectiles
         public float rot;
         public Vector2 scale;
         public float depth;
-        public StoredDraw(Vector2 position, Rectangle frame, Color Color, float rotation, Vector2 Scale, float Depth)
+        public StoredRootDraw(Vector2 position, Rectangle frame, Color Color, float rotation, Vector2 Scale, float Depth)
         {
             pos = position;
             rect = frame;

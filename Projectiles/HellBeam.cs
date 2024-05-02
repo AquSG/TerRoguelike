@@ -1,0 +1,246 @@
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Collections.Generic;
+using Terraria;
+using Terraria.DataStructures;
+using Terraria.ModLoader;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.Managers;
+using TerRoguelike.Particles;
+using ReLogic.Utilities;
+using Terraria.Audio;
+using Terraria.ID;
+using TerRoguelike.Systems;
+using TerRoguelike.NPCs.Enemy.Boss;
+using Terraria.GameContent;
+using Humanizer;
+using Terraria.Graphics.Shaders;
+using Terraria.Graphics.Effects;
+using System.Diagnostics;
+using System.IO.Pipes;
+
+
+namespace TerRoguelike.Projectiles
+{
+    public class HellBeam : ModProjectile, ILocalizedModType
+    {
+        public int maxTimeLeft;
+        public List<Vector2> specialOldPos = [];
+        public List<Vector2> specialOldVel = [];
+        public List<bool> specialOldDead = [];
+        public Texture2D waveTex;
+        public Texture2D squareTex;
+        public List<StoredDraw> draws = [];
+        public override void SetStaticDefaults()
+        {
+            ProjectileID.Sets.DrawScreenCheckFluff[Type] = 10000;
+        }
+        public override void SetDefaults()
+        {
+            Projectile.width = 16;
+            Projectile.height = 16;
+            Projectile.timeLeft = maxTimeLeft = 1500;
+            Projectile.tileCollide = true;
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = -1;
+            Projectile.friendly = true;
+            Projectile.hostile = false;
+            waveTex = TexDict["HellBeamWave"].Value;
+            squareTex = TexDict["Square"].Value;
+            Projectile.hide = true;
+        }
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            behindNPCs.Add(index);
+        }
+        public override void OnSpawn(IEntitySource source)
+        {
+
+        }
+        public override void AI()
+        {
+            int maxSpecialPos = 240;
+
+            if (specialOldPos.Count < maxSpecialPos)
+            { 
+                Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
+                Color fillColor = Color.Lerp(outlineColor, Color.DarkRed, 0.2f);
+                for (int j = -6; j <= 6; j++)
+                {
+                    if (!Main.rand.NextBool(12) || j == 0)
+                        continue;
+                    Vector2 particleSpawnPos = Projectile.Center + Vector2.UnitX.RotatedBy(Math.Sign(j) * -0.3f + Projectile.rotation) * 0.4f + Projectile.rotation.ToRotationVector2() * 4;
+                    Vector2 particleVel = (Projectile.rotation.ToRotationVector2()).RotatedBy(Math.Sign(j) * 0.5f + j * 0.12f + Main.rand.NextFloat(-0.02f, 0.02f)) * Main.rand.NextFloat(0.5f, 1f) * 4;
+                    ParticleManager.AddParticle(new BallOutlined(
+                        particleSpawnPos, particleVel,
+                        60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50));
+                }
+
+                specialOldPos.Add(Projectile.Center);
+                specialOldVel.Add(Projectile.rotation.ToRotationVector2() * 12f);
+                specialOldDead.Add(false);
+            }
+            int deadCount = 0;
+            for (int i = 0; i < specialOldPos.Count; i++)
+            {
+                if (specialOldDead[i])
+                {
+                    deadCount++;
+                }
+
+                Vector2 pos = specialOldPos[i];
+                Vector2 predictedPos = pos + specialOldVel[i];
+                specialOldPos[i] = predictedPos;
+                if (!specialOldDead[i] && !CanHitInLine(pos, predictedPos))
+                {
+                    specialOldDead[i] = true;
+                    Color outlineColor = Color.Lerp(Color.Salmon, Color.OrangeRed, 0.13f);
+                    Color fillColor = Color.Lerp(outlineColor, Color.LightPink, 0.2f);
+                    for (int j = -6; j <= 6; j++)
+                    {
+                        if (!Main.rand.NextBool(7) || j == 0)
+                            continue;
+                        Vector2 particleSpawnPos = predictedPos + specialOldVel[i].RotatedBy(Math.Sign(j) * -0.3f) * 0.4f;
+                        Vector2 particleVel = -specialOldVel[i].SafeNormalize(Vector2.UnitY).RotatedBy(Math.Sign(j) * 0.5f + j * 0.12f + Main.rand.NextFloat(-0.02f, 0.02f)) * Main.rand.NextFloat(0.5f, 1f) * 4;
+                        ParticleManager.AddParticle(new BallOutlined(
+                            particleSpawnPos, particleVel,
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50));
+                    }
+                }
+            }
+            if (deadCount >= maxSpecialPos)
+            {
+                Projectile.Kill();
+            }
+
+            
+            Texture2D tex = TextureAssets.Projectile[Type].Value;
+            int frameWidth = tex.Width;
+            float frameProgress = 0;
+            if (specialOldPos.Count >= maxSpecialPos)
+            {
+                frameProgress = Projectile.Center.Distance(specialOldPos[specialOldPos.Count - 1]);
+            }
+            Rectangle frame;
+            draws = [];
+            for (int i = specialOldPos.Count - 1; i > 0; i--)
+            {
+                if (specialOldDead[i])
+                    continue;
+
+                Vector2 pos = specialOldPos[i];
+                float rot = specialOldVel[i].ToRotation();
+                Vector2 frontPos = specialOldPos[i - 1];
+                float frontrot = specialOldVel[i - 1].ToRotation();
+                bool frontDead = i == 1 || specialOldDead[i - 1];
+
+                bool backDead = i == specialOldPos.Count - 1 || specialOldDead[i + 1];
+                Vector2 backPos = specialOldPos[i];
+
+                rot = (frontPos - pos).ToRotation();
+
+
+                int giveUp = 0;
+                while (pos != frontPos)
+                {
+                    float rotToFront = (frontPos - pos).ToRotation();
+                    Vector2 scale = new Vector2(1f);
+                    float distance = pos.Distance(frontPos);
+                    if (frontDead)
+                    {
+                        if (distance < 10)
+                            scale.Y *= ((int)distance / 2 + 1) / 5f;
+                    }
+                    if (backDead)
+                    {
+                        if (pos.Distance(backPos) < 10)
+                            scale.Y *= ((int)(12 - distance) / 2) / 5f;
+                    }
+                    frame = new Rectangle((int)frameProgress % frameWidth, 0, 2, tex.Height);
+                    frameProgress += 2;
+                    draws.Add(new StoredDraw(tex, pos - Main.screenPosition, frame, Color.White, rot, frame.Size() * 0.5f, scale, SpriteEffects.None));
+
+                    Vector2 step = rot.ToRotationVector2() * 1;
+                    if (distance <= 1f)
+                    {
+                        pos = frontPos;
+
+                    }
+                    else
+                    {
+                        pos += step;
+                    }
+
+                    rot = rot.AngleTowards(rotToFront, 0.1f);
+
+                    giveUp++;
+                    if (giveUp >= 400)
+                    {
+                        pos = frontPos;
+                    }
+                }
+                
+            }
+            
+        }
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
+        {
+            int cap = draws.Count - 1;
+            for (int i = 0; i <= cap; i += 16)
+            {
+                var draw = draws[i];
+                    if (draw.scale.Y < 1f || i == cap)
+                        continue;
+                    Vector2 pos = draw.position;
+                    if (pos.Distance(draws[i + 1].position) > 24)
+                        continue;
+                    pos += Main.screenPosition;
+                if (targetHitbox.ClosestPointInRect(pos).Distance(pos) < 24)
+                    return true;
+            }
+            return false;
+        }
+        
+        public override bool PreDraw(ref Color lightColor)
+        {
+            Main.spriteBatch.End();
+            Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+            Color tint = Color.Lerp(Color.LightSalmon, Color.White, 0.6f);
+            maskEffect.Parameters["screenOffset"].SetValue(new Vector2(Main.GlobalTimeWrappedHourly * 10, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 10) * 0.01f));
+            maskEffect.Parameters["stretch"].SetValue(new Vector2(1, 1));
+            maskEffect.Parameters["replacementTexture"].SetValue(waveTex);
+            maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            for (int i = 0; i < draws.Count; i++)
+            {
+                var draw = draws[i];
+                draw.Draw();
+            }
+            StartVanillaSpritebatch();
+
+            if (false)
+            {
+                int cap = draws.Count - 1;
+                for (int i = 0; i <= cap; i += 32)
+                {
+                    var draw = draws[i];
+                    if (draw.scale.Y < 1f || i == cap)
+                        continue;
+                    Vector2 pos = draw.position;
+                    if (pos.Distance(draws[i + 1].position) > 24)
+                        continue;
+
+                    for (int j = 0; j < 60; j++)
+                    {
+                        Main.EntitySpriteDraw(squareTex, pos + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Cyan, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                    }
+                }
+            }
+            
+            return false;
+        }
+    }
+}
