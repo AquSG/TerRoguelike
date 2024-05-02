@@ -46,10 +46,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             new ExtraHitbox(new Point(80, 80), new Vector2(-32, -331.2f)),
             new ExtraHitbox(new Point(80, 80), new Vector2(-32, 303.6f)),
         };
+        public static readonly SoundStyle HellBeamSound = new SoundStyle("TerRoguelike/Sounds/HellBeam");
+        public static readonly SoundStyle HellBeamCharge = new SoundStyle("TerRoguelike/Sounds/DeathrayCharge");
         public Texture2D squareTex;
         public Texture2D bodyTex;
         public Texture2D eyeTex;
         public Texture2D mouthTex;
+        public SlotId DeathraySlot;
         public float topEyeRotation = MathHelper.Pi;
         public float bottomEyeRotation = MathHelper.Pi;
         public float mouthRotation = MathHelper.Pi;
@@ -61,7 +64,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 180);
         public static Attack Laser = new Attack(1, 30, 180);
-        public static Attack Deathray = new Attack(2, 30, 300);
+        public static Attack Deathray = new Attack(2, 30, 330);
         public int deathrayTrackedProjId1 = -1;
         public int deathrayTrackedProjId2 = -1;
         public override void SetDefaults()
@@ -135,10 +138,31 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
+            if (SoundEngine.TryGetActiveSound(DeathraySlot, out var sound) && sound.IsPlaying)
+            {
+                Vector2 basePos = (NPC.Center + hitboxes[1].offset);
+                if (NPC.ai[0] != Deathray.Id)
+                {
+                    sound.Position += (basePos - (Vector2)sound.Position).SafeNormalize(Vector2.UnitY) * 1.2f;
+                    sound.Pitch -= 0.012f;
+                    
+                    sound.Volume -= 0.01f;
+                    if (sound.Volume <= 0)
+                        sound.Stop();
+                }
+                else
+                {
+                    float time = (NPC.ai[1] - 90);
+                    sound.Position = basePos + (Main.LocalPlayer.Center - basePos) * 0.75f * MathHelper.Clamp(time / 90, 0, 1);
+                    if (time < 120)
+                    {
+                        sound.Pitch += 0.45f / 120;
+                    }
+                }
+            }
         }
         public override void AI()
         {
-            Deathray = new Attack(2, 30, 330);
             if (!positionsinitialized)
             {
                 positionsinitialized = true;
@@ -232,6 +256,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Deathray.Id)
             {
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(HellBeamCharge with { Volume = 0.3f, Pitch = 0.32f }, NPC.Center + hitboxes[1].offset);
+                }
                 if (NPC.ai[1] < 90)
                 {
                     Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
@@ -257,6 +285,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] == 90)
                 {
+                    DeathraySlot = SoundEngine.PlaySound(HellBeamSound with { Volume = 1f }, NPC.Center + hitboxes[1].offset);
                     deathrayTrackedProjId1 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
                     Main.projectile[deathrayTrackedProjId1].rotation = topEyeRotation;
                     deathrayTrackedProjId2 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
@@ -519,14 +548,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 int frameYPos = (i + bodyFrameYOff) % bodyTex.Height;
                 Rectangle frame = new Rectangle(0, frameYPos, bodyTex.Width - 16, 4);
                 bodyDrawColor = Lighting.GetColor(bodyDrawPos.ToTileCoordinates());
-                draws.Add(new StoredDraw(bodyTex, bodyDrawPos - Main.screenPosition, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects));
+                draws.Add(new StoredDraw(bodyTex, bodyDrawPos, frame, bodyDrawColor, 0, new Vector2(frame.Size().X * 0.5f, 0), 1f, spriteEffects));
             }
             Vector2 drawPos = hitboxes[2].offset + NPC.Center - Vector2.UnitY * 4;
-            draws.Add(new StoredDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(eyeTex, drawPos, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), topEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
             drawPos = hitboxes[3].offset + NPC.Center - Vector2.UnitY * 4;
-            draws.Add(new StoredDraw(eyeTex, drawPos - Main.screenPosition, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(eyeTex, drawPos, eyeFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), bottomEyeRotation, eyeFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
             drawPos = hitboxes[1].offset + NPC.Center;
-            draws.Add(new StoredDraw(mouthTex, drawPos - Main.screenPosition, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(mouthTex, drawPos, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
 
             if (modNPC.ignitedStacks.Any())
             {
@@ -543,7 +572,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     var draw = draws[i];
                     for (int j = 0; j < 8; j++)
                     {
-                        draw.Draw(Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
+                        draw.Draw(-Main.screenPosition + Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
                     }
                 }
 
@@ -552,7 +581,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             for (int i = 0; i < draws.Count; i++)
             {
                 var draw = draws[i];
-                draw.Draw();
+                draw.Draw(-Main.screenPosition);
             }
 
             if (false)
