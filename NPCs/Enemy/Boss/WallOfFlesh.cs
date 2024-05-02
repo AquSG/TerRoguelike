@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Graphics.PackedVector;
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
@@ -9,17 +8,14 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
-using Terraria.GameContent.Animations;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
-using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Managers;
 using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
-using static log4net.Appender.ColoredConsoleAppender;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
@@ -62,11 +58,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 180);
+        public static Attack None = new Attack(0, 0, 100);
         public static Attack Laser = new Attack(1, 30, 180);
-        public static Attack Deathray = new Attack(2, 30, 330);
+        public static Attack Deathray = new Attack(2, 40, 330);
+        public static Attack BouncyBall = new Attack(3, 30, 180);
+        public static Attack Bloodball = new Attack(4, 30, 180);
+        public static Attack Summon = new Attack(5, 20, 180);
+        public int laserStartup = 60;
+        public int laserFireRate = 8;
+        public int laserVomitStartTime = 120;
+        public int laserVomitStartup = 40;
+        public int laserVomitFireRate = 21;
         public int deathrayTrackedProjId1 = -1;
         public int deathrayTrackedProjId2 = -1;
+
+        public override void SetStaticDefaults()
+        {
+            SoundEngine.PlaySound(HellBeamSound with { Volume = 0 });
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();
@@ -253,6 +262,69 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Laser.Id)
             {
+                if (NPC.ai[1] < laserStartup)
+                {
+                    if (NPC.ai[1] == 0 || NPC.ai[1] == 24)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.7f, Pitch = 0 }, NPC.Center + hitboxes[1].offset);
+                    }
+                    for (int i = 0; i <= 1; i++)
+                    {
+                        Vector2 pos = NPC.Center + (i == 0 ? hitboxes[2].offset : hitboxes[3].offset);
+                        float rot = i == 0 ? topEyeRotation : bottomEyeRotation;
+                        pos += rot.ToRotationVector2() * 44;
+
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(16, 24).RotatedBy(rot);
+                        ParticleManager.AddParticle(new Square(
+                            pos + offset, -offset.SafeNormalize(Vector2.UnitY) * 1f,
+                            20, Color.MediumPurple, new Vector2(1), offset.ToRotation(), 0.96f, 10, true));
+                    }
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - laserStartup;
+                    if (time % laserFireRate == 0)
+                    {
+                        for (int i = 0; i <= 1; i++)
+                        {
+                            Vector2 pos = NPC.Center + (i == 0 ? hitboxes[2].offset : hitboxes[3].offset);
+                            float rot = i == 0 ? topEyeRotation : bottomEyeRotation;
+                            pos += rot.ToRotationVector2() * 44;
+                            SoundEngine.PlaySound(SoundID.Item33 with { Volume = 0.3f, Pitch = 0.5f, PitchVariance = 0.04f, MaxInstances = 2 }, pos);
+
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 12, ModContent.ProjectileType<DemonLaser>(), NPC.damage, 0);
+                        }
+
+                    }
+                    int vomitTime = (int)NPC.ai[1] - laserVomitStartTime;
+                    if (vomitTime > -laserVomitStartup && vomitTime < 0)
+                    {
+                        Vector2 pos = NPC.Center + hitboxes[1].offset;
+                        float rot = mouthRotation;
+                        pos += rot.ToRotationVector2() * 36;
+
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(16, 24).RotatedBy(rot);
+                        ParticleManager.AddParticle(new Square(
+                            pos + offset, -offset.SafeNormalize(Vector2.UnitY) * 1f,
+                            20, Color.OrangeRed, new Vector2(1), offset.ToRotation(), 0.96f, 10, true));
+                    }
+                    else if (vomitTime >= 0 && vomitTime % laserVomitFireRate == 0)
+                    {
+                        Vector2 pos = NPC.Center + hitboxes[1].offset;
+                        float rot = mouthRotation;
+                        pos += rot.ToRotationVector2() * 36;
+                        Vector2 extraSpeed = target != null ? (target.Center - pos) * 0.005f : Vector2.Zero;
+
+                        SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.8f, Pitch = -0.1f }, NPC.Center);
+                        for (int i = -6; i <= 6; i++)
+                        {
+                            float randRot = Main.rand.NextFloat(-0.15f, 0.15f) + rot;
+                            randRot += 0.075f * i;
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) - Vector2.UnitY + (extraSpeed.ToRotation().AngleLerp(-MathHelper.PiOver2, 0.2f).ToRotationVector2() * extraSpeed.Length()), ModContent.ProjectileType<FleshVomit>(), NPC.damage, 0);
+                        }
+                    }
+
+                }
                 if (NPC.ai[1] >= Laser.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -264,7 +336,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[1] == 0)
                 {
-                    SoundEngine.PlaySound(HellBeamCharge with { Volume = 0.3f, Pitch = 0.32f }, NPC.Center + hitboxes[1].offset);
+                    SoundEngine.PlaySound(HellBeamCharge with { Volume = 0.45f, Pitch = 0.32f }, NPC.Center + hitboxes[1].offset);
                 }
                 if (NPC.ai[1] < 90)
                 {
@@ -338,7 +410,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Laser };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -358,7 +430,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Deathray.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -491,7 +563,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            
+
         }
         public override void OnKill()
         {

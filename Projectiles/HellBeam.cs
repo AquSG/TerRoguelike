@@ -145,15 +145,10 @@ namespace TerRoguelike.Projectiles
                     continue;
 
                 Vector2 pos = specialOldPos[i];
-                float rot = specialOldVel[i].ToRotation();
                 Vector2 frontPos = specialOldPos[i - 1];
-                float frontrot = specialOldVel[i - 1].ToRotation();
                 bool frontDead = i == 1 || specialOldDead[i - 1];
-
                 bool backDead = i == specialOldPos.Count - 1 || specialOldDead[i + 1];
-                Vector2 backPos = specialOldPos[i];
-
-                rot = (frontPos - pos).ToRotation();
+                float rot = (frontPos - pos).ToRotation();
 
 
                 int giveUp = 0;
