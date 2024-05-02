@@ -18,7 +18,6 @@ namespace TerRoguelike.Projectiles
 {
     public class IceCloudSpawner : ModProjectile, ILocalizedModType
     {
-        //almost everything in this is just visuals. the hitbox is active for 1/4 of a second after 30 frames pass, and is a big square
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public int maxTimeLeft;
         public override void SetDefaults()

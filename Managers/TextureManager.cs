@@ -125,6 +125,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshBody",
                 "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshEye",
                 "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshMouth",
+                "TerRoguelike/ExtraTextures/HellBeamWave",
             };
             foreach (string path in pathList)
             {

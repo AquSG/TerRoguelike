@@ -82,6 +82,7 @@ Projectiles: {
 	Bee.DisplayName: Bee
 	HoneyGlob.DisplayName: Honey Glob
 	CutsceneBee.DisplayName: Cutscene Bee
+	HellBeam.DisplayName: Hell Beam
 }
 
 Items: {
