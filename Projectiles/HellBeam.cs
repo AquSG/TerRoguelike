@@ -138,6 +138,7 @@ namespace TerRoguelike.Projectiles
             }
             Rectangle frame;
             draws = [];
+
             for (int i = specialOldPos.Count - 1; i > 0; i--)
             {
                 if (specialOldDead[i])
@@ -158,7 +159,6 @@ namespace TerRoguelike.Projectiles
                 int giveUp = 0;
                 while (pos != frontPos)
                 {
-                    float rotToFront = (frontPos - pos).ToRotation();
                     Vector2 scale = new Vector2(1f);
                     float distance = pos.Distance(frontPos);
                     if (frontDead)
@@ -186,8 +186,6 @@ namespace TerRoguelike.Projectiles
                         pos += step;
                     }
 
-                    rot = rot.AngleTowards(rotToFront, 0.1f);
-
                     giveUp++;
                     if (giveUp >= 400)
                     {
@@ -196,7 +194,6 @@ namespace TerRoguelike.Projectiles
                 }
                 
             }
-            
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {

@@ -144,9 +144,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[0] != Deathray.Id)
                 {
                     sound.Position += (basePos - (Vector2)sound.Position).SafeNormalize(Vector2.UnitY) * 1.2f;
-                    sound.Pitch -= 0.012f;
-                    
-                    sound.Volume -= 0.01f;
+                    if (sound.Pitch > -0.15f)
+                        sound.Pitch -= 0.008f;
+                    sound.Volume -= 0.008f;
                     if (sound.Volume <= 0)
                         sound.Stop();
                 }
@@ -157,6 +157,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (time < 120)
                     {
                         sound.Pitch += 0.45f / 120;
+                    }
+                    else
+                    {
+                        sound.Pitch += 0.12f / 120;
                     }
                 }
             }
