@@ -110,13 +110,25 @@ namespace TerRoguelike.Projectiles
                             60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50));
                     }
                 }
+                if (i % 2 == 0 && Projectile.timeLeft % 1 == 0 && !specialOldDead[i] && i > 0)
+                {
+                    Vector2 particlePos = specialOldPos[i];
+                    float rot = (specialOldPos[i - 1] - specialOldPos[i]).ToRotation();
+                    for (int j = -1; j <= 1; j += 2)
+                    {
+                        ParticleManager.AddParticle(new ThinSpark(
+                            particlePos + (rot + MathHelper.PiOver2 * j).ToRotationVector2() * 24, specialOldVel[i], 
+                            10, Color.Red, new Vector2(0.1f, 0.4f) * 5, rot + (MathHelper.PiOver4 * 0.1f * j), true, false));
+                    }
+                    
+                }
             }
             if (deadCount >= maxSpecialPos)
             {
                 Projectile.Kill();
             }
 
-            
+              
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             int frameWidth = tex.Width;
             float frameProgress = 0;
@@ -161,7 +173,7 @@ namespace TerRoguelike.Projectiles
                     }
                     frame = new Rectangle((int)frameProgress % frameWidth, 0, 2, tex.Height);
                     frameProgress += 2;
-                    draws.Add(new StoredDraw(tex, pos - Main.screenPosition, frame, Color.White, rot, frame.Size() * 0.5f, scale, SpriteEffects.None));
+                    draws.Add(new StoredDraw(tex, pos, frame, Color.White, rot, frame.Size() * 0.5f, scale, SpriteEffects.None));
 
                     Vector2 step = rot.ToRotationVector2() * 1;
                     if (distance <= 1f)
@@ -197,7 +209,6 @@ namespace TerRoguelike.Projectiles
                     Vector2 pos = draw.position;
                     if (pos.Distance(draws[i + 1].position) > 24)
                         continue;
-                    pos += Main.screenPosition;
                 if (targetHitbox.ClosestPointInRect(pos).Distance(pos) < 24)
                     return true;
             }
@@ -217,7 +228,7 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < draws.Count; i++)
             {
                 var draw = draws[i];
-                draw.Draw();
+                draw.Draw(-Main.screenPosition);
             }
             StartVanillaSpritebatch();
 
@@ -235,7 +246,7 @@ namespace TerRoguelike.Projectiles
 
                     for (int j = 0; j < 60; j++)
                     {
-                        Main.EntitySpriteDraw(squareTex, pos + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Cyan, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                        Main.EntitySpriteDraw(squareTex, pos + Main.screenPosition + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Cyan, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
                     }
                 }
             }
