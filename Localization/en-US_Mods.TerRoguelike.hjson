@@ -86,6 +86,7 @@ Projectiles: {
 	DemonLaser.DisplayName: Demon Laser
 	FleshVomit.DisplayName: Flesh Vomit
 	FleshBall.DisplayName: Flesh Ball
+	VolatileFlesh.DisplayName: Volatile Flesh
 }
 
 Items: {

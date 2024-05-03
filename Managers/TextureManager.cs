@@ -128,6 +128,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/HellBeamWave",
                 "TerRoguelike/ExtraTextures/BlobbyNoise",
                 "TerRoguelike/ExtraTextures/BlobbyNoiseSmall",
+                "TerRoguelike/ExtraTextures/CurvedSpike",
             };
             foreach (string path in pathList)
             {

@@ -231,6 +231,7 @@ namespace TerRoguelike.Utilities
         /// <returns>The radians present between the 2 angles, positive or negative based on the closest direction</returns>
         public static float AngleSizeBetween(float angle1, float angle2)
         {
+            
             float rad1 = angle1 % MathHelper.TwoPi;
             float rad2 = angle2 % MathHelper.TwoPi;
 
@@ -239,7 +240,7 @@ namespace TerRoguelike.Utilities
             if (Math.Abs(angle) > MathHelper.Pi)
                 angle -= Math.Sign(angle) * MathHelper.TwoPi;
 
-            return angle;
+            return MathHelper.WrapAngle(angle);
         }
         public static bool? CircularHitboxCollision(Vector2 circleCenter, Rectangle targetHitbox, float radius)
         {
@@ -398,6 +399,10 @@ namespace TerRoguelike.Utilities
 
             return end;
         }
+        /// <summary>
+        /// Checks for tile collision at the position
+        /// </summary>
+        /// <returns>Whether or not a collision would happen at the position</returns> 
         public static bool TileCollisionAtThisPosition(Vector2 position)
         {
             Point tilePos = position.ToTileCoordinates();
@@ -453,6 +458,12 @@ namespace TerRoguelike.Utilities
             if (end)
                 Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+        }
+        public static void StartNonPremultipliedSpritebatch(bool end = true)
+        {
+            if (end)
+                Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
         public static void StartVanillaSpritebatch(bool end = true)
         {
