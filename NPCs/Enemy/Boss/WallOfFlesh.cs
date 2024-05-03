@@ -63,7 +63,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Laser = new Attack(1, 30, 180);
         public static Attack Deathray = new Attack(2, 40, 330);
         public static Attack BouncyBall = new Attack(3, 30, 180);
-        public static Attack Bloodball = new Attack(4, 30, 180);
+        public static Attack Bloodball = new Attack(4, 30, 60);
         public static Attack Summon = new Attack(5, 20, 180);
         public int laserStartup = 60;
         public int laserFireRate = 8;
@@ -74,6 +74,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathrayTrackedProjId2 = -1;
         public int bouncyballFireRate = 60;
         public int bouncyballWindup = 40;
+        public int bloodBallFireRate = 11;
 
         public override void SetStaticDefaults()
         {
@@ -444,10 +445,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Bloodball.Id)
             {
+                if (NPC.ai[1] % bloodBallFireRate == 0)
+                {
+                    int number = (int)NPC.ai[1] / bloodBallFireRate;
+                    Vector2 startPos;
+                    if (number % 2 == 0)
+                    {
+                        startPos = NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 52;
+                    }
+                    else
+                    {
+                        startPos = NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 52;
+                    }
+                    startPos += Vector2.UnitY * -4;
+                    Vector2 pos = target != null ? target.Center : spawnPos + hitboxes[1].offset + new Vector2(-950, 0);
+                    Vector2 offset = Vector2.Zero;
+                    Vector2 extra = target != null ? target.velocity * 5 : Vector2.Zero;
+                    for (int i = 0; i < 70; i++)
+                    {
+                        offset = Main.rand.NextVector2CircularEdge(320, 320) * Main.rand.NextFloat(0.8f, 1f) + extra;
+                        Vector2 potentialPos = pos + offset;
+                        if (potentialPos.X < NPC.position.X - 80 && !ParanoidTileRetrieval((potentialPos).ToTileCoordinates()).IsTileSolidGround(true))
+                            break;
+                    }
+                    pos += offset;
+                    SoundEngine.PlaySound(SoundID.Item73 with { Volume = 0.5f, Pitch = -0.5f, PitchVariance = 0.05f, MaxInstances = 6 }, pos);
+                    SoundEngine.PlaySound(SoundID.NPCHit13 with { Volume = 0.3f, Pitch = -0.95f, PitchVariance = 0.05f, MaxInstances = 6 }, pos);
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<VolatileFlesh>(), NPC.damage, 0, -1, startPos.X - pos.X, startPos.Y - pos.Y);
+                }
                 if (NPC.ai[1] >= Bloodball.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -120;
                     NPC.ai[2] = Bloodball.Id;
                 }
             }
@@ -467,7 +496,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray, BouncyBall, Bloodball, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray, BouncyBall };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser, Deathray, BouncyBall, Bloodball };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;

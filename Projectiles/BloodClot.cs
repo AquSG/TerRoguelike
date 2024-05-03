@@ -13,11 +13,13 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
+using static TerRoguelike.Managers.TextureManager;
 
 namespace TerRoguelike.Projectiles
 {
     public class BloodClot : ModProjectile, ILocalizedModType
     {
+        public Texture2D glowTex;
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public override void SetDefaults()
         {
@@ -27,6 +29,12 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 300;
             Projectile.penetrate = 1;
+            glowTex = TexDict["CircularGlow"].Value;
+            Projectile.hide = true;
+        }
+        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        {
+            behindNPCs.Add(index);
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -84,6 +92,13 @@ namespace TerRoguelike.Projectiles
                     dust.noLight = true;
                 }
             }
+        }
+        public override bool PreDraw(ref Color lightColor)
+        {
+            TerRoguelikeUtils.StartNonPremultipliedSpritebatch();
+            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.Black * 0.2f, Projectile.velocity.ToRotation(), glowTex.Size() * 0.5f, new Vector2(0.1f, 0.05f), SpriteEffects.None);
+            TerRoguelikeUtils.StartVanillaSpritebatch();
+            return false;
         }
     }
 }

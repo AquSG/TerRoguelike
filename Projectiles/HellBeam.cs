@@ -46,6 +46,8 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
+            Projectile.tileCollide = false;
+            Projectile.ignoreWater = true;
             Projectile.friendly = true;
             Projectile.hostile = false;
             waveTex = TexDict["HellBeamWave"].Value;
@@ -63,7 +65,7 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             int maxSpecialPos = 240;
-
+            int time = maxTimeLeft - Projectile.timeLeft;
             if (specialOldPos.Count < maxSpecialPos)
             {
                 Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
@@ -84,7 +86,8 @@ namespace TerRoguelike.Projectiles
                 specialOldDead.Add(false);
             }
             int deadCount = 0;
-            for (int i = 0; i < specialOldPos.Count; i++)
+            int last = specialOldPos.Count - 1;
+            for (int i = 0; i <= last; i++)
             {
                 if (specialOldDead[i])
                 {
@@ -123,6 +126,13 @@ namespace TerRoguelike.Projectiles
 
                 }
             }
+            if (!specialOldDead[last] && time < 300)
+            {
+                float completion = time < 60 ? MathHelper.Clamp(time / 4f, 0, 1) : (1f - MathHelper.Clamp((time - 240) / 60f, 0, 1));
+                Point lPos = (Projectile.Center + Projectile.rotation.ToRotationVector2() * -20).ToTileCoordinates();
+                Lighting.AddLight(lPos.X, lPos.Y, TorchID.Orange, completion);
+            }
+
             if (deadCount >= maxSpecialPos)
             {
                 Projectile.Kill();

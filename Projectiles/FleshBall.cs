@@ -56,7 +56,7 @@ namespace TerRoguelike.Projectiles
 
                 if (Main.rand.NextBool(3))
                     velocity *= 1.5f;
-                //velocity.X += Math.Sign(velocity.X) * Main.rand.NextFloat(0.25f, 1f);
+
                 Vector2 scale = new Vector2(0.25f, 0.4f) * 0.75f;
                 int time = 110 + Main.rand.Next(70);
                 Color color = Color.Lerp(Color.Red * 0.65f, Color.Purple, Main.rand.NextFloat());
