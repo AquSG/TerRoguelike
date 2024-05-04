@@ -1028,12 +1028,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int time;
         public Vector2 scale;
         public int segment;
-        public GodRay(float Rotation, int Time, Vector2 Scale, int Segment = 0)
+        public Vector2 position;
+        public GodRay(float Rotation, int Time, Vector2 Scale, int Segment = 0, Vector2? Position = null)
         {
             rotation = Rotation;
             time = Time;
             scale = Scale;
             segment = Segment;
+            if (Position != null)
+                position = (Vector2)Position;
         }
     }
 }
