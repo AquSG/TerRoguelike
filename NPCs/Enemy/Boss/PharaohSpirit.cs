@@ -43,7 +43,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         Texture2D glowTex;
         public Texture2D noiseTex;
         public Texture2D circleGlowTex;
-        public SoundStyle LocustSwarm = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
+        public static readonly SoundStyle LocustSwarm = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
         public SlotId LocustSlot;
         public int soundMoveDirection = 0;
         public SlotId rumbleSlot;
@@ -73,6 +73,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 13;
+            SoundEngine.PlaySound(LocustSwarm with { Volume = 0 });
         }
         public override void SetDefaults()
         {
