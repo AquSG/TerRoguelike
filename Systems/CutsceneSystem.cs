@@ -18,8 +18,8 @@ namespace TerRoguelike.Systems
         private static int easeInTime;
         private static int easeOutTime;
         public static bool cutsceneActive;
-        private static bool easeInActivated;
-        private static bool easeOutActivated;
+        public static bool easeInActivated;
+        public static bool easeOutActivated;
         public static bool cutsceneDisableControl;
 
         public override void PostUpdateEverything()
