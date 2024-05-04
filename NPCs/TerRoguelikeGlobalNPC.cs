@@ -3662,7 +3662,7 @@ namespace TerRoguelike.NPCs
         /// <returns>The position of the closest segment to the input vector. Returns inputVect if you call this when there's no segment in the Segments list </returns>
         public Vector2 ClosestSegment(Vector2 inputVect)
         {
-            if (!Segments.Any())
+            if (Segments.Count <= 0)
                 return inputVect;
 
             int closest = 0;
@@ -3682,6 +3682,31 @@ namespace TerRoguelike.NPCs
             Vector2 closestVect = Segments[closest].Position;
             closestVect += (inputVect - closestVect).SafeNormalize(Vector2.UnitY) * Segments[closest].Height * 0.5f;
             return closestVect;
+        }
+        public Vector2 ClosestPosition(Vector2 fallback, Vector2 origin, NPC npc)
+        {
+            if (Segments.Count > 0)
+            {
+                return ClosestSegment(origin);
+            }
+            if (ExtraIgniteTargetPoints.Count > 0)
+            {
+                int closest = 0;
+                float closestLength = (origin - (ExtraIgniteTargetPoints[0] + npc.Center)).Length();
+
+                for (int i = 1; i < ExtraIgniteTargetPoints.Count; i++)
+                {
+                    var position = ExtraIgniteTargetPoints[i] + npc.Center;
+                    float distance = (position - origin).Length();
+                    if (distance < closestLength)
+                    {
+                        closestLength = distance;
+                        closest = i;
+                    }
+                }
+                return ExtraIgniteTargetPoints[closest] + npc.Center;
+            }
+            return fallback;
         }
         /// <summary>
         /// 

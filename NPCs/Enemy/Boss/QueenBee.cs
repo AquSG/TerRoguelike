@@ -43,7 +43,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             new ExtraHitbox(new Point(50, 50), new Vector2(46, 0)),
         };
         public Texture2D squareTex;
-        public SoundStyle BeeSwarmSound = new SoundStyle("TerRoguelike/Sounds/LocustSwarm");
         public SlotId BeeSwarmSlot;
         public SlotId ChargeSlot;
 
@@ -385,7 +384,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             if (NPC.ai[1] == 60)
                             {
-                                BeeSwarmSlot = SoundEngine.PlaySound(BeeSwarmSound with { Volume = 0.4f, PitchVariance = 0.03f }, anchor);
+                                BeeSwarmSlot = SoundEngine.PlaySound(PharaohSpirit.LocustSwarm with { Volume = 0.4f, PitchVariance = 0.03f }, anchor);
                                 NPC.localAI[1] = 1;
                             }
                             NPC.velocity += rotToAnchor.ToRotationVector2() * 0.051f;
@@ -771,7 +770,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (deadTime == 0)
             {
                 SoundEngine.PlaySound(SoundID.Item173 with { Volume = 0.8f, Pitch = 0.2f }, NPC.Center);
-                ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(BeeSwarmSound with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center), 1, deathCutsceneDuration, 360));
+                ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(PharaohSpirit.LocustSwarm with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center), 1, deathCutsceneDuration, 360));
                 NPC.velocity *= 0;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
