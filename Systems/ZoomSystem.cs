@@ -9,7 +9,7 @@ namespace TerRoguelike.Systems
 {
     public class ZoomSystem : ModSystem
     {
-        //lifted from ZoomHandler from the Starlight River Mod
+        //lifted from ZoomHandler from the Starlight River Mod, with a bit of edits for what I want to accomplish
         private static int zoomTimer;
         public static float zoomOverride = 1;
         private static float oldZoom = 1;
@@ -23,6 +23,10 @@ namespace TerRoguelike.Systems
 
         private static float extraZoomTarget = 1;
 
+        public static float effectiveResolutionZoomDifference
+        {
+            get { return MathHelper.Clamp(Main.screenHeight, 108, 1080) / 1080f; }
+        }
         public static float ExtraZoomTarget
         {
             get => extraZoomTarget;
@@ -83,7 +87,7 @@ namespace TerRoguelike.Systems
 
         public static void UpdateZoom()
         {
-            zoomOverride = Vector2.SmoothStep(new Vector2(oldZoom, 0), new Vector2(extraZoomTarget, 0), zoomTimer / (float)maxTimer).X;
+            zoomOverride = Vector2.SmoothStep(new Vector2(oldZoom, 0), new Vector2(extraZoomTarget * (CutsceneSystem.cutsceneActive && !CutsceneSystem.easeOutActivated ? effectiveResolutionZoomDifference : 1f), 0), zoomTimer / (float)maxTimer).X;
 
             if (zoomOverride == Main.GameZoomTarget)
                 oldZoom = Main.GameZoomTarget;
