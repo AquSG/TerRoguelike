@@ -71,7 +71,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.ai[3] > 0)
                 NPC.ai[3]--;
-            modNPC.RogueWormAI(NPC, 12f, MathHelper.Pi / 60f, 480);
+            modNPC.RogueWormAI(NPC, 10f, MathHelper.Pi / 70f, 480);
             NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(NPC);
             Point tile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
