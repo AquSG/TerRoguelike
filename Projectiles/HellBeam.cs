@@ -64,9 +64,22 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            bool allow = true;
+            var modProj = Projectile.ModProj();
+            if (modProj.npcOwner >= 0)
+            {
+                NPC npc = Main.npc[modProj.npcOwner];
+                var modNPC = npc.ModNPC();
+                if (modNPC.isRoomNPC)
+                {
+                    if (RoomSystem.RoomList[modNPC.sourceRoomListID].bossDead)
+                        allow = false;
+                }
+            }
+
             int maxSpecialPos = 240;
             int time = maxTimeLeft - Projectile.timeLeft;
-            if (specialOldPos.Count < maxSpecialPos)
+            if (specialOldPos.Count < maxSpecialPos && allow)
             {
                 Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
                 Color fillColor = Color.Lerp(outlineColor, Color.DarkRed, 0.2f);
@@ -133,7 +146,7 @@ namespace TerRoguelike.Projectiles
                 Lighting.AddLight(lPos.X, lPos.Y, TorchID.Orange, completion);
             }
 
-            if (deadCount >= maxSpecialPos)
+            if (deadCount >= specialOldPos.Count)
             {
                 Projectile.Kill();
             }

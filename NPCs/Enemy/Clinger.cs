@@ -158,17 +158,16 @@ namespace TerRoguelike.NPCs.Enemy
 
                         Vector2 drawPos = start + (Vector2.UnitX * j).RotatedBy(direction);
                         Texture2D tex = (j / segmentLength) % 2 == 0 ? segment1Tex : segment2Tex;
+                        SpriteEffects spriteEffects = SpriteEffects.FlipHorizontally;
+                        Vector2 position = drawPos + (Vector2.UnitY * NPC.gfxOffY);
 
                         Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
                         Vector3 colorHSL = Main.rgbToHsl(color);
                         float outlineThickness = 1f;
-                        SpriteEffects spriteEffects = SpriteEffects.FlipHorizontally;
-
                         GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
                         GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
                         GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
 
-                        Vector2 position = drawPos + (Vector2.UnitY * NPC.gfxOffY);
                         for (float k = 0; k < 1; k += 0.125f)
                         {
                             spriteBatch.Draw(tex, position + (k * MathHelper.TwoPi + direction).ToRotationVector2() * outlineThickness - Main.screenPosition, !end ? null : new Rectangle(tex.Width - (tetherLength % segmentLength), 0, (tetherLength % segmentLength), tex.Height), color, direction, tex.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
