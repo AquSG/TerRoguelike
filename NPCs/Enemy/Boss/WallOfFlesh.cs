@@ -221,7 +221,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(QueenBeeTheme);
+                SetBossTrack(WallOfFleshTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
