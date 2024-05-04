@@ -58,9 +58,9 @@ namespace TerRoguelike.Projectiles
                     Tile tile = TerRoguelikeUtils.ParanoidTileRetrieval(futureTile);
                     if (TileID.Sets.Platforms[tile.TileType] && tile.IsTileSolidGround() && tile.BlockType == BlockType.Solid)
                     {
-                        if (Projectile.ai[0] > 0)
+                        if (Projectile.ai[1] > 0)
                         {
-                            Projectile.ai[0]--;
+                            Projectile.ai[1]--;
                         }
                         else
                         {
@@ -91,7 +91,6 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.frame == 3 && modProj != null && modProj.npcOwner >= 0 && Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID >= 0 && RoomSystem.RoomList[Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID].bossDead)
                     Projectile.timeLeft = 60;
             }
-            
             
         }
         public override bool OnTileCollide(Vector2 oldVelocity)

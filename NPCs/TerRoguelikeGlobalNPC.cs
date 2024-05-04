@@ -10,6 +10,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using TerRoguelike.Managers;
+using TerRoguelike.NPCs.Enemy.Boss;
 using TerRoguelike.Projectiles;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
@@ -3179,6 +3180,21 @@ namespace TerRoguelike.NPCs
 
             if (npc.type == NPCID.OldMan || npc.type == NPCID.Guide)
                 npc.active = false;
+
+            if (source is EntitySource_Parent parentSource)
+            {
+                if (parentSource.Entity is NPC)
+                {
+                    NPC parent = Main.npc[parentSource.Entity.whoAmI];
+                    var modparent = parent.ModNPC();
+                    if (modparent != null && modparent.isRoomNPC)
+                    {
+                        isRoomNPC = true;
+                        sourceRoomListID = modparent.sourceRoomListID;
+                    }
+                }
+            }
+
             SpawnManager.ApplyNPCDifficultyScaling(npc, this);
         }
         public override bool PreAI(NPC npc)

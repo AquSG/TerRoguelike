@@ -69,6 +69,18 @@ namespace TerRoguelike.Projectiles
             Projectile.rotation += 0.06f * Projectile.direction;
             Projectile.frameCounter -= 1 * Projectile.direction;
 
+            var modProj = Projectile.ModProj();
+            if (modProj.npcOwner >= 0)
+            {
+                NPC npc = Main.npc[modProj.npcOwner];
+                var modNPC = npc.ModNPC();
+                if (modNPC.isRoomNPC)
+                {
+                    if (RoomSystem.RoomList[modNPC.sourceRoomListID].bossDead)
+                        OnTileCollide(Projectile.velocity);
+                }
+            }
+
             if (Projectile.localAI[0] > 0)
                 Projectile.localAI[0]--;
 

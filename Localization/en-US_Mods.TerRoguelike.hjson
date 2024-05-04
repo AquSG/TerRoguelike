@@ -811,4 +811,6 @@ NPCs: {
 	PharaohSpirit.DisplayName: Pharaoh Spirit
 	QueenBee.DisplayName: Queen Bee
 	WallOfFlesh.DisplayName: Wall of Flesh
+	Hungry.DisplayName: Hungry
+	HungryAnchored.DisplayName: Hungry
 }

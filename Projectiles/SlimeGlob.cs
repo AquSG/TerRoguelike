@@ -46,7 +46,28 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.velocity.Y > 8)
                     Projectile.velocity.Y = 8;
 
-                return;
+                Point bottomTilePos = Projectile.Bottom.ToTileCoordinates();
+                Point extraBottomTimePos = (Projectile.Bottom + Vector2.UnitY * Projectile.velocity.Y).ToTileCoordinates();
+                if (bottomTilePos.Y != extraBottomTimePos.Y && Projectile.velocity.Y > 1)
+                {
+                    Point futureTile = (Projectile.Bottom + Projectile.velocity).ToTileCoordinates();
+                    Tile tile = TerRoguelikeUtils.ParanoidTileRetrieval(futureTile);
+                    if (TileID.Sets.Platforms[tile.TileType] && tile.IsTileSolidGround() && tile.BlockType == BlockType.Solid)
+                    {
+                        if (Projectile.ai[1] > 0)
+                        {
+                            Projectile.ai[1]--;
+                        }
+                        else
+                        {
+                            Projectile.frame = 3;
+                            Projectile.velocity = Vector2.Zero;
+                            Projectile.rotation = 0f;
+                            Projectile.Bottom = new Vector2(Projectile.Bottom.X, extraBottomTimePos.ToWorldCoordinates(0, 0).Y);
+                            SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.4f }, Projectile.Center);
+                        }
+                    }
+                }
             }
 
             if (Projectile.ai[0] % 30 != 0)
@@ -71,7 +92,6 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            
             if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
             {
                 Projectile.velocity.X = -oldVelocity.X * 0.5f;
@@ -82,10 +102,10 @@ namespace TerRoguelike.Projectiles
                 Projectile.frame = 3;
                 Projectile.velocity = Vector2.Zero;
                 Projectile.rotation = 0f;
-                Projectile.Bottom = new Vector2(Projectile.Bottom.X, (int)((Projectile.oldPosition.Y + 1f) / 16f) * 16f + 16f);
+                Projectile.Bottom = new Vector2(Projectile.Bottom.X, (Projectile.Bottom + Vector2.UnitY * 16).ToTileCoordinates().ToWorldCoordinates(0, 0).Y);
                 SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.4f }, Projectile.Center);
             }
-            
+
             return false;
         }
         public override bool? CanDamage() => false;

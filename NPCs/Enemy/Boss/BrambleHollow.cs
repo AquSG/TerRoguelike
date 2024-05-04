@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SoundStyle BramblePunch = new SoundStyle("TerRoguelike/Sounds/BramblePunch");
         public SoundStyle BurrowSound = new SoundStyle("TerRoguelike/Sounds/Shockwave", 3);
 
-        public Attack None = new Attack(0, 0, 180);
+        public Attack None = new Attack(0, 0, 120);
         public Attack Burrow = new Attack(1, 60, 360);
         public Attack VineWall = new Attack(2, 40, 240);
         public Attack RootLift = new Attack(3, 40, 180);
