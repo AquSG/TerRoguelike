@@ -15,13 +15,19 @@ namespace TerRoguelike.Rooms
 {
     public class HellEnemyRoom7 : Room
     {
+        public override int AssociatedFloor => FloorDict["Hell"];
         public override string Key => "HellEnemyRoom7";
         public override string Filename => "Schematics/RoomSchematics/HellEnemyRoom7.csch";
         public override bool CanExitRight => true;
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ChooseEnemy(FloorDict["Hell"], 0), 60, 120, 0.45f);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 2, 5), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -13, -3), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 18, -3), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+
+            AddRoomNPC(MakeEnemySpawnPos(Center, -13, -9), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 18, -9), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
         }
     }
 }

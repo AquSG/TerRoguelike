@@ -15,13 +15,20 @@ namespace TerRoguelike.Rooms
 {
     public class HellEnemyRoom9 : Room
     {
+        public override int AssociatedFloor => FloorDict["Hell"];
         public override string Key => "HellEnemyRoom9";
         public override string Filename => "Schematics/RoomSchematics/HellEnemyRoom9.csch";
         public override bool CanExitRight => true;
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ChooseEnemy(FloorDict["Hell"], 0), 60, 120, 0.45f);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -1, -13), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -22, -23), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 22, -19), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -1, 16), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -22, 10), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, 22, 4), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Right, -7, 0), ChooseEnemy(AssociatedFloor, 0), 300, 120, 0.45f, 0);
         }
     }
 }
