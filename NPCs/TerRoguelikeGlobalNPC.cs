@@ -54,6 +54,7 @@ namespace TerRoguelike.NPCs
         public List<BleedingStack> bleedingStacks = [];
         public int bleedingHitCooldown = 0;
         public int ballAndChainSlow = 0;
+        public bool ballAndChainSlowApplied = false;
         public Vector2 drawCenter = new Vector2(-1000);
         public int whoAmI;
         public int targetPlayer = -1;
@@ -3200,10 +3201,10 @@ namespace TerRoguelike.NPCs
         public override bool PreAI(NPC npc)
         {
             diminishingDR = 0;
-            if (ballAndChainSlow > 0) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
+            if (ballAndChainSlowApplied) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
             {
                 npc.velocity /= 0.7f;
-                ballAndChainSlow--;
+                ballAndChainSlowApplied = false;
             }
             return true;
         }
@@ -3282,6 +3283,7 @@ namespace TerRoguelike.NPCs
             {
                 npc.velocity *= 0.7f;
                 ballAndChainSlow--;
+                ballAndChainSlowApplied = true;
             }
 
             if (hostileTurnedAlly)
