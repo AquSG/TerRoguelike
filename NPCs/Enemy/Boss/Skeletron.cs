@@ -43,12 +43,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         bool skipEyeParticles = false;
 
         public static Attack None = new Attack(0, 0, 100);
-        public static Attack Charge = new Attack(1, 30, 180);
+        public static Attack Charge = new Attack(1, 30, 270);
         public static Attack SoulBurst = new Attack(2, 30, 180);
         public static Attack BoneSpear = new Attack(3, 30, 180);
         public static Attack SoulTurret = new Attack(4, 30, 180);
         public static Attack TeleportDash = new Attack(5, 30, 180);
         public static Attack Summon = new Attack(6, 30, 180);
+        public int chargeWindup = 60;
+        public int chargeFireRate = 60;
 
         public override void SetStaticDefaults()
         {
@@ -159,7 +161,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            UpdateDirection();
             target = modNPC.GetTarget(NPC);
 
             NPC.ai[1]++;
@@ -167,6 +168,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                UpdateDirection();
                 if (NPC.ai[1] == None.Duration)
                 {
                     Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
@@ -192,6 +194,34 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (NPC.ai[0] == Charge.Id)
             {
+                Vector2 targetPos = target != null ? target.Center : NPC.velocity.ToRotation().AngleTowards((spawnPos - NPC.Center).ToRotation(), 0.03f).ToRotationVector2() * 100 + NPC.Center;
+                float magnitude = MathHelper.Clamp(targetPos.Distance(NPC.Center) * 0.03f, 4f, 8f);
+                NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * magnitude;
+                NPC.rotation += 0.2f * NPC.direction;
+
+                if (NPC.ai[1] < chargeWindup)
+                {
+                    float startupCompletion = NPC.ai[1] / chargeWindup;
+                    NPC.velocity *= (float)Math.Pow(startupCompletion, 3);
+                    if (NPC.ai[1] == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Roar with { Volume = 1f }, NPC.Center);
+                    }
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - chargeWindup;
+                    if (time % chargeFireRate == 0)
+                    {
+                        float fireDirection = (-NPC.velocity).ToRotation();
+                        for (int i = -3; i <= 3; i += 2)
+                        {
+                            Vector2 projVelDir = (fireDirection + 0.37f * i).ToRotationVector2();
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projVelDir * 28, projVelDir * 2, ModContent.ProjectileType<Spectre>(), NPC.damage, 0);
+                        }
+                    }
+                }
+                
                 if (NPC.ai[1] >= Charge.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -302,7 +332,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            chosenAttack = None.Id;
+            chosenAttack = Charge.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
