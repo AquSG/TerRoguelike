@@ -813,4 +813,5 @@ NPCs: {
 	WallOfFlesh.DisplayName: Wall of Flesh
 	Hungry.DisplayName: Hungry
 	HungryAnchored.DisplayName: Hungry
+	Skeletron.DisplayName: Skeletron
 }
