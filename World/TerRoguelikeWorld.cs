@@ -13,6 +13,8 @@ using TerRoguelike.Projectiles;
 using Microsoft.Xna.Framework;
 using Terraria.Audio;
 using static TerRoguelike.Systems.MusicSystem;
+using rail;
+using TerRoguelike.Schematics;
 
 namespace TerRoguelike.World
 {
@@ -35,18 +37,22 @@ namespace TerRoguelike.World
             currentStage++;
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
-                if (RoomSystem.RoomList[i].IsBossRoom)
+                Room room = RoomSystem.RoomList[i];
+                if (room.IsBossRoom)
                     continue;
 
-                RoomSystem.ResetRoomID(RoomSystem.RoomList[i].ID);
-                if (RoomSystem.RoomList[i].IsStartRoom)
-                    RoomSystem.RoomList[i].awake = true;
-
+                RoomSystem.ResetRoomID(room.ID);
+                if (room.IsStartRoom)
+                {
+                    room.awake = true;
+                    if (room.AssociatedFloor == SchematicManager.FloorDict["Lunar"]) // don't reset the rest of the lunar floor
+                        break;
+                }
             }
             SetMusicMode(MusicStyle.AllCalm);
-            SetCalm(Escape);
-            CalmVolumeLevel = 0.25f;
-            //SetCombat(Silence with { Volume = 0f });
+            SetCalm(Escape, false);
+            CalmVolumeLevel = 0.5f;
+            PauseWhenIngamePaused = true;
         }
     }
     public class Chain

@@ -32,6 +32,7 @@ namespace TerRoguelike.Systems
     {
         public static bool Initialized = false;
         public static bool PlayedAllSounds = false;
+        public static bool PauseWhenIngamePaused = false;
         public static int BlankMusicSlotId = -1;
         public static float CalmVolumeInterpolant = 0;
         public static float CombatVolumeInterpolant = 0;
@@ -215,6 +216,8 @@ namespace TerRoguelike.Systems
         }
         public static void SetCalm(SoundEffect track, bool loop = true)
         {
+            if (!BufferCalmSilence)
+                PauseWhenIngamePaused = false;
             if (CalmMusic != null)
                 CalmMusic.Dispose();
 
@@ -229,6 +232,8 @@ namespace TerRoguelike.Systems
         }
         public static void SetCombat(SoundEffect track, bool loop = true)
         {
+            if (!BufferCombatSilence)
+                PauseWhenIngamePaused = false;
             if (CombatMusic != null)
                 CombatMusic.Dispose();
 
@@ -258,8 +263,7 @@ namespace TerRoguelike.Systems
             }
             if (!Initialized)
                 return;
-
-            if (!Main.hasFocus)
+            if (!Main.hasFocus || (PauseWhenIngamePaused && Main.gamePaused))
             {
                 if (CalmMusic.State == SoundState.Playing)
                     CalmMusic.Pause();
