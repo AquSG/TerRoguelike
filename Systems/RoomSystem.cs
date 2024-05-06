@@ -67,9 +67,31 @@ namespace TerRoguelike.Systems
 
                         Main.player[i].KillMe(PlayerDeathReason.LegacyDefault(), Main.rand.Next(10000, 25000), Main.rand.NextBool() ? -1 : 1);
                     }
-                    escape = false;
+
+                    for (int i = 0; i < Main.maxNPCs; i++)
+                    {
+                        NPC npc = Main.npc[i];
+                        if (npc == null)
+                            continue;
+                        if (!npc.active)
+                            continue;
+
+                        TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
+                        if (modNPC == null)
+                            continue;
+                        if (modNPC.isRoomNPC)
+                        {
+                            npc.StrikeInstantKill();
+                            npc.active = false;
+                        }
+                    }
+                    for (int i = 0; i < SpawnManager.pendingEnemies.Count; i++)
+                    {
+                        SpawnManager.pendingEnemies[i].spent = true;
+                    }
                 }
             }
+            
             SpawnManager.UpdateSpawnManager(); //Run all logic for all pending items and enemies being telegraphed
             UpdateHealingPulse(); //Used for uncommon healing item based on room time
             UpdateAttackPlanRocketBundles(); //Used for the attack plan item that handles future attack plan bundles
