@@ -375,9 +375,6 @@ namespace TerRoguelike.Managers
             if (TerRoguelikeWorld.escape)
                 return;
 
-            if (Main.player[Main.myPlayer].ModPlayer().currentFloor.Stage == 4 && IsBossRoom)
-                SetMusicMode(MusicStyle.Silent);
-
             ClearSpecificProjectiles();
 
             // reward. boss rooms give higher tiers.

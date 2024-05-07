@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack None = new Attack(0, 0, 100);
         public static Attack Charge = new Attack(1, 30, 270);
         public static Attack SoulBurst = new Attack(2, 30, 480);
-        public static Attack BoneSpear = new Attack(3, 30, 180);
+        public static Attack BoneSpear = new Attack(3, 30, 120);
         public static Attack SoulTurret = new Attack(4, 30, 180);
         public static Attack TeleportDash = new Attack(5, 30, 180);
         public static Attack Summon = new Attack(6, 30, 180);
@@ -56,6 +56,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int soulBurstShootingDuration = 240;
         public int soulBurstWindDown = 180;
         public float soulBurstProjRot = 0;
+        public int boneSpearFireRate = 20;
 
         public override void SetStaticDefaults()
         {
@@ -69,7 +70,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.width = 80;
             NPC.height = 80;
             NPC.aiStyle = -1;
-            NPC.damage = 35;
+            NPC.damage = 32;
             NPC.lifeMax = 29000;
             NPC.HitSound = SoundID.NPCHit2;
             NPC.knockBackResist = 0f;
@@ -219,7 +220,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.velocity *= (float)Math.Pow(startupCompletion, 4);
                     if (NPC.ai[1] == 0)
                     {
-                        SoundEngine.PlaySound(SoundID.Roar with { Volume = 1f }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.9f }, NPC.Center);
                     }
                 }
                 else
@@ -250,17 +251,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == SoulBurst.Id)
             {
-                Vector2 targetPos = target != null ? target.Center + new Vector2(0, -64) : spawnPos;
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Vector2 targetPosOffset = (NPC.Center - targetPos).SafeNormalize(Vector2.UnitY) * 160;
+                if (targetPosOffset.Y > 0)
+                    targetPosOffset = targetPosOffset.ToRotation().AngleTowards(-MathHelper.PiOver2, 0.8f).ToRotationVector2() * targetPosOffset.Length();
+                targetPos = TileCollidePositionInLine(targetPos, targetPos + targetPosOffset);
 
                 if (NPC.ai[1] < soulBurstWindup)
                 {
                     UpdateDirection();
                     DefaultRotation();
-
                     
                     if (NPC.localAI[2] % 20 == 0)
                     {
-                        trackedSlot = SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.5f, Pitch = 0.2f, PitchVariance = 0 }, NPC.Center);
+                        trackedSlot = SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.8f, Pitch = 0.2f, PitchVariance = 0 }, NPC.Center);
                     }
                     NPC.localAI[2]++;
 
@@ -277,18 +281,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             {
                                 collide = true;
                                 collidingVector += new Vector2(-1 + x, -1 + y);
-                                break;
                             }
                         }
-                        if (collide)
-                            break;
                     }
-                    float targetAngle = (target.Center - NPC.Center).ToRotation();
-                    if (NPC.Center.Distance(targetPos) < 32)
+                    float targetAngle = (targetPos - NPC.Center).ToRotation();
+                    if (collide && (NPC.Center.Distance(targetPos) < 32 || NPC.ai[1] == soulBurstWindup - 1))
                     {
+                        if (target != null)
+                            targetPos = target.Center;
+
+                        if (collidingVector == Vector2.Zero)
+                            collidingVector = (NPC.Center - (TileCollisionAtThisPosition(targetPos) ? spawnPos : targetPos));
                         targetAngle = (-collidingVector).ToRotation();
                     }
-                    NPC.velocity += targetAngle.ToRotationVector2() * 0.15f;
+                    NPC.velocity += targetAngle.ToRotationVector2() * 0.2f;
                     float speedCap = 10;
                     if (NPC.velocity.Length() > speedCap)
                         NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * speedCap;
@@ -320,9 +326,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.rotation = NPC.rotation.AngleTowards(0, 0.02f);
                     if (NPC.ai[1] % 6 == 0)
                     {
-                        float randRot = Main.rand.NextFloat(-0.4f, 0.4f);
-                        NPC.rotation = randRot + Math.Sign(randRot) * 0.1f;
-                        SoundEngine.PlaySound(SoundID.Item103 with { Volume = 0.25f, MaxInstances = 7, Pitch = 0.14f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                        float randRot = Main.rand.NextFloat(-0.25f, 0.25f);
+                        NPC.rotation = randRot + Math.Sign(randRot) * 0.05f;
+                        SoundEngine.PlaySound(SoundID.Item103 with { Volume = 0.42f, MaxInstances = 7, Pitch = 0.14f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                        NPC.direction = Math.Sign(NPC.rotation);
                     }
                         
                     Vector2 projSpawnPos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
@@ -346,11 +353,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             {
                                 collide = true;
                                 collidingVector += new Vector2(-1 + x, -1 + y);
-                                break;
                             }
                         }
-                        if (collide)
-                            break;
                     }
                     if (collide)
                     {
@@ -362,13 +366,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[1] == SoulBurst.Duration - soulBurstWindDown)
                     {
                         eyeParticleIntensity = -1;
-                        SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.1f, MaxInstances = 2, Pitch = -0.8f }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.1f, MaxInstances = 2, Pitch = -1f }, NPC.Center);
                     }
 
                     currentFrame = 0;
                     NPC.noTileCollide = false;
                     NPC.noGravity = false;
-                    NPC.GravityMultiplier *= 0.85f;
+                    NPC.GravityMultiplier *= 0.9f;
                     NPC.rotation += NPC.velocity.Y * 0.01f * NPC.direction;
                     if (NPC.localAI[1] == 0 && NPC.ai[1] > SoulBurst.Duration - soulBurstWindDown && NPC.collideY)
                     {
@@ -380,7 +384,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (NPC.ai[1] == SoulBurst.Duration - 30)
                         {
                             eyeParticleIntensity = 1;
-                            SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                            SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f, Pitch = -0.5f }, NPC.Center);
                             EyeSummonParticleEffect(NPC.rotation.AngleTowards(0, 1.6f));
                         }
                         NPC.rotation = NPC.rotation.AngleLerp(0, 0.08f).AngleTowards(0, 0.01f);
@@ -404,10 +408,34 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 DefaultMovement();
                 DefaultRotation();
 
+                if (NPC.ai[1] % boneSpearFireRate == 0)
+                {
+                    Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
+                    Vector2 targetPos = target != null ? target.Center : spawnPos;
+                    Vector2 basePos = targetPos;
+                    float checkLength = 300;
+                    for (int i = 0; i < 50; i++)
+                    {
+                        float randRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                        Vector2 rotVect = randRot.ToRotationVector2();
+                        Vector2 checkStart = basePos + new Vector2(0, Main.rand.NextFloat(-16, 16)).RotatedBy(randRot);
+                        Vector2 checkEnd = checkStart + rotVect * checkLength;
+                        Vector2 projSpawnPos = TileCollidePositionInLine(checkStart, checkEnd);
+                        if (projSpawnPos == checkEnd)
+                            continue;
+                        if (room != null && !room.GetRect().Contains(projSpawnPos.ToPoint()))
+                            continue;
+
+                        projSpawnPos -= rotVect;
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, -rotVect, ModContent.ProjectileType<BoneSpear>(), NPC.damage, 0);
+                        break;
+                    }
+                }
+
                 if (NPC.ai[1] >= BoneSpear.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -30;
                     NPC.ai[2] = BoneSpear.Id;
                 }
             }
@@ -447,7 +475,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (target != null)
                 {
-                    Vector2 targetPos = target.Center + new Vector2(0, -160);
+
+
+                    Vector2 targetPos = target.Center + new Vector2(0, -240 + (float)Math.Cos(NPC.localAI[0] * 0.03f) * 8);
                     targetPos = TileCollidePositionInLine(target.Center + new Vector2(0, -80), targetPos);
                     if (NPC.velocity.Length() < 10)
                         NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
@@ -482,7 +512,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash, Summon };
+            //List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -503,7 +534,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            chosenAttack = SoulBurst.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
