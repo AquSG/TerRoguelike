@@ -156,7 +156,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 BossAI();
                 bool defaultRotation = NPC.ai[0] == None.Id || NPC.ai[0] == BoneSpear.Id || NPC.ai[0] == SoulTurret.Id || NPC.ai[0] == Summon.Id;
                 if (defaultRotation)
-                    NPC.rotation = NPC.rotation.AngleLerp(MathHelper.Clamp(NPC.velocity.X * 0.1f, -MathHelper.PiOver2 * 0.6f, MathHelper.PiOver2 * 0.5f), 0.25f);
+                {
+                    float rotBound = MathHelper.PiOver2 * 0.6f;
+                    NPC.rotation = NPC.rotation.AngleTowards(MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotBound, rotBound), 0.2f);
+                }
+                    
             }
         }
         public void BossAI()
@@ -194,15 +198,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (NPC.ai[0] == Charge.Id)
             {
-                Vector2 targetPos = target != null ? target.Center : NPC.velocity.ToRotation().AngleTowards((spawnPos - NPC.Center).ToRotation(), 0.03f).ToRotationVector2() * 100 + NPC.Center;
-                float magnitude = MathHelper.Clamp(targetPos.Distance(NPC.Center) * 0.03f, 4f, 8f);
+                Vector2 targetPos = target != null ? target.Center : NPC.velocity.ToRotation().AngleTowards((spawnPos - NPC.Center).ToRotation(), 0.03f).ToRotationVector2() * 180 + NPC.Center;
+                float magnitude = MathHelper.Clamp(targetPos.Distance(NPC.Center) * 0.015f, 3f, 8f);
                 NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * magnitude;
                 NPC.rotation += 0.2f * NPC.direction;
 
                 if (NPC.ai[1] < chargeWindup)
                 {
                     float startupCompletion = NPC.ai[1] / chargeWindup;
-                    NPC.velocity *= (float)Math.Pow(startupCompletion, 3);
+                    NPC.velocity *= (float)Math.Pow(startupCompletion, 4);
                     if (NPC.ai[1] == 0)
                     {
                         SoundEngine.PlaySound(SoundID.Roar with { Volume = 1f }, NPC.Center);
@@ -213,13 +217,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int time = (int)NPC.ai[1] - chargeWindup;
                     if (time % chargeFireRate == 0)
                     {
+                        SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.3f, MaxInstances = 2 }, NPC.Center);
                         float fireDirection = (-NPC.velocity).ToRotation();
-                        for (int i = -3; i <= 3; i += 2)
+                        for (float i = -3; i <= 3; i += 2)
                         {
-                            Vector2 projVelDir = (fireDirection + 0.37f * i).ToRotationVector2();
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projVelDir * 28, projVelDir * 2, ModContent.ProjectileType<Spectre>(), NPC.damage, 0);
+                            Vector2 projVelDir = (fireDirection + 0.5f * i).ToRotationVector2();
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projVelDir * 28, projVelDir * 12, ModContent.ProjectileType<SeekingSoulBlast>(), NPC.damage, 0, -1, targetPos.X, targetPos.Y, NPC.velocity.ToRotation());
                         }
                     }
+                }
+                if (NPC.Center.Distance(NPC.Center + NPC.velocity) >= NPC.Center.Distance(targetPos))
+                {
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY * NPC.Center.Distance(targetPos));
                 }
                 
                 if (NPC.ai[1] >= Charge.Duration)
