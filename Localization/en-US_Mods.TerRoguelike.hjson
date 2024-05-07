@@ -87,6 +87,7 @@ Projectiles: {
 	FleshVomit.DisplayName: Flesh Vomit
 	FleshBall.DisplayName: Flesh Ball
 	VolatileFlesh.DisplayName: Volatile Flesh
+	SeekingSoulBlast.DisplayName: Seeking Soul Blast
 }
 
 Items: {
