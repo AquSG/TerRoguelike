@@ -89,6 +89,7 @@ Projectiles: {
 	VolatileFlesh.DisplayName: Volatile Flesh
 	SeekingSoulBlast.DisplayName: Seeking Soul Blast
 	SoulBlast.DisplayName: Soul Blast
+	BoneSpear.DisplayName: Bone Spear
 }
 
 Items: {

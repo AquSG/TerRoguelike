@@ -62,7 +62,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.frameCounter += 0.2d;
-            modNPC.RogueAntlionAI(NPC, MathHelper.TwoPi / 3f, 80f, 200f, burrowDownTime, burrowUpTime, 48f, 360, attackTelegraph, attackCooldown, ModContent.ProjectileType<SandBlast>(), Vector2.Zero, 15, NPC.damage, MathHelper.Pi * 0.0675f, 9f, 15f);
+            modNPC.RogueAntlionAI(NPC, MathHelper.PiOver2, 80f, 200f, burrowDownTime, burrowUpTime, 48f, 360, attackTelegraph, attackCooldown, ModContent.ProjectileType<SandBlast>(), Vector2.Zero, 15, NPC.damage, MathHelper.Pi * 0.0675f, 9f, 15f);
 
             if (NPC.ai[0] >= 0 && (int)(NPC.ai[0] - attackTelegraph) % (attackTelegraph + attackCooldown) == 0)
             {

@@ -131,6 +131,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/CurvedSpike",
                 "TerRoguelike/NPCs/Enemy/Boss/HungryTether",
                 "TerRoguelike/NPCs/Enemy/Boss/SkeletronEye",
+                "TerRoguelike/Projectiles/BoneSpearTip",
             };
             foreach (string path in pathList)
             {

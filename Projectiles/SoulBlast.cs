@@ -31,8 +31,8 @@ namespace TerRoguelike.Projectiles
         }
         public override void SetDefaults()
         {
-            Projectile.width = 16;
-            Projectile.height = 16;
+            Projectile.width = 8;
+            Projectile.height = 8;
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.ignoreWater = true;
