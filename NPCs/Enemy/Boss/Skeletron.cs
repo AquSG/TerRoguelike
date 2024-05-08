@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack BoneSpear = new Attack(3, 30, 120);
         public static Attack SoulTurret = new Attack(4, 30, 90);
         public static Attack TeleportDash = new Attack(5, 30, 269);
-        public static Attack Summon = new Attack(6, 20, 239);
+        public static Attack Summon = new Attack(6, 16, 239);
         public int chargeWindup = 60;
         public int chargeFireRate = 60;
         public int soulBurstWindup = 60;
@@ -156,7 +156,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(QueenBeeTheme);
+                SetBossTrack(SkeletronTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0;
@@ -203,6 +203,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
+                    NPC.ai[2] = Summon.Id;
                 }
             }
             else
@@ -587,8 +588,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         eyeParticleIntensity = 0;
                         float randRot = Main.rand.NextFloat(-MathHelper.PiOver2 * 0.75f, MathHelper.PiOver2 * 0.75f);
                         randRot += Math.Sign(randRot) * MathHelper.PiOver2 * 0.25f;
-                        if (NPC.ai[1] == 0)
-                            randRot += MathHelper.Pi;
                         Vector2 teleportPos = ((wantedPos - targetPos).ToRotation() + randRot).ToRotationVector2() * chargeStartDist + targetPos;
                         Vector2 teleportVect = NPC.Center - teleportPos;
                         NPC.Center = teleportPos;

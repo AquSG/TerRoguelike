@@ -109,6 +109,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/WallOfFleshThemeStart",
             "TerRoguelike/Tracks/WallOfFleshThemeEnd",
             0.44f);
+        public static BossTheme SkeletronTheme = new(
+            "TerRoguelike/Tracks/SkeletronTheme",
+            "TerRoguelike/Tracks/SkeletronThemeStart",
+            "TerRoguelike/Tracks/SkeletronThemeEnd",
+            0.42f);
 
 
         public static void PlayAllSounds()
@@ -149,7 +154,10 @@ namespace TerRoguelike.Systems
                 QueenBeeTheme.EndTrack,
                 WallOfFleshTheme.BattleTrack,
                 WallOfFleshTheme.StartTrack,
-                WallOfFleshTheme.EndTrack
+                WallOfFleshTheme.EndTrack,
+                SkeletronTheme.BattleTrack,
+                SkeletronTheme.StartTrack,
+                SkeletronTheme.EndTrack
             };
             foreach (string path in pathList)
             {
@@ -244,6 +252,7 @@ namespace TerRoguelike.Systems
         }
         public void MusicUpdate()
         {
+            SkeletronTheme.Volume = 0.42f;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
 
