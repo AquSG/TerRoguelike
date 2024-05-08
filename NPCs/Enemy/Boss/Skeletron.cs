@@ -49,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack SoulBurst = new Attack(2, 30, 480);
         public static Attack BoneSpear = new Attack(3, 30, 120);
         public static Attack SoulTurret = new Attack(4, 30, 90);
-        public static Attack TeleportDash = new Attack(5, 30, 180);
+        public static Attack TeleportDash = new Attack(5, 30, 269);
         public static Attack Summon = new Attack(6, 30, 180);
         public int chargeWindup = 60;
         public int chargeFireRate = 60;
@@ -59,6 +59,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float soulBurstProjRot = 0;
         public int boneSpearFireRate = 20;
         public int soulTurretWindup = 40;
+        public int teleportDashWindup = 45;
+        public int teleportDashingDuration = 45;
 
         public override void SetStaticDefaults()
         {
@@ -73,7 +75,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 80;
             NPC.aiStyle = -1;
             NPC.damage = 32;
-            NPC.lifeMax = 29000;
+            NPC.lifeMax = 27000;
             NPC.HitSound = SoundID.NPCHit2;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
@@ -537,8 +539,80 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == TeleportDash.Id)
             {
+                
+                float chargeStartDist = 240;
+                int time = ((int)NPC.ai[1]) % (teleportDashWindup + teleportDashingDuration);
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Vector2 wantedPos = targetPos + (NPC.Center - targetPos).SafeNormalize(Vector2.UnitY) * chargeStartDist;
+
+                if (time < teleportDashWindup)
+                {
+                    if (time == 0)
+                    {
+                        trackedSlot = default;
+                        eyeParticleIntensity = 0;
+                        float randRot = Main.rand.NextFloat(-MathHelper.PiOver2 * 0.75f, MathHelper.PiOver2 * 0.75f);
+                        randRot += Math.Sign(randRot) * MathHelper.PiOver2 * 0.25f;
+                        if (NPC.ai[1] == 0)
+                            randRot += MathHelper.Pi;
+                        Vector2 teleportPos = ((wantedPos - targetPos).ToRotation() + randRot).ToRotationVector2() * chargeStartDist + targetPos;
+                        Vector2 teleportVect = NPC.Center - teleportPos;
+                        NPC.Center = teleportPos;
+                        if (target != null)
+                            NPC.velocity = target.velocity * 0.4f;
+                        UpdateDirection();
+
+                        SoundEngine.PlaySound(SoundID.Zombie54 with { Volume = 0.8f, Pitch = -0.27f, PitchVariance = 0.1f }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.Item8 with { Volume = 0.8f, Pitch = -0.27f, PitchVariance = 0.1f }, NPC.Center);
+
+                        float length = teleportVect.Length() * 0.5f;
+                        float teleportRot = teleportVect.ToRotation();
+                        for (int i = -2; i <= 2; i++)
+                        {
+                            for (int j = (int)teleportVect.Length(); j >= teleportVect.Length() - length; j -= 15)
+                            {
+                                Vector2 particlePos = NPC.Center + new Vector2(j, 10 * i).RotatedBy(teleportRot);
+                                ParticleManager.AddParticle(new ThinSpark(
+                                    particlePos, -teleportRot.ToRotationVector2() * length * 0.16f,
+                                    20, Color.Cyan * 0.5f, new Vector2(0.25f, 0.4f), teleportRot, true, false));
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (time == 2)
+                            eyeParticleIntensity = 1;
+                        float speedCap = 10;
+                        NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
+                        if (NPC.velocity.Length() > 10)
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * speedCap;
+                        if (NPC.Center.Distance(wantedPos) <= NPC.velocity.Length())
+                            NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * NPC.Center.Distance(wantedPos);
+                    }
+                }
+                else
+                {
+                    if (time == teleportDashWindup)
+                    {
+                        trackedSlot = SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.9f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                        NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 14;
+                        Vector2 basePos = NPC.Center;
+                        for (int i = 0; i < 50; i++)
+                        {
+                            int particleTime = Main.rand.Next(26, 31);
+                            Vector2 offset = Main.rand.NextVector2CircularEdge(9, 9) * Main.rand.NextFloat(0.4f, 1f);
+                            ParticleManager.AddParticle(new Square(
+                                basePos + offset, offset * 0.6f + NPC.velocity * Main.rand.NextFloat(), 
+                                particleTime, Color.Cyan, new Vector2(1f), offset.ToRotation(), Main.rand.NextFloat(0.94f, 0.96f), particleTime, true));
+                        }
+                    }
+                    NPC.velocity /= 0.98f;
+                }
+
+                NPC.rotation += 0.2f * NPC.direction;
                 if (NPC.ai[1] >= TeleportDash.Duration)
                 {
+                    eyeParticleIntensity = 1;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = TeleportDash.Id;
@@ -604,7 +678,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -782,8 +856,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Color color = Color.Lerp(drawColor, Color.White, 0.2f);
+            float opacity = 1;
 
-            Main.EntitySpriteDraw(tex, NPC.Center + modNPC.drawCenter - Main.screenPosition, NPC.frame, color, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            bool ghostly = NPC.ai[0] == TeleportDash.Id && ((int)NPC.ai[1]) % (teleportDashWindup + teleportDashingDuration) < teleportDashWindup;
+            if (ghostly)
+            {
+                int dashTime = ((int)NPC.ai[1]) % (teleportDashWindup + teleportDashingDuration);
+                if (dashTime < 10)
+                {
+                    opacity *= (dashTime + 5) / 15f;
+                }
+                color = Color.Cyan * 0.6f;
+            }
+                
+            
+            Main.EntitySpriteDraw(tex, NPC.Center + modNPC.drawCenter - Main.screenPosition, NPC.frame, color * opacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+
+            if (ghostly)
+            {
+                StartAdditiveSpritebatch();
+                Main.EntitySpriteDraw(tex, NPC.Center + modNPC.drawCenter - Main.screenPosition, NPC.frame, Color.Cyan * 0.4f * opacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                StartVanillaSpritebatch();
+            }
 
             bool drawEyes = eyeParticleIntensity >= 0;
             if (drawEyes)
