@@ -81,7 +81,7 @@ namespace TerRoguelike.Projectiles
                 magnitude *= 1f - (float)Math.Pow((time / 30f), 1.1d);
 
                 if (time == 29)
-                    dashSlot = SoundEngine.PlaySound(SoundID.Item103 with { Volume = 0.25f, MaxInstances = 4, Pitch = 0.14f }, Projectile.Center);
+                    dashSlot = SoundEngine.PlaySound(SoundID.Item103 with { Volume = 0.4f, MaxInstances = 4, Pitch = 0.14f }, Projectile.Center);
             }
             else if (time < 45 && Math.Abs(TerRoguelikeUtils.AngleSizeBetween(Projectile.rotation, rotToTarget)) < MathHelper.PiOver2)
             {

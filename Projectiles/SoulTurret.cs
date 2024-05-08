@@ -106,9 +106,10 @@ namespace TerRoguelike.Projectiles
             }
             for (int i = 0; i < count; i++)
             {
+                float radius = count <= 2 ? 8 : 12;
                 Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat());
                 ParticleManager.AddParticle(new Ball(
-                    Main.rand.NextVector2Circular(12, 12) + Projectile.Center, Main.rand.NextVector2Circular(1.3f, 1.3f) + Projectile.velocity * 0.5f,
+                    Main.rand.NextVector2Circular(radius, radius) + Projectile.Center, Main.rand.NextVector2Circular(1.3f, 1.3f) + Projectile.velocity * 0.5f,
                     20, color, new Vector2(0.25f) * Main.rand.NextFloat(0.7f, 1f), 0, 0.96f, 15));
             }
 
