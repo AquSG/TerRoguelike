@@ -28,7 +28,7 @@ namespace TerRoguelike.Projectiles
         public float currentLength = 0;
         public Vector2 endPosition;
         public float maxLength = 300;
-        public int telegraphDuration = 30;
+        public int telegraphDuration = 45;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 1600;

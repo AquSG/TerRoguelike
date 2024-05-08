@@ -37,6 +37,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool CollisionPass = false;
         public SlotId trackedSlot;
         public Texture2D eyeTex;
+        public Texture2D squareTex;
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -47,7 +48,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Charge = new Attack(1, 30, 270);
         public static Attack SoulBurst = new Attack(2, 30, 480);
         public static Attack BoneSpear = new Attack(3, 30, 120);
-        public static Attack SoulTurret = new Attack(4, 30, 180);
+        public static Attack SoulTurret = new Attack(4, 30, 90);
         public static Attack TeleportDash = new Attack(5, 30, 180);
         public static Attack Summon = new Attack(6, 30, 180);
         public int chargeWindup = 60;
@@ -57,6 +58,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int soulBurstWindDown = 180;
         public float soulBurstProjRot = 0;
         public int boneSpearFireRate = 20;
+        public int soulTurretWindup = 40;
 
         public override void SetStaticDefaults()
         {
@@ -79,6 +81,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             eyeTex = TexDict["SkeletronEye"].Value;
+            squareTex = TexDict["Square"].Value;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -174,7 +177,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public void BossAI()
         {
             target = modNPC.GetTarget(NPC);
-
             NPC.ai[1]++;
             NPC.velocity *= 0.98f;
 
@@ -188,7 +190,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
                     if (room != null)
                     {
-                        if (!room.GetRect().Contains(NPC.getRect()))
+                        if (!room.GetRect().Contains(NPC.Center.ToPoint()))
                         {
                             NPC.velocity += (room.GetRect().ClosestPointInRect(NPC.Center) - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.1f;
                             NPC.ai[1]--;
@@ -210,7 +212,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.ai[0] == Charge.Id)
             {
                 Vector2 targetPos = target != null ? target.Center : NPC.velocity.ToRotation().AngleTowards((spawnPos - NPC.Center).ToRotation(), 0.03f).ToRotationVector2() * 180 + NPC.Center;
-                float magnitude = MathHelper.Clamp(targetPos.Distance(NPC.Center) * 0.015f, 3f, 8f);
+                float magnitude = MathHelper.Clamp(targetPos.Distance(NPC.Center) * 0.01f, 3f, 8f);
                 NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * magnitude;
                 NPC.rotation += 0.2f * NPC.direction;
 
@@ -264,7 +266,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     
                     if (NPC.localAI[2] % 20 == 0)
                     {
-                        trackedSlot = SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.8f, Pitch = 0.2f, PitchVariance = 0 }, NPC.Center);
+                        trackedSlot = SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.8f, Pitch = 0.12f, PitchVariance = 0 }, NPC.Center);
                     }
                     NPC.localAI[2]++;
 
@@ -294,7 +296,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             collidingVector = (NPC.Center - (TileCollisionAtThisPosition(targetPos) ? spawnPos : targetPos));
                         targetAngle = (-collidingVector).ToRotation();
                     }
-                    NPC.velocity += targetAngle.ToRotationVector2() * 0.2f;
+                    NPC.velocity += targetAngle.ToRotationVector2() * 0.15f;
                     float speedCap = 10;
                     if (NPC.velocity.Length() > speedCap)
                         NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * speedCap;
@@ -331,11 +333,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         SoundEngine.PlaySound(SoundID.Item103 with { Volume = 0.42f, MaxInstances = 7, Pitch = 0.14f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                         NPC.direction = Math.Sign(NPC.rotation);
                     }
-                        
-                    Vector2 projSpawnPos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
-                    Vector2 projVel = soulBurstProjRot.ToRotationVector2() * 8;
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<SoulBlast>(), NPC.damage, 0);
-                    soulBurstProjRot += (MathHelper.PiOver2 + Main.rand.NextFloat(-0.7f, 0.7f)) * NPC.direction;
+
+                    if (NPC.ai[1] % 2 == 0)
+                    {
+                        Vector2 projSpawnPos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
+                        Vector2 projVel = soulBurstProjRot.ToRotationVector2() * 8;
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<SoulBlast>(), NPC.damage, 0);
+                        soulBurstProjRot += (MathHelper.PiOver2 + Main.rand.NextFloat(-0.7f, 0.7f)) * NPC.direction;
+                    }
 
                     bool collide = false;
                     Vector2 baseCheckPos = NPC.position;
@@ -425,6 +430,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             continue;
                         if (room != null && !room.GetRect().Contains(projSpawnPos.ToPoint()))
                             continue;
+                        if (projSpawnPos.Distance(checkStart) < 64)
+                            continue;
+                        bool cont = false;
+                        for (int j = -1; j <= 1; j += 2) // stops the bottom part of bone from potentially peeking out of the ground at harsh angles
+                        {
+                            if (!TileCollisionAtThisPosition(projSpawnPos + new Vector2(8, 5 * j).RotatedBy(randRot)))
+                            {
+                                cont = true;
+                                break;
+                            }
+                        }
+                        if (cont)
+                            continue;
 
                         projSpawnPos -= rotVect;
                         Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, -rotVect, ModContent.ProjectileType<BoneSpear>(), NPC.damage, 0);
@@ -442,11 +460,78 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == SoulTurret.Id)
             {
                 DefaultRotation();
+                NPC.velocity *= 0.98f;
+                
+                if (NPC.ai[1] < soulTurretWindup)
+                {
+                    currentFrame = 1;
+                    if (NPC.ai[1] == soulTurretWindup - 7)
+                        SoundEngine.PlaySound(SoundID.DD2_DarkMageSummonSkeleton with { Volume = 1, PitchVariance = 0, Variants = [0] }, NPC.Center);
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - soulTurretWindup;
+
+                    if (time == 0)
+                    {
+                        Vector2 spawningDimensions;
+                        Vector2 start;
+                        if (modNPC.isRoomNPC)
+                        {
+                            Room room = RoomList[modNPC.sourceRoomListID];
+                            spawningDimensions = room.RoomDimensions16 * new Vector2(0.83f, 0.8f);
+                            start = room.RoomPosition16 + room.RoomCenter16;
+                        }
+                        else
+                        {
+                            spawningDimensions = new Vector2(800, 400);
+                            start = spawnPos;
+                        }
+
+                        int halfProjCount = 7;
+                        for (int d = -1; d <= 1; d += 2)
+                        {
+                            for (int i = 0; i < halfProjCount; i++)
+                            {
+                                float completion = i / ((float)halfProjCount - 1);
+                                float amplitude = (Math.Abs(MathHelper.Lerp(0.0025f, 0.9975f, completion) - 0.5f) * -2) + 1;
+                                amplitude = (float)Math.Pow(amplitude, 0.5f);
+                                float xOff = (spawningDimensions.X * completion) - spawningDimensions.X * 0.5f;
+                                float yOff = (spawningDimensions.Y * amplitude * 0.4f + spawningDimensions.Y * 0.1f) * d;
+                                Vector2 spawnPos = start + new Vector2(xOff, yOff);
+                                Vector2 off = (NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation)) - spawnPos;
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), spawnPos, Vector2.Zero, ModContent.ProjectileType<SoulTurret>(), NPC.damage, 0, -1, off.X, off.Y);
+                            }
+                        }
+
+                        Vector2 pos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
+                        for (int i = 0; i < 40; i++)
+                        {
+                            Vector2 offset = Main.rand.NextVector2CircularEdge(32, 19) * (1f - (float)Math.Pow(Main.rand.NextFloat(), 4));
+                            offset.Y *= Math.Abs(offset.X) / 32f;
+                            offset.Y += Main.rand.NextFloat(-2, 2);
+                            offset = offset.RotatedBy(NPC.rotation);
+
+                            if (Main.rand.NextBool(5))
+                                offset *= 1.5f;
+
+                            Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.8f));
+                            ParticleManager.AddParticle(new Ball(
+                                pos + offset * 0.25f, offset * 0.09f + NPC.velocity * 1.2f,
+                                30, color, new Vector2(0.25f) * Main.rand.NextFloat(0.7f, 1f), 0, 0.98f, 25));
+                        }
+                    }
+                    if (time > 40)
+                    {
+                        currentFrame = 0;
+                    }
+                }
 
                 if (NPC.ai[1] >= SoulTurret.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -240;
                     NPC.ai[2] = SoulTurret.Id;
                 }
             }
@@ -475,10 +560,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (target != null)
                 {
-
-
                     Vector2 targetPos = target.Center + new Vector2(0, -240 + (float)Math.Cos(NPC.localAI[0] * 0.03f) * 8);
-                    targetPos = TileCollidePositionInLine(target.Center + new Vector2(0, -80), targetPos);
+                    targetPos = TileCollidePositionInLine(target.Center + new Vector2(0, -120), targetPos);
+                    if (NPC.velocity.Length() < 10)
+                        NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
+                    if (NPC.velocity.Length() > 10)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * 10;
+                }
+                else
+                {
+                    Vector2 targetPos = spawnPos + new Vector2(0, 80);
                     if (NPC.velocity.Length() < 10)
                         NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
                     if (NPC.velocity.Length() > 10)
@@ -513,7 +604,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -542,7 +633,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
         {
-            return ableToHit;
+            Vector2 circlePos = NPC.Center + new Vector2(0, -10).RotatedBy(NPC.rotation);
+            float radius = NPC.width * 0.4f;
+            if (target.getRect().ClosestPointInRect(circlePos).Distance(circlePos) < radius)
+                return ableToHit;
+            return false;
         }
         public override bool CanHitNPC(NPC target)
         {
@@ -649,6 +744,34 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 54);
             Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 55);
         }
+        public List<Vector2> EyePositions(Vector2 center, float rotation)
+        {
+            List<Vector2> positions = [];
+            for (int i = -1; i <= 1; i += 2)
+            {
+                Vector2 offset = (new Vector2(18 * i, -12) * NPC.scale).RotatedBy(rotation);
+                positions.Add(center + offset);
+            }
+            return positions;
+        }
+        public void EyeSummonParticleEffect(float potentialRot)
+        {
+            var positions = EyePositions(NPC.Center, NPC.rotation);
+            var potentialPositions = EyePositions(NPC.Center, potentialRot);
+            for (int i = 0; i < positions.Count; i++)
+            {
+                Vector2 pos = positions[i];
+                Vector2 potPos = potentialPositions[i];
+                Vector2 extraVel = (potPos - pos) * 0.07f;
+                for (int j = 0; j < 10; j++)
+                {
+                    Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.75f));
+                    ParticleManager.AddParticle(new Ball(
+                        pos, Main.rand.NextVector2CircularEdge(0.6f, 0.8f) * Main.rand.NextFloat(0.5f, 1.3f) + extraVel,
+                        15, color, new Vector2(0.25f) * Main.rand.NextFloat(0.7f, 1f), 0, 0.96f, 15));
+                }
+            }
+        }
         public override void FindFrame(int frameHeight)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
@@ -679,35 +802,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 }
             }
-            return false;
-        }
-        public List<Vector2> EyePositions(Vector2 center, float rotation)
-        {
-            List<Vector2> positions = [];
-            for (int i = -1; i <= 1; i += 2)
+
+            if (false)
             {
-                Vector2 offset = (new Vector2(18 * i, -12) * NPC.scale).RotatedBy(rotation);
-                positions.Add(center + offset);
-            }
-            return positions;
-        }
-        public void EyeSummonParticleEffect(float potentialRot)
-        {
-            var positions = EyePositions(NPC.Center, NPC.rotation);
-            var potentialPositions = EyePositions(NPC.Center, potentialRot);
-            for (int i = 0; i < positions.Count; i++)
-            {
-                Vector2 pos = positions[i];
-                Vector2 potPos = potentialPositions[i];
-                Vector2 extraVel = (potPos - pos) * 0.07f;
-                for (int j = 0; j < 10; j++)
+                Vector2 circlePos = NPC.Center + new Vector2(0, -10).RotatedBy(NPC.rotation);
+                float radius = NPC.width * 0.4f;
+                for (int i = 0; i < 100; i++)
                 {
-                    Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.75f));
-                    ParticleManager.AddParticle(new Ball(
-                        pos, Main.rand.NextVector2CircularEdge(0.6f, 0.8f) * Main.rand.NextFloat(0.5f, 1.3f) + extraVel,
-                        15, color, new Vector2(0.25f) * Main.rand.NextFloat(0.7f, 1f), 0, 0.96f, 15));
+                    float completion = i / 100f;
+                    float rot = completion * MathHelper.TwoPi;
+                    Main.EntitySpriteDraw(squareTex, circlePos + rot.ToRotationVector2() * radius - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
                 }
             }
+            return false;
         }
     }
 }
