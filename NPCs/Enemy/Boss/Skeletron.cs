@@ -50,7 +50,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack BoneSpear = new Attack(3, 30, 120);
         public static Attack SoulTurret = new Attack(4, 30, 90);
         public static Attack TeleportDash = new Attack(5, 30, 269);
-        public static Attack Summon = new Attack(6, 30, 180);
+        public static Attack Summon = new Attack(6, 20, 239);
         public int chargeWindup = 60;
         public int chargeFireRate = 60;
         public int soulBurstWindup = 60;
@@ -61,6 +61,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int soulTurretWindup = 40;
         public int teleportDashWindup = 45;
         public int teleportDashingDuration = 45;
+        public int summonWindup = 40;
+        public int summonCooldown = 40;
 
         public override void SetStaticDefaults()
         {
@@ -539,7 +541,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == TeleportDash.Id)
             {
-                
                 float chargeStartDist = 240;
                 int time = ((int)NPC.ai[1]) % (teleportDashWindup + teleportDashingDuration);
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
@@ -573,7 +574,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             {
                                 Vector2 particlePos = NPC.Center + new Vector2(j, 10 * i).RotatedBy(teleportRot);
                                 ParticleManager.AddParticle(new ThinSpark(
-                                    particlePos, -teleportRot.ToRotationVector2() * length * 0.16f,
+                                    particlePos, -teleportRot.ToRotationVector2() * length * 0.185f,
                                     20, Color.Cyan * 0.5f, new Vector2(0.25f, 0.4f), teleportRot, true, false));
                             }
                         }
@@ -621,11 +622,42 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == Summon.Id)
             {
                 DefaultRotation();
+                NPC.velocity *= 0.93f;
+                int time = (int)NPC.ai[1] % (summonWindup + summonCooldown);
+                Vector2 pos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
+
+                if (time < summonWindup)
+                {
+                    currentFrame = 0;
+                    for (int i = 0; i < 1; i++)
+                    {
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(25, 19) * (1f - (float)Math.Pow(Main.rand.NextFloat(), 4));
+                        offset.Y *= Math.Abs(offset.X) / 32f;
+                        offset = offset.RotatedBy(NPC.rotation);
+
+                        Color color = Color.HotPink;
+                        ParticleManager.AddParticle(new Square(
+                            pos + offset, -offset.SafeNormalize(Vector2.UnitY) * 1.3f + NPC.velocity * 1.2f,
+                            20, color, new Vector2(1.5f) * Main.rand.NextFloat(0.7f, 1f), 0, 0.96f, 20));
+                    }
+                }
+                else
+                {
+                    if (time == summonWindup)
+                    {
+                        currentFrame = 1;
+                        SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2, Variants = [0] }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+
+                        SpawnManager.SpawnEnemy(ModContent.NPCType<DungeonSpirit>(), NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation) + NPC.velocity, modNPC.sourceRoomListID, 40, 0.45f);
+                    }
+                }
 
                 if (NPC.ai[1] >= Summon.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -180;
                     NPC.ai[2] = Summon.Id;
                 }
             }
@@ -635,7 +667,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (target != null)
                 {
                     Vector2 targetPos = target.Center + new Vector2(0, -240 + (float)Math.Cos(NPC.localAI[0] * 0.03f) * 8);
-                    targetPos = TileCollidePositionInLine(target.Center + new Vector2(0, -120), targetPos);
+                    targetPos = TileCollidePositionInLine(target.Center + new Vector2(0, -104), targetPos);
                     if (NPC.velocity.Length() < 10)
                         NPC.velocity += (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
                     if (NPC.velocity.Length() > 10)
@@ -677,8 +709,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash };
+            List<Attack> potentialAttacks = new List<Attack>() { Charge, SoulBurst, BoneSpear, SoulTurret, TeleportDash, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
