@@ -39,6 +39,7 @@ namespace TerRoguelike.Projectiles
             glowTex = TexDict["CircularGlow"].Value;
             crossGlowTex = TexDict["CrossSpark"].Value;
             Projectile.hide = true;
+            Projectile.ModProj().killOnRoomClear = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
@@ -90,7 +91,7 @@ namespace TerRoguelike.Projectiles
             {
                 count = time / 90 + 1;
                 if (time == 130)
-                    SoundEngine.PlaySound(SoundID.Zombie53 with { Volume = 0.077f, MaxInstances = 30 }, Projectile.Center);
+                    SoundEngine.PlaySound(SoundID.Zombie53 with { Volume = 0.085f, MaxInstances = 30 }, Projectile.Center);
             }   
             if (time == 160)
             {
