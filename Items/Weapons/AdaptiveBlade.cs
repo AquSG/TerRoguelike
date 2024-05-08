@@ -52,6 +52,7 @@ namespace TerRoguelike.Items.Weapons
             {
                 player.ChangeDir(-1);
             }
+            modPlayer.lockDirection = true;
 
             //Calculate the dirction in which the players arms should be pointing at.
             if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
@@ -67,6 +68,7 @@ namespace TerRoguelike.Items.Weapons
                 {
                     modPlayer.swingAnimCompletion = 0;
                     modPlayer.playerToCursor = Vector2.Zero;
+                    modPlayer.lockDirection = false;
                 }
                     
             }
@@ -74,6 +76,7 @@ namespace TerRoguelike.Items.Weapons
             {
                 modPlayer.swingAnimCompletion = 0;
                 modPlayer.playerToCursor = Vector2.Zero;
+                modPlayer.lockDirection = false;
             }
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(38, 38), new Vector2(-14, 14));

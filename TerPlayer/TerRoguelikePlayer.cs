@@ -27,6 +27,7 @@ using TerRoguelike.Particles;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using TerRoguelike.MainMenu;
+using Terraria.GameInput;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -126,6 +127,7 @@ namespace TerRoguelike.TerPlayer
         public float scaleMultiplier;
         public int procLuck = 0;
         public float swingAnimCompletion = 0;
+        public bool lockDirection = false;
         public int bladeFlashTime = 0;
         public Vector2 playerToCursor = Vector2.Zero;
         public float barrierHealth = 0;
@@ -160,12 +162,16 @@ namespace TerRoguelike.TerPlayer
         public int killerProjType = 0;
         public bool brainSucked = false;
         public int brainSucklerTime = 0;
+        public bool oldPulley = false;
+        public int startDirection = 1;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
         #region Reset Variables
         public override void PreUpdate()
         {
+            startDirection = Player.direction;
+
             coolantBarrel = 0;
             clingyGrenade = 0;
             pocketSpotter = 0;
@@ -916,6 +922,28 @@ namespace TerRoguelike.TerPlayer
             if (barrierHealth < 0)
                 barrierHealth = 0;
         }
+        public override void ProcessTriggers(TriggersSet triggersSet)
+        {
+            if (Player.pulley && lockDirection)
+            {
+                Player.pulleyDir = 2;
+                if (Player.direction == 1)
+                {
+                    if (Player.controlLeft && !(Player.controlUp || Player.controlDown))
+                        Player.pulley = false;
+                    else
+                        Player.controlLeft = false;
+                }
+                else
+                {
+                    if (Player.controlRight && !(Player.controlUp || Player.controlDown))
+                        Player.pulley = false;
+                    else
+                        Player.controlRight = false;
+                }
+                    
+            }
+        }
         public override void SetControls()
         {
             if (CutsceneSystem.cutsceneDisableControl)
@@ -1021,6 +1049,21 @@ namespace TerRoguelike.TerPlayer
             {
                 DashDirCache = 0;
             }
+
+            if (lockDirection && Player.pulley && !oldPulley)
+            {
+                if (Player.direction != startDirection)
+                {
+                    Player.direction = startDirection;
+                }
+
+            }
+
+            oldPulley = Player.pulley;
+        }
+        public override void PostUpdate()
+        {
+            
         }
         #endregion
 
