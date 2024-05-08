@@ -35,8 +35,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.aiStyle = -1;
             NPC.damage = 30;
             NPC.lifeMax = 400;
-            NPC.HitSound = SoundID.NPCHit36;
-            NPC.DeathSound = SoundID.NPCDeath39;
+            NPC.HitSound = SoundID.NPCHit36 with { Volume = 0.3f };
+            NPC.DeathSound = SoundID.NPCDeath39 with { Volume = 0.5f };
             NPC.knockBackResist = 1f;
             modNPC.drawCenter = new Vector2(0, -3);
             NPC.noGravity = true;

@@ -41,7 +41,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public int deadTime = 0;
         public int cutsceneDuration = 180;
-        public int deathCutsceneDuration = 120;
+        public int deathCutsceneDuration = 240;
         public int eyeParticleIntensity = 1;
         public static float spawnRotation = MathHelper.PiOver4 * 0.5f;
 
@@ -802,19 +802,54 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.dontTakeDamage = true;
             NPC.active = true;
             eyeParticleIntensity = 1;
-            NPC.noTileCollide = true;
-            NPC.noGravity = true;
-
+            NPC.noTileCollide = false;
 
             if (deadTime == 0)
             {
-                eyeParticleIntensity = 0;
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
                 currentFrame = 0;
                 NPC.localAI[1] = 0;
                 NPC.localAI[2] = 0;
+                NPC.noGravity = true;
+
+                Vector2 startingPos = NPC.Center;
+                if (CollidingVector(NPC.position, new Vector2(NPC.width, NPC.height)) != null)
+                {
+                    startingPos = spawnPos;
+                    if (target != null && modNPC.targetPlayer >= 0)
+                    {
+                        if (true)
+                        {
+                            startingPos = Main.player[modNPC.targetPlayer].ModPlayer().FindAirToPlayer(NPC.Center);
+                        }
+                    }
+
+                    Vector2 teleportVect = NPC.Center - startingPos;
+                    NPC.Center = startingPos;
+                    for (int i = 0; i < 50; i++)
+                    {
+                        var collidingVect = CollidingVector(NPC.position, new Vector2(NPC.width, NPC.height));
+                        if (collidingVect != null)
+                            NPC.Center -= (Vector2)collidingVect;
+                    }
+
+                    float length = teleportVect.Length() * 0.5f;
+                    float teleportRot = teleportVect.ToRotation();
+                    for (int i = -2; i <= 2; i++)
+                    {
+                        for (int j = (int)teleportVect.Length(); j >= teleportVect.Length() - length; j -= 15)
+                        {
+                            Vector2 particlePos = NPC.Center + new Vector2(j, 10 * i).RotatedBy(teleportRot);
+                            ParticleManager.AddParticle(new ThinSpark(
+                                particlePos, -teleportRot.ToRotationVector2() * length * 0.185f,
+                                20, Color.Cyan * 0.5f, new Vector2(0.25f, 0.4f), teleportRot, true, false));
+                        }
+                    }
+                }
+
+                
 
                 if (modNPC.isRoomNPC)
                 {
@@ -825,6 +860,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
             }
+            if (deadTime <= 2)
+                eyeParticleIntensity = 0;
 
             void ClearChildren()
             {
@@ -850,6 +887,37 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             deadTime++;
+
+            CutsceneSystem.cameraTargetCenter += 0.075f * (NPC.Center - CutsceneSystem.cameraTargetCenter);
+            if (deadTime < 100)
+            {
+                NPC.velocity.Y -= 0.02f;
+                currentFrame = 1;
+                NPC.rotation = NPC.rotation.AngleTowards(0, 0.02f);
+                if (deadTime % 6 == 0)
+                {
+                    float randRot = Main.rand.NextFloat(-0.25f, 0.25f);
+                    NPC.rotation = randRot + Math.Sign(randRot) * 0.05f;
+                    NPC.direction = Math.Sign(NPC.rotation);
+                }
+            }
+            else
+            {
+                if (deadTime == 100)
+                {
+                    EyeSummonParticleEffect(NPC.rotation);
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f, Pitch = -0.75f }, NPC.Center);
+                }
+                eyeParticleIntensity = -1;
+                NPC.noGravity = false;
+                NPC.GravityMultiplier *= 1.1f;
+                NPC.rotation += NPC.velocity.Y * 0.01f * NPC.direction;
+                if (NPC.collideY && NPC.oldVelocity.Y > 0)
+                {
+                    deadTime = deathCutsceneDuration - 30;
+                    SoundEngine.PlaySound(SoundID.DD2_SkeletonHurt with { Volume = 1f, Variants = [2] }, NPC.Center);
+                }
+            }
 
             if (deadTime >= deathCutsceneDuration - 30)
             {
@@ -879,8 +947,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, Main.rand.NextFloat(-2.5f, 2.5f), -2.5f);
             }
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 54);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 55);
+
+            Vector2 goreOff = new Vector2(0, -20).RotatedBy(NPC.rotation);
+            int g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + goreOff * 0.07f, 54);
+            Gore gore = Main.gore[g];
+            gore.position = NPC.position + goreOff;
+            gore.rotation = NPC.rotation;
+
+            goreOff = new Vector2(0, 24).RotatedBy(NPC.rotation);
+            g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + goreOff * 0.07f, 55);
+            gore = Main.gore[g];
+            gore.position = NPC.position + goreOff;
+            gore.rotation = NPC.rotation;
         }
         public List<Vector2> EyePositions(Vector2 center, float rotation)
         {

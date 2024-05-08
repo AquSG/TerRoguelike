@@ -446,6 +446,38 @@ namespace TerRoguelike.Utilities
             }
             return false;
         }
+        /// <summary>
+        /// Finds the normal vector to the average colliding position on all the points in the box.
+        /// </summary>
+        /// <param name="topLeftPosition"></param>
+        /// <param name="dimensions"></param>
+        /// <param name="precision"></param>
+        /// <returns>null if no collision, otherwise a normal vector. The normal vector can be 0.</returns>
+        public static Vector2? CollidingVector(Vector2 topLeftPosition, Vector2 dimensions, int precision = 3)
+        {
+            bool collide = false;
+            Vector2 baseCheckPos = topLeftPosition;
+            Vector2 offsetPerLoop = new Vector2(dimensions.X * 0.5f, dimensions.X * 0.5f);
+            Vector2 collidingVector = Vector2.Zero;
+            int vectOffset = precision / 2;
+
+            for (int x = 0; x < precision; x++)
+            {
+                for (int y = 0; y < precision; y++)
+                {
+                    Vector2 checkPos = baseCheckPos + offsetPerLoop * new Vector2(x, y);
+                    if (TileCollisionAtThisPosition(checkPos))
+                    {
+                        collide = true;
+                        collidingVector += new Vector2(-vectOffset + x, -vectOffset + y);
+                    }
+                }
+            }
+            if (!collide)
+                return null;
+            else
+                return collidingVector.SafeNormalize(Vector2.Zero);
+        }
         public static void StartAdditiveSpritebatch(bool end = true)
         {
             if (end)
