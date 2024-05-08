@@ -40,9 +40,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D squareTex;
 
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
+        public int cutsceneDuration = 180;
         public int deathCutsceneDuration = 120;
         public int eyeParticleIntensity = 1;
+        public static float spawnRotation = MathHelper.PiOver4 * 0.5f;
 
         public static Attack None = new Attack(0, 0, 100);
         public static Attack Charge = new Attack(1, 30, 270);
@@ -97,9 +98,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.spriteDirection = -1;
             NPC.Center += Vector2.UnitY * NPC.height * 0.5f;
             spawnPos = NPC.Center;
+            NPC.rotation = spawnRotation;
             NPC.ai[2] = None.Id;
             ableToHit = false;
             soulBurstProjRot = Main.rand.NextFloat(MathHelper.TwoPi);
+            eyeParticleIntensity = -1;
+
+            
+            NPC.Center = TileCollidePositionInLine(NPC.Center, NPC.Center + new Vector2(0, 1000));
+            NPC.Center += new Vector2(0, -40);
         }
         public override void PostAI()
         {
@@ -161,12 +168,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
 
+                CutsceneSystem.cameraTargetCenter += 0.05f * (NPC.Center - CutsceneSystem.cameraTargetCenter);
+                int time = (int)NPC.localAI[0] + cutsceneDuration - 40;
+                if (time > 60)
+                {
+                    NPC.velocity *= 0.98f;
+                }
+                else
+                {
+                    if (time >= 0)
+                    {
+                        NPC.rotation = NPC.rotation.AngleLerp(0, 0.01f).AngleTowards(0, 0.005f);
+                        if (time == 30)
+                        {
+                            eyeParticleIntensity = 1;
+                            SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f, Pitch = -0.5f }, NPC.Center);
+                            EyeSummonParticleEffect(NPC.rotation.AngleTowards(0, 1.6f));
+                        }
+                        if (time == 25)
+                        {
+                            SoundEngine.PlaySound(SoundID.DD2_DarkMageSummonSkeleton with { Volume = 1, PitchVariance = 0, Variants = [0], Pitch = -0.15f }, NPC.Center);
+                        }
+                        NPC.velocity.Y -= 0.03f;
+                    }
+                }
+
                 if (NPC.localAI[0] == -30)
                 {
+                    eyeParticleIntensity = 1;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
