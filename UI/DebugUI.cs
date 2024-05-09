@@ -92,7 +92,7 @@ namespace TerRoguelike.UI
             }
             else if (pressed && resetHover)
             {
-                if (RoomSystem.RoomList != null && RoomSystem.RoomList.Any())
+                if (RoomSystem.RoomList != null && RoomSystem.RoomList.Count > 0)
                 {
                     for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                     {

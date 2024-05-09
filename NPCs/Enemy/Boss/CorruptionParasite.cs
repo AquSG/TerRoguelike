@@ -1001,7 +1001,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (deadTime > 0)
             {
-                if (deathGodRays.Any())
+                if (deathGodRays.Count > 0)
                 {
                     StartAdditiveSpritebatch();
                     for (int i = 0; i < deathGodRays.Count; i++)
@@ -1030,7 +1030,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (modNPC.ignitedStacks.Any() && deadTime <= 0)
+            if (modNPC.ignitedStacks.Count > 0 && deadTime <= 0)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -1082,7 +1082,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else
                     texture = bodyTex;
 
-                Color color = modNPC.ignitedStacks.Any() ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : blockColor;
+                Color color = modNPC.ignitedStacks.Count > 0 ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : blockColor;
                 spriteBatch.Draw(texture, segment.Position - screenPos, i == 0 ? headFrame : null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * new Vector2(0.5f, i == 0 ? 0.25f : 0.5f), 1f, SpriteEffects.None, 0);
             }
             return false;

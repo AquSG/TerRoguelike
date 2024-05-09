@@ -223,7 +223,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 BossAI();
             }
 
-            if (trackedSeers.Any())
+            if (trackedSeers.Count > 0)
             {
                 for (int i = 0; i < trackedSeers.Count; i++)
                 {
@@ -274,7 +274,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (!(NPC.ai[0] == BouncyBall.Id && NPC.ai[1] > teleportTime) && trackedSeers.Any())
+            if (!(NPC.ai[0] == BouncyBall.Id && NPC.ai[1] > teleportTime) && trackedSeers.Count > 0)
             {
                 calculatedSeers = trackedSeers.Count;
                 for (int i = 0; i < trackedSeers.Count; i++)
@@ -311,7 +311,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.velocity = Vector2.Zero;
                 if (NPC.ai[1] == teleportTime + 1)
                 {
-                    if (!trackedSeers.Any())
+                    if (trackedSeers.Count == 0)
                         NPC.ai[1] = Heal.Duration - seerSpawnTime - 120;
                 }
                 if (NPC.ai[1] >= teleportTime - 10 && NPC.ai[1] <= teleportTime)
@@ -442,7 +442,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 int start = (int)(NPC.ai[1] - (teleportTime + bloodSpreadStartup));
                 float periodCompletion = start % (2 * bloodSpreadRate);
-                if (NPC.ai[1] < BloodSpread.Duration - bloodSpreadEndLag && periodCompletion % 40 == 10 && trackedSeers.Any())
+                if (NPC.ai[1] < BloodSpread.Duration - bloodSpreadEndLag && periodCompletion % 40 == 10 && trackedSeers.Count > 0)
                 {
                     SoundEngine.PlaySound(SoundID.NPCHit13 with { Volume = 0.5f, Pitch = -0.6f }, NPC.Center);
                 }
@@ -526,8 +526,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     for (int i = 0; i <= potentialRots.Count; i++)
                     {
-                        int potentialIndex = checkedIndex.Any() ? checkedIndex[Main.rand.Next(checkedIndex.Count)] : -1;
-                        float chosenRot = checkedIndex.Any() ? potentialRots[potentialIndex] : potentialRots[Main.rand.Next(potentialRots.Count)];
+                        int potentialIndex = checkedIndex.Count > 0 ? checkedIndex[Main.rand.Next(checkedIndex.Count)] : -1;
+                        float chosenRot = checkedIndex.Count > 0 ? potentialRots[potentialIndex] : potentialRots[Main.rand.Next(potentialRots.Count)];
                         Vector2 potentialPos = target.Center + (chosenRot.ToRotationVector2() * teleportDistance);
                         if (i < potentialRots.Count)
                         {
@@ -939,13 +939,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Vector2 drawPos = NPC.Center + modNPC.drawCenter;
-            bool igniteVisual = modNPC.ignitedStacks.Any() && deadTime == 0;
+            bool igniteVisual = modNPC.ignitedStacks.Count > 0 && deadTime == 0;
             Color color = igniteVisual ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
             Vector2 scale = new Vector2(NPC.scale);
 
             if (deadTime > 0)
             {
-                if (deathGodRays.Any())
+                if (deathGodRays.Count > 0)
                 {
                     StartAdditiveSpritebatch();
                     for (int i = 0; i < deathGodRays.Count; i++)

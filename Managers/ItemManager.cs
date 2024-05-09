@@ -99,7 +99,7 @@ namespace TerRoguelike.Managers
             }
 
             //attempt to steer the rewarded category towards a category the player is reportedly lacking in.
-            if (!PastRoomRewardCategories.Any())
+            if (PastRoomRewardCategories.Count == 0)
             {
                 combatChance *= 2f;
             }

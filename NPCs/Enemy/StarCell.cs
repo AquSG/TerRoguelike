@@ -126,7 +126,7 @@ namespace TerRoguelike.NPCs.Enemy
                 Main.EntitySpriteDraw(lightTex, NPC.oldPos[i] + offset - Main.screenPosition + (Vector2.UnitY * NPC.gfxOffY) + modNPC.drawCenter, NPC.frame, Color.White * opacity, NPC.oldRot[i], NPC.frame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
             }
 
-            if (modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Count > 0)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

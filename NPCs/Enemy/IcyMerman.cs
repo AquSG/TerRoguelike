@@ -111,7 +111,7 @@ namespace TerRoguelike.NPCs.Enemy
             headPosition = NPC.Center + new Vector2(0, -14 + headYOffset + NPC.gfxOffY) - Main.screenPosition + new Vector2(2, 0).RotatedBy(headRotation);
             spriteEffects = NPC.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
 
-            if (modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Count > 0)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

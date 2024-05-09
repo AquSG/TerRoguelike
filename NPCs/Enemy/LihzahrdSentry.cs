@@ -131,7 +131,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (!modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Count == 0)
                 Main.EntitySpriteDraw(lightTex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
     }

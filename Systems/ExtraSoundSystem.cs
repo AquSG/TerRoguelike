@@ -19,7 +19,7 @@ namespace TerRoguelike.Systems
         {
             if (ExtraSounds == null)
                 return;
-            if (!ExtraSounds.Any())
+            if (ExtraSounds.Count == 0)
                 return;
 
             for (int i = 0; i < ExtraSounds.Count; i++)

@@ -102,7 +102,7 @@ namespace TerRoguelike.NPCs.Enemy
             int frameHeight = (int)(texture.Size().Y * 0.5d);
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, Math.Abs(NPC.ai[0] + burrowDownTime) / 20), 0f, 1f);
 
-            if (modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Count > 0)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

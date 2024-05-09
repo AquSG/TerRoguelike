@@ -135,11 +135,11 @@ namespace TerRoguelike.Managers
         public static int ChooseEnemy(int floorID, int combatStyle)
         {
             List<BaseRoguelikeNPC> enemyPool = AllNPCs.FindAll(x => x.associatedFloors.Contains(floorID) && x.CombatStyle == combatStyle);
-            if (!enemyPool.Any())
+            if (enemyPool.Count == 0)
             {
                 enemyPool = AllNPCs.FindAll(x => x.associatedFloors.Contains(floorID) && x.CombatStyle >= 0);
             }
-            if (enemyPool.Any())
+            if (enemyPool.Count > 0)
             {
                 int randIndex = Main.rand.Next(enemyPool.Count);
                 return enemyPool[randIndex].modNPCID;

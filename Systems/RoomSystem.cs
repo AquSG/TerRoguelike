@@ -100,7 +100,7 @@ namespace TerRoguelike.Systems
             if (RoomList == null)
                 return;
 
-            if (!RoomList.Any())
+            if (RoomList.Count == 0)
                 return;
 
             int loopCount = -1;
@@ -624,7 +624,7 @@ namespace TerRoguelike.Systems
         {
             if (SpawnManager.pendingEnemies == null)
                 return;
-            if (!SpawnManager.pendingEnemies.Any())
+            if (SpawnManager.pendingEnemies.Count == 0)
                 return;
 
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -654,7 +654,7 @@ namespace TerRoguelike.Systems
             if (healingPulses == null)
                 healingPulses = new List<HealingPulse>();
 
-            if (!healingPulses.Any())
+            if (healingPulses.Count == 0)
                 return;
 
             for (int p = 0; p < healingPulses.Count; p++)
@@ -687,7 +687,7 @@ namespace TerRoguelike.Systems
         {
             if (healingPulses == null)
                 return;
-            if (!healingPulses.Any())
+            if (healingPulses.Count == 0)
                 return;
 
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -732,7 +732,7 @@ namespace TerRoguelike.Systems
         {
             if (chainList == null)
                 return;
-            if (!chainList.Any())
+            if (chainList.Count == 0)
                 return;
 
             for (int i = 0; i < chainList.Count; i++)
@@ -772,7 +772,7 @@ namespace TerRoguelike.Systems
             if (chainList == null)
                 return;
 
-            if (!chainList.Any())
+            if (chainList.Count == 0)
                 return;
 
             Texture2D chain1Tex = TexDict["Chain1"].Value;
@@ -802,7 +802,7 @@ namespace TerRoguelike.Systems
         {
             if (attackPlanRocketBundles == null)
                 attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
-            if (!attackPlanRocketBundles.Any())
+            if (attackPlanRocketBundles.Count == 0)
                 return;
 
             for (int i = 0; i < attackPlanRocketBundles.Count; i++)

@@ -3210,7 +3210,7 @@ namespace TerRoguelike.NPCs
         }
         public override void PostAI(NPC npc)
         {
-            if (ignitedStacks != null && ignitedStacks.Any()) // ignite debuff logic
+            if (ignitedStacks != null && ignitedStacks.Count > 0) // ignite debuff logic
             {
                 if (ignitedHitCooldown <= 0)
                 {
@@ -3247,7 +3247,7 @@ namespace TerRoguelike.NPCs
             if (ignitedHitCooldown > 0)
                 ignitedHitCooldown--;
 
-            if (bleedingStacks != null && bleedingStacks.Any()) // bleeding debuff logic
+            if (bleedingStacks != null && bleedingStacks.Count > 0) // bleeding debuff logic
             {
                 if (bleedingHitCooldown <= 0)
                 {
@@ -3374,7 +3374,7 @@ namespace TerRoguelike.NPCs
         }
         public void AddBleedingStackWithRefresh(BleedingStack stack)
         {
-            if (bleedingStacks.Any())
+            if (bleedingStacks.Count > 0)
             {
                 for (int i = 0; i < bleedingStacks.Count; i++)
                 {
@@ -3409,7 +3409,7 @@ namespace TerRoguelike.NPCs
         }
         public override void ModifyIncomingHit(NPC npc, ref NPC.HitModifiers modifiers)
         {
-            if (Segments.Any())
+            if (Segments.Count > 0)
                 modifiers.HideCombatText();
 
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -3425,7 +3425,7 @@ namespace TerRoguelike.NPCs
         }
         public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
-            if (Segments.Any())
+            if (Segments.Count > 0)
             {
                 Vector2 position = Segments[hitSegment].Position;
                 int segHeight = (int)Segments[hitSegment].Height;
@@ -3435,7 +3435,7 @@ namespace TerRoguelike.NPCs
         }
         public override void ModifyHoverBoundingBox(NPC npc, ref Rectangle boundingBox)
         {
-            if (Segments.Any())
+            if (Segments.Count > 0)
             {
                 for (int i = 0; i < Segments.Count; i++)
                 {
@@ -3452,7 +3452,7 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (ignitedStacks != null && ignitedStacks.Any() && !OverrideIgniteVisual)
+            if (ignitedStacks != null && ignitedStacks.Count > 0 && !OverrideIgniteVisual)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -3480,7 +3480,7 @@ namespace TerRoguelike.NPCs
 
             }
 
-            if (bleedingStacks != null && bleedingStacks.Any())
+            if (bleedingStacks != null && bleedingStacks.Count > 0)
             {
                 DrawRotatlingBloodParticles(false, npc);
             }
@@ -3489,7 +3489,7 @@ namespace TerRoguelike.NPCs
         }
         public override void DrawEffects(NPC npc, ref Color drawColor)
         {
-            if (ignitedStacks != null && ignitedStacks.Any())
+            if (ignitedStacks != null && ignitedStacks.Count > 0)
             {
                 drawColor = Color.Lerp(Color.White, Color.OrangeRed, 0.4f);
                 for (int i = 0; i < ignitedStacks.Count; i++)
@@ -3497,7 +3497,7 @@ namespace TerRoguelike.NPCs
                     if (Main.rand.NextBool(5))
                     {
                         int d = Dust.NewDust(npc.position + npc.ModNPC().drawCenter, npc.width, npc.height, DustID.Torch);
-                        if (Segments.Any())
+                        if (Segments.Count > 0)
                             Main.dust[d].noLight = true;
                     }
                         
@@ -3511,7 +3511,7 @@ namespace TerRoguelike.NPCs
         }
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (bleedingStacks != null && bleedingStacks.Any())
+            if (bleedingStacks != null && bleedingStacks.Count > 0)
             {
                 DrawRotatlingBloodParticles(true, npc);
             }

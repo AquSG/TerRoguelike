@@ -35,7 +35,7 @@ namespace TerRoguelike.Managers
         }
         public static void UpdatePendingEnemies()
         {
-            if (!pendingEnemies.Any())
+            if (pendingEnemies.Count == 0)
                 return;
 
             int loopcount = -1;
@@ -107,7 +107,7 @@ namespace TerRoguelike.Managers
         }
         public static void UpdatePendingItems()
         {
-            if (!pendingItems.Any())
+            if (pendingItems.Count == 0)
                 return;
 
             int loopcount = -1;

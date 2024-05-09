@@ -146,7 +146,7 @@ namespace TerRoguelike.NPCs.Enemy
                 
                 }
 
-                if (modNPC.ignitedStacks.Any() && NPC.ai[1] > 0)
+                if (modNPC.ignitedStacks.Count > 0 && NPC.ai[1] > 0)
                 {
                     spriteBatch.End();
                     spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
