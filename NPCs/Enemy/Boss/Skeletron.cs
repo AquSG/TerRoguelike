@@ -159,7 +159,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(SkeletronTheme);
             }
 
-            ableToHit = NPC.localAI[0] >= 0;
+            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
             canBeHit = true;
 
             if (NPC.localAI[0] < 0)
@@ -802,6 +802,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             eyeParticleIntensity = 1;
             NPC.noTileCollide = false;
+            ableToHit = false;
 
             if (deadTime == 0)
             {
@@ -947,16 +948,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, Main.rand.NextFloat(-2.5f, 2.5f), -2.5f);
             }
 
-            Vector2 goreOff = new Vector2(0, -20).RotatedBy(NPC.rotation);
-            int g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + goreOff * 0.07f, 54);
+            Vector2 goreOff = new Vector2(0, -18).RotatedBy(NPC.rotation);
+            int g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + new Vector2(0, -24) * 0.07f, 54);
             Gore gore = Main.gore[g];
-            gore.position = NPC.position + goreOff;
+            gore.position = NPC.Center + goreOff - new Vector2(gore.Width, gore.Height) * 0.5f;
             gore.rotation = NPC.rotation;
 
-            goreOff = new Vector2(0, 24).RotatedBy(NPC.rotation);
-            g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + goreOff * 0.07f, 55);
+            goreOff = new Vector2(0, 32).RotatedBy(NPC.rotation);
+            g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + new Vector2(0, 24).RotatedBy(NPC.rotation) * 0.07f, 55);
             gore = Main.gore[g];
-            gore.position = NPC.position + goreOff;
+            gore.position = NPC.Center + goreOff - new Vector2(gore.Width, gore.Height) * 0.5f;
             gore.rotation = NPC.rotation;
         }
         public List<Vector2> EyePositions(Vector2 center, float rotation)
