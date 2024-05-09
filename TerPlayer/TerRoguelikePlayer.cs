@@ -455,7 +455,7 @@ namespace TerRoguelike.TerPlayer
 
                     evilEyeStacks.RemoveAll(time => time <= 0);
 
-                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
+                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count, 1, 4 + evilEye) * 0.1f * (float)evilEye;
                 }
             }
             else if (evilEyeStacks.Count > 0)
@@ -610,8 +610,8 @@ namespace TerRoguelike.TerPlayer
 
                     thrillOfTheHuntStacks.RemoveAll(time => time <= 0);
 
-                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(thrillOfTheHuntStacks.Count(), 1, 4 + thrillOfTheHunt) * 0.15f * (float)thrillOfTheHunt;
-                    Player.moveSpeed += MathHelper.Clamp(thrillOfTheHuntStacks.Count(), 1, 4 + thrillOfTheHunt) * 0.15f;
+                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(thrillOfTheHuntStacks.Count, 1, 4 + thrillOfTheHunt) * 0.15f * (float)thrillOfTheHunt;
+                    Player.moveSpeed += MathHelper.Clamp(thrillOfTheHuntStacks.Count, 1, 4 + thrillOfTheHunt) * 0.15f;
                 }
             }
             else if (thrillOfTheHuntStacks.Count > 0)
