@@ -356,7 +356,7 @@ namespace TerRoguelike.TerPlayer
                 }
                 steamEngineStacks.RemoveAll(x => x <= 0);
             }
-            else if (steamEngineStacks.Any())
+            else if (steamEngineStacks.Count > 0)
             {
                 for (int i = 0; i < steamEngineStacks.Count; i++)
                 {
@@ -446,7 +446,7 @@ namespace TerRoguelike.TerPlayer
             if (evilEye > 0)
             {
                 Player.GetCritChance(DamageClass.Generic) += 5;
-                if (evilEyeStacks.Any())
+                if (evilEyeStacks.Count > 0)
                 {
                     for (int i = 0; i < evilEyeStacks.Count; i++)
                     {
@@ -458,7 +458,7 @@ namespace TerRoguelike.TerPlayer
                     Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count(), 1, 4 + evilEye) * 0.1f * (float)evilEye;
                 }
             }
-            else if (evilEyeStacks.Any())
+            else if (evilEyeStacks.Count > 0)
                 evilEyeStacks.Clear();
 
             if (enchantingEye > 0)
@@ -539,7 +539,7 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
 
-                if (barbedLassoHitCooldown <= 0 && barbedLassoTargets.Any())
+                if (barbedLassoHitCooldown <= 0 && barbedLassoTargets.Count > 0)
                 {
                     int totalHealAmt = 0;
                     for (int i = 0; i < barbedLassoTargets.Count; i++)
@@ -601,7 +601,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (thrillOfTheHunt > 0)
             {
-                if (thrillOfTheHuntStacks.Any())
+                if (thrillOfTheHuntStacks.Count > 0)
                 {
                     for (int i = 0; i < thrillOfTheHuntStacks.Count; i++)
                     {
@@ -614,7 +614,7 @@ namespace TerRoguelike.TerPlayer
                     Player.moveSpeed += MathHelper.Clamp(thrillOfTheHuntStacks.Count(), 1, 4 + thrillOfTheHunt) * 0.15f;
                 }
             }
-            else if (thrillOfTheHuntStacks.Any())
+            else if (thrillOfTheHuntStacks.Count > 0)
                 thrillOfTheHuntStacks.Clear();
 
             if (theDreamsoul > 0)
@@ -789,7 +789,7 @@ namespace TerRoguelike.TerPlayer
                         if (npc.life <= 0 || !npc.CanBeChasedBy())
                             continue;
 
-                        if (npc.ModNPC().Segments.Any() ? npc.ModNPC().IsPointInsideSegment(npc, Main.MouseWorld.ToPoint()) : npc.getRect().Contains(Main.MouseWorld.ToPoint()))
+                        if (npc.ModNPC().Segments.Count > 0 ? npc.ModNPC().IsPointInsideSegment(npc, Main.MouseWorld.ToPoint()) : npc.getRect().Contains(Main.MouseWorld.ToPoint()))
                         {
                             allSeeingEyeTarget = i;
                             break;
@@ -1094,7 +1094,7 @@ namespace TerRoguelike.TerPlayer
                     radius *= 0.4f;
 
                     var modtarget = target.ModNPC();
-                    Vector2 targetPos = modtarget.Segments.Any() ? modtarget.Segments[modtarget.hitSegment].Position : target.Center;
+                    Vector2 targetPos = modtarget.Segments.Count > 0 ? modtarget.Segments[modtarget.hitSegment].Position : target.Center;
                     Vector2 direction = (proj.Center - targetPos).SafeNormalize(Vector2.UnitY);
                     Vector2 spawnPosition = (direction * radius) + (targetPos);
                     int damage = (int)(hit.Damage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
@@ -1406,7 +1406,7 @@ namespace TerRoguelike.TerPlayer
                     if (!npc.active || npc.life <= 0 || npc.friendly || npc.immortal || npc.dontTakeDamage)
                         continue;
 
-                    Vector2 npcPos = npc.ModNPC().Segments.Any() ? npc.ModNPC().ClosestSegment(Player.Center) : npc.getRect().ClosestPointInRect(Player.Center);
+                    Vector2 npcPos = npc.ModNPC().Segments.Count > 0 ? npc.ModNPC().ClosestSegment(Player.Center) : npc.getRect().ClosestPointInRect(Player.Center);
 
                     if (Player.Center.Distance(npcPos) <= requiredDistance)
                     {
@@ -1829,7 +1829,7 @@ namespace TerRoguelike.TerPlayer
 
             if (barbedLasso > 0)
             {
-                if (barbedLassoTargets.Any())
+                if (barbedLassoTargets.Count > 0)
                 {
                     for (int i = 0; i < barbedLassoTargets.Count; i++)
                     {
@@ -2166,7 +2166,7 @@ namespace TerRoguelike.TerPlayer
                     visualFungi.Add(new VisualFungus(Main.rand.Next(150, 210), position, Main.rand.Next(0, Main.projFrames[ModContent.ProjectileType<HealingFungus>()]), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally));
                 }
             }
-            if (!visualFungi.Any())
+            if (visualFungi.Count == 0)
             {
                 return;
             }

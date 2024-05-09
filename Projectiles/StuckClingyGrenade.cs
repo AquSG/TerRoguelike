@@ -37,11 +37,12 @@ namespace TerRoguelike.Projectiles
         {
             stuckNPC = (int)Projectile.ai[0];
             var stuckModNPC = Main.npc[stuckNPC].ModNPC();
-            stuckSegment = stuckModNPC.Segments.Any() ? stuckModNPC.hitSegment : -1;
-            stuckPosition = Projectile.Center - (stuckModNPC.Segments.Any() ? stuckModNPC.Segments[stuckSegment].Position : Main.npc[stuckNPC].Center);
+            bool segments = stuckModNPC.Segments.Count > 0;
+            stuckSegment = segments ? stuckModNPC.hitSegment : -1;
+            stuckPosition = Projectile.Center - (segments ? stuckModNPC.Segments[stuckSegment].Position : Main.npc[stuckNPC].Center);
 
-            float potentialRot = (Projectile.Center - (stuckModNPC.Segments.Any() ? stuckModNPC.Segments[stuckSegment].Position : Main.npc[stuckNPC].Center)).ToRotation();
-            origStuckRot = potentialRot - (stuckModNPC.Segments.Any() ? stuckModNPC.Segments[stuckSegment].Rotation : Main.npc[stuckNPC].rotation);
+            float potentialRot = (Projectile.Center - (segments ? stuckModNPC.Segments[stuckSegment].Position : Main.npc[stuckNPC].Center)).ToRotation();
+            origStuckRot = potentialRot - (segments ? stuckModNPC.Segments[stuckSegment].Rotation : Main.npc[stuckNPC].rotation);
         }
         public override void AI()
         {
@@ -57,7 +58,7 @@ namespace TerRoguelike.Projectiles
                 {
                     if (npc.ModNPC.CanBeHitByProjectile(Projectile) == false)
                     {
-                        if (!npc.ModNPC().Segments.Any())
+                        if (npc.ModNPC().Segments.Count == 0)
                         {
                             Rectangle npcRect = npc.Hitbox;
                             MultipliableFloat f = new MultipliableFloat();
@@ -93,7 +94,7 @@ namespace TerRoguelike.Projectiles
                         {
                             if (npc.ModNPC.CanBeHitByProjectile(Projectile) != false)
                             {
-                                if (!npc.ModNPC().Segments.Any())
+                                if (npc.ModNPC().Segments.Count == 0)
                                 {
                                     Rectangle npcRect = npc.Hitbox;
                                     MultipliableFloat f = new MultipliableFloat();
@@ -104,14 +105,14 @@ namespace TerRoguelike.Projectiles
                                 }
                                 Projectile.ModProj().ultimateCollideOverride = false;
                                 stuckNPC = i;
-                                bool anySegments = npc.ModNPC().Segments.Any();
+                                bool anySegments = npc.ModNPC().Segments.Count > 0;
                                 if (anySegments)
                                 {
                                     stuckSegment = npc.ModNPC().hitSegment;
                                 }
                                 Vector2 pos = anySegments ? npc.ModNPC().Segments[stuckSegment].Position : npc.Center;
                                 stuckPosition = Projectile.Center - pos;
-                                origStuckRot = stuckPosition.ToRotation() - (npc.ModNPC().Segments.Any() ? npc.ModNPC().Segments[stuckSegment].Rotation : Main.npc[stuckNPC].rotation);
+                                origStuckRot = stuckPosition.ToRotation() - (anySegments ? npc.ModNPC().Segments[stuckSegment].Rotation : Main.npc[stuckNPC].rotation);
                                 break;
                             }
                         }
@@ -127,8 +128,9 @@ namespace TerRoguelike.Projectiles
             if (stuckNPC != -1)
             {
                 NPC npc = Main.npc[stuckNPC];
-                Vector2 pos = npc.ModNPC().Segments.Any() ? npc.ModNPC().Segments[stuckSegment].Position : npc.Center;
-                stuckPosition = (Vector2.UnitX * stuckPosition.Length()).RotatedBy((npc.ModNPC().Segments.Any() ? npc.ModNPC().Segments[stuckSegment].Rotation : npc.rotation) + origStuckRot);
+                bool anySegments = npc.ModNPC().Segments.Count > 0;
+                Vector2 pos = anySegments ? npc.ModNPC().Segments[stuckSegment].Position : npc.Center;
+                stuckPosition = (Vector2.UnitX * stuckPosition.Length()).RotatedBy((anySegments ? npc.ModNPC().Segments[stuckSegment].Rotation : npc.rotation) + origStuckRot);
                 Projectile.Center = pos + stuckPosition;
                 return;
             }

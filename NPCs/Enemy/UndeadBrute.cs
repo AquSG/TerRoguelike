@@ -124,7 +124,7 @@ namespace TerRoguelike.NPCs.Enemy
                 SpriteEffects spriteEffects = NPC.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
                 float realArmRot = armRot - MathHelper.PiOver4 * 0.9f * NPC.spriteDirection + (NPC.spriteDirection == -1 ? MathHelper.Pi : 0);
 
-                if (modNPC.ignitedStacks.Any() && NPC.ai[1] > 0)
+                if (modNPC.ignitedStacks.Count > 0 && NPC.ai[1] > 0)
                 {
                     spriteBatch.End();
                     spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

@@ -103,7 +103,7 @@ namespace TerRoguelike.NPCs.Enemy
             int currentFrame = NPC.ai[0] >= -150 ? 1 : (NPC.ai[0] > 0 ? (int)(NPC.ai[0] / 5) + 2 : (int)((NPC.ai[0] + attackCooldown) / 5) + 3);
             int frameHeight = texture.Height / Main.npcFrameCount[modNPCID];
             SpriteEffects effects = Math.Abs(NPC.rotation) < MathHelper.PiOver2 ? SpriteEffects.None : SpriteEffects.FlipVertically;
-            if (modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Count > 0)
             {
                 spriteBatch.End();
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);

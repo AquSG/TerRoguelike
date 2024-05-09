@@ -913,7 +913,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (deadTime > 0)
             {
-                if (deathGodRays.Any())
+                if (deathGodRays.Count > 0)
                 {
                     StartAdditiveSpritebatch();
                     for (int i = 0; i < deathGodRays.Count; i++)
@@ -963,7 +963,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             drawPos = hitboxes[1].offset + NPC.Center;
             draws.Add(new StoredDraw(mouthTex, drawPos, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
 
-            if (modNPC.ignitedStacks.Any())
+            if (modNPC.ignitedStacks.Count > 0)
             {
                 StartAlphaBlendSpritebatch();
 

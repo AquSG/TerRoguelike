@@ -182,7 +182,7 @@ namespace TerRoguelike.UI
                 spriteBatch.Draw(projTex, screenPos + new Vector2(240, -40), new Rectangle(0, 0, projTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(projTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
             }
 
-            if (!itemsToDraw.Any())
+            if (itemsToDraw.Count == 0)
             {
                 for (int invItem = 0; invItem < 50; invItem++)
                 {
@@ -195,7 +195,7 @@ namespace TerRoguelike.UI
                 }
             }
 
-            if (itemsToDraw.Any())
+            if (itemsToDraw.Count > 0)
             {
                 Vector2 itemDrawStartPos = new Vector2(-346, -180);
                 Vector2 itemDisplayDimensions = new Vector2(48, 48);

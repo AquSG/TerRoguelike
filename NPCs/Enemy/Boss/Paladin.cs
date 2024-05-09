@@ -958,7 +958,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (deadTime > 0)
             {
                 modNPC.drawCenter.X += Main.rand.NextFloat(-2f, 2f) * ((deadTime + 50) / 200f);
-                if (deathGodRays.Any())
+                if (deathGodRays.Count > 0)
                 {
                     StartAdditiveSpritebatch();
                     for (int i = 0; i < deathGodRays.Count; i++)

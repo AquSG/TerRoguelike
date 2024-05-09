@@ -41,7 +41,7 @@ namespace TerRoguelike.Managers
             
             if (ActiveParticles == null)
                 return;
-            if (!ActiveParticles.Any())
+            if (ActiveParticles.Count == 0)
                 return;
 
             FastParallel.For(0, ActiveParticles.Count, delegate (int start, int end, object context)
@@ -58,7 +58,7 @@ namespace TerRoguelike.Managers
         {
             if (ActiveParticles == null)
                 return;
-            if (!ActiveParticles.Any())
+            if (ActiveParticles.Count == 0)
                 return;
             StartAlphaBlendSpritebatch(false);
             for (int i = 0; i < ActiveParticles.Count; i++)

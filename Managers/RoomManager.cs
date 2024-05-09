@@ -235,7 +235,7 @@ namespace TerRoguelike.Managers
                         directionsAvailable.Add(2);
                 }
 
-                if ((!directionsAvailable.Any()) || directionsAvailable.Count == 0) //failsafe. if no directions available, just plop down the boss room
+                if (directionsAvailable.Count == 0) //failsafe. if no directions available, just plop down the boss room
                 {
                     PlaceRoom(1, previousRoom);
                     return;
@@ -533,7 +533,7 @@ namespace TerRoguelike.Managers
             }
             int currentStage = FloorID[currentFloorGen].Stage;
             List<Floor> nextFloors = FloorID.FindAll(x => x.Stage == currentStage + 1);
-            if (nextFloors.Any())
+            if (nextFloors.Count > 0)
             {
                 Floor nextFloor = nextFloors[Main.rand.Next(nextFloors.Count)];
                 currentFloorGen = nextFloor.ID;
@@ -545,7 +545,7 @@ namespace TerRoguelike.Managers
         }
         public static Room SelectRoom(int direction)
         {
-            if (!RoomGenPool.Any())
+            if (RoomGenPool.Count == 0)
                 return RoomID[0];
 
             string floorKey = GetFloorKey();
@@ -580,7 +580,7 @@ namespace TerRoguelike.Managers
                         //break;
                 }
             }
-            if (roomSelection.Any())
+            if (roomSelection.Count > 0)
             {
                 Room selectedRoom = roomSelection[Main.rand.Next(roomSelection.Count)];
                 if (GenDebugWorld)
