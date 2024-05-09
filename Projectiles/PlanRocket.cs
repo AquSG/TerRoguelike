@@ -88,8 +88,10 @@ namespace TerRoguelike.Projectiles
             if (modProj.homingTarget == -1 && Projectile.ai[0] != -1)
                 modProj.homingTarget = (int)Projectile.ai[0];
 
+            float homingStrength = 2.9f;
+            homingStrength *= MathHelper.Lerp(1f, 3f, (setTimeLeft - Projectile.timeLeft) / (float)setTimeLeft);
             if (Projectile.localAI[1] > 300)
-                modProj.HomingAI(Projectile, 0.001128f * 2.9f, true);
+                modProj.HomingAI(Projectile, 0.001128f * homingStrength, true);
             else
             {
                 rotationOffset += Main.rand.Next(-1, 2) * (MathHelper.Pi / 72f);
