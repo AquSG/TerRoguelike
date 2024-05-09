@@ -38,18 +38,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SlotId trackedSlot;
         public Texture2D eyeTex;
         public Texture2D lightTex;
+        public List<Vector2> eyePositions = [];
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 100);
-        public static Attack Attack1 = new Attack(1, 30, 180);
-        public static Attack Attack2 = new Attack(2, 30, 180);
-        public static Attack Attack3 = new Attack(3, 30, 180);
-        public static Attack Attack4 = new Attack(4, 30, 180);
-        public static Attack Attack5 = new Attack(5, 30, 180);
+        public static Attack None = new Attack(0, 0, 30);
+        public static Attack Laser = new Attack(1, 30, 180);
+        public static Attack SpikeBall = new Attack(2, 30, 180);
+        public static Attack Flame = new Attack(3, 30, 180);
+        public static Attack DartTrap = new Attack(4, 30, 180);
+        public static Attack Boulder = new Attack(5, 30, 180);
         public static Attack Summon = new Attack(6, 16, 180);
+        public int laserWindup = 60;
+        public int laserFireRate = 7;
 
         public override void SetStaticDefaults()
         {
@@ -87,6 +90,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             NPC.Center = TileCollidePositionInLine(NPC.Center, NPC.Center + new Vector2(0, -1000));
             NPC.Center += new Vector2(0, 45);
+
+            for (int i = -1; i <= 1; i += 2)
+            {
+                eyePositions.Add(new Vector2(-15 * i - 1, -3) + NPC.Center + modNPC.drawCenter);
+            }
         }
         public override void PostAI()
         {
@@ -148,49 +156,93 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (NPC.ai[0] == Attack1.Id)
+            if (NPC.ai[0] == Laser.Id)
             {
-                if (NPC.ai[1] >= Attack1.Duration)
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Color particleColor = Color.Lerp(Color.Goldenrod, Color.White, 0.3f);
+                if (NPC.ai[1] < laserWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item15 with { Volume = 1f, Pitch = -0.5f, PitchVariance = 0 }, NPC.Center);
+                    }
+                    if (NPC.ai[1] % 30 == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.8f, Pitch = -0.05f, PitchVariance = 0 }, NPC.Center);
+                    }
+                    for (int i = 0; i < eyePositions.Count; i++)
+                    {
+                        if (Main.rand.NextBool())
+                        {
+                            Vector2 offset = Main.rand.NextVector2CircularEdge(24f, 24f);
+                            ParticleManager.AddParticle(new Square(
+                                eyePositions[i] + offset, -offset * 0.1f, 30, particleColor, new Vector2(Main.rand.NextFloat(0.5f, 0.75f)), offset.ToRotation(), 0.96f, 30, true));
+                        }
+                    }
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - laserWindup;
+                    if (time % laserFireRate == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.8f, MaxInstances = 2 }, NPC.Center);
+                        for (int i = 0; i < eyePositions.Count; i++)
+                        {
+                            Vector2 pos = eyePositions[i];
+                            float rotToTarget = (targetPos - pos).ToRotation();
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rotToTarget.ToRotationVector2() * 10, ModContent.ProjectileType<LihzahrdLaser>(), NPC.damage, 0, -1, 1);
+
+                            for (int j = 0; j < 5; j++)
+                            {
+                                Vector2 offset = Main.rand.NextVector2CircularEdge(24f, 24f);
+                                ParticleManager.AddParticle(new Square(
+                                    eyePositions[i] + offset, -offset * 0.1f, 30, particleColor, new Vector2(Main.rand.NextFloat(0.75f, 1f)), offset.ToRotation(), 0.96f, 30, true));
+                            }
+                        }
+                    }
+                }
+                
+                if (NPC.ai[1] >= Laser.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack1.Id;
+                    NPC.ai[2] = Laser.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack2.Id)
+            else if (NPC.ai[0] == SpikeBall.Id)
             {
-                if (NPC.ai[1] >= Attack2.Duration)
+                if (NPC.ai[1] >= SpikeBall.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack2.Id;
+                    NPC.ai[2] = SpikeBall.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack3.Id)
+            else if (NPC.ai[0] == Flame.Id)
             {
-                if (NPC.ai[1] >= Attack3.Duration)
+                if (NPC.ai[1] >= Flame.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack3.Id;
+                    NPC.ai[2] = Flame.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack4.Id)
+            else if (NPC.ai[0] == DartTrap.Id)
             {
-                if (NPC.ai[1] >= Attack4.Duration)
+                if (NPC.ai[1] >= DartTrap.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack4.Id;
+                    NPC.ai[2] = DartTrap.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack5.Id)
+            else if (NPC.ai[0] == Boulder.Id)
             {
-                if (NPC.ai[1] >= Attack5.Duration)
+                if (NPC.ai[1] >= Boulder.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack5.Id;
+                    NPC.ai[2] = Boulder.Id;
                 }
             }
             else if (NPC.ai[0] == Summon.Id)
@@ -209,7 +261,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Attack1, Attack2, Attack3, Attack4, Attack5, Summon };
+            //List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame, DartTrap, Boulder, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -229,7 +282,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = Laser.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()

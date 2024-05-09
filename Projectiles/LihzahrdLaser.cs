@@ -31,7 +31,7 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.MaxUpdates = 10;
-            Projectile.timeLeft = 180 * Projectile.MaxUpdates;
+            Projectile.timeLeft = 300 * Projectile.MaxUpdates;
             Projectile.penetrate = 1;
         }
         public override void OnSpawn(IEntitySource source)
@@ -50,15 +50,29 @@ namespace TerRoguelike.Projectiles
                 dust.noLightEmittence = true;
             }
         }
-
-        public override Color? GetAlpha(Color lightColor)
-        {
-            return Color.Lerp(lightColor, Color.White, 0.4f);
-        }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.7f }, Projectile.Center);
-            return true;
+            Projectile.ai[0]--;
+            
+            
+            if (Projectile.ai[0] <= -1)
+            {
+                SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.5f }, Projectile.Center);
+                return true;
+            }
+
+            Projectile.timeLeft = 300 * Projectile.MaxUpdates;
+            // If the projectile hits the left or right side of the tile, reverse the X velocity
+            if (Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon)
+            {
+                Projectile.velocity.X = -oldVelocity.X;
+            }
+            // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
+            if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
+            {
+                Projectile.velocity.Y = -oldVelocity.Y;
+            }
+            return false;
         }
         public override void OnKill(int timeLeft)
         {

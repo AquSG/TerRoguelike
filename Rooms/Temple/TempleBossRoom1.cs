@@ -33,9 +33,8 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
-            bossSpawnPos = new Vector2(RoomDimensions.X * 8f - 8f, RoomDimensions.Y * 8f);
             if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 3f);
+                bossSpawnPos = new Vector2(RoomDimensions.X * 8f - 8f, RoomDimensions.Y * 8f);
             base.Update();
         }
         public override void PostDrawTilesRoom()
