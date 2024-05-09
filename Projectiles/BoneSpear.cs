@@ -110,6 +110,22 @@ namespace TerRoguelike.Projectiles
 
             return false;
         }
+        public override bool? CanDamage()
+        {
+            var modProj = Projectile.ModProj();
+            if (modProj.npcOwner >= 0)
+            {
+                NPC npc = Main.npc[modProj.npcOwner];
+                var modNPC = npc.ModNPC();
+                if (modNPC.isRoomNPC)
+                {
+                    if (RoomSystem.RoomList[modNPC.sourceRoomListID].bossDead)
+                        return false;
+                }
+            }
+
+            return null;
+        }
         public override bool PreDraw(ref Color lightColor)
         {
             int time = maxTimeLeft - Projectile.timeLeft;

@@ -73,7 +73,9 @@ namespace TerRoguelike.Projectiles
             if (modProj.homingTarget == -1 && Projectile.ai[0] != -1)
                 modProj.homingTarget = (int)Projectile.ai[0];
 
-            modProj.HomingAI(Projectile, 0.001128f * 4f, false);
+            float homingStrength = 4f;
+            homingStrength *= MathHelper.Lerp(1f, 2.2f, (setTimeLeft - Projectile.timeLeft) / (float)setTimeLeft);
+            modProj.HomingAI(Projectile, 0.001128f * homingStrength, false);
 
             if (Projectile.timeLeft <= 60)
             {

@@ -119,6 +119,7 @@ namespace TerRoguelike.Managers
                 new QueenBee(),
                 new WallOfFlesh(),
                 new Skeletron(),
+                new TempleGolem(),
             };
         }
         internal static void Unload()

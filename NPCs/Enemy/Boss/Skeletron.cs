@@ -34,7 +34,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override List<int> associatedFloors => new List<int>() { FloorDict["Dungeon"] };
         public override int CombatStyle => -1;
         public int currentFrame;
-        public bool CollisionPass = false;
         public SlotId trackedSlot;
         public Texture2D eyeTex;
         public Texture2D squareTex;
@@ -147,8 +146,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
-            NPC.frameCounter += 0.25d;
-
             if (deadTime > 0)
             {
                 CheckDead();

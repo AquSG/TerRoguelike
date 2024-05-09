@@ -818,4 +818,5 @@ NPCs: {
 	Hungry.DisplayName: Hungry
 	HungryAnchored.DisplayName: Hungry
 	Skeletron.DisplayName: Skeletron
+	TempleGolem.DisplayName: Temple Golem
 }
