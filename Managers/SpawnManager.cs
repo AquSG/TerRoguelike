@@ -91,8 +91,8 @@ namespace TerRoguelike.Managers
             }
             return npc;
         }
-        public static double healthScalingMultiplier { get { return Math.Pow(1.2d, TerRoguelikeWorld.currentStage); } }
-        public static double damageScalingMultiplier { get { return Math.Pow(1.10d, TerRoguelikeWorld.currentStage); } }
+        public static double healthScalingMultiplier => Math.Pow(1.2d, TerRoguelikeWorld.currentStage);
+        public static double damageScalingMultiplier => Math.Pow(1.10d, TerRoguelikeWorld.currentStage);
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {
             double healthMultiplier = healthScalingMultiplier;
