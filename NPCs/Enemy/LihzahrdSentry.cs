@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[1] = NPC.ai[1].AngleLerp(direction, 0.2f);
             if (NPC.ai[0] >= attackTelegraph && NPC.ai[0] < attackTelegraph + attackDuration && (NPC.ai[0] - attackTelegraph) % attackTimeBetween == 0)
             {
-                SoundEngine.PlaySound(SoundID.Item91 with { Volume = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.8f, MaxInstances = 2 }, NPC.Center);
                 for (int i = 0; i < 5; i++)
                 {
                     Vector2 offset = Main.rand.NextVector2CircularEdge(24f, 24f);
