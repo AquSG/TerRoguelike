@@ -54,7 +54,6 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.ai[0]--;
             
-            
             if (Projectile.ai[0] <= -1)
             {
                 SoundEngine.PlaySound(SoundID.NPCDeath3 with { Volume = 0.5f }, Projectile.Center);

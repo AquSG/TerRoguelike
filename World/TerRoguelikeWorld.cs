@@ -30,6 +30,9 @@ namespace TerRoguelike.World
         public static int escapeTime = 0;
         public const int escapeTimeSet = 18000;
         public static List<Chain> chainList = new List<Chain>();
+
+        public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
+        public static readonly SoundStyle EarthPound = new SoundStyle("TerRoguelike/Sounds/EarthPound", 4);
         public static void StartEscapeSequence()
         {
             escape = true;

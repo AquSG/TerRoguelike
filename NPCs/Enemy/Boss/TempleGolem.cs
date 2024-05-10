@@ -16,6 +16,7 @@ using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
+using TerRoguelike.World;
 using static Terraria.GameContent.PlayerEyeHelper;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
@@ -35,7 +36,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override List<int> associatedFloors => new List<int>() { FloorDict["Temple"] };
         public override int CombatStyle => -1;
         public int currentFrame;
-        public SlotId trackedSlot;
+        public SlotId RumbleSlot;
         public Texture2D eyeTex;
         public Texture2D lightTex;
         public List<Vector2> eyePositions = [];
@@ -53,6 +54,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Summon = new Attack(6, 16, 180);
         public int laserWindup = 60;
         public int laserFireRate = 7;
+        public int spikeBallWindup = 60;
+        public int spikeBallFireRate = 4;
 
         public override void SetStaticDefaults()
         {
@@ -98,7 +101,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            
+            if (SoundEngine.TryGetActiveSound(RumbleSlot, out var sound) && sound.IsPlaying)
+            {
+                if (NPC.ai[0] != SpikeBall.Id || (NPC.ai[0] == SpikeBall.Id && NPC.ai[1] >= spikeBallWindup))
+                {
+                    sound.Volume *= 0.98f;
+                    sound.Volume -= 0.001f;
+                    if (sound.Volume <= 0)
+                        sound.Stop();
+                }
+            }
         }
         public override void AI()
         {
@@ -211,11 +223,45 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == SpikeBall.Id)
             {
+                Vector2 leftBound = TileCollidePositionInLine(NPC.Center + new Vector2(0, 160), NPC.Center + new Vector2(-1000, 160)) + Vector2.UnitX * 8;
+                Vector2 rightBound = TileCollidePositionInLine(leftBound, leftBound + new Vector2(2000, 0)) - Vector2.UnitX * 8;
+                float boundWidth = leftBound.Distance(rightBound);
+                float thirdWidth = boundWidth * 0.3333f;
+                if (NPC.ai[1] < spikeBallWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        NPC.ai[3] = Main.rand.Next(3);
+                        RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthTremor with { Volume = 1f }, new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + thirdWidth * 0.5f, NPC.position.Y));
+                    }
+                    if (NPC.ai[1] % 2 == 0)
+                    {
+                        Vector2 particlePos = new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
+                        particlePos = TileCollidePositionInLine(particlePos, particlePos + new Vector2(0, -240)) - Vector2.UnitY * 16;
+                        ParticleManager.AddParticle(new Debris(
+                            particlePos, Vector2.UnitY * Main.rand.NextFloat(0.75f, 1.25f),
+                            80, Color.Lerp(Color.DarkOrange, Color.Black, 0.2f) * 0.875f, new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
+                            Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.1f, 7f, 60),
+                            ParticleManager.ParticleLayer.BehindTiles);
+                    }
+                }
+                else
+                {
+                    if (NPC.ai[1] % spikeBallFireRate == 0)
+                    {
+                        Vector2 projSpawnPos = new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
+                        projSpawnPos = TileCollidePositionInLine(projSpawnPos, projSpawnPos + new Vector2(0, -240)) - Vector2.UnitY * 16;
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<LihzahrdSpikeBall>(), NPC.damage, 0, -1, 7);
+                    }
+                    
+                }
+
                 if (NPC.ai[1] >= SpikeBall.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = SpikeBall.Id;
+                    NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == Flame.Id)
@@ -262,7 +308,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame, DartTrap, Boulder, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Laser };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -282,7 +328,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = Laser.Id;
+            chosenAttack = SpikeBall.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -311,6 +357,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             NPC.ai[0] = None.Id;
             NPC.ai[1] = 1;
+            NPC.ai[3] = 0;
 
             modNPC.OverrideIgniteVisual = true;
             NPC.life = 1;
@@ -378,7 +425,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 for (int i = 0; (double)i < hit.Damage * 0.04d; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, 148, hit.HitDirection, -1f);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.t_Lihzahrd, hit.HitDirection, -1f);
                 }
             }
         }

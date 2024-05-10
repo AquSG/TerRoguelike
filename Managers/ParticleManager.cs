@@ -26,19 +26,33 @@ using TerRoguelike.Particles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using ReLogic.Threading;
 using System.Diagnostics;
+using rail;
 
 namespace TerRoguelike.Managers
 {
     public class ParticleManager
     {
         public static List<Particle> ActiveParticles = new List<Particle>();
-        public static void AddParticle(Particle particle)
+        public static List<Particle> ActiveParticlesBehindTiles = new List<Particle>();
+        public enum ParticleLayer
         {
-            ActiveParticles.Add(particle);
+            Default = 0,
+            BehindTiles = 1
+        }
+        public static void AddParticle(Particle particle, ParticleLayer layer = ParticleLayer.Default)
+        {
+            if (layer == ParticleLayer.Default)
+                ActiveParticles.Add(particle);
+            else if (layer == ParticleLayer.BehindTiles)
+                ActiveParticlesBehindTiles.Add(particle);
         }
         public static void UpdateParticles()
         {
-            
+            UpdateParticles_Default();
+            UpdateParticles_BehindTiles();
+        }
+        public static void UpdateParticles_Default()
+        {
             if (ActiveParticles == null)
                 return;
             if (ActiveParticles.Count == 0)
@@ -54,7 +68,24 @@ namespace TerRoguelike.Managers
             });
             ActiveParticles.RemoveAll(x => x.timeLeft <= 0);
         }
-        public static void DrawParticles()
+        public static void UpdateParticles_BehindTiles()
+        {
+            if (ActiveParticlesBehindTiles == null)
+                return;
+            if (ActiveParticlesBehindTiles.Count == 0)
+                return;
+
+            FastParallel.For(0, ActiveParticlesBehindTiles.Count, delegate (int start, int end, object context)
+            {
+                for (int i = start; i < end; i++)
+                {
+                    Particle particle = ActiveParticlesBehindTiles[i];
+                    particle.Update();
+                }
+            });
+            ActiveParticlesBehindTiles.RemoveAll(x => x.timeLeft <= 0);
+        }
+        public static void DrawParticles_Default()
         {
             if (ActiveParticles == null)
                 return;
@@ -77,6 +108,34 @@ namespace TerRoguelike.Managers
                 particle.Draw();
             }
             Main.spriteBatch.End();
+        }
+        public static void DrawParticles_BehindTiles()
+        {
+            if (ActiveParticlesBehindTiles == null)
+                return;
+            if (ActiveParticlesBehindTiles.Count == 0)
+                return;
+            Vector2 drawBehindOffset = RoomSystem.DrawBehindTilesOffset;
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            for (int i = 0; i < ActiveParticlesBehindTiles.Count; i++)
+            {
+                Particle particle = ActiveParticlesBehindTiles[i];
+                if (particle.additive)
+                    continue;
+                particle.Draw(drawBehindOffset);
+            }
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            for (int i = 0; i < ActiveParticlesBehindTiles.Count; i++)
+            {
+                Particle particle = ActiveParticlesBehindTiles[i];
+                if (!particle.additive)
+                    continue;
+                particle.Draw(drawBehindOffset);
+            }
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
         }
     }
 }

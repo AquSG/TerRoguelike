@@ -3731,6 +3731,16 @@ namespace TerRoguelike.NPCs
             }
             return pass;
         }
+        /// <summary>
+        /// Tries to get the room that this modNPC spawned from
+        /// </summary>
+        /// <returns>null if the npc is not from a room, otherwise returns the room</returns>
+        public Room GetParentRoom()
+        {
+            if (!isRoomNPC || sourceRoomListID < 0)
+                return null;
+            return RoomList[sourceRoomListID];
+        }
     }
 
     public class BallAndChain
