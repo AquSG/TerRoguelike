@@ -91,6 +91,7 @@ Projectiles: {
 	SoulBlast.DisplayName: Soul Blast
 	BoneSpear.DisplayName: Bone Spear
 	SoulTurret.DisplayName: Soul Turret
+	LihzahrdSpikeBall.DisplayName: Lihzahrd Spike Ball
 }
 
 Items: {

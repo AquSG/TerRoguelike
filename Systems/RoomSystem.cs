@@ -482,10 +482,13 @@ namespace TerRoguelike.Systems
         public static void PostDrawWalls(SpriteBatch spriteBatch)
         {
             Main.tileBatch.End();
-            Main.tileBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
             DrawChains();
             DrawRoomWalls(spriteBatch);
-            Main.tileBatch.End();
+            ParticleManager.DrawParticles_BehindTiles();
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
             Main.tileBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
         }
         public static void DrawRoomWalls(SpriteBatch spriteBatch)
@@ -564,7 +567,7 @@ namespace TerRoguelike.Systems
             DrawDeathScene();
             DrawPendingEnemies();
             DrawHealingPulse();
-            ParticleManager.DrawParticles();
+            ParticleManager.DrawParticles_Default();
 
             if (RoomList == null)
                 return;

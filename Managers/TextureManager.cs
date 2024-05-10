@@ -134,6 +134,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/BoneSpearTip",
                 "TerRoguelike/NPCs/Enemy/Boss/TempleGolemEyes",
                 "TerRoguelike/NPCs/Enemy/Boss/TempleGolemGlow",
+                "TerRoguelike/Projectiles/RockDebris",
             };
             foreach (string path in pathList)
             {

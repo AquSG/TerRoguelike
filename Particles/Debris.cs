@@ -34,50 +34,54 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Particles
 {
-    public class BallOutlined : Particle
+    public class Debris : Particle
     {
         Vector2 startScale;
-        float deceleration;
+        float acceleration;
+        int verticalFrameCount = 3;
+        int currentFrame;
+        int frameWidth;
+        int frameHeight;
         int fadeOutTime;
-        float outlineWidth;
-        Color outlineColor;
-        public BallOutlined(Vector2 Position, Vector2 Velocity, int TimeLeft, Color OutlineColor, Color FillColor, Vector2 Scale, float OutlineWidth, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30)
+        Color startColor;
+        float yVelCap;
+
+        public Debris(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame, float Rotation, SpriteEffects SpriteEffects, float Acceleration, float yCap, int fadeOutTimeLeftThreshold = 60)
         {
-            texture = TexDict["DarkTendril"].Value;
-            frame = new Rectangle(0, 0, texture.Width, texture.Height);
-            additive = false;
+            texture = TexDict["RockDebris"].Value;
+            frameWidth = texture.Width;
+            frameHeight = texture.Height / verticalFrameCount;
+            currentFrame = StartFrame;
+            FindFrame();
+            additive = true;
             oldPosition = Position;
             position = Position;
             velocity = Velocity;
-            color = FillColor;
-            outlineColor = OutlineColor;
+            color = startColor = Color;
             rotation = Rotation;
-            scale = Scale;
-            startScale = Scale;
-            spriteEffects = SpriteEffects.None;
+            scale = startScale = Scale;
+            spriteEffects = SpriteEffects;
             timeLeft = TimeLeft;
-            deceleration = Deceleration;
+            acceleration = Acceleration;
             fadeOutTime = fadeOutTimeLeftThreshold;
-            outlineWidth = OutlineWidth;
+            yVelCap = yCap;
         }
         public override void AI()
         {
-            velocity *= deceleration;
+            velocity.Y += acceleration;
+            if (Math.Abs(velocity.Y) > Math.Abs(yVelCap))
+                velocity.Y = Math.Sign(velocity.Y) * yVelCap;
             if (timeLeft < fadeOutTime)
             {
-                scale = startScale * (timeLeft / (float)fadeOutTime);
+                float interpolant = (timeLeft / (float)fadeOutTime);
+                //color = startColor * interpolant;
+                scale = startScale * interpolant;
             }
         }
-        public override bool PreDraw(Vector2 offset)
+        public void FindFrame()
         {
-            Vector2 basePos = position - Main.screenPosition;
-            Vector2 baseOffset = Vector2.UnitX * outlineWidth * (float)Math.Sqrt(scale.Length());
-            Vector2 origin = frame.Size() * 0.5f;
-            for (int i = 0; i < 8; i++)
-            {
-                Main.EntitySpriteDraw(texture, basePos + baseOffset.RotatedBy(i * MathHelper.PiOver4 + rotation) + offset, frame, outlineColor, rotation, origin, scale, spriteEffects);
-            }
-            return true;
+            int vertiFrame = currentFrame % verticalFrameCount;
+            frame = new Rectangle(0, vertiFrame * frameHeight, frameWidth, frameHeight - 2);
         }
     }
 }
