@@ -52,7 +52,7 @@ namespace TerRoguelike.Particles
             frameHeight = texture.Height / verticalFrameCount;
             currentFrame = StartFrame;
             FindFrame();
-            additive = true;
+            additive = false;
             oldPosition = Position;
             position = Position;
             velocity = Velocity;
