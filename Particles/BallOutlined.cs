@@ -68,14 +68,14 @@ namespace TerRoguelike.Particles
                 scale = startScale * (timeLeft / (float)fadeOutTime);
             }
         }
-        public override bool PreDraw(Vector2 offset)
+        public override bool PreDraw()
         {
             Vector2 basePos = position - Main.screenPosition;
             Vector2 baseOffset = Vector2.UnitX * outlineWidth * (float)Math.Sqrt(scale.Length());
             Vector2 origin = frame.Size() * 0.5f;
             for (int i = 0; i < 8; i++)
             {
-                Main.EntitySpriteDraw(texture, basePos + baseOffset.RotatedBy(i * MathHelper.PiOver4 + rotation) + offset, frame, outlineColor, rotation, origin, scale, spriteEffects);
+                Main.EntitySpriteDraw(texture, basePos + baseOffset.RotatedBy(i * MathHelper.PiOver4 + rotation), frame, outlineColor, rotation, origin, scale, spriteEffects);
             }
             return true;
         }

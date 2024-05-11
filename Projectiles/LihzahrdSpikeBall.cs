@@ -66,7 +66,7 @@ namespace TerRoguelike.Projectiles
             // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
             if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             {
-                Projectile.velocity.Y = -oldVelocity.Y * Main.rand.NextFloat(0.8f, 0.9f);
+                Projectile.velocity.Y = -oldVelocity.Y * Main.rand.NextFloat(0.78f, 0.85f);
             }
             return false;
         }

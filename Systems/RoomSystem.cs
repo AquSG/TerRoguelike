@@ -40,7 +40,6 @@ namespace TerRoguelike.Systems
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static bool obtainedRoomListFromServer = false;
-        public static Vector2 DrawBehindTilesOffset { get { return new Vector2(Main.offScreenRange); } }
         public static bool debugDrawNotSpawnedEnemies = false;
         public static void NewRoom(Room room)
         {
@@ -481,15 +480,11 @@ namespace TerRoguelike.Systems
         }
         public static void PostDrawWalls(SpriteBatch spriteBatch)
         {
-            Main.tileBatch.End();
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            StartAlphaBlendSpritebatch();
             DrawChains();
             DrawRoomWalls(spriteBatch);
             ParticleManager.DrawParticles_BehindTiles();
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
-            Main.tileBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            StartVanillaSpritebatch();
         }
         public static void DrawRoomWalls(SpriteBatch spriteBatch)
         {
@@ -512,7 +507,7 @@ namespace TerRoguelike.Systems
                 if (room.wallActive)
                 {
                     //Draw the pink borders indicating the bounds of the room
-                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+                    StartAdditiveSpritebatch(false);
                     for (float side = 0; side < 2; side++)
                     {
                         for (float i = 0; i < room.RoomDimensions.X; i++)
@@ -532,7 +527,7 @@ namespace TerRoguelike.Systems
                             Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, -16f * side);
                             float rotation = MathHelper.Pi + (MathHelper.Pi * side);
 
-                            Main.EntitySpriteDraw(lightTexture, drawPosition + DrawBehindTilesOffset, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
                         }
                         for (float i = 0; i < room.RoomDimensions.Y; i++)
                         {
@@ -550,13 +545,13 @@ namespace TerRoguelike.Systems
                             Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(-16f * side, (16f) * (side - 1f));
                             float rotation = MathHelper.PiOver2 + (MathHelper.Pi * side);
 
-                            Main.EntitySpriteDraw(lightTexture, drawPosition + DrawBehindTilesOffset, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
+                            Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
                         }
                     }
                     spriteBatch.End();
                 }
             }
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            StartAlphaBlendSpritebatch(false);
         }
         public override void PostDrawTiles()
         {
@@ -789,7 +784,7 @@ namespace TerRoguelike.Systems
                 for (int j = 0; j < visualLength; j++)
                 {
                     Vector2 position = ((chain.End - visualStart) * (j / (float)chain.Length));
-                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.screenPosition + DrawBehindTilesOffset, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(j % 2 == 0 ? chain2Tex : chain1Tex, visualStart + position - Main.screenPosition, null, Color.White, rotation + MathHelper.PiOver2, j % 2 == 0 ? chain2Tex.Size() * 0.5f : chain1Tex.Size() * 0.5f, 1f, SpriteEffects.None);
                 }
             }
         }

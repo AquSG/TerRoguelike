@@ -45,12 +45,18 @@ namespace TerRoguelike.ILEditing
             On_Main.DrawMenu += On_Main_DrawMenu;
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
-            On_WallDrawing.DrawWalls += On_WallDrawing_DrawWalls;
+            On_Main.DoDraw_Tiles_NonSolid += PreDrawTilesInjection;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
         }
 
-		//Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
+        private void PreDrawTilesInjection(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
+        {
+            RoomSystem.PostDrawWalls(Main.spriteBatch);
+			orig.Invoke(self);
+        }
+
+        //Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
         private void On_WorldGen_SectionTileFrameWithCheck(On_WorldGen.orig_SectionTileFrameWithCheck orig, int startX, int startY, int endX, int endY)
         {
 			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -97,13 +103,6 @@ namespace TerRoguelike.ILEditing
 			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
 				orig.Invoke(self, closestPlayer);
         }
-
-        private void On_WallDrawing_DrawWalls(On_WallDrawing.orig_DrawWalls orig, WallDrawing self)
-        {
-			orig.Invoke(self);
-			if (TerRoguelikeWorld.IsTerRoguelikeWorld)
-				RoomSystem.PostDrawWalls(Main.spriteBatch);
-		}
 
         private void On_NPC_UpdateCollision(On_NPC.orig_UpdateCollision orig, NPC self)
         {
