@@ -310,7 +310,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         float angleBetween = MathHelper.Clamp(Math.Abs(AngleSizeBetween(NPC.ai[3], rotToTarget)), 0, slowdownCone);
                         if (target != null)
                             NPC.ai[3] = NPC.ai[3].AngleTowards(rotToTarget, 0.075f * (angleBetween / slowdownCone));
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * 7, ProjectileID.Flames, NPC.damage, 0, -1, 0, 0.24f);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * 7, ModContent.ProjectileType<Flames>(), NPC.damage, 0, -1, 0, 0.24f);
                     }
                     if (time % 10 == 0)
                     {
