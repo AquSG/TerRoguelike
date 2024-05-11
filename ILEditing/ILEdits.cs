@@ -48,6 +48,14 @@ namespace TerRoguelike.ILEditing
             On_Main.DoDraw_Tiles_NonSolid += PreDrawTilesInjection;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
+            On_Projectile.AI_193_Flamethrower += FlamethrowerAIEdit;
+        }
+
+        private void FlamethrowerAIEdit(On_Projectile.orig_AI_193_Flamethrower orig, Projectile self)
+        {
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld && self.localAI[0] >= 30 && self.localAI[0] < 60)
+				self.localAI[0] -= self.ai[1]; // flamethrower extension 
+			orig.Invoke(self);
         }
 
         private void PreDrawTilesInjection(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
