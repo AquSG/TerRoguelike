@@ -33,7 +33,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 480;
             Projectile.penetrate = 1;
             Projectile.ignoreWater = true;
-            lightTex = TexDict["SeekingStarCellGlow"].Value;
+            lightTex = TexDict["SeekingStarCellGlow"];
             maxTimeLeft = Projectile.timeLeft;
         }
         public override void OnSpawn(IEntitySource source)

@@ -39,8 +39,8 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.tileCollide = true;
-            noiseTex = TexDict["BlobbyNoiseSmall"].Value;
-            glowTex = TexDict["CircularGlow"].Value;
+            noiseTex = TexDict["BlobbyNoiseSmall"];
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

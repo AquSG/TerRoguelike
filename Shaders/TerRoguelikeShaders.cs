@@ -49,7 +49,7 @@ namespace TerRoguelike.Shaders
             //This was some code I wrote to get it working on the ice queen boss I made
             /*
             Texture2D tex = TextureAssets.Npc[Type].Value;
-            Texture2D starTex = TexDict["StarrySky"].Value;
+            Texture2D starTex = TexDict["StarrySky"];
 
             Main.spriteBatch.End();
             Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;

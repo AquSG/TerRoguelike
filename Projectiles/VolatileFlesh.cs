@@ -34,9 +34,9 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = maxTimeLeft = 90;
             Projectile.penetrate = -1;
-            spikeTex = TexDict["CurvedSpike"].Value;
-            lineTex = TexDict["LerpLineGradient"].Value;
-            glowTex = TexDict["CircularGlow"].Value;
+            spikeTex = TexDict["CurvedSpike"];
+            lineTex = TexDict["LerpLineGradient"];
+            glowTex = TexDict["CircularGlow"];
             Projectile.hide = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)

@@ -110,7 +110,7 @@ namespace TerRoguelike.MainMenu
                 else
                     mouseHover = false;
 
-                Texture2D xButtonTex = TexDict["XButton"].Value;
+                Texture2D xButtonTex = TexDict["XButton"];
                 ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, "Play TerRoguelike", position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, Vector2.Zero, new Vector2(0.8f));
                 if (PlayerInput.UsingGamepadUI)
                     Main.spriteBatch.Draw(xButtonTex, position + new Vector2(-36, 8), Color.White);

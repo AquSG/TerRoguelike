@@ -43,8 +43,8 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.hide = true;
             Projectile.ModProj().killOnRoomClear = true;
-            tipTex = TexDict["BoneSpearTip"].Value;
-            squareTex = TexDict["Square"].Value;
+            tipTex = TexDict["BoneSpearTip"];
+            squareTex = TexDict["Square"];
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {

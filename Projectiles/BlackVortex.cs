@@ -42,7 +42,7 @@ namespace TerRoguelike.Projectiles
             modProj = Projectile.ModProj();
             maxTimeLeft = Projectile.timeLeft;
             maxScale = Projectile.scale;
-            glowTex = TexDict["CircularGlow"].Value;
+            glowTex = TexDict["CircularGlow"];
             Projectile.hide = true;
             origWidth = Projectile.width;
         }

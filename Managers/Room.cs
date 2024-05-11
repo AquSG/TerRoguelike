@@ -528,7 +528,7 @@ namespace TerRoguelike.Managers
                 StartAlphaBlendSpritebatch();
             }
 
-            Texture2D wallTex = TextureManager.TexDict["TemporaryBlock"].Value;
+            Texture2D wallTex = TextureManager.TexDict["TemporaryBlock"];
 
             if (IsStartRoom && TerRoguelikeWorld.escape)
             {

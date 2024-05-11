@@ -52,8 +52,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath2;
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -6);
-            gunTex = TexDict["UndeadSharpshooterGun"].Value;
-            telegraphTex = TexDict["LineGradient"].Value;
+            gunTex = TexDict["UndeadSharpshooterGun"];
+            telegraphTex = TexDict["LineGradient"];
         }
         public override void AI()
         {

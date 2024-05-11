@@ -3524,7 +3524,7 @@ namespace TerRoguelike.NPCs
                 }
                 if (!Main.hideUI && overheadArrowTime > 0)
                 {
-                    Texture2D arrowTex = TexDict["YellowArrow"].Value;
+                    Texture2D arrowTex = TexDict["YellowArrow"];
                     float opacity = MathHelper.Clamp(overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
                     Vector2 pos = npc.Top + drawCenter + ((npc.gfxOffY - 32 + (14 * opacity)) * Vector2.UnitY) - Main.screenPosition;
                     Main.EntitySpriteDraw(arrowTex, pos, null, Color.White * opacity * 0.9f, MathHelper.PiOver2, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
@@ -3536,7 +3536,7 @@ namespace TerRoguelike.NPCs
         /// </summary>
         public void DrawRotatlingBloodParticles(bool inFront, NPC npc)
         {
-            Texture2D texture = TexDict["AdaptiveGunBullet"].Value;
+            Texture2D texture = TexDict["AdaptiveGunBullet"];
             Color color = Color.Red * 1f;
             Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
 

@@ -49,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, -10);
             NPC.noGravity = true;
             NPC.noTileCollide = true;
-            lightTex = TexDict["LihzahrdSentryGlow"].Value;
+            lightTex = TexDict["LihzahrdSentryGlow"];
         }
         public override void AI()
         {

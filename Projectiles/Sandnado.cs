@@ -36,8 +36,8 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
-            lightTex = TexDict["SandnadoLight"].Value;
-            glowTex = TexDict["CircularGlow"].Value;
+            lightTex = TexDict["SandnadoLight"];
+            glowTex = TexDict["CircularGlow"];
             Projectile.hide = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)

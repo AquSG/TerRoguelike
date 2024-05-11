@@ -86,7 +86,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.SpecialProjectileCollisionRules = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
-            squareTex = TexDict["Square"].Value;
+            squareTex = TexDict["Square"];
         }
         public override void OnSpawn(IEntitySource source)
         {

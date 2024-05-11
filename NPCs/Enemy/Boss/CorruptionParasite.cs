@@ -110,11 +110,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.OverrideIgniteVisual = true;
             modNPC.SpecialProjectileCollisionRules = true;
             NPC.behindTiles = true;
-            headTex = TexDict["CorruptionParasiteHead"].Value;
-            bodyTex = TexDict["CorruptionParasiteBody"].Value;
-            tailTex = TexDict["CorruptionParasiteTail"].Value;
-            eggTex = TexDict["ParasiticEgg"].Value;
-            godRayTex = TexDict["GodRay"].Value;
+            headTex = TexDict["CorruptionParasiteHead"];
+            bodyTex = TexDict["CorruptionParasiteBody"];
+            tailTex = TexDict["CorruptionParasiteTail"];
+            eggTex = TexDict["ParasiticEgg"];
+            godRayTex = TexDict["GodRay"];
         }
         public override void OnSpawn(IEntitySource source)
         {

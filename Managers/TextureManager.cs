@@ -30,10 +30,10 @@ namespace TerRoguelike.Managers
     public class TextureManager
     {
         public static bool TexturesLoaded = false;
-        public static Dictionary<string, Asset<Texture2D>> TexDict = new Dictionary<string, Asset<Texture2D>>();
+        public static Dictionary<string, Texture2D> TexDict = [];
+        public static Dictionary<string, Asset<Texture2D>> TexAssetDict = [];
         internal static void Load()
         {
-            TexturesLoaded = true;
             List<string> pathList = new List<string>()
             {
                 "TerRoguelike/NPCs/StillMoonLord",
@@ -141,15 +141,29 @@ namespace TerRoguelike.Managers
                 AddTex(path);
             }
         }
+        public static void SetStaticDefaults()
+        {
+            TexDict.Clear();
+            foreach (var asset in TexAssetDict)
+            {
+                TexDict.Add(asset.Key, asset.Value.Value);
+            }
+            TexAssetDict = null;
+            TexturesLoaded = true;
+        }
         internal static void Unload()
         {
             TexDict = null;
             TexturesLoaded = false;
+            TexAssetDict = null;
         }
         internal static void AddTex(string path)
         {
             string name = path.Substring(path.LastIndexOf("/") + 1);
-            TexDict.Add(name, ModContent.Request<Texture2D>(path, AssetRequestMode.AsyncLoad));
+            TexAssetDict.Add(name, ModContent.Request<Texture2D>(path, AssetRequestMode.AsyncLoad));
+
+            // this just fills in a placeholder blank texture since loading isn't fully done yet. 
+            TexDict.Add(name, TexAssetDict[name].Value);
         }
     }
 }

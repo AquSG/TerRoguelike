@@ -46,7 +46,7 @@ namespace TerRoguelike.Particles
         int floatTime;
         public Ash(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, float Deceleration = 0.96f, float gravity = 0.04f, int fadeOutTimeLeftThreshold = 30, int airHangTime = 30, bool Additive = false)
         {
-            texture = TexDict["Square"].Value;
+            texture = TexDict["Square"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = Additive;
             oldPosition = Position;

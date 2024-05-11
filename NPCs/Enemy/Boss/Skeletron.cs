@@ -84,8 +84,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.IgnoreRoomWallCollision = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
-            eyeTex = TexDict["SkeletronEye"].Value;
-            squareTex = TexDict["Square"].Value;
+            eyeTex = TexDict["SkeletronEye"];
+            squareTex = TexDict["Square"];
         }
         public override void OnSpawn(IEntitySource source)
         {

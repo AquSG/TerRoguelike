@@ -53,8 +53,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             modNPC.OverrideIgniteVisual = true;
             NPC.hide = true;
-            lightningTex = TexDict["Square"].Value;
-            crossSparkTex = TexDict["CrossSpark"].Value;
+            lightningTex = TexDict["Square"];
+            crossSparkTex = TexDict["CrossSpark"];
         }
         public override void DrawBehind(int index)
         {

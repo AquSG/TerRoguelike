@@ -31,6 +31,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using TerRoguelike.UI;
 
 namespace TerRoguelike.Systems
 {
@@ -492,7 +493,7 @@ namespace TerRoguelike.Systems
                 return;
 
             spriteBatch.End();
-            Texture2D lightTexture = TexDict["TemporaryBlock"].Value;
+            Texture2D lightTexture = TexDict["TemporaryBlock"];
             foreach (Room room in RoomList)
             {
                 if (room == null)
@@ -693,7 +694,7 @@ namespace TerRoguelike.Systems
             for (int p = 0; p < healingPulses.Count; p++)
             {
                 HealingPulse pulse = healingPulses[p];
-                Texture2D telegraphBase = TexDict["InvisibleProj"].Value;
+                Texture2D telegraphBase = TexDict["InvisibleProj"];
 
                 float scale;
                 float opacity;
@@ -773,8 +774,8 @@ namespace TerRoguelike.Systems
             if (chainList.Count == 0)
                 return;
 
-            Texture2D chain1Tex = TexDict["Chain1"].Value;
-            Texture2D chain2Tex = TexDict["Chain2"].Value;
+            Texture2D chain1Tex = TexDict["Chain1"];
+            Texture2D chain2Tex = TexDict["Chain2"];
             for (int i = 0; i < chainList.Count; i++)
             {
                 Chain chain = chainList[i];
@@ -878,6 +879,10 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsDebugWorld = false;
             TerRoguelikeWorld.IsDeletableOnExit = false;
             TerRoguelikeWorld.IsTerRoguelikeWorld = false;
+        }
+        public override void SetStaticDefaults()
+        {
+            
         }
     }
     public class HealingPulse

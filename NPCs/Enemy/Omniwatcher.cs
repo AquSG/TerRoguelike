@@ -45,7 +45,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, -2);
             NPC.noGravity = true;
             NPC.noTileCollide = false;
-            lightTex = TexDict["OmniwatcherGlow"].Value;
+            lightTex = TexDict["OmniwatcherGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

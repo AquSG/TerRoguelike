@@ -33,7 +33,7 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = true;
             Projectile.ignoreWater = true;
             Projectile.hide = true;
-            chainTex = TexDict["SpikedBallChain"].Value;
+            chainTex = TexDict["SpikedBallChain"];
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {

@@ -89,9 +89,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.RoomWallCollisionShrink = new Vector2(8, 24);
             NPC.noTileCollide = true;
             NPC.noGravity = true;
-            glowTex = TexDict["PharaohSpiritGlow"].Value;
-            noiseTex = TexDict["Crust"].Value;
-            circleGlowTex = TexDict["CircularGlow"].Value;
+            glowTex = TexDict["PharaohSpiritGlow"];
+            noiseTex = TexDict["Crust"];
+            circleGlowTex = TexDict["CircularGlow"];
         }
         public override void DrawBehind(int index)
         {

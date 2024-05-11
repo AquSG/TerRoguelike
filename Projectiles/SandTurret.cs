@@ -45,9 +45,9 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = -1;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
-            noiseTex = TexDict["Crust"].Value;
-            glowTex = TexDict["CircularGlow"].Value;
-            crossGlowTex = TexDict["CrossSpark"].Value;
+            noiseTex = TexDict["Crust"];
+            glowTex = TexDict["CircularGlow"];
+            crossGlowTex = TexDict["CrossSpark"];
         }
         public override void OnSpawn(IEntitySource source)
         {

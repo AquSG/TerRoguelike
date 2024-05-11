@@ -33,7 +33,7 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = true;
             Projectile.timeLeft = maxTimeLeft = 600;
             Projectile.penetrate = -1;
-            glowTex = TexDict["CircularGlow"].Value;
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {
