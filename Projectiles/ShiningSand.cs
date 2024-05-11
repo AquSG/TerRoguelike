@@ -35,8 +35,8 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = maxTimeLeft = 600;
             Projectile.penetrate = -1;
             Projectile.ignoreWater = true;
-            noiseTex = TexDict["Crust"].Value;
-            glowTex = TexDict["CircularGlow"].Value;
+            noiseTex = TexDict["Crust"];
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

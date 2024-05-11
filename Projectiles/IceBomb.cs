@@ -32,7 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = false;
             Projectile.timeLeft = 60;
             Projectile.penetrate = -1;
-            lineTex = TexDict["LerpLineGradient"].Value;
+            lineTex = TexDict["LerpLineGradient"];
         }
         public override void OnSpawn(IEntitySource source)
         {

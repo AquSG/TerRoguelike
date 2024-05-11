@@ -106,8 +106,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.SpecialProjectileCollisionRules = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
-            glowTex = TexDict["IceQueenGlow"].Value;
-            squareTex = TexDict["Square"].Value;
+            glowTex = TexDict["IceQueenGlow"];
+            squareTex = TexDict["Square"];
         }
         public override void OnSpawn(IEntitySource source)
         {

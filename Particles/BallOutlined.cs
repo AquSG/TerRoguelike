@@ -43,7 +43,7 @@ namespace TerRoguelike.Particles
         Color outlineColor;
         public BallOutlined(Vector2 Position, Vector2 Velocity, int TimeLeft, Color OutlineColor, Color FillColor, Vector2 Scale, float OutlineWidth, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30)
         {
-            texture = TexDict["DarkTendril"].Value;
+            texture = TexDict["DarkTendril"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = false;
             oldPosition = Position;

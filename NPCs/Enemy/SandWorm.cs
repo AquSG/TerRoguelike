@@ -52,9 +52,9 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.OverrideIgniteVisual = true;
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.SpecialProjectileCollisionRules = true;
-            headTex = TexDict["SandWormHead"].Value;
-            bodyTex = TexDict["SandWormBody"].Value;
-            tailTex = TexDict["SandWormTail"].Value;
+            headTex = TexDict["SandWormHead"];
+            bodyTex = TexDict["SandWormBody"];
+            tailTex = TexDict["SandWormTail"];
         }
         public override void OnSpawn(IEntitySource source)
         {

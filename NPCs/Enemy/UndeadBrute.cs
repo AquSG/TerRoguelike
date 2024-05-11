@@ -55,9 +55,9 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -4);
             ball = new BallAndChain(NPC.Center - (Vector2.UnitX * 32), 20, 20, 0);
-            ballTex = TexDict["SpikedBall"].Value;
-            chainTex = TexDict["SpikedBallChain"].Value;
-            armTex = TexDict["UndeadBruteArm"].Value;
+            ballTex = TexDict["SpikedBall"];
+            chainTex = TexDict["SpikedBallChain"];
+            armTex = TexDict["UndeadBruteArm"];
         }
         public override void AI()
         {

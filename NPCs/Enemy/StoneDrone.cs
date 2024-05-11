@@ -45,7 +45,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.8f;
             modNPC.drawCenter = new Vector2(0, -10);
             NPC.noGravity = true;
-            lightTex = TexDict["StoneDroneGlow"].Value;
+            lightTex = TexDict["StoneDroneGlow"];
         }
         public override void AI()
         {

@@ -52,8 +52,8 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.behindTiles = true;
             NPC.noTileCollide = true;
-            segment1Tex = TexDict["ClingerSegment1"].Value;
-            segment2Tex = TexDict["ClingerSegment2"].Value;
+            segment1Tex = TexDict["ClingerSegment1"];
+            segment2Tex = TexDict["ClingerSegment2"];
         }
         public override void OnSpawn(IEntitySource source)
         {

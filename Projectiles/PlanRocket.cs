@@ -124,7 +124,7 @@ namespace TerRoguelike.Projectiles
             }
             if (Projectile.velocity != Vector2.Zero)
             {
-                Texture2D rocketTexture = TexDict["PlanRocket"].Value;
+                Texture2D rocketTexture = TexDict["PlanRocket"];
                 Vector2 drawPosition = Projectile.Center - Main.screenPosition;
                 Main.EntitySpriteDraw(rocketTexture, drawPosition, null, Color.White, Projectile.velocity.ToRotation(), rocketTexture.Size() * 0.5f, 1f, SpriteEffects.None);
             }

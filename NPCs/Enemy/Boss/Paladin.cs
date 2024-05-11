@@ -71,8 +71,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.DeathSound = SoundID.NPCDeath6;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, -12);
-            hammerTex = TexDict["PaladinHammer"].Value;
-            godRayTex = TexDict["GodRay"].Value;
+            hammerTex = TexDict["PaladinHammer"];
+            godRayTex = TexDict["GodRay"];
         }
         public override void OnSpawn(IEntitySource source)
         {

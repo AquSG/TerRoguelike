@@ -47,7 +47,7 @@ namespace TerRoguelike.Particles
 
         public Debris(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame, float Rotation, SpriteEffects SpriteEffects, float Acceleration, float yCap, int fadeOutTimeLeftThreshold = 60)
         {
-            texture = TexDict["RockDebris"].Value;
+            texture = TexDict["RockDebris"];
             frameWidth = texture.Width;
             frameHeight = texture.Height / verticalFrameCount;
             currentFrame = StartFrame;
@@ -56,7 +56,7 @@ namespace TerRoguelike.Particles
             oldPosition = Position;
             position = Position;
             velocity = Velocity;
-            color = startColor = Color;
+            color = Color;
             rotation = Rotation;
             scale = startScale = Scale;
             spriteEffects = SpriteEffects;

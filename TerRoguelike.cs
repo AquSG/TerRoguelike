@@ -19,9 +19,6 @@ namespace TerRoguelike
             SchematicManager.Load();
             ItemManager.Load();
             NPCManager.Load();
-            BarrierUI.Load();
-            DeathUI.Load();
-            DebugUI.Load();
             if (!Main.dedServ)
             {
                 LoadClient();
@@ -46,6 +43,13 @@ namespace TerRoguelike
         public void LoadClient()
         {
             TerRoguelikeShaders.LoadShaders();
+        }
+        public override void PostSetupContent()
+        {
+            TextureManager.SetStaticDefaults();
+            BarrierUI.Load();
+            DeathUI.Load();
+            DebugUI.Load();
         }
     }
 }

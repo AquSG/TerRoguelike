@@ -88,7 +88,7 @@ namespace TerRoguelike.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D texture = TextureAssets.Projectile[Type].Value;
-            Texture2D glowTex = TexDict["LenaGlow"].Value;
+            Texture2D glowTex = TexDict["LenaGlow"];
             int frameHeight = texture.Height / Main.projFrames[Projectile.type];
             SpriteEffects spriteEffects = direction == 1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             float opacity = MathHelper.Clamp(MathHelper.Lerp(1f, 0f, (Projectile.timeLeft - 6) / 30f), 0f, 1f); // fade in

@@ -75,9 +75,9 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.timeLeft <= 60 && Projectile.timeLeft >= 45 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D bombTex = TexDict["SingularClusterBomb"].Value;
-            Texture2D explosionTex = TexDict["Explosion"].Value;
-            Texture2D smokeTex = TexDict["Smoke"].Value;
+            Texture2D bombTex = TexDict["SingularClusterBomb"];
+            Texture2D explosionTex = TexDict["Explosion"];
+            Texture2D smokeTex = TexDict["Smoke"];
 
             if (randomSmokeRotation == -100f)
             {

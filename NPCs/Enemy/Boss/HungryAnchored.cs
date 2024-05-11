@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             NPC.behindTiles = true;
-            segmentTex = TexDict["HungryTether"].Value;
+            segmentTex = TexDict["HungryTether"];
             NPC.spriteDirection = 1;
             NPC.gfxOffY = 2;
         }

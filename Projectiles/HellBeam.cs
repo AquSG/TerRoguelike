@@ -50,8 +50,8 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            waveTex = TexDict["HellBeamWave"].Value;
-            squareTex = TexDict["Square"].Value;
+            waveTex = TexDict["HellBeamWave"];
+            squareTex = TexDict["Square"];
             Projectile.hide = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)

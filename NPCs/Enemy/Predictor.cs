@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath5;
             NPC.knockBackResist = 0.4f;
             modNPC.drawCenter = new Vector2(0, -5);
-            lightTex = TexDict["PredictorGlow"].Value;
+            lightTex = TexDict["PredictorGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

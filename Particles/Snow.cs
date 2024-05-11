@@ -48,7 +48,7 @@ namespace TerRoguelike.Particles
         float periodOffset;
         public Snow(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, float Deceleration = 0.96f, float gravity = 0.04f, int fadeOutTimeLeftThreshold = 30, int airHangTime = 30, bool TileCollide = true, bool Additive = false)
         {
-            texture = TexDict["Snowflake"].Value;
+            texture = TexDict["Snowflake"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = Additive;
             oldPosition = Position;

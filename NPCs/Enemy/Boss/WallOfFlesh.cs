@@ -99,11 +99,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             NPC.behindTiles = true;
-            squareTex = TexDict["Square"].Value;
-            bodyTex = TexDict["WallOfFleshBody"].Value;
-            eyeTex = TexDict["WallOfFleshEye"].Value;
-            mouthTex = TexDict["WallOfFleshMouth"].Value;
-            godRayTex = TexDict["GodRay"].Value;
+            squareTex = TexDict["Square"];
+            bodyTex = TexDict["WallOfFleshBody"];
+            eyeTex = TexDict["WallOfFleshEye"];
+            mouthTex = TexDict["WallOfFleshMouth"];
+            godRayTex = TexDict["GodRay"];
         }
         public override void OnSpawn(IEntitySource source)
         {

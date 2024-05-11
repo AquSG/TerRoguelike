@@ -51,7 +51,7 @@ namespace TerRoguelike.Particles
 
         public Smoke(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame = 0, float Rotation = 0, SpriteEffects SpriteEffects = SpriteEffects.None, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 60, int FadeInTime = 15)
         {
-            texture = TexDict["AnimatedSmoke"].Value;
+            texture = TexDict["AnimatedSmoke"];
             frameWidth = texture.Width / horizontalFrameCount;
             frameHeight = texture.Height / verticalFrameCount;
             currentFrame = startFrame = StartFrame;

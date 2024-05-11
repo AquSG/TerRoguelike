@@ -53,9 +53,9 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.OverrideIgniteVisual = true;
             modNPC.SpecialProjectileCollisionRules = true;
-            headTex = TexDict["BoneSerpentHead"].Value;
-            bodyTex = TexDict["BoneSerpentBody"].Value;
-            tailTex = TexDict["BoneSerpentTail"].Value;
+            headTex = TexDict["BoneSerpentHead"];
+            bodyTex = TexDict["BoneSerpentBody"];
+            tailTex = TexDict["BoneSerpentTail"];
         }
         public override void OnSpawn(IEntitySource source)
         {

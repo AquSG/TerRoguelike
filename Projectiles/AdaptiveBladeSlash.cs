@@ -41,7 +41,7 @@ namespace TerRoguelike.Projectiles
             Projectile.usesLocalNPCImmunity = true;
             Projectile.localNPCHitCooldown = -1;
             modProj = Projectile.ModProj();
-            squareTex = TextureManager.TexDict["Square"].Value;
+            squareTex = TextureManager.TexDict["Square"];
         }
 
         public override void AI()

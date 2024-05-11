@@ -38,7 +38,7 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.timeLeft = maxTimeLeft = 400;
-            glowTex = TexDict["CircularGlow"].Value;
+            glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

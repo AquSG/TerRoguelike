@@ -75,8 +75,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.IgnoreRoomWallCollision = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
-            eyeTex = TexDict["TempleGolemEyes"].Value;
-            lightTex = TexDict["TempleGolemGlow"].Value;
+            eyeTex = TexDict["TempleGolemEyes"];
+            lightTex = TexDict["TempleGolemGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

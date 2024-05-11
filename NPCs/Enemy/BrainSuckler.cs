@@ -44,7 +44,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.8f;
             modNPC.drawCenter = new Vector2(0, 5);
             NPC.noGravity = true;
-            lightTex = TexDict["BrainSucklerGlow"].Value;
+            lightTex = TexDict["BrainSucklerGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {

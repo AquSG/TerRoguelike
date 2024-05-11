@@ -36,8 +36,8 @@ namespace TerRoguelike.Projectiles
             Projectile.localNPCHitCooldown = -1;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            smokeTex = TexDict["Smoke"].Value;
-            starTex = TexDict["CrossGlow"].Value;
+            smokeTex = TexDict["Smoke"];
+            starTex = TexDict["CrossGlow"];
         }
 
         public override void OnSpawn(IEntitySource source)

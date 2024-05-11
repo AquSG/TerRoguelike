@@ -29,7 +29,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 300;
             Projectile.penetrate = 1;
-            glowTex = TexDict["CircularGlow"].Value;
+            glowTex = TexDict["CircularGlow"];
             Projectile.hide = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)

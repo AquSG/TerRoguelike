@@ -36,8 +36,8 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
-            glowTex = TexDict["CircularGlow"].Value;
-            crossGlowTex = TexDict["CrossSpark"].Value;
+            glowTex = TexDict["CircularGlow"];
+            crossGlowTex = TexDict["CrossSpark"];
             Projectile.hide = true;
             Projectile.ModProj().killOnRoomClear = true;
         }

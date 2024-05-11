@@ -29,7 +29,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.timeLeft = 240;
             Projectile.penetrate = -1;
-            lightTex = TexDict["TempleBoulderGlow"].Value;
+            lightTex = TexDict["TempleBoulderGlow"];
         }
         public override void OnSpawn(IEntitySource source)
         {
