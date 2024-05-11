@@ -115,27 +115,23 @@ namespace TerRoguelike.Managers
                 return;
             if (ActiveParticlesBehindTiles.Count == 0)
                 return;
-            Vector2 drawBehindOffset = RoomSystem.DrawBehindTilesOffset;
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            StartAlphaBlendSpritebatch();
             for (int i = 0; i < ActiveParticlesBehindTiles.Count; i++)
             {
                 Particle particle = ActiveParticlesBehindTiles[i];
                 if (particle.additive)
                     continue;
-                particle.Draw(drawBehindOffset);
+                particle.Draw();
             }
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            StartAdditiveSpritebatch();
             for (int i = 0; i < ActiveParticlesBehindTiles.Count; i++)
             {
                 Particle particle = ActiveParticlesBehindTiles[i];
                 if (!particle.additive)
                     continue;
-                particle.Draw(drawBehindOffset);
+                particle.Draw();
             }
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.EffectMatrix);
+            StartVanillaSpritebatch();
         }
     }
 }

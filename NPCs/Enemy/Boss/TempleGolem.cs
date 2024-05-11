@@ -105,7 +105,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[0] != SpikeBall.Id || (NPC.ai[0] == SpikeBall.Id && NPC.ai[1] >= spikeBallWindup))
                 {
-                    sound.Volume *= 0.98f;
+                    sound.Volume *= 0.99f;
                     sound.Volume -= 0.001f;
                     if (sound.Volume <= 0)
                         sound.Stop();
@@ -234,16 +234,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.ai[3] = Main.rand.Next(3);
                         RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthTremor with { Volume = 1f }, new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + thirdWidth * 0.5f, NPC.position.Y));
                     }
-                    if (NPC.ai[1] % 2 == 0)
-                    {
-                        Vector2 particlePos = new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
-                        particlePos = TileCollidePositionInLine(particlePos, particlePos + new Vector2(0, -240)) - Vector2.UnitY * 16;
-                        ParticleManager.AddParticle(new Debris(
-                            particlePos, Vector2.UnitY * Main.rand.NextFloat(0.75f, 1.25f),
-                            80, Color.Lerp(Color.DarkOrange, Color.Black, 0.2f) * 0.875f, new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
-                            Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.1f, 7f, 60),
-                            ParticleManager.ParticleLayer.BehindTiles);
-                    }
                 }
                 else
                 {
@@ -255,6 +245,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     
                 }
+                if (NPC.localAI[1] >= 0)
+                {
+                    NPC.localAI[1] = -(2 + ((int)NPC.ai[1] / spikeBallWindup) * 2);
+                    Vector2 particlePos = new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
+                    particlePos = TileCollidePositionInLine(particlePos, particlePos + new Vector2(0, -240)) - Vector2.UnitY * 16;
+                    ParticleManager.AddParticle(new Debris(
+                        particlePos, Vector2.UnitY * Main.rand.NextFloat(0.75f, 1.25f),
+                        80, Color.Lerp(Color.DarkOrange, Color.Black, 0.2f), new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
+                        Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.1f, 7f, 60),
+                        ParticleManager.ParticleLayer.BehindTiles);
+                }
+                else
+                    NPC.localAI[1]++;
 
                 if (NPC.ai[1] >= SpikeBall.Duration)
                 {
@@ -262,6 +265,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[1] = 0;
                     NPC.ai[2] = SpikeBall.Id;
                     NPC.ai[3] = 0;
+                    NPC.localAI[1] = 0;
                 }
             }
             else if (NPC.ai[0] == Flame.Id)
@@ -358,6 +362,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[0] = None.Id;
             NPC.ai[1] = 1;
             NPC.ai[3] = 0;
+            NPC.localAI[1] = 0;
 
             modNPC.OverrideIgniteVisual = true;
             NPC.life = 1;

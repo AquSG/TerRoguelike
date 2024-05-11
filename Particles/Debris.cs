@@ -43,7 +43,6 @@ namespace TerRoguelike.Particles
         int frameWidth;
         int frameHeight;
         int fadeOutTime;
-        Color startColor;
         float yVelCap;
 
         public Debris(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame, float Rotation, SpriteEffects SpriteEffects, float Acceleration, float yCap, int fadeOutTimeLeftThreshold = 60)
@@ -74,9 +73,9 @@ namespace TerRoguelike.Particles
             if (timeLeft < fadeOutTime)
             {
                 float interpolant = (timeLeft / (float)fadeOutTime);
-                //color = startColor * interpolant;
                 scale = startScale * interpolant;
             }
+            rotation += 0.075f * (Math.Abs(velocity.Y) / Math.Abs(yVelCap)) * (spriteEffects == SpriteEffects.None ? 1 : -1);
         }
         public void FindFrame()
         {
