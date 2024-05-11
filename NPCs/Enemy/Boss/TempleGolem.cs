@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
+using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack None = new Attack(0, 0, 30);
         public static Attack Laser = new Attack(1, 30, 180);
         public static Attack SpikeBall = new Attack(2, 30, 180);
-        public static Attack Flame = new Attack(3, 30, 180);
+        public static Attack Flame = new Attack(3, 35, 180);
         public static Attack DartTrap = new Attack(4, 30, 180);
         public static Attack Boulder = new Attack(5, 30, 180);
         public static Attack Summon = new Attack(6, 16, 180);
@@ -56,6 +57,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int laserFireRate = 7;
         public int spikeBallWindup = 60;
         public int spikeBallFireRate = 4;
+        public int flameWindup = 60;
+        public int flameFireRate = 4;
 
         public override void SetStaticDefaults()
         {
@@ -67,7 +70,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.width = 70;
             NPC.height = 70;
             NPC.aiStyle = -1;
-            NPC.damage = 34;
+            NPC.damage = 30;
             NPC.lifeMax = 31000;
             NPC.HitSound = SoundID.NPCHit4;
             NPC.knockBackResist = 0f;
@@ -270,11 +273,69 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Flame.Id)
             {
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Vector2 projSpawnPos = NPC.Center + new Vector2(0, 34);
+                float rotToTarget = (targetPos - projSpawnPos).ToRotation();
+                currentFrame = 1;
+                if (NPC.ai[1] < flameWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        int soundCount = 2; // play more so it's a higher volume lol
+                        for (int i = 0; i < soundCount; i++)
+                        {
+                            SoundEngine.PlaySound(SoundID.DD2_BetsySummon with { Volume = 0.66f, Variants = [2], MaxInstances = soundCount, PitchVariance = 0, Pitch = -0.4f }, projSpawnPos);
+                        }
+                    }
+                    if (NPC.ai[1] < flameWindup - 5)
+                    {
+                        if (target != null && NPC.ai[1] < flameWindup - 10)
+                            NPC.ai[3] = rotToTarget;
+                        Color particleColor = Color.Lerp(Color.Red, Color.Yellow, Main.rand.NextFloat());
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(30f, 20f);
+                        offset.Y *= (Math.Abs(offset.X) / 45) + 0.33f;
+                        if (Main.rand.NextBool(5))
+                            offset.Y *= Main.rand.NextFloat(1.2f, 1.7f);
+                        ParticleManager.AddParticle(new Square(
+                            projSpawnPos + offset, -offset * 0.1f, 30, particleColor, new Vector2(Main.rand.NextFloat(0.8f, 1.3f)), offset.ToRotation(), 0.96f, 30, true));
+                    }
+                        
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - flameWindup;
+                    if (time % flameFireRate == 0)
+                    {
+                        float slowdownCone = MathHelper.PiOver4 * 0.55f;
+                        float angleBetween = MathHelper.Clamp(Math.Abs(AngleSizeBetween(NPC.ai[3], rotToTarget)), 0, slowdownCone);
+                        if (target != null)
+                            NPC.ai[3] = NPC.ai[3].AngleTowards(rotToTarget, 0.075f * (angleBetween / slowdownCone));
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * 7, ProjectileID.Flames, NPC.damage, 0, -1, 0, 0.24f);
+                    }
+                    if (time % 10 == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item34 with { Volume = 1f, MaxInstances = 2 }, projSpawnPos);
+                        if (time == 0)
+                            SoundEngine.PlaySound(SoundID.DD2_BetsyFlameBreath with { Volume = 1 }, projSpawnPos);
+                        else
+                            SoundEngine.PlaySound(SoundID.DD2_BetsyFlameBreath with { Volume = 0.3f, MaxInstances = 10, PitchVariance = 0.1f }, projSpawnPos);
+                        
+                    }
+
+                    Color particleColor = Color.Lerp(Color.Red, Color.Yellow, Main.rand.NextFloat());
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(30f, 20f);
+                    offset.Y *= (Math.Abs(offset.X) / 45) + 0.33f;
+                    float rotForParticles = NPC.ai[3].AngleTowards(rotToTarget, 0.15f);
+                    ParticleManager.AddParticle(new Square(
+                        projSpawnPos, offset.RotatedBy(rotForParticles + MathHelper.PiOver2) * 0.1f + rotForParticles.ToRotationVector2() * 1.6f, 30, particleColor, new Vector2(Main.rand.NextFloat(1, 1.5f)), offset.ToRotation(), 0.96f, 30, true));
+                }
                 if (NPC.ai[1] >= Flame.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Flame.Id;
+                    NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == DartTrap.Id)
@@ -312,8 +373,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame, DartTrap, Boulder, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+            if (target != null && NPC.Center.Distance(target.Center) > 500)
+                potentialAttacks.RemoveAll(x => x.Id == Flame.Id);
 
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
@@ -332,7 +395,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = SpikeBall.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
