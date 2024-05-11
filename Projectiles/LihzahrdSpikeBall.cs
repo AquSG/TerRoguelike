@@ -38,14 +38,18 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             direction = Main.rand.NextBool() ? 1 : -1;
+            Projectile.ai[1] = Projectile.ai[0];
         }
         public override void AI()
         {
+            if (Projectile.ai[1] == Projectile.ai[0])
+                Projectile.localAI[0] = Projectile.velocity.Y;
+
             if (Projectile.timeLeft < 360)
                 Projectile.tileCollide = true;
 
             Projectile.velocity.Y += 0.15f;
-            Projectile.rotation += MathHelper.Clamp((Math.Abs(Projectile.velocity.Y) + 1f) * direction * 0.05f, -0.2f, 0.2f);
+            Projectile.rotation += MathHelper.Clamp((Math.Abs(Projectile.localAI[0])) * direction * 0.02f, -0.2f, 0.2f);
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
@@ -68,6 +72,7 @@ namespace TerRoguelike.Projectiles
             {
                 Projectile.velocity.Y = -oldVelocity.Y * Main.rand.NextFloat(0.78f, 0.85f);
             }
+            Projectile.localAI[0] = Projectile.velocity.Y;
             return false;
         }
         public override Color? GetAlpha(Color lightColor) => Color.Lerp(lightColor, Color.White, 0f);
@@ -75,8 +80,9 @@ namespace TerRoguelike.Projectiles
         {
             for (int i = 0; i < 5; i++)
             {
-                Vector2 randVel = Main.rand.NextVector2Circular(1, 1);
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.t_Lihzahrd, randVel.X, randVel.Y, 0, default(Color), 1.5f);
+                int dustType = Main.rand.NextBool() ? DustID.t_Lihzahrd : DustID.OrangeTorch;
+                Vector2 randVel = Main.rand.NextVector2CircularEdge(1, 1) * Main.rand.NextFloat(2f, 3f);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, dustType, randVel.X, randVel.Y, 0, default(Color), 1.5f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.noLight = true;

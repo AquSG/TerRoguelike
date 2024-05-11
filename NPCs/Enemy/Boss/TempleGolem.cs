@@ -252,7 +252,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     particlePos = TileCollidePositionInLine(particlePos, particlePos + new Vector2(0, -240)) - Vector2.UnitY * 16;
                     ParticleManager.AddParticle(new Debris(
                         particlePos, Vector2.UnitY * Main.rand.NextFloat(0.75f, 1.25f),
-                        80, Color.Lerp(Color.DarkOrange, Color.Black, 0.2f), new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
+                        80, Color.DarkOrange * 0.875f, new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
                         Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.1f, 7f, 60),
                         ParticleManager.ParticleLayer.BehindTiles);
                 }
