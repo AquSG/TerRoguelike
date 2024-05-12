@@ -30,6 +30,7 @@ namespace TerRoguelike.Projectiles
             Projectile.penetrate = 1;
             Projectile.tileCollide = false;
             Projectile.hide = true;
+            Projectile.ModProj().killOnRoomClear = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
