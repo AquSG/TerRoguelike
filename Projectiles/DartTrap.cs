@@ -70,19 +70,19 @@ namespace TerRoguelike.Projectiles
                     SoundEngine.PlaySound(SoundID.Item108 with { Volume = 0.5f, Pitch = 0.1f, PitchVariance = 0, MaxInstances = 100, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, Projectile.Center + Projectile.ai[0].ToRotationVector2() * -390);
 
                     ParticleManager.AddParticle(new ThinSpark(
-                    Projectile.Center + Projectile.ai[0].ToRotationVector2() * 26, Vector2.Zero, 30, Color.LightGoldenrodYellow * 0.6f, new Vector2(0.1f, 0.13f) * 1.05f, MathHelper.PiOver2, true, false));
+                    Projectile.Center + Projectile.ai[0].ToRotationVector2() * 26, Vector2.Zero, 30, Color.LightGoldenrodYellow * 0.6f, new Vector2(0.1f, 0.13f) * 1.05f, MathHelper.PiOver2 + Projectile.ai[0], true, false));
 
                     ParticleManager.AddParticle(new ThinSpark(
-                        Projectile.Center + Projectile.ai[0].ToRotationVector2() * 40, Vector2.Zero, 30, Color.LightGoldenrodYellow * 0.6f, new Vector2(0.2f, 0.13f) * 1.05f, 0, true, false));
+                        Projectile.Center + Projectile.ai[0].ToRotationVector2() * 40, Vector2.Zero, 30, Color.LightGoldenrodYellow * 0.6f, new Vector2(0.2f, 0.13f) * 1.05f, Projectile.ai[0], true, false));
                 }
             }
             else
             {
                 ParticleManager.AddParticle(new ThinSpark(
-                    Projectile.Center + Projectile.ai[0].ToRotationVector2() * 26, Vector2.Zero, 30, Color.Goldenrod * 0.2f, new Vector2(0.1f, 0.13f), MathHelper.PiOver2, true, false));
+                    Projectile.Center + Projectile.ai[0].ToRotationVector2() * 26, Vector2.Zero, 30, Color.Goldenrod * 0.2f, new Vector2(0.1f, 0.13f), MathHelper.PiOver2 + Projectile.ai[0], true, false));
 
                 ParticleManager.AddParticle(new ThinSpark(
-                    Projectile.Center + Projectile.ai[0].ToRotationVector2() * 40, Vector2.Zero, 30, Color.Goldenrod * 0.2f, new Vector2(0.2f, 0.13f), 0, true, false));
+                    Projectile.Center + Projectile.ai[0].ToRotationVector2() * 40, Vector2.Zero, 30, Color.Goldenrod * 0.2f, new Vector2(0.2f, 0.13f), Projectile.ai[0], true, false));
             }
         }
         public override bool? CanDamage() => false;
