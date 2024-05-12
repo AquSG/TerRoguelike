@@ -982,7 +982,13 @@ namespace TerRoguelike.NPCs
                     }
                     if (npc.collideY)
                     {
-                        npc.velocity.Y = npc.oldVelocity.Y * -0.75f;
+                        if (npc.ai[1] < -attackTelegraph)
+                            npc.velocity.Y = npc.oldVelocity.Y * -0.75f;
+                        else if (npc.ai[1] < 0)
+                        {
+                            npc.velocity.Y = npc.oldVelocity.Y * -0.2f;
+                            npc.velocity.X *= 0.5f;
+                        }
                         npc.velocity.X *= 0.9f;
                     }
                     npc.ai[1]++;
