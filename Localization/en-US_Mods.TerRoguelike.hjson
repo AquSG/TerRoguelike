@@ -442,7 +442,7 @@ Items: {
 			8% chance upon hitting an enemy to inflict bleeding
 			Bleeding deals 240 base damage in total over a duration, which can be extended by inflicting bleeding again
 			Inflicting bleeding also extends the duration of other bleeding stacks on the enemy
-			Extra copies of this item further increase the chance by 8%
+			Extra copies of this item further increase the chance by 4%
 			'''
 	}
 

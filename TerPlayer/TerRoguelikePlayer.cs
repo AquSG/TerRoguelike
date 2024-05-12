@@ -1113,7 +1113,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (sanguineOrb > 0)
             {
-                float chance = 0.08f * sanguineOrb;
+                float chance = 0.08f + (0.04f * (sanguineOrb - 1));
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
                     int bleedDamage = 240;

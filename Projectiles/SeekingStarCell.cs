@@ -54,7 +54,7 @@ namespace TerRoguelike.Projectiles
                 d.noLightEmittence = true;
             }
 
-            Projectile.rotation += Projectile.velocity.Length() * 0.05f * Projectile.direction;
+            Projectile.rotation += MathHelper.Clamp(Projectile.velocity.Length(), 0, 6) * 0.05f * Projectile.direction;
             if (Projectile.timeLeft > maxTimeLeft - 90)
             {
                 Projectile.velocity *= 0.972f;
