@@ -58,9 +58,9 @@ namespace TerRoguelike.Projectiles
                     Tile tile = TerRoguelikeUtils.ParanoidTileRetrieval(futureTile);
                     if (TileID.Sets.Platforms[tile.TileType] && tile.IsTileSolidGround() && tile.BlockType == BlockType.Solid)
                     {
-                        if (Projectile.ai[1] > 0)
+                        if (Projectile.ai[0] > 0)
                         {
-                            Projectile.ai[1]--;
+                            Projectile.ai[0]--;
                         }
                         else
                         {

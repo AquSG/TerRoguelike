@@ -48,6 +48,7 @@ namespace TerRoguelike.Projectiles
         {
             float fallSpeedCap = 25f;
             float downwardsAccel = 0.3f;
+            Projectile.gfxOffY = 0;
 
             if (stuckNPC != -1)
             {
@@ -132,6 +133,7 @@ namespace TerRoguelike.Projectiles
                 Vector2 pos = anySegments ? npc.ModNPC().Segments[stuckSegment].Position : npc.Center;
                 stuckPosition = (Vector2.UnitX * stuckPosition.Length()).RotatedBy((anySegments ? npc.ModNPC().Segments[stuckSegment].Rotation : npc.rotation) + origStuckRot);
                 Projectile.Center = pos + stuckPosition;
+                Projectile.gfxOffY = npc.gfxOffY;
                 return;
             }
 

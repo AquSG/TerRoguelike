@@ -41,7 +41,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit24;
             NPC.DeathSound = SoundID.NPCDeath27;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 0);
+            modNPC.drawCenter = new Vector2(0, -2);
         }
         public override void AI()
         {

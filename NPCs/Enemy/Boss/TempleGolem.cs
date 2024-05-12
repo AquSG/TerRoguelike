@@ -174,7 +174,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -130)
                 {
-                    SoundEngine.PlaySound(GolemAwaken with { Volume = 0.5f, Pitch = -0.25f }, NPC.Center);
+                    SoundEngine.PlaySound(GolemAwaken with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
                 }
                 if (NPC.localAI[0] == -85)
                 {
