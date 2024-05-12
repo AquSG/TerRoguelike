@@ -70,7 +70,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int dartTrapFireRate = 15;
         public int boulderWindup = 60;
         public int summonWindup = 80;
-        public int summonChooseAttackCooldown = 0;
+        public int summonChooseAttackCooldown = 600;
 
         public override void SetStaticDefaults()
         {
@@ -156,7 +156,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(SkeletronTheme);
+                SetBossTrack(TempleGolemTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
@@ -715,6 +715,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (deadTime != 0)
                     deathGodRays.Add(new GodRay(Main.rand.NextFloat(MathHelper.TwoPi), deadTime, new Vector2(0.16f + Main.rand.NextFloat(-0.02f, 0.02f), 0.025f)));
                 SoundEngine.PlaySound(Paladin.HammerLand with { Volume = 0.15f, MaxInstances = 10, Pitch = 0.67f, PitchVariance = 0.06f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.22f }, NPC.Center);
             }
             deadTime++;
 
@@ -757,7 +758,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 float rot = i * MathHelper.TwoPi * 0.125f + Main.rand.NextFloat(-0.5f, 0.5f);
                 ParticleManager.AddParticle(new ThinSpark(
-                    NPC.Center + rot.ToRotationVector2() * 30, rot.ToRotationVector2() * 2, 47, Color.Goldenrod, new Vector2(0.075f, 0.075f), rot, true, false));
+                    NPC.Center + rot.ToRotationVector2() * 15, rot.ToRotationVector2() * 3, 43, Color.Goldenrod, new Vector2(0.075f, 0.075f), rot, true, false));
             }
             for (int i = 0; i < 25; i++)
             {
