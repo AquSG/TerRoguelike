@@ -481,11 +481,11 @@ namespace TerRoguelike.Systems
         }
         public static void PostDrawWalls(SpriteBatch spriteBatch)
         {
-            StartAlphaBlendSpritebatch();
+            StartAlphaBlendSpritebatch(false);
             DrawChains();
             DrawRoomWalls(spriteBatch);
             ParticleManager.DrawParticles_BehindTiles();
-            StartVanillaSpritebatch();
+            Main.spriteBatch.End();
         }
         public static void DrawRoomWalls(SpriteBatch spriteBatch)
         {

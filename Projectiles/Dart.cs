@@ -16,17 +16,19 @@ using Terraria.Graphics.Shaders;
 
 namespace TerRoguelike.Projectiles
 {
-    public class WoodSliver : ModProjectile, ILocalizedModType
+    public class Dart : ModProjectile, ILocalizedModType
     {
+        public override string Texture => "TerRoguelike/Projectiles/WoodSliver";
         public override void SetDefaults()
         {
             Projectile.width = 6;
             Projectile.height = 6;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 180;
+            Projectile.timeLeft = 600;
             Projectile.penetrate = 1;
             Projectile.hide = true;
+            Projectile.ModProj().killOnRoomClear = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
@@ -35,23 +37,18 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
-            if (Projectile.velocity.Y > 7)
-                Projectile.velocity.Y = 7;
-            else
-                Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0.2f, 0, (Projectile.timeLeft - 170) / 10f), 0, 0.2f);
-            Projectile.velocity.X *= 0.995f;
         }
 
         public override Color? GetAlpha(Color lightColor)
         {
-            return Color.Lerp(lightColor, Color.White, 0.6f);
+            return Color.Lerp(lightColor, Color.Orange, 0.6f);
         }
 
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             for (int i = 0; i < 5; i++)
             {
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.WoodFurniture, 0f, 0f, 0, default(Color), 1.5f);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.t_Lihzahrd, 0f, 0f, 0, default(Color), 1.5f);
                 Main.dust[d].noGravity = true;
             }
             return true;
@@ -63,7 +60,7 @@ namespace TerRoguelike.Projectiles
 
             TerRoguelikeUtils.StartAlphaBlendSpritebatch();
 
-            Vector3 colorHSL = Main.rgbToHsl(Color.SandyBrown);
+            Vector3 colorHSL = Main.rgbToHsl(Color.Goldenrod);
 
             GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
             GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
@@ -76,6 +73,7 @@ namespace TerRoguelike.Projectiles
             TerRoguelikeUtils.StartVanillaSpritebatch();
 
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, (Color)GetAlpha(Lighting.GetColor(Projectile.Center.ToTileCoordinates())), Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
+
             return false;
         }
     }

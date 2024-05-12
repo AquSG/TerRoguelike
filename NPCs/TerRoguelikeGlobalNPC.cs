@@ -1383,7 +1383,7 @@ namespace TerRoguelike.NPCs
             else if (!LosCheck)
             {
                 float x = npc.velocity.X == 0 ? -0.5f : Math.Sign(npc.velocity.X) * 0.5f;
-                float y = (float)Math.Cos((double)npc.ai[2] * MathHelper.TwoPi) * 2;
+                float y = (float)Math.Cos((double)npc.ai[2] * 0.66f) * 2;
                 npc.velocity += new Vector2(x, y).SafeNormalize(Vector2.UnitY) * passiveAccel;
                 if (npc.velocity.Length() > passiveMaxVelocity && npc.ai[0] < attackTelegraph)
                     npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitY) * passiveMaxVelocity;
