@@ -175,7 +175,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(IceQueenTheme);
             }
 
-            ableToHit = NPC.localAI[0] >= 0;
+            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
             canBeHit = true;
 
             if (NPC.localAI[0] < 0)

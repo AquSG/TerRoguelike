@@ -150,7 +150,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(CrimsonVesselTheme);
             }
 
-            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id) && NPC.localAI[0] >= 0 && !(NPC.ai[0] == BloodTrail.Id && NPC.ai[1] < BloodTrail.Duration - teleportTime);
+            ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id) && NPC.localAI[0] >= 0 && !(NPC.ai[0] == BloodTrail.Id && NPC.ai[1] < BloodTrail.Duration - teleportTime) && deadTime == 0;
             canBeHit = true;
             trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;

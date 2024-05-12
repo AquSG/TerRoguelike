@@ -97,7 +97,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(PaladinTheme);
             }
 
-            ableToHit = !(NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise + slamFall);
+            ableToHit = !(NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise + slamFall) && deadTime == 0;
 
             if (NPC.collideY)
                 NPC.localAI[1] = 0;

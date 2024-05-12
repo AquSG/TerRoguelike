@@ -112,7 +112,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(BrambleHollowTheme);
             }
 
-            ableToHit = !(NPC.ai[0] == Burrow.Id && NPC.ai[1] > Burrow.Duration * 0.5f);
+            ableToHit = !(NPC.ai[0] == Burrow.Id && NPC.ai[1] > Burrow.Duration * 0.5f) && deadTime == 0;
             canBeHit = !(NPC.ai[0] == Burrow.Id && Math.Abs(NPC.ai[1] - (Burrow.Duration * 0.5f)) < 60);
 
             NPC.velocity += new Vector2(0, 0.1f).RotatedBy(MathHelper.PiOver2 * NPC.ai[3]);
