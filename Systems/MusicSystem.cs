@@ -114,6 +114,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/SkeletronThemeStart",
             "TerRoguelike/Tracks/SkeletronThemeEnd",
             0.42f);
+        public static BossTheme TempleGolemTheme = new(
+            "TerRoguelike/Tracks/TempleGolemTheme",
+            "TerRoguelike/Tracks/TempleGolemThemeStart",
+            "TerRoguelike/Tracks/TempleGolemThemeEnd",
+            0.55f);
 
 
         public static void PlayAllSounds()
@@ -157,7 +162,10 @@ namespace TerRoguelike.Systems
                 WallOfFleshTheme.EndTrack,
                 SkeletronTheme.BattleTrack,
                 SkeletronTheme.StartTrack,
-                SkeletronTheme.EndTrack
+                SkeletronTheme.EndTrack,
+                TempleGolemTheme.BattleTrack,
+                TempleGolemTheme.StartTrack,
+                TempleGolemTheme.EndTrack
             };
             foreach (string path in pathList)
             {
@@ -252,7 +260,6 @@ namespace TerRoguelike.Systems
         }
         public void MusicUpdate()
         {
-            SkeletronTheme.Volume = 0.42f;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
 
