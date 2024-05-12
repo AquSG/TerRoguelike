@@ -27,6 +27,8 @@ using static Terraria.Collision;
 using Terraria.GameContent.Drawing;
 using static Terraria.WorldGen;
 using ReLogic.Threading;
+using Terraria.GameContent.Events;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.ILEditing
 {
@@ -48,7 +50,17 @@ namespace TerRoguelike.ILEditing
 			On_Main.DoDraw_DrawNPCsBehindTiles += PreDrawTilesInjection;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
+            On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
         }
+
+        private void PostDrawBasicallyEverything(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
+        {
+			orig.Invoke(spriteBatch);
+			spriteBatch.End();
+			RoomSystem.PostDrawEverything(spriteBatch);
+			TerRoguelikeUtils.StartVanillaSpritebatch(false);
+        }
+
         private void PreDrawTilesInjection(On_Main.orig_DoDraw_DrawNPCsBehindTiles orig, Main self)
         {
             orig.Invoke(self);

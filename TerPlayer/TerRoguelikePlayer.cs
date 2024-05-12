@@ -281,7 +281,10 @@ namespace TerRoguelike.TerPlayer
                 Player.noFallDmg = true;
                 Player.noKnockback = true;
                 Player.GetCritChance(DamageClass.Generic) -= 3f;
-                Player.hasMagiluminescence = true;
+                Player.runAcceleration *= 1.75f;
+                Player.maxRunSpeed *= 1.15f;
+                Player.accRunSpeed *= 1.15f;
+                Player.runSlowdown *= 1.75f;
                 Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
                 Player.lifeRegen += 4;
                 Player.lifeRegenTime = 0;

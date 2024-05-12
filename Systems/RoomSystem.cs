@@ -181,7 +181,7 @@ namespace TerRoguelike.Systems
                                 CalmVolumeLevel = nextFloor.Soundtrack.Volume;
                                 CombatVolumeLevel = nextFloor.Soundtrack.Volume;
                             }
-                            
+                            FloorTransitionEffects();
                             NewFloorEffects(targetRoom, modPlayer);
                         }
 
@@ -285,6 +285,7 @@ namespace TerRoguelike.Systems
                                 }
                             }
 
+                            FloorTransitionEffects();
                             NewFloorEffects(targetRoom, modPlayer);
                         }
 
@@ -487,6 +488,29 @@ namespace TerRoguelike.Systems
             ParticleManager.DrawParticles_BehindTiles();
             Main.spriteBatch.End();
         }
+        public static void PostDrawEverything(SpriteBatch spritebatch)
+        {
+            if (worldTeleportTime > 0)
+            {
+                StartAlphaBlendSpritebatch(false);
+                float worldTeleportOpacity = 1f;
+                int fadeIn = 0;
+                int fadeOut = 50;
+                int totalTime = 60;
+                if (worldTeleportTime < fadeIn)
+                {
+                    worldTeleportOpacity *= worldTeleportTime / (float)fadeIn;
+                }
+                if (totalTime - worldTeleportTime < fadeOut)
+                {
+                    worldTeleportOpacity *= ((totalTime - worldTeleportTime) / (float)fadeOut);
+                }
+
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f), SpriteEffects.None);
+
+                Main.spriteBatch.End();
+            }
+        }
         public static void DrawRoomWalls(SpriteBatch spriteBatch)
         {
             if (RoomList == null)
@@ -593,6 +617,11 @@ namespace TerRoguelike.Systems
                 modPlayer.portableGeneratorImmuneTime += 540 + (600 * modPlayer.portableGenerator);
                 SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.5f });
             }
+        }
+        public void FloorTransitionEffects()
+        {
+            worldTeleportTime = 1;
+            SoundEngine.PlaySound(WorldTeleport with { Volume = 0.3f, Variants = [1] });
         }
         #endregion
 
@@ -793,6 +822,12 @@ namespace TerRoguelike.Systems
         public override void PostUpdateEverything()
         {
             ParticleManager.UpdateParticles();
+            if (worldTeleportTime > 0)
+            {
+                worldTeleportTime++;
+                if (worldTeleportTime > 60)
+                    worldTeleportTime = 0;
+            }
         }
         #endregion
 
@@ -879,6 +914,7 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsDebugWorld = false;
             TerRoguelikeWorld.IsDeletableOnExit = false;
             TerRoguelikeWorld.IsTerRoguelikeWorld = false;
+            worldTeleportTime = 0;
         }
         public override void SetStaticDefaults()
         {

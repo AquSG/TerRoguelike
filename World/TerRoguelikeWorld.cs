@@ -30,9 +30,11 @@ namespace TerRoguelike.World
         public static int escapeTime = 0;
         public const int escapeTimeSet = 18000;
         public static List<Chain> chainList = new List<Chain>();
+        public static int worldTeleportTime = 0;
 
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
         public static readonly SoundStyle EarthPound = new SoundStyle("TerRoguelike/Sounds/EarthPound", 4);
+        public static readonly SoundStyle WorldTeleport = new SoundStyle("TerRoguelike/Sounds/WorldTeleport", 2);
         public static void StartEscapeSequence()
         {
             escape = true;
@@ -54,7 +56,7 @@ namespace TerRoguelike.World
             }
             SetMusicMode(MusicStyle.AllCalm);
             SetCalm(Escape, false);
-            CalmVolumeLevel = 0.5f;
+            CalmVolumeLevel = 0.43f;
             PauseWhenIngamePaused = true;
         }
     }
