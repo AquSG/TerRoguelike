@@ -168,6 +168,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
+                    NPC.ai[2] = Summon.Id;
                 }
             }
             else
@@ -310,7 +311,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         int soundCount = 2; // play more so it's a higher volume lol
                         for (int i = 0; i < soundCount; i++)
                         {
-                            SoundEngine.PlaySound(SoundID.DD2_BetsySummon with { Volume = 0.66f, Variants = [2], MaxInstances = soundCount, PitchVariance = 0, Pitch = -0.4f }, projSpawnPos);
+                            SoundEngine.PlaySound(SoundID.DD2_BetsySummon with { Volume = 1f, Variants = [2], MaxInstances = soundCount, PitchVariance = 0, Pitch = -0.4f }, projSpawnPos);
                         }
                     }
                     if (NPC.ai[1] < flameWindup - 5)
