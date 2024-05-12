@@ -43,10 +43,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public SlotId RumbleSlot;
         public Texture2D eyeTex;
         public Texture2D lightTex;
+        public static readonly SoundStyle DingSound = new SoundStyle("TerRoguelike/Sounds/Ding");
+        public static readonly SoundStyle GolemAwaken = new SoundStyle("TerRoguelike/Sounds/GolemAwaken");
         public List<Vector2> eyePositions = [];
 
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
+        public int cutsceneDuration = 160;
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 30);
@@ -78,7 +80,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 70;
             NPC.aiStyle = -1;
             NPC.damage = 30;
-            NPC.lifeMax = 31000;
+            NPC.lifeMax = 32000;
             NPC.HitSound = SoundID.NPCHit4;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
@@ -162,6 +164,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
+
+                if (NPC.localAI[0] == -130)
+                {
+                    SoundEngine.PlaySound(GolemAwaken with { Volume = 0.5f, Pitch = -0.25f }, NPC.Center);
+                }
+                if (NPC.localAI[0] == -85)
+                {
+                    SoundEngine.PlaySound(DingSound with { Volume = 0.07f, Pitch = -1f, MaxInstances = 2 }, NPC.Center);
+                    SoundEngine.PlaySound(DingSound with { Volume = 0.07f, Pitch = -0.8f, MaxInstances = 2 }, NPC.Center);
+                    for (int i = 0; i < eyePositions.Count; i++)
+                    {
+                        Vector2 particlePos = eyePositions[i];
+                        for (int p = 0; p < 2; p++)
+                        {
+                            ParticleManager.AddParticle(new ThinSpark(
+                                particlePos, Vector2.Zero, 40, Color.OrangeRed, new Vector2(0.1f, 0.24f), MathHelper.PiOver2 * p, true, false));
+                        }
+                    }
+                }
 
                 if (NPC.localAI[0] == -30)
                 {
@@ -644,7 +665,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
                 
-
                 if (modNPC.isRoomNPC)
                 {
                     ActiveBossTheme.endFlag = true;
@@ -723,31 +743,44 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Texture2D tex = TextureAssets.Npc[Type].Value;
             Color color = Color.Lerp(drawColor, Color.White, 0.2f);
             Vector2 origin = NPC.frame.Size() * 0.5f;
+            SpriteEffects spriteEffects = NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
-            Main.EntitySpriteDraw(tex, NPC.Center + modNPC.drawCenter - Main.screenPosition, NPC.frame, color, NPC.rotation, origin, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            Main.EntitySpriteDraw(tex, NPC.Center + modNPC.drawCenter - Main.screenPosition, NPC.frame, color, NPC.rotation, origin, NPC.scale, spriteEffects);
 
-            Vector2 eyePos = NPC.Center + modNPC.drawCenter;
-            for (int j = 0; j < 5; j++)
+            bool drawEyes = NPC.localAI[0] >= -85;
+            if (drawEyes)
             {
-                Main.EntitySpriteDraw(eyeTex, eyePos - Main.screenPosition + Main.rand.NextVector2CircularEdge(2f, 2f) * NPC.scale, null, Color.White * 0.4f, 0, origin, NPC.scale, SpriteEffects.None);
-            }
-
-            Main.EntitySpriteDraw(eyeTex, eyePos - Main.screenPosition, null, Color.White, NPC.rotation, origin, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-            Main.EntitySpriteDraw(lightTex, NPC.Center + modNPC.drawCenter - Main.screenPosition, null, Color.White, NPC.rotation, origin, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-
-            if (NPC.ai[0] == DartTrap.Id && NPC.ai[1] < 60)
-            {
-                float completion = NPC.ai[1] / 60;
-                float radius = (float)Math.Pow(completion, 2f) * 240;
-                float rotOff = completion * 6;
-                float opacity = 0.65f * (1f - completion);
-                Color extraColor = Color.White * opacity;
-                extraColor.A = 0;
-                for (int i = 0; i < 16; i++)
+                Vector2 eyePos = NPC.Center + modNPC.drawCenter;
+                for (int j = 0; j < 5; j++)
                 {
-                    Main.EntitySpriteDraw(lightTex, NPC.Center + modNPC.drawCenter - Main.screenPosition + ((rotOff + i * MathHelper.PiOver4 * 0.5f) * (i % 2 == 0 ? -1 : 1)).ToRotationVector2() * radius, null, extraColor, NPC.rotation, origin, NPC.scale, SpriteEffects.None);
+                    Main.EntitySpriteDraw(eyeTex, eyePos - Main.screenPosition + Main.rand.NextVector2CircularEdge(2f, 2f) * NPC.scale, null, Color.White * 0.4f, 0, origin, NPC.scale, SpriteEffects.None);
+                }
+                Main.EntitySpriteDraw(eyeTex, eyePos - Main.screenPosition, null, Color.White, NPC.rotation, origin, NPC.scale, SpriteEffects.None);
+            }
+            bool drawLights = NPC.localAI[0] >= -160;
+            if (drawLights)
+            {
+                float lightsOpacity = 1f;
+                if (NPC.localAI[0] < -100)
+                    lightsOpacity = (NPC.localAI[0] + 130) / 30f;
+
+                Main.EntitySpriteDraw(lightTex, NPC.Center + modNPC.drawCenter - Main.screenPosition, null, Color.White * lightsOpacity, NPC.rotation, origin, NPC.scale, spriteEffects);
+
+                if (NPC.ai[0] == DartTrap.Id && NPC.ai[1] < 60)
+                {
+                    float completion = NPC.ai[1] / 60;
+                    float radius = (float)Math.Pow(completion, 2f) * 240;
+                    float rotOff = completion * 6;
+                    float opacity = 0.65f * (1f - completion);
+                    Color extraColor = Color.White * opacity;
+                    extraColor.A = 0;
+                    for (int i = 0; i < 16; i++)
+                    {
+                        Main.EntitySpriteDraw(lightTex, NPC.Center + modNPC.drawCenter - Main.screenPosition + ((rotOff + i * MathHelper.PiOver4 * 0.5f) * (i % 2 == 0 ? -1 : 1)).ToRotationVector2() * radius, null, extraColor, NPC.rotation, origin, NPC.scale, spriteEffects);
+                    }
                 }
             }
+
             return false;
         }
     }
