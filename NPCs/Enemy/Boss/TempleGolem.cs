@@ -1,14 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using Steamworks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.Graphics.Renderers;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -51,14 +54,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack SpikeBall = new Attack(2, 30, 180);
         public static Attack Flame = new Attack(3, 35, 180);
         public static Attack DartTrap = new Attack(4, 30, 180);
-        public static Attack Boulder = new Attack(5, 30, 180);
-        public static Attack Summon = new Attack(6, 16, 180);
+        public static Attack Boulder = new Attack(5, 25, 180);
+        public static Attack Summon = new Attack(6, 18, 180);
         public int laserWindup = 60;
         public int laserFireRate = 7;
         public int spikeBallWindup = 60;
         public int spikeBallFireRate = 4;
         public int flameWindup = 60;
         public int flameFireRate = 4;
+        public int dartTrapWindup = 30;
+        public int dartTrapFireRate = 15;
+        public int boulderWindup = 60;
+        public int summonWindup = 80;
 
         public override void SetStaticDefaults()
         {
@@ -93,6 +100,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = NPC.Center;
             NPC.ai[2] = None.Id;
             ableToHit = false;
+            NPC.localAI[2] = Main.rand.Next(0, 3);
 
             NPC.Center = TileCollidePositionInLine(NPC.Center, NPC.Center + new Vector2(0, -1000));
             NPC.Center += new Vector2(0, 45);
@@ -117,6 +125,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.localAI[3] = 0;
+            if (modNPC.isRoomNPC)
+            {
+                int checkType = ModContent.NPCType<LihzahrdSentry>();
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.life <= 0 || npc.friendly || npc.ModNPC() == null)
+                        continue;
+                    if (npc.type == checkType && npc.ModNPC().sourceRoomListID == modNPC.sourceRoomListID)
+                    {
+                        NPC.localAI[3]++;
+                    }
+                }
+            }
             if (deadTime > 0)
             {
                 CheckDead();
@@ -220,7 +243,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= Laser.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -20;
                     NPC.ai[2] = Laser.Id;
                 }
             }
@@ -234,24 +257,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     if (NPC.ai[1] == 0)
                     {
-                        NPC.ai[3] = Main.rand.Next(3);
-                        RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthTremor with { Volume = 1f }, new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + thirdWidth * 0.5f, NPC.position.Y));
+                        List<int> potentialThirds = [0, 1, 2];
+                        potentialThirds.RemoveAll(x => x == (int)NPC.localAI[2]);
+                        NPC.localAI[2] = potentialThirds[Main.rand.Next(potentialThirds.Count)];
+                        RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthTremor with { Volume = 1f }, new Vector2(leftBound.X + (thirdWidth * NPC.localAI[2]) + thirdWidth * 0.5f, NPC.position.Y));
                     }
                 }
                 else
                 {
                     if (NPC.ai[1] % spikeBallFireRate == 0)
                     {
-                        Vector2 projSpawnPos = new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
+                        Vector2 projSpawnPos = new Vector2(leftBound.X + (thirdWidth * NPC.localAI[2]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
                         projSpawnPos = TileCollidePositionInLine(projSpawnPos, projSpawnPos + new Vector2(0, -240)) - Vector2.UnitY * 16;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<LihzahrdSpikeBall>(), NPC.damage, 0, -1, 7);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, new Vector2(0, -1), ModContent.ProjectileType<LihzahrdSpikeBall>(), NPC.damage, 0, -1, 7);
                     }
                     
                 }
                 if (NPC.localAI[1] >= 0)
                 {
                     NPC.localAI[1] = -(2 + ((int)NPC.ai[1] / spikeBallWindup) * 2);
-                    Vector2 particlePos = new Vector2(leftBound.X + (thirdWidth * NPC.ai[3]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
+                    Vector2 particlePos = new Vector2(leftBound.X + (thirdWidth * NPC.localAI[2]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
                     particlePos = TileCollidePositionInLine(particlePos, particlePos + new Vector2(0, -240)) - Vector2.UnitY * 16;
                     ParticleManager.AddParticle(new Debris(
                         particlePos, Vector2.UnitY * Main.rand.NextFloat(0.75f, 1.25f),
@@ -265,7 +290,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= SpikeBall.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -15;
                     NPC.ai[2] = SpikeBall.Id;
                     NPC.ai[3] = 0;
                     NPC.localAI[1] = 0;
@@ -281,6 +306,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     if (NPC.ai[1] == 0)
                     {
+                        NPC.ai[3] = MathHelper.PiOver2;
                         int soundCount = 2; // play more so it's a higher volume lol
                         for (int i = 0; i < soundCount; i++)
                         {
@@ -333,22 +359,146 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -20;
                     NPC.ai[2] = Flame.Id;
                     NPC.ai[3] = 0;
                 }
             }
             else if (NPC.ai[0] == DartTrap.Id)
             {
+                Vector2 leftBound = TileCollidePositionInLine(spawnPos, spawnPos + new Vector2(-1000, 0)) + Vector2.UnitX * 1;
+                Vector2 rightBound = TileCollidePositionInLine(leftBound, leftBound + new Vector2(2000, 0)) - Vector2.UnitX * 1;
+                leftBound = TileCollidePositionInLine(leftBound, leftBound + new Vector2(0, -1000)) + Vector2.UnitY * 8;
+                rightBound = TileCollidePositionInLine(rightBound, rightBound + new Vector2(0, -1000)) + Vector2.UnitY * 8;
+                float leftBoundHeight = TileCollidePositionInLine(leftBound, leftBound + new Vector2(0, 2000)).Distance(leftBound) - 8;
+                float rightBoundHeight = TileCollidePositionInLine(rightBound, rightBound + new Vector2(0, 2000)).Distance(rightBound) - 8;
+                if (NPC.ai[1] < dartTrapWindup)
+                {
+                    currentFrame = 1;
+                    if (NPC.ai[1] == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item15 with { Volume = 1f, PitchVariance = 0, Pitch = -1 }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.4f, PitchVariance = 0, Pitch = -0.8f }, NPC.Center);
+                    }
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - dartTrapWindup;
+                    if (time > 25)
+                    {
+                        currentFrame = 0;
+                    }
+                    if (time % dartTrapFireRate == 0)
+                    {
+                        for (int i = 0; i < 2; i++)
+                        {
+                            Vector2 projSpawnPos;
+                            float dir;
+                            switch (i)
+                            {
+                                default:
+                                case 0:
+                                    projSpawnPos = leftBound + new Vector2(0, Main.rand.NextFloat(leftBoundHeight));
+                                    dir = 0;
+                                    break;
+                                case 1:
+                                    projSpawnPos = rightBound + new Vector2(0, Main.rand.NextFloat(rightBoundHeight));
+                                    dir = MathHelper.Pi;
+                                    break;
+                            }
+                            projSpawnPos = projSpawnPos.ToTileCoordinates().ToWorldCoordinates();
+                            projSpawnPos = TileCollidePositionInLine(projSpawnPos, projSpawnPos + dir.ToRotationVector2() * -160);
+                            Room room = modNPC.GetParentRoom();
+                            if (room != null)
+                            {
+                                Rectangle roomRect = room.GetRect();
+                                roomRect.Inflate(-16, -16);
+                                if (!roomRect.Contains(projSpawnPos.ToPoint()))
+                                {
+                                    projSpawnPos = roomRect.ClosestPointInRect(projSpawnPos);
+                                }
+                            }
+                            projSpawnPos += dir.ToRotationVector2() * -4;
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, dir.ToRotationVector2() * 8, ModContent.ProjectileType<DartTrap>(), NPC.damage, 0);
+                        }
+                    }
+                }
                 if (NPC.ai[1] >= DartTrap.Duration)
                 {
+                    currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -45;
                     NPC.ai[2] = DartTrap.Id;
                 }
             }
             else if (NPC.ai[0] == Boulder.Id)
             {
+                Vector2 leftBound = TileCollidePositionInLine(spawnPos, spawnPos + new Vector2(-1000, 0)) + Vector2.UnitX * 1;
+                Vector2 rightBound = TileCollidePositionInLine(leftBound, leftBound + new Vector2(2000, 0)) - Vector2.UnitX * 1;
+                leftBound = TileCollidePositionInLine(leftBound, leftBound + new Vector2(0, -1000)) + Vector2.UnitY * 1;
+                rightBound = TileCollidePositionInLine(rightBound, rightBound + new Vector2(0, -1000)) + Vector2.UnitY * 1;
+                Room room = modNPC.GetParentRoom();
+                int height = room != null ? (int)room.RoomDimensions.Y : 60;
+                bool spawnProj = NPC.ai[1] == boulderWindup;
+                bool spawnParticle = NPC.ai[1] < boulderWindup;
+                bool spawnDebris = NPC.ai[1] % 2 == 0;
+
+                if (NPC.ai[1] == 0)
+                {
+                    RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthPound with { Volume = 0.67f }, spawnPos);
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    Vector2 basePos;
+                    int dir;
+                    switch (i)
+                    {
+                        default:
+                        case 0:
+                            basePos = leftBound;
+                            dir = -1;
+                            break;
+                        case 1:
+                            basePos = rightBound;
+                            dir = 1;
+                            break;
+                    }
+                    for (int y = 0; y < height; y++)
+                    {
+                        Vector2 checkPos = basePos + new Vector2(0, y * 16);
+                        Tile tile = ParanoidTileRetrieval(checkPos.ToTileCoordinates());
+                        if (tile.HasTile && TileID.Sets.Platforms[tile.TileType] && tile.IsTileSolidGround() && tile.BlockType == BlockType.Solid)
+                        {
+                            Vector2 spawnPos = checkPos.ToTileCoordinates().ToWorldCoordinates(8 + 8 * dir, 0);
+                            if (spawnProj)
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), spawnPos + new Vector2(20 * dir, -24), new Vector2(-dir * Main.rand.NextFloat(1.9f, 2f), 0), ModContent.ProjectileType<RollingBoulder>(), NPC.damage, 0);
+                            }
+                            if (spawnParticle)
+                            {
+                                for (int p = 0; p < 2; p++)
+                                {
+                                    ParticleManager.AddParticle(new ThinSpark(
+                                        spawnPos + new Vector2(dir * 4, -8 - 16 * p), Vector2.Zero,
+                                        60, Color.Goldenrod * 0.15f, new Vector2(0.075f, 0.1f), MathHelper.PiOver2, true, false));
+                                }
+                                if (spawnDebris && Main.rand.NextBool())
+                                {
+                                    Vector2 particleVel = Main.rand.NextVector2Circular(0.5f, 0.5f) + new Vector2(2 * -dir, -0.5f);
+                                    if (Main.rand.NextBool(3))
+                                        particleVel.X *= 1.7f;
+                                    ParticleManager.AddParticle(new Debris(
+                                    spawnPos + new Vector2(16 * dir, Main.rand.NextFloat(-32, 0)), particleVel,
+                                    40, Color.DarkOrange * 0.875f, new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
+                                        Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.05f, 7f, 30),
+                                        ParticleManager.ParticleLayer.BehindTiles);
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if (NPC.ai[1] >= Boulder.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -358,11 +508,62 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Vector2 startPos = NPC.Center + new Vector2(0, 34);
+                Vector2[] spawnPositions = [NPC.Center + new Vector2(-400, 0), NPC.Center + new Vector2(400, 0)];
+
+                currentFrame = 1;
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_GhastlyGlaiveImpactGhost with { Volume = 1f, Pitch = -0.6f }, startPos);
+                }
+                if (NPC.ai[1] < 15)
+                {
+                    Vector2 offset = Main.rand.NextVector2Circular(30, 20);
+
+                    ParticleManager.AddParticle(new Square(startPos + offset, -offset * 0.1f, 20, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * 0.35f), 0, 0.96f, 20, true));
+                }
+                if (NPC.ai[1] < summonWindup && NPC.ai[1] >= 20)
+                {
+                    for (int i = 0; i < spawnPositions.Length; i++)
+                    {
+                        var summonPosition = spawnPositions[i];
+
+                        int time = 20;
+                        float completion = (NPC.ai[1] - 20) / 60f;
+                        Vector2 endPos = summonPosition;
+                        endPos.Y += 48;
+
+                        Vector2 particlePos = startPos + ((startPos - endPos) * completion);
+                        particlePos += new Vector2(Main.rand.NextFloat(-10, 10), Main.rand.NextFloat(-10, 10));
+
+                        ParticleManager.AddParticle(new Square(particlePos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * 0.45f), 0, 0.96f, time, true));
+                        
+                    }
+                }
+                else
+                {
+                    if (NPC.ai[1] == summonWindup)
+                    {
+                        SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, NPC.Center);
+
+                        for (int i = 0; i < spawnPositions.Length; i++)
+                        {
+                            var summonPosition = spawnPositions[i];
+                            SpawnManager.SpawnEnemy(ModContent.NPCType<LihzahrdSentry>(), summonPosition, modNPC.sourceRoomListID, 60, 0.45f);
+                        }
+                    }
+                    if (NPC.ai[1] > summonWindup)
+                    {
+                        currentFrame = 0;
+                    }
+                }
                 if (NPC.ai[1] >= Summon.Duration)
                 {
                     currentFrame = 0;
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -200;
                     NPC.ai[2] = Summon.Id;
                 }
             }
@@ -372,11 +573,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame, DartTrap, Boulder, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame };
+            List<Attack> potentialAttacks = new List<Attack>() { Laser, SpikeBall, Flame, DartTrap, Boulder, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
-            if (target != null && NPC.Center.Distance(target.Center) > 500)
+            if (target != null && NPC.Center.Distance(target.Center) > 540)
                 potentialAttacks.RemoveAll(x => x.Id == Flame.Id);
+            if (NPC.localAI[3] > 0)
+                potentialAttacks.RemoveAll(x => x.Id == Summon.Id);
 
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
@@ -532,6 +734,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.EntitySpriteDraw(eyeTex, eyePos - Main.screenPosition, null, Color.White, NPC.rotation, origin, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             Main.EntitySpriteDraw(lightTex, NPC.Center + modNPC.drawCenter - Main.screenPosition, null, Color.White, NPC.rotation, origin, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
 
+            if (NPC.ai[0] == DartTrap.Id && NPC.ai[1] < 60)
+            {
+                float completion = NPC.ai[1] / 60;
+                float radius = (float)Math.Pow(completion, 2f) * 240;
+                float rotOff = completion * 6;
+                float opacity = 0.65f * (1f - completion);
+                Color extraColor = Color.White * opacity;
+                extraColor.A = 0;
+                for (int i = 0; i < 16; i++)
+                {
+                    Main.EntitySpriteDraw(lightTex, NPC.Center + modNPC.drawCenter - Main.screenPosition + ((rotOff + i * MathHelper.PiOver4 * 0.5f) * (i % 2 == 0 ? -1 : 1)).ToRotationVector2() * radius, null, extraColor, NPC.rotation, origin, NPC.scale, SpriteEffects.None);
+                }
+            }
             return false;
         }
     }

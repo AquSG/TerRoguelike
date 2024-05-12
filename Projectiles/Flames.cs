@@ -107,7 +107,7 @@ namespace TerRoguelike.Projectiles
             }
             return Collision.CanHit(Projectile.Center, 0, 0, targetHitbox.Center.ToVector2(), 0, 0);
         }
-        public override bool? CanDamage() => Projectile.timeLeft >= 18 ? null : false;
+        public override bool? CanDamage() => Projectile.localAI[0] < 59 ? null : false;
         public override bool PreDraw(ref Color lightColor)
         {
             var tex = TextureAssets.Projectile[Type].Value;

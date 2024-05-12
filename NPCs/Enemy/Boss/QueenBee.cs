@@ -605,7 +605,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         int time = 20;
                         Vector2 startPos = summonPositionStartTelegraph;
                         float completion = (NPC.ai[1] - summonTime) / 20f;
-                        float curveMultiplier = 1f - (float)Math.Pow(Math.Abs(completion - 0.5f) * 2, 2);
                         Vector2 endPos = summonPosition;
                         if (endPos != new Vector2(-1))
                         {

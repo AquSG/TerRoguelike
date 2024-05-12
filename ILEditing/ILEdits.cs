@@ -45,14 +45,14 @@ namespace TerRoguelike.ILEditing
             On_Main.DrawMenu += On_Main_DrawMenu;
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
-            On_Main.DoDraw_Tiles_NonSolid += PreDrawTilesInjection;
+			On_Main.DoDraw_DrawNPCsBehindTiles += PreDrawTilesInjection;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
         }
-        private void PreDrawTilesInjection(On_Main.orig_DoDraw_Tiles_NonSolid orig, Main self)
+        private void PreDrawTilesInjection(On_Main.orig_DoDraw_DrawNPCsBehindTiles orig, Main self)
         {
+            orig.Invoke(self);
             RoomSystem.PostDrawWalls(Main.spriteBatch);
-			orig.Invoke(self);
         }
 
         //Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
