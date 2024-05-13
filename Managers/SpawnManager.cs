@@ -18,6 +18,8 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.ItemManager;
 using Microsoft.Xna.Framework.Audio;
 using Terraria.Audio;
+using System.Threading;
+using TerRoguelike.Items.Rare;
 
 namespace TerRoguelike.Managers
 {
@@ -171,36 +173,63 @@ namespace TerRoguelike.Managers
                 };
                 item.TelegraphDuration--;
 
-                item.Velocity.Y += item.Gravity;
-                if (item.Velocity.Y > 6)
-                    item.Velocity.Y = 6;
-                Vector2 futurePos = item.Position + item.Velocity;
-                Vector2 futurePosColliding = TileCollidePositionInLine(item.Position, futurePos);
-                if (futurePos != futurePosColliding)
+                if (item.TelegraphDuration > 120)
                 {
-                    item.TelegraphDuration = 0;
-                }
-                ParticleManager.AddParticle(new Square(
-                    item.Position + (futurePosColliding - item.Position) * 0.5f, Vector2.Zero, 30, color, new Vector2(3f, 1f), item.Velocity.ToRotation(), 0.96f, 30, false));
-
-                item.Position = futurePosColliding;
-                ParticleManager.AddParticle(new BallOutlined(
-                    item.Position, Vector2.Zero, 2, color, Color.White * 0.75f, new Vector2(0.12f), 6, 0, 0.96f, 0));
-
-                if (item.TelegraphDuration == 0)
-                {
-                    int particleCount = 15 + (5 * item.ItemTier);
-                    for (int i = 0; i < particleCount; i++)
+                    if (item.TelegraphDuration == 150)
                     {
-                        float randRot = Main.rand.NextFloat(MathHelper.TwoPi);
-                        Vector2 offset = randRot.ToRotationVector2() * (float)Math.Pow(Main.rand.NextFloat(0.5f, 0.9f), 3) * 5;
-                        SpawnParticle(item.Position + offset, offset.ToRotation(), offset.Length() * 0.5f, color, Main.rand.Next(20, 61), new Vector2(Main.rand.NextFloat(0.7f, 0.9f) * 0.2f));
+                        int particleCount = 8 + (3 * item.ItemTier);
+                        for (int i = 0; i < particleCount; i++)
+                        {
+                            float randRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                            randRot = randRot.AngleLerp(-MathHelper.PiOver2, 0.56f);
+                            Vector2 offset = randRot.ToRotationVector2() * (float)Math.Pow(Main.rand.NextFloat(0.5f, 0.9f), 3) * 4;
+                            SpawnParticle(item.Position + offset, randRot, offset.Length() * 0.5f, color, Main.rand.Next(20, 61), new Vector2(Main.rand.NextFloat(0.7f, 0.9f) * 0.2f));
+                        }
+                        if (item.Sound)
+                            SoundEngine.PlaySound(SoundID.Item176 with { Volume = 1f, MaxInstances = 3 }, item.Position);
                     }
-                    item.Position.Y -= 10;
-                    int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
-                    SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
-                    Main.item[spawnedItem].noGrabDelay = 24;
-                    item.spent = true;
+                }
+                else // item has been dunked in the soup. proceed.
+                {
+                    if (item.TelegraphDuration == 120)
+                    {
+                        if (item.Sound)
+                        {
+                            SoundEngine.PlaySound(ItemSpawn with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
+                        }
+                    }
+                    item.Velocity.Y += item.Gravity;
+                    if (item.Velocity.Y > 6)
+                        item.Velocity.Y = 6;
+                    Vector2 futurePos = item.Position + item.Velocity;
+                    Vector2 futurePosColliding = TileCollidePositionInLine(item.Position, futurePos);
+                    if (futurePos != futurePosColliding)
+                    {
+                        item.TelegraphDuration = 0;
+                    }
+                    ParticleManager.AddParticle(new Square(
+                        item.Position + (futurePosColliding - item.Position) * 0.5f, Vector2.Zero, 30, color, new Vector2(3f, 1f), item.Velocity.ToRotation(), 0.96f, 30, false));
+
+                    item.Position = futurePosColliding;
+                    ParticleManager.AddParticle(new BallOutlined(
+                        item.Position, Vector2.Zero, 2, color, Color.White * 0.75f, new Vector2(0.12f), 6, 0, 0.96f, 0));
+
+                    if (item.TelegraphDuration == 0)
+                    {
+                        int particleCount = 15 + (5 * item.ItemTier);
+                        for (int i = 0; i < particleCount; i++)
+                        {
+                            float randRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                            Vector2 offset = randRot.ToRotationVector2() * (float)Math.Pow(Main.rand.NextFloat(0.5f, 0.9f), 3) * 5;
+                            SpawnParticle(item.Position + offset, offset.ToRotation(), offset.Length() * 0.5f, color, Main.rand.Next(20, 61), new Vector2(Main.rand.NextFloat(0.7f, 0.9f) * 0.2f));
+                        }
+                        item.Position.Y -= 10;
+                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
+                        if (item.Sound)
+                            SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
+                        Main.item[spawnedItem].noGrabDelay = 24;
+                        item.spent = true;
+                    }
                 }
             }
 
@@ -246,28 +275,77 @@ namespace TerRoguelike.Managers
         public Vector2 Velocity;
         public float Gravity;
         public bool spent = false;
+        public bool Sound;
+        public int setTelegraphDuration;
+        public Vector2 displayInterpolationStartPos;
+        public int itemSacrificeType;
         public PendingItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {
             ItemType = itemType;
             Position = position;
             ItemTier = itemTier;
-            TelegraphDuration = telegraphDuration;
+            TelegraphDuration = setTelegraphDuration = telegraphDuration;
             TelegraphSize = telegraphSize;
             Velocity = Vector2.Zero;
             Gravity = 0;
+            Sound = false;
+            displayInterpolationStartPos = Vector2.Zero;
+            itemSacrificeType = 0;
         }
-        public PendingItem(int itemType, Vector2 position, ItemTier itemTier, int telegraphDuration, Vector2 velocity, float gravity, bool sound = true)
+        public PendingItem(int itemType, Vector2 position, ItemTier itemTier, int telegraphDuration, Vector2 velocity, float gravity, Vector2 start, int ItemSacrificeType, bool sound = true)
         {
             ItemType = itemType;
             Position = position;
             ItemTier = (int)itemTier;
-            TelegraphDuration= telegraphDuration;
+            TelegraphDuration = setTelegraphDuration = 120 + telegraphDuration;
             Velocity = velocity;
             Gravity = gravity;
             TelegraphSize = 1;
-            if (sound)
+            Sound = sound;
+            displayInterpolationStartPos = Main.LocalPlayer.Top;
+            if (Sound)
             {
-                SoundEngine.PlaySound(ItemSpawn with { Volume = 0.2f, Variants = [ItemTier], MaxInstances = 10 }, Position);
+                SoundEngine.PlaySound(SoundID.Item1 with { Volume = 1f, Pitch = -0.24f }, displayInterpolationStartPos);
+            }
+            itemSacrificeType = ItemSacrificeType;
+        }
+        public void DrawPreDunkInSoup()
+        {
+            int time = (setTelegraphDuration - TelegraphDuration);
+            int endTime = setTelegraphDuration - 150;
+
+
+            if (TelegraphDuration > 150)
+            {
+                float completion = (time + 1) / (float)endTime;
+                completion = 1f - (float)Math.Pow(1f - completion, 0.66f);
+                Vector2 sacrificeDrawPos = displayInterpolationStartPos + ((Position - displayInterpolationStartPos) * completion);
+                sacrificeDrawPos.Y -= (1f - (float)Math.Pow(Math.Abs(completion - 0.5f) * -2, 2)) * 32;
+                Vector2 itemDisplayDimensions = new Vector2(36);
+                Texture2D itemTex;
+                float scale;
+                Rectangle rect;
+                Main.GetItemDrawFrame(itemSacrificeType, out itemTex, out rect);
+                if (itemTex.Width < itemTex.Height)
+                {
+                    scale = 1f / (rect.Height / itemDisplayDimensions.Y);
+                }
+                else
+                {
+                    scale = 1f / (itemTex.Width / itemDisplayDimensions.X);
+                }
+                if (scale > 1f)
+                    scale = 1f;
+                if (time < 12)
+                {
+                    scale *= MathHelper.SmoothStep(0, 1, MathHelper.Clamp(time / 9f, 0, 1));
+                }
+                else if (completion > 0.8f)
+                {
+                    scale *= 1f - ((completion - 0.8f) / 0.4f);
+                }
+
+                Main.EntitySpriteDraw(itemTex, (sacrificeDrawPos - Main.screenPosition), rect, Color.White * 0.9f, 0f, rect.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
         }
     }
