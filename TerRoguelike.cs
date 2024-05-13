@@ -33,6 +33,7 @@ namespace TerRoguelike
             attackPlanRocketBundles = null;
             pendingEnemies = null;
             pendingItems = null;
+            specialPendingItems = null;
             BarrierUI.Unload();
             DeathUI.Unload();
             DebugUI.Unload();

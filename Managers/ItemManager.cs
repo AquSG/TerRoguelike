@@ -18,11 +18,14 @@ using TerRoguelike.Items.Uncommon;
 using TerRoguelike.Items.Rare;
 using Terraria.ModLoader.Core;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.Audio;
 
 namespace TerRoguelike.Managers
 {
     public class ItemManager
     {
+        public static readonly SoundStyle ItemSpawn = new SoundStyle("TerRoguelike/Sounds/ItemSpawn", 3);
+        public static readonly SoundStyle ItemLand = new SoundStyle("TerRoguelike/Sounds/ItemLand", 3);
         public enum ItemTier
         {
             Common = 0,
