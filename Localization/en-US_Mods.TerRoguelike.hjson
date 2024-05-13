@@ -830,3 +830,5 @@ NPCs: {
 	Skeletron.DisplayName: Skeletron
 	TempleGolem.DisplayName: Temple Golem
 }
+
+ItemBasin.DisplayName: Item Basin

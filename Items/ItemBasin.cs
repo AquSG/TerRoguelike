@@ -19,6 +19,7 @@ namespace TerRoguelike.Items
             Item.maxStack = 9999;
             Item.useTime = 10;
             Item.useAnimation = 15;
+            Item.autoReuse = true;
             Item.useStyle = ItemUseStyleID.Swing;
             Item.consumable = true;
             Item.createTile = ModContent.TileType<Tiles.ItemBasin>();

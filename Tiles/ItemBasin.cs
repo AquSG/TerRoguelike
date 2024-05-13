@@ -14,6 +14,10 @@ using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.World;
 using Terraria.GameContent;
 using TerRoguelike.Managers;
+using Terraria.Localization;
+using TerRoguelike.Projectiles;
+using ReLogic.Content;
+using Microsoft.Build.Tasks;
 
 namespace TerRoguelike.Tiles
 {
@@ -22,6 +26,7 @@ namespace TerRoguelike.Tiles
         int currentFrame = 0;
 
         public static Texture2D glowTex = null;
+        public static Texture2D highlightTex = null;
         public override void SetStaticDefaults()
         {
             Main.tileLighted[Type] = true;
@@ -31,6 +36,7 @@ namespace TerRoguelike.Tiles
             TileObjectData.newTile.LavaDeath = false;
             TileObjectData.addTile(Type);
             AnimationFrameHeight = 38;
+            AddMapEntry(new Color(100, 100, 100), Language.GetOrRegister("Mods.TerRoguelike.ItemBasin.DisplayName"));
         }
         public override void PostSetDefaults()
         {
@@ -44,7 +50,11 @@ namespace TerRoguelike.Tiles
                 var basin = TerRoguelikeWorld.itemBasins[b];
                 if (basin.rect.Contains(tilePos))
                 {
-                    basin.nearby = 5;
+                    if (basin.nearby == 0 && Main.LocalPlayer != null)
+                    {
+                        basin.GenerateItemOptions(Main.LocalPlayer);
+                    }
+                    basin.nearby = 60;
                     
                     if (basin.itemDisplay == 0)
                     {
@@ -101,9 +111,6 @@ namespace TerRoguelike.Tiles
             Vector2 drawPos = new Vector2(i, j) * 16 - Main.screenPosition + offset;
 
             Main.spriteBatch.Draw(glowTex, drawPos, new Rectangle?(new Rectangle(xPos, yPos + currentFrame * AnimationFrameHeight, 18, 18)), color, 0, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
-
-
-
         }
         public override void PlaceInWorld(int i, int j, Item item)
         {
@@ -136,8 +143,9 @@ namespace TerRoguelike.Tiles
             if (scale > 1f)
                 scale = 1f;
 
-            float opacity = 0.5f + (float)Math.Cos(period * 2) * 0.1f;
-            Main.EntitySpriteDraw(itemTex, drawPos - Main.screenPosition + new Vector2(Main.offScreenRange), rect, Color.White * opacity, 0f, rect.Size() * 0.5f, scale, SpriteEffects.None, 0);
+            float opacity = 0.55f + (float)Math.Cos(period * 2) * 0.1f;
+            Color color = Color.White * opacity;
+            Main.EntitySpriteDraw(itemTex, drawPos - Main.screenPosition + new Vector2(Main.offScreenRange), rect, color, 0f, rect.Size() * 0.5f, scale, SpriteEffects.None, 0);
         }
     }
 }
