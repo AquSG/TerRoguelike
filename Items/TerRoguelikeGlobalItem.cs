@@ -12,6 +12,5 @@ namespace TerRoguelike.Items
     public class TerRoguelikeGlobalItem : GlobalItem
     {
         public override bool InstancePerEntity => true;
-
     }
 }

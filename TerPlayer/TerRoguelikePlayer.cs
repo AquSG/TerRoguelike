@@ -958,6 +958,11 @@ namespace TerRoguelike.TerPlayer
         }
         public override void SetControls()
         {
+            if (true)
+            {
+                Player.controlThrow = false;
+                Player.noThrow = 15;
+            }
             if (CutsceneSystem.cutsceneDisableControl)
             {
                 Player.controlDown = false;
