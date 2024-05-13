@@ -22,6 +22,7 @@ using TerRoguelike.Managers;
 using Terraria.GameInput;
 using static TerRoguelike.Managers.ItemManager;
 using System.Linq;
+using TerRoguelike.Tiles;
 
 namespace TerRoguelike.UI
 {
@@ -58,12 +59,23 @@ namespace TerRoguelike.UI
             Open();
 
             var basin = modPlayer.selectedBasin;
+            if (Main.tile[basin.position.X, basin.position.Y].TileType != ModContent.TileType<ItemBasin>())
+            {
+                Close();
+                modPlayer.selectedBasin = null;
+                return;
+            }
             Vector2 anchorPos = basin.position.ToWorldCoordinates(24, -64);
 
             List<Item> invList = [];
-            for (int invItem = 0; invItem < 50; invItem++)
+            for (int invItem = 0; invItem < 51; invItem++)
             {
-                Item item = player.inventory[invItem];
+                var item = invItem switch
+                {
+                    50 => player.trashItem,
+                    _ => player.inventory[invItem],
+                };
+
                 if (!item.active || item.stack <= 0 || item.type == 0)
                     continue;
 
@@ -87,7 +99,7 @@ namespace TerRoguelike.UI
             int horizButtonDisplay = (int)MathHelper.Clamp(effectiveCount, 1, maxButtonsWidth);
             int verticalButtonDisplay = (effectiveCount / maxButtonsWidth) + 1;
 
-            bool mouseInteract = PlayerInput.Triggers.JustPressed.MouseLeft;
+            bool mouseInteract = PlayerInput.Triggers.JustPressed.MouseLeft && player.inventory[58].type == 0;
             Vector2 drawStartPos = anchorPos + new Vector2(buttonDimensionsInflate.X * horizButtonDisplay * -0.5f, buttonDimensionsInflate.Y * -verticalButtonDisplay);
             Vector2 buttonScale = new Vector2(0.25f) * buttonDimensions;
             Vector2 buttonHighlightScale = new Vector2(0.25f) * buttonDimensionsInflate;
@@ -117,7 +129,13 @@ namespace TerRoguelike.UI
                             bool found = false;
                             for (int T = 0; T < 300; T++) // try find an item to scoop up
                             {
-                                Item potItem = player.inventory[Main.rand.Next(50)];
+                                int randInt = Main.rand.Next(51);
+                                var potItem = randInt switch
+                                {
+                                    50 => player.trashItem,
+                                    _ => player.inventory[randInt],
+                                };
+
                                 if (!potItem.active)
                                     continue;
                                 int playerItemType = potItem.type;
@@ -134,9 +152,14 @@ namespace TerRoguelike.UI
                             }
                             if (!found) //somehow didn't randomly find an item to take. search manually through the player's items instead.
                             {
-                                for (int invItem = 0; invItem < 50; invItem++)
+                                for (int invItem = 0; invItem < 51; invItem++)
                                 {
-                                    Item potItem = player.inventory[invItem];
+                                    var potItem = invItem switch
+                                    {
+                                        50 => player.trashItem,
+                                        _ => player.inventory[invItem],
+                                    };
+
                                     if (!potItem.active)
                                         continue;
 
@@ -158,18 +181,28 @@ namespace TerRoguelike.UI
                                 queueClose = true;
                             }
                         }
-                        for (int invItem = 0; invItem < 50; invItem++)
+                        for (int invItem = 0; invItem < 51; invItem++)
                         {
-                            Item potItem = player.inventory[invItem];
+                            var potItem = invItem switch
+                            {
+                                50 => player.trashItem,
+                                _ => player.inventory[invItem],
+                            };
+
                             if (!potItem.active)
                                 continue;
                             if (potItem.type == pulledItem)
                             {
-                                if (player.inventory[invItem].stack == 1)
+                                Main.NewText(potItem.stack);
+                                if (potItem.stack == 1)
                                 {
-                                    priorityRemove = player.inventory[invItem].type;
-                                } 
-                                player.inventory[invItem].stack--;
+                                    priorityRemove = potItem.type;
+                                }
+                                potItem.stack--;
+                                if (invItem == 50)
+                                {
+                                    player.inventory[player.selectedItem] = potItem;
+                                }
                                 SpawnManager.SpawnItem(basin.itemDisplay, anchorPos, (int)basin.tier, 75, 0.5f);
                                 
                                 SoundEngine.PlaySound(SoundID.MenuTick);

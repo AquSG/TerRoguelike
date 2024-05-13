@@ -110,9 +110,14 @@ namespace TerRoguelike.World
         {
             useCount = 0;
             itemOptions = [];
-            for (int invItem = 0; invItem < 50; invItem++)
+            for (int invItem = 0; invItem < 51; invItem++)
             {
-                Item item = player.inventory[invItem];
+                var item = invItem switch
+                {
+                    50 => player.trashItem,
+                    _ => player.inventory[invItem],
+                };
+
                 if (item.type == itemDisplay || !item.active || item.stack == 0 || item.type == 0)
                     continue;
 

@@ -862,6 +862,15 @@ namespace TerRoguelike.Systems
                 for (int i = 0; i < itemBasins.Count; i++)
                 {
                     var basin = itemBasins[i];
+                    Player player = Main.LocalPlayer;
+                    if (player == null || !player.active || player.ModPlayer() == null)
+                        continue;
+                    if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
+                    {
+                        itemBasins.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
                     if (basin.nearby <= 0)
                         basin.itemDisplay = 0;
                     else
@@ -871,9 +880,7 @@ namespace TerRoguelike.Systems
                             basin.SpawnParticles();
                         if (interact && basin.rect16.Contains(Main.MouseWorld.ToPoint()))
                         {
-                            Player player = Main.LocalPlayer;
-                            if (player == null || !player.active || player.ModPlayer() == null)
-                                continue;
+                            
                             Vector2 checkPos = basin.position.ToWorldCoordinates(24, 16);
                             if (player.Center.Distance(checkPos) > 200)
                                 continue;
@@ -881,13 +888,6 @@ namespace TerRoguelike.Systems
                             player.ModPlayer().selectedBasin = basin;
                             SoundEngine.PlaySound(SoundID.MenuOpen);
                         }
-                    }
-                        
-
-                    if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
-                    {
-                        itemBasins.RemoveAt(i);
-                        i--;
                     }
                 }
             }
