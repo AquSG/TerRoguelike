@@ -17,5 +17,6 @@ namespace TerRoguelike.Floors
         public override int StartRoomID => RoomDict["SanctuaryRoom1"];
         public override int Stage => -1;
         public override string Name => "Sanctuary";
+        public override FloorSoundtrack Soundtrack => MusicSystem.SanctuaryTheme;
     }
 }
