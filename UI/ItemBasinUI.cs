@@ -136,7 +136,7 @@ namespace TerRoguelike.UI
                                     _ => player.inventory[randInt],
                                 };
 
-                                if (!potItem.active)
+                                if (!potItem.active || potItem.stack <= 0)
                                     continue;
                                 int playerItemType = potItem.type;
                                 if (playerItemType == 0 || playerItemType == basin.itemDisplay)
@@ -160,7 +160,7 @@ namespace TerRoguelike.UI
                                         _ => player.inventory[invItem],
                                     };
 
-                                    if (!potItem.active)
+                                    if (!potItem.active || potItem.stack <= 0)
                                         continue;
 
                                     int playerItemType = potItem.type;
@@ -189,7 +189,7 @@ namespace TerRoguelike.UI
                                 _ => player.inventory[invItem],
                             };
 
-                            if (!potItem.active)
+                            if (!potItem.active || potItem.stack <= 0)
                                 continue;
                             if (potItem.type == pulledItem)
                             {
@@ -198,10 +198,7 @@ namespace TerRoguelike.UI
                                     priorityRemove = potItem.type;
                                 }
                                 potItem.stack--;
-                                if (invItem == 50)
-                                {
-                                    player.inventory[player.selectedItem] = potItem;
-                                }
+
                                 int direction = player.Center.X > anchorPos.X ? 1 : -1;
                                 SpawnManager.specialPendingItems.Add(new PendingItem(basin.itemDisplay, basin.position.ToWorldCoordinates(24, 0), basin.tier, 75, new Vector2(1.5f * direction * Main.rand.NextFloat(0.75f, 1.06f), -2), 0.1f, player.Top, pulledItem));
                                 

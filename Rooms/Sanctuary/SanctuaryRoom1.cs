@@ -17,6 +17,8 @@ using TerRoguelike.NPCs.Enemy;
 using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
+using TerRoguelike.Utilities;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Rooms
 {
@@ -26,6 +28,8 @@ namespace TerRoguelike.Rooms
         public override string Key => "SanctuaryRoom1";
         public override string Filename => "Schematics/RoomSchematics/SanctuaryRoom1.csch";
         public override bool IsStartRoom => true;
+        public override bool IsSanctuary => true;
+        public override bool ActivateNewFloorEffects => false;
         public override void InitializeRoom()
         {
             if (!initialized && Main.LocalPlayer != null)
@@ -47,6 +51,15 @@ namespace TerRoguelike.Rooms
             active = false;
             base.Update();
             awake = false;
+        }
+        public override bool CanDescend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            modPlayer.noThrow = true;
+            return !TerRoguelikeWorld.escape && player.position.X + player.width >= ((RoomPosition.X + RoomDimensions.X) * 16f) - 22f && !player.dead;
+        }
+        public override Vector2 DescendTeleportPosition()
+        {
+            return RoomPosition16 + RoomDimensions16 * new Vector2(0.125f, 0.6f);
         }
     }
 }

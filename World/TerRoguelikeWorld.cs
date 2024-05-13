@@ -37,6 +37,8 @@ namespace TerRoguelike.World
         public static int worldTeleportTime = 0;
         public static int sanctuaryTries = 0;
         public static readonly int sanctuaryMaxTries = 3;
+        public static readonly int sanctuaryMaxVisits = 2;
+        public static int sanctuaryCount = 0;
         public static float sanctuaryChance => 1 / MathHelper.Clamp(sanctuaryMaxTries - sanctuaryTries, 1, sanctuaryMaxTries);
 
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
@@ -44,9 +46,20 @@ namespace TerRoguelike.World
         public static readonly SoundStyle WorldTeleport = new SoundStyle("TerRoguelike/Sounds/WorldTeleport", 2);
         public static bool TryWarpToSanctuary()
         {
+            if (sanctuaryCount >= sanctuaryMaxVisits)
+                return false;
+            if (currentStage == 5)
+            {
+                sanctuaryCount++;
+                return true;
+            }
+
             if (Main.rand.NextFloat() <= sanctuaryChance)
             {
                 sanctuaryTries = 0;
+                sanctuaryCount++;
+                if (sanctuaryCount == sanctuaryMaxVisits && currentStage <= 2) // if you got a sanctuary on the first two stages, allow a third one since you didn't get the best chance to take advantage of the pools.
+                    sanctuaryCount--;
                 return true;
             }
             sanctuaryTries++;
@@ -106,7 +119,7 @@ namespace TerRoguelike.World
             {
                 ItemTier.Uncommon => new Color(0.4f, 1f, 0.4f),
                 ItemTier.Rare => new Color(1f, 0.4f, 0.4f),
-                _ => new Color(0.4f, 0.4f, 1f),
+                _ => new Color(0.2f, 0.55f, 1f),
             };
             Color fillColor = Color.Lerp(color, Color.Black, 0.3f);
             int time = 30;
@@ -131,7 +144,7 @@ namespace TerRoguelike.World
                     _ => player.inventory[invItem],
                 };
 
-                if (item.type == itemDisplay || !item.active || item.stack == 0 || item.type == 0)
+                if (item.type == itemDisplay || !item.active || item.stack <= 0 || item.type == 0)
                     continue;
 
                 int rogueItemType = AllItems.FindIndex(x => x.modItemID == item.type);

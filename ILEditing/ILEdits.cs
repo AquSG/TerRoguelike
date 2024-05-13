@@ -86,9 +86,11 @@ namespace TerRoguelike.ILEditing
 			//Can't have fast parallel count backwards. Never happened until randomly one time I opened a world and then it threw an error?? still have no clue why it happened, but it wasn't a harmful error. the game kept running. but this should ideally stop it throwing an error in chat in the rare event that it happens again.
 			if (forEnd - forStart < 0)
 			{
-				forStart = sectionX2;
-				forEnd = sectionX3 + 1;
-			}
+				orig.Invoke(startX, startY, endX, endY);
+				return;
+                //forStart = sectionX2;
+                //forEnd = sectionX3 + 1;
+            }
 
 			FastParallel.For(forStart, forEnd, delegate (int start, int end, object context)
 			{

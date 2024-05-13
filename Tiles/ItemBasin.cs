@@ -98,7 +98,7 @@ namespace TerRoguelike.Tiles
             {
                 ItemTier.Uncommon => new Color(0.4f, 1f, 0.4f),
                 ItemTier.Rare => new Color(1f, 0.4f, 0.4f),
-                _ => new Color(0.4f, 0.4f, 1f),
+                _ => new Color(0.2f, 0.55f, 1f),
             };
             color *= 0.8f;
             color.A = 100;
