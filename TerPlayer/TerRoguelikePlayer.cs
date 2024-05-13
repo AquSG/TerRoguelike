@@ -28,6 +28,8 @@ using Terraria.Localization;
 using Terraria.ModLoader.IO;
 using TerRoguelike.MainMenu;
 using Terraria.GameInput;
+using TerRoguelike.Schematics;
+using System.Diagnostics;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -166,6 +168,7 @@ namespace TerRoguelike.TerPlayer
         public int startDirection = 1;
         public ItemBasinEntity selectedBasin = null;
         public int cacheRoomListWarp = -1;
+        public bool noThrow = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -959,11 +962,11 @@ namespace TerRoguelike.TerPlayer
         }
         public override void SetControls()
         {
-            bool basinNoThrowZone = false;
-            if (basinNoThrowZone)
+            if (noThrow)
             {
                 Player.controlThrow = false;
                 Player.noThrow = 15;
+                noThrow = false;
             }
             if (CutsceneSystem.cutsceneDisableControl)
             {

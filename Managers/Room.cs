@@ -10,16 +10,21 @@ using TerRoguelike.World;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Managers.SpawnManager;
+using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Shaders;
 using Terraria.GameContent;
 using Terraria.UI.Chat;
 using Terraria.ID;
+using TerRoguelike.Schematics;
+using rail;
 
 namespace TerRoguelike.Managers
 {
     public class Room
     {
+        private static Texture2D wallTex = null;
+
         // base room class used by all rooms
         public virtual string Key => null; //schematic key
         public virtual string Filename => null; //schematic filename
@@ -34,6 +39,8 @@ namespace TerRoguelike.Managers
         public virtual bool IsRoomVariant => false; // if room uses the schematic of another room
         public virtual bool HasTransition => false; // if room is preceeded by a transition room
         public virtual int TransitionDirection => -1; // -1 if not a transition room. 0: right, 1: Down, 2: Up
+        public virtual bool ActivateNewFloorEffects => true;
+        public virtual bool IsSanctuary => false;
         public int myRoom; // index in RoomList
         public bool initialized = false; // whether initialize has run yet
         public bool escapeInitialized = false; // whether initialize has been run yet in the escape sequence
@@ -421,6 +428,73 @@ namespace TerRoguelike.Managers
             }
             SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f);
         }
+        public virtual bool CanDescend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            return closedTime > 180 && IsBossRoom && player.position.X + player.width >= ((RoomPosition.X + RoomDimensions.X) * 16f) - 22f && !player.dead && !TerRoguelikeWorld.escape;
+        }
+        public virtual bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            return IsStartRoom && player.position.X <= (RoomPosition.X * 16f) + 22f && !player.dead && TerRoguelikeWorld.escape;
+        }
+        public void Descend(Player player)
+        {
+            var modPlayer = player.ModPlayer();
+            int nextStage = !IsSanctuary ? modPlayer.currentFloor.Stage + 1 : TerRoguelikeWorld.currentStage;
+            if (nextStage >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
+            {
+                nextStage = 0;
+                TerRoguelikeWorld.currentStage = 0;
+            }
+            else
+            {
+                if (nextStage > TerRoguelikeWorld.currentStage)
+                    TerRoguelikeWorld.currentStage = nextStage;
+            }
+
+            Floor nextFloor;
+            Room targetRoom;
+            if (!IsSanctuary)
+            {
+                nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
+                targetRoom = RoomID[nextFloor.StartRoomID];
+                modPlayer.cacheRoomListWarp = targetRoom.myRoom;
+            }
+            else
+            {
+                targetRoom = RoomSystem.RoomList[modPlayer.cacheRoomListWarp];
+                nextFloor = FloorID[targetRoom.AssociatedFloor];
+            }
+            
+
+            if (!IsSanctuary && TerRoguelikeWorld.TryWarpToSanctuary())
+            {
+                modPlayer.currentFloor = FloorID[FloorDict["Sanctuary"]];
+                targetRoom = RoomID[modPlayer.currentFloor.StartRoomID];
+                nextFloor = modPlayer.currentFloor;
+            }
+            else
+            {
+                modPlayer.currentFloor = nextFloor;
+            }
+            player.Center = targetRoom.DescendTeleportPosition();
+
+            if (nextFloor.Name != "Lunar")
+            {
+                SetCalm(nextFloor.Soundtrack.CalmTrack);
+                SetCombat(nextFloor.Soundtrack.CombatTrack);
+                SetMusicMode(MusicStyle.Dynamic);
+                CombatVolumeInterpolant = 0;
+                CalmVolumeInterpolant = 0;
+                CalmVolumeLevel = nextFloor.Soundtrack.Volume;
+                CombatVolumeLevel = nextFloor.Soundtrack.Volume;
+            }
+
+            RoomSystem.NewFloorEffects(targetRoom, modPlayer);
+        }
+        public virtual Vector2 DescendTeleportPosition()
+        {
+            return (RoomPosition + (RoomDimensions / 2f)) * 16f;
+        }
         public void PlayerItemsUpdate()
         {
             if (TerRoguelikeWorld.escape)
@@ -528,11 +602,56 @@ namespace TerRoguelike.Managers
                 StartAlphaBlendSpritebatch();
             }
 
-            Texture2D wallTex = TextureManager.TexDict["TemporaryBlock"];
+            wallTex ??= TextureManager.TexDict["TemporaryBlock"];
 
             if (IsStartRoom && TerRoguelikeWorld.escape)
             {
                 //Draw the blue wall portal
+                LeftPortal();
+            }
+
+            if (closedTime > 60)
+            {
+                if (IsBossRoom && !TerRoguelikeWorld.escape)
+                {
+                    //Draw the blue wall portal
+                    RightPortal((closedTime - 120) / 60f);
+                }
+            }
+            if (IsSanctuary && !TerRoguelikeWorld.escape)
+            {
+                RightPortal(1f);
+            }
+
+            void RightPortal(float completion)
+            {
+                StartAdditiveSpritebatch();
+                for (float i = 0; i < RoomDimensions.Y; i++)
+                {
+                    Vector2 targetBlock = RoomPosition + new Vector2(RoomDimensions.X - 2, i);
+                    int tileType = Main.tile[targetBlock.ToPoint()].TileType;
+                    if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
+                        continue;
+
+                    Color color = Color.Cyan;
+
+                    color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255, completion), 0, 255); ;
+
+                    Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(0, -16f);
+                    float rotation = MathHelper.PiOver2;
+
+                    Main.EntitySpriteDraw(wallTex, drawPosition, null, color, rotation, wallTex.Size(), 1f, SpriteEffects.None);
+
+                    float scale = MathHelper.Clamp(MathHelper.Lerp(0.85f, 0.75f, completion), 0.75f, 0.85f);
+
+                    if (Main.rand.NextBool((int)MathHelper.Clamp(MathHelper.Lerp(30f, 8f, completion), 8f, 20f)))
+                        Dust.NewDustDirect((targetBlock * 16f) + new Vector2(10f, 0), 2, 16, 206, Scale: scale);
+                }
+                StartAlphaBlendSpritebatch();
+            }
+
+            void LeftPortal()
+            {
                 StartAdditiveSpritebatch();
                 for (float i = 0; i < RoomDimensions.Y; i++)
                 {
@@ -555,37 +674,6 @@ namespace TerRoguelike.Managers
                         Dust.NewDustDirect((targetBlock * 16f) + new Vector2(2f, 0), 2, 16, 206, Scale: scale);
                 }
                 StartAlphaBlendSpritebatch();
-            }
-
-            if (closedTime > 60)
-            {
-                if (IsBossRoom && !TerRoguelikeWorld.escape)
-                {
-                    //Draw the blue wall portal
-                    StartAdditiveSpritebatch();
-                    for (float i = 0; i < RoomDimensions.Y; i++)
-                    {
-                        Vector2 targetBlock = RoomPosition + new Vector2(RoomDimensions.X - 2, i);
-                        int tileType = Main.tile[targetBlock.ToPoint()].TileType;
-                        if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
-                            continue;
-
-                        Color color = Color.Cyan;
-
-                        color.A = (byte)MathHelper.Clamp(MathHelper.Lerp(0, 255, (closedTime - 120) / 60f), 0, 255);
-
-                        Vector2 drawPosition = targetBlock * 16f - Main.screenPosition - new Vector2(0, -16f);
-                        float rotation = MathHelper.PiOver2;
-
-                        Main.EntitySpriteDraw(wallTex, drawPosition, null, color, rotation, wallTex.Size(), 1f, SpriteEffects.None);
-
-                        float scale = MathHelper.Clamp(MathHelper.Lerp(0.85f, 0.75f, (closedTime - 120f) / 60f), 0.75f, 0.85f);
-
-                        if (Main.rand.NextBool((int)MathHelper.Clamp(MathHelper.Lerp(30f, 8f, (closedTime - 60f) / 120f), 8f, 20f)))
-                            Dust.NewDustDirect((targetBlock * 16f) + new Vector2(10f, 0), 2, 16, 206, Scale: scale);
-                    }
-                    StartAlphaBlendSpritebatch();
-                }
             }
 
             return;

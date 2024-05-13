@@ -153,42 +153,12 @@ namespace TerRoguelike.Systems
                         }
 
                         room.awake = true;
-                        bool descendTeleportCheck = room.closedTime > 180 && room.IsBossRoom && player.position.X + player.width >= ((room.RoomPosition.X + room.RoomDimensions.X) * 16f) - 22f && !player.dead && !escape;
-                        bool ascendTeleportCheck = room.IsStartRoom && player.position.X <= (room.RoomPosition.X * 16f) + 22f && !player.dead && escape;
-                        if (descendTeleportCheck) //New Floor Blue Wall Portal Teleport
+                        if (room.CanDescend(player, modPlayer)) //New Floor Blue Wall Portal Teleport
                         {
-                            int nextStage = modPlayer.currentFloor.Stage + 1;
-                            if (nextStage >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
-                            {
-                                nextStage = 0;
-                                currentStage = 0;
-                            }
-                            else
-                            {
-                                if (nextStage > currentStage)
-                                    currentStage = nextStage;
-                            }
-
-                            var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
-                            var targetRoom = RoomID[nextFloor.StartRoomID];
-                            player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
-                            modPlayer.currentFloor = nextFloor;
-
-                            if (nextFloor.Name != "Lunar")
-                            {
-                                SetCalm(nextFloor.Soundtrack.CalmTrack);
-                                SetCombat(nextFloor.Soundtrack.CombatTrack);
-                                SetMusicMode(MusicStyle.Dynamic);
-                                CombatVolumeInterpolant = 0;
-                                CalmVolumeInterpolant = 0;
-                                CalmVolumeLevel = nextFloor.Soundtrack.Volume;
-                                CombatVolumeLevel = nextFloor.Soundtrack.Volume;
-                            }
+                            room.Descend(player);
                             FloorTransitionEffects();
-                            NewFloorEffects(targetRoom, modPlayer);
                         }
-
-                        if (ascendTeleportCheck)
+                        if (room.CanAscend(player, modPlayer))
                         {
                             int nextStage = modPlayer.currentFloor.Stage - 1;
                             if (nextStage < 0) // if FloorIDsInPlay underflows, send back to the start
@@ -634,11 +604,11 @@ namespace TerRoguelike.Systems
             Main.spriteBatch.End();
         }
         #region New Floor Effects
-        public void NewFloorEffects(Room targetRoom, TerRoguelikePlayer modPlayer)
+        public static void NewFloorEffects(Room targetRoom, TerRoguelikePlayer modPlayer)
         {
-            modPlayer.soulOfLenaUses = 0;
-            modPlayer.lenaVisualPosition = Vector2.Zero;
-            modPlayer.droneBuddyVisualPosition = Vector2.Zero;
+            if (!targetRoom.ActivateNewFloorEffects)
+                return;
+
             if (modPlayer.giftBox > 0)
             {
                 modPlayer.GiftBoxLogic((targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f);
@@ -649,10 +619,18 @@ namespace TerRoguelike.Systems
                 SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.5f });
             }
         }
-        public void FloorTransitionEffects()
+        public static void FloorTransitionEffects()
         {
             worldTeleportTime = 1;
             SoundEngine.PlaySound(WorldTeleport with { Volume = 0.3f, Variants = [1] });
+
+            var modPlayer = Main.LocalPlayer.ModPlayer();
+            if (modPlayer != null)
+            {
+                modPlayer.soulOfLenaUses = 0;
+                modPlayer.lenaVisualPosition = Vector2.Zero;
+                modPlayer.droneBuddyVisualPosition = Vector2.Zero;
+            }
         }
         #endregion
 
@@ -1000,6 +978,8 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsTerRoguelikeWorld = false;
             itemBasins.Clear();
             worldTeleportTime = 0;
+            sanctuaryTries = 0;
+            sanctuaryCount = 0;
         }
         public override void SetStaticDefaults()
         {

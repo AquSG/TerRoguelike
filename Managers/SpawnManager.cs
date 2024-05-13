@@ -169,7 +169,7 @@ namespace TerRoguelike.Managers
                 {
                     ItemTier.Uncommon => new Color(0.2f, 1f, 0.2f),
                     ItemTier.Rare => new Color(1f, 0.2f, 0.2f),
-                    _ => new Color(0.2f, 0.2f, 1f),
+                    _ => new Color(0.1f, 0.5f, 1f),
                 };
                 item.TelegraphDuration--;
 
