@@ -23,6 +23,13 @@ namespace TerRoguelike.Managers
 {
     public class ItemManager
     {
+        public enum ItemTier
+        {
+            Common = 0,
+            Uncommon = 1,
+            Rare = 2
+        }
+
         //ITEM TIERS: 0 - Common, 1 - Uncommon, 2 - Rare
         public static int RoomRewardCooldown = 0;
         public static List<int> PastRoomRewardCategories = new List<int>();
@@ -72,7 +79,6 @@ namespace TerRoguelike.Managers
 
             return chosenItem.modItemID;
         }
-
         public static int ChooseCategory(int tier)
         {
             float combatChance = 33f;
@@ -160,6 +166,57 @@ namespace TerRoguelike.Managers
                 totalWeight += list[i].ItemDropWeight;
             }
             return totalWeight;
+        }
+        public static int ChooseItemUnbiased(int tier)
+        {
+            float combatChance;
+            float healingChance;
+            float utilityChance;
+            List<BaseRoguelikeItem> combatItemList;
+            List<BaseRoguelikeItem> healingItemList;
+            List<BaseRoguelikeItem> utilityItemList;
+            switch (tier)
+            {
+                //obtain weights of each list so that every item in each tier has the same chance of appearing as every other.
+                default:
+                case 0:
+                    combatItemList = CommonCombatItems;
+                    healingItemList = CommonHealingItems;
+                    utilityItemList = CommonUtilityItems;
+                    break;
+                case 1:
+                    combatItemList = UncommonCombatItems;
+                    healingItemList = UncommonHealingItems;
+                    utilityItemList = UncommonUtilityItems;
+                    break;
+                case 2:
+                    combatItemList = RareCombatItems;
+                    healingItemList = RareHealingItems;
+                    utilityItemList = RareUtilityItems;
+                    break;
+            }
+
+            combatChance = GetItemListWeight(combatItemList);
+            healingChance = GetItemListWeight(healingItemList);
+            utilityChance = GetItemListWeight(utilityItemList);
+
+            float chance = Main.rand.NextFloat(combatChance + healingChance + utilityChance + float.Epsilon);
+            int chosenCategory;
+            if (chance <= combatChance)
+                chosenCategory = 0;
+            else if (chance <= combatChance + healingChance)
+                chosenCategory = 1;
+            else
+                chosenCategory = 2;
+
+            BaseRoguelikeItem chosenItem;
+            if (chosenCategory == 0)
+                chosenItem = GetItemFromListWithWeights(combatItemList);
+            else if (chosenCategory == 1)
+                chosenItem = GetItemFromListWithWeights(healingItemList);
+            else
+                chosenItem = GetItemFromListWithWeights(utilityItemList);
+            return chosenItem.modItemID;
         }
         internal static void Load()
         {
