@@ -25,7 +25,28 @@ namespace TerRoguelike.Rooms
         public override int AssociatedFloor => FloorDict["Sanctuary"];
         public override string Key => "SanctuaryRoom1";
         public override string Filename => "Schematics/RoomSchematics/SanctuaryRoom1.csch";
-
         public override bool IsStartRoom => true;
+        public override void InitializeRoom()
+        {
+            if (!initialized && Main.LocalPlayer != null)
+            {
+                for (int i = 0; i < TerRoguelikeWorld.itemBasins.Count; i++)
+                {
+                    var basin = TerRoguelikeWorld.itemBasins[i];
+                    basin.itemDisplay = ItemManager.ChooseItemUnbiased((int)basin.tier);
+                    basin.GenerateItemOptions(Main.LocalPlayer);
+                }
+            }
+            initialized = true;
+        }
+        public override void Update()
+        {
+            if (!awake)
+                initialized = false;
+
+            active = false;
+            base.Update();
+            awake = false;
+        }
     }
 }

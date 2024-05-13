@@ -894,9 +894,7 @@ namespace TerRoguelike.Systems
                         i--;
                         continue;
                     }
-                    if (basin.nearby <= 0)
-                        basin.itemDisplay = 0;
-                    else
+                    if (basin.nearby > 0)
                     {
                         basin.nearby--;
                         if (spawnParticles)
