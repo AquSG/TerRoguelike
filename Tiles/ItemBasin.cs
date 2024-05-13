@@ -44,7 +44,7 @@ namespace TerRoguelike.Tiles
                 var basin = TerRoguelikeWorld.itemBasins[b];
                 if (basin.rect.Contains(tilePos))
                 {
-                    basin.nearby = 4;
+                    basin.nearby = 5;
                     
                     if (basin.itemDisplay == 0)
                     {

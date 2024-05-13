@@ -854,6 +854,7 @@ namespace TerRoguelike.Systems
 
             if (itemBasins.Count > 0)
             {
+                bool update = (int)(Main.GlobalTimeWrappedHourly * 60) % 4 == 0;
                 int basinTileType = ModContent.TileType<ItemBasin>();
                 for (int i = 0; i < itemBasins.Count; i++)
                 {
@@ -861,7 +862,12 @@ namespace TerRoguelike.Systems
                     if (basin.nearby <= 0)
                         basin.itemDisplay = 0;
                     else
+                    {
                         basin.nearby--;
+                        if (update)
+                            basin.Update();
+                    }
+                        
 
                     if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
                     {
