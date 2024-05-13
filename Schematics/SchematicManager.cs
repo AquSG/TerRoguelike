@@ -9,6 +9,9 @@ using Microsoft.Xna.Framework;
 using TerRoguelike.Rooms;
 using TerRoguelike.Managers;
 using TerRoguelike.Floors;
+using Terraria.ModLoader;
+using TerRoguelike.Tiles;
+using TerRoguelike.Items;
 
 namespace TerRoguelike.Schematics
 {
@@ -55,6 +58,7 @@ namespace TerRoguelike.Schematics
             FloorID.Add(new DungeonFloor());
             FloorID.Add(new TempleFloor());
             FloorID.Add(new LunarFloor());
+            FloorID.Add(new SanctuaryFloor());
 
             for (int i = 0; i < FloorID.Count; i++)
             {
@@ -220,6 +224,7 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new LunarPillarRoomTopRight());
             RoomID.Add(new LunarPillarRoomBottomLeft());
             RoomID.Add(new LunarPillarRoomBottomRight());
+            RoomID.Add(new SanctuaryRoom1());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
@@ -351,10 +356,30 @@ namespace TerRoguelike.Schematics
                     smt.ApplyTo(x + cornerX, y + cornerY, originalTiles[x, y]);
                     Tile worldTile = Main.tile[x + cornerX, y + cornerY];
 
+                    // Now that the tile data is correctly set, place appropriate tile entities.
+                    TryToInitializeBasin(x + cornerX, y + cornerY, worldTile);
+
                     // Activate the pile placement function if defined.
                     Rectangle placeInArea = new Rectangle(x, y, width, height);
                     pilePlacementFunction?.Invoke(x + cornerX, y + cornerY, placeInArea);
                 }
+        }
+        #endregion
+
+        #region Place Schematic Helper Methods
+        private static void TryToInitializeBasin(int x, int y, Tile t)
+        {
+            // A tile entity in an empty spot would make no sense.
+            if (!t.HasTile)
+                return;
+            // Ignore tiles that aren't at the top left of the tile.
+            if (t.TileFrameX != 0 || t.TileFrameY != 0)
+                return;
+
+            if (t.TileType == ModContent.TileType<Tiles.ItemBasin>())
+            {
+                TileLoader.PlaceInWorld(x + 1, y + 1, new Item(ModContent.ItemType<Items.ItemBasin>()));
+            }
         }
         #endregion
     }

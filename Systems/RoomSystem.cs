@@ -51,6 +51,7 @@ namespace TerRoguelike.Systems
         }
         public override void PostUpdateWorld()
         {
+            Main.NewText(alertCounter);
             if (escapeTime > 0 && escape)
             {
                 escapeTime--;
