@@ -16,6 +16,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using rail;
 using TerRoguelike.Schematics;
 using static TerRoguelike.Managers.ItemManager;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.World
 {
@@ -79,6 +80,25 @@ namespace TerRoguelike.World
         public void ResetRect()
         {
             rect = new Rectangle(position.X, position.Y, 3, 2);
+        }
+        public void Update()
+        {
+            Vector2 basePos = (position.ToVector2() + new Vector2(1, 0)).ToWorldCoordinates(8, 0);
+            var color = tier switch
+            {
+                ItemTier.Uncommon => new Color(0.4f, 1f, 0.4f),
+                ItemTier.Rare => new Color(1f, 0.4f, 0.4f),
+                _ => new Color(0.4f, 0.4f, 1f),
+            };
+            Color fillColor = Color.Lerp(color, Color.Black, 0.3f);
+            int time = 30;
+
+            if (!Main.rand.NextBool(4))
+            {
+                Vector2 particlePos = basePos + new Vector2(Main.rand.NextFloat(-12, 12), 0);
+                ParticleManager.AddParticle(new BallOutlined(
+                    particlePos, (-Vector2.UnitY * Main.rand.NextFloat(0.7f, 1.2f)).RotatedBy(Main.rand.NextFloat(-0.4f, 0.4f)), time, color, fillColor, new Vector2(0.15f, 0.15f), 2, 0, 0.92f, time));
+            }
         }
     }
     public class Chain
