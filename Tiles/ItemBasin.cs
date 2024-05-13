@@ -143,7 +143,7 @@ namespace TerRoguelike.Tiles
             if (scale > 1f)
                 scale = 1f;
 
-            float opacity = 0.55f + (float)Math.Cos(period * 2) * 0.1f;
+            float opacity = 0.65f + (float)Math.Cos(period * 2) * 0.15f;
             Color color = Color.White * opacity;
             Main.EntitySpriteDraw(itemTex, drawPos - Main.screenPosition + new Vector2(Main.offScreenRange), rect, color, 0f, rect.Size() * 0.5f, scale, SpriteEffects.None, 0);
         }

@@ -616,6 +616,7 @@ namespace TerRoguelike.Systems
 
             DrawDeathScene();
             DrawPendingEnemies();
+            DrawSpecialPendingItems();
             DrawHealingPulse();
             ParticleManager.DrawParticles_Default();
 
@@ -700,6 +701,23 @@ namespace TerRoguelike.Systems
                 float completion = enemy.TelegraphDuration / (float)enemy.MaxTelegraphDuration;
                 int cutoff = (int)(completion * height);
                 Main.EntitySpriteDraw(texture, enemy.Position + new Vector2(0, cutoff) - Main.screenPosition, new Rectangle(0, cutoff, texture.Width, height - cutoff), color, 0f, new Vector2(texture.Width / 2f, texture.Height / frameCount / 2f), 1f, SpriteEffects.None);
+            }
+
+            Main.spriteBatch.End();
+        }
+        #endregion
+
+        #region Special Pending Items
+        public static void DrawSpecialPendingItems()
+        {
+            if (SpawnManager.specialPendingItems == null || SpawnManager.specialPendingItems.Count == 0)
+                return;
+
+            StartAlphaBlendSpritebatch(false);
+
+            for (int i = 0; i < SpawnManager.specialPendingItems.Count; i++)
+            {
+                SpawnManager.specialPendingItems[i].DrawPreDunkInSoup();
             }
 
             Main.spriteBatch.End();

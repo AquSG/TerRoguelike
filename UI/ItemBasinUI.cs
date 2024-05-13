@@ -203,7 +203,7 @@ namespace TerRoguelike.UI
                                     player.inventory[player.selectedItem] = potItem;
                                 }
                                 int direction = player.Center.X > anchorPos.X ? 1 : -1;
-                                SpawnManager.specialPendingItems.Add(new PendingItem(basin.itemDisplay, basin.position.ToWorldCoordinates(24, 0), basin.tier, 120, new Vector2(1.5f * direction, -2), 0.1f));
+                                SpawnManager.specialPendingItems.Add(new PendingItem(basin.itemDisplay, basin.position.ToWorldCoordinates(24, 0), basin.tier, 75, new Vector2(1.5f * direction, -2), 0.1f, player.Top, pulledItem));
                                 
                                 SoundEngine.PlaySound(SoundID.MenuTick);
                                 queueShrinkClose = true;
