@@ -958,7 +958,8 @@ namespace TerRoguelike.TerPlayer
         }
         public override void SetControls()
         {
-            if (true)
+            bool basinNoThrowZone = false;
+            if (basinNoThrowZone)
             {
                 Player.controlThrow = false;
                 Player.noThrow = 15;
