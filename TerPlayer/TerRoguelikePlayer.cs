@@ -164,6 +164,7 @@ namespace TerRoguelike.TerPlayer
         public int brainSucklerTime = 0;
         public bool oldPulley = false;
         public int startDirection = 1;
+        public ItemBasinEntity selectedBasin = null;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -250,6 +251,14 @@ namespace TerRoguelike.TerPlayer
                 standingStillTime++;
             else
                 standingStillTime = 0;
+            if (selectedBasin != null)
+            {
+                Vector2 checkPos = selectedBasin.position.ToWorldCoordinates(24, 16);
+                if (Player.Center.Distance(checkPos) > 200)
+                {
+                    selectedBasin = null;
+                }
+            }
 
             barrierFloor = 0;
             barrierFullAbsorbHit = false;

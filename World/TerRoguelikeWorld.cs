@@ -17,6 +17,7 @@ using rail;
 using TerRoguelike.Schematics;
 using static TerRoguelike.Managers.ItemManager;
 using TerRoguelike.Particles;
+using Steamworks;
 
 namespace TerRoguelike.World
 {
@@ -67,9 +68,12 @@ namespace TerRoguelike.World
     {
         public Point position;
         public Rectangle rect;
+        public Rectangle rect16;
         public ItemTier tier;
         public int nearby = 0;
         public int itemDisplay;
+        public List<int> itemOptions = [];
+        public int useCount = 0;
         
         public ItemBasinEntity(Point Position, ItemTier Tier)
         {
@@ -80,8 +84,9 @@ namespace TerRoguelike.World
         public void ResetRect()
         {
             rect = new Rectangle(position.X, position.Y, 3, 2);
+            rect16 = new Rectangle(rect.X * 16, rect.Y * 16, 48, 32);
         }
-        public void Update()
+        public void SpawnParticles()
         {
             Vector2 basePos = (position.ToVector2() + new Vector2(1, 0)).ToWorldCoordinates(8, 0);
             var color = tier switch
@@ -97,7 +102,44 @@ namespace TerRoguelike.World
             {
                 Vector2 particlePos = basePos + new Vector2(Main.rand.NextFloat(-12, 12), 0);
                 ParticleManager.AddParticle(new BallOutlined(
-                    particlePos, (-Vector2.UnitY * Main.rand.NextFloat(0.7f, 1.2f)).RotatedBy(Main.rand.NextFloat(-0.4f, 0.4f)), time, color, fillColor, new Vector2(0.15f, 0.15f), 2, 0, 0.92f, time));
+                    particlePos, (-Vector2.UnitY * Main.rand.NextFloat(0.7f, 1.2f)).RotatedBy(Main.rand.NextFloat(-0.4f, 0.4f)), time, color, fillColor, new Vector2(0.15f, 0.15f), 2, 0, 0.92f, time),
+                    ParticleManager.ParticleLayer.BehindTiles);
+            }
+        }
+        public void GenerateItemOptions(Player player)
+        {
+            useCount = 0;
+            itemOptions = [];
+            for (int invItem = 0; invItem < 50; invItem++)
+            {
+                Item item = player.inventory[invItem];
+                if (item.type == itemDisplay || !item.active || item.stack == 0 || item.type == 0)
+                    continue;
+
+                int rogueItemType = AllItems.FindIndex(x => x.modItemID == item.type);
+                if (rogueItemType != -1 && (ItemTier)AllItems[rogueItemType].itemTier == tier && !itemOptions.Contains(item.type))
+                {
+                    itemOptions.Add(item.type);
+                }
+            }
+        }
+        public void ShrinkItemOptions(int priority = -1)
+        {
+            useCount++;
+            float removeRatio = useCount / 4f;
+            int removeCount = (int)(removeRatio * itemOptions.Count);
+            if (removeCount == 0)
+                removeCount = 1;
+            for (int i = 0; i < removeCount; i++)
+            {
+                if (itemOptions.Count <= 0)
+                    break;
+                if (i == 0 && priority >= 0)
+                {
+                    itemOptions.RemoveAll(x => x == priority);
+                    continue;
+                }
+                itemOptions.RemoveAt(Main.rand.Next(itemOptions.Count));
             }
         }
     }

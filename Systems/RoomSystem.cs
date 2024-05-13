@@ -33,6 +33,8 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using TerRoguelike.UI;
 using TerRoguelike.Tiles;
+using Steamworks;
+using Terraria.GameInput;
 
 namespace TerRoguelike.Systems
 {
@@ -854,8 +856,9 @@ namespace TerRoguelike.Systems
 
             if (itemBasins.Count > 0)
             {
-                bool update = (int)(Main.GlobalTimeWrappedHourly * 60) % 4 == 0;
+                bool spawnParticles = (int)(Main.GlobalTimeWrappedHourly * 60) % 4 == 0;
                 int basinTileType = ModContent.TileType<ItemBasin>();
+                bool interact = PlayerInput.Triggers.JustPressed.MouseRight;
                 for (int i = 0; i < itemBasins.Count; i++)
                 {
                     var basin = itemBasins[i];
@@ -864,8 +867,20 @@ namespace TerRoguelike.Systems
                     else
                     {
                         basin.nearby--;
-                        if (update)
-                            basin.Update();
+                        if (spawnParticles)
+                            basin.SpawnParticles();
+                        if (interact && basin.rect16.Contains(Main.MouseWorld.ToPoint()))
+                        {
+                            Player player = Main.LocalPlayer;
+                            if (player == null || !player.active || player.ModPlayer() == null)
+                                continue;
+                            Vector2 checkPos = basin.position.ToWorldCoordinates(24, 16);
+                            if (player.Center.Distance(checkPos) > 200)
+                                continue;
+
+                            player.ModPlayer().selectedBasin = basin;
+                            SoundEngine.PlaySound(SoundID.MenuOpen);
+                        }
                     }
                         
 

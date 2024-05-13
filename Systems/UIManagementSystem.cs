@@ -103,6 +103,11 @@ namespace TerRoguelike.Systems
                 DebugUI.Draw(Main.spriteBatch, Main.LocalPlayer);
                 return true;
             }, InterfaceScaleType.None));
+            layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Item Basin UI", () =>
+            {
+                ItemBasinUI.Draw();
+                return true;
+            }, InterfaceScaleType.Game));
         }
     }
 }

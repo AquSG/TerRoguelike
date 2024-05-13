@@ -36,6 +36,7 @@ namespace TerRoguelike
             BarrierUI.Unload();
             DeathUI.Unload();
             DebugUI.Unload();
+            ItemBasinUI.Unload();
             ItemManager.Unload();
             NPCManager.Unload();
             TextureManager.Unload();
@@ -50,6 +51,7 @@ namespace TerRoguelike
             BarrierUI.Load();
             DeathUI.Load();
             DebugUI.Load();
+            ItemBasinUI.Load();
         }
     }
 }
