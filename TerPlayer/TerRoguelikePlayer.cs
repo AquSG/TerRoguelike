@@ -165,6 +165,7 @@ namespace TerRoguelike.TerPlayer
         public bool oldPulley = false;
         public int startDirection = 1;
         public ItemBasinEntity selectedBasin = null;
+        public int cacheRoomListWarp = -1;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 

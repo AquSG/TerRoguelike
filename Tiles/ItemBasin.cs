@@ -50,10 +50,6 @@ namespace TerRoguelike.Tiles
                 var basin = TerRoguelikeWorld.itemBasins[b];
                 if (basin.rect.Contains(tilePos))
                 {
-                    if (basin.nearby == 0 && Main.LocalPlayer != null)
-                    {
-                        basin.GenerateItemOptions(Main.LocalPlayer);
-                    }
                     basin.nearby = 60;
                     
                     if (basin.itemDisplay == 0)

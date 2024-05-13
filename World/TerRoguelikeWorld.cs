@@ -35,10 +35,23 @@ namespace TerRoguelike.World
         public const int escapeTimeSet = 18000;
         public static List<Chain> chainList = new List<Chain>();
         public static int worldTeleportTime = 0;
+        public static int sanctuaryTries = 0;
+        public static readonly int sanctuaryMaxTries = 3;
+        public static float sanctuaryChance => 1 / MathHelper.Clamp(sanctuaryMaxTries - sanctuaryTries, 1, sanctuaryMaxTries);
 
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
         public static readonly SoundStyle EarthPound = new SoundStyle("TerRoguelike/Sounds/EarthPound", 4);
         public static readonly SoundStyle WorldTeleport = new SoundStyle("TerRoguelike/Sounds/WorldTeleport", 2);
+        public static bool TryWarpToSanctuary()
+        {
+            if (Main.rand.NextFloat() <= sanctuaryChance)
+            {
+                sanctuaryTries = 0;
+                return true;
+            }
+            sanctuaryTries++;
+            return false;
+        }
         public static void StartEscapeSequence()
         {
             escape = true;
