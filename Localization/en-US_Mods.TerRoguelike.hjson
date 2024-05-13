@@ -730,6 +730,11 @@ Items: {
 		DisplayName: Black Wall
 		Tooltip: ""
 	}
+
+	ItemBasin: {
+		DisplayName: Item Basin
+		Tooltip: ""
+	}
 }
 
 NPCs: {

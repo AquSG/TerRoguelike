@@ -32,6 +32,7 @@ using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using TerRoguelike.UI;
+using TerRoguelike.Tiles;
 
 namespace TerRoguelike.Systems
 {
@@ -374,6 +375,21 @@ namespace TerRoguelike.Systems
             tag["isDeletableOnExit"] = isDeletableOnExit;
             tag["isDebugWorld"] = isDebugWorld;
 
+            if (itemBasins != null && itemBasins.Count > 0)
+            {
+                var basinPositions = new List<Point>();
+                var basinTiers = new List<int>();
+
+                foreach( var basin in itemBasins)
+                {
+                    basinPositions.Add(basin.position);
+                    basinTiers.Add((int)basin.tier);
+                }
+
+                tag["basinPositions"] = basinPositions;
+                tag["basinTiers"] = basinTiers;
+            }
+
             if (RoomList == null)
                 return;
 
@@ -410,6 +426,17 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsDebugWorld = isDebugWorld;
             TerRoguelikeWorld.currentStage = 0;
             TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
+
+            var basinPositions = tag.GetList<Point>("basinPositions");
+            var basinTiers = tag.GetList<int>("basinTiers");
+            if (basinPositions != null && basinPositions.Count > 0)
+            {
+                for (int i = 0; i < basinPositions.Count; i++)
+                {
+                    itemBasins.Add(new ItemBasinEntity(basinPositions[i], (ItemManager.ItemTier)basinTiers[i]));
+                }
+            }
+
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 RoomList = new List<Room>();
@@ -443,11 +470,7 @@ namespace TerRoguelike.Systems
                 ResetRoomID(id);
                 loopcount++;
             }
-            RoomManager.FloorIDsInPlay = new List<int>();
-            foreach (int floorID in floorIDsInPlay)
-            {
-                RoomManager.FloorIDsInPlay.Add(floorID);
-            }
+            RoomManager.FloorIDsInPlay = [.. floorIDsInPlay];
         }
         #endregion
 
@@ -828,6 +851,25 @@ namespace TerRoguelike.Systems
                 if (worldTeleportTime > 60)
                     worldTeleportTime = 0;
             }
+
+            if (itemBasins.Count > 0)
+            {
+                int basinTileType = ModContent.TileType<ItemBasin>();
+                for (int i = 0; i < itemBasins.Count; i++)
+                {
+                    var basin = itemBasins[i];
+                    if (basin.nearby <= 0)
+                        basin.itemDisplay = 0;
+                    else
+                        basin.nearby--;
+
+                    if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
+                    {
+                        itemBasins.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
         }
         #endregion
 
@@ -914,6 +956,7 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsDebugWorld = false;
             TerRoguelikeWorld.IsDeletableOnExit = false;
             TerRoguelikeWorld.IsTerRoguelikeWorld = false;
+            itemBasins.Clear();
             worldTeleportTime = 0;
         }
         public override void SetStaticDefaults()

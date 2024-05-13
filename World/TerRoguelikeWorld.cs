@@ -15,11 +15,13 @@ using Terraria.Audio;
 using static TerRoguelike.Systems.MusicSystem;
 using rail;
 using TerRoguelike.Schematics;
+using static TerRoguelike.Managers.ItemManager;
 
 namespace TerRoguelike.World
 {
     public static class TerRoguelikeWorld
     {
+        public static List<ItemBasinEntity> itemBasins = [];
         public static bool IsTerRoguelikeWorld = false;
         public static bool IsDeletableOnExit = false;
         public static bool IsDebugWorld = false;
@@ -58,6 +60,25 @@ namespace TerRoguelike.World
             SetCalm(Escape, false);
             CalmVolumeLevel = 0.43f;
             PauseWhenIngamePaused = true;
+        }
+    }
+    public class ItemBasinEntity
+    {
+        public Point position;
+        public Rectangle rect;
+        public ItemTier tier;
+        public int nearby = 0;
+        public int itemDisplay;
+        
+        public ItemBasinEntity(Point Position, ItemTier Tier)
+        {
+            position = Position;
+            ResetRect();
+            tier = Tier;
+        }
+        public void ResetRect()
+        {
+            rect = new Rectangle(position.X, position.Y, 3, 2);
         }
     }
     public class Chain
