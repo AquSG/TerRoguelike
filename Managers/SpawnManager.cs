@@ -15,14 +15,18 @@ using TerRoguelike.World;
 using TerRoguelike.Particles;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Managers.ItemManager;
+using Microsoft.Xna.Framework.Audio;
+using Terraria.Audio;
 
 namespace TerRoguelike.Managers
 {
     public class SpawnManager
     {
         //Custom classes being updated so that projectile/npc limitations don't get in the way of crucial gameplay elements
-        public static List<PendingEnemy> pendingEnemies = new List<PendingEnemy>();
-        public static List<PendingItem> pendingItems = new List<PendingItem>();
+        public static List<PendingEnemy> pendingEnemies = [];
+        public static List<PendingItem> pendingItems = [];
+        public static List<PendingItem> specialPendingItems = [];
         public static void UpdateSpawnManager()
         {
             UpdatePendingEnemies();
@@ -107,6 +111,8 @@ namespace TerRoguelike.Managers
         }
         public static void UpdatePendingItems()
         {
+            UpdateSpecialPendingItems();
+
             if (pendingItems.Count == 0)
                 return;
 
@@ -115,23 +121,23 @@ namespace TerRoguelike.Managers
             {
                 loopcount++;
 
-                if (item.dustID == -1)
+                if (item.particleTier == -1)
                 {
                     if (item.ItemTier == 0)
                     {
-                        item.dustID = DustID.Firework_Blue;
+                        item.particleTier = DustID.Firework_Blue;
                     }
                     else if (item.ItemTier == 1)
                     {
-                        item.dustID = DustID.Firework_Green;
+                        item.particleTier = DustID.Firework_Green;
                     }
                     else
                     {
-                        item.dustID = DustID.Firework_Red;
+                        item.particleTier = DustID.Firework_Red;
                     }
                 }
                 
-                Dust.NewDustDirect(item.Position - new Vector2(15f * item.TelegraphSize, 15f * item.TelegraphSize), (int)(30 * item.TelegraphSize), (int)(30 * item.TelegraphSize), item.dustID, Scale: 0.5f);
+                Dust.NewDustDirect(item.Position - new Vector2(15f * item.TelegraphSize, 15f * item.TelegraphSize), (int)(30 * item.TelegraphSize), (int)(30 * item.TelegraphSize), item.particleTier, Scale: 0.5f);
                 item.TelegraphDuration--;
                 if (item.TelegraphDuration == 0)
                 {
@@ -139,13 +145,72 @@ namespace TerRoguelike.Managers
                     int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
                     for (int i = 0; i < 15; i++)
                     {
-                        Dust dust = Dust.NewDustDirect(item.Position - new Vector2(15f * item.TelegraphSize, 15f * item.TelegraphSize), (int)(30 * item.TelegraphSize), (int)(30 * item.TelegraphSize), item.dustID, Scale: 0.75f);
+                        Dust dust = Dust.NewDustDirect(item.Position - new Vector2(15f * item.TelegraphSize, 15f * item.TelegraphSize), (int)(30 * item.TelegraphSize), (int)(30 * item.TelegraphSize), item.particleTier, Scale: 0.75f);
                         dust.noGravity = true;
                     }
                     item.spent = true;
                 }
             }
             pendingItems.RemoveAll(item => item.spent);
+        }
+        public static void UpdateSpecialPendingItems()
+        {
+            if (specialPendingItems.Count <= 0)
+                return;
+
+            int loopcount = -1;
+            foreach (PendingItem item in specialPendingItems)
+            {
+                loopcount++;
+
+                var color = (ItemTier)item.ItemTier switch
+                {
+                    ItemTier.Uncommon => new Color(0.2f, 1f, 0.2f),
+                    ItemTier.Rare => new Color(1f, 0.2f, 0.2f),
+                    _ => new Color(0.2f, 0.2f, 1f),
+                };
+                item.TelegraphDuration--;
+
+                item.Velocity.Y += item.Gravity;
+                if (item.Velocity.Y > 6)
+                    item.Velocity.Y = 6;
+                Vector2 futurePos = item.Position + item.Velocity;
+                Vector2 futurePosColliding = TileCollidePositionInLine(item.Position, futurePos);
+                if (futurePos != futurePosColliding)
+                {
+                    item.TelegraphDuration = 0;
+                }
+                ParticleManager.AddParticle(new Square(
+                    item.Position + (futurePosColliding - item.Position) * 0.5f, Vector2.Zero, 30, color, new Vector2(3f, 1f), item.Velocity.ToRotation(), 0.96f, 30, false));
+
+                item.Position = futurePosColliding;
+                ParticleManager.AddParticle(new BallOutlined(
+                    item.Position, Vector2.Zero, 2, color, Color.White * 0.75f, new Vector2(0.12f), 6, 0, 0.96f, 0));
+
+                if (item.TelegraphDuration == 0)
+                {
+                    int particleCount = 15 + (5 * item.ItemTier);
+                    for (int i = 0; i < particleCount; i++)
+                    {
+                        float randRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                        Vector2 offset = randRot.ToRotationVector2() * (float)Math.Pow(Main.rand.NextFloat(0.5f, 0.9f), 3) * 5;
+                        SpawnParticle(item.Position + offset, offset.ToRotation(), offset.Length() * 0.5f, color, Main.rand.Next(20, 61), new Vector2(Main.rand.NextFloat(0.7f, 0.9f) * 0.2f));
+                    }
+                    item.Position.Y -= 10;
+                    int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
+                    SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
+                    Main.item[spawnedItem].noGrabDelay = 24;
+                    item.spent = true;
+                }
+            }
+
+            void SpawnParticle(Vector2 position, float rotation, float speed, Color color, int time, Vector2 scale)
+            {
+                ParticleManager.AddParticle(new BallOutlined(
+                    position, rotation.ToRotationVector2() * speed, time, color, Color.White * 0.5f, scale, 6, rotation, 0.96f, time));
+            }
+
+            specialPendingItems.RemoveAll(item => item.spent);
         }
     }
 
@@ -177,7 +242,9 @@ namespace TerRoguelike.Managers
         public int ItemTier;
         public int TelegraphDuration;
         public float TelegraphSize;
-        public int dustID = -1;
+        public int particleTier = -1;
+        public Vector2 Velocity;
+        public float Gravity;
         public bool spent = false;
         public PendingItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {
@@ -186,6 +253,22 @@ namespace TerRoguelike.Managers
             ItemTier = itemTier;
             TelegraphDuration = telegraphDuration;
             TelegraphSize = telegraphSize;
+            Velocity = Vector2.Zero;
+            Gravity = 0;
+        }
+        public PendingItem(int itemType, Vector2 position, ItemTier itemTier, int telegraphDuration, Vector2 velocity, float gravity, bool sound = true)
+        {
+            ItemType = itemType;
+            Position = position;
+            ItemTier = (int)itemTier;
+            TelegraphDuration= telegraphDuration;
+            Velocity = velocity;
+            Gravity = gravity;
+            TelegraphSize = 1;
+            if (sound)
+            {
+                SoundEngine.PlaySound(ItemSpawn with { Volume = 0.2f, Variants = [ItemTier], MaxInstances = 10 }, Position);
+            }
         }
     }
 }

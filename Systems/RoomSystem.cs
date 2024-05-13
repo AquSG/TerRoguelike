@@ -448,12 +448,17 @@ namespace TerRoguelike.Systems
             if (SpawnManager.pendingEnemies != null)
                 SpawnManager.pendingEnemies.Clear();
             else
-                SpawnManager.pendingEnemies = new List<PendingEnemy>();
+                SpawnManager.pendingEnemies = [];
 
             if (SpawnManager.pendingItems != null)
                 SpawnManager.pendingItems.Clear();
             else
-                SpawnManager.pendingItems = new List<PendingItem>();
+                SpawnManager.pendingItems = [];
+
+            if (SpawnManager.specialPendingItems != null)
+                SpawnManager.specialPendingItems.Clear();
+            else
+                SpawnManager.specialPendingItems = [];
 
             RoomList = new List<Room>();
             int loopcount = 0;
