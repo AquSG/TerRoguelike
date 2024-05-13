@@ -70,6 +70,17 @@ namespace TerRoguelike.Managers
                 roomCount = 200;
 
             PlaceRoom(roomCount, firstRoom);
+
+            var sanctuaryRoom = RoomID[FloorID[FloorDict["Sanctuary"]].StartRoomID];
+            schematic = TileMaps[sanctuaryRoom.Key];
+            schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+
+            sanctuaryRoom.RoomPosition = (placementPoint + new Point(0, GenDebugWorld ? -60 : -300)).ToVector2();
+            sanctuaryRoom.RoomDimensions = schematicSize;
+            RoomSystem.NewRoom(sanctuaryRoom);
+            RoomGenPool.Remove(sanctuaryRoom);
+
+            PlaceSchematic(sanctuaryRoom.Key, sanctuaryRoom.RoomPosition.ToPoint(), anchorType);
         }
         public static string GetFloorKey()
         {
@@ -97,6 +108,8 @@ namespace TerRoguelike.Managers
                     return "Temple";
                 case 10:
                     return "Lunar";
+                case 11:
+                    return "Sanctuary";
                 default:
                     return null;
             }
@@ -527,6 +540,8 @@ namespace TerRoguelike.Managers
             if (GenDebugWorld)
             {
                 currentFloorGen++;
+                if (currentFloorGen == FloorDict["Sanctuary"])
+                    currentFloorGen++;
                 if (currentFloorGen >= FloorID.Count)
                     currentFloorGen = -1;
                 return;
