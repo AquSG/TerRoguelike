@@ -22,6 +22,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.ExtraSoundSystem;
 using Terraria.GameContent.Animations;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -198,6 +199,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -768,6 +770,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                enemyHealthBar.ForceEnd(0);
                 SoundEngine.PlaySound(SoundID.Item173 with { Volume = 0.8f, Pitch = 0.2f }, NPC.Center);
                 ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(PharaohSpirit.LocustSwarm with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center), 1, deathCutsceneDuration, 360));
                 NPC.velocity *= 0;

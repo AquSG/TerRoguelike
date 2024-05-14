@@ -27,6 +27,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -197,6 +198,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Summon.Id;
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -672,6 +674,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();

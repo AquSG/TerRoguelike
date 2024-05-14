@@ -21,6 +21,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -213,6 +214,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
                     NPC.ai[3] = 0;
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
                 if (NPC.localAI[0] < -30)
                     NPC.ai[1]++;
@@ -811,6 +813,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                enemyHealthBar.ForceEnd(0);
                 TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.5f }, NPC.Center);
                 CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
