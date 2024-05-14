@@ -137,6 +137,9 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/RockDebris",
                 "TerRoguelike/Tiles/ItemBasinGlow",
                 "TerRoguelike/UI/Random",
+                "TerRoguelike/UI/BasinOptionBox",
+                "TerRoguelike/UI/BasinOptionBoxHover",
+                "TerRoguelike/UI/BasinOptionsBackground",
             };
             foreach (string path in pathList)
             {

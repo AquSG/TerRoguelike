@@ -23,28 +23,34 @@ using Terraria.GameInput;
 using static TerRoguelike.Managers.ItemManager;
 using System.Linq;
 using TerRoguelike.Tiles;
+using Terraria.Graphics;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.UI
 {
     public static class ItemBasinUI
     {
         public static bool Active;
-        public static Texture2D buttonTex, diceTex;
+        public static int gamepadSelectedOption = 0;
+        public static Texture2D buttonTex, buttonHoverTex, buttonBackgroundTex, diceTex;
+        public static int stickMoveCooldown = 0;
         internal static void Load()
         {
-            buttonTex = TexDict["Square"];
+            buttonTex = TexDict["BasinOptionBox"];
+            buttonHoverTex = TexDict["BasinOptionBoxHover"];
+            buttonBackgroundTex = TexDict["BasinOptionsBackground"];
             diceTex = TexDict["Random"];
         }
 
         internal static void Unload()
         {
-            buttonTex = null;
+            buttonTex = buttonHoverTex = diceTex = null;
         }
 
         public static void Draw()
         {
             Player player = Main.LocalPlayer;
-            if (player == null || !player.active)
+            if (player == null || !player.active || player.dead)
             {
                 Close();
                 return;
@@ -90,6 +96,8 @@ namespace TerRoguelike.UI
                 }
             }
 
+            bool gamepad = PlayerInput.UsingGamepad;
+
             var basinItemList = basin.itemOptions;
             int effectiveCount = basinItemList.Count + 1;
 
@@ -101,12 +109,50 @@ namespace TerRoguelike.UI
 
             bool mouseInteract = PlayerInput.Triggers.JustPressed.MouseLeft && player.inventory[58].type == 0;
             Vector2 drawStartPos = anchorPos + new Vector2(buttonDimensionsInflate.X * horizButtonDisplay * -0.5f, buttonDimensionsInflate.Y * -verticalButtonDisplay);
-            Vector2 buttonScale = new Vector2(0.25f) * buttonDimensions;
-            Vector2 buttonHighlightScale = new Vector2(0.25f) * buttonDimensionsInflate;
             int currentHighlight = -1;
             bool queueShrinkClose = false;
             bool queueClose = false;
             int priorityRemove = -1;
+
+            // draw the backdrop to the buttons
+            Rectangle backgroundDrawRect = new Rectangle((int)drawStartPos.X, (int)drawStartPos.Y, (int)(horizButtonDisplay * buttonDimensionsInflate.X), (int)(verticalButtonDisplay * buttonDimensionsInflate.Y));
+            int inflateAmt = 6;
+            int edgeWidth = 12; // do not touch unless the texture is changed.
+            backgroundDrawRect.Inflate(inflateAmt, inflateAmt);
+            Rectangle cornerFrame = new Rectangle(0, 0, edgeWidth, edgeWidth);
+            Rectangle edgeFrame = new Rectangle(edgeWidth, 0, 2, edgeWidth);
+            Rectangle fillFrame = new Rectangle(edgeWidth, edgeWidth, 1, 1);
+
+            Vector2 drawStart = new Vector2(backgroundDrawRect.X, backgroundDrawRect.Y);
+            Vector2 fillDrawPos = drawStart + new Vector2(edgeWidth);
+            Vector2 fillScale = new Vector2(backgroundDrawRect.Width - edgeWidth * 2, backgroundDrawRect.Height - edgeWidth * 2);
+            Color backgroundColor = Color.Lerp(Color.DarkSlateBlue, Color.Blue, 0.6f);
+            Main.EntitySpriteDraw(buttonBackgroundTex, (fillDrawPos - Main.screenPosition).ToPoint().ToVector2(), fillFrame, backgroundColor, 0, Vector2.Zero, fillScale, SpriteEffects.None);
+
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 cornerDrawStart = drawStart;
+                Vector2 edgeScale;
+                if (i == 1 || i == 2)
+                {
+                    cornerDrawStart.X += backgroundDrawRect.Width;
+                }
+                if (i == 2 || i == 3)
+                {
+                    cornerDrawStart.Y += backgroundDrawRect.Height;
+                }
+                if (i % 2 == 0)
+                    edgeScale = new Vector2(fillScale.X * 0.5f, 1);
+                else
+                    edgeScale = new Vector2(fillScale.Y * 0.5f, 1);
+
+                float rot = i * MathHelper.PiOver2;
+
+                Vector2 sideDrawStart = cornerDrawStart + new Vector2(edgeWidth, 0).RotatedBy(rot);
+
+                Main.EntitySpriteDraw(buttonBackgroundTex, (sideDrawStart - Main.screenPosition).ToPoint().ToVector2(), edgeFrame, backgroundColor, rot, Vector2.Zero, edgeScale, SpriteEffects.None);
+                Main.EntitySpriteDraw(buttonBackgroundTex, (cornerDrawStart - Main.screenPosition).ToPoint().ToVector2(), cornerFrame, backgroundColor, rot, Vector2.Zero, 1f, SpriteEffects.None);
+            }
 
             for (int i = 0; i < effectiveCount; i++)
             {
@@ -116,11 +162,12 @@ namespace TerRoguelike.UI
                 int vertiMulti = i / 10;
                 Point drawPos = (drawStartPos + (buttonDimensionsInflate * new Vector2(horizMulti, vertiMulti))).ToPoint();
                 Rectangle interactRect = new Rectangle(drawPos.X, drawPos.Y, (int)buttonDimensionsInflate.X, (int)buttonDimensionsInflate.Y);
-                if (interactRect.Contains(Main.MouseWorld.ToPoint()))
+                if (!gamepad ? interactRect.Contains(Main.MouseWorld.ToPoint()) : i == gamepadSelectedOption)
                 {
                     Main.blockMouse = true;
                     currentHighlight = i;
-                    Main.EntitySpriteDraw(buttonTex, (drawPos.ToVector2() - Main.screenPosition).ToPoint().ToVector2(), null, Color.Yellow, 0, Vector2.Zero, buttonHighlightScale, SpriteEffects.None);
+                    Color highlightColor = Color.Lerp(Color.Yellow, Color.White, 0.4f);
+                    Main.EntitySpriteDraw(buttonHoverTex, (drawPos.ToVector2() - Main.screenPosition).ToPoint().ToVector2(), null, highlightColor, 0, Vector2.Zero, 1f, SpriteEffects.None);
                     if (mouseInteract)
                     {
                         int pulledItem = itemType;
@@ -209,15 +256,14 @@ namespace TerRoguelike.UI
                         }
                     }
                 }
-                drawPos += new Point(2, 2);
-                Main.EntitySpriteDraw(buttonTex, (drawPos.ToVector2() - Main.screenPosition).ToPoint().ToVector2(), null, Color.DarkSlateBlue, 0, Vector2.Zero, buttonScale, SpriteEffects.None);
+                Main.EntitySpriteDraw(buttonTex, (drawPos.ToVector2() - Main.screenPosition).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None);
                 if (itemType >= 0)
                 {
-                    DrawItem(drawPos.ToVector2() + buttonDimensions * 0.5f, itemType);
+                    DrawItem(drawPos.ToVector2() + buttonDimensionsInflate * 0.5f, itemType);
                 }
                 else
                 {
-                    Main.EntitySpriteDraw(diceTex, (drawPos.ToVector2() + buttonDimensions * 0.5f - Main.screenPosition).ToPoint().ToVector2(), null, Color.White, 0, diceTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(diceTex, (drawPos.ToVector2() + buttonDimensionsInflate * 0.5f - Main.screenPosition).ToPoint().ToVector2(), null, Color.White, 0, diceTex.Size() * 0.5f, 1f, SpriteEffects.None);
                 }
             }
             if (queueShrinkClose)
@@ -233,12 +279,93 @@ namespace TerRoguelike.UI
                 modPlayer.selectedBasin = null;
                 return;
             }
+            if (currentHighlight >= 0)
+            {
+                if (gamepad)
+                {
+                    var triggers = PlayerInput.Triggers.JustPressed;
+                    bool pass = true;
+                    int horizPos = currentHighlight % horizButtonDisplay;
+                    int vertiPos = currentHighlight / 10;
+                    int lastRowLength = effectiveCount % horizButtonDisplay;
+                    bool onLastRow = (currentHighlight / horizButtonDisplay) == (effectiveCount / horizButtonDisplay);
+                    int checkLength = onLastRow ? lastRowLength : horizButtonDisplay;
+
+                    Vector2 rightStick = PlayerInput.GamepadThumbstickRight;
+                    int stickdir = -1;
+                    if (stickMoveCooldown <= 1 && rightStick.Length() > 0.12f)
+                    {
+                        stickMoveCooldown = stickMoveCooldown == 0 ? 15 : (int)(6 / rightStick.Length());
+                        float stickRot = rightStick.ToRotation();
+                        if (Math.Abs(stickRot) < MathHelper.PiOver4)
+                        {
+                            stickdir = 2;
+                        }
+                        else if (stickRot > 0 && stickRot < MathHelper.PiOver4 * 3)
+                        {
+                            stickdir = 3;
+                        }
+                        else if (stickRot < 0 && stickRot > MathHelper.PiOver4 * -3)
+                        {
+                            stickdir = 1;
+                        }
+                        else
+                        {
+                            stickdir = 4;
+                        }
+                    }
+                    if (triggers.DpadMouseSnap4 || triggers.DpadRadial4 || stickdir == 4)
+                    {
+                        if (currentHighlight % checkLength == 0)
+                        {
+                            currentHighlight += checkLength;
+                        }
+                        currentHighlight--;
+                    }
+                    else if (triggers.DpadMouseSnap2 || triggers.DpadRadial2 || stickdir == 2)
+                    {
+                        if (currentHighlight % checkLength == checkLength - 1)
+                        {
+                            currentHighlight -= checkLength;
+                        }
+                        currentHighlight++;
+                    }
+                    else if (triggers.DpadMouseSnap1 || triggers.DpadRadial1 || stickdir == 1)
+                    {
+                        currentHighlight -= 10;
+                        if (currentHighlight < 0)
+                        {
+                            currentHighlight += 10 * verticalButtonDisplay;
+                            if (currentHighlight >= effectiveCount)
+                                currentHighlight -= 10;
+                        }
+                    }
+                    else if (triggers.DpadMouseSnap3 || triggers.DpadRadial3 || stickdir == 3)
+                    {
+                        currentHighlight += 10;
+                        if (currentHighlight >= effectiveCount)
+                        {
+                            currentHighlight -= 10 * verticalButtonDisplay;
+                            if (currentHighlight < 0)
+                                currentHighlight += 10;
+                        }
+                    }
+                    else
+                        pass = false;
+                    if (pass)
+                    {
+                        gamepadSelectedOption = currentHighlight;
+                        
+                    }
+                }
+            }
         }
         public static void Close()
         {
             if (!Active)
                 return;
 
+            gamepadSelectedOption = 0;
             SoundEngine.PlaySound(SoundID.MenuClose);
             Active = false;
         }
@@ -246,7 +373,7 @@ namespace TerRoguelike.UI
         {
             if (Active)
                 return;
-
+            
             Active = true;
         }
         public static void DrawItem(Vector2 position, int itemType)
