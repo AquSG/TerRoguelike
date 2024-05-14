@@ -74,10 +74,11 @@ namespace TerRoguelike.UI
             Vector2 anchorPos = basin.position.ToWorldCoordinates(24, -64);
 
             List<Item> invList = [];
-            for (int invItem = 0; invItem < 51; invItem++)
+            for (int invItem = 0; invItem < 52; invItem++)
             {
                 var item = invItem switch
                 {
+                    51 => player.HeldItem,
                     50 => player.trashItem,
                     _ => player.inventory[invItem],
                 };
@@ -105,7 +106,11 @@ namespace TerRoguelike.UI
             Vector2 buttonDimensionsInflate = new Vector2(52);
             int maxButtonsWidth = 10;
             int horizButtonDisplay = (int)MathHelper.Clamp(effectiveCount, 1, maxButtonsWidth);
-            int verticalButtonDisplay = (effectiveCount / maxButtonsWidth) + 1;
+            int verticalButtonDisplay = ((effectiveCount - 1) / maxButtonsWidth);
+            if (verticalButtonDisplay < 0)
+                verticalButtonDisplay = 0;
+            verticalButtonDisplay++;
+
 
             bool mouseInteract = PlayerInput.Triggers.JustPressed.MouseLeft && player.inventory[58].type == 0;
             Vector2 drawStartPos = anchorPos + new Vector2(buttonDimensionsInflate.X * horizButtonDisplay * -0.5f, buttonDimensionsInflate.Y * -verticalButtonDisplay);
