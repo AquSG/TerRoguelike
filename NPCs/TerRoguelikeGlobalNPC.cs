@@ -3210,7 +3210,7 @@ namespace TerRoguelike.NPCs
             diminishingDR = 0;
             if (ballAndChainSlowApplied) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
             {
-                npc.velocity /= 0.7f;
+                npc.velocity /= 0.85f;
                 ballAndChainSlowApplied = false;
             }
             return true;
@@ -3288,7 +3288,7 @@ namespace TerRoguelike.NPCs
 
             if (ballAndChainSlow > 0) // slow down
             {
-                npc.velocity *= 0.7f;
+                npc.velocity *= 0.85f;
                 ballAndChainSlow--;
                 ballAndChainSlowApplied = true;
             }

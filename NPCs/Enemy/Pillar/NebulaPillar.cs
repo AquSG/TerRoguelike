@@ -18,6 +18,7 @@ using Terraria.Graphics.Shaders;
 using TerRoguelike.Systems;
 using TerRoguelike.World;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Pillar
 {
@@ -49,7 +50,14 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             if (TerRoguelikeWorld.IsTerRoguelikeWorld && modNPC.isRoomNPC)
             {
                 if (RoomSystem.RoomList[modNPC.sourceRoomListID].awake)
+                {
                     NPC.immortal = false;
+                    if (NPC.localAI[0] == 0)
+                    {
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                        NPC.localAI[0] = 1;
+                    }
+                }
                 else
                     NPC.immortal = true;
             }
