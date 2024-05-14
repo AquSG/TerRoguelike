@@ -32,7 +32,7 @@ namespace TerRoguelike.Systems
     public class MusicSystem : ModSystem
     {
         public static bool Initialized = false;
-        public static bool PlayedAllSounds = false;
+        public static bool MusicDictionaryFilled = false;
         public static bool PauseWhenIngamePaused = false;
         public static int BlankMusicSlotId = -1;
         public static float CalmVolumeInterpolant = 0;
@@ -128,12 +128,12 @@ namespace TerRoguelike.Systems
             0.55f);
 
 
-        public static void PlayAllSounds()
+        public static void FillMusicDictionary()
         {
-            if (PlayedAllSounds)
+            if (MusicDictionaryFilled)
                 return;
 
-            PlayedAllSounds = true;
+            MusicDictionaryFilled = true;
 
             List<string> pathList = new List<string>()
             {
@@ -195,7 +195,7 @@ namespace TerRoguelike.Systems
         }
         public override void SetStaticDefaults()
         {
-            PlayAllSounds();
+            FillMusicDictionary();
             BlankMusicSlotId = MusicLoader.GetMusicSlot(TerRoguelike.Instance, "Tracks/Blank");
         }
         public static void SetBossTrack(BossTheme bossTheme)

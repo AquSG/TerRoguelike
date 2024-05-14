@@ -23,7 +23,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Graphics.Effects;
-using Steamworks;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -232,6 +232,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -583,6 +584,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                enemyHealthBar.ForceEnd(0);
                 rumbleSlot = SoundEngine.PlaySound(SoundID.DD2_EtherianPortalIdleLoop with { Volume = 0.03f, PitchVariance = 0f, Pitch = 0.8f }, NPC.Center);
 
                 NPC.rotation = 0;

@@ -12,6 +12,7 @@ using Terraria.ModLoader;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs.Enemy.Boss;
 using TerRoguelike.Projectiles;
+using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
 using static TerRoguelike.Managers.TextureManager;

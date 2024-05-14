@@ -35,7 +35,6 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.aiStyle = -1;
             NPC.damage = 30;
             NPC.lifeMax = 400;
-            NPC.HitSound = SoundID.NPCHit36 with { Volume = 0.3f };
             NPC.DeathSound = SoundID.NPCDeath39 with { Volume = 0.5f };
             NPC.knockBackResist = 1f;
             modNPC.drawCenter = new Vector2(0, -3);
@@ -72,8 +71,15 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (NPC.soundDelay <= 0 && NPC.life > 0)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.3f }, NPC.Center);
+                NPC.soundDelay = 15;
+            }
+            
             if (NPC.life <= 0)
             {
+                SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.3f }, NPC.Center);
                 for (int i = 0; i < 50; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, 180, NPC.velocity.X * 0.5f, NPC.velocity.Y * 0.5f);

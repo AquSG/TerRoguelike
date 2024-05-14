@@ -19,7 +19,6 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using static TerRoguelike.NPCs.Enemy.Boss.CrimsonVessel;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {

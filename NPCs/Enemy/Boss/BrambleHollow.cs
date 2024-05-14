@@ -18,6 +18,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -140,6 +141,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -577,6 +579,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             if (deadTime == 0)
             {
+                enemyHealthBar.ForceEnd(0);
                 SoundEngine.PlaySound(SoundID.DD2_OgreHurt with { Volume = 1f, Pitch = -0.5f }, NPC.Center);
                 NPC.HitSound = SoundID.Item1 with { Volume = 0f };
                 NPC.DeathSound = SoundID.Item1 with { Volume = 0f };

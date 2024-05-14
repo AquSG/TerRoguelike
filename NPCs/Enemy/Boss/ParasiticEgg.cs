@@ -69,7 +69,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg1").Type, NPC.scale);
                 Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg2").Type, NPC.scale);
                 Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg3").Type, NPC.scale);
-                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg1").Type + Main.rand.Next(3), NPC.scale);
+                Gore.NewGore(NPC.GetSource_FromThis(), NPC.position, Vector2.UnitX * hit.HitDirection, Mod.Find<ModGore>("ParasiticEgg" + Main.rand.Next(1, 4).ToString()).Type, NPC.scale);
             }
         }
     }

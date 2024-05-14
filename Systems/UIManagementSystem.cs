@@ -108,6 +108,16 @@ namespace TerRoguelike.Systems
                 ItemBasinUI.Draw();
                 return true;
             }, InterfaceScaleType.Game));
+            layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Escape UI", () =>
+            {
+                EscapeUI.Draw(Main.spriteBatch);
+                return true;
+            }, InterfaceScaleType.None));
+            layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Enemy Healthbar UI", () =>
+            {
+                EnemyHealthbarUI.Draw(Main.spriteBatch);
+                return true;
+            }, InterfaceScaleType.UI));
         }
     }
 }

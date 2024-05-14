@@ -18,6 +18,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -121,6 +122,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -778,6 +780,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             if (deadTime == 0)
             {
+                enemyHealthBar.ForceEnd(0);
                 CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {

@@ -22,6 +22,7 @@ namespace TerRoguelike.Shaders
         internal static Effect CircularGradientOuter;
         internal static Effect ProtectiveBubbleShield;
         internal static Effect MaskOverlay;
+        internal static Effect SideFade;
 
         public static void LoadShaders()
         {
@@ -43,6 +44,9 @@ namespace TerRoguelike.Shaders
 
             ProtectiveBubbleShield = LoadShader("ProtectiveBubbleShield"); //lifted from the Calamity Mod
             RegisterScreenShader(ProtectiveBubbleShield, "ShieldPass", "ProtectiveBubbleShield");
+
+            SideFade = LoadShader("SideFade");
+            RegisterScreenShader(SideFade, "SideFadePass", "SideFade");
 
             MaskOverlay = LoadShader("MaskOverlay");
             RegisterScreenShader(MaskOverlay, "MaskOverlayPass", "MaskOverlay");
