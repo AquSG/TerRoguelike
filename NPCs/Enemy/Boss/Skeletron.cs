@@ -945,14 +945,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, 26, Main.rand.NextFloat(-2.5f, 2.5f), -2.5f);
             }
 
+            //Custom gores because for some reason when using vanilla ones, the very first time the gores were spawned, they were offset by a lot.
             Vector2 goreOff = new Vector2(0, -18).RotatedBy(NPC.rotation);
-            int g = Gore.NewGore(NPC.GetSource_Death(), NPC.position - Vector2.UnitY * 80, -Vector2.UnitY * 0.75f + new Vector2(0, -24) * 0.07f, 54);
+            int g = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + new Vector2(0, -24) * 0.07f, Mod.Find<ModGore>("Skeletron1").Type);
             Gore gore = Main.gore[g];
             gore.position = NPC.Center + goreOff - new Vector2(gore.Width, gore.Height) * 0.5f;
             gore.rotation = NPC.rotation;
 
             Vector2 goreOff2 = new Vector2(0, 32).RotatedBy(NPC.rotation);
-            int g2 = Gore.NewGore(NPC.GetSource_Death(), NPC.position - Vector2.UnitY * 80, -Vector2.UnitY * 0.75f + new Vector2(0, 24).RotatedBy(NPC.rotation) * 0.07f, 55);
+            int g2 = Gore.NewGore(NPC.GetSource_Death(), NPC.position, -Vector2.UnitY * 0.75f + new Vector2(0, 24).RotatedBy(NPC.rotation) * 0.07f, Mod.Find<ModGore>("Skeletron2").Type);
             Gore gore2 = Main.gore[g2];
             gore2.position = NPC.Center + goreOff2 - new Vector2(gore2.Width, gore2.Height) * 0.5f;
             gore2.rotation = NPC.rotation;
