@@ -25,6 +25,7 @@ using System.Threading;
 using ReLogic.Content;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
+using System.Diagnostics;
 
 namespace TerRoguelike.Systems
 {
@@ -40,7 +41,8 @@ namespace TerRoguelike.Systems
         public static float CombatVolumeLevel = 1f;
         public static double BossIntroDuration = 0;
         public static double BossIntroProgress = 0;
-        public static float BossIntroPreviousGlobalTime = 0;
+        public static Stopwatch BossIntroStopwatch = new Stopwatch();
+        public static double BossIntroPreviousTime = 0;
         public static SoundEffectInstance CalmMusic;
         public static SoundEffectInstance CombatMusic;
         public static BossTheme ActiveBossTheme;
@@ -198,16 +200,20 @@ namespace TerRoguelike.Systems
         }
         public static void SetBossTrack(BossTheme bossTheme)
         {
+            BossIntroStopwatch.Reset();
+
             ActiveBossTheme = new BossTheme(bossTheme);
             ActiveBossTheme.startFlag = true;
             SoundEffect introTrack = MusicDict[bossTheme.StartTrack].Value;
             BossIntroDuration = introTrack.Duration.TotalSeconds;
             BossIntroProgress = 0;
-            BossIntroPreviousGlobalTime = Main.GlobalTimeWrappedHourly;
+            BossIntroPreviousTime = 0;
 
             SetCombat(introTrack, false);
             SetMusicMode(MusicStyle.Boss);
             CombatVolumeLevel = bossTheme.Volume;
+
+            BossIntroStopwatch.Start();
         }
         public static void SetMusicMode(MusicStyle newMode)
         {
@@ -412,10 +418,8 @@ namespace TerRoguelike.Systems
 
                 if (ActiveBossTheme.startFlag)
                 {
-                    float currentTime = Main.GlobalTimeWrappedHourly;
-                    if (currentTime < BossIntroPreviousGlobalTime)
-                        currentTime += 3600;
-                    float difference = currentTime - BossIntroPreviousGlobalTime;
+                    double currentTime = BossIntroStopwatch.Elapsed.TotalSeconds;
+                    double difference = currentTime - BossIntroPreviousTime;
 
                     if (Main.hasFocus && !Main.gamePaused)
                     {
@@ -424,10 +428,11 @@ namespace TerRoguelike.Systems
                         {
                             SetCombat(ActiveBossTheme.BattleTrack);
                             ActiveBossTheme.startFlag = false;
+                            BossIntroStopwatch.Reset();
                         }
                     }
 
-                    BossIntroPreviousGlobalTime = currentTime;
+                    BossIntroPreviousTime = currentTime;
                 }
                 if (CombatMusic != null && !CombatMusic.IsDisposed && CombatMusic.State != SoundState.Stopped)
                 {
@@ -455,6 +460,13 @@ namespace TerRoguelike.Systems
                         CombatVolumeInterpolant = 0;
                         SetMusicMode(MusicStyle.Silent);
                     }   
+                }
+            }
+            else
+            {
+                if (BossIntroStopwatch.IsRunning)
+                {
+                    BossIntroStopwatch.Reset();
                 }
             }
 
