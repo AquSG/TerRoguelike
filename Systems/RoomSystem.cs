@@ -859,13 +859,18 @@ namespace TerRoguelike.Systems
             {
                 bool spawnParticles = (int)(Main.GlobalTimeWrappedHourly * 60) % 4 == 0;
                 int basinTileType = ModContent.TileType<ItemBasin>();
-                bool interact = PlayerInput.Triggers.JustPressed.MouseRight;
+                bool interact = PlayerInput.Triggers.JustPressed.MouseRight && !Main.mapFullscreen;
+                Player player = Main.LocalPlayer;
+                if (player == null || !player.active || player.ModPlayer() == null)
+                    return;
+                var modPlayer = player.ModPlayer();
+                if (Main.mapFullscreen)
+                    modPlayer.selectedBasin = null;
+
                 for (int i = 0; i < itemBasins.Count; i++)
                 {
                     var basin = itemBasins[i];
-                    Player player = Main.LocalPlayer;
-                    if (player == null || !player.active || player.ModPlayer() == null)
-                        continue;
+                    
                     if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
                     {
                         itemBasins.RemoveAt(i);
@@ -879,12 +884,11 @@ namespace TerRoguelike.Systems
                             basin.SpawnParticles();
                         if (interact && basin.rect16.Contains(Main.MouseWorld.ToPoint()))
                         {
-                            
                             Vector2 checkPos = basin.position.ToWorldCoordinates(24, 16);
                             if (player.Center.Distance(checkPos) > 200)
                                 continue;
 
-                            player.ModPlayer().selectedBasin = basin;
+                            modPlayer.selectedBasin = basin;
                             ItemBasinUI.gamepadSelectedOption = 0;
                             SoundEngine.PlaySound(SoundID.MenuOpen);
                         }

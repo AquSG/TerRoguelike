@@ -8,18 +8,26 @@ using TerRoguelike.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
+using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
     public class TempleEnemyRoom3 : Room
     {
+        public override int AssociatedFloor => FloorDict["Temple"];
         public override string Key => "TempleEnemyRoom3";
         public override string Filename => "Schematics/RoomSchematics/TempleEnemyRoom3.csch";
         public override bool CanExitRight => true;
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.FlyingSnake, 60, 120, 0.45f);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -11, -12), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Bottom, 12, -7), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Bottom, 5, -12, 0), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 15, -12, 0), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Top, 5, 8, 0), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 8, 10, 0), ChooseEnemy(AssociatedFloor, 2), 240, 120, 0.45f, 0);
         }
     }
 }
