@@ -885,11 +885,14 @@ namespace TerRoguelike.Systems
                                 continue;
 
                             player.ModPlayer().selectedBasin = basin;
+                            ItemBasinUI.gamepadSelectedOption = 0;
                             SoundEngine.PlaySound(SoundID.MenuOpen);
                         }
                     }
                 }
             }
+            if (ItemBasinUI.stickMoveCooldown > 0)
+                ItemBasinUI.stickMoveCooldown--;
         }
         #endregion
 
