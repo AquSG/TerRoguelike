@@ -10,6 +10,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Items
 {
@@ -36,6 +37,7 @@ namespace TerRoguelike.Items
         {
             Item.width = 20;
             Item.height = 20;
+            Item.ModItem().RogueItemTier = itemTier;
         }
         /// <summary>
         /// Item Effects happen here. updated in UpdateInventory(Player player)

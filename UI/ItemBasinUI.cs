@@ -25,6 +25,7 @@ using System.Linq;
 using TerRoguelike.Tiles;
 using Terraria.Graphics;
 using TerRoguelike.Systems;
+using System.Diagnostics;
 
 namespace TerRoguelike.UI
 {
@@ -32,7 +33,7 @@ namespace TerRoguelike.UI
     {
         public static bool Active;
         public static int gamepadSelectedOption = 0;
-        public static Texture2D buttonTex, buttonHoverTex, buttonBackgroundTex, diceTex;
+        public static Texture2D buttonTex, buttonHoverTex, buttonBackgroundTex, diceTex, noCircleTex;
         public static int stickMoveCooldown = 0;
         internal static void Load()
         {
@@ -40,11 +41,12 @@ namespace TerRoguelike.UI
             buttonHoverTex = TexDict["BasinOptionBoxHover"];
             buttonBackgroundTex = TexDict["BasinOptionsBackground"];
             diceTex = TexDict["Random"];
+            noCircleTex = TexDict["NoCircle"];
         }
 
         internal static void Unload()
         {
-            buttonTex = buttonHoverTex = diceTex = null;
+            buttonTex = buttonHoverTex = buttonBackgroundTex = diceTex = noCircleTex = null;
         }
 
         public static void Draw()
@@ -73,7 +75,7 @@ namespace TerRoguelike.UI
             }
             Vector2 anchorPos = basin.position.ToWorldCoordinates(24, -64);
 
-            List<Item> invList = [];
+            List<Item> allowedItemList = [];
             for (int invItem = 0; invItem < 52; invItem++)
             {
                 var item = invItem switch
@@ -83,19 +85,24 @@ namespace TerRoguelike.UI
                     _ => player.inventory[invItem],
                 };
 
-                if (!item.active || item.stack <= 0 || item.type == 0)
+                if (!item.active || item.stack <= 0 || item.type == 0 || item.type == basin.itemDisplay)
                     continue;
 
-                invList.Add(item);
+                var modItem = item.ModItem();
+                if (modItem == null || modItem.RogueItemTier != (int)basin.tier || allowedItemList.Any(x => x.type == item.type))
+                    continue;
+
+                allowedItemList.Add(item);
             }
             for (int i = 0; i < basin.itemOptions.Count; i++)
             {
-                if (!invList.Any(x => x.type == basin.itemOptions[i]))
+                if (!allowedItemList.Any(x => x.type == basin.itemOptions[i]))
                 {
                     basin.itemOptions.RemoveAt(i);
                     i--;
                 }
             }
+            bool noCircle = allowedItemList.Count == 0;
 
             bool gamepad = PlayerInput.UsingGamepad;
 
@@ -175,33 +182,18 @@ namespace TerRoguelike.UI
                     Main.EntitySpriteDraw(buttonHoverTex, (drawPos.ToVector2() - Main.screenPosition).ToPoint().ToVector2(), null, highlightColor, 0, Vector2.Zero, 1f, SpriteEffects.None);
                     if (mouseInteract)
                     {
+                        if (noCircle)
+                        {
+                            queueClose = true;
+                            break;
+                        }
                         int pulledItem = itemType;
                         if (pulledItem < 0)
                         {
                             bool found = false;
-                            for (int T = 0; T < 300; T++) // try find an item to scoop up
-                            {
-                                int randInt = Main.rand.Next(51);
-                                var potItem = randInt switch
-                                {
-                                    50 => player.trashItem,
-                                    _ => player.inventory[randInt],
-                                };
-
-                                if (!potItem.active || potItem.stack <= 0)
-                                    continue;
-                                int playerItemType = potItem.type;
-                                if (playerItemType == 0 || playerItemType == basin.itemDisplay)
-                                    continue;
-                                
-                                int rogueItemType = AllItems.FindIndex(x => x.modItemID == playerItemType);
-                                if (rogueItemType != -1 && (ItemTier)AllItems[rogueItemType].itemTier == basin.tier)
-                                {
-                                    found = true;
-                                    pulledItem = playerItemType;
-                                    break;
-                                }
-                            }
+                            Item randItem = allowedItemList[Main.rand.Next(allowedItemList.Count)];
+                            found = true;
+                            pulledItem = randItem.type;
                             if (!found) //somehow didn't randomly find an item to take. search manually through the player's items instead.
                             {
                                 for (int invItem = 0; invItem < 51; invItem++)
@@ -268,7 +260,7 @@ namespace TerRoguelike.UI
                 }
                 else
                 {
-                    Main.EntitySpriteDraw(diceTex, (drawPos.ToVector2() + buttonDimensionsInflate * 0.5f - Main.screenPosition).ToPoint().ToVector2(), null, Color.White, 0, diceTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                    Main.EntitySpriteDraw(noCircle ? noCircleTex : diceTex, (drawPos.ToVector2() + buttonDimensionsInflate * 0.5f - Main.screenPosition).ToPoint().ToVector2(), null, Color.White, 0, noCircle ? noCircleTex.Size() * 0.5f : diceTex.Size() * 0.5f, 1f, SpriteEffects.None);
                 }
             }
             if (queueShrinkClose)

@@ -12,6 +12,7 @@ using TerRoguelike.TerPlayer;
 using TerRoguelike.NPCs;
 using Terraria.GameInput;
 using TerRoguelike.Projectiles;
+using TerRoguelike.Items;
 
 namespace TerRoguelike.Utilities
 {
@@ -20,6 +21,7 @@ namespace TerRoguelike.Utilities
         public static TerRoguelikePlayer ModPlayer(this Player player) => player.GetModPlayer<TerRoguelikePlayer>();
         public static TerRoguelikeGlobalProjectile ModProj(this Projectile projectile) => projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
         public static TerRoguelikeGlobalNPC ModNPC(this NPC npc) => npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
+        public static TerRoguelikeGlobalItem ModItem(this Item item) => item.GetGlobalItem<TerRoguelikeGlobalItem>();
 
         /// <summary>
         /// Properly sets the player's held item rotation and position by doing the annoying math for you, since vanilla decided to be wholly inconsistent about it!
