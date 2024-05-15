@@ -904,6 +904,7 @@ namespace TerRoguelike.Systems
                 {
                     ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthTremor with { Volume = 1f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextFloat(-500, 500), -500)), 1, 120, 90));
                     ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthPound with { Volume = 0.35f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextBool() ? -500 : 500, -500)), 1, 120, 90));
+                    ScreenshakeSystem.SetScreenshake(180, Main.rand.NextFloat(3, 4));
                 }
                 if (quakeTime % 5 == 0)
                 {
