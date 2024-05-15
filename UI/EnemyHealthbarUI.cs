@@ -19,6 +19,7 @@ using ReLogic.Graphics;
 using Terraria.DataStructures;
 using TerRoguelike.Utilities;
 using Terraria.Graphics.Effects;
+using System.Diagnostics;
 
 namespace TerRoguelike.UI
 {
@@ -53,29 +54,51 @@ namespace TerRoguelike.UI
 
             Vector2 MainBarScale = barDimensions * new Vector2(healthBar.MainBar, 1);
             Vector2 ExtraBarScale = barDimensions * new Vector2(healthBar.ExtraBar, 1);
-            Vector2 opacityToScaleMultiplier = new Vector2(1 - (float)Math.Pow(1 - MathHelper.Clamp(MathHelper.Lerp(0, 1, (healthBar.Opacity - 0.33f) * 1.5f), 0, 1), 3f), 1);
-
-            Color underlayColor = new Color(0.3f, 0.3f, 0.3f);
-            Vector2 underlayBarInflate = new Vector2(60, 3);
+            Vector2 opacityToScaleMultiplier = new Vector2(1 - (float)Math.Pow(1 - MathHelper.Clamp(MathHelper.Lerp(0, 1, (healthBar.Opacity - 0.25f) * 1.34f), 0, 1), 3.3d), 1);
+            Color underlayColor = new Color(1f, 1f, 1f);
+            Vector2 underlayBarInflate = new Vector2(60, 4);
 
             Main.spriteBatch.End();
             Effect fadeEffect = Filters.Scene["TerRoguelike:SideFade"].GetShader().Shader;
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
 
-            Color tint = underlayColor * (float)Math.Pow(healthBar.Opacity, 0.75d) * 0.66f;
+            float underlayOpacity = (float)Math.Pow(healthBar.Opacity, 2);
+            Color tint = Color.Black * underlayOpacity * 0.33f;
             fadeEffect.Parameters["tint"].SetValue(tint.ToVector4());
             fadeEffect.Parameters["fadeTint"].SetValue(Color.Transparent.ToVector4());
             fadeEffect.Parameters["fadeCutoff"].SetValue(0.1f);
 
-            Main.EntitySpriteDraw(pixelTex, (barDrawStart - underlayBarInflate).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, (barDimensions + underlayBarInflate * 2) * pixlelScale, SpriteEffects.None);
+            Main.EntitySpriteDraw(pixelTex, (barDrawStart - underlayBarInflate + Vector2.UnitX * -10).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, (barDimensions + underlayBarInflate * 2 + Vector2.UnitX * 20) * pixlelScale, SpriteEffects.None);
+            
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
+
+            tint = underlayColor * underlayOpacity * 0.2f;
+            fadeEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            fadeEffect.Parameters["fadeTint"].SetValue(Color.Transparent.ToVector4());
+            fadeEffect.Parameters["fadeCutoff"].SetValue(0.1f);
+            Main.EntitySpriteDraw(pixelTex, (barDrawStart - underlayBarInflate + Vector2.UnitY * 3).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, (barDimensions + underlayBarInflate * 2 - Vector2.UnitY * 6) * pixlelScale, SpriteEffects.None);
+
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 
-            Color extraBarColor = new Color(1f, 0.8f, 0.8f);
-            Main.EntitySpriteDraw(pixelTex, barDrawStart.ToPoint().ToVector2(), null, extraBarColor * (float)Math.Pow(healthBar.Opacity, 4), 0, Vector2.Zero, ExtraBarScale * pixlelScale * opacityToScaleMultiplier, SpriteEffects.None);
+            Color extraBarColor = new Color(0.8f, 0.6f, 0.5f) * 1;
+            Main.EntitySpriteDraw(pixelTex, barDrawStart.ToPoint().ToVector2(), null, extraBarColor * (float)Math.Pow(healthBar.Opacity, 2), 0, Vector2.Zero, ExtraBarScale * pixlelScale * opacityToScaleMultiplier, SpriteEffects.None);
 
-            Color mainBarColor = new Color(1f, 0, 0);
-            Main.EntitySpriteDraw(pixelTex, barDrawStart.ToPoint().ToVector2(), null, mainBarColor * healthBar.Opacity, 0, Vector2.Zero, MainBarScale * pixlelScale * opacityToScaleMultiplier, SpriteEffects.None);
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
+
+            Color mainBarColor = new Color(230, 24, 0);
+            tint = mainBarColor * healthBar.Opacity;
+            Color tintFade = new Color(93, 29, 35) * healthBar.Opacity;
+            fadeEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            fadeEffect.Parameters["fadeTint"].SetValue(tintFade.ToVector4());
+            fadeEffect.Parameters["fadeCutoff"].SetValue(0.24f);
+            Vector2 mainScale = (MainBarScale * pixlelScale * opacityToScaleMultiplier);
+            Main.EntitySpriteDraw(pixelTex, (barDrawStart + Vector2.UnitY * mainScale.Y / pixlelScale.X).ToPoint().ToVector2(), null, Color.White, -MathHelper.PiOver2, Vector2.Zero, new Vector2(mainScale.Y, mainScale.X), SpriteEffects.None);
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
 
             DynamicSpriteFont healthFont = FontAssets.MouseText.Value;
 

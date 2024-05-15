@@ -169,6 +169,8 @@ namespace TerRoguelike.TerPlayer
         public ItemBasinEntity selectedBasin = null;
         public int cacheRoomListWarp = -1;
         public bool noThrow = false;
+        public int escapeArrowTime = 0;
+        public Vector2 escapeArrowTarget = Vector2.Zero;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -255,6 +257,7 @@ namespace TerRoguelike.TerPlayer
                 standingStillTime++;
             else
                 standingStillTime = 0;
+
             if (selectedBasin != null)
             {
                 Vector2 checkPos = selectedBasin.position.ToWorldCoordinates(24, 16);
@@ -263,6 +266,9 @@ namespace TerRoguelike.TerPlayer
                     selectedBasin = null;
                 }
             }
+
+            if (escapeArrowTime > 0)
+                escapeArrowTime--;
 
             barrierFloor = 0;
             barrierFullAbsorbHit = false;
@@ -1967,6 +1973,28 @@ namespace TerRoguelike.TerPlayer
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
             
+            if (escapeArrowTime > 0)
+            {
+                float opacity = MathHelper.Clamp(escapeArrowTime / 60f, 0, 1);
+
+                float amplitude = (float)Math.Cos(escapeArrowTime / 60f * 3 + MathHelper.Pi);
+
+                Texture2D escapeArrow = TexDict["BigArrow"];
+
+                float arrowRot = (escapeArrowTarget - Player.Center).ToRotation();
+                Vector2 arrowOffset = arrowRot.ToRotationVector2() * (240 + 16 * amplitude) / ZoomSystem.ScaleVector;
+                opacity *= 0.85f + 0.15f * amplitude;
+
+                Color arrowColor = Color.DarkCyan;
+                Color arrowOutlineColor = Color.Cyan;
+                int frameHeight = escapeArrow.Height / 2;
+                Rectangle arrowFrame = new Rectangle(0, 0, escapeArrow.Width, frameHeight - 2);
+                Vector2 scale = new Vector2(1) / ZoomSystem.ScaleVector;
+                Vector2 origin = arrowFrame.Size() * 0.5f;
+                Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowColor * opacity * 0.7f, arrowRot, origin, scale, SpriteEffects.None);
+                arrowFrame.Y += frameHeight;
+                Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowOutlineColor * opacity * 0.9f, arrowRot, origin, scale, SpriteEffects.None);
+            }
 
             return;
 
