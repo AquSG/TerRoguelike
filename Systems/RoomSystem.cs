@@ -191,6 +191,11 @@ namespace TerRoguelike.Systems
                                 player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                                 modPlayer.currentFloor = nextFloor;
+
+                                modPlayer.escapeArrowTime = 180;
+                                var newFloorStartRoom = RoomList.Find(x => x.ID == nextFloor.StartRoomID);
+                                modPlayer.escapeArrowTarget = newFloorStartRoom.RoomPosition16 + Vector2.UnitY * newFloorStartRoom.RoomDimensions.Y * 8f;
+
                                 for (int n = 0; n < Main.maxNPCs; n++)
                                 {
                                     NPC npc = Main.npc[n];
@@ -904,6 +909,8 @@ namespace TerRoguelike.Systems
                 {
                     Vector2 basePos = player.Center + new Vector2(Main.rand.NextFloat(-1050, 1050), -1500);
                     int debrisCount = Main.rand.Next(2, 5);
+                    if (quakeTime < 75)
+                        debrisCount /= 2;
                     int blackTileType = ModContent.TileType<Tiles.BlackTile>();
                     for (int i = 0; i < debrisCount; i++)
                     {

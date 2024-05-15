@@ -141,6 +141,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/UI/BasinOptionBox",
                 "TerRoguelike/UI/BasinOptionBoxHover",
                 "TerRoguelike/UI/BasinOptionsBackground",
+                "TerRoguelike/ExtraTextures/BigArrow",
             };
             foreach (string path in pathList)
             {

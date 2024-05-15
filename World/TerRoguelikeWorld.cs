@@ -18,6 +18,7 @@ using TerRoguelike.Schematics;
 using static TerRoguelike.Managers.ItemManager;
 using TerRoguelike.Particles;
 using Steamworks;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.World
 {
@@ -91,6 +92,17 @@ namespace TerRoguelike.World
             SetCalm(Escape, false);
             CalmVolumeLevel = 0.43f;
             PauseWhenIngamePaused = true;
+            quakeCooldown = Main.rand.Next(1200, 1800);
+
+            Player player = Main.LocalPlayer;
+            if (player == null)
+                return;
+            var modPlayer = player.ModPlayer();
+            if (modPlayer == null)
+                return;
+            modPlayer.escapeArrowTime = 300;
+            Room lunarStartRoom = SchematicManager.RoomID[SchematicManager.FloorID[SchematicManager.FloorDict["Lunar"]].StartRoomID];
+            modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 0.5f;
         }
     }
     public class ItemBasinEntity

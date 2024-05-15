@@ -67,8 +67,7 @@ namespace TerRoguelike.Systems
                 {
                     int storedHealth = MaxHealth;
                     MaxHealth = 0;
-                    Opacity += 0.005f;
-                    Opacity *= 1.03f;
+                    Opacity += 0.016f;
                     for (int i = 0; i < TrackedEnemies.Count; i++)
                     {
                         int storedType = TrackedEnemyTypes[i];
@@ -109,8 +108,8 @@ namespace TerRoguelike.Systems
                 MainBar = CurrentHealth / (float)MaxHealth;
                 MainBar = MathHelper.Clamp(MainBar, 0, 1);
 
-                ExtraBar = MathHelper.Lerp(MainBar, ExtraBar, 0.98f);
-                ExtraBar -= 0.0001f;
+                ExtraBar = MathHelper.Lerp(MainBar, ExtraBar, 0.965f);
+                ExtraBar -= 0.00001f;
                 ExtraBar = MathHelper.Clamp(ExtraBar, MainBar - 0.001f, 1);
 
             }
