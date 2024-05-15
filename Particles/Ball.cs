@@ -38,7 +38,9 @@ namespace TerRoguelike.Particles
         Vector2 startScale;
         float deceleration;
         int fadeOutTime;
-        public Ball(Vector2 Position, Vector2 Velocity, int TimeLeft, Color FillColor, Vector2 Scale, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30, bool Additive = false)
+        bool useLighting;
+        Color startColor;
+        public Ball(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30, bool Additive = false, bool UseLighting = false)
         {
             texture = TexDict["DarkTendril"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
@@ -46,7 +48,7 @@ namespace TerRoguelike.Particles
             oldPosition = Position;
             position = Position;
             velocity = Velocity;
-            color = FillColor;
+            color = startColor = Color;
             rotation = Rotation;
             scale = Scale;
             startScale = Scale;
@@ -54,6 +56,7 @@ namespace TerRoguelike.Particles
             timeLeft = TimeLeft;
             deceleration = Deceleration;
             fadeOutTime = fadeOutTimeLeftThreshold;
+            useLighting = UseLighting;
         }
         public override void AI()
         {
@@ -61,6 +64,10 @@ namespace TerRoguelike.Particles
             if (timeLeft < fadeOutTime)
             {
                 scale = startScale * (timeLeft / (float)fadeOutTime);
+            }
+            if (useLighting)
+            {
+                color = startColor.MultiplyRGBA(Lighting.GetColor(position.ToTileCoordinates()));
             }
         }
     }

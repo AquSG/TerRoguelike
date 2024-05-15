@@ -35,6 +35,9 @@ namespace TerRoguelike.World
         public const int escapeTimeSet = 18000;
         public static List<Chain> chainList = new List<Chain>();
         public static int worldTeleportTime = 0;
+        public static int quakeTime = 0;
+        public static readonly int setQuateTime = 180;
+        public static int quakeCooldown = 0;
         public static int sanctuaryTries = 0;
         public static readonly int sanctuaryMaxTries = 3;
         public static readonly int sanctuaryMaxVisits = 2;

@@ -62,7 +62,7 @@ namespace TerRoguelike.UI
             Effect fadeEffect = Filters.Scene["TerRoguelike:SideFade"].GetShader().Shader;
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
 
-            Color tint = underlayColor * (float)Math.Pow(healthBar.Opacity, 4) * 0.66f;
+            Color tint = underlayColor * (float)Math.Pow(healthBar.Opacity, 0.75d) * 0.66f;
             fadeEffect.Parameters["tint"].SetValue(tint.ToVector4());
             fadeEffect.Parameters["fadeTint"].SetValue(Color.Transparent.ToVector4());
             fadeEffect.Parameters["fadeCutoff"].SetValue(0.1f);

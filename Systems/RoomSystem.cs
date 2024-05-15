@@ -35,6 +35,7 @@ using TerRoguelike.UI;
 using TerRoguelike.Tiles;
 using Steamworks;
 using Terraria.GameInput;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.Systems
 {
@@ -53,6 +54,14 @@ namespace TerRoguelike.Systems
         {
             if (escapeTime > 0 && escape)
             {
+                if (quakeCooldown <= 0)
+                {
+                    quakeCooldown = Main.rand.Next(600, 1201);
+                    quakeTime = setQuateTime;
+                }
+                else
+                    quakeCooldown--;
+
                 escapeTime--;
                 if (escapeTime == 0)
                 {
@@ -99,6 +108,7 @@ namespace TerRoguelike.Systems
             UpdateHealingPulse(); //Used for uncommon healing item based on room time
             UpdateAttackPlanRocketBundles(); //Used for the attack plan item that handles future attack plan bundles
             UpdateChains();
+            UpdateQuake();
 
             if (RoomList == null)
                 return;
@@ -844,7 +854,96 @@ namespace TerRoguelike.Systems
                 }
             }
         }
+        #endregion
 
+        #region Attack Plan Rocket Bundles
+        public void UpdateAttackPlanRocketBundles()
+        {
+            if (attackPlanRocketBundles == null)
+                attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
+            if (attackPlanRocketBundles.Count == 0)
+                return;
+
+            for (int i = 0; i < attackPlanRocketBundles.Count; i++)
+            {
+                AttackPlanRocketBundle bundle = attackPlanRocketBundles[i];
+
+                if (!RoomList[bundle.SourceRoom].active)
+                {
+                    bundle.Time = -1;
+                    continue;
+                }
+
+                if (bundle.Time % 12 == 0 && bundle.Count > 0)
+                {
+                    Projectile.NewProjectile(Projectile.GetSource_None(), bundle.Position + new Vector2(0, -32).RotatedBy(bundle.Rotation), (-Vector2.UnitY * 2.2f).RotatedBy(bundle.Rotation), ModContent.ProjectileType<PlanRocket>(), 70, 1f, bundle.Owner, -1);
+                    bundle.Count--;
+                    bundle.Rotation += MathHelper.PiOver4;
+                }
+                bundle.Time--;
+            }
+            attackPlanRocketBundles.RemoveAll(x => x.Time < 0);
+        }
+        #endregion
+
+        #region Quake
+        public void UpdateQuake()
+        {
+            if (quakeTime > 0)
+            {
+                Player player = Main.LocalPlayer;
+                if (player == null)
+                    return;
+
+                if (quakeTime == setQuateTime)
+                {
+                    ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthTremor with { Volume = 1f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextFloat(-500, 500), -500)), 1, 120, 90));
+                    ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthPound with { Volume = 0.35f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextBool() ? -500 : 500, -500)), 1, 120, 90));
+                }
+                if (quakeTime % 5 == 0)
+                {
+                    Vector2 basePos = player.Center + new Vector2(Main.rand.NextFloat(-1050, 1050), -1500);
+                    int debrisCount = Main.rand.Next(2, 5);
+                    int blackTileType = ModContent.TileType<Tiles.BlackTile>();
+                    for (int i = 0; i < debrisCount; i++)
+                    {
+                        Vector2 startPos = basePos + new Vector2(Main.rand.NextFloat(-80, 80), 0);
+                        Point startTilePoint = startPos.ToTileCoordinates();
+                        Tile tile = ParanoidTileRetrieval(startTilePoint);
+                        if (tile.TileType == blackTileType && tile.IsTileSolidGround(true))
+                        {
+                            for (int y = 1; y < 125; y++)
+                            {
+                                Tile checkTile = ParanoidTileRetrieval(startTilePoint + new Point(0, y));
+                                if (!checkTile.IsTileSolidGround(true))
+                                {
+                                    Vector2 particlePos = new Vector2(startPos.X, ((int)(startPos.Y / 16) + y - 1) * 16);
+                                    particlePos.Y -= 8;
+                                    ParticleManager.AddParticle(new Debris(
+                                        particlePos, Vector2.UnitY * Main.rand.NextFloat(-1.5f, 1.5f),
+                                        Main.rand.Next(80, 120), Color.White, new Vector2(0.5f), Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi),
+                                        Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, Main.rand.NextFloat(0.1f, 0.13f), 7f, 60, true),
+                                        ParticleManager.ParticleLayer.BehindTiles);
+
+                                    if (Main.rand.NextBool())
+                                    {
+                                        ParticleManager.AddParticle(new Ball(
+                                        particlePos, (Vector2.UnitY * Main.rand.NextFloat(2f, 3.5f)).RotatedBy(Main.rand.NextFloat(-0.6f, 0.6f)), 60, Color.SandyBrown, new Vector2(Main.rand.NextFloat(0.075f, 0.15f)), 0, Main.rand.NextFloat(0.95f, 0.97f), 40, false, true),
+                                        ParticleManager.ParticleLayer.BehindTiles);
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                quakeTime--;
+            }
+        }
+        #endregion
+
+        #region Post Update Everything
         public override void PostUpdateEverything()
         {
             ParticleManager.UpdateParticles();
@@ -897,36 +996,6 @@ namespace TerRoguelike.Systems
             }
             if (ItemBasinUI.stickMoveCooldown > 0)
                 ItemBasinUI.stickMoveCooldown--;
-        }
-        #endregion
-
-        #region Attack Plan Rocket Bundles
-        public void UpdateAttackPlanRocketBundles()
-        {
-            if (attackPlanRocketBundles == null)
-                attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
-            if (attackPlanRocketBundles.Count == 0)
-                return;
-
-            for (int i = 0; i < attackPlanRocketBundles.Count; i++)
-            {
-                AttackPlanRocketBundle bundle = attackPlanRocketBundles[i];
-
-                if (!RoomList[bundle.SourceRoom].active)
-                {
-                    bundle.Time = -1;
-                    continue;
-                }
-
-                if (bundle.Time % 12 == 0 && bundle.Count > 0)
-                {
-                    Projectile.NewProjectile(Projectile.GetSource_None(), bundle.Position + new Vector2(0, -32).RotatedBy(bundle.Rotation), (-Vector2.UnitY * 2.2f).RotatedBy(bundle.Rotation), ModContent.ProjectileType<PlanRocket>(), 70, 1f, bundle.Owner, -1);
-                    bundle.Count--;
-                    bundle.Rotation += MathHelper.PiOver4;
-                }
-                bundle.Time--;
-            }
-            attackPlanRocketBundles.RemoveAll(x => x.Time < 0);
         }
         #endregion
 
@@ -987,6 +1056,8 @@ namespace TerRoguelike.Systems
             worldTeleportTime = 0;
             sanctuaryTries = 0;
             sanctuaryCount = 0;
+            quakeTime = 0;
+            quakeCooldown = 0;
         }
         public override void SetStaticDefaults()
         {

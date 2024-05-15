@@ -44,8 +44,11 @@ namespace TerRoguelike.Particles
         int frameHeight;
         int fadeOutTime;
         float yVelCap;
+        Color startColor;
+        bool useLighting;
+        int maxTimeLeft;
 
-        public Debris(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame, float Rotation, SpriteEffects SpriteEffects, float Acceleration, float yCap, int fadeOutTimeLeftThreshold = 60)
+        public Debris(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame, float Rotation, SpriteEffects SpriteEffects, float Acceleration, float yCap, int fadeOutTimeLeftThreshold = 60, bool UseLighting = false)
         {
             texture = TexDict["RockDebris"];
             frameWidth = texture.Width;
@@ -56,26 +59,37 @@ namespace TerRoguelike.Particles
             oldPosition = Position;
             position = Position;
             velocity = Velocity;
-            color = Color;
+            color = startColor = Color;
             rotation = Rotation;
             scale = startScale = Scale;
             spriteEffects = SpriteEffects;
-            timeLeft = TimeLeft;
+            timeLeft = maxTimeLeft = TimeLeft;
             acceleration = Acceleration;
             fadeOutTime = fadeOutTimeLeftThreshold;
             yVelCap = yCap;
+            useLighting = UseLighting;
         }
         public override void AI()
         {
             velocity.Y += acceleration;
             if (Math.Abs(velocity.Y) > Math.Abs(yVelCap))
                 velocity.Y = Math.Sign(velocity.Y) * yVelCap;
+
+            int time = maxTimeLeft - timeLeft;
             if (timeLeft < fadeOutTime)
             {
                 float interpolant = (timeLeft / (float)fadeOutTime);
                 scale = startScale * interpolant;
             }
+            else if (time < 6)
+            {
+                scale = startScale * (time / 6f);
+            }
             rotation += 0.075f * (Math.Abs(velocity.Y) / Math.Abs(yVelCap)) * (spriteEffects == SpriteEffects.None ? 1 : -1);
+            if (useLighting)
+            {
+                color = startColor.MultiplyRGBA(Lighting.GetColor(position.ToTileCoordinates()));
+            }
         }
         public void FindFrame()
         {
