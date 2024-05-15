@@ -22,8 +22,13 @@ namespace TerRoguelike.Systems
         public override void ModifyScreenPosition()
         {
             UpdateScreenshake();
+            
             if (screenshakeTimer > 0)
-                Main.screenPosition = (CutsceneSystem.cutsceneActive ? Main.screenPosition : Main.Camera.UnscaledPosition) + TranslationVector / ZoomSystem.zoomOverride;
+            {
+                float magnitude = ModContent.GetInstance<TerRoguelikeConfig>().ScreenshakeIntensity;
+                if (magnitude > 0)
+                    Main.screenPosition = (CutsceneSystem.cutsceneActive ? Main.screenPosition : Main.Camera.UnscaledPosition) + (TranslationVector / ZoomSystem.zoomOverride) * magnitude;
+            }
         }
         public static Vector2 TranslationVector => screenshakeVector;
         public void TickScreenshake()

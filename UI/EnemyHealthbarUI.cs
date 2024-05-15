@@ -41,7 +41,7 @@ namespace TerRoguelike.UI
         public static void Draw(SpriteBatch spriteBatch)
         {
             var healthBar = enemyHealthBar;
-            if (enemyHealthBar.Opacity == 0)
+            if (enemyHealthBar.Opacity == 0 || !ModContent.GetInstance<TerRoguelikeConfig>().BossHealthbar)
                 return;
 
             Vector2 pixlelScale = new Vector2(0.25f);

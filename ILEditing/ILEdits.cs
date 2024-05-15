@@ -63,6 +63,7 @@ namespace TerRoguelike.ILEditing
 
         private void PreDrawTilesInjection(On_Main.orig_DoDraw_DrawNPCsBehindTiles orig, Main self)
         {
+            RoomSystem.PostDrawWalls_PreNPCsBehindTiles(Main.spriteBatch);
             orig.Invoke(self);
             RoomSystem.PostDrawWalls(Main.spriteBatch);
         }

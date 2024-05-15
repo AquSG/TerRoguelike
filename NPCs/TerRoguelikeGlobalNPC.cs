@@ -3529,7 +3529,7 @@ namespace TerRoguelike.NPCs
                 {
                     overheadArrowTime++;
                 }
-                if (!Main.hideUI && overheadArrowTime > 0)
+                if (!Main.hideUI && overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
                 {
                     Texture2D arrowTex = TexDict["YellowArrow"];
                     float opacity = MathHelper.Clamp(overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
