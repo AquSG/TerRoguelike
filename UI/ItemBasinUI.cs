@@ -190,40 +190,7 @@ namespace TerRoguelike.UI
                         int pulledItem = itemType;
                         if (pulledItem < 0)
                         {
-                            bool found = false;
-                            Item randItem = allowedItemList[Main.rand.Next(allowedItemList.Count)];
-                            found = true;
-                            pulledItem = randItem.type;
-                            if (!found) //somehow didn't randomly find an item to take. search manually through the player's items instead.
-                            {
-                                for (int invItem = 0; invItem < 51; invItem++)
-                                {
-                                    var potItem = invItem switch
-                                    {
-                                        50 => player.trashItem,
-                                        _ => player.inventory[invItem],
-                                    };
-
-                                    if (!potItem.active || potItem.stack <= 0)
-                                        continue;
-
-                                    int playerItemType = potItem.type;
-                                    if (playerItemType == 0 || playerItemType == basin.itemDisplay)
-                                        continue;
-
-                                    int rogueItemType = AllItems.FindIndex(x => x.modItemID == playerItemType);
-                                    if (rogueItemType != -1 && (ItemTier)AllItems[rogueItemType].itemTier == basin.tier)
-                                    {
-                                        pulledItem = playerItemType;
-                                        found = true;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!found)
-                            {
-                                queueClose = true;
-                            }
+                            pulledItem = allowedItemList[Main.rand.Next(allowedItemList.Count)].type;
                         }
                         for (int invItem = 0; invItem < 51; invItem++)
                         {
