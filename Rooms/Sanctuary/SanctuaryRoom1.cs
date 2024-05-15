@@ -61,5 +61,13 @@ namespace TerRoguelike.Rooms
         {
             return RoomPosition16 + RoomDimensions16 * new Vector2(0.125f, 0.6f);
         }
+        public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            return player.position.X <= (RoomPosition.X * 16f) + 22f && !player.dead && modPlayer.escaped;
+        }
+        public override void Ascend(Player player)
+        {
+            player.Center = new Vector2(Main.maxTilesX * 8, 3000);
+        }
     }
 }

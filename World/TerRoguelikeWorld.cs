@@ -102,7 +102,7 @@ namespace TerRoguelike.World
                 return;
             modPlayer.escapeArrowTime = 600;
             Room lunarStartRoom = SchematicManager.RoomID[SchematicManager.FloorID[SchematicManager.FloorDict["Lunar"]].StartRoomID];
-            modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 0.5f;
+            modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 8f;
         }
     }
     public class ItemBasinEntity

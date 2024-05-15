@@ -18,6 +18,7 @@ using Terraria.UI.Chat;
 using Terraria.ID;
 using TerRoguelike.Schematics;
 using rail;
+using Terraria.ModLoader.Core;
 
 namespace TerRoguelike.Managers
 {
@@ -491,6 +492,118 @@ namespace TerRoguelike.Managers
 
             RoomSystem.NewFloorEffects(targetRoom, modPlayer);
         }
+        public virtual void Ascend(Player player)
+        {
+            var modPlayer = player.ModPlayer();
+            int nextStage = modPlayer.currentFloor.Stage - 1;
+            if (nextStage < 0) // if FloorIDsInPlay underflows, send back to the start
+            {
+                nextStage = 0;
+                TerRoguelikeWorld.escape = false;
+            }
+
+            var nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
+            Room potentialRoom = null;
+            for (int j = 0; j < nextFloor.BossRoomIDs.Count; j++)
+            {
+                potentialRoom = RoomSystem.RoomList.Find(x => x.ID == nextFloor.BossRoomIDs[j]);
+                if (potentialRoom != null)
+                    break;
+            }
+            var targetRoom = potentialRoom;
+            if (TerRoguelikeWorld.escape)
+            {
+                player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
+                player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
+                modPlayer.currentFloor = nextFloor;
+
+                modPlayer.escapeArrowTime = 300;
+                var newFloorStartRoom = RoomSystem.RoomList.Find(x => x.ID == nextFloor.StartRoomID);
+                modPlayer.escapeArrowTarget = newFloorStartRoom.RoomPosition16 + Vector2.UnitY * newFloorStartRoom.RoomDimensions.Y * 8f;
+
+                for (int n = 0; n < Main.maxNPCs; n++)
+                {
+                    NPC npc = Main.npc[n];
+                    if (npc == null)
+                        continue;
+                    if (!npc.active)
+                        continue;
+                    if (npc.life <= 0)
+                        continue;
+
+                    TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
+                    if (!modNPC.isRoomNPC)
+                        continue;
+                    if (modNPC.sourceRoomListID < 0)
+                        continue;
+
+                    if (modNPC.sourceRoomListID > targetRoom.myRoom)
+                        npc.active = false;
+                }
+                for (int t = targetRoom.myRoom + 1; t < RoomSystem.RoomList.Count; t++)
+                {
+                    Room roomToClear = RoomSystem.RoomList[t];
+                    if (!roomToClear.active)
+                        continue;
+
+                    for (int p = 0; p < roomToClear.NotSpawned.Length; p++)
+                    {
+                        roomToClear.NotSpawned[p] = false;
+                    }
+                }
+                for (int s = 0; s < SpawnManager.pendingEnemies.Count; s++)
+                {
+                    var pendingEnemy = SpawnManager.pendingEnemies[s];
+                    if (pendingEnemy.RoomListID > targetRoom.myRoom)
+                    {
+                        pendingEnemy.spent = true;
+                    }
+                }
+
+                RoomSystem.NewFloorEffects(targetRoom, modPlayer);
+            }
+            else
+            {
+                targetRoom = RoomID[FloorID[FloorDict["Sanctuary"]].StartRoomID];
+                player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
+                player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
+                player.GetModPlayer<TerRoguelikePlayer>().escaped = true;
+                for (int L = 0; L < RoomSystem.RoomList.Count; L++)
+                {
+                    RoomSystem.ResetRoomID(RoomSystem.RoomList[L].ID);
+                }
+                
+                SetMusicMode(MusicStyle.AllCombat);
+                SetCombat(FinalBoss2Prelude);
+                CombatVolumeInterpolant = 0;
+
+                for (int n = 0; n < Main.maxNPCs; n++)
+                {
+                    NPC npc = Main.npc[n];
+                    if (npc == null)
+                        continue;
+                    if (!npc.active)
+                        continue;
+                    if (npc.life <= 0)
+                        continue;
+
+                    TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
+                    if (!modNPC.isRoomNPC)
+                        continue;
+                    if (modNPC.sourceRoomListID < 0)
+                        continue;
+
+                    npc.active = false;
+                }
+
+                for (int s = 0; s < SpawnManager.pendingEnemies.Count; s++)
+                {
+                    var pendingEnemy = SpawnManager.pendingEnemies[s];
+                    pendingEnemy.spent = true;
+
+                }
+            }
+        }
         public virtual Vector2 DescendTeleportPosition()
         {
             return (RoomPosition + (RoomDimensions / 2f)) * 16f;
@@ -604,7 +717,14 @@ namespace TerRoguelike.Managers
 
             wallTex ??= TextureManager.TexDict["TemporaryBlock"];
 
-            if (IsStartRoom && TerRoguelikeWorld.escape)
+            if (IsSanctuary)
+            {
+                if (!Main.LocalPlayer.ModPlayer().escaped)
+                    RightPortal(1f);
+                else
+                    LeftPortal();
+            }
+            else if (IsStartRoom && TerRoguelikeWorld.escape)
             {
                 //Draw the blue wall portal
                 LeftPortal();
@@ -617,10 +737,6 @@ namespace TerRoguelike.Managers
                     //Draw the blue wall portal
                     RightPortal((closedTime - 120) / 60f);
                 }
-            }
-            if (IsSanctuary && !TerRoguelikeWorld.escape)
-            {
-                RightPortal(1f);
             }
 
             void RightPortal(float completion)

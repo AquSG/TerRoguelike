@@ -63,6 +63,7 @@ namespace TerRoguelike.Systems
         public static string FinalStage = "TerRoguelike/Tracks/FinalStage";
         public static string FinalBoss = "TerRoguelike/Tracks/FinalBoss";
         public static string Escape = "TerRoguelike/Tracks/Escape";
+        public static string FinalBoss2Prelude = "TerRoguelike/Tracks/FinalBoss2Prelude";
 
         public static FloorSoundtrack SanctuaryTheme = new(
             "TerRoguelike/Tracks/SanctuaryTheme",
@@ -126,6 +127,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/TempleGolemThemeStart",
             "TerRoguelike/Tracks/TempleGolemThemeEnd",
             0.55f);
+        public static BossTheme FinalBoss2Theme = new(
+            "TerRoguelike/Tracks/FinalBoss2",
+            "TerRoguelike/Tracks/FinalBoss2Start",
+            "TerRoguelike/Tracks/FinalBoss2End",
+            0.45f);
 
 
         public static void FillMusicDictionary()
@@ -141,6 +147,7 @@ namespace TerRoguelike.Systems
                 FinalStage,
                 FinalBoss,
                 Escape,
+                FinalBoss2Prelude,
                 SanctuaryTheme.CalmTrack,
                 BaseTheme.CalmTrack,
                 BaseTheme.CombatTrack,
@@ -173,7 +180,10 @@ namespace TerRoguelike.Systems
                 SkeletronTheme.EndTrack,
                 TempleGolemTheme.BattleTrack,
                 TempleGolemTheme.StartTrack,
-                TempleGolemTheme.EndTrack
+                TempleGolemTheme.EndTrack,
+                FinalBoss2Theme.BattleTrack,
+                FinalBoss2Theme.StartTrack,
+                FinalBoss2Theme.EndTrack
             };
             foreach (string path in pathList)
             {
