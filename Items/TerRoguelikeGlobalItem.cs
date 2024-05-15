@@ -12,5 +12,6 @@ namespace TerRoguelike.Items
     public class TerRoguelikeGlobalItem : GlobalItem
     {
         public override bool InstancePerEntity => true;
+        public int RogueItemTier = -1; // global variant of itemTier from BaseRoguelikeItem
     }
 }
