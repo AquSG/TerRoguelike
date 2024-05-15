@@ -1981,8 +1981,14 @@ namespace TerRoguelike.TerPlayer
 
                 Texture2D escapeArrow = TexDict["BigArrow"];
 
-                float arrowRot = (escapeArrowTarget - Player.Center).ToRotation();
-                Vector2 arrowOffset = arrowRot.ToRotationVector2() * (240 + 16 * amplitude) / ZoomSystem.ScaleVector;
+                Vector2 playerToTargetVector = escapeArrowTarget - (Player.Center + Vector2.UnitY * Player.gfxOffY);
+                float arrowRot = (playerToTargetVector).ToRotation();
+                float distance = 240;
+                float targetVectLength = playerToTargetVector.Length();
+                if (targetVectLength < distance)
+                    distance = targetVectLength;
+                Vector2 arrowOffset = arrowRot.ToRotationVector2() * (distance + 16 * amplitude) / ZoomSystem.ScaleVector;
+                arrowOffset += Vector2.UnitY * Player.gfxOffY;
                 opacity *= 0.85f + 0.15f * amplitude;
 
                 Color arrowColor = Color.DarkCyan;

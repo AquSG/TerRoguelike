@@ -64,7 +64,6 @@ namespace TerRoguelike.Systems
         public static string FinalStage = "TerRoguelike/Tracks/FinalStage";
         public static string FinalBoss = "TerRoguelike/Tracks/FinalBoss";
         public static string Escape = "TerRoguelike/Tracks/Escape";
-        public static string FinalBoss2Prelude = "TerRoguelike/Tracks/FinalBoss2Prelude";
 
         public static FloorSoundtrack SanctuaryTheme = new(
             "TerRoguelike/Tracks/SanctuaryTheme",
@@ -128,6 +127,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/TempleGolemThemeStart",
             "TerRoguelike/Tracks/TempleGolemThemeEnd",
             0.55f);
+        public static BossTheme FinalBoss2PreludeTheme = new(
+            "TerRoguelike/Tracks/FinalBoss2Prelude",
+            "TerRoguelike/Tracks/FinalBoss2PreludeStart",
+            Silence,
+            0.45f);
         public static BossTheme FinalBoss2Theme = new(
             "TerRoguelike/Tracks/FinalBoss2",
             "TerRoguelike/Tracks/FinalBoss2Start",
@@ -148,7 +152,6 @@ namespace TerRoguelike.Systems
                 FinalStage,
                 FinalBoss,
                 Escape,
-                FinalBoss2Prelude,
                 SanctuaryTheme.CalmTrack,
                 BaseTheme.CalmTrack,
                 BaseTheme.CombatTrack,
@@ -182,6 +185,8 @@ namespace TerRoguelike.Systems
                 TempleGolemTheme.BattleTrack,
                 TempleGolemTheme.StartTrack,
                 TempleGolemTheme.EndTrack,
+                FinalBoss2PreludeTheme.BattleTrack,
+                FinalBoss2PreludeTheme.StartTrack,
                 FinalBoss2Theme.BattleTrack,
                 FinalBoss2Theme.StartTrack,
                 FinalBoss2Theme.EndTrack
@@ -209,7 +214,7 @@ namespace TerRoguelike.Systems
             FillMusicDictionary();
             BlankMusicSlotId = MusicLoader.GetMusicSlot(TerRoguelike.Instance, "Tracks/Blank");
         }
-        public static void SetBossTrack(BossTheme bossTheme)
+        public static void SetBossTrack(BossTheme bossTheme, float fadeRateMulti = 1)
         {
             BossIntroStopwatch.Reset();
 
@@ -220,7 +225,7 @@ namespace TerRoguelike.Systems
             BossIntroProgress = 0;
             BossIntroPreviousTime = 0;
 
-            SetCombat(introTrack, false);
+            SetCombat(introTrack, false, fadeRateMulti);
             SetMusicMode(MusicStyle.Boss);
             CombatVolumeLevel = bossTheme.Volume;
 
@@ -291,7 +296,7 @@ namespace TerRoguelike.Systems
         {
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
-            Main.NewText(fadeRateMultiplier);
+
             TerRoguelikePlayer modPlayer = Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>();
             if (!Initialized && modPlayer != null && modPlayer.currentFloor != null)
             {
@@ -428,7 +433,7 @@ namespace TerRoguelike.Systems
                 {
                     if (CalmMusic.Volume <= 0)
                     {
-                        SetCalm(Silence);
+                        SetCalm(Silence, true);
                         BufferCalmSilence = false;
                     }
                 }
@@ -443,7 +448,7 @@ namespace TerRoguelike.Systems
                         BossIntroProgress += difference;
                         if (BossIntroProgress + difference >= BossIntroDuration)
                         {
-                            SetCombat(ActiveBossTheme.BattleTrack);
+                            SetCombat(ActiveBossTheme.BattleTrack, true, fadeRateMultiplier);
                             ActiveBossTheme.startFlag = false;
                             BossIntroStopwatch.Reset();
                         }
@@ -459,7 +464,7 @@ namespace TerRoguelike.Systems
 
                     if (ActiveBossTheme.endFlag)
                     {
-                        SetCombat(ActiveBossTheme.EndTrack, false);
+                        SetCombat(ActiveBossTheme.EndTrack, false, fadeRateMultiplier);
                         ActiveBossTheme.endFlag = false;
                         ActiveBossTheme.startFlag = false;
                     }
@@ -468,12 +473,12 @@ namespace TerRoguelike.Systems
                 {
                     if (ActiveBossTheme.startFlag)
                     {
-                        SetCombat(ActiveBossTheme.BattleTrack);
+                        SetCombat(ActiveBossTheme.BattleTrack, true, fadeRateMultiplier);
                         ActiveBossTheme.startFlag = false;
                     }
                     else
                     {
-                        SetCombat(Silence);
+                        SetCombat(Silence, true, 1);
                         CombatVolumeInterpolant = 0;
                         SetMusicMode(MusicStyle.Silent);
                     }   

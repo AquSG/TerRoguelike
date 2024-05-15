@@ -565,16 +565,16 @@ namespace TerRoguelike.Managers
             else
             {
                 targetRoom = RoomID[FloorID[FloorDict["Sanctuary"]].StartRoomID];
-                player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
+                player.Center = targetRoom.RoomPosition16 + targetRoom.RoomDimensions16 * new Vector2(0.9f, 0.5f);
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
-                player.GetModPlayer<TerRoguelikePlayer>().escaped = true;
+                modPlayer.escaped = true;
+                modPlayer.escapeArrowTime = 0;
                 for (int L = 0; L < RoomSystem.RoomList.Count; L++)
                 {
                     RoomSystem.ResetRoomID(RoomSystem.RoomList[L].ID);
                 }
-                
-                SetMusicMode(MusicStyle.AllCombat);
-                SetCombat(FinalBoss2Prelude, true, 2);
+
+                SetBossTrack(FinalBoss2PreludeTheme, 2);
                 CombatVolumeInterpolant = 0;
 
                 for (int n = 0; n < Main.maxNPCs; n++)

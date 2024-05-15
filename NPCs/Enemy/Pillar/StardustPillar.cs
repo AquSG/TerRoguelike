@@ -35,7 +35,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             NPC.height = 320;
             NPC.aiStyle = -1;
             NPC.damage = 0;
-            NPC.lifeMax = 10000;
+            NPC.lifeMax = 10047;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = SoundID.NPCDeath1;
             NPC.knockBackResist = 0f;
