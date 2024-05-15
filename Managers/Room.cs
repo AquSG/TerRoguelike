@@ -574,7 +574,7 @@ namespace TerRoguelike.Managers
                 }
                 
                 SetMusicMode(MusicStyle.AllCombat);
-                SetCombat(FinalBoss2Prelude);
+                SetCombat(FinalBoss2Prelude, true, 2);
                 CombatVolumeInterpolant = 0;
 
                 for (int n = 0; n < Main.maxNPCs; n++)
