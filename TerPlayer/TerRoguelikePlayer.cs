@@ -1976,6 +1976,11 @@ namespace TerRoguelike.TerPlayer
             if (!Main.hideUI && escapeArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().ObjectiveLocationArrow)
             {
                 float opacity = MathHelper.Clamp(escapeArrowTime / 60f, 0, 1);
+                int escapeTimer = TerRoguelikeWorld.escapeTimeSet - TerRoguelikeWorld.escapeTime;
+                if (escapeTimer < 60)
+                {
+                    opacity *= escapeTimer / 60f;
+                }
 
                 float amplitude = (float)Math.Cos(escapeArrowTime / 60f * 3 + MathHelper.Pi);
 

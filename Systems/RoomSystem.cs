@@ -33,7 +33,6 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using TerRoguelike.UI;
 using TerRoguelike.Tiles;
-using Steamworks;
 using Terraria.GameInput;
 using TerRoguelike.Particles;
 
@@ -805,8 +804,8 @@ namespace TerRoguelike.Systems
 
                 if (quakeTime == setQuateTime)
                 {
-                    ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthTremor with { Volume = 1f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextFloat(-500, 500), -500)), 1, 120, 90));
-                    ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthPound with { Volume = 0.35f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextBool() ? -500 : 500, -500)), 1, 120, 90));
+                    ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthTremor with { Volume = 1f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextFloat(-500, 500), -500)), 1, 120, 90, true));
+                    ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(EarthPound with { Volume = 0.35f, Pitch = -0.5f, PitchVariance = 0.1f }, player.Center + new Vector2(Main.rand.NextBool() ? -500 : 500, -500)), 1, 120, 90, true));
                     ScreenshakeSystem.SetScreenshake(180, Main.rand.NextFloat(3, 4));
                 }
                 if (quakeTime % 5 == 0)

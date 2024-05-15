@@ -33,7 +33,7 @@ namespace TerRoguelike.World
         public static bool lunarBossSpawned = false;
         public static bool escape = false;
         public static int escapeTime = 0;
-        public const int escapeTimeSet = 18000;
+        public static readonly int escapeTimeSet = 18000;
         public static List<Chain> chainList = new List<Chain>();
         public static int worldTeleportTime = 0;
         public static int quakeTime = 0;
