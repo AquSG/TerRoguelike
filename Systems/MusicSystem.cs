@@ -48,6 +48,7 @@ namespace TerRoguelike.Systems
         public static BossTheme ActiveBossTheme;
         public static MusicStyle MusicMode = MusicStyle.Dynamic;
         public static Dictionary<string, Asset<SoundEffect>> MusicDict = new Dictionary<string, Asset<SoundEffect>>();
+        public static float fadeRateMultiplier = 1;
         public enum MusicStyle
         {
             Dynamic = 0,
@@ -248,14 +249,17 @@ namespace TerRoguelike.Systems
             if (!Main.hasFocus || Main.gamePaused)
                 MusicUpdate();
         }
-        public static void SetCalm(string track, bool loop = true)
+        public static void SetCalm(string track, bool loop = true, float fadeRateMulti = 1)
         {
-            SetCalm(MusicDict[track].Value, loop);
+            SetCalm(MusicDict[track].Value, loop, fadeRateMulti);
         }
-        public static void SetCalm(SoundEffect track, bool loop = true)
+        public static void SetCalm(SoundEffect track, bool loop = true, float fadeRateMulti = 1)
         {
             if (!BufferCalmSilence)
+            {
                 PauseWhenIngamePaused = false;
+                fadeRateMultiplier = fadeRateMulti;
+            }
             if (CalmMusic != null)
                 CalmMusic.Dispose();
 
@@ -264,14 +268,17 @@ namespace TerRoguelike.Systems
             CalmMusic.Play();
             CalmMusic.Volume = 0;
         }
-        public static void SetCombat(string track, bool loop = true)
+        public static void SetCombat(string track, bool loop = true, float fadeRateMulti = 1)
         {
-            SetCombat(MusicDict[track].Value, loop);
+            SetCombat(MusicDict[track].Value, loop, fadeRateMulti);
         }
-        public static void SetCombat(SoundEffect track, bool loop = true)
+        public static void SetCombat(SoundEffect track, bool loop = true, float fadeRateMulti = 1)
         {
             if (!BufferCombatSilence)
+            {
                 PauseWhenIngamePaused = false;
+                fadeRateMultiplier = fadeRateMulti;
+            }
             if (CombatMusic != null)
                 CombatMusic.Dispose();
 
@@ -284,7 +291,7 @@ namespace TerRoguelike.Systems
         {
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
-
+            Main.NewText(fadeRateMultiplier);
             TerRoguelikePlayer modPlayer = Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>();
             if (!Initialized && modPlayer != null && modPlayer.currentFloor != null)
             {
@@ -320,21 +327,21 @@ namespace TerRoguelike.Systems
             {
                 if (modPlayer.currentRoom == -1)
                 {
-                    float calmInterpolant = CalmVolumeInterpolant + (1f / 120f);
+                    float calmInterpolant = CalmVolumeInterpolant + (1f / (120f * fadeRateMultiplier));
 
                     CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
 
-                    float combatInterpolant = CombatVolumeInterpolant - (1f / 120f);
+                    float combatInterpolant = CombatVolumeInterpolant - (1f / (120f * fadeRateMultiplier));
 
                     CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
                 }
                 else
                 {
-                    float calmInterpolant = CalmVolumeInterpolant - (1f / 60f);
+                    float calmInterpolant = CalmVolumeInterpolant - (1f / (60f * fadeRateMultiplier));
 
                     CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
 
-                    float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
+                    float combatInterpolant = CombatVolumeInterpolant + (1f / (60f * fadeRateMultiplier));
 
                     CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
                 }
@@ -343,12 +350,12 @@ namespace TerRoguelike.Systems
             
             if (MusicMode == MusicStyle.AllCalm)
             {
-                float calmInterpolant = CalmVolumeInterpolant + (1f / 120f);
+                float calmInterpolant = CalmVolumeInterpolant + (1f / (120f * fadeRateMultiplier));
 
                 CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
 
 
-                float combatInterpolant = CombatVolumeInterpolant - (1f / 120f);
+                float combatInterpolant = CombatVolumeInterpolant - (1f / (120f * fadeRateMultiplier));
 
                 CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
 
@@ -364,7 +371,7 @@ namespace TerRoguelike.Systems
 
             if (MusicMode == MusicStyle.AllCombat)
             {
-                float calmInterpolant = CalmVolumeInterpolant - (1f / 60f);
+                float calmInterpolant = CalmVolumeInterpolant - (1f / (60f * fadeRateMultiplier));
 
                 CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
 
@@ -377,14 +384,14 @@ namespace TerRoguelike.Systems
                     }
                 }
 
-                float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
+                float combatInterpolant = CombatVolumeInterpolant + (1f / (60f * fadeRateMultiplier));
 
                 CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
             }
 
             if (MusicMode == MusicStyle.Silent)
             {
-                float calmInterpolant = CalmVolumeInterpolant - (1f / 180f);
+                float calmInterpolant = CalmVolumeInterpolant - (1f / (180f * fadeRateMultiplier));
 
                 CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
 
@@ -397,7 +404,7 @@ namespace TerRoguelike.Systems
                     }
                 }
 
-                float combatInterpolant = CombatVolumeInterpolant - (1f / 180f);
+                float combatInterpolant = CombatVolumeInterpolant - (1f / (180f * fadeRateMultiplier));
 
                 CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
 
@@ -413,7 +420,7 @@ namespace TerRoguelike.Systems
 
             if (MusicMode == MusicStyle.Boss)
             {
-                float calmInterpolant = CalmVolumeInterpolant - (1f / 60f);
+                float calmInterpolant = CalmVolumeInterpolant - (1f / (60f * fadeRateMultiplier));
 
                 CalmVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, calmInterpolant), 0f, 1f);
 
@@ -446,7 +453,7 @@ namespace TerRoguelike.Systems
                 }
                 if (CombatMusic != null && !CombatMusic.IsDisposed && CombatMusic.State != SoundState.Stopped)
                 {
-                    float combatInterpolant = CombatVolumeInterpolant + (1f / 60f);
+                    float combatInterpolant = CombatVolumeInterpolant + (1f / (60f * fadeRateMultiplier));
 
                     CombatVolumeInterpolant = MathHelper.Clamp(MathHelper.Lerp(0, 1f, combatInterpolant), 0f, 1f);
 
