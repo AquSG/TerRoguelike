@@ -100,7 +100,7 @@ namespace TerRoguelike.World
             var modPlayer = player.ModPlayer();
             if (modPlayer == null)
                 return;
-            modPlayer.escapeArrowTime = 300;
+            modPlayer.escapeArrowTime = 600;
             Room lunarStartRoom = SchematicManager.RoomID[SchematicManager.FloorID[SchematicManager.FloorDict["Lunar"]].StartRoomID];
             modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 0.5f;
         }

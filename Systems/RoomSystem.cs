@@ -192,7 +192,7 @@ namespace TerRoguelike.Systems
                                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                                 modPlayer.currentFloor = nextFloor;
 
-                                modPlayer.escapeArrowTime = 180;
+                                modPlayer.escapeArrowTime = 300;
                                 var newFloorStartRoom = RoomList.Find(x => x.ID == nextFloor.StartRoomID);
                                 modPlayer.escapeArrowTarget = newFloorStartRoom.RoomPosition16 + Vector2.UnitY * newFloorStartRoom.RoomDimensions.Y * 8f;
 
@@ -495,10 +495,15 @@ namespace TerRoguelike.Systems
             room.bossSpawnPos = Vector2.Zero;
             room.bossDead = false;
         }
-        public static void PostDrawWalls(SpriteBatch spriteBatch)
+        public static void PostDrawWalls_PreNPCsBehindTiles(SpriteBatch spritebatch)
         {
             StartAlphaBlendSpritebatch(false);
             DrawChains();
+            Main.spriteBatch.End();
+        }
+        public static void PostDrawWalls(SpriteBatch spriteBatch)
+        {
+            StartAlphaBlendSpritebatch(false);
             DrawRoomWalls(spriteBatch);
             ParticleManager.DrawParticles_BehindTiles();
             Main.spriteBatch.End();

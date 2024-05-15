@@ -1973,7 +1973,7 @@ namespace TerRoguelike.TerPlayer
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
             
-            if (escapeArrowTime > 0)
+            if (!Main.hideUI && escapeArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().ObjectiveLocationArrow)
             {
                 float opacity = MathHelper.Clamp(escapeArrowTime / 60f, 0, 1);
 

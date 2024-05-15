@@ -832,3 +832,30 @@ NPCs: {
 }
 
 ItemBasin.DisplayName: Item Basin
+
+Configs: {
+	TerRoguelikeConfig: {
+		DisplayName: TerRoguelike Config
+		Headers.Mods.TerRoguelike.VisualConfig: Visual Config
+
+		EnemyLocationArrow: {
+			Label: Enemy Location Arrow
+			Tooltip: ""
+		}
+
+		ObjectiveLocationArrow: {
+			Label: Objective Location Arrow
+			Tooltip: ""
+		}
+
+		BossHealthbar: {
+			Label: Boss Healthbar
+			Tooltip: ""
+		}
+
+		ScreenshakeIntensity: {
+			Label: Screenshake Intensity
+			Tooltip: ""
+		}
+	}
+}
