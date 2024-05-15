@@ -15,11 +15,15 @@ namespace TerRoguelike.Systems
     public class ExtraSoundSystem : ModSystem
     {
         public static List<ExtraSound> ExtraSounds = [];
-        public override void PostUpdateWorld()
+        public override void PostUpdateEverything()
         {
             if (ExtraSounds == null)
                 return;
             if (ExtraSounds.Count == 0)
+                return;
+
+            Player player = Main.LocalPlayer;
+            if (player == null)
                 return;
 
             for (int i = 0; i < ExtraSounds.Count; i++)
@@ -33,6 +37,10 @@ namespace TerRoguelike.Systems
                     continue;
                 }
                 sound.Volume = potentialSound.volume;
+                if (potentialSound.followPlayer)
+                {
+                    sound.Position = player.Center + potentialSound.followPlayerAnchor;
+                }
                 if (potentialSound.fadeOutStart >= 0 && potentialSound.time > potentialSound.fadeOutStart)
                 {
                     float fadeOutInterpolant = 1 - (float)Math.Pow((potentialSound.time - potentialSound.fadeOutStart) / (float)potentialSound.fadeOutTime, 0.5d);
@@ -56,12 +64,20 @@ namespace TerRoguelike.Systems
         public int fadeOutTime;
         public int endTime;
         public float volume;
-        public ExtraSound(SlotId sound, float Volume = 1f, int FadeOutStart = -1, int FadeOutTime = 1)
+        public bool followPlayer;
+        public Vector2 followPlayerAnchor = Vector2.Zero;
+        public ExtraSound(SlotId sound, float Volume = 1f, int FadeOutStart = -1, int FadeOutTime = 1, bool FollowPlayer = false)
         {
             slot = sound;
             fadeOutStart = FadeOutStart;
             volume = Volume;
             fadeOutTime = FadeOutTime;
+            followPlayer = FollowPlayer;
+            if (followPlayer && SoundEngine.TryGetActiveSound(sound, out var outSound) && outSound.IsPlaying && Main.LocalPlayer != null)
+            {
+                Vector2 soundPos = outSound.Position == null ? Vector2.Zero : (Vector2)outSound.Position;
+                followPlayerAnchor = soundPos - Main.LocalPlayer.Center;
+            }
         }
     }
 }
