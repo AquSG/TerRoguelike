@@ -143,6 +143,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             leftHandPos = NPC.Center + new Vector2(-400, -40);
             rightHandPos = NPC.Center + new Vector2(400, -40);
+            rightHandPos = Main.MouseWorld;
             headPos = NPC.Center + new Vector2(0, -395);
 
             NPC leftHand = Main.npc[leftHandWho];
@@ -443,7 +444,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             frameHeight = coreTex.Height / 5;
-            coreCurrentFrame = leftHandAlive && rightHandAlive && headAlive ? 0 : (int)NPC.frameCounter % 4 + 1;
+            coreCurrentFrame = leftHandAlive || rightHandAlive || headAlive ? 0 : (int)NPC.frameCounter % 4 + 1;
             coreFrame = new Rectangle(0, coreCurrentFrame * frameHeight, coreTex.Width, frameHeight - 2);
 
             frameHeight = mouthTex.Height / 3;
