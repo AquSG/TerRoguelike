@@ -45,11 +45,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int headEyeCurrentFrame = 0;
         public int leftHandCurrentFrame = 0;
         public int rightHandCurrentFrame = 0;
+        public int emptyEyeCurrentFrame = 0;
         public Rectangle coreFrame;
         public Rectangle mouthFrame;
         public Rectangle headEyeFrame;
         public Rectangle leftHandFrame;
         public Rectangle rightHandFrame;
+        public Rectangle emptyEyeFrame;
         Vector2 headPos;
         Vector2 leftHandPos;
         Vector2 rightHandPos;
@@ -141,8 +143,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             leftHandPos = NPC.Center + new Vector2(-500, -40);
             rightHandPos = NPC.Center + new Vector2(500, -40);
-            rightHandPos = Main.MouseWorld;
-            headPos = NPC.Center + new Vector2(0, -400);
+            headPos = NPC.Center + new Vector2(0, -391);
 
             NPC leftHand = Main.npc[leftHandWho];
             NPC rightHand = Main.npc[rightHandWho];
@@ -162,6 +163,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.frameCounter += 0.2d;
             if (deadTime > 0)
             {
                 CheckDead();
@@ -409,11 +411,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             leftHandFrame = new Rectangle(0, leftHandCurrentFrame * frameHeight, handTex.Width, frameHeight - 2);
 
             rightHandFrame = new Rectangle(0, rightHandCurrentFrame * frameHeight, handTex.Width, frameHeight - 2);
+
+            emptyEyeCurrentFrame = (int)NPC.frameCounter % 4;
+            frameHeight = emptyEyeTex.Height / 4;
+            emptyEyeFrame = new Rectangle(0, emptyEyeCurrentFrame * frameHeight, emptyEyeTex.Width, frameHeight - 2);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Vector2 bodyDrawPos = NPC.Center + new Vector2(0, 43);
-            Vector2 shoulderAnchor = new Vector2(210, -64);
+            Vector2 shoulderAnchor = new Vector2(212, -48);
             float upperArmLength = upperArmTex.Height * 0.8f;
             float lowerArmLength = lowerArmTex.Height * 1f;
             float upperArmLengthRatio = 1 / ((upperArmLength + lowerArmLength) / upperArmLength);
@@ -451,6 +457,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.EntitySpriteDraw(lowerArmTex, leftElbowPos - Main.screenPosition, null, Color.White, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(lowerArmTex, rightElbowPos - Main.screenPosition, null, Color.White, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
 
+            Main.EntitySpriteDraw(emptyEyeTex, leftHandPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(emptyEyeTex, rightHandPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
+
             Main.EntitySpriteDraw(topEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(topEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
 
@@ -463,6 +472,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.EntitySpriteDraw(headTex, headPos - Main.screenPosition, null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(mouthTex, headPos + new Vector2(1, 208) - Main.screenPosition, mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
 
+            Main.EntitySpriteDraw(emptyEyeTex, headPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(topEyeTex, headPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(innerEyeTex, headPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(topEyeOverlayTex, headPos - Main.screenPosition, headEyeFrame, Color.White, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
