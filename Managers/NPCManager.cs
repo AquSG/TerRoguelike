@@ -120,6 +120,9 @@ namespace TerRoguelike.Managers
                 new WallOfFlesh(),
                 new Skeletron(),
                 new TempleGolem(),
+                new MoonLord(),
+                new MoonLordHand(),
+                new MoonLordHead(),
             };
         }
         internal static void Unload()
