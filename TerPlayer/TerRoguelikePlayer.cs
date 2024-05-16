@@ -1957,7 +1957,6 @@ namespace TerRoguelike.TerPlayer
                 float opacity;
                 float interpolant = brainSucklerTime / 600f;
                 scale = MathHelper.Clamp(MathHelper.Lerp(4f, 1.5f, interpolant * interpolant), 1.5f, 8f);
-                //opacity = MathHelper.Clamp(MathHelper.Lerp(0, 0.75f, interpolant * (1 + interpolant * 6)), 0, 0.75f);
                 opacity = MathHelper.Clamp(MathHelper.SmoothStep(0, 0.75f, interpolant * (1 + interpolant * 1.1f)), 0, 0.75f);
                 
                 GameShaders.Misc["TerRoguelike:CircularGradientOuter"].UseOpacity(opacity);

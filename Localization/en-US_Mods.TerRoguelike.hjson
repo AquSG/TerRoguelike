@@ -829,6 +829,9 @@ NPCs: {
 	HungryAnchored.DisplayName: Hungry
 	Skeletron.DisplayName: Skeletron
 	TempleGolem.DisplayName: Temple Golem
+	MoonLord.DisplayName: Moon Lord
+	MoonLordHand.DisplayName: Moon Lord Hand
+	MoonLordHead.DisplayName: Moon Lord Head
 }
 
 ItemBasin.DisplayName: Item Basin
