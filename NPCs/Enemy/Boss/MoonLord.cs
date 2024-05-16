@@ -141,24 +141,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            leftHandPos = NPC.Center + new Vector2(-500, -40);
-            rightHandPos = NPC.Center + new Vector2(500, -40);
-            headPos = NPC.Center + new Vector2(0, -391);
+            leftHandPos = NPC.Center + new Vector2(-400, -40);
+            rightHandPos = NPC.Center + new Vector2(400, -40);
+            headPos = NPC.Center + new Vector2(0, -395);
 
             NPC leftHand = Main.npc[leftHandWho];
             NPC rightHand = Main.npc[rightHandWho];
             NPC head = Main.npc[headWho];
+
+            NPC.immortal = true;
+            NPC.dontTakeDamage = true;
+            canBeHit = false;
+            bool enableHitBox = true;
             if (leftHand.life > 1)
             {
+                enableHitBox = false;
                 leftHand.Center = leftHandPos;
             }
             if (rightHand.life > 1)
             {
+                enableHitBox = false;
                 rightHand.Center = rightHandPos;
             }
             if (head.life > 1)
             {
+                enableHitBox = false;
                 head.Center = headPos;
+            }
+            if (enableHitBox)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+                canBeHit = true;
             }
         }
         public override void AI()
@@ -398,37 +412,77 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;
+            bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;
+            bool headAlive = headWho >= 0 && Main.npc[headWho].life > 1;
+
+            int showcaseFrame = (int)(NPC.frameCounter * 0.65d) % 20;
+            if (showcaseFrame > 6)
+                showcaseFrame = 0;
+            else
+            {
+                switch (showcaseFrame)
+                {
+                    default:
+                    case 0:
+                    case 6:
+                        showcaseFrame = 0;
+                        break;
+                    case 1:
+                    case 5:
+                        showcaseFrame = 1;
+                        break;
+                    case 2:
+                    case 4:
+                        showcaseFrame = 2;
+                        break;
+                    case 3:
+                        showcaseFrame = 3;
+                        break;
+                }
+            }
+
             frameHeight = coreTex.Height / 5;
+            coreCurrentFrame = leftHandAlive && rightHandAlive && headAlive ? 0 : (int)NPC.frameCounter % 4 + 1;
             coreFrame = new Rectangle(0, coreCurrentFrame * frameHeight, coreTex.Width, frameHeight - 2);
 
             frameHeight = mouthTex.Height / 3;
+            mouthCurrentFrame = 0;
             mouthFrame = new Rectangle(0, mouthCurrentFrame * frameHeight, mouthTex.Width, frameHeight - 2);
 
             frameHeight = topEyeOverlayTex.Height / 4;
+            headEyeCurrentFrame = showcaseFrame;
             headEyeFrame = new Rectangle(0, headEyeCurrentFrame * frameHeight, topEyeOverlayTex.Width, frameHeight - 2);
 
             frameHeight = handTex.Height / 4;
+            leftHandCurrentFrame = showcaseFrame;
             leftHandFrame = new Rectangle(0, leftHandCurrentFrame * frameHeight, handTex.Width, frameHeight - 2);
 
+            rightHandCurrentFrame = showcaseFrame;
             rightHandFrame = new Rectangle(0, rightHandCurrentFrame * frameHeight, handTex.Width, frameHeight - 2);
 
-            emptyEyeCurrentFrame = (int)NPC.frameCounter % 4;
             frameHeight = emptyEyeTex.Height / 4;
+            emptyEyeCurrentFrame = (int)NPC.frameCounter % 4;
             emptyEyeFrame = new Rectangle(0, emptyEyeCurrentFrame * frameHeight, emptyEyeTex.Width, frameHeight - 2);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;
+            bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;
+            bool headAlive = headWho >= 0 && Main.npc[headWho].life > 1;
+
             Vector2 bodyDrawPos = NPC.Center + new Vector2(0, 43);
-            Vector2 shoulderAnchor = new Vector2(212, -48);
+            Vector2 shoulderAnchor = new Vector2(220, -98);
             float upperArmLength = upperArmTex.Height * 0.8f;
             float lowerArmLength = lowerArmTex.Height * 1f;
             float upperArmLengthRatio = 1 / ((upperArmLength + lowerArmLength) / upperArmLength);
 
-            Vector2 upperArmOrigin = upperArmTex.Size() * new Vector2(0.5f, 0.175f);
+            Vector2 leftUpperArmOrigin = upperArmTex.Size() * new Vector2(0.4477f, 0.17f);
+            Vector2 rightUpperArmOrigin = upperArmTex.Size() * new Vector2(1 - 0.4477f, 0.17f);
             Vector2 lowerArmOrigin = lowerArmTex.Size() * new Vector2(0.5f, 0.9f);
 
-            Vector2 leftShoulderPos = NPC.Center + shoulderAnchor * new Vector2(-1, 1);
-            Vector2 rightShoulderPos = NPC.Center + shoulderAnchor * new Vector2(1, 1);
+            Vector2 leftShoulderPos = bodyDrawPos + shoulderAnchor * new Vector2(-1, 1);
+            Vector2 rightShoulderPos = bodyDrawPos + shoulderAnchor * new Vector2(1, 1);
 
             Vector2 leftHandBottomPos = leftHandPos + new Vector2(0, 32);
             Vector2 rightHandBottomPos = rightHandPos + new Vector2(0, 32);
@@ -443,12 +497,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             float leftLowerArmRot = (leftHandBottomPos - leftElbowPos).ToRotation() + MathHelper.PiOver2;
             float rightLowerArmRot = (rightHandBottomPos - rightElbowPos).ToRotation() + MathHelper.PiOver2;
 
-            Main.EntitySpriteDraw(upperArmTex, leftShoulderPos - Main.screenPosition, null, Color.White, leftUpperArmRot, upperArmOrigin, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(upperArmTex, rightShoulderPos - Main.screenPosition, null, Color.White, rightUpperArmRot, upperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
+            Main.EntitySpriteDraw(upperArmTex, leftShoulderPos - Main.screenPosition, null, Color.White, leftUpperArmRot, leftUpperArmOrigin, NPC.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(upperArmTex, rightShoulderPos - Main.screenPosition, null, Color.White, rightUpperArmRot, rightUpperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
 
             for (int i = -1; i <= 1; i += 2)
             {
-
                 Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition, null, Color.White, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
             Main.EntitySpriteDraw(coreCrackTex, NPC.Center + new Vector2(2, -11) - Main.screenPosition, null, Color.White, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
@@ -457,25 +510,32 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.EntitySpriteDraw(lowerArmTex, leftElbowPos - Main.screenPosition, null, Color.White, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(lowerArmTex, rightElbowPos - Main.screenPosition, null, Color.White, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
 
-            Main.EntitySpriteDraw(emptyEyeTex, leftHandPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(emptyEyeTex, rightHandPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
-
-            Main.EntitySpriteDraw(topEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(topEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
-
-            Main.EntitySpriteDraw(innerEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(innerEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-
+            Main.EntitySpriteDraw(emptyEyeTex, leftHandPos + new Vector2(0, -2) - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            if (leftHandAlive)
+            {
+                Main.EntitySpriteDraw(sideEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(innerEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            }
             Main.EntitySpriteDraw(handTex, leftHandPos + new Vector2(2, -49) - Main.screenPosition, leftHandFrame, Color.White, 0, leftHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+
+            Main.EntitySpriteDraw(emptyEyeTex, rightHandPos + new Vector2(0, -2) - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
+            if (rightHandAlive)
+            {
+                Main.EntitySpriteDraw(sideEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(innerEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            }
             Main.EntitySpriteDraw(handTex, rightHandPos + new Vector2(-2, -49) - Main.screenPosition, rightHandFrame, Color.White, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
 
-            Main.EntitySpriteDraw(headTex, headPos - Main.screenPosition, null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(mouthTex, headPos + new Vector2(1, 208) - Main.screenPosition, mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-
+            Main.EntitySpriteDraw(headTex, headPos + new Vector2(0, 4) - Main.screenPosition, null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(mouthTex, headPos + new Vector2(1, 212) - Main.screenPosition, mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            
             Main.EntitySpriteDraw(emptyEyeTex, headPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(topEyeTex, headPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(innerEyeTex, headPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(topEyeOverlayTex, headPos - Main.screenPosition, headEyeFrame, Color.White, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            if (headAlive)
+            {
+                Main.EntitySpriteDraw(topEyeTex, headPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(innerEyeTex, headPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(topEyeOverlayTex, headPos + new Vector2(0, 4) - Main.screenPosition, headEyeFrame, Color.White, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            }
             return false;
         }
     }
