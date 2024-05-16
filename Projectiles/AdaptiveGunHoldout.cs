@@ -120,7 +120,7 @@ namespace TerRoguelike.Projectiles
                 }
                 if (modPlayer.minigunComponent > 0)
                 {
-                    mainAngle += Main.rand.NextFloat(-MathHelper.Pi * 0.01f, MathHelper.Pi * 0.04f + float.Epsilon);
+                    mainAngle += Main.rand.NextFloat(-MathHelper.Pi * 0.025f, MathHelper.Pi * 0.025f + float.Epsilon);
                 }
                 
                 Vector2 direction = (mainAngle).ToRotationVector2();
