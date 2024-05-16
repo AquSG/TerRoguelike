@@ -190,7 +190,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
-                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI, headWho, leftHandWho, rightHandWho], NPC.FullName);
                 }
             }
             else
@@ -413,30 +413,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Vector2 bodyDrawPos = NPC.Center + new Vector2(0, 43);
-            Vector2 shoulderAnchor = new Vector2(208, -64);
-            float upperArmLength = upperArmTex.Height * 0.9f;
-            float lowerArmLength = lowerArmTex.Height * 0.9f;
+            Vector2 shoulderAnchor = new Vector2(210, -64);
+            float upperArmLength = upperArmTex.Height * 0.8f;
+            float lowerArmLength = lowerArmTex.Height * 1f;
             float upperArmLengthRatio = 1 / ((upperArmLength + lowerArmLength) / upperArmLength);
 
-            Vector2 upperArmOrigin = upperArmTex.Size() * new Vector2(0.5f, 0.15f);
+            Vector2 upperArmOrigin = upperArmTex.Size() * new Vector2(0.5f, 0.175f);
             Vector2 lowerArmOrigin = lowerArmTex.Size() * new Vector2(0.5f, 0.9f);
 
             Vector2 leftShoulderPos = NPC.Center + shoulderAnchor * new Vector2(-1, 1);
             Vector2 rightShoulderPos = NPC.Center + shoulderAnchor * new Vector2(1, 1);
 
-            Vector2 leftShoulderHandVect = leftHandPos - leftShoulderPos;
-            Vector2 rightShoulderHandVect = rightHandPos - rightShoulderPos;
+            Vector2 leftHandBottomPos = leftHandPos + new Vector2(0, 32);
+            Vector2 rightHandBottomPos = rightHandPos + new Vector2(0, 32);
+            Vector2 leftShoulderHandVect = leftHandBottomPos - leftShoulderPos;
+            Vector2 rightShoulderHandVect = rightHandBottomPos - rightShoulderPos;
 
             float leftUpperArmRot = (float)Math.Asin((leftShoulderHandVect * upperArmLengthRatio).Length() / upperArmLength) + leftShoulderHandVect.ToRotation() - MathHelper.Pi;
             Vector2 leftElbowPos = (leftUpperArmRot + MathHelper.PiOver2).ToRotationVector2() * upperArmLength + leftShoulderPos;
             float rightUpperArmRot = (float)Math.Asin((rightShoulderHandVect * upperArmLengthRatio).Length() / upperArmLength) * -1 + rightShoulderHandVect.ToRotation();
             Vector2 rightElbowPos = (rightUpperArmRot + MathHelper.PiOver2).ToRotationVector2() * upperArmLength + rightShoulderPos;
 
-            float leftLowerArmRot = (leftHandPos - leftElbowPos).ToRotation() + MathHelper.PiOver2;
-            float rightLowerArmRot = (rightHandPos - rightElbowPos).ToRotation() + MathHelper.PiOver2;
+            float leftLowerArmRot = (leftHandBottomPos - leftElbowPos).ToRotation() + MathHelper.PiOver2;
+            float rightLowerArmRot = (rightHandBottomPos - rightElbowPos).ToRotation() + MathHelper.PiOver2;
 
             Main.EntitySpriteDraw(upperArmTex, leftShoulderPos - Main.screenPosition, null, Color.White, leftUpperArmRot, upperArmOrigin, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(upperArmTex, rightShoulderPos - Main.screenPosition, null, Color.White, rightUpperArmRot, upperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
+
+            for (int i = -1; i <= 1; i += 2)
+            {
+
+                Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition, null, Color.White, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+            }
+            Main.EntitySpriteDraw(coreCrackTex, NPC.Center + new Vector2(2, -11) - Main.screenPosition, null, Color.White, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(coreTex, NPC.Center + new Vector2(-1, 0) - Main.screenPosition, coreFrame, Color.White, 0, coreFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
 
             Main.EntitySpriteDraw(lowerArmTex, leftElbowPos - Main.screenPosition, null, Color.White, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(lowerArmTex, rightElbowPos - Main.screenPosition, null, Color.White, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
@@ -449,15 +459,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             Main.EntitySpriteDraw(handTex, leftHandPos + new Vector2(2, -49) - Main.screenPosition, leftHandFrame, Color.White, 0, leftHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(handTex, rightHandPos + new Vector2(-2, -49) - Main.screenPosition, rightHandFrame, Color.White, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
-
-            for (int i = -1; i <= 1; i += 2)
-            {
-
-                Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition, null, Color.White, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-            }
-
-            Main.EntitySpriteDraw(coreCrackTex, NPC.Center + new Vector2(2, -11) - Main.screenPosition, null, Color.White, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(coreTex, NPC.Center + new Vector2(-1, 0) - Main.screenPosition, coreFrame, Color.White, 0, coreFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
 
             Main.EntitySpriteDraw(headTex, headPos - Main.screenPosition, null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(mouthTex, headPos + new Vector2(1, 208) - Main.screenPosition, mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
