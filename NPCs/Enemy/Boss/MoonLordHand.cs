@@ -64,6 +64,30 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
+            NPC.ai[0] = -1;
+            if (source is EntitySource_Parent parentSource)
+            {
+                if (parentSource.Entity is NPC)
+                {
+                    NPC.ai[0] = parentSource.Entity.whoAmI;
+                    NPC npc = Main.npc[(int)NPC.ai[0]];
+                    if (!npc.active || npc.type != ModContent.NPCType<MoonLord>())
+                    {
+                        NPC.ai[0] = -1;
+                        NPC.StrikeInstantKill();
+                        NPC.active = false;
+                        return;
+                    }
+
+                }
+            }
+
+            if (NPC.ai[0] == -1)
+            {
+                NPC.StrikeInstantKill();
+                NPC.active = false;
+            }
+
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             spawnPos = NPC.Center;
@@ -75,7 +99,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC parent = Main.npc[(int)NPC.ai[0]];
+            if (!parent.active || parent.type != ModContent.NPCType<MoonLord>())
+            {
+                NPC.dontTakeDamage = false;
+                NPC.immortal = false;
+                NPC.StrikeInstantKill();
+                NPC.active = false;
+                return;
+            }
+
+            NPC.dontTakeDamage = false;
+            NPC.immortal = false;
             canBeHit = true;
+            if (NPC.life <= 1)
+            {
+                CheckDead();
+            }
         }
        
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
@@ -93,13 +133,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
-
+            NPC parent = Main.npc[(int)NPC.ai[0]];
+            if (parent.active)
+            {
+                NPC.active = true;
+                NPC.life = 1;
+                NPC.immortal = true;
+                NPC.dontTakeDamage = true;
+                return false;
+            }
+            NPC.StrikeInstantKill();
             return true;
         }
         
         public override void HitEffect(NPC.HitInfo hit)
         {
-            
+            if (NPC.life <= 1)
+            {
+                CheckDead();
+            }
         }
         public override void OnKill()
         {
