@@ -142,6 +142,19 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/UI/BasinOptionBoxHover",
                 "TerRoguelike/UI/BasinOptionsBackground",
                 "TerRoguelike/ExtraTextures/BigArrow",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordCore",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordCoreCracks",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordEmptyEye",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordInnerEye",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordLowerArm",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordUpperArm",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordMouth",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordSideEye",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordTopEye",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordTopEyeOverlay",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordHead",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordHand",
+                "TerRoguelike/NPCs/Enemy/Boss/MoonLordBodyHalf",
             };
             foreach (string path in pathList)
             {
