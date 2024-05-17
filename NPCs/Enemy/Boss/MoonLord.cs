@@ -147,7 +147,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                     
             }
-            Vector2 headSpawnPos = new Vector2(0, -700) + NPC.Center;
+            Vector2 headSpawnPos = new Vector2(0, -395) + NPC.Center;
             headWho = NPC.NewNPC(NPC.GetSource_FromThis(), (int)headSpawnPos.X, (int)headSpawnPos.Y, headType);
             headPos = headSpawnPos;
         }
@@ -165,8 +165,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 modPlayer.moonLordVisualEffect = true;
             }
 
-            leftHandPos = NPC.Center + new Vector2(-400, -60);
-            rightHandPos = NPC.Center + new Vector2(400, -60);
+            leftHandPos = NPC.Center + new Vector2(-464, -60);
+            rightHandPos = NPC.Center + new Vector2(464, -60);
             //rightHandPos = Main.MouseWorld;
             headPos = NPC.Center + new Vector2(0, -395); // do NOT touch this one
 
@@ -272,7 +272,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(TempleGolemTheme);
+                SetBossTrack(FinalBoss2Theme);
             }
 
             ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
@@ -434,7 +434,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (modNPC.isRoomNPC)
                 {
-                    ActiveBossTheme.endFlag = true;
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
                     Room room = RoomList[modNPC.sourceRoomListID];
                     room.bossDead = true;
                     ClearChildren();

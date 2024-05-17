@@ -6,6 +6,8 @@ using static TerRoguelike.Systems.RoomSystem;
 using TerRoguelike.UI;
 using Terraria;
 using TerRoguelike.Shaders;
+using Terraria.Graphics.Effects;
+using TerRoguelike.Skies;
 
 namespace TerRoguelike
 {
@@ -46,6 +48,7 @@ namespace TerRoguelike
         public void LoadClient()
         {
             TerRoguelikeShaders.LoadShaders();
+            SkyManager.Instance["TerRoguelike:MoonLordSkyClone"] = new MoonLordSkyClone();
         }
         public override void PostSetupContent()
         {
