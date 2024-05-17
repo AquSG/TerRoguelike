@@ -50,8 +50,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 70;
-            NPC.height = 70;
+            NPC.width = 46;
+            NPC.height = 76;
             NPC.aiStyle = -1;
             NPC.damage = 36;
             NPC.lifeMax = 25000;
@@ -135,6 +135,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
+            if (NPC.ai[0] < 0)
+                return true;
             NPC parent = Main.npc[(int)NPC.ai[0]];
             if (parent.active)
             {

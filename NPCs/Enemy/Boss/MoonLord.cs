@@ -38,6 +38,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool ableToHit = true;
         public bool canBeHit = true;
         public override int modNPCID => ModContent.NPCType<MoonLord>();
+        public int handType = ModContent.NPCType<MoonLordHand>();
+        public int headType = ModContent.NPCType<MoonLordHead>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
         public int coreCurrentFrame = 0;
@@ -66,12 +68,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 180);
-        public static Attack Attack1 = new Attack(1, 30, 180);
-        public static Attack Attack2 = new Attack(2, 30, 180);
-        public static Attack Attack3 = new Attack(3, 30, 180);
-        public static Attack Attack4 = new Attack(4, 30, 180);
-        public static Attack Attack5 = new Attack(5, 30, 180);
-        public static Attack Attack6 = new Attack(6, 30, 180);
+        public static Attack PhantSpin = new Attack(1, 30, 180);
+        public static Attack PhantBolt = new Attack(2, 30, 180);
+        public static Attack PhantSphere = new Attack(3, 30, 180);
+        public static Attack Tentacle = new Attack(4, 30, 180);
+        public static Attack Deathray = new Attack(5, 30, 180);
+        public static Attack PhantSpawn = new Attack(6, 30, 180);
 
         public override void SetStaticDefaults()
         {
@@ -80,8 +82,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 70;
-            NPC.height = 70;
+            NPC.width = 60;
+            NPC.height = 88;
             NPC.aiStyle = -1;
             NPC.damage = 36;
             NPC.lifeMax = 25000;
@@ -120,7 +122,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             for (int i = -1; i <= 1; i += 2)
             {
                 Vector2 handSpawnPos = new Vector2(800 * i, -40) + NPC.Center;
-                int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)handSpawnPos.X, (int)handSpawnPos.Y, ModContent.NPCType<MoonLordHand>());
+                int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)handSpawnPos.X, (int)handSpawnPos.Y, handType);
                 NPC hand = Main.npc[whoAmI];
                 hand.direction = hand.spriteDirection = i;
                 if (i == -1)
@@ -136,7 +138,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     
             }
             Vector2 headSpawnPos = new Vector2(0, -700) + NPC.Center;
-            headWho = NPC.NewNPC(NPC.GetSource_FromThis(), (int)headSpawnPos.X, (int)headSpawnPos.Y, ModContent.NPCType<MoonLordHead>());
+            headWho = NPC.NewNPC(NPC.GetSource_FromThis(), (int)headSpawnPos.X, (int)headSpawnPos.Y, headType);
             headPos = headSpawnPos;
         }
         public override void PostAI()
@@ -144,32 +146,55 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             leftHandPos = NPC.Center + new Vector2(-400, -40);
             rightHandPos = NPC.Center + new Vector2(400, -40);
             rightHandPos = Main.MouseWorld;
-            headPos = NPC.Center + new Vector2(0, -395);
+            headPos = NPC.Center + new Vector2(0, -395); // do NOT touch this one
 
-            NPC leftHand = Main.npc[leftHandWho];
-            NPC rightHand = Main.npc[rightHandWho];
-            NPC head = Main.npc[headWho];
+            NPC leftHand = leftHandWho >= 0 ? Main.npc[leftHandWho] : null;
+            NPC rightHand = rightHandWho >= 0 ? Main.npc[rightHandWho] : null;
+            NPC head = headWho >= 0 ? Main.npc[headWho] : null;
 
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             canBeHit = false;
             bool enableHitBox = true;
-            if (leftHand.life > 1)
+
+            if (leftHand != null)
             {
-                enableHitBox = false;
-                leftHand.Center = leftHandPos;
+                if (leftHand.type != handType)
+                {
+                    leftHandWho = -1;
+                }
+                else if (leftHand.life > 1)
+                {
+                    enableHitBox = false;
+                    leftHand.Center = leftHandPos;
+                }
             }
-            if (rightHand.life > 1)
+            if (rightHand != null)
             {
-                enableHitBox = false;
-                rightHand.Center = rightHandPos;
+                if (rightHand.type != handType)
+                {
+                    rightHandWho = -1;
+                }
+                else if(rightHand.life > 1)
+                {
+                    enableHitBox = false;
+                    rightHand.Center = rightHandPos;
+                }
             }
-            if (head.life > 1)
+            if (head != null)
             {
-                enableHitBox = false;
-                head.Center = headPos;
+                if (head.type != headType)
+                {
+                    headWho = -1;
+                }
+                else if (head.life > 1)
+                {
+                    enableHitBox = false;
+                    head.Center = headPos;
+                }
             }
-            if (enableHitBox)
+            
+            if (enableHitBox && deadTime == 0)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -189,7 +214,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(TempleGolemTheme);
             }
 
-            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
+            ableToHit = false;
             canBeHit = true;
 
             if (NPC.localAI[0] < 0)
@@ -220,7 +245,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
-            NPC.velocity *= 0.98f;
 
             if (NPC.ai[0] == None.Id)
             {
@@ -234,58 +258,58 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (NPC.ai[0] == Attack1.Id)
+            if (NPC.ai[0] == PhantSpin.Id)
             {                
-                if (NPC.ai[1] >= Attack1.Duration)
+                if (NPC.ai[1] >= PhantSpin.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack1.Id;
+                    NPC.ai[2] = PhantSpin.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack2.Id)
+            else if (NPC.ai[0] == PhantBolt.Id)
             {
-                if (NPC.ai[1] >= Attack2.Duration)
+                if (NPC.ai[1] >= PhantBolt.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack2.Id;
+                    NPC.ai[2] = PhantBolt.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack3.Id)
+            else if (NPC.ai[0] == PhantSphere.Id)
             {
-                if (NPC.ai[1] >= Attack3.Duration)
+                if (NPC.ai[1] >= PhantSphere.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack3.Id;
+                    NPC.ai[2] = PhantSphere.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack4.Id)
+            else if (NPC.ai[0] == Tentacle.Id)
             {
-                if (NPC.ai[1] >= Attack4.Duration)
+                if (NPC.ai[1] >= Tentacle.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack4.Id;
+                    NPC.ai[2] = Tentacle.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack5.Id)
+            else if (NPC.ai[0] == Deathray.Id)
             {
-                if (NPC.ai[1] >= Attack5.Duration)
+                if (NPC.ai[1] >= Deathray.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack5.Id;
+                    NPC.ai[2] = Deathray.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack6.Id)
+            else if (NPC.ai[0] == PhantSpawn.Id)
             {
-                if (NPC.ai[1] >= Attack6.Duration)
+                if (NPC.ai[1] >= PhantSpawn.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack6.Id;
+                    NPC.ai[2] = PhantSpawn.Id;
                 }
             }
         }
@@ -294,7 +318,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Attack1, Attack2, Attack3, Attack4, Attack5, Attack6 };
+            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -345,6 +369,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.dontTakeDamage = true;
             NPC.active = true;
             ableToHit = false;
+            canBeHit = false;
 
             if (deadTime == 0)
             {
@@ -401,9 +426,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage * 0.04d; i++)
+                for (int i = 0; (double)i < hit.Damage * 0.025d; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.t_Lihzahrd, hit.HitDirection, -1f);
+                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.LunarOre, hit.HitDirection, -1f);
                 }
             }
         }
