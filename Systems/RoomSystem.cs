@@ -299,9 +299,6 @@ namespace TerRoguelike.Systems
         }
         public override void LoadWorldData(TagCompound tag)
         {
-            TerRoguelikeWorld.lunarFloorInitialized = false;
-            TerRoguelikeWorld.lunarBossSpawned = false;
-            TerRoguelikeWorld.escape = false;
             var isTerRoguelikeWorld = tag.GetBool("isTerRoguelikeWorld");
             var isDeletableOnExit = TerRoguelikeMenu.prepareForRoguelikeGeneration ? tag.GetBool("isDeletableOnExit") : false;
             var isDebugWorld = tag.GetBool("isDebugWorld");
@@ -962,6 +959,9 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.IsDebugWorld = false;
             TerRoguelikeWorld.IsDeletableOnExit = false;
             TerRoguelikeWorld.IsTerRoguelikeWorld = false;
+            TerRoguelikeWorld.lunarFloorInitialized = false;
+            TerRoguelikeWorld.lunarBossSpawned = false;
+            TerRoguelikeWorld.escape = false;
             itemBasins.Clear();
             worldTeleportTime = 0;
             sanctuaryTries = 0;

@@ -242,7 +242,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         NPC parent = Main.npc[(int)NPC.ai[2]];
                         SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, parent.Center + new Vector2(0, -300));
-                        SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f }, parent.Center + new Vector2(0, -300));
+                        SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f }, parent.Center + new Vector2(0, -300));
                         int[] goreIds = [GoreID.MoonLordHeart1, GoreID.MoonLordHeart2, GoreID.MoonLordHeart3, GoreID.MoonLordHeart4];
                         for (int i = 0; i < 8; i++)
                         {

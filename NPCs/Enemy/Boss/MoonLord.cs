@@ -131,7 +131,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             for (int i = -1; i <= 1; i += 2)
             {
-                Vector2 handSpawnPos = new Vector2(800 * i, -40) + NPC.Center;
+                Vector2 handSpawnPos = new Vector2(464 * i, -60) + NPC.Center;
                 int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)handSpawnPos.X, (int)handSpawnPos.Y, handType);
                 NPC hand = Main.npc[whoAmI];
                 hand.direction = hand.spriteDirection = i;
@@ -228,7 +228,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!goreProc)
                 {
                     SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f }, NPC.Center + new Vector2(0, -300));
+                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f, Pitch = 0.1f }, NPC.Center + new Vector2(0, -300));
                     int[] goreIds = [GoreID.MoonLordHeart1, GoreID.MoonLordHeart2, GoreID.MoonLordHeart3, GoreID.MoonLordHeart4];
                     for (int i = 0; i < 20; i++)
                     {
@@ -272,7 +272,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(FinalBoss2Theme);
+                SetBossTrack(TempleGolemTheme);
             }
 
             ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
@@ -481,7 +481,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage * 0.015d; i++)
+                for (int i = 0; (double)i < hit.Damage * 0.01d; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f);
                     Main.dust[d].noLight = true;

@@ -23,6 +23,7 @@ using TerRoguelike.World;
 using TerRoguelike.Systems;
 using Terraria.GameInput;
 using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.UI
 {
@@ -94,6 +95,11 @@ namespace TerRoguelike.UI
             {
                 if (RoomSystem.RoomList != null && RoomSystem.RoomList.Count > 0)
                 {
+                    TerRoguelikeWorld.lunarFloorInitialized = false;
+                    TerRoguelikeWorld.lunarBossSpawned = false;
+                    TerRoguelikeWorld.escape = false;
+                    Main.LocalPlayer.ModPlayer().escaped = false;
+                    TerRoguelikeWorld.escapeTime = 0;
                     for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                     {
                         Room room = RoomSystem.RoomList[i];
