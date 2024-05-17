@@ -39,27 +39,23 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
+            bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 11f);
             if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f);
+                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f - 32f);
             base.Update();
             if (TerRoguelikeWorld.lunarFloorInitialized && !TerRoguelikeWorld.lunarBossSpawned)
             {
                 if (RoomID[RoomDict["LunarPillarRoomTopLeft"]].closedTime > 120 && RoomID[RoomDict["LunarPillarRoomTopRight"]].closedTime > 120 && RoomID[RoomDict["LunarPillarRoomBottomLeft"]].closedTime > 120 && RoomID[RoomDict["LunarPillarRoomBottomRight"]].closedTime > 120)
                 {
-                    musicPlayed = false;
-                    AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<MoonLord>(), 1, 1, 0.9f);
-                    TerRoguelikeWorld.lunarBossSpawned = true;
                     SetMusicMode(MusicStyle.Silent);
                 }
                 else
                     awake = false;
             }
-            if (awake && !musicPlayed)
+            if (awake && !TerRoguelikeWorld.lunarBossSpawned)
             {
-                SetMusicMode(MusicStyle.AllCombat);
-                SetCombat(FinalBoss);
-                CombatVolumeLevel = 0.4f;
-                musicPlayed = true;
+                AddBoss(bossSpawnPos, ModContent.NPCType<MoonLord>());
+                TerRoguelikeWorld.lunarBossSpawned = true;
             }
         }
         public override bool ClearCondition()

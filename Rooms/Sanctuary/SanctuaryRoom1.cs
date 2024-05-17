@@ -67,6 +67,7 @@ namespace TerRoguelike.Rooms
         }
         public override void Ascend(Player player)
         {
+            TerRoguelikeWorld.lunarBossSpawned = false;
             player.Center = new Vector2(Main.maxTilesX * 8, 3000);
             SetBossTrack(FinalBoss2Theme);
         }

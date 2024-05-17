@@ -166,7 +166,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (!goreProc)
                     {
                         NPC parent = Main.npc[(int)NPC.ai[2]];
-                        SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f }, parent.Center + new Vector2(0, -300));
+                        SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f }, parent.Center + new Vector2(0, -300));
                         goreProc = true;
                     }
                 }
