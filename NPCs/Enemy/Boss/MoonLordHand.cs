@@ -39,7 +39,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool ableToHit = true;
         public bool canBeHit = true;
         public override int modNPCID => ModContent.NPCType<MoonLordHand>();
-        public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
+        public override string Texture => "TerRoguelike/NPCs/Enemy/Boss/MoonLordSideEye";
+        public Texture2D trueEyeTex;
+        public Texture2D innerEyeTex;
+        public int currentFrame;
+        Vector2 trueEyeVector;
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
@@ -59,21 +63,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.IgnoreRoomWallCollision = true;
+            modNPC.OverrideIgniteVisual = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
+            trueEyeTex = TexDict["TrueEyeOfCthulhu"];
+            innerEyeTex = TexDict["MoonLordInnerEye"];
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.ai[0] = -1;
+            NPC.ai[2] = -1;
             if (source is EntitySource_Parent parentSource)
             {
                 if (parentSource.Entity is NPC)
                 {
-                    NPC.ai[0] = parentSource.Entity.whoAmI;
-                    NPC npc = Main.npc[(int)NPC.ai[0]];
+                    NPC.ai[2] = parentSource.Entity.whoAmI;
+                    NPC npc = Main.npc[(int)NPC.ai[2]];
                     if (!npc.active || npc.type != ModContent.NPCType<MoonLord>())
                     {
-                        NPC.ai[0] = -1;
+                        NPC.ai[2] = -1;
                         NPC.StrikeInstantKill();
                         NPC.active = false;
                         return;
@@ -82,7 +89,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (NPC.ai[0] == -1)
+            if (NPC.ai[2] == -1)
             {
                 NPC.StrikeInstantKill();
                 NPC.active = false;
@@ -92,6 +99,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.dontTakeDamage = true;
             spawnPos = NPC.Center;
             ableToHit = false;
+            trueEyeVector = Vector2.Zero;
         }
         public override void PostAI()
         {
@@ -99,7 +107,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
-            NPC parent = Main.npc[(int)NPC.ai[0]];
+            NPC parent = Main.npc[(int)NPC.ai[2]];
             if (!parent.active || parent.type != ModContent.NPCType<MoonLord>())
             {
                 NPC.dontTakeDamage = false;
@@ -114,7 +122,74 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             canBeHit = true;
             if (NPC.life <= 1)
             {
-                CheckDead();
+                if (CheckDead())
+                    return;
+
+                TrueEyeAI(parent);
+            }
+        }
+        public void TrueEyeAI(NPC parent)
+        {
+            var modNpc = NPC.ModNPC();
+            var modParent = parent.ModNPC();
+
+            modNpc.targetPlayer = modParent.targetPlayer;
+            modNpc.targetNPC = modParent.targetNPC;
+
+            if (modNpc.targetPlayer >= 0)
+            {
+                target = Main.player[modNpc.targetPlayer];
+            }
+            else if (modNpc.targetNPC >= 0)
+            {
+                target = Main.npc[modNpc.targetNPC];
+            }
+            else
+                target = null;
+
+            Vector2 targetPos = target != null ? target.Center : spawnPos;
+
+            Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -300);
+            float wantedRadius = 90;
+            if (NPC.Center.Distance(wantedPos) <= wantedRadius)
+            {
+                NPC.velocity *= Main.rand.NextFloat(0.96f, 0.97f);
+                float velocityLength = NPC.velocity.Length();
+                if (velocityLength > 1)
+                {
+                    NPC.velocity = (NPC.velocity.ToRotation().AngleTowards((wantedPos - NPC.Center).ToRotation(), 0.02f)).ToRotationVector2() * velocityLength;
+                }
+            }
+            else
+            {
+                float maxSpeed = 12;
+                NPC.velocity *= 0.98f;
+                NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.25f * Main.rand.NextFloat(0.9f, 1f);
+                if (NPC.velocity.Length() > maxSpeed)
+                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
+            }
+            float rotCap = MathHelper.PiOver2 * 0.66f;
+            NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
+            InnerEyePositionUpdate(ref trueEyeVector, NPC.Center);
+
+            void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
+            {
+                bool eyeCenter = target == null;
+
+                if (eyeCenter)
+                {
+                    eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, 0.2f);
+                }
+                else
+                {
+                    Vector2 targetPos = target != null ? target.Center : spawnPos + new Vector2(0, -80);
+                    float maxEyeOffset = 15;
+
+                    Vector2 targetVect = targetPos - basePosition;
+                    if (targetVect.Length() > maxEyeOffset)
+                        targetVect = targetVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
+                    eyeVector = Vector2.Lerp(eyeVector, targetVect, 0.2f);
+                }
             }
         }
        
@@ -133,9 +208,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
-            if (NPC.ai[0] < 0)
+            if (NPC.ai[2] < 0)
                 return true;
-            NPC parent = Main.npc[(int)NPC.ai[0]];
+
+            NPC.frameCounter += 0.2d;
+            if (NPC.localAI[3] == 0)
+            {
+                modNPC.ignitedStacks.Clear();
+                NPC.height = NPC.width;
+            }
+            NPC.localAI[3]++;
+            NPC parent = Main.npc[(int)NPC.ai[2]];
             if (parent.active)
             {
                 NPC.active = true;
@@ -159,13 +242,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             
         }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            boundingBox = NPC.Hitbox;
+        }
         public override void FindFrame(int frameHeight)
         {
-            
+            currentFrame = (int)NPC.frameCounter % 4;
+            frameHeight = trueEyeTex.Height / 4;
+            NPC.frame = new Rectangle(0, frameHeight * currentFrame, trueEyeTex.Width, frameHeight - 2);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            
+            if (NPC.life > 1)
+                return false;
+
+            Vector2 eyeOrigin = new Vector2(NPC.frame.Width * 0.5f);
+            Main.EntitySpriteDraw(trueEyeTex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, eyeOrigin, NPC.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(innerEyeTex, NPC.Center + trueEyeVector - Main.screenPosition, null, Color.White, NPC.rotation, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+
+
             return false;
         }
     }

@@ -39,7 +39,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool ableToHit = true;
         public bool canBeHit = true;
         public override int modNPCID => ModContent.NPCType<MoonLordHead>();
-        public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
+        public override string Texture => "TerRoguelike/NPCs/Enemy/Boss/MoonLordSideEye";
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
@@ -59,6 +59,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.IgnoreRoomWallCollision = true;
+            modNPC.OverrideIgniteVisual = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
         }
@@ -137,6 +138,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.ai[0] < 0)
                 return true;
+            if (NPC.ai[3] == 0)
+            {
+                modNPC.ignitedStacks.Clear();
+            }
+            NPC.ai[3]++;
             NPC parent = Main.npc[(int)NPC.ai[0]];
             if (parent.active)
             {
@@ -160,6 +166,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void OnKill()
         {
             
+        }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            boundingBox = NPC.Hitbox;
         }
         public override void FindFrame(int frameHeight)
         {
