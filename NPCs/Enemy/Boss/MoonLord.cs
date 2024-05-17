@@ -153,6 +153,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+                if (!player.active)
+                    continue;
+                var modPlayer = player.ModPlayer();
+                if (modPlayer == null)
+                    continue;
+
+                modPlayer.moonLordVisualEffect = true;
+            }
+
             leftHandPos = NPC.Center + new Vector2(-400, -60);
             rightHandPos = NPC.Center + new Vector2(400, -60);
             //rightHandPos = Main.MouseWorld;
@@ -388,6 +400,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            chosenAttack = PhantSpin.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)

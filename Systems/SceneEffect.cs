@@ -20,6 +20,8 @@ using Microsoft.Xna.Framework;
 using Terraria.Audio;
 using ReLogic.Utilities;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.Utilities;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Systems
 {
@@ -30,6 +32,10 @@ namespace TerRoguelike.Systems
         public override bool IsSceneEffectActive(Player player)
         {
             return TerRoguelikeWorld.IsTerRoguelikeWorld;
+        }
+        public override void SpecialVisuals(Player player, bool isActive)
+        {
+            player.ManageSpecialBiomeVisuals("MoonLord", player.ModPlayer().moonLordVisualEffect);
         }
     }
 }

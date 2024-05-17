@@ -96,6 +96,7 @@ Projectiles: {
 	DartTrap.DisplayName: Dart Trap
 	Dart.DisplayName: Dart
 	RollingBoulder.DisplayName: Rolling Boulder
+	PhantasmalEye.DisplayName: Phantasmal Eye
 }
 
 Items: {

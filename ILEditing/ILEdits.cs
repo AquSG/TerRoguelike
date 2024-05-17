@@ -29,6 +29,9 @@ using static Terraria.WorldGen;
 using ReLogic.Threading;
 using Terraria.GameContent.Events;
 using TerRoguelike.Utilities;
+using Terraria.GameContent.Shaders;
+using TerRoguelike.NPCs.Enemy.Boss;
+using System.Reflection;
 
 namespace TerRoguelike.ILEditing
 {
@@ -51,6 +54,45 @@ namespace TerRoguelike.ILEditing
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
+            On_MoonLordScreenShaderData.UpdateMoonLordIndex += TerRoguelikeMoonLordIndexInjectionIntoShader;
+        }
+
+        private void TerRoguelikeMoonLordIndexInjectionIntoShader(On_MoonLordScreenShaderData.orig_UpdateMoonLordIndex orig, MoonLordScreenShaderData self)
+        {
+			Player player = Main.LocalPlayer;
+			if (player == null)
+			{
+                orig.Invoke(self);
+                return;
+            }
+			var modPlayer = player.ModPlayer();
+			if (modPlayer == null || !modPlayer.moonLordVisualEffect)
+			{
+                orig.Invoke(self);
+                return;
+            }
+
+			int moonLordType = ModContent.NPCType<MoonLord>();
+			int trueBrainType = -2;
+
+			var moonIndex = (int)self.GetType().GetField("_moonLordIndex", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+			var aimAtPlayer = (bool)self.GetType().GetField("_aimAtPlayer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
+
+            if (aimAtPlayer || (moonIndex >= 0 && Main.npc[moonIndex].active && (Main.npc[moonIndex].type == moonLordType || Main.npc[moonIndex].type == trueBrainType)))
+            {
+                return;
+            }
+            int moonLordIndex = -1;
+            for (int i = 0; i < Main.npc.Length; i++)
+            {
+                if (Main.npc[i].active && (Main.npc[i].type == moonLordType || Main.npc[i].type == trueBrainType))
+                {
+                    moonLordIndex = i;
+                    break;
+                }
+            }
+
+			self.GetType().GetField("_moonLordIndex", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, moonLordIndex);
         }
 
         private void PostDrawBasicallyEverything(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
