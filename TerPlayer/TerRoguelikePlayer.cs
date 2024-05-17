@@ -171,6 +171,7 @@ namespace TerRoguelike.TerPlayer
         public bool noThrow = false;
         public int escapeArrowTime = 0;
         public Vector2 escapeArrowTarget = Vector2.Zero;
+        public bool moonLordVisualEffect = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -1091,7 +1092,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void PostUpdate()
         {
-            
+            moonLordVisualEffect = false;
         }
         #endregion
 
