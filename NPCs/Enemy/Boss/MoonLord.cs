@@ -29,6 +29,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using System.Diagnostics;
+using System.CodeDom;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -43,6 +44,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int headType = ModContent.NPCType<MoonLordHead>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
+        public bool CollisionPass = false;
+        public bool goreProc = false;
         public int coreCurrentFrame = 0;
         public int mouthCurrentFrame = 0;
         public int headEyeCurrentFrame = 0;
@@ -55,6 +58,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Rectangle leftHandFrame;
         public Rectangle rightHandFrame;
         public Rectangle emptyEyeFrame;
+        int headOverlayFrameCounter;
         Vector2 headPos;
         Vector2 leftHandPos;
         Vector2 rightHandPos;
@@ -201,10 +205,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     head.Center = headPos;
                     InnerEyePositionUpdate(ref headEyeVector, headPos);
                 }
+                else
+                {
+                    headOverlayFrameCounter++;
+                }
             }
             
             if (enableHitBox && deadTime == 0)
             {
+                if (!goreProc)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f }, NPC.Center + new Vector2(0, -300));
+                    int[] goreIds = [GoreID.MoonLordHeart1, GoreID.MoonLordHeart2, GoreID.MoonLordHeart3, GoreID.MoonLordHeart4];
+                    for (int i = 0; i < 20; i++)
+                    {
+                        int goreId = goreIds[(i / 5) % 4];
+                        Gore.NewGore(NPC.GetSource_Death(), Main.rand.NextVector2Circular(NPC.width * 0.5f, NPC.height * 0.5f) + NPC.position + new Vector2(NPC.width * 0.25f, NPC.height * 0.25f), Main.rand.NextVector2CircularEdge(5, 3) - Vector2.UnitY * 0.5f, goreId, NPC.scale);
+                    }
+                    goreProc = true;
+                }
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 canBeHit = true;
@@ -243,7 +263,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(TempleGolemTheme);
             }
 
-            ableToHit = false;
+            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
             canBeHit = true;
 
             if (NPC.localAI[0] < 0)
@@ -370,14 +390,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             NPC.ai[0] = chosenAttack;
         }
-        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
-        {
-            return ableToHit;
-        }
-        public override bool CanHitNPC(NPC target)
-        {
-            return ableToHit;
-        }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {
             return canBeHit ? null : false;
@@ -467,6 +479,106 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             
         }
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot)
+        {
+            bool topEyeCanHit = headWho >= 0 && Main.npc[headWho].life > 1;
+            float eyeHitRadius = 30;
+            for (int i = topEyeCanHit ? 0 : 1; i < 3; i++)
+            {
+                var checkPos = i switch
+                {
+                    0 => headPos,
+                    1 => leftHandPos,
+                    _ => rightHandPos,
+                };
+
+                Vector2 targetVectorToPos = (target.getRect().ClosestPointInRect(checkPos) - checkPos);
+                targetVectorToPos.X *= 1.6f; // simulates an oval-like shape
+
+                if (targetVectorToPos.Length() <= eyeHitRadius)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            float trueEyeHitRadius = 36;
+            if (leftHandWho >= 0 && Main.npc[leftHandWho].life == 1)
+            {
+                Vector2 checkPos = Main.npc[leftHandWho].Center;
+                Vector2 targetVectorToPos = target.getRect().ClosestPointInRect(checkPos) - checkPos;
+                if (targetVectorToPos.Length() <= trueEyeHitRadius)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            if (rightHandWho >= 0 && Main.npc[rightHandWho].life == 1)
+            {
+                Vector2 checkPos = Main.npc[rightHandWho].Center;
+                Vector2 targetVectorToPos = target.getRect().ClosestPointInRect(checkPos) - checkPos;
+                if (targetVectorToPos.Length() <= trueEyeHitRadius)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            CollisionPass = false;
+            return false;
+        }
+        public override bool CanHitNPC(NPC target)
+        {
+            bool topEyeCanHit = headWho >= 0 && Main.npc[headWho].life > 1;
+            float eyeHitRadius = 30;
+            for (int i = topEyeCanHit ? 0 : 1; i < 3; i++)
+            {
+                var checkPos = i switch
+                {
+                    0 => headPos,
+                    1 => leftHandPos,
+                    _ => rightHandPos,
+                };
+
+                Vector2 targetVectorToPos = (target.Hitbox.ClosestPointInRect(checkPos) - checkPos);
+                targetVectorToPos.X *= 1.6f; // simulates an oval-like shape
+
+                if (targetVectorToPos.Length() <= eyeHitRadius)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            float trueEyeHitRadius = 36;
+            if (leftHandWho >= 0 && Main.npc[leftHandWho].life == 1)
+            {
+                Vector2 checkPos = Main.npc[leftHandWho].Center;
+                Vector2 targetVectorToPos = target.Hitbox.ClosestPointInRect(checkPos) - checkPos;
+                if (targetVectorToPos.Length() <= trueEyeHitRadius)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            if (rightHandWho >= 0 && Main.npc[rightHandWho].life == 1)
+            {
+                Vector2 checkPos = Main.npc[rightHandWho].Center;
+                Vector2 targetVectorToPos = target.Hitbox.ClosestPointInRect(checkPos) - checkPos;
+                if (targetVectorToPos.Length() <= trueEyeHitRadius)
+                {
+                    CollisionPass = ableToHit;
+                    return ableToHit;
+                }
+            }
+            CollisionPass = false;
+            return false;
+        }
+        public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
+        {
+            if (CollisionPass)
+            {
+                npcHitbox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+            }
+            return CollisionPass;
+        }
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {
             boundingBox = NPC.Hitbox;
@@ -512,7 +624,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             mouthFrame = new Rectangle(0, mouthCurrentFrame * frameHeight, mouthTex.Width, frameHeight - 2);
 
             frameHeight = topEyeOverlayTex.Height / 4;
-            headEyeCurrentFrame = showcaseFrame;
+            headEyeCurrentFrame = headOverlayFrameCounter == 0 ? showcaseFrame : Math.Min(headOverlayFrameCounter / 8 + 1, 3);
             headEyeFrame = new Rectangle(0, headEyeCurrentFrame * frameHeight, topEyeOverlayTex.Width, frameHeight - 2);
 
             frameHeight = handTex.Height / 4;
@@ -593,7 +705,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             draws.Add(new StoredDraw(mouthTex, headPos + new Vector2(1, 212), mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
             draws.Add(new StoredDraw(emptyEyeTex, headPos, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
-            if (headAlive)
+            if (headWho >= 0)
             {
                 draws.Add(new StoredDraw(topEyeTex, headPos, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
                 draws.Add(new StoredDraw(innerEyeTex, headPos + headEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
