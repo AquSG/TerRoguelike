@@ -44,6 +44,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D innerEyeTex;
         public int currentFrame;
         Vector2 trueEyeVector;
+        bool goreProc = false;
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
@@ -149,7 +150,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             Vector2 targetPos = target != null ? target.Center : spawnPos;
 
-            Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -300);
+            Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -230) + trueEyeVector * -7;
             float wantedRadius = 90;
             if (NPC.Center.Distance(wantedPos) <= wantedRadius)
             {
@@ -210,7 +211,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.ai[2] < 0)
                 return true;
-
+            ableToHit = false;
             NPC.frameCounter += 0.2d;
             if (NPC.localAI[3] == 0)
             {
@@ -235,7 +236,31 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life <= 1)
             {
-                CheckDead();
+                if (!CheckDead())
+                {
+                    if (!goreProc)
+                    {
+                        NPC parent = Main.npc[(int)NPC.ai[2]];
+                        SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, parent.Center + new Vector2(0, -300));
+                        SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f }, parent.Center + new Vector2(0, -300));
+                        int[] goreIds = [GoreID.MoonLordHeart1, GoreID.MoonLordHeart2, GoreID.MoonLordHeart3, GoreID.MoonLordHeart4];
+                        for (int i = 0; i < 8; i++)
+                        {
+                            int goreId = goreIds[(i / 2) % 4];
+                            Gore.NewGore(NPC.GetSource_Death(), Main.rand.NextVector2Circular(NPC.width * 0.3f, NPC.height * 0.3f) + NPC.position + new Vector2(NPC.width * 0.25f, NPC.height * 0.5f), Main.rand.NextVector2CircularEdge(3, 3) + Vector2.UnitY * 0.5f, goreId, NPC.scale * 0.5f);
+                        }
+                        goreProc = true;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; (double)i < hit.Damage * 0.01d; i++)
+                {
+                    int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f, 0, default, 0.5f);
+                    Main.dust[d].noLight = true;
+                    Main.dust[d].noLightEmittence = true;
+                }
             }
         }
         public override void OnKill()
