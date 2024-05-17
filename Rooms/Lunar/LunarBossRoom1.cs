@@ -17,6 +17,8 @@ using TerRoguelike.NPCs.Enemy;
 using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
+using Terraria.GameContent.Events;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Rooms
 {
@@ -37,13 +39,15 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
+            if (bossSpawnPos == Vector2.Zero)
+                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f);
             base.Update();
             if (TerRoguelikeWorld.lunarFloorInitialized && !TerRoguelikeWorld.lunarBossSpawned)
             {
                 if (RoomID[RoomDict["LunarPillarRoomTopLeft"]].closedTime > 120 && RoomID[RoomDict["LunarPillarRoomTopRight"]].closedTime > 120 && RoomID[RoomDict["LunarPillarRoomBottomLeft"]].closedTime > 120 && RoomID[RoomDict["LunarPillarRoomBottomRight"]].closedTime > 120)
                 {
                     musicPlayed = false;
-                    AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), NPCID.MoonLordCore, 1, 1, 0.9f);
+                    AddRoomNPC(new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f), ModContent.NPCType<MoonLord>(), 1, 1, 0.9f);
                     TerRoguelikeWorld.lunarBossSpawned = true;
                     SetMusicMode(MusicStyle.Silent);
                 }

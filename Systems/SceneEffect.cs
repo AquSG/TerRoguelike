@@ -22,6 +22,7 @@ using ReLogic.Utilities;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.Utilities;
 using TerRoguelike.NPCs.Enemy.Boss;
+using Terraria.Graphics.Effects;
 
 namespace TerRoguelike.Systems
 {
@@ -35,7 +36,12 @@ namespace TerRoguelike.Systems
         }
         public override void SpecialVisuals(Player player, bool isActive)
         {
-            player.ManageSpecialBiomeVisuals("MoonLord", player.ModPlayer().moonLordVisualEffect);
+            bool moonLordEffectActive = player.ModPlayer().moonLordVisualEffect;
+            player.ManageSpecialBiomeVisuals("MoonLord", moonLordEffectActive);
+            if (moonLordEffectActive)
+                SkyManager.Instance.Activate("TerRoguelike:MoonLordSkyClone");
+            else
+                SkyManager.Instance.Deactivate("TerRoguelike:MoonLordSkyClone");
         }
     }
 }

@@ -60,5 +60,12 @@ namespace TerRoguelike.Systems
             screenshakeTimer = screenshakeDuration = time;
             screenshakeMagnitude = magnitude;
         }
+        public override void ClearWorld()
+        {
+            screenshakeTimer = 0;
+            screenshakeDuration = 0;
+            screenshakeMagnitude = 0;
+            screenshakeVector = Vector2.Zero;
+        }
     }
 }
