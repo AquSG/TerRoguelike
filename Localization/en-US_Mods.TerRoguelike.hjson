@@ -830,8 +830,8 @@ NPCs: {
 	Skeletron.DisplayName: Skeletron
 	TempleGolem.DisplayName: Temple Golem
 	MoonLord.DisplayName: Moon Lord
-	MoonLordHand.DisplayName: Moon Lord Hand
-	MoonLordHead.DisplayName: Moon Lord Head
+	MoonLordHand.DisplayName: Moon Lord's Eye
+	MoonLordHead.DisplayName: Moon Lord's Eye
 }
 
 ItemBasin.DisplayName: Item Basin

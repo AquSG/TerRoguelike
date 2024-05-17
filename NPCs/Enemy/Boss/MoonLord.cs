@@ -28,6 +28,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
+using System.Diagnostics;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -57,6 +58,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         Vector2 headPos;
         Vector2 leftHandPos;
         Vector2 rightHandPos;
+        Vector2 headEyeVector;
+        Vector2 leftEyeVector;
+        Vector2 rightEyeVector;
 
         public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex;
         public int leftHandWho = -1; // yes, technically moon lord's "Left" is not the same as the left for the viewer, and vice versa for right hand. I do not care. internally it will be based on viewer perspective.
@@ -94,6 +98,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.OverrideIgniteVisual = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
+            NPC.behindTiles = true;
             coreTex = TexDict["MoonLordCore"];
             coreCrackTex = TexDict["MoonLordCoreCracks"];
             emptyEyeTex = TexDict["MoonLordEmptyEye"];
@@ -118,6 +123,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = NPC.Center;
             NPC.ai[2] = None.Id;
             ableToHit = false;
+            rightEyeVector = leftEyeVector = headEyeVector = Vector2.Zero;
 
             for (int i = -1; i <= 1; i += 2)
             {
@@ -143,9 +149,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            leftHandPos = NPC.Center + new Vector2(-400, -40);
-            rightHandPos = NPC.Center + new Vector2(400, -40);
-            rightHandPos = Main.MouseWorld;
+            leftHandPos = NPC.Center + new Vector2(-400, -60);
+            rightHandPos = NPC.Center + new Vector2(400, -60);
+            //rightHandPos = Main.MouseWorld;
             headPos = NPC.Center + new Vector2(0, -395); // do NOT touch this one
 
             NPC leftHand = leftHandWho >= 0 ? Main.npc[leftHandWho] : null;
@@ -167,6 +173,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     enableHitBox = false;
                     leftHand.Center = leftHandPos;
+                    InnerEyePositionUpdate(ref leftEyeVector, leftHandPos);
                 }
             }
             if (rightHand != null)
@@ -179,6 +186,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     enableHitBox = false;
                     rightHand.Center = rightHandPos;
+                    InnerEyePositionUpdate(ref rightEyeVector, rightHandPos);
                 }
             }
             if (head != null)
@@ -191,6 +199,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     enableHitBox = false;
                     head.Center = headPos;
+                    InnerEyePositionUpdate(ref headEyeVector, headPos);
                 }
             }
             
@@ -199,6 +208,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 canBeHit = true;
+            }
+
+            void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
+            {
+                bool eyeCenter = target == null;
+
+                if (eyeCenter)
+                {
+                    eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, 0.2f);
+                }
+                else
+                {
+                    Vector2 targetPos = target != null ? target.Center : spawnPos + new Vector2(0, -80);
+                    float maxEyeOffset = 16;
+
+                    Vector2 targetVect = targetPos - basePosition;
+                    if (targetVect.Length() > maxEyeOffset)
+                        targetVect = targetVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
+                    eyeVector = Vector2.Lerp(eyeVector, targetVect, 0.2f);
+                }
             }
         }
         public override void AI()
@@ -426,15 +455,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage * 0.025d; i++)
+                for (int i = 0; (double)i < hit.Damage * 0.015d; i++)
                 {
-                    Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.LunarOre, hit.HitDirection, -1f);
+                    int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f);
+                    Main.dust[d].noLight = true;
+                    Main.dust[d].noLightEmittence = true;
                 }
             }
         }
         public override void OnKill()
         {
             
+        }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            boundingBox = NPC.Hitbox;
         }
         public override void FindFrame(int frameHeight)
         {
@@ -523,44 +558,77 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             float leftLowerArmRot = (leftHandBottomPos - leftElbowPos).ToRotation() + MathHelper.PiOver2;
             float rightLowerArmRot = (rightHandBottomPos - rightElbowPos).ToRotation() + MathHelper.PiOver2;
 
-            Main.EntitySpriteDraw(upperArmTex, leftShoulderPos - Main.screenPosition, null, Color.White, leftUpperArmRot, leftUpperArmOrigin, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(upperArmTex, rightShoulderPos - Main.screenPosition, null, Color.White, rightUpperArmRot, rightUpperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
+
+            List<StoredDraw> draws = [];
+            draws.Add(new StoredDraw(upperArmTex, leftShoulderPos, null, Color.White, leftUpperArmRot, leftUpperArmOrigin, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(upperArmTex, rightShoulderPos, null, Color.White, rightUpperArmRot, rightUpperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally));
 
             for (int i = -1; i <= 1; i += 2)
             {
-                Main.EntitySpriteDraw(bodyTex, bodyDrawPos - Main.screenPosition, null, Color.White, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                draws.Add(new StoredDraw(bodyTex, bodyDrawPos, null, Color.White, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally));
             }
-            Main.EntitySpriteDraw(coreCrackTex, NPC.Center + new Vector2(2, -11) - Main.screenPosition, null, Color.White, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(coreTex, NPC.Center + new Vector2(-1, 0) - Main.screenPosition, coreFrame, Color.White, 0, coreFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            draws.Add(new StoredDraw(coreCrackTex, NPC.Center + new Vector2(2, -11), null, Color.White, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(coreTex, NPC.Center + new Vector2(-1, 0), coreFrame, Color.White, 0, coreFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
-            Main.EntitySpriteDraw(lowerArmTex, leftElbowPos - Main.screenPosition, null, Color.White, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(lowerArmTex, rightElbowPos - Main.screenPosition, null, Color.White, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally);
+            draws.Add(new StoredDraw(lowerArmTex, leftElbowPos, null, Color.White, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(lowerArmTex, rightElbowPos, null, Color.White, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally));
 
-            Main.EntitySpriteDraw(emptyEyeTex, leftHandPos + new Vector2(0, -2) - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            draws.Add(new StoredDraw(emptyEyeTex, leftHandPos + new Vector2(0, -2), emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             if (leftHandAlive)
             {
-                Main.EntitySpriteDraw(sideEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-                Main.EntitySpriteDraw(innerEyeTex, leftHandPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                draws.Add(new StoredDraw(sideEyeTex, leftHandPos, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(innerEyeTex, leftHandPos + leftEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             }
-            Main.EntitySpriteDraw(handTex, leftHandPos + new Vector2(2, -49) - Main.screenPosition, leftHandFrame, Color.White, 0, leftHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            draws.Add(new StoredDraw(handTex, leftHandPos + new Vector2(2, -49), leftHandFrame, Color.White, 0, leftHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
-            Main.EntitySpriteDraw(emptyEyeTex, rightHandPos + new Vector2(0, -2) - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
+            draws.Add(new StoredDraw(emptyEyeTex, rightHandPos + new Vector2(0, -2), emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
             if (rightHandAlive)
             {
-                Main.EntitySpriteDraw(sideEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
-                Main.EntitySpriteDraw(innerEyeTex, rightHandPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                draws.Add(new StoredDraw(sideEyeTex, rightHandPos, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
+                draws.Add(new StoredDraw(innerEyeTex, rightHandPos + rightEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             }
-            Main.EntitySpriteDraw(handTex, rightHandPos + new Vector2(-2, -49) - Main.screenPosition, rightHandFrame, Color.White, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally);
+            draws.Add(new StoredDraw(handTex, rightHandPos + new Vector2(-2, -49), rightHandFrame, Color.White, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
 
-            Main.EntitySpriteDraw(headTex, headPos + new Vector2(0, 4) - Main.screenPosition, null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(mouthTex, headPos + new Vector2(1, 212) - Main.screenPosition, mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            
-            Main.EntitySpriteDraw(emptyEyeTex, headPos - Main.screenPosition, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            draws.Add(new StoredDraw(headTex, headPos + new Vector2(0, 4), null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(mouthTex, headPos + new Vector2(1, 212), mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+
+            draws.Add(new StoredDraw(emptyEyeTex, headPos, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             if (headAlive)
             {
-                Main.EntitySpriteDraw(topEyeTex, headPos - Main.screenPosition, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-                Main.EntitySpriteDraw(innerEyeTex, headPos - Main.screenPosition, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-                Main.EntitySpriteDraw(topEyeOverlayTex, headPos + new Vector2(0, 4) - Main.screenPosition, headEyeFrame, Color.White, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+                draws.Add(new StoredDraw(topEyeTex, headPos, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(innerEyeTex, headPos + headEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(topEyeOverlayTex, headPos + new Vector2(0, 4), headEyeFrame, Color.White, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            }
+
+            Vector2 drawOff = -Main.screenPosition;
+
+            if (modNPC.ignitedStacks.Count > 0 || (leftHandAlive && Main.npc[leftHandWho].ModNPC().ignitedStacks.Count > 0) || (rightHandAlive && Main.npc[rightHandWho].ModNPC().ignitedStacks.Count > 0) || (headAlive && Main.npc[headWho].ModNPC().ignitedStacks.Count > 0))
+            {
+                StartAlphaBlendSpritebatch();
+
+                Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
+                Vector3 colorHSL = Main.rgbToHsl(color);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
+                for (int i = 0; i < draws.Count; i++)
+                {
+                    var draw = draws[i];
+                    if (draw.texture.Width < 100) // every small texture here is covered up by a bigger texture. no point in wasting time drawing ignite textures for things that would have no effect
+                        continue;
+                    for (int j = 0; j < 8; j++)
+                    {
+                        draw.Draw(drawOff + Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
+                    }
+                }
+
+                StartVanillaSpritebatch();
+            }
+
+            for (int i = 0; i < draws.Count; i++)
+            {
+                draws[i].Draw(drawOff);
             }
             return false;
         }

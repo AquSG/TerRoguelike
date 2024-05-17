@@ -155,6 +155,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/MoonLordHead",
                 "TerRoguelike/NPCs/Enemy/Boss/MoonLordHand",
                 "TerRoguelike/NPCs/Enemy/Boss/MoonLordBodyHalf",
+                "TerRoguelike/NPCs/Enemy/Boss/TrueEyeOfCthulhu",
             };
             foreach (string path in pathList)
             {
