@@ -26,16 +26,15 @@ namespace TerRoguelike.UI
     public static class EnemyHealthbarUI
     {
         //"ripper bars" lifted from the Calamity Mod and largely gutted to only the things needed for drawing the barrier bar
-        private static Texture2D pixelTex, glowTex;
+        private static Texture2D pixelTex;
         internal static void Load()
         {
             pixelTex = TexDict["Square"];
-            glowTex = TexDict["CircularGlow"];
         }
 
         internal static void Unload()
         {
-            pixelTex = glowTex = null;
+            pixelTex = null;
         }
 
         public static void Draw(SpriteBatch spriteBatch)
@@ -58,6 +57,8 @@ namespace TerRoguelike.UI
             Color underlayColor = new Color(1f, 1f, 1f);
             Vector2 underlayBarInflate = new Vector2(60, 4);
 
+            //Spritebatch is reset for each bar because they all have differnt color and fading values and that's how I set the shader up
+            //Very back black bar
             Main.spriteBatch.End();
             Effect fadeEffect = Filters.Scene["TerRoguelike:SideFade"].GetShader().Shader;
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
@@ -70,6 +71,7 @@ namespace TerRoguelike.UI
 
             Main.EntitySpriteDraw(pixelTex, (barDrawStart - underlayBarInflate + Vector2.UnitX * -10).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, (barDimensions + underlayBarInflate * 2 + Vector2.UnitX * 20) * pixlelScale, SpriteEffects.None);
             
+            //Lighter bar drawn on black bar, a bit smaller to give the illusion of a grey fill and black edge
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
 
@@ -79,6 +81,7 @@ namespace TerRoguelike.UI
             fadeEffect.Parameters["fadeCutoff"].SetValue(0.1f);
             Main.EntitySpriteDraw(pixelTex, (barDrawStart - underlayBarInflate + Vector2.UnitY * 3).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, (barDimensions + underlayBarInflate * 2 - Vector2.UnitY * 6) * pixlelScale, SpriteEffects.None);
 
+            //The bar that is visible as you damage an enemy, before smoothing back down to the real hp value
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
 
@@ -91,6 +94,7 @@ namespace TerRoguelike.UI
             Vector2 extraScale = ExtraBarScale * pixlelScale * opacityToScaleMultiplier;
             Main.EntitySpriteDraw(pixelTex, (barDrawStart + Vector2.UnitY * extraScale.Y / pixlelScale.X).ToPoint().ToVector2(), null, Color.White, -MathHelper.PiOver2, Vector2.Zero, new Vector2(extraScale.Y, extraScale.X), SpriteEffects.None);
 
+            //The hp value bar
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
 
