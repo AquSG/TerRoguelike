@@ -27,6 +27,32 @@ namespace TerRoguelike.Managers
 
 
         //The ultimate worldgen function
+        // HOW IT WORKS as of May 18, 2024:
+
+        // 1.  GenerateRoomStructure Called
+        // 2.  Randomly select potential floor 1
+        // 3.  Place start room from that floor. Every time a room is placed, it is removed from the RoomGenPool list so it cannot be picked again.
+        // 4.  PlaceRoom gets called for the first time. this is where the cycle of placing things until the process is done begins.
+        // 5.  Now in PlaceRoom. The room count interger is subtracted each run of PlaceRoom
+        // 6.  CheckDirAvailability is called. This uses the current floor key (string) and tries finding if a potential room to place actually exists in the directions for that floor
+        // 7.  Potential direction list is initialized. each bool that was true from CheckDirAvailability is now also checked if the previously placed room can even exit in that direction, or if going up or down immediately would result in overlap. previous room direction list is used for the latter.
+        // 8.  The potential directions list is filled. 0 is right, 1 is down, 2 is up, but the respective directions are only in this list if they were added to it in the previous step.
+        // 9.  Pick a random direction from this list. if somehow no directions are available. panic place down the boss room.
+        // 10. Calls PlaceRight, PlaceDown, or PlaceUp depending on which direction was chosen. These functions randomly pick a room that enters to that direction for the current floor, and actually places them down.
+        // 11. The room that is returned from the Place call is fed back into PlaceRoom, starting a loop again.
+        // 12. Room count is subtracted each run of this function. so once it reaches 0, it's time to place the boss room.
+        // 13. A boss room is randomly picked from the floor's boss room pool.
+        // 14. The selected room is checked for if it has a transition room that is always placed before the boss room
+        // 15. if there is a transition room, place the transition room in a way similar to PlaceRight.
+        // 16. Boss room about to be placed. checks the previous room's transition direction, which has the behaviour of Right by default. If the previous room was a transition room, it will typically specify a direction that the following boss room will be placed at.
+        // 17. Place boss room.
+        // 18. Try choosing a floor that will be the next one generated. Goes based off of the stage. so, if the current floor stage is 3, it picks a random stage 4 floor.
+        // 19. If NO floor is found, the function returns and the PlaceRoom loop stops.
+        // 20. Generate next floor is called. the start room of the floor is placed. usually around the center of the y axis, but if the floor hell bool is true, it gets sent to hell.
+        // 21. If the floor's ID matches the Lunar floor ID, PlaceFinalFloor is called and the function is returned early, stopping the PlaceRoom loop and focusing entirely on precisely placing the final floor at the end of generation.
+        // 22. Otherwise, PlaceRoom is called again and the cycle begins for the new floor.
+        // 23. At the very end of generation, after all the nested functions are done and all that, the Lunar Sanctuary is placed around where the first room was placed, but far above.
+
         public static void GenerateRoomStructure()
         {
             List<int> stage0Floors = new List<int>()
