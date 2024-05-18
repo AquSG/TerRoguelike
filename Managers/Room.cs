@@ -513,6 +513,16 @@ namespace TerRoguelike.Managers
             var targetRoom = potentialRoom;
             if (TerRoguelikeWorld.escape)
             {
+                if (myRoom >= 2)
+                {
+                    Room jumpstartRoom = RoomSystem.RoomList[myRoom - 2];
+                    if (!jumpstartRoom.initialized)
+                    {
+                        jumpstartRoom.awake = true;
+                        jumpstartRoom.InitializeRoom();
+                    }
+                }
+
                 player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                 modPlayer.currentFloor = nextFloor;
