@@ -83,13 +83,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 180);
-        public static Attack PhantSpin = new Attack(1, 30, 180);
-        public static Attack PhantBolt = new Attack(2, 30, 180);
+        public static Attack PhantSpin = new Attack(1, 30, 300);
+        public static Attack PhantBolt = new Attack(2, 30, 360);
         public static Attack PhantSphere = new Attack(3, 30, 180);
         public static Attack Tentacle = new Attack(4, 30, 180);
         public static Attack Deathray = new Attack(5, 30, 180);
         public static Attack PhantSpawn = new Attack(6, 30, 180);
         public static int phantSpinWindup = 50;
+        public int phantBoltWindup = 30;
+        public int phantBoltFireRate = 8;
+        public int phantBoltFiringDuration = 90;
 
         public override void SetStaticDefaults()
         {
@@ -160,6 +163,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
+            PhantSpin.Duration = 260;
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player player = Main.player[i];
@@ -443,7 +447,144 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == PhantBolt.Id)
             {
-                if (NPC.ai[1] >= PhantBolt.Duration)
+                Vector2 targetPos = target != null ? target.Center : spawnPos + new Vector2(0, -80);
+
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Zombie94 with { Volume = 0.8f }, NPC.Center + new Vector2(0, -100));
+                    float closest = 2000;
+                    if (head != null)
+                        head.direction = Main.rand.NextBool() ? -1 : 1;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        NPC npc = i switch
+                        {
+                            1 => leftHand,
+                            2 => rightHand,
+                            _ => head,
+                        };
+                        if (npc == null || (i == 0 && head.life <= 1))
+                            continue;
+
+                        float distance = npc.Center.Distance(targetPos);
+                        if (distance < closest)
+                        {
+                            closest = distance;
+                            NPC.ai[3] = i;
+                            NPC.direction = npc.direction;
+                        }
+                    }
+                }
+                if (NPC.ai[3] > -1)
+                {
+                    bool comboAttack = NPC.ai[1] >= PhantBolt.Duration / 3 * 2;
+
+                    int time = (int)NPC.ai[1] % (phantBoltWindup + phantBoltFiringDuration);
+                    int[] order = NPC.ai[3] switch
+                    {
+                        1 => [1, 2, 0],
+                        2 => [2, 1, 0],
+                        _ => NPC.direction > 0 ? [0, 2, 1] : [0, 1, 2],
+                    };
+                    bool played = false;
+                    for (int i = 0; i < order.Length; i++)
+                    {
+                        int n = order[i];
+                        NPC npc = n switch
+                        {
+                            1 => leftHand,
+                            2 => rightHand,
+                            _ => head,
+                        };
+                        if (npc == null || (n == 0 && head.life <= 1))
+                            continue;
+
+                        float rot = (targetPos - npc.Center).ToRotation();
+                        Vector2 projSpawnPos = npc.Center + rot.ToRotationVector2() * 25;
+
+                        int myFiringDuration = comboAttack ? phantBoltFiringDuration : phantBoltFiringDuration / 3;
+                        int delay = comboAttack ? 0 : i * myFiringDuration;
+                        int effectiveTime = time - delay;
+                        int firingTime = effectiveTime - phantBoltWindup;
+                        if (effectiveTime >= 0)
+                        {
+                            if (effectiveTime == 0)
+                            {
+                                SoundEngine.PlaySound(SoundID.Item13 with { Volume = comboAttack ? 0.66f : 1f, Pitch = 0.2f, MaxInstances = 3 }, npc.Center);
+                                if (n == 1)
+                                {
+                                    leftHandTargetPos = leftHandAnchor + (leftHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
+                                }
+                                else if (n == 2)
+                                {
+                                    rightHandTargetPos = rightHandAnchor + (rightHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
+                                }
+                            }
+                            if (effectiveTime < phantBoltWindup && PhantBolt.Duration - NPC.ai[1] > 10)
+                            {
+                                if (effectiveTime % 3 == 0)
+                                {
+                                    Vector2 particlePos = projSpawnPos;
+                                    Vector2 addedParticleVel = npc.velocity * 1.2f;
+                                    if (npc.life <= 1)
+                                        particlePos += rot.ToRotationVector2() * 13;
+                                    else
+                                    {
+                                        if (n == 1)
+                                            addedParticleVel = (leftHandTargetPos - leftHandPos) * 0.05f;
+                                        else if (n == 2)
+                                            addedParticleVel = (rightHandTargetPos - rightHandPos) * 0.05f;
+                                    }
+                                    float range = MathHelper.PiOver4 * 1.5f;
+                                    Vector2 offset = (Main.rand.NextFloat(-range, range) + rot).ToRotationVector2() * Main.rand.NextFloat(32);
+                                    ParticleManager.AddParticle(new Ball(
+                                        particlePos + offset, -offset * 0.1f + addedParticleVel,
+                                        20, Color.Lerp(Color.Teal, Color.Cyan, Main.rand.NextFloat(0.25f, 0.75f)), new Vector2(0.25f), 0, 0.96f, 10));
+                                }
+                            }
+                            else if (firingTime % phantBoltFireRate == 0 && firingTime < myFiringDuration)
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rot.ToRotationVector2() * 15, ModContent.ProjectileType<PhantasmalBolt>(), NPC.damage, 0);
+                            }
+                            if (effectiveTime >= phantBoltWindup && firingTime % 12 == 0 && firingTime < myFiringDuration)
+                            {
+                                if (!comboAttack || !played)
+                                {
+                                    played = true;
+                                    Vector2 soundPos = npc.Center;
+                                    if (comboAttack)
+                                    {
+                                        int addCount = 0;
+                                        soundPos = Vector2.Zero;
+                                        if (head != null && head.life > 1)
+                                        {
+                                            soundPos += head.position;
+                                            addCount++;
+                                        }
+                                        if (leftHand != null)
+                                        {
+                                            soundPos += leftHand.position;
+                                            addCount++;
+                                        }
+                                        if (rightHand != null)
+                                        {
+                                            soundPos += rightHand.position;
+                                            addCount++;
+                                        }
+                                        if (addCount == 0)
+                                            soundPos = npc.Center;
+                                        else
+                                            soundPos /= addCount;
+                                        soundPos += (Main.LocalPlayer.Center - soundPos) * 0.5f;
+                                    }
+                                    SoundEngine.PlaySound(SoundID.Item125 with { Volume = comboAttack ? 0.94f : 0.8f, MaxInstances = 6, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, soundPos);
+                                }
+                                    
+                            }
+                        }
+                    }
+                }
+                if (NPC.ai[1] >= PhantBolt.Duration || NPC.ai[3] == -1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -492,7 +633,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
+            //List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
+            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -513,7 +655,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            chosenAttack = PhantSpin.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
@@ -716,28 +857,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;
             bool headAlive = headWho >= 0 && Main.npc[headWho].life > 1;
 
-            int showcaseFrame = (int)(NPC.frameCounter * 0.65d) % 20;
-            if (showcaseFrame > 6)
-                showcaseFrame = 0;
+            int headForceFrame = -1;
+            int leftHandForceFrame = -1;
+            int rightHandForceFrame = -1;
+
+            int sharedFrame = 0;
+            if (NPC.ai[0] == None.Id)
+            {
+                sharedFrame = (int)(NPC.ai[1] * 0.125f);
+            }
+            else if (NPC.ai[0] == PhantBolt.Id && NPC.ai[1] >= (phantBoltWindup + phantBoltFiringDuration) * 2)
+            {
+                sharedFrame = (int)((NPC.ai[1] % (phantBoltWindup + phantBoltFiringDuration)) * 0.2f);
+            }
+            if (sharedFrame > 6)
+                sharedFrame = 0;
             else
             {
-                switch (showcaseFrame)
+                switch (sharedFrame)
                 {
                     default:
                     case 0:
                     case 6:
-                        showcaseFrame = 0;
+                        sharedFrame = 0;
                         break;
                     case 1:
                     case 5:
-                        showcaseFrame = 1;
+                        sharedFrame = 1;
                         break;
                     case 2:
                     case 4:
-                        showcaseFrame = 2;
+                        sharedFrame = 2;
                         break;
                     case 3:
-                        showcaseFrame = 3;
+                        sharedFrame = 3;
                         break;
                 }
             }
@@ -751,14 +904,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             mouthFrame = new Rectangle(0, mouthCurrentFrame * frameHeight, mouthTex.Width, frameHeight - 2);
 
             frameHeight = topEyeOverlayTex.Height / 4;
-            headEyeCurrentFrame = headOverlayFrameCounter == 0 ? showcaseFrame : Math.Min(headOverlayFrameCounter / 8 + 1, 3);
+            headEyeCurrentFrame = headOverlayFrameCounter == 0 ? (headForceFrame >= 0 ? headForceFrame : sharedFrame) : Math.Min(headOverlayFrameCounter / 8 + 1, 3);
             headEyeFrame = new Rectangle(0, headEyeCurrentFrame * frameHeight, topEyeOverlayTex.Width, frameHeight - 2);
 
             frameHeight = handTex.Height / 4;
-            leftHandCurrentFrame = showcaseFrame;
+            leftHandCurrentFrame = leftHandForceFrame >= 0 ? leftHandForceFrame : sharedFrame;
             leftHandFrame = new Rectangle(0, leftHandCurrentFrame * frameHeight, handTex.Width, frameHeight - 2);
 
-            rightHandCurrentFrame = showcaseFrame;
+            rightHandCurrentFrame = rightHandForceFrame >= 0 ? rightHandForceFrame : sharedFrame;
             rightHandFrame = new Rectangle(0, rightHandCurrentFrame * frameHeight, handTex.Width, frameHeight - 2);
 
             frameHeight = emptyEyeTex.Height / 4;

@@ -14,11 +14,16 @@ using Terraria.GameContent;
 using Terraria.UI.Chat;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.Localization;
+using Terraria.Map;
 
 namespace TerRoguelike.UI
 {
     public static class EscapeUI
     {
+        public static float EscapeUiYOff
+        {
+            get { return MathHelper.Clamp(MathHelper.Lerp(-60, 0, (TerRoguelikeWorld.escapeTimeSet - TerRoguelikeWorld.escapeTime) / 270f), -5000, 0); }
+        }
         public static void Draw(SpriteBatch spriteBatch)
         {
             if (TerRoguelikeWorld.escape)
@@ -31,7 +36,7 @@ namespace TerRoguelike.UI
                 string secondsString = seconds.ToString().Length == 1 ? "0" + seconds.ToString() : seconds.ToString();
                 string milisecondsString = miliseconds.ToString().Length == 1 ? "00" + miliseconds.ToString() : (miliseconds.ToString().Length == 2 ? "0" + miliseconds.ToString() : miliseconds.ToString());
                 string timer = minutes.ToString() + ":" + secondsString + "." + milisecondsString;
-                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, timer, new Vector2((Main.screenWidth / 2) - 80, MathHelper.Clamp(MathHelper.Lerp(-60, 0, (maxTime - time) / 270f), -5000, 0)), Color.White, 0f, Vector2.Zero, new Vector2(1f));
+                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, timer, new Vector2((Main.screenWidth / 2) - 80, EscapeUiYOff), Color.White, 0f, Vector2.Zero, new Vector2(1f));
             }
         }
     }

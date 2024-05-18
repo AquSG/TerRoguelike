@@ -49,6 +49,12 @@ namespace TerRoguelike.UI
             bool barOverlappingHotbar = (barCenter.X - barDimensions.X * 0.5f * Main.UIScale) < 428 / Main.UIScale + 20;
             if (barOverlappingHotbar)
                 barCenter.Y += 47 * Main.UIScale * 0.5f + 12;
+            if (TerRoguelikeWorld.escape)
+            {
+                float escapeTimeHeight = 50 + EscapeUI.EscapeUiYOff + (50 / Main.UIScale);
+                if (barCenter.Y < escapeTimeHeight)
+                    barCenter.Y = escapeTimeHeight;
+            }
             Vector2 barDrawStart = barCenter + barDimensions * -0.5f;
 
             Vector2 MainBarScale = barDimensions * new Vector2(healthBar.MainBar, 1);
