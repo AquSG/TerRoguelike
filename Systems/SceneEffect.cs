@@ -37,7 +37,7 @@ namespace TerRoguelike.Systems
         public override void SpecialVisuals(Player player, bool isActive)
         {
             bool moonLordEffectActive = player.ModPlayer().moonLordVisualEffect;
-            player.ManageSpecialBiomeVisuals("MoonLord", moonLordEffectActive);
+            player.ManageSpecialBiomeVisuals("TerRoguelike:MoonLordClone", moonLordEffectActive);
             if (moonLordEffectActive)
                 SkyManager.Instance.Activate("TerRoguelike:MoonLordSkyClone");
             else

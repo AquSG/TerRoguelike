@@ -2187,15 +2187,15 @@ namespace TerRoguelike.TerPlayer
                 List<DrawData> existingDrawData = drawInfo.DrawDataCache;
                 for (int i = 0; i < 4; i++)
                 {
-                    float scale = 0.8f + 0.08f * ((float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi));
+                    float offsetScale = ((float)Math.Cos(Main.GlobalTimeWrappedHourly % 60f * MathHelper.TwoPi)) * 0.15f + 0.75f;
                     float opacity = (0.13f + (0.23f * (0.5f + (modPlayer.barrierHealth / drawPlayer.statLifeMax2)))) * 0.3f;
                     List<DrawData> afterimages = new List<DrawData>();
                     for (int j = 0; j < existingDrawData.Count; j++)
                     {
                         var drawData = existingDrawData[j];
-                        drawData.position = existingDrawData[j].position + (Vector2.UnitY * 6f).RotatedBy(MathHelper.PiOver2 * i);
+                        drawData.position = existingDrawData[j].position + (Vector2.UnitY * 6f * offsetScale).RotatedBy(MathHelper.PiOver2 * i);
                         drawData.color = Color.Yellow * opacity;
-                        drawData.scale = new Vector2(scale);
+                        drawData.scale = new Vector2(1f);
                         afterimages.Add(drawData);
                         drawData.shader = 1;
                     }

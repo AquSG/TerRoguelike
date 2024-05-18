@@ -8,6 +8,7 @@ using Terraria;
 using TerRoguelike.Shaders;
 using Terraria.Graphics.Effects;
 using TerRoguelike.Skies;
+using Terraria.GameContent.Shaders;
 
 namespace TerRoguelike
 {
@@ -48,6 +49,7 @@ namespace TerRoguelike
         public void LoadClient()
         {
             TerRoguelikeShaders.LoadShaders();
+            Filters.Scene["TerRoguelike:MoonLordClone"] = new Filter(new MoonLordScreenShaderData("FilterMoonLord", true), EffectPriority.VeryHigh);
             SkyManager.Instance["TerRoguelike:MoonLordSkyClone"] = new MoonLordSkyClone();
         }
         public override void PostSetupContent()
