@@ -43,8 +43,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D trueEyeTex;
         public Texture2D innerEyeTex;
         public int currentFrame;
-        Vector2 trueEyeVector;
-        bool goreProc = false;
+        public Vector2 trueEyeVector;
+        public bool goreProc = false;
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
@@ -148,38 +148,75 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else
                 target = null;
 
+            float rotCap = MathHelper.PiOver2 * 0.66f;
+            bool phantasmalSpin = parent.ai[0] == PhantSpin.Id;
+
             Vector2 targetPos = target != null ? target.Center : spawnPos;
 
-            Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -230) + trueEyeVector * -7;
-            float wantedRadius = 90;
-            if (NPC.Center.Distance(wantedPos) <= wantedRadius)
+            if (phantasmalSpin)
             {
-                NPC.velocity *= Main.rand.NextFloat(0.96f, 0.97f);
-                float velocityLength = NPC.velocity.Length();
-                if (velocityLength > 1)
+                if (parent.ai[1] < phantSpinWindup)
                 {
-                    NPC.velocity = (NPC.velocity.ToRotation().AngleTowards((wantedPos - NPC.Center).ToRotation(), 0.02f)).ToRotationVector2() * velocityLength;
+                    NPC.velocity *= 0.95f;
+                    NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
+                }
+                else
+                {
+                    float spinSpeed = 10;
+                    bool initiateSpin = parent.ai[1] == phantSpinWindup || NPC.velocity.Length() < 1f; // starts the spin either in sync with moon lord or if an eye pops out mid attack, which is the 1 case where this guy shouldn't have high velocity mid-attack
+                    if (initiateSpin)
+                    {
+                        NPC.velocity = new Vector2(0, -spinSpeed);
+                    }
+                    if (parent.ai[1] == phantSpinWindup) // only play the sound if it started naturally though because a similar sound plays when the eye pops out
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.3f, MaxInstances = 2 }, NPC.Center + new Vector2(80 * NPC.direction, 0));
+                    }
+                    NPC.velocity = NPC.velocity.RotatedBy(0.013f * NPC.direction * spinSpeed);
+                    NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
                 }
             }
             else
             {
-                float maxSpeed = 12;
-                NPC.velocity *= 0.98f;
-                NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.25f * Main.rand.NextFloat(0.9f, 1f);
-                if (NPC.velocity.Length() > maxSpeed)
-                    NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
+                Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -230) + trueEyeVector * -7;
+                float wantedRadius = 90;
+                if (NPC.Center.Distance(wantedPos) <= wantedRadius)
+                {
+                    NPC.velocity *= Main.rand.NextFloat(0.96f, 0.97f);
+                    float velocityLength = NPC.velocity.Length();
+                    if (velocityLength > 1)
+                    {
+                        NPC.velocity = (NPC.velocity.ToRotation().AngleTowards((wantedPos - NPC.Center).ToRotation(), 0.02f)).ToRotationVector2() * velocityLength;
+                    }
+                }
+                else
+                {
+                    float maxSpeed = 12;
+                    NPC.velocity *= 0.98f;
+                    NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.25f * Main.rand.NextFloat(0.9f, 1f);
+                    if (NPC.velocity.Length() > maxSpeed)
+                        NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * maxSpeed;
+                }
+                if (NPC.rotation > rotCap)
+                {
+                    NPC.rotation = NPC.rotation.AngleTowards(0, 0.1f);
+                }
+                else
+                    NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
             }
-            float rotCap = MathHelper.PiOver2 * 0.66f;
-            NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
+
+            float rate = 0.2f;
+            if (phantasmalSpin)
+                rate = 0.05f;
             InnerEyePositionUpdate(ref trueEyeVector, NPC.Center);
 
             void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
             {
-                bool eyeCenter = target == null;
+                bool eyeCenter = phantasmalSpin || target == null;
 
                 if (eyeCenter)
                 {
-                    eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, 0.2f);
+                    eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, rate);
                 }
                 else
                 {
@@ -189,7 +226,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 targetVect = targetPos - basePosition;
                     if (targetVect.Length() > maxEyeOffset)
                         targetVect = targetVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
-                    eyeVector = Vector2.Lerp(eyeVector, targetVect, 0.2f);
+                    eyeVector = Vector2.Lerp(eyeVector, targetVect, rate);
                 }
             }
         }
@@ -243,6 +280,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC parent = Main.npc[(int)NPC.ai[2]];
                         SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 1f }, parent.Center + new Vector2(0, -300));
                         SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f }, parent.Center + new Vector2(0, -300));
+                        SoundEngine.PlaySound(SoundID.NPCDeath62 with { Volume = 0.8f }, NPC.Center);
                         int[] goreIds = [GoreID.MoonLordHeart1, GoreID.MoonLordHeart2, GoreID.MoonLordHeart3, GoreID.MoonLordHeart4];
                         for (int i = 0; i < 8; i++)
                         {
