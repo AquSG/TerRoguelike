@@ -28,8 +28,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
-using System.Diagnostics;
-using System.CodeDom;
+using System.Collections;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -58,13 +57,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Rectangle leftHandFrame;
         public Rectangle rightHandFrame;
         public Rectangle emptyEyeFrame;
-        int headOverlayFrameCounter;
-        Vector2 headPos;
-        Vector2 leftHandPos;
-        Vector2 rightHandPos;
-        Vector2 headEyeVector;
-        Vector2 leftEyeVector;
-        Vector2 rightEyeVector;
+        public int headOverlayFrameCounter;
+        public Vector2 headPos;
+        public Vector2 leftHandPos;
+        public Vector2 rightHandPos;
+        public Vector2 headEyeVector;
+        public Vector2 leftEyeVector;
+        public Vector2 rightEyeVector;
+        public Vector2 leftHandAnchor;
+        public Vector2 leftHandTargetPos;
+        public float leftHandMoveInterpolant;
+        public Vector2 rightHandAnchor;
+        public Vector2 rightHandTargetPos;
+        public float rightHandMoveInterpolant;
+        public float maxHandAnchorDistance = 480;
+
 
         public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex;
         public int leftHandWho = -1; // yes, technically moon lord's "Left" is not the same as the left for the viewer, and vice versa for right hand. I do not care. internally it will be based on viewer perspective.
@@ -82,6 +89,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack Tentacle = new Attack(4, 30, 180);
         public static Attack Deathray = new Attack(5, 30, 180);
         public static Attack PhantSpawn = new Attack(6, 30, 180);
+        public static int phantSpinWindup = 50;
 
         public override void SetStaticDefaults()
         {
@@ -138,14 +146,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (i == -1)
                 {
                     leftHandWho = whoAmI;
-                    leftHandPos = handSpawnPos;
+                    leftHandPos = leftHandAnchor = leftHandTargetPos = handSpawnPos;
                 }
                 else
                 {
                     rightHandWho = whoAmI;
-                    rightHandPos = handSpawnPos;
+                    rightHandPos = rightHandAnchor = rightHandTargetPos = handSpawnPos;
                 }
-                    
             }
             Vector2 headSpawnPos = new Vector2(0, -395) + NPC.Center;
             headWho = NPC.NewNPC(NPC.GetSource_FromThis(), (int)headSpawnPos.X, (int)headSpawnPos.Y, headType);
@@ -165,9 +172,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 modPlayer.moonLordVisualEffect = true;
             }
 
-            leftHandPos = NPC.Center + new Vector2(-464, -60);
-            rightHandPos = NPC.Center + new Vector2(464, -60);
-            //rightHandPos = Main.MouseWorld;
+
+            leftHandPos = Vector2.Lerp(leftHandPos, leftHandTargetPos, leftHandMoveInterpolant);
+            if (leftHandPos.Distance(leftHandAnchor) > maxHandAnchorDistance)
+                leftHandPos = leftHandAnchor + (leftHandPos - leftHandAnchor).SafeNormalize(Vector2.UnitY) * maxHandAnchorDistance;
+
+            rightHandPos = Vector2.Lerp(rightHandPos, rightHandTargetPos, rightHandMoveInterpolant);
+            if (rightHandPos.Distance(rightHandAnchor) > maxHandAnchorDistance)
+                rightHandPos = rightHandAnchor + (rightHandPos - rightHandAnchor).SafeNormalize(Vector2.UnitY) * maxHandAnchorDistance;
+
             headPos = NPC.Center + new Vector2(0, -395); // do NOT touch this one
 
             NPC leftHand = leftHandWho >= 0 ? Main.npc[leftHandWho] : null;
@@ -179,13 +192,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             canBeHit = false;
             bool enableHitBox = true;
 
+            float rate = 0.15f;
+            bool eyeCenter = NPC.ai[0] == PhantSpin.Id;
+            if (eyeCenter)
+                rate = 0.075f;
             if (leftHand != null)
             {
-                if (leftHand.type != handType)
-                {
-                    leftHandWho = -1;
-                }
-                else if (leftHand.life > 1)
+                if (leftHand.life > 1)
                 {
                     enableHitBox = false;
                     leftHand.Center = leftHandPos;
@@ -194,11 +207,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (rightHand != null)
             {
-                if (rightHand.type != handType)
-                {
-                    rightHandWho = -1;
-                }
-                else if(rightHand.life > 1)
+                if(rightHand.life > 1)
                 {
                     enableHitBox = false;
                     rightHand.Center = rightHandPos;
@@ -207,11 +216,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (head != null)
             {
-                if (head.type != headType)
-                {
-                    headWho = -1;
-                }
-                else if (head.life > 1)
+                if (head.life > 1)
                 {
                     enableHitBox = false;
                     head.Center = headPos;
@@ -244,11 +249,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
             {
-                bool eyeCenter = target == null;
-
                 if (eyeCenter)
                 {
-                    eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, 0.2f);
+                    eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, rate);
                 }
                 else
                 {
@@ -258,12 +261,42 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 targetVect = targetPos - basePosition;
                     if (targetVect.Length() > maxEyeOffset)
                         targetVect = targetVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
-                    eyeVector = Vector2.Lerp(eyeVector, targetVect, 0.2f);
+                    eyeVector = Vector2.Lerp(eyeVector, targetVect, rate);
                 }
             }
         }
         public override void AI()
         {
+            NPC leftHand = leftHandWho >= 0 ? Main.npc[leftHandWho] : null;
+            NPC rightHand = rightHandWho >= 0 ? Main.npc[rightHandWho] : null;
+            NPC head = headWho >= 0 ? Main.npc[headWho] : null;
+
+            if (leftHand != null)
+            {
+                if (leftHand.type != handType)
+                {
+                    leftHandWho = -1;
+                    leftHand = null;
+                }
+            }
+            if (rightHand != null)
+            {
+                if (rightHand.type != handType)
+                {
+                    rightHandWho = -1;
+                    rightHand = null;
+                }
+            }
+            if (head != null)
+            {
+                if (head.type != headType)
+                {
+                    headWho = -1;
+                    head = null;
+                }
+            }
+
+            leftHandMoveInterpolant = rightHandMoveInterpolant = 0.05f; //default move interpolant
             NPC.frameCounter += 0.2d;
             if (deadTime > 0)
             {
@@ -307,6 +340,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
 
+            NPC leftHand = leftHandWho >= 0 ? Main.npc[leftHandWho] : null;
+            NPC rightHand = rightHandWho >= 0 ? Main.npc[rightHandWho] : null;
+            NPC head = headWho >= 0 ? Main.npc[headWho] : null;
+
             if (NPC.ai[0] == None.Id)
             {
                 if (NPC.ai[1] >= None.Duration)
@@ -315,12 +352,88 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-
+                    leftHandTargetPos = leftHandAnchor;
+                    rightHandTargetPos = rightHandAnchor;
                 }
             }
 
             if (NPC.ai[0] == PhantSpin.Id)
-            {                
+            {
+                int start = head.life > 1 ? 0 : 1;
+
+                if (NPC.ai[1] < phantSpinWindup)
+                {
+                    bool beginning = NPC.ai[1] == 0;
+                    if (beginning)
+                    {
+                        leftHandTargetPos = leftHandAnchor + new Vector2(-32, 0);
+                        rightHandTargetPos = rightHandAnchor + new Vector2(32, 0);
+                        SoundEngine.PlaySound(SoundID.Zombie93 with { Volume = 0.9f }, NPC.Center + new Vector2(0, -100));
+                        if (head != null)
+                        {
+                            head.direction = Main.rand.NextBool() ? -1 : 1;
+                        }
+                    }
+                    if (NPC.ai[1] % 2 == 0)
+                    {
+                        for (int i = start; i < 3; i++)
+                        {
+                            NPC npc = i switch
+                            {
+                                1 => leftHand,
+                                2 => rightHand,
+                                _ => head,
+                            };
+                            if (npc == null)
+                                continue;
+
+                            Vector2 offset = Main.rand.NextVector2Circular(48, 48);
+                            ParticleManager.AddParticle(new Ball(
+                                npc.Center + offset, -offset * 0.1f + npc.velocity,
+                                20, Color.Lerp(Color.Teal, Color.Cyan, 0.5f), new Vector2(0.25f), 0, 0.96f, 10));
+                        }
+                    }
+                }
+                else
+                {
+                    if (NPC.ai[1] % 10 == 0)
+                    {
+                        float projSpeed = 8;
+                        for (int i = start; i < 3; i++)
+                        {
+                            NPC npc = i switch
+                            {
+                                1 => leftHand,
+                                2 => rightHand,
+                                _ => head,
+                            };
+                            if (npc == null)
+                                continue;
+
+                            if (npc.life > 1)
+                            {
+                                float shootBaseRot = NPC.ai[1] * 0.015f * npc.direction + i * 0.4f;
+                                for (int j = 0; j < 4; j++)
+                                {
+                                    float shootRot = shootBaseRot + j * MathHelper.PiOver2;
+                                    Vector2 shootRotVector = shootRot.ToRotationVector2();
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), npc.Center + shootRotVector * npc.width * 0.3f, shootRotVector * projSpeed, ModContent.ProjectileType<PhantasmalEye>(), NPC.damage, 0);
+                                }
+                            }
+                            else
+                            {
+                                float shootBaseRot = npc.rotation;
+                                for (int j = 0; j < 2; j++)
+                                {
+                                    float shootRot = shootBaseRot + j * MathHelper.Pi;
+                                    Vector2 shootRotVector = shootRot.ToRotationVector2();
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), npc.Center + shootRotVector * npc.width * 0.3f, shootRotVector * projSpeed, ModContent.ProjectileType<PhantasmalEye>(), NPC.damage, 0);
+                                }
+                            }
+                            SoundEngine.PlaySound(SoundID.Item12 with { Volume = 0.4f, MaxInstances = 24 }, npc.Center);
+                        }
+                    }
+                }
                 if (NPC.ai[1] >= PhantSpin.Duration)
                 {
                     NPC.ai[0] = None.Id;

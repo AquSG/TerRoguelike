@@ -40,7 +40,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool canBeHit = true;
         public override int modNPCID => ModContent.NPCType<MoonLordHead>();
         public override string Texture => "TerRoguelike/NPCs/Enemy/Boss/MoonLordSideEye";
-        bool goreProc = false;
+        public bool goreProc = false;
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
@@ -167,6 +167,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         NPC parent = Main.npc[(int)NPC.ai[2]];
                         SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f }, parent.Center + new Vector2(0, -300));
+                        SoundEngine.PlaySound(SoundID.NPCDeath62 with { Volume = 0.8f }, NPC.Center);
                         goreProc = true;
                     }
                 }
