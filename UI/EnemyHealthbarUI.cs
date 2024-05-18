@@ -80,10 +80,16 @@ namespace TerRoguelike.UI
             Main.EntitySpriteDraw(pixelTex, (barDrawStart - underlayBarInflate + Vector2.UnitY * 3).ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, (barDimensions + underlayBarInflate * 2 - Vector2.UnitY * 6) * pixlelScale, SpriteEffects.None);
 
             Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);
 
-            Color extraBarColor = new Color(0.8f, 0.6f, 0.5f) * 1;
-            Main.EntitySpriteDraw(pixelTex, barDrawStart.ToPoint().ToVector2(), null, extraBarColor * (float)Math.Pow(healthBar.Opacity, 2), 0, Vector2.Zero, ExtraBarScale * pixlelScale * opacityToScaleMultiplier, SpriteEffects.None);
+            Color extraBarColor = new Color(0.9f, 0.8f, 0.75f);
+            float extraBarOpacity = (float)Math.Pow(healthBar.Opacity, 2);
+            tint = extraBarColor * extraBarOpacity;
+            fadeEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            fadeEffect.Parameters["fadeTint"].SetValue((Color.Lerp(extraBarColor, Color.DarkRed, 0.4f) * extraBarOpacity).ToVector4());
+            fadeEffect.Parameters["fadeCutoff"].SetValue(0.24f);
+            Vector2 extraScale = ExtraBarScale * pixlelScale * opacityToScaleMultiplier;
+            Main.EntitySpriteDraw(pixelTex, (barDrawStart + Vector2.UnitY * extraScale.Y / pixlelScale.X).ToPoint().ToVector2(), null, Color.White, -MathHelper.PiOver2, Vector2.Zero, new Vector2(extraScale.Y, extraScale.X), SpriteEffects.None);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.UIScaleMatrix);

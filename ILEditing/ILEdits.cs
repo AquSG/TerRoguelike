@@ -54,12 +54,17 @@ namespace TerRoguelike.ILEditing
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
-            On_MoonLordScreenShaderData.UpdateMoonLordIndex += TerRoguelikeMoonLordIndexInjectionIntoShader;
+            //On_MoonLordScreenShaderData.UpdateMoonLordIndex += TerRoguelikeMoonLordIndexInjectionIntoShader;
         }
+
+		/* 
+		This was from a time where I wanted the moon lord shader to appear on the npc itself. 
+		I have come to realise that it's not very cool when you are somewhat far away from moon lord. 
+		it has been quarantined for now. Instead it is displayed on the player like the monolith, but with a high piority.
 
         private void TerRoguelikeMoonLordIndexInjectionIntoShader(On_MoonLordScreenShaderData.orig_UpdateMoonLordIndex orig, MoonLordScreenShaderData self)
         {
-			Player player = Main.LocalPlayer;
+            Player player = Main.LocalPlayer;
 			if (player == null)
 			{
                 orig.Invoke(self);
@@ -94,6 +99,7 @@ namespace TerRoguelike.ILEditing
 
 			self.GetType().GetField("_moonLordIndex", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, moonLordIndex);
         }
+		*/
 
         private void PostDrawBasicallyEverything(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
         {
