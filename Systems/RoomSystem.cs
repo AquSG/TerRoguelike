@@ -148,7 +148,7 @@ namespace TerRoguelike.Systems
                             InitializeLunarFloor();
                         }
 
-                        if (escape)
+                        if (escape && !room.IsStartRoom)
                         {
                             if (loopCount >= 2)
                             {
