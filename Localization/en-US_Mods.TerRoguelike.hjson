@@ -98,6 +98,7 @@ Projectiles: {
 	RollingBoulder.DisplayName: Rolling Boulder
 	PhantasmalEye.DisplayName: Phantasmal Eye
 	PhantasmalBolt.DisplayName: Phantasmal Bolt
+	PhantasmalSphere.DisplayName: Phantasmal Sphere
 }
 
 Items: {

@@ -82,10 +82,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 180);
-        public static Attack PhantSpin = new Attack(1, 30, 300);
+        public static Attack None = new Attack(0, 0, 130);
+        public static Attack PhantSpin = new Attack(1, 30, 260);
         public static Attack PhantBolt = new Attack(2, 30, 360);
-        public static Attack PhantSphere = new Attack(3, 30, 180);
+        public static Attack PhantSphere = new Attack(3, 30, 179);
         public static Attack Tentacle = new Attack(4, 30, 180);
         public static Attack Deathray = new Attack(5, 30, 180);
         public static Attack PhantSpawn = new Attack(6, 30, 180);
@@ -93,6 +93,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int phantBoltWindup = 30;
         public int phantBoltFireRate = 8;
         public int phantBoltFiringDuration = 90;
+        public int phantSphereFireRate = 20;
 
         public override void SetStaticDefaults()
         {
@@ -163,7 +164,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            PhantSpin.Duration = 260;
             for (int i = 0; i < Main.maxPlayers; i++)
             {
                 Player player = Main.player[i];
@@ -197,7 +197,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             bool enableHitBox = true;
 
             float rate = 0.15f;
-            bool eyeCenter = NPC.ai[0] == PhantSpin.Id;
+            bool eyeCenter = NPC.ai[0] == PhantSpin.Id || NPC.ai[0] == PhantSphere.Id;
             if (eyeCenter)
                 rate = 0.075f;
             if (leftHand != null)
@@ -218,6 +218,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     InnerEyePositionUpdate(ref rightEyeVector, rightHandPos);
                 }
             }
+            if (NPC.ai[0] == PhantSphere.Id)
+                eyeCenter = false;
             if (head != null)
             {
                 if (head.life > 1)
@@ -593,10 +595,42 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == PhantSphere.Id)
             {
+                if (NPC.ai[1] == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Zombie96 with { Volume = 0.8f }, NPC.Center + new Vector2(0, -80));
+                }
+                float completion = NPC.ai[1] / PhantSphere.Duration;
+                if (NPC.ai[1] % phantSphereFireRate == 0 && PhantSphere.Duration - NPC.ai[1] > 30)
+                {
+                    for (int i = 1; i <= 2; i++)
+                    {
+                        NPC npc = i switch
+                        {
+                            2 => rightHand,
+                            _ => leftHand,
+                        };
+                        if (npc == null)
+                            continue;
+
+                        if (i == 1)
+                        {
+                            leftHandTargetPos = leftHandAnchor + new Vector2(-32, -64);
+                            leftHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
+                        }
+                        else
+                        {
+                            rightHandTargetPos = rightHandAnchor + new Vector2(32, -64);
+                            rightHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
+                        }
+
+                        SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 1f, MaxInstances = 10 }, npc.Center);
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), npc.Center, (-Vector2.UnitY * 10).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)), ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, npc.whoAmI);
+                    }
+                }
                 if (NPC.ai[1] >= PhantSphere.Duration)
                 {
                     NPC.ai[0] = None.Id;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = -60;
                     NPC.ai[2] = PhantSphere.Id;
                 }
             }
@@ -634,7 +668,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
-            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt };
+            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -869,6 +903,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == PhantBolt.Id && NPC.ai[1] >= (phantBoltWindup + phantBoltFiringDuration) * 2)
             {
                 sharedFrame = (int)((NPC.ai[1] % (phantBoltWindup + phantBoltFiringDuration)) * 0.2f);
+            }
+            if (NPC.ai[0] == PhantSphere.Id)
+            {
+                leftHandForceFrame = 1;
+                rightHandForceFrame = 1;
             }
             if (sharedFrame > 6)
                 sharedFrame = 0;

@@ -32,16 +32,15 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 8;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 480;
+            Projectile.timeLeft = maxTimeLeft = 480;
             Projectile.penetrate = -1;
             Projectile.ignoreWater = true;
+            Projectile.tileCollide = false;
+            Projectile.MaxUpdates = 2;
         }
         public override void OnSpawn(IEntitySource source)
         {
-            Projectile.MaxUpdates = 2;
             Projectile.velocity /= Projectile.MaxUpdates;
-            maxTimeLeft = Projectile.timeLeft;
-            Projectile.tileCollide = false;
             Projectile.rotation = Projectile.velocity.ToRotation();
             for (int i = 0; i < 8; i++)
             {
