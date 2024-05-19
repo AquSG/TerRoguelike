@@ -150,6 +150,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             float rotCap = MathHelper.PiOver2 * 0.66f;
             bool phantasmalSpin = parent.ai[0] == PhantSpin.Id;
+            bool phantasmalSphere = parent.ai[0] == PhantSphere.Id;
 
             Vector2 targetPos = target != null ? target.Center : spawnPos;
 
@@ -175,6 +176,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.velocity = NPC.velocity.RotatedBy(0.013f * NPC.direction * spinSpeed);
                     NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
                 }
+            }
+            else if (phantasmalSphere)
+            {
+                float quickMoveVel = 0.5f;
+                Vector2 attackStartPos = new Vector2(NPC.localAI[0], NPC.localAI[1]);
+                if (parent.ai[1] == 0 || attackStartPos.X == 0)
+                {
+                    Vector2 randVect = Main.rand.NextVector2CircularEdge(quickMoveVel, quickMoveVel);
+                    randVect.Y = Math.Abs(randVect.Y);
+                    NPC.velocity = randVect;
+                    attackStartPos = NPC.Center;
+                    NPC.localAI[0] = attackStartPos.X;
+                    NPC.localAI[1] = attackStartPos.Y;
+                }
+                else if (parent.ai[1] % 30 < 10)
+                {
+                    if (parent.ai[1] % 30 == 0)
+                    {
+                        NPC.velocity *= 0.35f;
+                        float randRot = Main.rand.NextFloat(-1.2f, 1.2f);
+                        NPC.velocity += ((attackStartPos - NPC.Center).SafeNormalize(Vector2.UnitY) * quickMoveVel * 3).RotatedBy(randRot + Math.Sign(randRot) * 0.2f);
+                    }
+                    else
+                    {
+                        NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * quickMoveVel;
+                    }
+                }
+                NPC.velocity *= 0.97f;
+                if (NPC.rotation > rotCap)
+                {
+                    NPC.rotation = NPC.rotation.AngleTowards(0, 0.1f);
+                }
+                else
+                    NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
             }
             else
             {
@@ -206,13 +241,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             float rate = 0.2f;
-            if (phantasmalSpin)
+            if (phantasmalSpin || phantasmalSphere)
                 rate = 0.05f;
             InnerEyePositionUpdate(ref trueEyeVector, NPC.Center);
 
             void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
             {
-                bool eyeCenter = phantasmalSpin || target == null;
+                bool eyeCenter = phantasmalSpin || phantasmalSphere || target == null;
 
                 if (eyeCenter)
                 {
