@@ -646,6 +646,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[1] == 10)
                     {
                         SoundEngine.PlaySound(SoundID.Zombie98 with { Volume = 0.7f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.2f, Pitch = -0.3f }, NPC.Center + new Vector2(0, -80));
                     }
                     if (NPC.ai[1] > 10 && (NPC.ai[1] < 60 ? NPC.ai[1] % 16 == 0 : NPC.ai[1] % 9 == 0 ))
                     {
@@ -738,7 +739,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            chosenAttack = TentacleCharge.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)

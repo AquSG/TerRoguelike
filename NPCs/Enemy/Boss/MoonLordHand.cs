@@ -45,6 +45,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int currentFrame;
         public Vector2 trueEyeVector;
         public bool goreProc = false;
+        public SlotId trackedSlot;
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
 
@@ -104,7 +105,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            
+            if (SoundEngine.TryGetActiveSound(trackedSlot, out var sound) && sound.IsPlaying)
+            {
+                sound.Position = NPC.Center;
+            }
         }
         public override void AI()
         {
@@ -205,12 +209,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
                 NPC.velocity *= 0.97f;
-                if (NPC.rotation > rotCap)
-                {
-                    NPC.rotation = NPC.rotation.AngleTowards(0, 0.1f);
-                }
-                else
-                    NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
+                NPC.rotation = NPC.rotation.AngleTowards(NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap), 0.1f);
+                    
             }
             else if (tentacleCharge)
             {
@@ -221,6 +221,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float rotToTarget = (targetVect).ToRotation();
                 if (chargeTimer < 60)
                 {
+                    NPC.localAI[0] = 1; // this is here to try and catch if the eye was popped out when it would be mid charge.
                     NPC.velocity *= 0.97f;
                     float minTargetDist = 300;
                     float maxTargetDist = 460;
@@ -237,13 +238,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-                    if (chargeTimer < 90)
+                    if (chargeTimer < 90 && NPC.localAI[0] == 1)
                     {
                         if (chargeTimer == 60)
                         {
                             NPC.velocity = rotToTarget.ToRotationVector2() * 16;
                             NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
-                            SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.15f, MaxInstances = 2, Pitch = -0.1f }, NPC.Center + new Vector2(80 * NPC.direction, 0));
+                            trackedSlot = SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.15f, MaxInstances = 2, Pitch = -0.1f }, NPC.Center + new Vector2(80 * NPC.direction, 0));
                         }
                         Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
                         float effectiveRot = NPC.rotation - MathHelper.PiOver2;
@@ -254,6 +255,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     else
                     {
+                        NPC.localAI[0] = 0;
                         NPC.velocity *= 0.96f;
                         if (TentacleCharge.Duration - parent.ai[1] < 180)
                         {
