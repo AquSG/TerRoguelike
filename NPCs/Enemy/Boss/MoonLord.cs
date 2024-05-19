@@ -86,14 +86,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack PhantSpin = new Attack(1, 30, 260);
         public static Attack PhantBolt = new Attack(2, 30, 360);
         public static Attack PhantSphere = new Attack(3, 30, 179);
-        public static Attack Tentacle = new Attack(4, 30, 180);
+        public static Attack TentacleCharge = new Attack(4, 30, 600);
         public static Attack Deathray = new Attack(5, 30, 180);
         public static Attack PhantSpawn = new Attack(6, 30, 180);
         public static int phantSpinWindup = 50;
-        public int phantBoltWindup = 30;
-        public int phantBoltFireRate = 8;
-        public int phantBoltFiringDuration = 90;
-        public int phantSphereFireRate = 20;
+        public static int phantBoltWindup = 30;
+        public static int phantBoltFireRate = 8;
+        public static int phantBoltFiringDuration = 90;
+        public static int phantSphereFireRate = 20;
+        public static int tentacleWindup = 90;
 
         public override void SetStaticDefaults()
         {
@@ -634,13 +635,61 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[2] = PhantSphere.Id;
                 }
             }
-            else if (NPC.ai[0] == Tentacle.Id)
+            else if (NPC.ai[0] == TentacleCharge.Id)
             {
-                if (NPC.ai[1] >= Tentacle.Duration)
+                Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(0, -80);
+                Vector2 projSpawnPos = headPos + new Vector2(0, 209);
+                float startSmoothing = 1f;
+                if (NPC.ai[1] < tentacleWindup)
+                {
+                    startSmoothing *= NPC.ai[1] / tentacleWindup;
+                    if (NPC.ai[1] == 10)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie98 with { Volume = 0.7f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
+                    }
+                    if (NPC.ai[1] > 10 && (NPC.ai[1] < 60 ? NPC.ai[1] % 16 == 0 : NPC.ai[1] % 9 == 0 ))
+                    {
+                        for (int i = 0; i < 4; i++)
+                        {
+                            Color outlineColor = Color.Lerp(Color.Teal, Color.Cyan, 0.4f);
+                            Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.6f);
+                            Vector2 particleVel = Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.7f, 0.7f) * 2);
+                            if (i == 0)
+                                particleVel.Y *= 2f;
+                            ParticleManager.AddParticle(new BallOutlined(
+                                projSpawnPos + new Vector2(Main.rand.NextFloat(-4, 4), Main.rand.NextFloat(-5, -8)), particleVel,
+                                30, outlineColor, fillColor, new Vector2(0.2f), 4, 0, 0.96f, 30));
+                        }
+                    }
+                }
+                else
+                {
+                    if (NPC.ai[1] == tentacleWindup)
+                    {
+                        SoundEngine.PlaySound(SoundID.DD2_BetsyDeath with { Volume = 1f, Pitch = -1f, Variants = [0] }, NPC.Center + new Vector2(0, -80));
+                        for (int i = -3; i <= 3; i += 2)
+                        {
+                            float shootRot = MathHelper.PiOver2 + MathHelper.PiOver4 * 0.5f * i;
+                            Vector2 shootRotVect = shootRot.ToRotationVector2();
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos + shootRotVect * 3, shootRotVect * 7.5f, ModContent.ProjectileType<Tentacle>(), NPC.damage, 0);
+                        }
+                    }
+                }
+                if (TentacleCharge.Duration - NPC.ai[1] > 180)
+                {
+                    leftHandTargetPos = leftHandPos + (leftHandPos - targetPos).SafeNormalize(Vector2.UnitY) * 4 * startSmoothing;
+                    rightHandTargetPos = rightHandPos + (rightHandPos - targetPos).SafeNormalize(Vector2.UnitY) * 4 * startSmoothing;
+                }
+                else if (TentacleCharge.Duration - NPC.ai[1] < 90)
+                {
+                    leftHandTargetPos = leftHandAnchor;
+                    rightHandTargetPos = rightHandAnchor;
+                }
+                if (NPC.ai[1] >= TentacleCharge.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Tentacle.Id;
+                    NPC.ai[2] = TentacleCharge.Id;
                 }
             }
             else if (NPC.ai[0] == Deathray.Id)
@@ -668,7 +717,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
-            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere };
+            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, TentacleCharge };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -689,6 +738,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            chosenAttack = TentacleCharge.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
@@ -894,6 +944,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int headForceFrame = -1;
             int leftHandForceFrame = -1;
             int rightHandForceFrame = -1;
+            int mouthForceFrame = 0;
 
             int sharedFrame = 0;
             if (NPC.ai[0] == None.Id)
@@ -908,6 +959,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 leftHandForceFrame = 1;
                 rightHandForceFrame = 1;
+            }
+            if (NPC.ai[0] == TentacleCharge.Id)
+            {
+                if (NPC.ai[1] < 15 || TentacleCharge.Duration - NPC.ai[1] < 15)
+                    mouthForceFrame = 1;
+                else
+                    mouthForceFrame = 2;
             }
             if (sharedFrame > 6)
                 sharedFrame = 0;
@@ -939,7 +997,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             coreFrame = new Rectangle(0, coreCurrentFrame * frameHeight, coreTex.Width, frameHeight - 2);
 
             frameHeight = mouthTex.Height / 3;
-            mouthCurrentFrame = 0;
+            mouthCurrentFrame = mouthForceFrame;
             mouthFrame = new Rectangle(0, mouthCurrentFrame * frameHeight, mouthTex.Width, frameHeight - 2);
 
             frameHeight = topEyeOverlayTex.Height / 4;

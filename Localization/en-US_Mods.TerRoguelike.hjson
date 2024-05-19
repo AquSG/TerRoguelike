@@ -99,6 +99,7 @@ Projectiles: {
 	PhantasmalEye.DisplayName: Phantasmal Eye
 	PhantasmalBolt.DisplayName: Phantasmal Bolt
 	PhantasmalSphere.DisplayName: Phantasmal Sphere
+	Tentacle.DisplayName: Tentacle
 }
 
 Items: {

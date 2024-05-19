@@ -151,6 +151,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             float rotCap = MathHelper.PiOver2 * 0.66f;
             bool phantasmalSpin = parent.ai[0] == PhantSpin.Id;
             bool phantasmalSphere = parent.ai[0] == PhantSphere.Id;
+            bool tentacleCharge = parent.ai[0] == TentacleCharge.Id && parent.ai[1] >= tentacleWindup && TentacleCharge.Duration - parent.ai[1] > 150;
 
             Vector2 targetPos = target != null ? target.Center : spawnPos;
 
@@ -210,6 +211,62 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                     NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
+            }
+            else if (tentacleCharge)
+            {
+                int tentacleChargeTimer = (int)parent.ai[1] - tentacleWindup;
+                int chargeTimer = tentacleChargeTimer % 120;
+                Vector2 targetVect = targetPos - NPC.Center;
+                float targetVectLength = targetVect.Length();
+                float rotToTarget = (targetVect).ToRotation();
+                if (chargeTimer < 60)
+                {
+                    NPC.velocity *= 0.97f;
+                    float minTargetDist = 300;
+                    float maxTargetDist = 460;
+                    if (targetVectLength > minTargetDist && targetVectLength < maxTargetDist)
+                    {
+                        NPC.velocity *= 0.98f;
+                    }
+                    else
+                    {
+                        Vector2 wantedPos = targetPos + (-rotToTarget.ToRotationVector2() * ((minTargetDist + maxTargetDist) * 0.5f));
+                        NPC.velocity += (wantedPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.5f;
+                    }
+                    NPC.rotation = NPC.rotation.AngleLerp(rotToTarget + MathHelper.PiOver2, 0.05f);
+                }
+                else
+                {
+                    if (chargeTimer < 90)
+                    {
+                        if (chargeTimer == 60)
+                        {
+                            NPC.velocity = rotToTarget.ToRotationVector2() * 16;
+                            NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
+                            SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.15f, MaxInstances = 2, Pitch = -0.1f }, NPC.Center + new Vector2(80 * NPC.direction, 0));
+                        }
+                        Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
+                        float effectiveRot = NPC.rotation - MathHelper.PiOver2;
+                        ParticleManager.AddParticle(new Wriggler(
+                            NPC.Center - effectiveRot.ToRotationVector2() * 20 + (Vector2.UnitY * Main.rand.NextFloat(-20, 20)).RotatedBy(effectiveRot), NPC.velocity * 0.66f,
+                            26, particleColor, new Vector2(0.5f), Main.rand.Next(4), effectiveRot, 0.98f, 16,
+                            Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipVertically));
+                    }
+                    else
+                    {
+                        NPC.velocity *= 0.96f;
+                        if (TentacleCharge.Duration - parent.ai[1] < 180)
+                        {
+                            NPC.rotation = NPC.rotation.AngleLerp(0, 0.05f);
+                        }
+                        else
+                        {
+                            NPC.rotation = NPC.rotation.AngleLerp(rotToTarget + MathHelper.PiOver2, 0.05f);
+                        }
+                        
+                    }
+                }
+                
             }
             else
             {
