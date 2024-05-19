@@ -121,7 +121,6 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/PharaohSpiritGlow",
                 "TerRoguelike/Projectiles/SandnadoLight",
                 "TerRoguelike/ExtraTextures/Crust",
-                "TerRoguelike/Projectiles/DarkTendril",
                 "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshBody",
                 "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshEye",
                 "TerRoguelike/NPCs/Enemy/Boss/WallOfFleshMouth",
@@ -157,6 +156,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/MoonLordBodyHalf",
                 "TerRoguelike/NPCs/Enemy/Boss/TrueEyeOfCthulhu",
                 "TerRoguelike/Particles/Wriggler",
+                "TerRoguelike/ExtraTextures/Circle",
             };
             foreach (string path in pathList)
             {

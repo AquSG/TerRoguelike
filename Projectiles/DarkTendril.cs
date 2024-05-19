@@ -15,6 +15,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.Particles;
 using ReLogic.Utilities;
 using static TerRoguelike.Systems.RoomSystem;
+using System.Diagnostics;
 
 namespace TerRoguelike.Projectiles
 {
@@ -27,6 +28,8 @@ namespace TerRoguelike.Projectiles
         public int maxTimeLeft;
         public float startRot;
         public SlotId rumbleSlot;
+        public Texture2D circleTex;
+        public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 2000;
@@ -42,6 +45,7 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.hide = true;
+            circleTex = TexDict["Circle"];
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
@@ -164,32 +168,26 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Texture2D tex = TextureAssets.Projectile[Type].Value;
-
             Color outlineColor = Color.Purple;
             Color fillColor = Color.Lerp(outlineColor, Color.Black, 0.6f);
-            Vector2 origin = tex.Size() * 0.5f;
+            Vector2 origin = circleTex.Size() * 0.5f;
             int countOffset = (maxTendrilLength - specialOldPos.Count);
 
             for (int i = 0; i < specialOldPos.Count; i++)
             {
                 float completion = MathHelper.Clamp((float)(i + countOffset) / (maxTendrilLength - 1), 0, 1f);
                 Vector2 basePos = specialOldPos[i] - Main.screenPosition;
-                float scale = MathHelper.Lerp(0.7f, 0.2f, completion);
-                for (int j = 0; j < 8; j++)
-                {
-                    Main.EntitySpriteDraw(tex, basePos + (Vector2.UnitX * 2).RotatedBy(j * MathHelper.PiOver4), null, outlineColor, 0, origin, scale, SpriteEffects.None);
-                }
+                float scale = MathHelper.Lerp(0.0875f, 0.026f, completion);
+                Main.EntitySpriteDraw(circleTex, basePos, null, outlineColor, 0, origin, scale, SpriteEffects.None);
             }
             for (int i = 0; i < specialOldPos.Count; i++)
             {
                 float completion = MathHelper.Clamp((float)(i + countOffset) / (maxTendrilLength - 1), 0, 1f);
                 Vector2 basePos = specialOldPos[i] - Main.screenPosition;
-                float scale = MathHelper.Lerp(0.7f, 0.2f, completion);
+                float scale = MathHelper.Lerp(0.07f, 0.02f, completion);
 
-                Main.EntitySpriteDraw(tex, basePos, null, fillColor, 0, origin, scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(circleTex, basePos, null, fillColor, 0, origin, scale, SpriteEffects.None);
             }
-
             return false;
         }
     }

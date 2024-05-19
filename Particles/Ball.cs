@@ -42,7 +42,7 @@ namespace TerRoguelike.Particles
         Color startColor;
         public Ball(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30, bool Additive = false, bool UseLighting = false)
         {
-            texture = TexDict["DarkTendril"];
+            texture = TexDict["Circle"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = Additive;
             oldPosition = Position;
@@ -50,8 +50,7 @@ namespace TerRoguelike.Particles
             velocity = Velocity;
             color = startColor = Color;
             rotation = Rotation;
-            scale = Scale;
-            startScale = Scale;
+            scale = startScale = Scale * 0.1f;
             spriteEffects = SpriteEffects.None;
             timeLeft = TimeLeft;
             deceleration = Deceleration;

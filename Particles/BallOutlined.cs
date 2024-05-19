@@ -43,7 +43,7 @@ namespace TerRoguelike.Particles
         Color outlineColor;
         public BallOutlined(Vector2 Position, Vector2 Velocity, int TimeLeft, Color OutlineColor, Color FillColor, Vector2 Scale, float OutlineWidth, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30)
         {
-            texture = TexDict["DarkTendril"];
+            texture = TexDict["Circle"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = false;
             oldPosition = Position;
@@ -52,8 +52,7 @@ namespace TerRoguelike.Particles
             color = FillColor;
             outlineColor = OutlineColor;
             rotation = Rotation;
-            scale = Scale;
-            startScale = Scale;
+            scale = startScale = Scale * 0.1f;
             spriteEffects = SpriteEffects.None;
             timeLeft = TimeLeft;
             deceleration = Deceleration;
@@ -71,12 +70,9 @@ namespace TerRoguelike.Particles
         public override bool PreDraw()
         {
             Vector2 basePos = position - Main.screenPosition;
-            Vector2 baseOffset = Vector2.UnitX * outlineWidth * (float)Math.Sqrt(scale.Length());
             Vector2 origin = frame.Size() * 0.5f;
-            for (int i = 0; i < 8; i++)
-            {
-                Main.EntitySpriteDraw(texture, basePos + baseOffset.RotatedBy(i * MathHelper.PiOver4 + rotation), frame, outlineColor, rotation, origin, scale, spriteEffects);
-            }
+            Vector2 outlineScale = scale * (1 + (0.08f * outlineWidth));
+            Main.EntitySpriteDraw(texture, basePos, frame, outlineColor, rotation, origin, outlineScale, spriteEffects);
             return true;
         }
     }
