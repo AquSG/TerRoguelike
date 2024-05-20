@@ -36,8 +36,20 @@ namespace TerRoguelike.NPCs
         public List<WormSegment> Segments = [];
         public List<Vector2> ExtraIgniteTargetPoints = [];
         public int hitSegment = 0;
-        public float effectiveDamageTakenMulti { get { return diminishingDR == 0 ? 1f : (diminishingDR > 0 ? (100f / (100f + diminishingDR)) : 2 - (100f / (100f - diminishingDR))); } }
+        public float effectiveDamageTakenMulti 
+        { 
+            get 
+            {
+                float finalDR = diminishingDR + (AdaptiveArmorEnabled ? AdaptiveArmor : 0);
+                return finalDR == 0 ? 1f : (finalDR > 0 ? (100f / (100f + finalDR)) : 2 - (100f / (100f - finalDR))); 
+            } 
+        }
         public int overheadArrowTime = 0;
+        public bool AdaptiveArmorEnabled = false;
+        public float AdaptiveArmorCap = 200;
+        public float AdaptiveArmorAddRate = 20;
+        public float AdaptiveArmorDecayRate = 60;
+        public float AdaptiveArmor = 0;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -3324,7 +3336,16 @@ namespace TerRoguelike.NPCs
                 }
                 else if (friendlyFireHitCooldown > 0)
                     friendlyFireHitCooldown--;
+            }
 
+            if (AdaptiveArmor > 0)
+            {
+                if (AdaptiveArmor > AdaptiveArmorCap)
+                    AdaptiveArmor = AdaptiveArmorCap;
+
+                AdaptiveArmor -= AdaptiveArmorDecayRate / 60f;
+                if (AdaptiveArmor < 0)
+                    AdaptiveArmor = 0;
             }
         }
         public void IgniteHit(int hitDamage, NPC npc, int owner)
@@ -3429,6 +3450,12 @@ namespace TerRoguelike.NPCs
         public override void HitEffect(NPC npc, NPC.HitInfo hit)
         {
             overheadArrowTime = -480;
+            if (AdaptiveArmorEnabled)
+            {
+                AdaptiveArmor += AdaptiveArmorAddRate * 100 * (hit.Damage / (float)npc.lifeMax);
+                if (AdaptiveArmor > AdaptiveArmorCap)
+                    AdaptiveArmor = AdaptiveArmorCap;
+            }
         }
         public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)
         {

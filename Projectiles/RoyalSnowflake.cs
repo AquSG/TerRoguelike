@@ -34,6 +34,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = maxTimeLeft = 600;
             Projectile.penetrate = -1;
             glowTex = TexDict["CircularGlow"];
+            Projectile.ModProj().killOnRoomClear = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

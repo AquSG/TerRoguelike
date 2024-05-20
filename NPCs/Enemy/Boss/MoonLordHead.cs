@@ -64,6 +64,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.OverrideIgniteVisual = true;
             NPC.noTileCollide = true;
             NPC.noGravity = true;
+            modNPC.AdaptiveArmorEnabled = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

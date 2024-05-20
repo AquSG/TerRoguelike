@@ -71,6 +71,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             trueEyeTex = TexDict["TrueEyeOfCthulhu"];
             innerEyeTex = TexDict["MoonLordInnerEye"];
+            modNPC.AdaptiveArmorEnabled = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
