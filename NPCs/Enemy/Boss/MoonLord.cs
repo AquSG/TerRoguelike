@@ -133,6 +133,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             handTex = TexDict["MoonLordHand"];
             bodyTex = TexDict["MoonLordBodyHalf"];
             deathrayTex = TexDict["PhantasmalDeathray"];
+            modNPC.AdaptiveArmorEnabled = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
