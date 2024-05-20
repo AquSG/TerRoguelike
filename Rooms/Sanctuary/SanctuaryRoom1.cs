@@ -55,7 +55,7 @@ namespace TerRoguelike.Rooms
         public override bool CanDescend(Player player, TerRoguelikePlayer modPlayer)
         {
             modPlayer.noThrow = true;
-            return !TerRoguelikeWorld.escape && player.position.X + player.width >= ((RoomPosition.X + RoomDimensions.X) * 16f) - 22f && !player.dead;
+            return !modPlayer.escaped && player.position.X + player.width >= ((RoomPosition.X + RoomDimensions.X) * 16f) - 22f && !player.dead;
         }
         public override Vector2 DescendTeleportPosition()
         {

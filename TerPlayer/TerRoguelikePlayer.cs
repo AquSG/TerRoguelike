@@ -1376,7 +1376,7 @@ namespace TerRoguelike.TerPlayer
         {
             if (flimsyPauldron > 0)
             {
-                int reductedDamage = 3 * flimsyPauldron;
+                int reductedDamage = 3 + (flimsyPauldron - 1) * 2;
                 info.Damage -= reductedDamage;
             }
             if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)

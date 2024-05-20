@@ -48,10 +48,21 @@ namespace TerRoguelike.NPCs.Enemy
             int attackCooldown = 75;
             NPC.frameCounter += 0.15d;
             NPC.rotation = MathHelper.PiOver2 * Math.Abs(NPC.velocity.X) * 0.10f * (NPC.velocity.X == 0 ? 0 : Math.Sign(NPC.velocity.X));
-            modNPC.RogueFlyingShooterAI(NPC, 1.5f, 1.5f, 0.04f, 160f, 480f, attackTelegraph, attackCooldown, ModContent.ProjectileType<IchorBlob>(), 8f, new Vector2(0, 10).RotatedBy(NPC.rotation), NPC.damage, true, 0.98f);
+            modNPC.RogueFlyingShooterAI(NPC, 1.5f, 1.5f, 0.04f, 160f, 480f, attackTelegraph, attackCooldown, ModContent.ProjectileType<IchorBlob>(), 8f, new Vector2(0, -2).RotatedBy(NPC.rotation), NPC.damage, true, 0.98f);
             if (NPC.ai[2] == -attackCooldown)
             {
                 SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f }, NPC.Center);
+            }
+            if (NPC.ai[2] > 0 && NPC.ai[2] < attackTelegraph)
+            {
+                if (NPC.ai[2] % 2 == 0)
+                {
+                    Vector2 offset = Main.rand.NextVector2Circular(16, 16);
+                    Dust dust = Dust.NewDustPerfect(NPC.Center + offset + (NPC.rotation + MathHelper.PiOver2).ToRotationVector2() * -2, DustID.Ichor, -offset * 0.1f + NPC.velocity, 0, default, 1.2f);
+                    dust.noGravity = true;
+                    dust.noLightEmittence = true;
+                    dust.noLight = true;
+                }
             }
         }
         public override void HitEffect(NPC.HitInfo hit)
