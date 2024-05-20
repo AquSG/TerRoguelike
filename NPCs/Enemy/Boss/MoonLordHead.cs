@@ -47,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 1;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -99,7 +100,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            
+
         }
         public override void AI()
         {
@@ -196,7 +197,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            
+            if (NPC.life > 1)
+                DrawDeathrayForNPC(NPC, Main.npc[(int)NPC.ai[2]]);
             return false;
         }
     }
