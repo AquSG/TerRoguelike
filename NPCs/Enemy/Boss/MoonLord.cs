@@ -672,8 +672,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     startSmoothing *= NPC.ai[1] / tentacleWindup;
                     if (NPC.ai[1] == 10)
                     {
-                        SoundEngine.PlaySound(SoundID.Zombie98 with { Volume = 0.7f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
-                        SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.2f, Pitch = -0.3f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.Zombie98 with { Volume = 0.9f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.3f, Pitch = -0.3f }, NPC.Center + new Vector2(0, -80));
                     }
                     if (NPC.ai[1] > 10 && (NPC.ai[1] < 60 ? NPC.ai[1] % 16 == 0 : NPC.ai[1] % 9 == 0 ))
                     {
@@ -694,7 +694,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     if (NPC.ai[1] == tentacleWindup)
                     {
-                        SoundEngine.PlaySound(SoundID.DD2_BetsyDeath with { Volume = 1f, Pitch = -1f, Variants = [0] }, NPC.Center + new Vector2(0, -80));
+                        ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(SoundID.DD2_BetsyDeath with { Volume = 1f, Pitch = -1f, Variants = [0] }, NPC.Center + new Vector2(0, -80)), 2.2f)); // shove it into extra sound system to amplify it beyond 1f
                         for (int i = -3; i <= 3; i += 2)
                         {
                             float shootRot = MathHelper.PiOver2 + MathHelper.PiOver4 * 0.5f * i;
@@ -877,7 +877,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-
+            chosenAttack = TentacleCharge.Id;
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
@@ -904,6 +904,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+                ExtraSoundSystem.ForceStopAllExtraSounds();
                 enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;

@@ -54,6 +54,25 @@ namespace TerRoguelike.Systems
             }
             ExtraSounds.RemoveAll(x => x.setToBeRemoved);
         }
+        public static void ForceStopAllExtraSounds()
+        {
+            if (ExtraSounds == null)
+                return;
+            if (ExtraSounds.Count == 0)
+                return;
+
+            for (int i = 0; i < ExtraSounds.Count; i++)
+            {
+                ExtraSound potentialSound = ExtraSounds[i];
+                bool soundPresent = SoundEngine.TryGetActiveSound(potentialSound.slot, out var sound);
+                if (soundPresent)
+                {
+                    sound.Stop();
+                    continue;
+                }
+            }
+            ExtraSounds.Clear();
+        }
     }
     public class ExtraSound
     {
