@@ -151,7 +151,7 @@ Items: {
 			'''
 			Enemies drop their soul as a healing orb on kill
 			The orb homes in towards the soul stealer and heals for 10% max life on contact
-			Extra copies of this item increase the healing amount by another 10% max life
+			Extra copies of this item increase the healing amount by 5% max life
 			'''
 	}
 
@@ -428,7 +428,7 @@ Items: {
 		Tooltip:
 			'''
 			Reduces damage taken by 3
-			Extra copies of this item further reduce damage taken by 3
+			Extra copies of this item further reduce damage taken by 2
 			'''
 	}
 
