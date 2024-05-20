@@ -172,12 +172,15 @@ namespace TerRoguelike.TerPlayer
         public int escapeArrowTime = 0;
         public Vector2 escapeArrowTarget = Vector2.Zero;
         public bool moonLordVisualEffect = false;
+        public bool deathrayDeathReason = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
         #region Reset Variables
         public override void PreUpdate()
         {
+            deathrayDeathReason = false;
+
             startDirection = Player.direction;
 
             coolantBarrel = 0;

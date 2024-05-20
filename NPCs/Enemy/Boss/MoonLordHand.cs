@@ -52,6 +52,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 1;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -155,6 +156,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             float rotCap = MathHelper.PiOver2 * 0.66f;
             bool phantasmalSpin = parent.ai[0] == PhantSpin.Id;
             bool phantasmalSphere = parent.ai[0] == PhantSphere.Id;
+            bool deathray = parent.ai[0] == Deathray.Id && parent.ai[1] > deathrayWindup - 30;
+            bool deathrayComing = parent.ai[0] == Deathray.Id && parent.ai[1] < deathrayWindup - 20;
             bool tentacleCharge = parent.ai[0] == TentacleCharge.Id && parent.ai[1] >= tentacleWindup && TentacleCharge.Duration - parent.ai[1] > 150;
 
             Vector2 targetPos = target != null ? target.Center : spawnPos;
@@ -221,6 +224,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float rotToTarget = (targetVect).ToRotation();
                 if (chargeTimer < 60)
                 {
+                    if (chargeTimer == 26)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.1f, Pitch = -0.5f, MaxInstances = 10, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                    }
                     NPC.localAI[0] = 1; // this is here to try and catch if the eye was popped out when it would be mid charge.
                     NPC.velocity *= 0.97f;
                     float minTargetDist = 300;
@@ -270,6 +277,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 
             }
+            else if (deathray)
+            {
+                NPC.velocity *= 0.98f;
+                if (parent.ai[1] >= deathrayWindup)
+                {
+                    NPC.velocity += -trueEyeVector * 0.0014f;
+                }
+                if (NPC.rotation > rotCap)
+                {
+                    NPC.rotation = NPC.rotation.AngleTowards(0, 0.1f);
+                }
+                else
+                    NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
+            }
             else
             {
                 Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -230) + trueEyeVector * -7;
@@ -298,19 +319,41 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else
                     NPC.rotation = MathHelper.Clamp(NPC.velocity.X * 0.1f, -rotCap, rotCap);
             }
+            if (deathrayComing)
+            {
+                if (NPC.ai[1] % 2 == 0)
+                {
+                    Vector2 offset = Main.rand.NextVector2Circular(16, 16);
+                    offset += trueEyeVector.SafeNormalize(Vector2.UnitY) * 16;
+                    ParticleManager.AddParticle(new Ball(
+                        NPC.Center + trueEyeVector.SafeNormalize(Vector2.UnitY) * 3 + offset + trueEyeVector, -offset * 0.1f + NPC.velocity,
+                        20, Color.Lerp(Color.White, Color.Cyan, 0.75f), new Vector2(0.25f), 0, 0.96f, 10));
+                }
+            }
 
             float rate = 0.2f;
-            if (phantasmalSpin || phantasmalSphere)
+            if (phantasmalSpin || phantasmalSphere || deathray)
                 rate = 0.05f;
             InnerEyePositionUpdate(ref trueEyeVector, NPC.Center);
 
             void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
             {
-                bool eyeCenter = phantasmalSpin || phantasmalSphere || target == null;
+                bool eyeCenter = phantasmalSpin || phantasmalSphere;
 
                 if (eyeCenter)
                 {
                     eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, rate);
+                }
+                else if (deathray)
+                {
+                    if (parent.ai[1] >= deathrayWindup)
+                        rate = 0.5f;
+                    Vector2 deathrayConvergePos = new Vector2(parent.localAI[1], parent.localAI[2]);
+                    Vector2 deathrayVect = deathrayConvergePos - basePosition;
+                    float maxEyeOffset = 15;
+                    if (deathrayVect.Length() > maxEyeOffset)
+                        deathrayVect = deathrayVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
+                    eyeVector = Vector2.Lerp(eyeVector, deathrayVect, rate);
                 }
                 else
                 {
@@ -411,14 +454,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            if (NPC.life > 1)
-                return false;
+            if (NPC.life <= 1)
+            {
+                Vector2 eyeOrigin = new Vector2(NPC.frame.Width * 0.5f);
+                Main.EntitySpriteDraw(trueEyeTex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, eyeOrigin, NPC.scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(innerEyeTex, NPC.Center + trueEyeVector - Main.screenPosition, null, Color.White, NPC.rotation, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
+            }
 
-            Vector2 eyeOrigin = new Vector2(NPC.frame.Width * 0.5f);
-            Main.EntitySpriteDraw(trueEyeTex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, eyeOrigin, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(innerEyeTex, NPC.Center + trueEyeVector - Main.screenPosition, null, Color.White, NPC.rotation, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-
-
+            DrawDeathrayForNPC(NPC, Main.npc[(int)NPC.ai[2]]);
             return false;
         }
     }

@@ -42,6 +42,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int handType = ModContent.NPCType<MoonLordHand>();
         public int headType = ModContent.NPCType<MoonLordHead>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
+        public SlotId DeathraySlot;
         public override int CombatStyle => -1;
         public bool CollisionPass = false;
         public bool goreProc = false;
@@ -73,7 +74,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float maxHandAnchorDistance = 480;
 
 
-        public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex;
+        public static Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex, deathrayTex;
         public int leftHandWho = -1; // yes, technically moon lord's "Left" is not the same as the left for the viewer, and vice versa for right hand. I do not care. internally it will be based on viewer perspective.
         public int rightHandWho = -1;
         public int headWho = -1;
@@ -87,7 +88,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack PhantBolt = new Attack(2, 30, 360);
         public static Attack PhantSphere = new Attack(3, 30, 179);
         public static Attack TentacleCharge = new Attack(4, 30, 600);
-        public static Attack Deathray = new Attack(5, 30, 180);
+        public static Attack Deathray = new Attack(5, 30, 300);
         public static Attack PhantSpawn = new Attack(6, 30, 180);
         public static int phantSpinWindup = 50;
         public static int phantBoltWindup = 30;
@@ -95,10 +96,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static int phantBoltFiringDuration = 90;
         public static int phantSphereFireRate = 20;
         public static int tentacleWindup = 90;
+        public static int deathrayWindup = 90;
 
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 1;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -129,6 +132,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             headTex = TexDict["MoonLordHead"];
             handTex = TexDict["MoonLordHand"];
             bodyTex = TexDict["MoonLordBodyHalf"];
+            deathrayTex = TexDict["PhantasmalDeathray"];
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -199,8 +203,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             float rate = 0.15f;
             bool eyeCenter = NPC.ai[0] == PhantSpin.Id || NPC.ai[0] == PhantSphere.Id;
+            bool eyeDeathray = NPC.ai[0] == Deathray.Id && NPC.ai[1] > deathrayWindup - 30;
+            Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);
             if (eyeCenter)
                 rate = 0.075f;
+            if (eyeDeathray)
+            {
+                if (NPC.ai[1] >= deathrayWindup)
+                    rate = 0.5f;
+                else
+                    rate = 0.075f;
+            }
             if (leftHand != null)
             {
                 if (leftHand.life > 1)
@@ -254,11 +267,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 canBeHit = true;
             }
 
+            if (SoundEngine.TryGetActiveSound(DeathraySlot, out var sound) && sound.IsPlaying)
+            {
+                sound.Position = deathrayConvergePos;
+            }
+
             void InnerEyePositionUpdate(ref Vector2 eyeVector, Vector2 basePosition)
             {
                 if (eyeCenter)
                 {
                     eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, rate);
+                }
+                else if (eyeDeathray)
+                {
+                    Vector2 deathrayVect = deathrayConvergePos - basePosition;
+                    float maxEyeOffset = 16;
+                    if (deathrayVect.Length() > maxEyeOffset)
+                        deathrayVect = deathrayVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
+                    eyeVector = Vector2.Lerp(eyeVector, deathrayVect, rate);
                 }
                 else
                 {
@@ -695,6 +721,118 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Deathray.Id)
             {
+                int timeToEnd = Deathray.Duration - (int)NPC.ai[1];
+                Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(0, -80);
+                Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);
+                if (NPC.ai[1] < deathrayWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        SoundEngine.PlaySound(WallOfFlesh.HellBeamCharge with { Volume = 0.9f, Pitch = 0.32f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.Zombie95 with { Volume = 0.45f }, NPC.Center + new Vector2(0, -80));
+                    }
+                    if (NPC.ai[1] < deathrayWindup - 30)
+                    {
+                        deathrayConvergePos = targetPos;
+                    }
+                    if (NPC.ai[1] < deathrayWindup - 20)
+                    {
+                        if (NPC.ai[1] % 2 == 0)
+                        {
+                            for (int i = 0; i < 3; i++)
+                            {
+                                NPC npc = i switch
+                                {
+                                    1 => leftHand,
+                                    2 => rightHand,
+                                    _ => head,
+                                };
+                                if (npc == null || npc.life <= 1)
+                                    continue;
+
+                                Vector2 eyeVector = i switch
+                                {
+                                    1 => leftEyeVector,
+                                    2 => rightEyeVector,
+                                    _ => headEyeVector
+                                };
+
+                                Vector2 offset = Main.rand.NextVector2Circular(12, 12);
+                                offset += eyeVector.SafeNormalize(Vector2.UnitY) * 12;
+                                ParticleManager.AddParticle(new Ball(
+                                    npc.Center + offset + eyeVector, -offset * 0.1f + npc.velocity,
+                                    20, Color.Lerp(Color.White, Color.Cyan, 0.75f), new Vector2(0.25f), 0, 0.96f, 10));
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - deathrayWindup;
+                    if (NPC.ai[1] == deathrayWindup)
+                    {
+                        DeathraySlot = SoundEngine.PlaySound(SoundID.Zombie104 with { Volume = 0.7f, Pitch = -0.25f }, NPC.Center + new Vector2(0, -80));
+                    }
+
+                    float deathraySpeed = 5.5f;
+                    if (time < 60)
+                    {
+                        deathraySpeed *= (float)Math.Pow(time / 60f, 0.5f);
+                    }
+
+                    if (target != null)
+                    {
+                        Vector2 addedVector = targetPos - deathrayConvergePos;
+                        if (addedVector.Length() > deathraySpeed)
+                            addedVector = addedVector.SafeNormalize(Vector2.UnitY) * deathraySpeed;
+                        deathrayConvergePos += addedVector;
+                    }
+
+                    if (NPC.ai[1] % 5 == 0)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), deathrayConvergePos, Vector2.Zero, ModContent.ProjectileType<PhantasmalResidue>(), NPC.damage, 0);
+                    }
+                    if (timeToEnd >= 3)
+                    {
+                        ParticleManager.AddParticle(new Glow(
+                            deathrayConvergePos, Main.rand.NextVector2Circular(6, 6), 5, Color.Cyan, new Vector2(0.25f), 0, 0.98f, 5, true));
+                        ParticleManager.AddParticle(new Ball(
+                            deathrayConvergePos, Main.rand.NextVector2Circular(6, 6), 5, Color.White * 0.18f, new Vector2(3f), 0, 0.96f, 5, false));
+                    }
+
+                    for (int i = 0; i < 3; i++)
+                    {
+                        NPC npc = i switch
+                        {
+                            1 => leftHand,
+                            2 => rightHand,
+                            _ => head
+                        };
+                        if (npc == null || (i == 0 && npc.life <= 1))
+                            continue;
+
+                        Vector2 basePos = npc.Center;
+                        float particleRot = (deathrayConvergePos - basePos).ToRotation();
+                        float randRot = Main.rand.NextFloat(-0.7f, 0.7f);
+                        Vector2 particleVel = (Vector2.UnitX * Main.rand.NextFloat(1, 2)).RotatedBy(randRot + Math.Sign(randRot) * 1.2f + particleRot);
+                        ParticleManager.AddParticle(new BallOutlined(
+                            basePos + particleRot.ToRotationVector2() * (npc.life > 1 ? 18 : 24), particleVel + npc.velocity, 30, Color.Lerp(Color.Teal, Color.Cyan, 0.5f), Color.White * 0.5f, new Vector2(0.2f), 4, 0, 0.96f, 15));
+                    }
+                    if (timeToEnd > 20)
+                    {
+                        Vector2 pseudoVelocity = deathrayConvergePos - new Vector2(NPC.localAI[1], NPC.localAI[2]);
+                        for (int i = 0; i < 3; i++)
+                        {
+                            Vector2 offset = Main.rand.NextVector2CircularEdge(26, 26) * Main.rand.NextFloat(0.7f, 1f);
+                            ParticleManager.AddParticle(new Ball(
+                                 deathrayConvergePos + offset, offset * 0.15f, 40, Color.White * 0.5f, new Vector2(0.3f, 0.1f), offset.ToRotation(), 0.98f, 20, false));
+                        }
+                    }
+                }
+
+                NPC.localAI[1] = deathrayConvergePos.X;
+                NPC.localAI[2] = deathrayConvergePos.Y;
+
                 if (NPC.ai[1] >= Deathray.Duration)
                 {
                     NPC.ai[0] = None.Id;
@@ -718,7 +856,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
-            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, TentacleCharge };
+            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, TentacleCharge, Deathray };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -874,6 +1012,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     return ableToHit;
                 }
             }
+
+            if (NPC.ai[0] == Deathray.Id && NPC.ai[1] >= deathrayWindup)
+            {
+                Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);
+                float deathrayRadius = 18;
+                for (int i = topEyeCanHit ? 0 : 1; i < 3; i++)
+                {
+                    NPC npc = i switch
+                    {
+                        1 => leftHandWho >= 0 ? Main.npc[leftHandWho] : null,
+                        2 => rightHandWho >= 0 ? Main.npc[rightHandWho] : null,
+                        _ => headWho >= 0 ? Main.npc[headWho] : null
+                    };
+                    if (npc == null)
+                        continue;
+
+                    Vector2 startCheckPos = npc.Center;
+                    Vector2 deathrayVect = deathrayConvergePos - startCheckPos;
+                    float deathrayLength = deathrayVect.Length();
+                    Vector2 deathrayNormalVect = deathrayVect.SafeNormalize(Vector2.UnitY);
+                    for (int d = 24; d < deathrayLength; d += 18)
+                    {
+                        Vector2 checkPos = startCheckPos + deathrayNormalVect * d;
+                        Vector2 closestPoint = target.getRect().ClosestPointInRect(checkPos);
+                        if (checkPos.Distance(closestPoint) < deathrayRadius)
+                        {
+                            CollisionPass = false;
+                            if (ableToHit)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), closestPoint, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathray>(), NPC.damage, 0);
+                            return false;
+                        }
+                    }
+                }
+            }
             CollisionPass = false;
             return false;
         }
@@ -918,6 +1090,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     CollisionPass = ableToHit;
                     return ableToHit;
+                }
+            }
+
+            if (NPC.ai[0] == Deathray.Id && NPC.ai[1] >= deathrayWindup)
+            {
+                Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);
+                float deathrayRadius = 18;
+                for (int i = topEyeCanHit ? 0 : 1; i < 3; i++)
+                {
+                    NPC npc = i switch
+                    {
+                        1 => leftHandWho >= 0 ? Main.npc[leftHandWho] : null,
+                        2 => rightHandWho >= 0 ? Main.npc[rightHandWho] : null,
+                        _ => headWho >= 0 ? Main.npc[headWho] : null
+                    };
+                    if (npc == null)
+                        continue;
+
+                    Vector2 startCheckPos = npc.Center;
+                    Vector2 deathrayVect = deathrayConvergePos - startCheckPos;
+                    float deathrayLength = deathrayVect.Length();
+                    Vector2 deathrayNormalVect = deathrayVect.SafeNormalize(Vector2.UnitY);
+                    for (int d = 24; d < deathrayLength; d += 18)
+                    {
+                        Vector2 checkPos = startCheckPos + deathrayNormalVect * d;
+                        Vector2 closestPoint = target.getRect().ClosestPointInRect(checkPos);
+                        if (checkPos.Distance(closestPoint) < deathrayRadius)
+                        {
+                            CollisionPass = false;
+                            if (ableToHit)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), closestPoint, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathray>(), NPC.damage, 0);
+                            return false;
+                        }
+                    }
                 }
             }
             CollisionPass = false;
@@ -1014,6 +1220,43 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             frameHeight = emptyEyeTex.Height / 4;
             emptyEyeCurrentFrame = (int)NPC.frameCounter % 4;
             emptyEyeFrame = new Rectangle(0, emptyEyeCurrentFrame * frameHeight, emptyEyeTex.Width, frameHeight - 2);
+        }
+        public static void DrawDeathrayForNPC(NPC npc, NPC parent)
+        {
+            if (parent.ai[0] == Deathray.Id && parent.ai[1] >= deathrayWindup - 30)
+            {
+                int timeToEnd = Deathray.Duration - (int)parent.ai[1];
+
+                Vector2 deathRayConvergePos = new Vector2(parent.localAI[1], parent.localAI[2]);
+
+                Vector2 deathrayVector = deathRayConvergePos - npc.Center;
+                float deathrayLength = deathrayVector.Length();
+
+                Vector2 deathrayNormalVect = deathrayVector.SafeNormalize(Vector2.UnitY);
+                float deathrayRot = deathrayVector.ToRotation();
+                Vector2 deathrayStartPos = npc.Center + deathrayNormalVect * (npc.life > 1 ? 18 : 24);
+
+                float verticalScale = 1f;
+                if (timeToEnd < 5)
+                {
+                    verticalScale *= timeToEnd / 5f;
+                }
+                else if (parent.ai[1] < deathrayWindup)
+                {
+                    if (parent.ai[1] < deathrayWindup - 5)
+                        verticalScale *= MathHelper.Clamp((parent.ai[1] - (deathrayWindup - 30)) / 10f, 0, 1) * 0.2f;
+                    else
+                        verticalScale *= (parent.ai[1] - (deathrayWindup - 5)) / 5f;
+                }
+
+                Main.EntitySpriteDraw(deathrayTex, deathrayStartPos - Main.screenPosition, null, Color.White, deathrayRot, new Vector2(0, deathrayTex.Height * 0.5f), new Vector2(1f, verticalScale), SpriteEffects.None);
+
+                float middleScale = deathrayLength - deathrayTex.Width * 2;
+                if (middleScale >= 1)
+                    Main.EntitySpriteDraw(deathrayTex, deathrayStartPos + deathrayNormalVect * deathrayTex.Width - Main.screenPosition, new Rectangle(deathrayTex.Width - 1, 0, 1, deathrayTex.Height), Color.White, deathrayRot, new Vector2(0, deathrayTex.Height * 0.5f), new Vector2(middleScale, verticalScale), SpriteEffects.None);
+
+                Main.EntitySpriteDraw(deathrayTex, deathRayConvergePos - Main.screenPosition, null, Color.White, deathrayRot, new Vector2(1, deathrayTex.Height * 0.5f), new Vector2(1f, verticalScale), SpriteEffects.FlipHorizontally);
+            }
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
