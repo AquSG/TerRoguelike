@@ -7,6 +7,8 @@ using Terraria.DataStructures;
 using Terraria.ModLoader;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.Managers;
+using TerRoguelike.Particles;
 
 namespace TerRoguelike.Projectiles
 {
@@ -59,7 +61,15 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-
+            if (Projectile.timeLeft > 45)
+            {
+                if (Projectile.timeLeft % 3 == 0)
+                {
+                    ParticleManager.AddParticle(new Glow(
+                    Projectile.Center, Projectile.velocity, 5, Color.Teal * 0.4f, new Vector2(0.34f), 0, 0.96f, 3, true));
+                }
+                
+            }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, targetHitbox, Projectile.width * 0.4f);
         public override bool? CanDamage() => Projectile.timeLeft > 45 ? null : false;

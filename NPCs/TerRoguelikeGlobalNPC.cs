@@ -46,7 +46,7 @@ namespace TerRoguelike.NPCs
         }
         public int overheadArrowTime = 0;
         public bool AdaptiveArmorEnabled = false;
-        public float AdaptiveArmorCap = 200;
+        public float AdaptiveArmorCap = 400;
         public float AdaptiveArmorAddRate = 20;
         public float AdaptiveArmorDecayRate = 60;
         public float AdaptiveArmor = 0;
