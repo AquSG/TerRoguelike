@@ -41,7 +41,7 @@ namespace TerRoguelike.Rooms
         {
             if (bossSpawnPos == Vector2.Zero)
                 bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 11f);
-            if (TerRoguelikeWorld.lunarFloorInitialized)
+            if (TerRoguelikeWorld.lunarFloorInitialized && active)
             {
                 if (RoomID[RoomDict["LunarPillarRoomTopLeft"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomTopRight"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomBottomLeft"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomBottomRight"]].closedTime > 0)
                 {
