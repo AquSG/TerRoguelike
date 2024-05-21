@@ -44,7 +44,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.DeathSound = SoundID.NPCDeath12;
             NPC.knockBackResist = 0.6f;
             modNPC.drawCenter = new Vector2(0, -6);
-            modNPC.IgnoreRoomWallCollision = true;
             NPC.noTileCollide = false;
             NPC.noGravity = true;
             NPC.hide = true;

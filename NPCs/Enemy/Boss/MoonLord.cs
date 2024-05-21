@@ -74,7 +74,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public float maxHandAnchorDistance = 480;
 
 
-        public static Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex, deathrayTex;
+        public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex;
         public int leftHandWho = -1; // yes, technically moon lord's "Left" is not the same as the left for the viewer, and vice versa for right hand. I do not care. internally it will be based on viewer perspective.
         public int rightHandWho = -1;
         public int headWho = -1;
@@ -89,7 +89,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack PhantSphere = new Attack(3, 30, 179);
         public static Attack TentacleCharge = new Attack(4, 30, 600);
         public static Attack Deathray = new Attack(5, 30, 300);
-        public static Attack PhantSpawn = new Attack(6, 30, 180);
+        public static Attack Summon = new Attack(6, 18, 77);
         public static int phantSpinWindup = 50;
         public static int phantBoltWindup = 30;
         public static int phantBoltFireRate = 8;
@@ -97,6 +97,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static int phantSphereFireRate = 20;
         public static int tentacleWindup = 90;
         public static int deathrayWindup = 90;
+        public static int summonWindup = 30;
 
         public override void SetStaticDefaults()
         {
@@ -132,7 +133,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             headTex = TexDict["MoonLordHead"];
             handTex = TexDict["MoonLordHand"];
             bodyTex = TexDict["MoonLordBodyHalf"];
-            deathrayTex = TexDict["PhantasmalDeathray"];
             modNPC.AdaptiveArmorEnabled = true;
         }
         public override void OnSpawn(IEntitySource source)
@@ -841,13 +841,44 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[2] = Deathray.Id;
                 }
             }
-            else if (NPC.ai[0] == PhantSpawn.Id)
+            else if (NPC.ai[0] == Summon.Id)
             {
-                if (NPC.ai[1] >= PhantSpawn.Duration)
+                if (NPC.ai[1] < summonWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        NPC.direction = Main.rand.NextBool() ? -1 : 1;
+                        SoundEngine.PlaySound(SoundID.Zombie99 with { Volume = 0.6f, Pitch = -0.1f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 1f, Pitch = -0.4f }, NPC.Center + new Vector2(0, -80));
+                    }
+                }
+                else
+                {
+                    int time = (int)NPC.ai[1] - summonWindup;
+                    int summonTimeBetween = 12;
+                    if (time % summonTimeBetween == 0)
+                    {
+                        int summonCounter = time / summonTimeBetween;
+                        Vector2 summonPos = headPos + new Vector2(0, 80);
+                        float xOff = 50;
+                        float yOff = 25;
+                        Vector2 summonOffset = new Vector2(summonCounter <= 1 ? -xOff : xOff, summonCounter % 3 == 0 ? yOff : -yOff);
+                        summonOffset.X *= NPC.direction;
+
+                        summonPos += summonOffset;
+                        NPC spawnedNPC = NPC.NewNPCDirect(NPC.GetSource_FromThis(), summonPos, ModContent.NPCType<TrueServant>(), 0, 0, -60);
+                        spawnedNPC.velocity = summonOffset.SafeNormalize(Vector2.UnitY) * 2;
+                        spawnedNPC.rotation = summonOffset.ToRotation() + MathHelper.PiOver2;
+
+                        SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2 }, summonPos);
+                        SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, summonPos);
+                    }
+                }
+                if (NPC.ai[1] >= Summon.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = PhantSpawn.Id;
+                    NPC.ai[2] = Summon.Id;
                 }
             }
         }
@@ -856,8 +887,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, Tentacle, Deathray, PhantSpawn };
-            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, TentacleCharge, Deathray };
+            List<Attack> potentialAttacks = new List<Attack>() { PhantSpin, PhantBolt, PhantSphere, TentacleCharge, Deathray, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -1227,6 +1257,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (parent.ai[0] == Deathray.Id && parent.ai[1] >= deathrayWindup - 30)
             {
+                var deathrayTex = TextureAssets.Projectile[ModContent.ProjectileType<PhantasmalDeathray>()].Value;
                 int timeToEnd = Deathray.Duration - (int)parent.ai[1];
 
                 Vector2 deathRayConvergePos = new Vector2(parent.localAI[1], parent.localAI[2]);
