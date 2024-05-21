@@ -39,24 +39,27 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
-            bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 11f);
             if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f - 32f);
-            base.Update();
-            if (TerRoguelikeWorld.lunarFloorInitialized && !TerRoguelikeWorld.lunarBossSpawned)
+                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 11f);
+            if (TerRoguelikeWorld.lunarFloorInitialized)
             {
                 if (RoomID[RoomDict["LunarPillarRoomTopLeft"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomTopRight"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomBottomLeft"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomBottomRight"]].closedTime > 0)
                 {
-                    SetMusicMode(MusicStyle.Silent);
+                    if (!awake)
+                        SetMusicMode(MusicStyle.Silent);
                 }
                 else
+                {
                     awake = false;
+                    roomTime = 0;
+                }
             }
-            if (awake && !TerRoguelikeWorld.lunarBossSpawned)
+            if (TerRoguelikeWorld.lunarFloorInitialized && !TerRoguelikeWorld.lunarBossSpawned)
             {
                 AddBoss(bossSpawnPos, ModContent.NPCType<MoonLord>());
                 TerRoguelikeWorld.lunarBossSpawned = true;
             }
+            base.Update();
         }
         public override bool ClearCondition()
         {
@@ -67,7 +70,7 @@ namespace TerRoguelike.Rooms
         }
         public override bool StartCondition()
         {
-            if (!TerRoguelikeWorld.lunarBossSpawned)
+            if (!awake)
                 return false;
             else
                 return base.StartCondition();
@@ -79,7 +82,7 @@ namespace TerRoguelike.Rooms
         }
         public override void PostDrawTilesRoom()
         {
-            if (TerRoguelikeWorld.lunarFloorInitialized && (!TerRoguelikeWorld.lunarBossSpawned || (!awake && closedTime <= 0)))
+            if (false && TerRoguelikeWorld.lunarFloorInitialized && (!TerRoguelikeWorld.lunarBossSpawned || (!awake && closedTime <= 0)))
             {
                 if (moonLordTex == null)
                     moonLordTex = TexDict["StillMoonLord"];

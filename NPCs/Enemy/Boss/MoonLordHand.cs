@@ -124,9 +124,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 return;
             }
 
-            NPC.dontTakeDamage = false;
-            NPC.immortal = false;
-            canBeHit = true;
+            NPC.dontTakeDamage = parent.localAI[0] <= -30;
+            NPC.immortal = parent.localAI[0] <= -30;
+            canBeHit = parent.localAI[3] == 1;
             if (NPC.life <= 1)
             {
                 if (CheckDead())

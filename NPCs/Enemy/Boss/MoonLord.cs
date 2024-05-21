@@ -170,18 +170,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            for (int i = 0; i < Main.maxPlayers; i++)
+            if (NPC.localAI[0] > -90)
             {
-                Player player = Main.player[i];
-                if (!player.active)
-                    continue;
-                var modPlayer = player.ModPlayer();
-                if (modPlayer == null)
-                    continue;
+                for (int i = 0; i < Main.maxPlayers; i++)
+                {
+                    Player player = Main.player[i];
+                    if (!player.active)
+                        continue;
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer == null)
+                        continue;
 
-                modPlayer.moonLordVisualEffect = true;
+                    modPlayer.moonLordVisualEffect = true;
+                }
             }
-
 
             leftHandPos = Vector2.Lerp(leftHandPos, leftHandTargetPos, leftHandMoveInterpolant);
             if (leftHandPos.Distance(leftHandAnchor) > maxHandAnchorDistance)
@@ -301,6 +303,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            if (NPC.localAI[3] == 0)
+            {
+                if (modNPC.isRoomNPC)
+                {
+                    Room parentRoom = modNPC.GetParentRoom();
+                    if (parentRoom.awake)
+                        NPC.localAI[3] = 1;
+                }
+                else
+                    NPC.localAI[3] = 1;
+            }
+
             NPC leftHand = leftHandWho >= 0 ? Main.npc[leftHandWho] : null;
             NPC rightHand = rightHandWho >= 0 ? Main.npc[rightHandWho] : null;
             NPC head = headWho >= 0 ? Main.npc[headWho] : null;
@@ -337,13 +351,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 CheckDead();
                 return;
             }
+
+            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
+            if (NPC.localAI[3] != 1)
+            {
+                target = modNPC.GetTarget(NPC);
+                return;
+            }
+                
+
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
                 SetBossTrack(TempleGolemTheme);
             }
-
-            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
-            canBeHit = true;
 
             if (NPC.localAI[0] < 0)
             {
@@ -351,15 +371,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 1.25f);
                 }
                 NPC.localAI[0]++;
 
+                if (NPC.localAI[0] > -90)
+                {
+                    BossAI();
+                }
                 if (NPC.localAI[0] == -30)
                 {
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
-                    NPC.ai[1] = 0;
                     enemyHealthBar = new EnemyHealthBar([NPC.whoAmI, headWho, leftHandWho, rightHandWho], NPC.FullName);
                 }
             }

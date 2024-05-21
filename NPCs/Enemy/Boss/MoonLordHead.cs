@@ -115,9 +115,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 return;
             }
 
-            NPC.dontTakeDamage = false;
-            NPC.immortal = false;
-            canBeHit = true;
+            NPC.dontTakeDamage = parent.localAI[0] <= -30;
+            NPC.immortal = parent.localAI[0] <= -30;
+            canBeHit = parent.localAI[3] == 1;
             if (NPC.life <= 1)
             {
                 CheckDead();
@@ -199,7 +199,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (NPC.life > 1)
-                DrawDeathrayForNPC(NPC, Main.npc[(int)NPC.ai[2]]);
+                DrawDeathrayForNPC(NPC, Main.npc[(int)NPC.ai[0]]);
             return false;
         }
     }
