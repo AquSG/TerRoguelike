@@ -19,7 +19,6 @@ namespace TerRoguelike.Projectiles
     public class PhantasmalDeathray : ModProjectile, ILocalizedModType
     {
         // this projectile exists for PlayerDeathReason. when the deathray should hit (calculatd in Moon Lord CanHit) then this projectile is spawned on the player for 1 frame to hit them and be used as a potential damage source.
-        public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public override void SetDefaults()
         {
             Projectile.width = 2;

@@ -43,8 +43,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.HitSound = SoundID.NPCHit1;
             NPC.DeathSound = NPC.DeathSound = SoundID.NPCDeath6 with { Volume = 0.8f, Pitch = 0.1f, PitchVariance = 0.05f };
             NPC.knockBackResist = 0.6f;
-            modNPC.drawCenter = new Vector2(0, -6);
-            modNPC.IgnoreRoomWallCollision = true;
+            modNPC.drawCenter = new Vector2(0, 6);
             NPC.noTileCollide = false;
             NPC.noGravity = true;
             NPC.hide = true;
@@ -60,15 +59,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         
         public override void AI()
         {
+            NPC.localAI[0]++;
+            if (NPC.localAI[0] < 50)
+            {
+                ParticleManager.AddParticle(new Glow(
+                    NPC.Center, NPC.velocity, 30, Color.Teal * 0.23f, new Vector2(0.15f), 0, 0.96f, 30, true));
+            }
+
             NPC.knockBackResist = 0.6f;
-            NPC.DeathSound = SoundID.NPCDeath6 with { Volume = 0.8f, Pitch = 0.1f, PitchVariance = 0.05f }; /// REMOVE THIS
             Entity target = modNPC.GetTarget(NPC);
             float velCap = 5;
 
             bool canHit = target != null && CanHitInLine(NPC.Center, target.Center);
             if (target != null)
             {
-                if (NPC.ai[1] == 0 && NPC.Center.Distance(target.Center) < 500 && canHit)
+                if (NPC.ai[1] == 0 && NPC.Center.Distance(target.Center) < 500 && canHit) // start dash
                 {
                     NPC.ai[1] = 1;
                     SoundEngine.PlaySound(SoundID.NPCHit45 with { Volume = 0.25f, Pitch = 0.5f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
@@ -82,33 +87,33 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             20, color * 0.9f, new Vector2(0.13f, 0.27f) * Main.rand.NextFloat(0.7f, 1f) * 0.6f, rot, true, false));
                     }
                 }
-                if (NPC.ai[1] != 0)
+                if (NPC.ai[1] != 0) // timer outside of default movement
                     NPC.ai[1]++;
             }
             else if (NPC.ai[1] > 0 && NPC.ai[1] <= 60)
                 NPC.ai[1] = 0;
 
-            if (NPC.ai[1] >= 0 && NPC.ai[1] < 60 && canHit)
+            if (NPC.ai[1] >= 0 && NPC.ai[1] < 60 && canHit) // default movement while LoS
             {
-                if (NPC.ai[1] != 0)
+                if (NPC.ai[1] != 0) // Charge windup
                     NPC.velocity *= 0.92f;
                 NPC.velocity += (target.Center - NPC.Center).SafeNormalize(Vector2.UnitX) * 0.2f;
                 if (NPC.velocity.Length() > velCap)
                     NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * velCap;
             }   
-            else if (NPC.ai[1] == 60)
+            else if (NPC.ai[1] == 60) // charge
             {
                 SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.16f, Pitch = 0.4f, MaxInstances = 10, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                 NPC.velocity = (NPC.rotation - MathHelper.PiOver2).ToRotationVector2() * 12f;
             }
-            else if (NPC.ai[1] <= 0 && !canHit)
+            else if (NPC.ai[1] <= 0 && !canHit) //default movement no LoS
             {
                 NPC.velocity *= 0.98f;
                 NPC.velocity += (NPC.velocity.RotatedBy(Main.rand.NextFloat(-0.1f, 0.1f))).SafeNormalize(Vector2.UnitX) * 0.1f;
                 if (NPC.velocity.Length() > velCap)
                     NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * velCap;
             }
-            if (NPC.ai[1] < 0)
+            if (NPC.ai[1] < 0) // bonk stun slowdown
                 NPC.velocity *= 0.97f;
 
             NPC.rotation = NPC.rotation.AngleTowards(NPC.velocity.ToRotation() + MathHelper.PiOver2, 0.1f);
@@ -124,7 +129,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.velocity.Y = -NPC.oldVelocity.Y * 0.5f;
                 }
                 NPC.velocity *= 0.8f;
-                if (NPC.ai[1] > 60)
+                if (NPC.ai[1] > 60) // bonk while dashing
                 {
                     NPC.ai[1] = -90;
                     NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
@@ -142,7 +147,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (NPC.ai[1] >= 60)
+            if (NPC.ai[1] >= 60) // dashing
             {
                 NPC.knockBackResist = 0;
                 if (NPC.ai[1] % 2 == 0)
@@ -162,6 +167,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipVertically));
                 }
             }
+
+            modNPC.drawCenter = new Vector2(0, 6).RotatedBy(NPC.rotation);
         }
 
         public override void HitEffect(NPC.HitInfo hit)
@@ -201,11 +208,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
         }
         public override bool? CanFallThroughPlatforms() => true;
+        public override bool CanHitNPC(NPC target) => NPC.localAI[0] >= 60;
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot) => NPC.localAI[0] >= 60;
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
 
-            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, Color.White, NPC.rotation, NPC.frame.Size() * new Vector2(0.5f, 0.35f), NPC.scale, SpriteEffects.None);
+            float opacity = 1;
+            if (NPC.localAI[0] < 60)
+            {
+                opacity *= NPC.localAI[0] / 60f;
+            }
+            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, Color.White * opacity, NPC.rotation, NPC.frame.Size() * new Vector2(0.5f, 0.35f), NPC.scale, SpriteEffects.None);
             return false;
         }
     }

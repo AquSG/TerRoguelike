@@ -157,7 +157,6 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/TrueEyeOfCthulhu",
                 "TerRoguelike/Particles/Wriggler",
                 "TerRoguelike/ExtraTextures/Circle",
-                "TerRoguelike/NPCs/Enemy/Boss/PhantasmalDeathray",
             };
             foreach (string path in pathList)
             {
