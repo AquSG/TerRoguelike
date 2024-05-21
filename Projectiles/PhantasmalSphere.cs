@@ -144,7 +144,6 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnKill(int timeLeft)
         {
-            SoundEngine.PlaySound(SoundID.NPCDeath6 with { Volume = 0.7f }, Projectile.Center);
             for (int i = 0; i < 15; i++)
             {
                 Color outlineColor = Color.Lerp(Color.Teal, Color.Cyan, 0.4f);

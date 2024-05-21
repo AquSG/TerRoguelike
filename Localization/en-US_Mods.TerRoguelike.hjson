@@ -838,6 +838,7 @@ NPCs: {
 	MoonLord.DisplayName: Moon Lord
 	MoonLordHand.DisplayName: Moon Lord's Eye
 	MoonLordHead.DisplayName: Moon Lord's Eye
+	TrueServant.DisplayName: True Servant
 }
 
 ItemBasin.DisplayName: Item Basin
