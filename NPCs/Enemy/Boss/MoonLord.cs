@@ -877,7 +877,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = TentacleCharge.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
