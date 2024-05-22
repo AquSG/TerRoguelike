@@ -57,6 +57,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
+            Projectile.scale = Projectile.ai[0];
             //scale support
             Projectile.position = Projectile.Center + new Vector2(-2 * Projectile.scale, -2 * Projectile.scale);
             Projectile.width = (int)(4 * Projectile.scale);

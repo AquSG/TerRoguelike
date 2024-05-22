@@ -28,7 +28,8 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
-using System.Collections;
+using Terraria.GameContent.Shaders;
+using Terraria.Graphics.Effects;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -72,15 +73,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 rightHandTargetPos;
         public float rightHandMoveInterpolant;
         public float maxHandAnchorDistance = 480;
+        public int idleCounter = 0;
 
-
-        public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex;
+        public static readonly SoundStyle Break = new SoundStyle("TerRoguelike/Sounds/GlassBreak");
+        public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex, perlinTex;
         public int leftHandWho = -1; // yes, technically moon lord's "Left" is not the same as the left for the viewer, and vice versa for right hand. I do not care. internally it will be based on viewer perspective.
         public int rightHandWho = -1;
         public int headWho = -1;
 
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
+        public int cutsceneDuration = 160;
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 130);
@@ -133,6 +135,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             headTex = TexDict["MoonLordHead"];
             handTex = TexDict["MoonLordHand"];
             bodyTex = TexDict["MoonLordBodyHalf"];
+            perlinTex = TexDict["Perlin"];
             modNPC.AdaptiveArmorEnabled = true;
         }
         public override void OnSpawn(IEntitySource source)
@@ -355,7 +358,35 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
             if (NPC.localAI[3] != 1)
             {
+                if (NPC.localAI[1] > 0)
+                    NPC.localAI[1]--;
+
+                idleCounter++;
+                float leftPeriod = (float)Math.Cos(idleCounter * 0.008f);
+                float RightPeriod = (float)Math.Cos(idleCounter * 0.008f + 0.6f);
+
+                leftHandTargetPos = leftHandAnchor + new Vector2(100, 0) + new Vector2(-8, 16) * leftPeriod;
+                rightHandTargetPos = rightHandAnchor + new Vector2(-100, 0) + new Vector2(8, 16) * RightPeriod;
                 target = modNPC.GetTarget(NPC);
+
+                for (int i = 0; i < Main.maxPlayers; i++)
+                {
+                    Player player = Main.player[i];
+                    if (!player.active)
+                        continue;
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer == null)
+                        continue;
+
+                    if (player.Center.Distance(NPC.Center + new Vector2(0, -80)) < 440)
+                    {
+                        modPlayer.brainSucked = true;
+                        if (Main.rand.NextBool(3))
+                        {
+                            modPlayer.brainSucklerTime--;
+                        }
+                    }
+                }
                 return;
             }
                 
@@ -371,16 +402,53 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 1.25f);
+                    CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -80), cutsceneDuration, 30, 30, 1.25f);
                 }
                 NPC.localAI[0]++;
 
+                if (NPC.localAI[0] == -120)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.8f, Pitch = -0.15f, PitchVariance = 0 }, NPC.Center + new Vector2(0, -80));
+                }
+                if (NPC.localAI[0] == -90)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath58 with { Volume = 1f, Pitch = 0f }, NPC.Center + new Vector2(0, -80));
+                }
                 if (NPC.localAI[0] > -90)
                 {
                     BossAI();
+                    if (NPC.localAI[0] == -80)
+                    {
+                        SoundEngine.PlaySound(Break with { Volume = 0.4f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.Shatter with { Volume = 0.2f, Pitch = -0.5f }, NPC.Center + new Vector2(0, -80));
+                        float radius = 470;
+                        Vector2 basePos = NPC.Center + new Vector2(0, -80);
+                        for (int d = 0; d < 16; d++)
+                        {
+                            float radiusCompletion = (float)Math.Pow(d / 16f, 0.65f);
+                            Color color = Color.Lerp(Color.Teal, Color.LightBlue, radiusCompletion) * MathHelper.Lerp(0.6f, 0.7f, radiusCompletion) * 0.8f;
+                            for (int i = 0; i < 26; i++)
+                            {
+                                float completion = i / 26f;
+                                float baseRot = MathHelper.TwoPi * (completion);
+                                baseRot += Main.rand.NextFloat(-0.2f, 0.2f);
+                                Vector2 particleSpawnPos = basePos + baseRot.ToRotationVector2() * radiusCompletion * radius;
+                                Vector2 particleVel = baseRot.ToRotationVector2() * Main.rand.NextFloat(4f, 10f) * MathHelper.Lerp(0.75f, 1f, radiusCompletion);
+                                particleVel.X *= 1.3f;
+                                particleVel.Y -= 2f;
+                                ParticleManager.AddParticle(new Shard(
+                                    particleSpawnPos, particleVel,
+                                    Main.rand.Next(60, 90), color, new Vector2(MathHelper.Lerp(0.2f, 0.3f, completion)), Main.rand.Next(4), Main.rand.NextFloat(MathHelper.TwoPi), 0.99f,
+                                    60, 0.1f, Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, true));
+                                ParticleManager.AddParticle(new Square(
+                                    particleSpawnPos, particleVel, Main.rand.Next(30, 60), color * 1.4f, new Vector2(1.5f), baseRot, 0.96f, 60, true));
+                            }
+                        }
+                    }
                 }
                 if (NPC.localAI[0] == -30)
                 {
+                    NPC.localAI[1] = 0;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     enemyHealthBar = new EnemyHealthBar([NPC.whoAmI, headWho, leftHandWho, rightHandWho], NPC.FullName);
@@ -1208,7 +1276,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int mouthForceFrame = 0;
 
             int sharedFrame = 0;
-            if (NPC.ai[0] == None.Id)
+            if (NPC.localAI[3] == 0)
+            {
+                sharedFrame = (int)(idleCounter % 680 * 0.1f);
+            }
+            else if (NPC.ai[0] == None.Id)
             {
                 sharedFrame = (int)(NPC.ai[1] * 0.125f);
             }
@@ -1227,6 +1299,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     mouthForceFrame = 1;
                 else
                     mouthForceFrame = 2;
+            }
+            if (NPC.localAI[0] < 0)
+            {
+                if (NPC.localAI[0] > -110)
+                {
+                    if (NPC.localAI[0] <= -100)
+                    {
+                        mouthForceFrame = 1;
+                    }
+                    else if (NPC.localAI[0] <= -70)
+                    {
+                        mouthForceFrame = 2;
+                    }
+                    else if (NPC.localAI[0] <= -62)
+                    {
+                        mouthForceFrame = 1;
+                    }
+                }
             }
             if (sharedFrame > 6)
                 sharedFrame = 0;
@@ -1316,6 +1406,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            float colorLerp = MathHelper.Clamp(MathHelper.Lerp(1f, 0.35f, -NPC.localAI[0] / 90), 0.35f, 1f);
+            Color MoonLordColor = Color.Lerp(Color.LightGray, Color.White, colorLerp);
+
             bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;
             bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;
             bool headAlive = headWho >= 0 && Main.npc[headWho].life > 1;
@@ -1348,44 +1441,44 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
 
             List<StoredDraw> draws = [];
-            draws.Add(new StoredDraw(upperArmTex, leftShoulderPos, null, Color.White, leftUpperArmRot, leftUpperArmOrigin, NPC.scale, SpriteEffects.None));
-            draws.Add(new StoredDraw(upperArmTex, rightShoulderPos, null, Color.White, rightUpperArmRot, rightUpperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(upperArmTex, leftShoulderPos, null, MoonLordColor, leftUpperArmRot, leftUpperArmOrigin, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(upperArmTex, rightShoulderPos, null, MoonLordColor, rightUpperArmRot, rightUpperArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally));
 
             for (int i = -1; i <= 1; i += 2)
             {
-                draws.Add(new StoredDraw(bodyTex, bodyDrawPos, null, Color.White, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally));
+                draws.Add(new StoredDraw(bodyTex, bodyDrawPos, null, MoonLordColor, 0, bodyTex.Size() * new Vector2(i == -1 ? 1 : 0, 0.5f), NPC.scale, i == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally));
             }
-            draws.Add(new StoredDraw(coreCrackTex, NPC.Center + new Vector2(2, -11), null, Color.White, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
-            draws.Add(new StoredDraw(coreTex, NPC.Center + new Vector2(-1, 0), coreFrame, Color.White, 0, coreFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(coreCrackTex, NPC.Center + new Vector2(2, -11), null, MoonLordColor, 0, coreCrackTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(coreTex, NPC.Center + new Vector2(-1, 0), coreFrame, MoonLordColor, 0, coreFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
-            draws.Add(new StoredDraw(lowerArmTex, leftElbowPos, null, Color.White, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None));
-            draws.Add(new StoredDraw(lowerArmTex, rightElbowPos, null, Color.White, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(lowerArmTex, leftElbowPos, null, MoonLordColor, leftLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(lowerArmTex, rightElbowPos, null, MoonLordColor, rightLowerArmRot, lowerArmOrigin, NPC.scale, SpriteEffects.FlipHorizontally));
 
-            draws.Add(new StoredDraw(emptyEyeTex, leftHandPos + new Vector2(0, -2), emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(emptyEyeTex, leftHandPos + new Vector2(0, -2), emptyEyeFrame, MoonLordColor, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             if (leftHandAlive)
             {
-                draws.Add(new StoredDraw(sideEyeTex, leftHandPos, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
-                draws.Add(new StoredDraw(innerEyeTex, leftHandPos + leftEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(sideEyeTex, leftHandPos, null, MoonLordColor, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(innerEyeTex, leftHandPos + leftEyeVector, null, MoonLordColor, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             }
-            draws.Add(new StoredDraw(handTex, leftHandPos + new Vector2(2, -49), leftHandFrame, Color.White, 0, leftHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(handTex, leftHandPos + new Vector2(2, -49), leftHandFrame, MoonLordColor, 0, leftHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
-            draws.Add(new StoredDraw(emptyEyeTex, rightHandPos + new Vector2(0, -2), emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(emptyEyeTex, rightHandPos + new Vector2(0, -2), emptyEyeFrame, MoonLordColor, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
             if (rightHandAlive)
             {
-                draws.Add(new StoredDraw(sideEyeTex, rightHandPos, null, Color.White, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
-                draws.Add(new StoredDraw(innerEyeTex, rightHandPos + rightEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(sideEyeTex, rightHandPos, null, MoonLordColor, 0, sideEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
+                draws.Add(new StoredDraw(innerEyeTex, rightHandPos + rightEyeVector, null, MoonLordColor, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             }
-            draws.Add(new StoredDraw(handTex, rightHandPos + new Vector2(-2, -49), rightHandFrame, Color.White, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
+            draws.Add(new StoredDraw(handTex, rightHandPos + new Vector2(-2, -49), rightHandFrame, MoonLordColor, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
 
-            draws.Add(new StoredDraw(headTex, headPos + new Vector2(0, 4), null, Color.White, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None));
-            draws.Add(new StoredDraw(mouthTex, headPos + new Vector2(1, 212), mouthFrame, Color.White, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(headTex, headPos + new Vector2(0, 4), null, MoonLordColor, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(mouthTex, headPos + new Vector2(1, 212), mouthFrame, MoonLordColor, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
-            draws.Add(new StoredDraw(emptyEyeTex, headPos, emptyEyeFrame, Color.White, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(emptyEyeTex, headPos, emptyEyeFrame, MoonLordColor, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             if (headWho >= 0)
             {
-                draws.Add(new StoredDraw(topEyeTex, headPos, null, Color.White, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
-                draws.Add(new StoredDraw(innerEyeTex, headPos + headEyeVector, null, Color.White, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
-                draws.Add(new StoredDraw(topEyeOverlayTex, headPos + new Vector2(0, 4), headEyeFrame, Color.White, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(topEyeTex, headPos, null, MoonLordColor, 0, topEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(innerEyeTex, headPos + headEyeVector, null, MoonLordColor, 0, innerEyeTex.Size() * 0.5f, NPC.scale, SpriteEffects.None));
+                draws.Add(new StoredDraw(topEyeOverlayTex, headPos + new Vector2(0, 4), headEyeFrame, MoonLordColor, 0, headEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
             }
 
             Vector2 drawOff = -Main.screenPosition;
@@ -1418,7 +1511,44 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 draws[i].Draw(drawOff);
             }
+
+            if (NPC.localAI[0] < 0)
+            {
+                DrawForcefield();
+            }
             return false;
+        }
+        public void DrawForcefield()
+        {
+            Vector2 drawpos = NPC.Center - Main.screenPosition;
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin((SpriteSortMode)1, BlendState.AlphaBlend, SamplerState.PointWrap, DepthStencilState.Default, RasterizerState.CullNone, null, Main.Transform);
+            float shieldExpandIntensity = (float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.7f) * 0.15f + 0.15f;
+            float shieldImpulseTime = NPC.localAI[1];
+            float shieldStrength = ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 0.7f) * 0.25f + 0.5f) * TerRoguelikeWorld.chainList.Count * 0.25f;
+            Color shieldColor = Color.Lerp(Color.White, Color.Teal, 0.5f);
+            shieldColor.A = 180;
+            if (shieldImpulseTime > 0f && shieldImpulseTime <= 120f)
+            {
+                shieldExpandIntensity += 0.8f * (shieldImpulseTime / 120f);
+                shieldStrength += 0.2f * (shieldImpulseTime / 120f);
+            }
+            if (NPC.localAI[0] >= -80)
+            {
+                int time = (int)NPC.localAI[0] + 80;
+                float completion = time / 80f;
+                shieldExpandIntensity += 20 * completion;
+                shieldStrength -= completion * 0.8f;
+                shieldColor = Color.Lerp(shieldColor, Color.White, completion);
+            }
+            Filters.Scene["Vortex"].GetShader().UseIntensity(1f + shieldExpandIntensity).UseProgress(0f);
+            Rectangle frame = new Rectangle(0, 0, 2000, 1300);
+            DrawData drawdata = new DrawData(perlinTex, drawpos + new Vector2(0, -72f), frame, shieldColor * (shieldStrength * 0.8f + 0.2f), NPC.rotation, frame.Size() * 0.5f, NPC.scale * (1f + shieldExpandIntensity * 0.05f), SpriteEffects.None, 0f);
+            GameShaders.Misc["ForceField"].UseColor(new Vector3(1f + shieldExpandIntensity * 0.5f));
+            GameShaders.Misc["ForceField"].Apply(drawdata);
+            drawdata.Draw(Main.spriteBatch);
+            StartVanillaSpritebatch();
         }
     }
 }
