@@ -35,6 +35,7 @@ using TerRoguelike.UI;
 using TerRoguelike.Tiles;
 using Terraria.GameInput;
 using TerRoguelike.Particles;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Systems
 {
@@ -714,6 +715,15 @@ namespace TerRoguelike.Systems
                         if ((int)(chain.Length * (chain.TimeLeft / (float)chain.MaxTimeLeft)) == 1)
                         {
                             SoundEngine.PlaySound(SoundID.DD2_WitherBeastDeath with { Volume = 0.8f }, soundPos);
+                            int wantedType = ModContent.NPCType<MoonLord>();
+                            for (int n = 0; n < Main.maxNPCs; n++)
+                            {
+                                NPC npc = Main.npc[n];
+                                if (npc == null || !npc.active)
+                                    continue;
+                                if (npc.type == wantedType && npc.localAI[3] == 0)
+                                    npc.localAI[1] = 120;
+                            }
                         }
                         else
                             SoundEngine.PlaySound(SoundID.DD2_WitherBeastCrystalImpact with { Volume = 0.8f }, soundPos);
