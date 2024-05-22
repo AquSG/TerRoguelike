@@ -393,7 +393,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (modNPC.isRoomNPC && NPC.localAI[0] == -(cutsceneDuration + 30))
             {
-                SetBossTrack(TempleGolemTheme);
+                SetBossTrack(FinalBoss1Theme);
             }
 
             if (NPC.localAI[0] < 0)
@@ -408,7 +408,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -120)
                 {
-                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.8f, Pitch = -0.15f, PitchVariance = 0 }, NPC.Center + new Vector2(0, -80));
+                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.6f, Pitch = -0.15f, PitchVariance = 0 }, NPC.Center + new Vector2(0, -80));
                 }
                 if (NPC.localAI[0] == -90)
                 {
@@ -419,8 +419,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     BossAI();
                     if (NPC.localAI[0] == -80)
                     {
-                        SoundEngine.PlaySound(Break with { Volume = 0.4f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
-                        SoundEngine.PlaySound(SoundID.Shatter with { Volume = 0.2f, Pitch = -0.5f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(Break with { Volume = 0.3f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
+                        SoundEngine.PlaySound(SoundID.Shatter with { Volume = 0.15f, Pitch = -0.5f }, NPC.Center + new Vector2(0, -80));
                         float radius = 470;
                         Vector2 basePos = NPC.Center + new Vector2(0, -80);
                         for (int d = 0; d < 16; d++)
