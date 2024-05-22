@@ -127,6 +127,11 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/TempleGolemThemeStart",
             "TerRoguelike/Tracks/TempleGolemThemeEnd",
             0.55f);
+        public static BossTheme FinalBoss1Theme = new(
+            "TerRoguelike/Tracks/FinalBoss1",
+            "TerRoguelike/Tracks/FinalBoss1Start",
+            "TerRoguelike/Tracks/FinalBoss1End",
+            0.65f);
         public static BossTheme FinalBoss2PreludeTheme = new(
             "TerRoguelike/Tracks/FinalBoss2Prelude",
             "TerRoguelike/Tracks/FinalBoss2PreludeStart",
@@ -185,6 +190,9 @@ namespace TerRoguelike.Systems
                 TempleGolemTheme.BattleTrack,
                 TempleGolemTheme.StartTrack,
                 TempleGolemTheme.EndTrack,
+                FinalBoss1Theme.BattleTrack,
+                FinalBoss1Theme.StartTrack,
+                FinalBoss1Theme.EndTrack,
                 FinalBoss2PreludeTheme.BattleTrack,
                 FinalBoss2PreludeTheme.StartTrack,
                 FinalBoss2Theme.BattleTrack,
