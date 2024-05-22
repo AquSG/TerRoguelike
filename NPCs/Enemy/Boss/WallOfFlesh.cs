@@ -697,7 +697,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 modNPC.ignitedStacks.Clear();
                 if (modNPC.isRoomNPC)
                 {
-                    ActiveBossTheme.endFlag = true;
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
                     Room room = RoomList[modNPC.sourceRoomListID];
                     room.bossDead = true;
                     ClearChildren();

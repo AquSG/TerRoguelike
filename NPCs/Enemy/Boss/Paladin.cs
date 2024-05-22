@@ -784,7 +784,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
                 if (modNPC.isRoomNPC)
                 {
-                    ActiveBossTheme.endFlag = true;
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
                     RoomList[modNPC.sourceRoomListID].bossDead = true;
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
