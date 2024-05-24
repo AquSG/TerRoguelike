@@ -159,6 +159,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/Circle",
                 "TerRoguelike/ExtraTextures/Perlin",
                 "TerRoguelike/Particles/Shard",
+                "TerRoguelike/NPCs/Enemy/Boss/TrueBrainEye",
             };
             foreach (string path in pathList)
             {

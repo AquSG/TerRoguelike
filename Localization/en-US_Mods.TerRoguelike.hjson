@@ -839,6 +839,7 @@ NPCs: {
 	MoonLordHand.DisplayName: Moon Lord's Eye
 	MoonLordHead.DisplayName: Moon Lord's Eye
 	TrueServant.DisplayName: True Servant of Cthulhu
+	TrueBrain.DisplayName: True Brain of Cthulhu
 }
 
 ItemBasin.DisplayName: Item Basin
