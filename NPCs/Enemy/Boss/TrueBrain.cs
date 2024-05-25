@@ -134,7 +134,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void AI()
         {
             NPC.rotation = 0f;
-            NPC.frameCounter += 0.2d;
+            NPC.frameCounter += 0.12d;
             if (deadTime > 0)
             {
                 CheckDead();
