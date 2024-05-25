@@ -83,7 +83,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public int deadTime = 0;
         public int cutsceneDuration = 160;
-        public int deathCutsceneDuration = 120;
+        public int deathCutsceneDuration = 600;
+        public int deathBlackWhiteStartTime = 180;
+        public int deathBlackWhiteStopTime = 270;
 
         public static Attack None = new Attack(0, 0, 130);
         public static Attack PhantSpin = new Attack(1, 30, 260);
@@ -138,6 +140,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             perlinTex = TexDict["Perlin"];
             modNPC.AdaptiveArmorEnabled = true;
         }
+        public override void DrawBehind(int index)
+        {
+            if (deadTime >= deathBlackWhiteStartTime && deadTime < deathBlackWhiteStopTime)
+            {
+                NPC.behindTiles = false;
+                Main.instance.DrawCacheNPCsOverPlayers.Add(index);
+            }
+            else
+            {
+                NPC.behindTiles = true;
+            }
+        }
         public override void OnSpawn(IEntitySource source)
         {
             NPC.immortal = true;
@@ -173,7 +187,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            if (NPC.localAI[0] > -90)
+            if (NPC.localAI[0] > -90 && deadTime < deathBlackWhiteStartTime - 45)
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
                 {
@@ -402,7 +416,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -80), cutsceneDuration, 30, 30, 1.25f);
+                    CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), cutsceneDuration, 30, 30, 1.25f);
                 }
                 NPC.localAI[0]++;
 
@@ -1039,7 +1053,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     room.bossDead = true;
                     ClearChildren();
                 }
-                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
+                CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), deathCutsceneDuration, 30, 30, 1f);
             }
 
             void ClearChildren()
@@ -1507,9 +1521,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 StartVanillaSpritebatch();
             }
 
-            for (int i = 0; i < draws.Count; i++)
+            if (deadTime >= deathBlackWhiteStartTime)
             {
-                draws[i].Draw(drawOff);
+                Vector2 trueBrainPos = headPos + (deadTime / (float)deathCutsceneDuration) * new Vector2(0, - 400);
+                Vector2 wantedEyeVector = Main.LocalPlayer == null ? Vector2.Zero : Main.LocalPlayer.Center - trueBrainPos;
+                var trueBrainDrawList = TerRoguelikeWorld.GetTrueBrainDrawList(trueBrainPos, wantedEyeVector, new Vector2(1f), Color.White);
+                if (!NPC.behindTiles)
+                {
+                    postDrawAllBlack = true;
+                    for (int i = 0; i < trueBrainDrawList.Count; i++)
+                    {
+                        var draw = trueBrainDrawList[i];
+                        draws.Add(draw);
+                    }
+                    for (int i = 0; i < draws.Count; i++)
+                    {
+                        postDrawEverythingCache.Add(draws[i]);
+                    }
+                }
+                else
+                {
+                    draws.Clear();
+                    for (int i = 0; i < trueBrainDrawList.Count; i++)
+                    {
+                        postDrawEverythingCache.Add(trueBrainDrawList[i]);
+                    }
+                }
+            }
+
+            if (NPC.behindTiles)
+            {
+                for (int i = 0; i < draws.Count; i++)
+                {
+                    draws[i].Draw(drawOff);
+                }
             }
 
             if (NPC.localAI[0] < 0)

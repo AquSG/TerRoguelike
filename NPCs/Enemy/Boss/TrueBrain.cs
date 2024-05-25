@@ -75,7 +75,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.lifeMax = 60000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
-            modNPC.drawCenter = new Vector2(0, 0);
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.OverrideIgniteVisual = true;
             NPC.noTileCollide = true;
@@ -134,7 +133,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void AI()
         {
             NPC.rotation = 0f;
-            NPC.frameCounter += 0.12d;
+            NPC.frameCounter += 0.125d;
             if (deadTime > 0)
             {
                 CheckDead();
@@ -149,7 +148,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -80), cutsceneDuration, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(NPC.Center + eyePosition, cutsceneDuration, 30, 30, 2.5f);
                 }
                 NPC.localAI[0]++;
 
@@ -366,6 +365,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool CanHitNPC(NPC target)
         {
             return ableToHit;
+        }
+        public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
+        {
+            boundingBox = NPC.Hitbox;
         }
         public override void FindFrame(int frameHeight)
         {
