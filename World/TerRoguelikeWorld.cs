@@ -19,6 +19,9 @@ using static TerRoguelike.Managers.ItemManager;
 using TerRoguelike.Particles;
 using Steamworks;
 using TerRoguelike.Utilities;
+using TerRoguelike.NPCs.Enemy.Boss;
+using Terraria.GameContent;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace TerRoguelike.World
 {
@@ -103,6 +106,28 @@ namespace TerRoguelike.World
             modPlayer.escapeArrowTime = 600;
             Room lunarStartRoom = SchematicManager.RoomID[SchematicManager.FloorID[SchematicManager.FloorDict["Lunar"]].StartRoomID];
             modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 8f;
+        }
+
+        public static List<StoredDraw> GetTrueBrainDrawList(Vector2 position, Vector2 eyeVector, Vector2 scale, Color color)
+        {
+            var draws = new List<StoredDraw>();
+            float maxLength = 12;
+            if (eyeVector.Length() > maxLength)
+                eyeVector = eyeVector.SafeNormalize(Vector2.UnitY) * maxLength;
+
+            var trueBrainTex = TextureAssets.Npc[ModContent.NPCType<TrueBrain>()].Value;
+            var trueBrainEyeTex = TextureManager.TexDict["TrueBrainEye"];
+            var trueBrainInnerEyeTex = TextureManager.TexDict["MoonLordInnerEye"];
+            int frameCount = Main.npcFrameCount[ModContent.NPCType<TrueBrain>()];
+            int frameHeight = trueBrainTex.Height / frameCount;
+            int currentFrame = (int)(Main.GlobalTimeWrappedHourly * 8) % (frameCount - 1) + 1;
+
+            var frame = new Rectangle(0, frameHeight * currentFrame, trueBrainTex.Width, frameHeight - 2);
+            draws.Add(new(trueBrainTex, position, frame, color, 0, frame.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(trueBrainEyeTex, position + new Vector2(0, -18), null, color, 0, trueBrainEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(trueBrainInnerEyeTex, position + new Vector2(0, -19) + eyeVector * new Vector2(0.35f, 1f), null, color, 0, trueBrainInnerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+
+            return draws;
         }
     }
     public class ItemBasinEntity

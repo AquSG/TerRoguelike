@@ -46,12 +46,16 @@ namespace TerRoguelike.Systems
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
         public static bool obtainedRoomListFromServer = false;
         public static bool debugDrawNotSpawnedEnemies = false;
+        public static List<StoredDraw> postDrawEverythingCache = [];
+        public static bool postDrawAllBlack = false;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
         }
         public override void PostUpdateWorld()
         {
+            postDrawAllBlack = false;
+
             if (escapeTime > 0 && escape)
             {
                 if (quakeCooldown <= 0)
@@ -425,6 +429,34 @@ namespace TerRoguelike.Systems
 
                 Main.spriteBatch.End();
             }
+
+            if (postDrawEverythingCache == null || postDrawEverythingCache.Count == 0)
+                return;
+
+            Vector2 offset = -Main.screenPosition;
+            if (postDrawAllBlack)
+            {
+                for (int i = 0; i < Main.combatText.Length; i++)
+                {
+                    Main.combatText[i].active = false;
+                }
+                StartAlphaBlendSpritebatch(false);
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.White, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f), SpriteEffects.None);
+                StartAlphaBlendSpritebatch();
+
+                Vector3 colorHSL = Main.rgbToHsl(Color.Black);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+            }
+            else
+                StartAlphaBlendSpritebatch(false);
+            foreach (var draw in postDrawEverythingCache)
+            {
+                draw.Draw(offset);
+            }
+            postDrawEverythingCache.Clear();
+            Main.spriteBatch.End();
         }
         public static void DrawRoomWalls(SpriteBatch spriteBatch)
         {
@@ -978,6 +1010,7 @@ namespace TerRoguelike.Systems
             sanctuaryCount = 0;
             quakeTime = 0;
             quakeCooldown = 0;
+            postDrawEverythingCache.Clear();
         }
         public override void SetStaticDefaults()
         {
