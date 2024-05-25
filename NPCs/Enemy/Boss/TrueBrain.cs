@@ -411,7 +411,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 StartVanillaSpritebatch();
 
             }
-
+            
             for (int i = 0; i < draws.Count; i++)
             {
                 draws[i].Draw(drawOff);
