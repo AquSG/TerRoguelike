@@ -251,6 +251,7 @@ namespace TerRoguelike.Utilities
 
             return false;
         }
+        public static Vector2 Abs(this Vector2 vector) => new(Math.Abs(vector.X), Math.Abs(vector.Y));
         /// <summary>
         /// Checks for tile collisions in a line from the start to end point
         /// </summary>

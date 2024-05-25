@@ -45,8 +45,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int currentFrame = 0;
         public Texture2D eyeTex, innerEyeTex;
         public Vector2 eyeVector = Vector2.Zero;
-        public Vector2 eyePosition { get { return new Vector2(0, -18); } }
-        public Vector2 innerEyePosition { get { return new Vector2(0, -20); } }
+        public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
+        public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
 
         public int deadTime = 0;
         public int cutsceneDuration = 120;
@@ -68,8 +68,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 60;
-            NPC.height = 88;
+            NPC.width = 240;
+            NPC.height = 150;
             NPC.aiStyle = -1;
             NPC.damage = 36;
             NPC.lifeMax = 60000;
@@ -84,6 +84,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.AdaptiveArmorAddRate = 50;
             innerEyeTex = TexDict["MoonLordInnerEye"];
             eyeTex = TexDict["TrueBrainEye"];
+            modNPC.drawCenter = new Vector2(0, 32);
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -98,7 +99,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            if (NPC.localAI[0] > -cutsceneDuration)
+            if (NPC.localAI[0] >= -(cutsceneDuration + 30))
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
                 {
@@ -132,6 +133,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.rotation = 0f;
             NPC.frameCounter += 0.2d;
             if (deadTime > 0)
             {
@@ -380,9 +382,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             List<StoredDraw> draws = [];
 
-            draws.Add(new(tex, NPC.Center, NPC.frame, npcColor, NPC.rotation, NPC.frame.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(tex, NPC.Center + modNPC.drawCenter.RotatedBy(NPC.rotation), NPC.frame, npcColor, NPC.rotation, NPC.frame.Size() * 0.5f, scale, SpriteEffects.None));
             draws.Add(new(eyeTex, NPC.Center + eyePosition.RotatedBy(NPC.rotation), null, npcColor, NPC.rotation, eyeTex.Size() * 0.5f, scale, SpriteEffects.None));
-            draws.Add(new(innerEyeTex, NPC.Center + innerEyePosition.RotatedBy(NPC.rotation) + eyeVector * new Vector2(0.35f, 1f), null, npcColor, NPC.rotation, innerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(innerEyeTex, NPC.Center + innerEyePosition.RotatedBy(NPC.rotation) + eyeVector * new Vector2(0.35f, 1f), null, npcColor, 0, innerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
 
             Vector2 drawOff = -Main.screenPosition;
 
@@ -406,8 +408,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         draw.Draw(drawOff + Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
                     }
                 }
-
                 StartVanillaSpritebatch();
+
             }
 
             for (int i = 0; i < draws.Count; i++)
