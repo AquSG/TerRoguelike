@@ -187,7 +187,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            if (NPC.localAI[0] > -90 && deadTime < deathBlackWhiteStartTime - 45)
+            if (NPC.localAI[0] > -90 && deadTime < deathBlackWhiteStartTime - 120)
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
                 {
@@ -1070,7 +1070,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     Main.npc[rightHandWho].ai[0] = 1;
                 }
-                CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), deathCutsceneDuration, 30, 30, 1f);
+                CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), deathCutsceneDuration, 30, 30, 1.000001f);
             }
 
             void ClearChildren()
@@ -1098,15 +1098,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (deadTime < deathBlackWhiteStartTime && deadTime >= deathBlackWhiteStartTime - 60)
+            {
+                float glowScaleMulti = MathHelper.Clamp((deadTime - (deathBlackWhiteStartTime - 60)) / 60f, 0, 1);
+                glowScaleMulti = (float)Math.Pow(glowScaleMulti, 2);
+                ParticleManager.AddParticle(new Glow(NPC.Center, Vector2.Zero, 60, Color.White * 0.3f, new Vector2(5.5f, 4.4f) * glowScaleMulti, Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 60, true));
+            }
             if (deadTime >= deathBlackWhiteStartTime && deadTime < deathBlackWhiteStopTime)
             {
+                if (deadTime == deathBlackWhiteStartTime)
+                {
+                    ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Volume = 1f, Pitch = -1f, Variants = [0]}, headPos), 2f));
+                    SoundEngine.PlaySound(SoundID.Zombie103 with { Volume = 0.4f, Pitch = -0.5f, PitchVariance = 0 }, headPos);
+                    SoundEngine.PlaySound(SoundID.Item73 with { Volume = 0.4f, Pitch = -0.5f, PitchVariance = 0 }, headPos);
+                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.4f, Pitch = -0.8f }, headPos);
+                }
                 float headRaiseInterpolant = MathHelper.Clamp((deadTime - deathBlackWhiteStartTime) / 140f, 0, 1);
                 headRaiseInterpolant = (float)Math.Pow(headRaiseInterpolant - 1, 4);
                 CutsceneSystem.cameraTargetCenter.Y += headRaiseInterpolant * -17f;
             }
             else if (deadTime == deathBlackWhiteStopTime)
             {
-                Color goreColor = Color.White;
+                Color goreColor = Color.Lerp(Color.LightGray, Color.White, 0.35f);
                 int direction = Main.rand.NextBool() ? -1 : 1;
                 ParticleManager.AddParticle(new BigGore(TexDict["MoonDeadSpine"], NPC.Center + new Vector2(32, 240), Vector2.UnitX * direction * 2 - Vector2.UnitY * Main.rand.NextFloat(3.6f, 4.4f), 500,
                     goreColor, new Vector2(1f), 0.25f, 20, 0, direction, SpriteEffects.None, 0.015f),
@@ -1131,6 +1144,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (deadTime == deathBlackWhiteStopTime + 60)
             {
                 SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.3f, Pitch = -0.1f }, NPC.Center + new Vector2(0, -400));
+            }
+            if (deadTime >= deathBlackWhiteStopTime - 60 && deadTime < deathBlackWhiteStopTime)
+            {
+                float glowScaleMulti = MathHelper.Clamp(1f - ((deadTime - (deathBlackWhiteStopTime)) / 60f), 0, 1);
+                glowScaleMulti = (float)Math.Pow(glowScaleMulti, 2);
+                ParticleManager.AddParticle(new Glow(NPC.Center, Vector2.Zero, 60, Color.White * 0.3f, new Vector2(3f, 2.4f) * glowScaleMulti, Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 60, true));
             }
 
             if (deadTime > deathBlackWhiteStopTime + 60)
