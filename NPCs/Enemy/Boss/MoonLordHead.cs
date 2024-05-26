@@ -139,8 +139,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
-            if (NPC.ai[0] < 0)
+            if (NPC.ai[0] < 0 || NPC.ai[0] == 1)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+                NPC.StrikeInstantKill();
                 return true;
+            }
+                
             if (NPC.ai[3] == 0)
             {
                 modNPC.ignitedStacks.Clear();
@@ -186,7 +192,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            
+
         }
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {

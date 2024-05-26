@@ -384,8 +384,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override bool CheckDead()
         {
-            if (NPC.ai[2] < 0)
+            if (NPC.ai[2] < 0 || NPC.ai[0] == 1)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+                NPC.StrikeInstantKill();
                 return true;
+            }
             ableToHit = false;
             NPC.frameCounter += 0.2d;
             if (NPC.localAI[3] == 0)
@@ -441,7 +446,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            
+            for (int i = 0; i < 16; i++)
+            {
+                Color outlineColor = Color.Lerp(Color.Teal, Color.Cyan, 0.4f);
+                Vector2 offset = Main.rand.NextVector2Circular(2.5f, 2.5f);
+                ParticleManager.AddParticle(new BallOutlined(
+                    NPC.Center - offset + Main.rand.NextVector2CircularEdge(16, 16), offset,
+                    21, outlineColor, Color.White * 0.75f, new Vector2(0.3f), 5, 0, 0.96f, 15));
+            }
         }
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {

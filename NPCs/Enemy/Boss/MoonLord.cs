@@ -83,9 +83,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public int deadTime = 0;
         public int cutsceneDuration = 160;
-        public int deathCutsceneDuration = 600;
-        public int deathBlackWhiteStartTime = 180;
-        public int deathBlackWhiteStopTime = 270;
+        public int deathCutsceneDuration = 540;
+        public int deathBlackWhiteStartTime = 200;
+        public int deathBlackWhiteStopTime = 340;
 
         public static Attack None = new Attack(0, 0, 130);
         public static Attack PhantSpin = new Attack(1, 30, 260);
@@ -116,7 +116,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.aiStyle = -1;
             NPC.damage = 36;
             NPC.lifeMax = 25000;
-            NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);
             modNPC.IgnoreRoomWallCollision = true;
@@ -1038,7 +1037,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             canBeHit = false;
 
             if (deadTime == 0)
-            {
+            { 
                 ExtraSoundSystem.ForceStopAllExtraSounds();
                 enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
@@ -1052,6 +1051,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Room room = RoomList[modNPC.sourceRoomListID];
                     room.bossDead = true;
                     ClearChildren();
+                }
+                if (headWho >= 0)
+                {
+                    Main.npc[headWho].ai[0] = 1;
+                }
+                if (leftHandWho >= 0)
+                {
+                    Main.npc[leftHandWho].ai[0] = 1;
+                }
+                if (rightHandWho >= 0)
+                {
+                    Main.npc[rightHandWho].ai[0] = 1;
                 }
                 CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), deathCutsceneDuration, 30, 30, 1f);
             }
@@ -1081,19 +1092,70 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (deadTime >= deathBlackWhiteStartTime && deadTime < deathBlackWhiteStopTime)
+            {
+                float headRaiseInterpolant = MathHelper.Clamp((deadTime - deathBlackWhiteStartTime) / 140f, 0, 1);
+                headRaiseInterpolant = (float)Math.Pow(headRaiseInterpolant - 1, 4);
+                CutsceneSystem.cameraTargetCenter.Y += headRaiseInterpolant * -17f;
+            }
+            else if (deadTime == deathBlackWhiteStopTime + 30)
+            {
+                SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.2f, Pitch = -0.5f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center + new Vector2(0, -400));
+            }
+            else if (deadTime == deathBlackWhiteStopTime + 60)
+            {
+                SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.3f, Pitch = -0.1f }, NPC.Center + new Vector2(0, -400));
+            }
+
+            if (deadTime > deathBlackWhiteStopTime + 60)
+            {
+                float brainRaiseInterpolant = MathHelper.Clamp((deadTime - deathBlackWhiteStartTime) / 140f, 0, 1);
+                brainRaiseInterpolant = 1 + -(float)Math.Pow(brainRaiseInterpolant - 1, 4);
+                float brainMoveRightInterpolant = MathHelper.Clamp((deadTime - (deathBlackWhiteStopTime + 30)) / 60f, 0, 1);
+                brainMoveRightInterpolant = 1 + -(float)Math.Pow(brainMoveRightInterpolant - 1, 2);
+                float brainMoveLeftInterpolant = 0;
+                if (deadTime - deathBlackWhiteStopTime - 60 >= 0)
+                {
+                    brainMoveLeftInterpolant = Math.Max((float)Math.Pow((deadTime - deathBlackWhiteStopTime - 60) / 180f, 2f), 0);
+                }
+
+                int amount = deadTime > deathBlackWhiteStopTime + 90 ? 3 : 1;
+                for (int i = 0; i < amount; i++)
+                {
+                    Vector2 trueBrainPos = headPos + new Vector2(0, 0) + new Vector2(0, -280) * brainRaiseInterpolant;
+                    trueBrainPos += brainMoveRightInterpolant * new Vector2(240, 0);
+                    trueBrainPos += brainMoveLeftInterpolant * new Vector2(-20000, 0);
+
+                    trueBrainPos.X += Main.rand.NextFloat(80, 120);
+                    trueBrainPos.Y += Main.rand.NextFloat(-80, 80) - 24;
+
+                    Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
+                    ParticleManager.AddParticle(new Wriggler(
+                        trueBrainPos, Vector2.UnitX * -5,
+                        26, particleColor, new Vector2(0.5f), Main.rand.Next(4), MathHelper.Pi + Main.rand.NextFloat(-0.2f, 0.2f), 0.98f, 16,
+                        Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipVertically));
+
+                    Vector2 offset = Main.rand.NextVector2Circular(2, 2);
+                    ParticleManager.AddParticle(new Ball(
+                        trueBrainPos + offset, offset,
+                        20, Color.Teal, new Vector2(0.25f), 0, 0.96f, 10));
+                }
+                
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
-                NPC.StrikeInstantKill();
+                NPC.life = 0;
             }
 
             return deadTime >= cutsceneDuration - 30;
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if (NPC.life > 0)
+            if (NPC.life > 0 && deadTime == 0)
             {
+                SoundEngine.PlaySound(SoundID.NPCHit1 with { Volume = 1f }, NPC.Center);
                 for (int i = 0; (double)i < hit.Damage * 0.01d; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f);
@@ -1523,9 +1585,29 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime >= deathBlackWhiteStartTime)
             {
-                Vector2 trueBrainPos = headPos + (deadTime / (float)deathCutsceneDuration) * new Vector2(0, - 400);
+                float brainRaiseInterpolant = MathHelper.Clamp((deadTime - deathBlackWhiteStartTime) / 140f, 0, 1);
+                brainRaiseInterpolant = 1 + -(float)Math.Pow(brainRaiseInterpolant - 1, 4);
+                float brainMoveRightInterpolant = MathHelper.Clamp((deadTime - (deathBlackWhiteStopTime + 30)) / 60f, 0, 1);
+                brainMoveRightInterpolant = 1 + -(float)Math.Pow(brainMoveRightInterpolant - 1, 2);
+                float brainMoveLeftInterpolant = 0;
+                if (deadTime - deathBlackWhiteStopTime - 60 >= 0)
+                {
+                    brainMoveLeftInterpolant = Math.Max((float)Math.Pow((deadTime - deathBlackWhiteStopTime - 60) / 180f, 2f), 0);
+                }
+
+
+                Vector2 trueBrainPos = headPos + new Vector2(0, 0) + new Vector2(0, -280) * brainRaiseInterpolant;
+                Vector2 brainScale = Vector2.One;
+                brainScale.X *= MathHelper.Clamp(MathHelper.Lerp(0.9f, 1f, brainRaiseInterpolant * 1.3f), 0.9f, 1f);
+                trueBrainPos += brainMoveRightInterpolant * new Vector2(240, 0);
+                trueBrainPos += brainMoveLeftInterpolant * new Vector2(-20000, 0);
+
                 Vector2 wantedEyeVector = Main.LocalPlayer == null ? Vector2.Zero : Main.LocalPlayer.Center - trueBrainPos;
-                var trueBrainDrawList = TerRoguelikeWorld.GetTrueBrainDrawList(trueBrainPos, wantedEyeVector, new Vector2(1f), Color.White);
+                wantedEyeVector = wantedEyeVector.SafeNormalize(Vector2.UnitY);
+                wantedEyeVector = Vector2.Lerp(wantedEyeVector, -Vector2.UnitX, brainMoveRightInterpolant);
+                wantedEyeVector *= 16;
+
+                var trueBrainDrawList = TerRoguelikeWorld.GetTrueBrainDrawList(trueBrainPos, wantedEyeVector, brainScale, Color.White);
                 if (!NPC.behindTiles)
                 {
                     postDrawAllBlack = true;
