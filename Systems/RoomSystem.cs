@@ -425,7 +425,7 @@ namespace TerRoguelike.Systems
                     worldTeleportOpacity *= ((totalTime - worldTeleportTime) / (float)fadeOut);
                 }
 
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f), SpriteEffects.None);
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector, SpriteEffects.None);
 
                 Main.spriteBatch.End();
             }
@@ -441,7 +441,7 @@ namespace TerRoguelike.Systems
                     Main.combatText[i].active = false;
                 }
                 StartAlphaBlendSpritebatch(false);
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.LightGray, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f), SpriteEffects.None);
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Lerp(Color.LightGray, Color.White, 0.8f), 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector, SpriteEffects.None);
                 StartAlphaBlendSpritebatch();
 
                 Vector3 colorHSL = Main.rgbToHsl(Color.Black);

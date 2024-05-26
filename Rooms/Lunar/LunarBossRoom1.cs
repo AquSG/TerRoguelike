@@ -19,6 +19,7 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using Terraria.GameContent.Events;
 using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Rooms
 {
@@ -83,6 +84,12 @@ namespace TerRoguelike.Rooms
         public override void PostDrawTilesRoom()
         {
             base.PostDrawTilesRoom();
+        }
+        public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            if (modPlayer.escapeArrowTime > 0 && modPlayer.escapeArrowTime < 200 && modPlayer.escapeArrowTime % 125 == 0) // basically if the player is just vibing in the boss room not knowing what to do, keep extending the escape arrow time
+                modPlayer.escapeArrowTime += 125;
+            return base.CanAscend(player, modPlayer);
         }
     }
 }
