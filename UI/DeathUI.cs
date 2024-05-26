@@ -152,6 +152,7 @@ namespace TerRoguelike.UI
                 NPC dummyNPC = new NPC();
                 dummyNPC.type = modPlayer.killerNPCType;
                 dummyNPC.SetDefaults(dummyNPC.type);
+                dummyNPC.active = false; // basically you can add a check for active in findframe if you want it to be a super specific frame instead of just the default from no upating of the npc
                 dummyNPC.FindFrame();
                 Rectangle frame = dummyNPC.frame;
                 //Rectangle frame = new Rectangle(0, 0, enemyTex.Width, frameHeight);

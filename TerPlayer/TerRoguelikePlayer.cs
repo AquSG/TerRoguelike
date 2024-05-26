@@ -30,6 +30,7 @@ using TerRoguelike.MainMenu;
 using Terraria.GameInput;
 using TerRoguelike.Schematics;
 using System.Diagnostics;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -122,6 +123,7 @@ namespace TerRoguelike.TerPlayer
         #region Misc Variables
         public Floor currentFloor;
         public bool escaped = false;
+        public bool escapeFail = false;
         public int shotsToFire = 1;
         public int extraDoubleJumps = 0;
         public int timesDoubleJumped = 0;
@@ -1474,7 +1476,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
         {
-            if (trumpCard > 0)
+            if (trumpCard > 0 && !escapeFail)
             {
                 for (int inventoryItem = 0; inventoryItem < 50; inventoryItem++)
                 {
@@ -1518,6 +1520,11 @@ namespace TerRoguelike.TerPlayer
                     killerProj = damageSource.SourceProjectileLocalIndex;
                     killerProjType = Main.projectile[killerProj].type;
                 }
+            }
+            if (killerNPC == -1 && escapeFail)
+            {
+                killerNPC = 0;
+                killerNPCType = ModContent.NPCType<TrueBrain>();
             }
             SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
             ZoomSystem.SetZoomAnimation(2.5f, 60);
