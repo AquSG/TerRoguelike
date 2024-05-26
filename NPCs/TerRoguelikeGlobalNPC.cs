@@ -30,6 +30,7 @@ namespace TerRoguelike.NPCs
         public bool IgnoreRoomWallCollision = false;
         public Vector2 RoomWallCollisionShrink = Vector2.Zero;
         public bool SpecialProjectileCollisionRules = false; // Makes certain things happen on the attacking projectile rather than the closest point in the NPC rect to the projectile
+        public bool ignoreForRoomClearing = false;
         public int baseMaxHP = 0;
         public int baseDamage = 0;
         public float diminishingDR = 0;

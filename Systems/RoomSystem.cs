@@ -441,7 +441,7 @@ namespace TerRoguelike.Systems
                     Main.combatText[i].active = false;
                 }
                 StartAlphaBlendSpritebatch(false);
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.White, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f), SpriteEffects.None);
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Vector2.Zero, null, Color.LightGray, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f), SpriteEffects.None);
                 StartAlphaBlendSpritebatch();
 
                 Vector3 colorHSL = Main.rgbToHsl(Color.Black);

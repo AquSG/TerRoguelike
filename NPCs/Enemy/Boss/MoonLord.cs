@@ -76,6 +76,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int idleCounter = 0;
 
         public static readonly SoundStyle Break = new SoundStyle("TerRoguelike/Sounds/GlassBreak");
+        public static readonly SoundStyle MoonLordDeath = new SoundStyle("TerRoguelike/Sounds/MoonLordDeath");
         public Texture2D coreTex, coreCrackTex, emptyEyeTex, innerEyeTex, lowerArmTex, upperArmTex, mouthTex, sideEyeTex, topEyeTex, topEyeOverlayTex, headTex, handTex, bodyTex, perlinTex;
         public int leftHandWho = -1; // yes, technically moon lord's "Left" is not the same as the left for the viewer, and vice versa for right hand. I do not care. internally it will be based on viewer perspective.
         public int rightHandWho = -1;
@@ -83,7 +84,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public int deadTime = 0;
         public int cutsceneDuration = 160;
-        public int deathCutsceneDuration = 540;
+        public int deathCutsceneDuration = 480;
         public int deathBlackWhiteStartTime = 200;
         public int deathBlackWhiteStopTime = 340;
 
@@ -1020,7 +1021,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool CheckDead()
         {
-            if (deadTime >= deathCutsceneDuration - 30)
+            if (deadTime >= deathCutsceneDuration)
             {
                 return true;
             }
@@ -1037,7 +1038,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             canBeHit = false;
 
             if (deadTime == 0)
-            { 
+            {
+                leftHandTargetPos = leftHandAnchor;
+                rightHandTargetPos = rightHandAnchor;
+                SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.6f }, NPC.Center + new Vector2(0, -300));
+                SoundEngine.PlaySound(SoundID.NPCDeath62 with { Volume = 0.8f }, NPC.Center);
+                SoundEngine.PlaySound(MoonLordDeath with { Volume = 0.45f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center + new Vector2(0, -100));
                 ExtraSoundSystem.ForceStopAllExtraSounds();
                 enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
@@ -1098,6 +1104,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 headRaiseInterpolant = (float)Math.Pow(headRaiseInterpolant - 1, 4);
                 CutsceneSystem.cameraTargetCenter.Y += headRaiseInterpolant * -17f;
             }
+            else if (deadTime == deathBlackWhiteStopTime)
+            {
+                Color goreColor = Color.White;
+                int direction = Main.rand.NextBool() ? -1 : 1;
+                ParticleManager.AddParticle(new BigGore(TexDict["MoonDeadSpine"], NPC.Center + new Vector2(32, 240), Vector2.UnitX * direction * 2 - Vector2.UnitY * Main.rand.NextFloat(3.6f, 4.4f), 500,
+                    goreColor, new Vector2(1f), 0.25f, 20, 0, direction, SpriteEffects.None, 0.015f),
+                    ParticleManager.ParticleLayer.BehindTiles);
+                direction = Main.rand.NextBool() ? -1 : 1;
+                ParticleManager.AddParticle(new BigGore(TexDict["MoonDeadShoulder"], NPC.Center + new Vector2(84, -152), Vector2.UnitX * direction * 2 - Vector2.UnitY * Main.rand.NextFloat(3.6f, 4.4f), 500,
+                    goreColor, new Vector2(1f), 0.25f, 20, 0, direction, SpriteEffects.None, 0.015f),
+                    ParticleManager.ParticleLayer.BehindTiles);
+                direction = Main.rand.NextBool() ? -1 : 1;
+                ParticleManager.AddParticle(new BigGore(TexDict["MoonDeadTorso"], NPC.Center + new Vector2(0, 48), Vector2.UnitX * direction * 2 - Vector2.UnitY * Main.rand.NextFloat(3.6f, 4.4f), 500,
+                    goreColor, new Vector2(1f), 0.25f, 20, 0, direction, SpriteEffects.None, 0.015f),
+                    ParticleManager.ParticleLayer.BehindTiles);
+                direction = Main.rand.NextBool() ? -1 : 1;
+                ParticleManager.AddParticle(new BigGore(TexDict["MoonDeadHead"], headPos + new Vector2(0, 90), Vector2.UnitX * direction * 2 - Vector2.UnitY * Main.rand.NextFloat(3.6f, 4.4f), 500,
+                    goreColor, new Vector2(1f), 0.25f, 20, 0, direction, SpriteEffects.None, 0.015f),
+                    ParticleManager.ParticleLayer.BehindTiles);
+            }
             else if (deadTime == deathBlackWhiteStopTime + 30)
             {
                 SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.2f, Pitch = -0.5f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center + new Vector2(0, -400));
@@ -1139,17 +1165,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     ParticleManager.AddParticle(new Ball(
                         trueBrainPos + offset, offset,
                         20, Color.Teal, new Vector2(0.25f), 0, 0.96f, 10));
-                }
-                
+                }   
             }
-            if (deadTime >= deathCutsceneDuration - 30)
+            if (deadTime >= deathCutsceneDuration - 40)
+            {
+                modNPC.ignoreForRoomClearing = true;
+            }
+            if (deadTime >= deathCutsceneDuration)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.life = 0;
             }
 
-            return deadTime >= cutsceneDuration - 30;
+            return deadTime >= cutsceneDuration;
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
