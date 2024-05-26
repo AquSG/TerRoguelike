@@ -53,12 +53,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int leftHandCurrentFrame = 0;
         public int rightHandCurrentFrame = 0;
         public int emptyEyeCurrentFrame = 0;
+        public int headCurrentFrame = 0;
         public Rectangle coreFrame;
         public Rectangle mouthFrame;
         public Rectangle headEyeFrame;
         public Rectangle leftHandFrame;
         public Rectangle rightHandFrame;
         public Rectangle emptyEyeFrame;
+        public Rectangle headFrame;
         public int headOverlayFrameCounter;
         public Vector2 headPos;
         public Vector2 leftHandPos;
@@ -187,7 +189,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            if (NPC.localAI[0] > -90 && deadTime < deathBlackWhiteStartTime - 120)
+            if (NPC.localAI[0] > -90 && deadTime < deathBlackWhiteStartTime - 80)
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
                 {
@@ -225,6 +227,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             bool eyeCenter = NPC.ai[0] == PhantSpin.Id || NPC.ai[0] == PhantSphere.Id;
             bool eyeDeathray = NPC.ai[0] == Deathray.Id && NPC.ai[1] > deathrayWindup - 30;
             Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);
+            if (deadTime != 0)
+            {
+                eyeCenter = true;
+                InnerEyePositionUpdate(ref headEyeVector, headPos);
+            }
             if (eyeCenter)
                 rate = 0.075f;
             if (eyeDeathray)
@@ -264,7 +271,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-                    headOverlayFrameCounter++;
+                    if (deadTime < 130)
+                    {
+                        headOverlayFrameCounter++;
+                    }
+                    else
+                    {
+                        if (headOverlayFrameCounter > 25)
+                            headOverlayFrameCounter = 25;
+                        if (headOverlayFrameCounter > 0)
+                            headOverlayFrameCounter--;
+                    }
                 }
             }
             
@@ -1098,20 +1115,62 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
-            if (deadTime < deathBlackWhiteStartTime && deadTime >= deathBlackWhiteStartTime - 60)
+            if (deadTime < deathBlackWhiteStartTime)
             {
-                float glowScaleMulti = MathHelper.Clamp((deadTime - (deathBlackWhiteStartTime - 60)) / 60f, 0, 1);
-                glowScaleMulti = (float)Math.Pow(glowScaleMulti, 2);
-                ParticleManager.AddParticle(new Glow(NPC.Center, Vector2.Zero, 60, Color.White * 0.3f, new Vector2(5.5f, 4.4f) * glowScaleMulti, Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 60, true));
+                if (deadTime % 3 == 0) // kinda vanilla moonlord death anim explosion spawning code, ported over
+                {
+                    Vector2 randPos = Main.rand.NextVector2Circular(1, 1);
+                    randPos *= 20 + Main.rand.NextFloat() * 450;
+                    randPos += NPC.Center;
+                    ParticleManager.AddParticle(new MoonExplosion(randPos, Main.rand.Next(14, 22), Color.White, new Vector2(1f)));
+
+                    float dustCount = Main.rand.Next(6, 19);
+                    float offetPerLoop = MathHelper.TwoPi / dustCount;
+                    float randAngleOffset = Main.rand.NextFloat(MathHelper.TwoPi);
+                    float randOffset = 1f + Main.rand.NextFloat(2f);
+                    float randScale = 1f + Main.rand.NextFloat();
+                    float fadeIn = 0.4f + Main.rand.NextFloat();
+
+                    for (float i = 0f; i < dustCount * 2f; i++)
+                    {
+                        Dust dust = Dust.NewDustDirect(randPos, 0, 0, DustID.Vortex, 0f, 0f, 0, default);
+                        dust.noGravity = true;
+                        dust.position = randPos;
+                        double rotateBy = randAngleOffset + offetPerLoop * i;
+                        dust.velocity = Vector2.UnitY.RotatedBy(rotateBy) * randOffset * (Main.rand.NextFloat() * 1.6f + 1.6f);
+                        dust.fadeIn = fadeIn;
+                        dust.scale = randScale;
+                    }
+                }
+                if (deadTime % 15 == 0) // same deal
+                {
+                    Vector2 randPos = Utils.RandomVector2(Main.rand, -1f, 1f);
+                    randPos *= 20f + Main.rand.NextFloat() * 400f;
+                    Vector2 projPos = NPC.Center + randPos;
+                    Vector2 spinningPoint = new Vector2(0f, (0f - Main.rand.NextFloat()) * 0.5f - 0.5f);
+                    double randRot = (float)(Main.rand.Next(4) < 2).ToDirectionInt() * ((float)Math.PI / 8f + (float)Math.PI / 4f * Main.rand.NextFloat());
+                    Vector2 projVel = Utils.RotatedBy(spinningPoint, randRot) * 6f;
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos.X, projPos.Y, projVel.X, projVel.Y, 622, 0, 0f, Main.myPlayer);
+                }
+                
+                if (deadTime >= deathBlackWhiteStartTime - 60)
+                {
+                    float glowScaleMulti = MathHelper.Clamp((deadTime - (deathBlackWhiteStartTime - 60)) / 60f, 0, 1);
+                    glowScaleMulti = (float)Math.Pow(glowScaleMulti, 2);
+                    ParticleManager.AddParticle(new Glow(NPC.Center, Vector2.Zero, 60, Color.White * 0.3f, new Vector2(5.5f, 4.4f) * glowScaleMulti, Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 60, true));
+                }
             }
+
             if (deadTime >= deathBlackWhiteStartTime && deadTime < deathBlackWhiteStopTime)
             {
+                headCurrentFrame = 1;
                 if (deadTime == deathBlackWhiteStartTime)
                 {
                     ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_BetsyFireballImpact with { Volume = 1f, Pitch = -1f, Variants = [0]}, headPos), 2f));
                     SoundEngine.PlaySound(SoundID.Zombie103 with { Volume = 0.4f, Pitch = -0.5f, PitchVariance = 0 }, headPos);
                     SoundEngine.PlaySound(SoundID.Item73 with { Volume = 0.4f, Pitch = -0.5f, PitchVariance = 0 }, headPos);
                     SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.4f, Pitch = -0.8f }, headPos);
+                    SoundEngine.PlaySound(SoundID.Zombie96 with { Volume = 0.4f, Pitch = -0.1f }, headPos);
                 }
                 float headRaiseInterpolant = MathHelper.Clamp((deadTime - deathBlackWhiteStartTime) / 140f, 0, 1);
                 headRaiseInterpolant = (float)Math.Pow(headRaiseInterpolant - 1, 4);
@@ -1150,6 +1209,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float glowScaleMulti = MathHelper.Clamp(1f - ((deadTime - (deathBlackWhiteStopTime)) / 60f), 0, 1);
                 glowScaleMulti = (float)Math.Pow(glowScaleMulti, 2);
                 ParticleManager.AddParticle(new Glow(NPC.Center, Vector2.Zero, 60, Color.White * 0.3f, new Vector2(3f, 2.4f) * glowScaleMulti, Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 60, true));
+            }
+            if (deadTime == deathBlackWhiteStopTime - 5)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.5f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, headPos);
             }
 
             if (deadTime > deathBlackWhiteStopTime + 60)
@@ -1489,6 +1552,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             frameHeight = emptyEyeTex.Height / 4;
             emptyEyeCurrentFrame = (int)NPC.frameCounter % 4;
             emptyEyeFrame = new Rectangle(0, emptyEyeCurrentFrame * frameHeight, emptyEyeTex.Width, frameHeight - 2);
+
+            frameHeight = headTex.Height / 2;
+            headFrame = new Rectangle(0, headCurrentFrame * frameHeight, headTex.Width, frameHeight - 2);
         }
         public static void DrawDeathrayForNPC(NPC npc, NPC parent)
         {
@@ -1594,7 +1660,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             draws.Add(new StoredDraw(handTex, rightHandPos + new Vector2(-2, -49), rightHandFrame, MoonLordColor, 0, rightHandFrame.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally));
 
-            draws.Add(new StoredDraw(headTex, headPos + new Vector2(0, 4), null, MoonLordColor, 0, headTex.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None));
+            draws.Add(new StoredDraw(headTex, headPos + new Vector2(0, 4), headFrame, MoonLordColor, 0, headFrame.Size() * new Vector2(0.5f, 0.25f), NPC.scale, SpriteEffects.None));
             draws.Add(new StoredDraw(mouthTex, headPos + new Vector2(1, 212), mouthFrame, MoonLordColor, 0, mouthFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
 
             draws.Add(new StoredDraw(emptyEyeTex, headPos, emptyEyeFrame, MoonLordColor, 0, emptyEyeFrame.Size() * 0.5f, NPC.scale, SpriteEffects.None));
