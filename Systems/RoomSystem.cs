@@ -75,12 +75,16 @@ namespace TerRoguelike.Systems
                             continue;
                         if (!Main.player[i].active)
                             continue;
+
+                        var modPlayer = Main.player[i].ModPlayer();
+                        if (modPlayer.escaped)
+                            continue;
+
+                        worldTeleportTime = 1;
+                        modPlayer.escapeFail = true;
+
                         if (Main.player[i].dead)
                             continue;
-
-                        if (Main.player[i].GetModPlayer<TerRoguelikePlayer>().escaped)
-                            continue;
-
                         Main.player[i].KillMe(PlayerDeathReason.LegacyDefault(), Main.rand.Next(10000, 25000), Main.rand.NextBool() ? -1 : 1);
                     }
 
@@ -409,6 +413,17 @@ namespace TerRoguelike.Systems
         }
         public static void PostDrawEverything(SpriteBatch spritebatch)
         {
+            Player player = Main.LocalPlayer;
+            if (player != null)
+            {
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null && modPlayer.escapeFail)
+                {
+                    StartAlphaBlendSpritebatch(false);
+                    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Black, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
+                    Main.spriteBatch.End();
+                }
+            }
             if (worldTeleportTime > 0)
             {
                 StartAlphaBlendSpritebatch(false);
@@ -425,7 +440,7 @@ namespace TerRoguelike.Systems
                     worldTeleportOpacity *= ((totalTime - worldTeleportTime) / (float)fadeOut);
                 }
 
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector, SpriteEffects.None);
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
 
                 Main.spriteBatch.End();
             }
@@ -441,7 +456,7 @@ namespace TerRoguelike.Systems
                     Main.combatText[i].active = false;
                 }
                 StartAlphaBlendSpritebatch(false);
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Lerp(Color.LightGray, Color.White, 0.8f), 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector, SpriteEffects.None);
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Lerp(Color.LightGray, Color.White, 0.8f), 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
                 StartAlphaBlendSpritebatch();
 
                 Vector3 colorHSL = Main.rgbToHsl(Color.Black);

@@ -375,6 +375,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             var tex = TextureAssets.Npc[Type].Value;
 
             currentFrame = (int)NPC.frameCounter % (Main.npcFrameCount[Type] - 1) + 1;
+            if (!NPC.active)
+                currentFrame = 0;
             NPC.frame = new Rectangle(0, frameHeight * currentFrame, tex.Width, frameHeight - 2);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
