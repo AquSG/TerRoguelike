@@ -36,7 +36,6 @@ namespace TerRoguelike.Managers
         {
             List<string> pathList = new List<string>()
             {
-                "TerRoguelike/NPCs/StillMoonLord",
                 "TerRoguelike/Projectiles/VolatileRocket",
                 "TerRoguelike/NPCs/Enemy/AntlionHead",
                 "TerRoguelike/NPCs/Enemy/BallistaBase",
@@ -160,6 +159,11 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/Perlin",
                 "TerRoguelike/Particles/Shard",
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainEye",
+                "TerRoguelike/ExtraTextures/MoonDeadExplosion",
+                "TerRoguelike/ExtraTextures/MoonDeadHead",
+                "TerRoguelike/ExtraTextures/MoonDeadShoulder",
+                "TerRoguelike/ExtraTextures/MoonDeadSpine",
+                "TerRoguelike/ExtraTextures/MoonDeadTorso",
             };
             foreach (string path in pathList)
             {

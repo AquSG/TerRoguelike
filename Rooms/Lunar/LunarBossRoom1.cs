@@ -82,12 +82,6 @@ namespace TerRoguelike.Rooms
         }
         public override void PostDrawTilesRoom()
         {
-            if (false && TerRoguelikeWorld.lunarFloorInitialized && (!TerRoguelikeWorld.lunarBossSpawned || (!awake && closedTime <= 0)))
-            {
-                if (moonLordTex == null)
-                    moonLordTex = TexDict["StillMoonLord"];
-                Main.EntitySpriteDraw(moonLordTex, (RoomPosition + (RoomDimensions * 0.5f)) * 16f - Main.screenPosition, null, Color.White * (0.5f + (MathHelper.Lerp(0, 0.125f, 0.5f + ((float)Math.Cos(Main.GlobalTimeWrappedHourly * 2f) * 0.5f)))), 0f, moonLordTex.Size() * 0.5f, 1f, SpriteEffects.None);
-            }
             base.PostDrawTilesRoom();
         }
     }

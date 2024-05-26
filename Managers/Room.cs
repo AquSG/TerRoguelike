@@ -245,7 +245,7 @@ namespace TerRoguelike.Managers
 
                     TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
 
-                    if (!modNPC.isRoomNPC)
+                    if (!modNPC.isRoomNPC || modNPC.ignoreForRoomClearing)
                         continue;
 
                     if (modNPC.sourceRoomListID == myRoom && !modNPC.hostileTurnedAlly)
