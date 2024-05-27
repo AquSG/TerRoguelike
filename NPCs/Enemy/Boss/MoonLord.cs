@@ -1075,6 +1075,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     room.bossDead = true;
                     ClearChildren();
                 }
+
+                Room.ClearSpecificProjectiles(); // clear projectiles early since the death anim is long and I want nothing getting in the way
+
                 if (headWho >= 0)
                 {
                     Main.npc[headWho].ai[0] = 1;
@@ -1231,7 +1234,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 for (int i = 0; i < amount; i++)
                 {
                     Vector2 trueBrainPos = headPos + new Vector2(0, 0) + new Vector2(0, -280) * brainRaiseInterpolant;
-                    trueBrainPos += brainMoveRightInterpolant * new Vector2(240, 0);
+                    trueBrainPos += brainMoveRightInterpolant * new Vector2(360, 0);
                     trueBrainPos += brainMoveLeftInterpolant * new Vector2(-20000, 0);
 
                     trueBrainPos.X += Main.rand.NextFloat(80, 120);
@@ -1713,7 +1716,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 trueBrainPos = headPos + new Vector2(0, 0) + new Vector2(0, -280) * brainRaiseInterpolant;
                 Vector2 brainScale = Vector2.One;
                 brainScale.X *= MathHelper.Clamp(MathHelper.Lerp(0.9f, 1f, brainRaiseInterpolant * 1.3f), 0.9f, 1f);
-                trueBrainPos += brainMoveRightInterpolant * new Vector2(240, 0);
+                trueBrainPos += brainMoveRightInterpolant * new Vector2(360, 0);
                 trueBrainPos += brainMoveLeftInterpolant * new Vector2(-20000, 0);
 
                 Vector2 wantedEyeVector = Main.LocalPlayer == null ? Vector2.Zero : Main.LocalPlayer.Center - trueBrainPos;
