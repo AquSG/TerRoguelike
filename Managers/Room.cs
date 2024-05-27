@@ -668,7 +668,7 @@ namespace TerRoguelike.Managers
                 }
             }
         }
-        public void ClearSpecificProjectiles()
+        public static void ClearSpecificProjectiles()
         {
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
