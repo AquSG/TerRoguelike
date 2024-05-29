@@ -51,7 +51,7 @@ namespace TerRoguelike.Managers
         // 20. Generate next floor is called. the start room of the floor is placed. usually around the center of the y axis, but if the floor hell bool is true, it gets sent to hell.
         // 21. If the floor's ID matches the Lunar floor ID, PlaceFinalFloor is called and the function is returned early, stopping the PlaceRoom loop and focusing entirely on precisely placing the final floor at the end of generation.
         // 22. Otherwise, PlaceRoom is called again and the cycle begins for the new floor.
-        // 23. At the very end of generation, after all the nested functions are done and all that, the Lunar Sanctuary is placed around where the first room was placed, but far above.
+        // 23. At the very end of generation, after all the nested functions are done and all that, the Lunar Sanctuary is placed around where the first room was placed, but far above. Also place the final final boss room.
 
         public static void GenerateRoomStructure()
         {
@@ -101,12 +101,27 @@ namespace TerRoguelike.Managers
             schematic = TileMaps[sanctuaryRoom.Key];
             schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
 
-            sanctuaryRoom.RoomPosition = (placementPoint + new Point(0, GenDebugWorld ? -60 : -300)).ToVector2();
+            sanctuaryRoom.RoomPosition = (placementPoint + new Point(0, GenDebugWorld ? -60 : -400)).ToVector2();
             sanctuaryRoom.RoomDimensions = schematicSize;
             RoomSystem.NewRoom(sanctuaryRoom);
             RoomGenPool.Remove(sanctuaryRoom);
 
             PlaceSchematic(sanctuaryRoom.Key, sanctuaryRoom.RoomPosition.ToPoint(), anchorType);
+
+            var finalFinalBossRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
+
+            schematic = TileMaps[finalFinalBossRoom.Key];
+            schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+
+            placementPoint = new Vector2(Main.maxTilesX * (GenDebugWorld ? 0.9f : 0.5f), (float)Main.worldSurface).ToPoint();
+            placementPoint.Y -= (int)schematicSize.Y - 45;
+
+            finalFinalBossRoom.RoomPosition = (placementPoint).ToVector2();
+            finalFinalBossRoom.RoomDimensions = schematicSize;
+            RoomSystem.NewRoom(finalFinalBossRoom);
+            RoomGenPool.Remove(finalFinalBossRoom);
+
+            PlaceSchematic(finalFinalBossRoom.Key, finalFinalBossRoom.RoomPosition.ToPoint(), anchorType);
         }
         public static string GetFloorKey()
         {

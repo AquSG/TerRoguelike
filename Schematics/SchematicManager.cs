@@ -59,6 +59,7 @@ namespace TerRoguelike.Schematics
             FloorID.Add(new TempleFloor());
             FloorID.Add(new LunarFloor());
             FloorID.Add(new SanctuaryFloor());
+            FloorID.Add(new SurfaceFloor());
 
             for (int i = 0; i < FloorID.Count; i++)
             {
@@ -225,6 +226,7 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new LunarPillarRoomBottomLeft());
             RoomID.Add(new LunarPillarRoomBottomRight());
             RoomID.Add(new SanctuaryRoom1());
+            RoomID.Add(new SurfaceRoom1());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
