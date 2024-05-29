@@ -19,6 +19,7 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using TerRoguelike.Utilities;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Rooms
 {
@@ -67,8 +68,12 @@ namespace TerRoguelike.Rooms
         }
         public override void Ascend(Player player)
         {
-            player.Center = new Vector2(Main.maxTilesX * 8, 3000);
+            var finalRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
+            player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
             SetBossTrack(FinalBoss2Theme);
+            finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
+
+            NewFloorEffects(finalRoom, player.ModPlayer());
         }
     }
 }
