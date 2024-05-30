@@ -108,7 +108,7 @@ namespace TerRoguelike.World
             modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 8f;
         }
 
-        public static List<StoredDraw> GetTrueBrainDrawList(Vector2 position, Vector2 eyeVector, Vector2 scale, Color color)
+        public static List<StoredDraw> GetTrueBrainDrawList(Vector2 position, Vector2 eyeVector, Vector2 scale, Color color, int currentFrame)
         {
             var draws = new List<StoredDraw>();
             float maxLength = 12;
@@ -120,7 +120,7 @@ namespace TerRoguelike.World
             var trueBrainInnerEyeTex = TextureManager.TexDict["MoonLordInnerEye"];
             int frameCount = Main.npcFrameCount[ModContent.NPCType<TrueBrain>()];
             int frameHeight = trueBrainTex.Height / frameCount;
-            int currentFrame = (int)(Main.GlobalTimeWrappedHourly * 8) % (frameCount - 1) + 1;
+            currentFrame = currentFrame % (frameCount - 1) + 1;
 
             var frame = new Rectangle(0, frameHeight * currentFrame, trueBrainTex.Width, frameHeight - 2);
             draws.Add(new(trueBrainTex, position, frame, color, 0, frame.Size() * 0.5f, scale, SpriteEffects.None));

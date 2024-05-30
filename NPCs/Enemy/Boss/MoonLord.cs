@@ -1724,7 +1724,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 wantedEyeVector = Vector2.Lerp(wantedEyeVector, -Vector2.UnitX, brainMoveRightInterpolant);
                 wantedEyeVector *= 16;
 
-                var trueBrainDrawList = TerRoguelikeWorld.GetTrueBrainDrawList(trueBrainPos, wantedEyeVector, brainScale, Color.White);
+                var trueBrainDrawList = TerRoguelikeWorld.GetTrueBrainDrawList(trueBrainPos, wantedEyeVector, brainScale, Color.White, (int)(Main.GlobalTimeWrappedHourly * 8));
                 if (!NPC.behindTiles)
                 {
                     postDrawAllBlack = true;
