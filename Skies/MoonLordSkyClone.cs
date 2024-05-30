@@ -18,7 +18,6 @@ using Microsoft.Xna.Framework;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria.GameContent.Bestiary;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.Audio;
@@ -48,6 +47,31 @@ namespace TerRoguelike.Skies
             if (maxDepth >= 0 && minDepth < 0)
             {
                 spriteBatch.Draw(TextureAssets.BlackTile.Value, new Rectangle(0, 0, Main.screenWidth, Main.screenHeight), Color.Black * intensity);
+
+                var anchorRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
+                Vector2 moonAnchor = anchorRoom.RoomPosition16 + anchorRoom.RoomDimensions16 * new Vector2(0.5f, 0.25f);
+                Vector2 paralaxOff = (Main.Camera.Center - moonAnchor) * 0.6f;
+                Vector2 drawPos = moonAnchor + paralaxOff - Main.screenPosition;
+
+                Main.spriteBatch.End();
+                Color glowColor = Color.Lerp(Color.White, Color.Cyan, 0.6f) * intensity;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                Texture2D glowTex = TexDict["CircularGlow"];
+                Main.EntitySpriteDraw(glowTex, drawPos, null, glowColor, 0, glowTex.Size() * 0.5f, 1.8f, SpriteEffects.None);
+                Main.spriteBatch.End();
+                Effect Pixelation = Filters.Scene["TerRoguelike:Pixelation"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, Pixelation, Main.GameViewMatrix.TransformationMatrix);
+
+                Color tint = Color.Lerp(Color.Lerp(Color.White, Color.Cyan, 0.5f), Color.Black, 0.3f) * intensity;
+                Texture2D moonTex = TexDict["Moon"];
+                Pixelation.Parameters["tint"].SetValue(tint.ToVector4());
+                Pixelation.Parameters["dimensions"].SetValue(moonTex.Size());
+                Pixelation.Parameters["offRot"].SetValue(Main.GlobalTimeWrappedHourly * 0.02f);
+                Pixelation.Parameters["pixelation"].SetValue(8);
+
+                Main.EntitySpriteDraw(moonTex, drawPos, null, Color.White, 0, moonTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
+
+                StartVanillaSpritebatch();
             }
         }
         public override void Update(GameTime gameTime)
