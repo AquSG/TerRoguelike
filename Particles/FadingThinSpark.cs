@@ -34,46 +34,41 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Particles
 {
-    public class BallOutlined : Particle
+    public class FadingThinSpark : Particle
     {
-        Vector2 startScale;
-        float deceleration;
-        int fadeOutTime;
-        float outlineWidth;
-        Color outlineColor;
-        public BallOutlined(Vector2 Position, Vector2 Velocity, int TimeLeft, Color OutlineColor, Color FillColor, Vector2 Scale, float OutlineWidth, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30)
+        public Color startColor;
+        public Vector2 startScale;
+        public int maxTimeLeft;
+        public FadingThinSpark(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0)
         {
-            texture = TexDict["Circle"];
+            texture = TexDict["ThinSpark"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
-            additive = false;
+            additive = true;
             oldPosition = Position;
             position = Position;
             velocity = Velocity;
-            color = FillColor;
-            outlineColor = OutlineColor;
+            color = Color;
+            startColor = Color;
             rotation = Rotation;
-            scale = startScale = Scale * 0.1f;
+            scale = Scale;
+            startScale = Scale;
             spriteEffects = SpriteEffects.None;
-            timeLeft = TimeLeft;
-            deceleration = Deceleration;
-            fadeOutTime = fadeOutTimeLeftThreshold;
-            outlineWidth = OutlineWidth;
+            timeLeft = maxTimeLeft = TimeLeft;
         }
         public override void AI()
         {
-            velocity *= deceleration;
-            if (timeLeft < fadeOutTime)
-            {
-                scale = startScale * (timeLeft / (float)fadeOutTime);
-            }
-        }
-        public override bool PreDraw(Vector2 offset)
-        {
-            Vector2 basePos = position - Main.screenPosition + offset;
-            Vector2 origin = frame.Size() * 0.5f;
-            Vector2 outlineScale = scale * (1 + (0.08f * outlineWidth));
-            Main.EntitySpriteDraw(texture, basePos, frame, outlineColor, rotation, origin, outlineScale, spriteEffects);
-            return true;
+            velocity *= 0.96f;
+            float halfTime = maxTimeLeft * 0.5f;
+
+            float multiplier;
+            if (timeLeft > halfTime)
+                multiplier = 1 - ((timeLeft - halfTime) / halfTime);
+            else
+                multiplier = timeLeft / halfTime;
+            multiplier = -(float)Math.Pow((multiplier - 0.5f * 2), 2) + 1;
+
+            color = startColor * multiplier;
+            scale = startScale * multiplier;
         }
     }
 }
