@@ -74,7 +74,8 @@ namespace TerRoguelike.Skies
                         particle.Draw(paralaxOff + moonAnchor);
                     }
                 }
-
+                float globalCompletion = Main.GlobalTimeWrappedHourly / 3600;
+                float extraRot = 3.399f * globalCompletion; // if globaltime overflows back to 0, this little bit of extra added rotation makes sure that it looks smooth still
                 Main.spriteBatch.End();
                 Color glowColor = Color.Lerp(Color.White, Color.Cyan, 0.6f) * intensity;
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -88,7 +89,7 @@ namespace TerRoguelike.Skies
                 Texture2D moonTex = TexDict["Moon"];
                 Pixelation.Parameters["tint"].SetValue(tint.ToVector4());
                 Pixelation.Parameters["dimensions"].SetValue(moonTex.Size());
-                Pixelation.Parameters["offRot"].SetValue(Main.GlobalTimeWrappedHourly * 0.02f);
+                Pixelation.Parameters["offRot"].SetValue(Main.GlobalTimeWrappedHourly * 0.02f + extraRot);
                 Pixelation.Parameters["pixelation"].SetValue(8);
 
                 Main.EntitySpriteDraw(moonTex, drawPos, null, Color.White, 0, moonTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
