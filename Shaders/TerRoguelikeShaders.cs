@@ -23,6 +23,7 @@ namespace TerRoguelike.Shaders
         internal static Effect ProtectiveBubbleShield;
         internal static Effect MaskOverlay;
         internal static Effect SideFade;
+        internal static Effect Pixelation;
 
         public static void LoadShaders()
         {
@@ -47,6 +48,9 @@ namespace TerRoguelike.Shaders
 
             SideFade = LoadShader("SideFade");
             RegisterScreenShader(SideFade, "SideFadePass", "SideFade");
+
+            Pixelation = LoadShader("Pixelation");
+            RegisterScreenShader(Pixelation, "PixelationPass", "Pixelation");
 
             MaskOverlay = LoadShader("MaskOverlay");
             RegisterScreenShader(MaskOverlay, "MaskOverlayPass", "MaskOverlay");
