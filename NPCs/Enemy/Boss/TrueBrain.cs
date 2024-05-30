@@ -21,7 +21,6 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
-using static Terraria.GameContent.PlayerEyeHelper;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
@@ -53,12 +52,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathCutsceneDuration = 120;
 
         public static Attack None = new Attack(0, 0, 120);
-        public static Attack Attack1 = new Attack(1, 30, 180);
-        public static Attack Attack2 = new Attack(2, 30, 180);
-        public static Attack Attack3 = new Attack(3, 30, 180);
-        public static Attack Attack4 = new Attack(4, 30, 180);
-        public static Attack Attack5 = new Attack(5, 30, 180);
-        public static Attack Summon = new Attack(6, 18, 180);
+        public static Attack TeleportBolt = new Attack(1, 30, 180);
+        public static Attack ProjCharge = new Attack(2, 30, 180);
+        public static Attack FakeCharge = new Attack(3, 30, 180);
+        public static Attack CrossBeam = new Attack(4, 30, 180);
+        public static Attack SpinBeam = new Attack(5, 30, 180);
+        public static Attack Teleport = new Attack(6, 30, 180);
+        public static Attack Summon = new Attack(7, 18, 180);
 
         public override void SetStaticDefaults()
         {
@@ -185,49 +185,58 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (NPC.ai[0] == Attack1.Id)
+            if (NPC.ai[0] == TeleportBolt.Id)
             {
-                if (NPC.ai[1] >= Attack1.Duration)
+                if (NPC.ai[1] >= TeleportBolt.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack1.Id;
+                    NPC.ai[2] = TeleportBolt.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack2.Id)
+            else if (NPC.ai[0] == ProjCharge.Id)
             {
-                if (NPC.ai[1] >= Attack2.Duration)
+                if (NPC.ai[1] >= ProjCharge.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack2.Id;
+                    NPC.ai[2] = ProjCharge.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack3.Id)
+            else if (NPC.ai[0] == FakeCharge.Id)
             {
-                if (NPC.ai[1] >= Attack3.Duration)
+                if (NPC.ai[1] >= FakeCharge.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack3.Id;
+                    NPC.ai[2] = FakeCharge.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack4.Id)
+            else if (NPC.ai[0] == CrossBeam.Id)
             {
-                if (NPC.ai[1] >= Attack4.Duration)
+                if (NPC.ai[1] >= CrossBeam.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack4.Id;
+                    NPC.ai[2] = CrossBeam.Id;
                 }
             }
-            else if (NPC.ai[0] == Attack5.Id)
+            else if (NPC.ai[0] == SpinBeam.Id)
             {
-                if (NPC.ai[1] >= Attack5.Duration)
+                if (NPC.ai[1] >= SpinBeam.Duration)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Attack5.Id;
+                    NPC.ai[2] = SpinBeam.Id;
+                }
+            }
+            else if (NPC.ai[0] == Teleport.Id)
+            {
+                if (NPC.ai[1] >= Teleport.Duration)
+                {
+                    NPC.ai[0] = None.Id;
+                    NPC.ai[1] = 0;
+                    NPC.ai[2] = Teleport.Id;
                 }
             }
             else if (NPC.ai[0] == Summon.Id)
@@ -245,7 +254,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { Attack1, Attack2, Attack3, Attack4, Attack5, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
