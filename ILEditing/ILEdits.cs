@@ -119,7 +119,7 @@ namespace TerRoguelike.ILEditing
         //Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
         private void On_WorldGen_SectionTileFrameWithCheck(On_WorldGen.orig_SectionTileFrameWithCheck orig, int startX, int startY, int endX, int endY)
         {
-			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || noMapUpdate) // don't fuck with this if not in a dungeon, or, assumedly for the second bool, if you just loaded into the world and are initializing all the shit around you. I'm pissed at this hardcrashing so much and this worked the best.
             {
 				orig.Invoke(startX, startY, endX, endY);
 				return;
@@ -133,32 +133,32 @@ namespace TerRoguelike.ILEditing
 			int forStart = sectionX3;
 			int forEnd = sectionX2 + 1;
 			//Can't have fast parallel count backwards. Never happened until randomly one time I opened a world and then it threw an error?? still have no clue why it happened, but it wasn't a harmful error. the game kept running. but this should ideally stop it throwing an error in chat in the rare event that it happens again.
+
+			var modPlayer = Main.LocalPlayer.ModPlayer();
 			if (forEnd - forStart < 0)
 			{
 				orig.Invoke(startX, startY, endX, endY);
 				return;
-                //forStart = sectionX2;
-                //forEnd = sectionX3 + 1;
             }
 
-			FastParallel.For(forStart, forEnd, delegate (int start, int end, object context)
+            FastParallel.For(forStart, forEnd, delegate (int start, int end, object context)
 			{
-				for (int i = start; i < end; i++)
-				{
-					for (int j = sectionY; j <= sectionY2; j++)
-					{
-						if (Main.sectionManager.SectionLoaded(i, j) && !Main.sectionManager.SectionFramed(i, j))
-						{
-							SectionTileFrame(i, j, i, j);
-							if (!Main.sectionManager.AnyUnfinishedSections)
-							{
-								return;
-							}
-						}
-					}
-				}
-			});
-		}
+                for (int i = start; i < end; i++)
+                {
+                    for (int j = sectionY; j <= sectionY2; j++)
+                    {
+                        if (Main.sectionManager.SectionLoaded(i, j) && !Main.sectionManager.SectionFramed(i, j))
+                        {
+                            SectionTileFrame(i, j, i, j);
+                            if (!Main.sectionManager.AnyUnfinishedSections)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+            });
+        }
 
         private void StopOnKillHeartsAndMana(On_NPC.orig_NPCLoot_DropCommonLifeAndMana orig, NPC self, Player closestPlayer)
         {

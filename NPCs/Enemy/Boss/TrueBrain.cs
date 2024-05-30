@@ -110,6 +110,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         continue;
 
                     modPlayer.moonLordVisualEffect = true;
+                    modPlayer.moonLordSkyEffect = true;
                 }
             }
 

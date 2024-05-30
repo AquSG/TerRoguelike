@@ -59,6 +59,8 @@ namespace TerRoguelike.Managers
         public Vector2 bossSpawnPos;
         public Vector2 RoomPosition; //position of the room
         public bool bossDead;
+        public virtual Point WallInflateModifier => new Point(0, 0);
+        public virtual bool AllowWallDrawing => true;
         public Rectangle GetRect()
         {
             Vector2 pos = RoomPosition16;
@@ -275,32 +277,33 @@ namespace TerRoguelike.Managers
             if (!wallActive)
                 return;
 
+            Vector2 playerCollisionShrink = WallInflateModifier.ToVector2() * 16;
             for (int playerID = 0; playerID < Main.maxPlayers; playerID++) // keep players in the fucking room
             {
                 var player = Main.player[playerID];
-                bool boundLeft = (player.position.X + player.velocity.X) < (RoomPosition.X + 1f) * 16f;
-                bool boundRight = (player.position.X + (float)player.width + player.velocity.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
-                bool boundTop = (player.position.Y + player.velocity.Y) < (RoomPosition.Y + 1f) * 16f;
-                bool boundBottom = (player.position.Y + (float)player.height + player.velocity.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
+                bool boundLeft = (player.position.X + player.velocity.X + playerCollisionShrink.X) < (RoomPosition.X + 1f) * 16f;
+                bool boundRight = (player.position.X + (float)player.width + player.velocity.X - playerCollisionShrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
+                bool boundTop = (player.position.Y + player.velocity.Y + playerCollisionShrink.Y) < (RoomPosition.Y + 1f) * 16f;
+                bool boundBottom = (player.position.Y + (float)player.height + player.velocity.Y - playerCollisionShrink.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
                 if (boundLeft)
                 {
-                    player.position.X = (RoomPosition.X + 1f) * 16f;
+                    player.position.X = (RoomPosition.X + 1f) * 16f - playerCollisionShrink.X;
                     player.velocity.X = 0;
                 }
                 if (boundRight)
                 {
-                    player.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f) - (float)player.width;
+                    player.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f + playerCollisionShrink.X) - (float)player.width;
                     player.velocity.X = 0;
                 }
                 if (boundTop)
                 {
-                    player.position.Y = (RoomPosition.Y + 1f) * 16f;
+                    player.position.Y = (RoomPosition.Y + 1f) * 16f - playerCollisionShrink.Y;
                     player.velocity.Y = 0.01f;
                     player.jump = 0;
                 }
                 if (boundBottom)
                 {
-                    player.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f) - (float)player.height;
+                    player.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f + playerCollisionShrink.Y) - (float)player.height;
                     player.velocity.Y = 0;
                 }
 
@@ -321,7 +324,7 @@ namespace TerRoguelike.Managers
                 if (modNPC.IgnoreRoomWallCollision)
                     continue;
 
-                Vector2 shrink = modNPC.RoomWallCollisionShrink;
+                Vector2 shrink = modNPC.RoomWallCollisionShrink + WallInflateModifier.ToVector2() * 16;
 
                 bool boundLeft = (npc.position.X + npc.velocity.X + shrink.X) < (RoomPosition.X + 1f) * 16f;
                 bool boundRight = (npc.position.X + (float)npc.width + npc.velocity.X - shrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;

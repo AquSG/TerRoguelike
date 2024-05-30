@@ -36,9 +36,15 @@ namespace TerRoguelike.Systems
         }
         public override void SpecialVisuals(Player player, bool isActive)
         {
-            bool moonLordEffectActive = player.ModPlayer().moonLordVisualEffect;
-            player.ManageSpecialBiomeVisuals("TerRoguelike:MoonLordClone", moonLordEffectActive);
-            if (moonLordEffectActive)
+            if (!player.active)
+            {
+                SkyManager.Instance.Deactivate("TerRoguelike:MoonLordSkyClone");
+                player.ManageSpecialBiomeVisuals("TerRoguelike:MoonLordClone", false);
+                return;
+            }
+            var modPlayer = player.ModPlayer();
+            player.ManageSpecialBiomeVisuals("TerRoguelike:MoonLordClone", modPlayer.moonLordVisualEffect);
+            if (modPlayer.moonLordSkyEffect)
                 SkyManager.Instance.Activate("TerRoguelike:MoonLordSkyClone");
             else
                 SkyManager.Instance.Deactivate("TerRoguelike:MoonLordSkyClone");

@@ -131,6 +131,7 @@ namespace TerRoguelike.MainMenu
                 if (prepareForRoguelikeGeneration)
                 {
                     Main.PendingPlayer.difficulty = 0;
+                    //ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, "prepare", Main.MouseScreen, Color.White, 0f, Vector2.Zero, new Vector2(0.8f));
                 }
             }
             if (Main.menuMode == 1 && prepareForRoguelikeGeneration)

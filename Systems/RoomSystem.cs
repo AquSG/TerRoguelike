@@ -366,6 +366,10 @@ namespace TerRoguelike.Systems
                 loopcount++;
             }
             RoomManager.FloorIDsInPlay = [.. floorIDsInPlay];
+
+            // for some reason vanilla isn't certain about where the spawn position is and some crazy camera lerp happens so I'm just gonna make that.. not happen
+            Main.BlackFadeIn = 255;
+            Main.SetCameraLerp(1, 1);
         }
         #endregion
 
@@ -491,15 +495,17 @@ namespace TerRoguelike.Systems
                 if (room.closedTime > 60)
                     continue;
 
-                if (room.wallActive)
+                if (room.wallActive && room.AllowWallDrawing)
                 {
                     //Draw the pink borders indicating the bounds of the room
                     StartAdditiveSpritebatch(false);
+                    int maxXDimensions = (int)room.RoomDimensions.X + room.WallInflateModifier.X * 2;
+                    int maxYDimensions = (int)room.RoomDimensions.Y + room.WallInflateModifier.Y * 2;
                     for (float side = 0; side < 2; side++)
                     {
-                        for (float i = 0; i < room.RoomDimensions.X; i++)
+                        for (float i = -room.WallInflateModifier.X; i < room.RoomDimensions.X + room.WallInflateModifier.X; i++)
                         {
-                            Vector2 targetBlock = room.RoomPosition + new Vector2(i, side * room.RoomDimensions.Y - side);
+                            Vector2 targetBlock = room.RoomPosition + new Vector2(i, side * maxYDimensions - side);
 
                             if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
                                 continue;
@@ -516,9 +522,9 @@ namespace TerRoguelike.Systems
 
                             Main.EntitySpriteDraw(lightTexture, drawPosition, null, color, rotation, lightTexture.Size(), 1f, SpriteEffects.None);
                         }
-                        for (float i = 0; i < room.RoomDimensions.Y; i++)
+                        for (float i = -room.WallInflateModifier.Y; i < room.RoomDimensions.Y + room.WallInflateModifier.Y; i++)
                         {
-                            Vector2 targetBlock = room.RoomPosition + new Vector2(side * room.RoomDimensions.X - side, i);
+                            Vector2 targetBlock = room.RoomPosition + new Vector2(side * maxXDimensions - side - room.WallInflateModifier.X, i);
                             if (Main.tile[targetBlock.ToPoint()].IsTileSolidGround(true))
                                 continue;
 
