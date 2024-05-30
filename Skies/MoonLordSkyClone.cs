@@ -35,6 +35,7 @@ using TerRoguelike.Tiles;
 using Terraria.GameInput;
 using TerRoguelike.Particles;
 using Terraria.Graphics.Effects;
+using ReLogic.Threading;
 
 namespace TerRoguelike.Skies
 {
@@ -42,6 +43,7 @@ namespace TerRoguelike.Skies
     {
         public bool isActive = false;
         public float intensity;
+        public static List<Particle> backgroundParticles = [];
         public override void Draw(SpriteBatch spriteBatch, float minDepth, float maxDepth)
         {
             if (maxDepth >= 0 && minDepth < 0)
@@ -52,6 +54,26 @@ namespace TerRoguelike.Skies
                 Vector2 moonAnchor = anchorRoom.RoomPosition16 + anchorRoom.RoomDimensions16 * new Vector2(0.5f, 0.25f);
                 Vector2 paralaxOff = (Main.Camera.Center - moonAnchor) * 0.6f;
                 Vector2 drawPos = moonAnchor + paralaxOff - Main.screenPosition;
+
+                if (backgroundParticles.Count > 0)
+                {
+                    StartAlphaBlendSpritebatch();
+                    for (int i = 0; i < backgroundParticles.Count; i++)
+                    {
+                        Particle particle = backgroundParticles[i];
+                        if (particle.additive)
+                            continue;
+                        particle.Draw(paralaxOff + moonAnchor);
+                    }
+                    StartAdditiveSpritebatch();
+                    for (int i = 0; i < backgroundParticles.Count; i++)
+                    {
+                        Particle particle = backgroundParticles[i];
+                        if (!particle.additive)
+                            continue;
+                        particle.Draw(paralaxOff + moonAnchor);
+                    }
+                }
 
                 Main.spriteBatch.End();
                 Color glowColor = Color.Lerp(Color.White, Color.Cyan, 0.6f) * intensity;
@@ -85,6 +107,23 @@ namespace TerRoguelike.Skies
                 intensity -= 0.01f;
             }
             intensity = MathHelper.Clamp(intensity, 0, 1);
+            if (intensity > 0)
+            {
+                if (intensity == 1)
+                {
+                    Vector2 particleScale = new Vector2(0.075f, 0.075f) * Main.rand.NextFloat(0.5f, 1f);
+                    Vector2 randParticlePos = Main.rand.NextVector2Circular(3000, 3000);
+                    Color particleColor = Color.Lerp(Color.White, Color.Cyan, 0.5f) * Main.rand.NextFloat(0.7f, 1f);
+                    float randParticleRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                    backgroundParticles.Add(new FadingThinSpark(randParticlePos, Vector2.Zero, 300, particleColor, particleScale, randParticleRot));
+                    backgroundParticles.Add(new FadingThinSpark(randParticlePos, Vector2.Zero, 300, particleColor, particleScale, randParticleRot + MathHelper.PiOver2));
+                }
+                UpdateBackgroundParticles();
+            }
+            else
+            {
+                backgroundParticles.Clear();
+            }
         }
         public override float GetCloudAlpha()
         {
@@ -100,6 +139,23 @@ namespace TerRoguelike.Skies
         }
         public override void Activate(Vector2 position, params object[] args)
         {
+            if (!isActive)
+            {
+                Vector2 particleScale = new Vector2(0.075f, 0.075f) * Main.rand.NextFloat(0.5f, 1f);
+                Vector2 randParticlePos = Main.rand.NextVector2Circular(3000, 3000);
+                Color particleColor = Color.Lerp(Color.White, Color.Cyan, 0.5f);
+                float randParticleRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                for (int i = 0; i < 300; i++) // quickstart add all the particles
+                {
+                    Color realColor = particleColor * Main.rand.NextFloat(0.7f, 1f);
+                    var particle = new FadingThinSpark(randParticlePos, Vector2.Zero, 300, realColor, particleScale, randParticleRot);
+                    particle.timeLeft = i;
+                    backgroundParticles.Add(particle);
+                    particle = new FadingThinSpark(randParticlePos, Vector2.Zero, 300, realColor, particleScale, randParticleRot);
+                    particle.timeLeft = i;
+                    backgroundParticles.Add(particle);
+                }
+            }
             isActive = true;
             intensity = 1;
         }
@@ -111,7 +167,25 @@ namespace TerRoguelike.Skies
         {
             isActive = false;
             intensity = 0;
+            backgroundParticles.Clear();
+        }
+        public void UpdateBackgroundParticles()
+        {
+            if (backgroundParticles == null)
+                return;
+            if (backgroundParticles.Count == 0)
+                return;
+
+            FastParallel.For(0, backgroundParticles.Count, delegate (int start, int end, object context)
+            {
+                for (int i = start; i < end; i++)
+                {
+                    Particle particle = backgroundParticles[i];
+                    particle.Update();
+                    particle.color *= intensity;
+                }
+            });
+            backgroundParticles.RemoveAll(x => x.timeLeft <= 0);
         }
     }
-    
 }
