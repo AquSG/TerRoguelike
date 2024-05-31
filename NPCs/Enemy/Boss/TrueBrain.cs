@@ -43,6 +43,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int CombatStyle => -1;
         public int currentFrame = 0;
         public SlotId TeleportSlot;
+        public SlotId ChargeSlot;
         public Texture2D eyeTex, innerEyeTex;
         public Vector2 eyeVector = Vector2.Zero;
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
@@ -59,15 +60,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 90);
         public static Attack TeleportBolt = new Attack(1, 30, 340);
-        public static Attack ProjCharge = new Attack(2, 30, 180);
+        public static Attack ProjCharge = new Attack(2, 30, 280);
         public static Attack FakeCharge = new Attack(3, 30, 180);
         public static Attack CrossBeam = new Attack(4, 30, 180);
         public static Attack SpinBeam = new Attack(5, 30, 180);
-        public static Attack Teleport = new Attack(6, 30, 100);
+        public static Attack Teleport = new Attack(6, 30, 115);
         public static Attack Summon = new Attack(7, 18, 180);
         public int TeleportBoltCycleTime = 90;
         public int TeleportBoltTelegraph = 20;
         public int TeleportBoltFireRate = 8;
+        public int ProjChargeCycleTime = 100;
+        public int ProjChargeTelegraph = 20;
+        public int ProjChargeFireRate = 5;
 
         public override void SetStaticDefaults()
         {
@@ -174,6 +178,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             bool eyeCenter = false;
+            bool eyeVelocity = NPC.ai[0] == ProjCharge.Id && (int)NPC.ai[1] % ProjChargeCycleTime >= teleportMoveTimestamp + ProjChargeTelegraph;
             float rate = 0.15f;
             if (eyeCenter)
             {
@@ -184,10 +189,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
                 float maxEyeOffset = 12;
 
-                Vector2 targetVect = targetPos - (NPC.Center + innerEyePosition.RotatedBy(NPC.rotation));
+                Vector2 targetVect = eyeVelocity ? NPC.velocity :  targetPos - (NPC.Center + innerEyePosition.RotatedBy(NPC.rotation));
                 if (targetVect.Length() > maxEyeOffset)
                     targetVect = targetVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
                 eyeVector = Vector2.Lerp(eyeVector, targetVect, rate);
+            }
+
+            if (SoundEngine.TryGetActiveSound(ChargeSlot, out var sound) && sound.IsPlaying)
+            {
+                sound.Position = NPC.Center;
+                sound.Update();
             }
         }
         public override void AI()
@@ -345,6 +356,65 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == ProjCharge.Id)
             {
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                int time = (int)NPC.ai[1] % ProjChargeCycleTime;
+                int chargeStartTime = teleportMoveTimestamp + ProjChargeTelegraph;
+                Vector2 targetVect = targetPos - NPC.Center;
+
+                if (time < chargeStartTime)
+                {
+                    if (time == 0)
+                    {
+                        ChargeSlot = SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.45f, PitchVariance = 0.2f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                    }
+                    float completion = time / (float)chargeStartTime;
+                    NPC.velocity = -targetVect.SafeNormalize(Vector2.UnitY) * 10 * (1 - completion);
+                }
+                else
+                {
+                    if (time == chargeStartTime)
+                    {
+                        NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 22;
+                        ChargeSlot = SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.3f, Pitch = -0.1f }, NPC.Center);
+                    }
+                    if (NPC.ai[3] == 0 && (time - chargeStartTime) % ProjChargeFireRate == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item12 with { Volume = 0.3f, MaxInstances = 24 }, NPC.Center);
+                        if (!ParanoidTileRetrieval((NPC.Center + innerEyePosition).ToTileCoordinates()).IsTileSolidGround(true))
+                        {
+                            float direction = NPC.velocity.ToRotation();
+                            for (int i = -1; i <= 1; i += 2)
+                            {
+                                float specificDirection = direction + i * MathHelper.PiOver2;
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + innerEyePosition, specificDirection.ToRotationVector2() * 8, ModContent.ProjectileType<PhantasmalEye>(), NPC.damage, 0);
+                            }
+                        }
+                    }
+
+                    int amount = NPC.ai[3] == 0 ? 3 : (NPC.ai[3] < 15 ? 1 : 0);
+                    float velRot = NPC.velocity.ToRotation();
+                    Vector2 baseParticlePos = NPC.Center + -NPC.velocity.SafeNormalize(Vector2.UnitY) * 75;
+                    for (int i = 0; i < amount; i++)
+                    {
+                        Vector2 particlePos = baseParticlePos + (Vector2.UnitY * Main.rand.NextFloat(-75, 75)).RotatedBy(velRot);
+                        Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
+                        ParticleManager.AddParticle(new Wriggler(
+                            particlePos, NPC.velocity * -0.15f,
+                            26, particleColor, new Vector2(0.5f), Main.rand.Next(4), velRot + Main.rand.NextFloat(-0.2f, 0.2f), 0.98f, 16,
+                            Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipVertically));
+
+                        Vector2 offset = Main.rand.NextVector2Circular(2, 2);
+                        ParticleManager.AddParticle(new Ball(
+                            particlePos + offset, offset,
+                            20, Color.Teal, new Vector2(0.25f), 0, 0.96f, 10));
+                    }
+
+                    if (time == ProjChargeCycleTime - 20)
+                        NPC.ai[3] = 1;
+                    {
+                    }
+                }
+
                 if (NPC.ai[1] == ProjCharge.Duration)
                 {
                     teleportTargetPos = new Vector2(-1);
@@ -401,8 +471,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Teleport.Id)
             {
+                int time = (int)NPC.ai[1] - 25;
                 DefaultMovement();
-                if (NPC.ai[3] == 0)
+                NPC.velocity *= 0.5f;
+                if (time % 45 == 0 && NPC.ai[1] < Teleport.Duration)
                 {
                     teleportTargetPos = new Vector2(-1);
                     NPC.ai[3] = 1;
@@ -455,7 +527,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
+            //List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
+            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, Teleport};
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -475,7 +548,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
-            chosenAttack = TeleportBolt.Id;
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
@@ -581,6 +654,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {
             boundingBox = NPC.Hitbox;
+        }
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            position = NPC.Center + new Vector2(0, 116);
+            return true;
         }
         public override void FindFrame(int frameHeight)
         {
