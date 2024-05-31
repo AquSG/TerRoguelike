@@ -32,6 +32,7 @@ using TerRoguelike.Utilities;
 using Terraria.GameContent.Shaders;
 using TerRoguelike.NPCs.Enemy.Boss;
 using System.Reflection;
+using Terraria.Graphics.Effects;
 
 namespace TerRoguelike.ILEditing
 {
@@ -483,7 +484,8 @@ namespace TerRoguelike.ILEditing
 
         private void On_WorldGen_SaveAndQuit(On_WorldGen.orig_SaveAndQuit orig, Action callback)
         {
-			MusicSystem.ClearMusic();
+            SkyManager.Instance.Deactivate("TerRoguelike:MoonLordSkyClone");
+            MusicSystem.ClearMusic();
 			if (TerRoguelikeWorld.IsDeletableOnExit && !TerRoguelikeMenu.wipeTempPlayer && !TerRoguelikeMenu.wipeTempWorld)
             {
 				TerRoguelikeMenu.wipeTempPlayer = true;
