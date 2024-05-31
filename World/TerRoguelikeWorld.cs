@@ -108,12 +108,23 @@ namespace TerRoguelike.World
             modPlayer.escapeArrowTarget = lunarStartRoom.RoomPosition16 + Vector2.UnitY * lunarStartRoom.RoomDimensions.Y * 8f;
         }
 
-        public static List<StoredDraw> GetTrueBrainDrawList(Vector2 position, Vector2 eyeVector, Vector2 scale, Color color, int currentFrame)
+        public static List<StoredDraw> GetTrueBrainDrawList(Vector2 position, Vector2 eyeVector, Vector2 scale, Color color, int currentFrame, float teleportInterpolant = 0)
         {
             var draws = new List<StoredDraw>();
             float maxLength = 12;
             if (eyeVector.Length() > maxLength)
                 eyeVector = eyeVector.SafeNormalize(Vector2.UnitY) * maxLength;
+
+            if (teleportInterpolant > 0)
+            {
+                float interpolant = teleportInterpolant < 0.5f ? teleportInterpolant / 0.5f : 1f - ((teleportInterpolant - 0.5f) / 0.5f);
+                float horizInterpolant = MathHelper.Lerp(1f, 2f, 0.5f + (0.5f * -(float)Math.Cos(interpolant * MathHelper.TwoPi)));
+                float verticInterpolant = MathHelper.Lerp(0.5f + (0.5f * (float)Math.Cos(interpolant * MathHelper.TwoPi)), 8f, interpolant * interpolant);
+                scale.X *= horizInterpolant;
+                scale.Y *= verticInterpolant;
+
+                scale *= 1f - interpolant;
+            }
 
             var trueBrainTex = TextureAssets.Npc[ModContent.NPCType<TrueBrain>()].Value;
             var trueBrainEyeTex = TextureManager.TexDict["TrueBrainEye"];
@@ -124,8 +135,8 @@ namespace TerRoguelike.World
 
             var frame = new Rectangle(0, frameHeight * currentFrame, trueBrainTex.Width, frameHeight - 2);
             draws.Add(new(trueBrainTex, position, frame, color, 0, frame.Size() * 0.5f, scale, SpriteEffects.None));
-            draws.Add(new(trueBrainEyeTex, position + new Vector2(0, -18), null, color, 0, trueBrainEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
-            draws.Add(new(trueBrainInnerEyeTex, position + new Vector2(0, -19) + eyeVector * new Vector2(0.35f, 1f), null, color, 0, trueBrainInnerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(trueBrainEyeTex, position + new Vector2(0, -18) * scale, null, color, 0, trueBrainEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(trueBrainInnerEyeTex, position + (new Vector2(0, -19) + eyeVector * new Vector2(0.35f, 1f)) * scale, null, color, 0, trueBrainInnerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
 
             return draws;
         }

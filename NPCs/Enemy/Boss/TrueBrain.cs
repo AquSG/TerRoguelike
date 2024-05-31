@@ -42,6 +42,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
         public int currentFrame = 0;
+        public SlotId TeleportSlot;
         public Texture2D eyeTex, innerEyeTex;
         public Vector2 eyeVector = Vector2.Zero;
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
@@ -51,13 +52,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
-        public static Attack None = new Attack(0, 0, 120);
+        public static int teleportTime = 40;
+        public static int teleportMoveTimestamp = 20;
+        public Vector2 teleportTargetPos = new Vector2(-1);
+
+        public static Attack None = new Attack(0, 0, 60);
         public static Attack TeleportBolt = new Attack(1, 30, 180);
         public static Attack ProjCharge = new Attack(2, 30, 180);
         public static Attack FakeCharge = new Attack(3, 30, 180);
         public static Attack CrossBeam = new Attack(4, 30, 180);
         public static Attack SpinBeam = new Attack(5, 30, 180);
-        public static Attack Teleport = new Attack(6, 30, 180);
+        public static Attack Teleport = new Attack(6, 30, 100);
         public static Attack Summon = new Attack(7, 18, 180);
 
         public override void SetStaticDefaults()
@@ -114,6 +119,56 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            if (NPC.ai[3] > 0)
+            {
+                if (NPC.ai[3] == 5)
+                {
+                    TeleportSlot = SoundEngine.PlaySound(CrimsonVessel.TeleportSound with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center);
+                }
+                else if (NPC.ai[3] == teleportMoveTimestamp)
+                {
+                    if (teleportTargetPos == new Vector2(-1))
+                    {
+                        Vector2 targetPos = target != null ? target.Center : spawnPos;
+                        bool found = false;
+                        for (int i = 0; i < 100; i++)
+                        {
+                            Vector2 wantedPos = targetPos + Main.rand.NextVector2CircularEdge(400, 340);
+                            if (ParanoidTileRetrieval(wantedPos.ToTileCoordinates()).IsTileSolidGround(true))
+                                continue;
+
+                            if (modNPC.isRoomNPC)
+                            {
+                                if (!RoomList[modNPC.sourceRoomListID].GetRect().Contains(wantedPos.ToPoint()))
+                                    continue;
+                            }
+                            if ((wantedPos - NPC.Center).Length() < 150f)
+                                continue;
+
+                            teleportTargetPos = wantedPos;
+                            found = true;
+                            break;
+                        }
+                        if (!found)
+                        {
+                            teleportTargetPos = targetPos + Main.rand.NextVector2CircularEdge(400, 340);
+                        }
+                    }
+
+                    NPC.Center = teleportTargetPos;
+                    if (SoundEngine.TryGetActiveSound(TeleportSlot, out var teleportSound) && teleportSound.IsPlaying)
+                    {
+                        teleportSound.Position = NPC.Center;
+                        teleportSound.Update();
+                    }
+                }
+                else if (NPC.ai[3] >= teleportTime)
+                {
+                    NPC.ai[3] = 0;
+                    teleportTargetPos = new Vector2(-1);
+                }
+            }
+
             bool eyeCenter = false;
             float rate = 0.15f;
             if (eyeCenter)
@@ -122,7 +177,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
-                Vector2 targetPos = target != null ? target.Center : spawnPos + new Vector2(0, -80);
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
                 float maxEyeOffset = 12;
 
                 Vector2 targetVect = targetPos - (NPC.Center + innerEyePosition.RotatedBy(NPC.rotation));
@@ -133,15 +188,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            if (NPC.ai[3] != 0)
+            {
+                NPC.ai[3]++;
+            }
+
             NPC.rotation = 0f;
-            NPC.frameCounter += 0.125d;
+            NPC.frameCounter += 0.16d;
             if (deadTime > 0)
             {
                 CheckDead();
                 return;
             }
 
-            ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
+            ableToHit = NPC.localAI[0] >= 0 && NPC.ai[3] == 0 && deadTime == 0;
 
             if (NPC.localAI[0] < 0)
             {
@@ -181,13 +241,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-
+                    DefaultMovement();
+                    if (NPC.ai[1] == None.Duration - teleportMoveTimestamp + 1)
+                    {
+                        teleportTargetPos = new Vector2(-1);
+                        NPC.ai[3] = 1;
+                    }
                 }
             }
 
             if (NPC.ai[0] == TeleportBolt.Id)
             {
-                if (NPC.ai[1] >= TeleportBolt.Duration)
+                if (NPC.ai[1] == TeleportBolt.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= TeleportBolt.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -196,7 +266,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == ProjCharge.Id)
             {
-                if (NPC.ai[1] >= ProjCharge.Duration)
+                if (NPC.ai[1] == ProjCharge.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= ProjCharge.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -205,7 +280,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == FakeCharge.Id)
             {
-                if (NPC.ai[1] >= FakeCharge.Duration)
+                if (NPC.ai[1] == FakeCharge.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= FakeCharge.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -214,7 +294,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == CrossBeam.Id)
             {
-                if (NPC.ai[1] >= CrossBeam.Duration)
+                if (NPC.ai[1] == CrossBeam.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= CrossBeam.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -223,7 +308,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == SpinBeam.Id)
             {
-                if (NPC.ai[1] >= SpinBeam.Duration)
+                if (NPC.ai[1] == SpinBeam.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= SpinBeam.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -232,7 +322,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Teleport.Id)
             {
-                if (NPC.ai[1] >= Teleport.Duration)
+                DefaultMovement();
+                if (NPC.ai[3] == 0)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] == Teleport.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= Teleport.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
@@ -241,11 +342,32 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
-                if (NPC.ai[1] >= Summon.Duration)
+                if (NPC.ai[1] == Summon.Duration)
+                {
+                    teleportTargetPos = new Vector2(-1);
+                    NPC.ai[3] = 1;
+                }
+                if (NPC.ai[1] >= Summon.Duration + teleportMoveTimestamp - 1)
                 {
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Summon.Id;
+                }
+            }
+
+            void DefaultMovement()
+            {
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+
+                NPC.velocity = (targetPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 1f;
+                float distance = targetPos.Distance(NPC.Center);
+                if (distance < 120)
+                {
+                    NPC.velocity *= distance / 120;
+                }
+                else
+                {
+                    NPC.velocity *= (distance - 120) * 0.5f / 120f + 1;
                 }
             }
         }
@@ -393,13 +515,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             var tex = TextureAssets.Npc[Type].Value;
             Color npcColor = Color.White;
+            Color phantomColor = Color.Lerp(Color.DarkBlue, Color.Cyan, 0.4f) * 0.65f;
+            
             Vector2 scale = new Vector2(NPC.scale);
+            if (NPC.ai[3] > 0)
+            {
+                float interpolant = NPC.ai[3] < teleportMoveTimestamp ? NPC.ai[3] / (teleportMoveTimestamp) : 1f - ((NPC.ai[3] - teleportMoveTimestamp) / (teleportTime - teleportMoveTimestamp));
+                float horizInterpolant = MathHelper.Lerp(1f, 2f, 0.5f + (0.5f * -(float)Math.Cos(interpolant * MathHelper.TwoPi)));
+                float verticInterpolant = MathHelper.Lerp(0.5f + (0.5f * (float)Math.Cos(interpolant * MathHelper.TwoPi)), 8f, interpolant * interpolant);
+                scale.X *= horizInterpolant;
+                scale.Y *= verticInterpolant;
+
+                scale *= 1f - interpolant;
+            }
 
             List<StoredDraw> draws = [];
 
-            draws.Add(new(tex, NPC.Center + modNPC.drawCenter.RotatedBy(NPC.rotation), NPC.frame, npcColor, NPC.rotation, NPC.frame.Size() * 0.5f, scale, SpriteEffects.None));
-            draws.Add(new(eyeTex, NPC.Center + eyePosition.RotatedBy(NPC.rotation), null, npcColor, NPC.rotation, eyeTex.Size() * 0.5f, scale, SpriteEffects.None));
-            draws.Add(new(innerEyeTex, NPC.Center + innerEyePosition.RotatedBy(NPC.rotation) + eyeVector * new Vector2(0.35f, 1f), null, npcColor, 0, innerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+            Vector2 bodyOff = modNPC.drawCenter.RotatedBy(NPC.rotation);
+            Vector2 eyeoff = eyePosition.RotatedBy(NPC.rotation);
+            Vector2 innerEyeOff = innerEyePosition.RotatedBy(NPC.rotation) + eyeVector * new Vector2(0.35f, 1f);
+            draws.Add(new(tex, NPC.Center + bodyOff * scale, NPC.frame, npcColor, NPC.rotation, NPC.frame.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(eyeTex, NPC.Center + eyeoff * scale, null, npcColor, NPC.rotation, eyeTex.Size() * 0.5f, scale, SpriteEffects.None));
+            draws.Add(new(innerEyeTex, NPC.Center + innerEyeOff * scale, null, npcColor, 0, innerEyeTex.Size() * 0.5f, scale, SpriteEffects.None));
 
             Vector2 drawOff = -Main.screenPosition;
 
