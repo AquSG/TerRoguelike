@@ -745,7 +745,7 @@ namespace TerRoguelike.Managers
 
             if (closedTime > 60)
             {
-                if (IsBossRoom && !TerRoguelikeWorld.escape)
+                if (IsBossRoom && !TerRoguelikeWorld.escape && AllowWallDrawing)
                 {
                     //Draw the blue wall portal
                     RightPortal((closedTime - 120) / 60f);

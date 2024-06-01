@@ -68,7 +68,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack CrossBeam = new Attack(4, 30, 180);
         public static Attack SpinBeam = new Attack(5, 30, 400);
         public static Attack Teleport = new Attack(6, 30, 115);
-        public static Attack Summon = new Attack(7, 18, 180);
+        public static Attack Summon = new Attack(7, 18, 150);
         public int TeleportBoltCycleTime = 90;
         public int TeleportBoltTelegraph = 20;
         public int TeleportBoltFireRate = 8;
@@ -83,6 +83,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int SpinBeamWindup = 110;
         public int SpinBeamFireDuration = 240;
         public int[] SpinBeamTrueEyeTimes = [100, 180];
+        public int SummonRate = 12;
+        public int SummonTime = 47;
+        public int SummonWindup = 40;
 
         public override void SetStaticDefaults()
         {
@@ -713,6 +716,33 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                DefaultMovement();
+                NPC.velocity *= 0.3f;
+                if (NPC.ai[1] < SummonWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        int teleportDir = targetPos.X > spawnPos.X ? -1 : 1;
+                        teleportTargetPos = new Vector2(MathHelper.Clamp(targetPos.X - spawnPos.X, -1000, 1000) + Main.rand.NextFloat(280, 400) * teleportDir, Main.rand.NextFloat(200)) + spawnPos;
+                    }
+                }
+                else if (NPC.ai[1] < SummonWindup + SummonTime)
+                {
+                    int time = (int)NPC.ai[1] - SummonWindup;
+                    if (time % SummonRate == 0)
+                    {
+                        Vector2 summonPos = NPC.Center + new Vector2(0, 80) + NPC.velocity * 4;
+                        Vector2 summonVelocity = Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * 4;
+                        NPC spawnedNPC = NPC.NewNPCDirect(NPC.GetSource_FromThis(), summonPos, ModContent.NPCType<TrueServant>(), 0, 0, -60);
+                        spawnedNPC.velocity = summonVelocity;
+                        spawnedNPC.rotation = summonVelocity.ToRotation() + MathHelper.PiOver2;
+                        spawnedNPC.localAI[0] = 10;
+
+                        SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2 }, summonPos);
+                        SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, summonPos);
+                    }
+                }
                 if (NPC.ai[1] == Summon.Duration)
                 {
                     teleportTargetPos = new Vector2(-1);
@@ -747,8 +777,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
-            //List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport};
+            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (teleportAttackCooldown > 0)
                 potentialAttacks.RemoveAll(x => x.Id == Teleport.Id);
@@ -957,8 +986,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 for (int i = 0; i < draws.Count; i++)
                 {
                     var draw = draws[i];
-                    if (draw.texture.Width < 100) // every small texture here is covered up by a bigger texture. no point in wasting time drawing ignite textures for things that would have no effect
-                        continue;
                     for (int j = 0; j < 8; j++)
                     {
                         draw.Draw(drawOff + Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
