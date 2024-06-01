@@ -64,9 +64,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack None = new Attack(0, 0, 90);
         public static Attack TeleportBolt = new Attack(1, 30, 340);
         public static Attack ProjCharge = new Attack(2, 30, 280);
-        public static Attack FakeCharge = new Attack(3, 30, 180);
+        public static Attack FakeCharge = new Attack(3, 30, 210);
         public static Attack CrossBeam = new Attack(4, 30, 180);
-        public static Attack SpinBeam = new Attack(5, 30, 179);
+        public static Attack SpinBeam = new Attack(5, 30, 400);
         public static Attack Teleport = new Attack(6, 30, 115);
         public static Attack Summon = new Attack(7, 18, 180);
         public int TeleportBoltCycleTime = 90;
@@ -78,8 +78,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int FakeChargeWindup = 90;
         public int FakeChargeTelegraph = 30;
         public int FakeChargeDashDuration = 60;
-        public int FakeChargeFireRate = 2;
+        public int FakeChargeFireRate = 3;
         public int CrossBeamCycleTime = 30;
+        public int SpinBeamWindup = 110;
+        public int SpinBeamFireDuration = 240;
+        public int[] SpinBeamTrueEyeTimes = [100, 180];
 
         public override void SetStaticDefaults()
         {
@@ -121,8 +124,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void PostAI()
         {
-            FakeChargeFireRate = 3;
-            FakeCharge.Duration = 210;
             if (NPC.localAI[0] >= -(cutsceneDuration + 30))
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
@@ -189,7 +190,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            bool eyeCenter = false;
+            bool eyeCenter = NPC.ai[0] == SpinBeam.Id && NPC.ai[1] < SpinBeamWindup + SpinBeamFireDuration + 30;
             bool eyeVelocity = 
                 (NPC.ai[0] == ProjCharge.Id && (int)NPC.ai[1] % ProjChargeCycleTime >= teleportMoveTimestamp + ProjChargeTelegraph) ||
                 (NPC.ai[0] == FakeCharge.Id && NPC.ai[1] >= FakeChargeTelegraph + FakeChargeWindup);
@@ -615,6 +616,67 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == SpinBeam.Id)
             {
+                NPC.velocity = Vector2.Zero;
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                if (NPC.ai[1] < SpinBeamWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        int teleportDir = targetPos.X > spawnPos.X ? -1 : 1;
+                        teleportTargetPos = new Vector2(MathHelper.Clamp(targetPos.X - spawnPos.X, -1000, 1000) + Main.rand.NextFloat(280, 400) * teleportDir, Main.rand.NextFloat(200)) + spawnPos;
+
+                        SoundEngine.PlaySound(WallOfFlesh.HellBeamCharge with { Volume = 0.9f, Pitch = 0.08f, PitchVariance = 0 }, teleportTargetPos);
+                        SoundEngine.PlaySound(SoundID.Zombie95 with { Volume = 0.45f }, teleportTargetPos);
+                    }
+
+                    if (NPC.ai[1] > 6 && NPC.ai[1] < SpinBeamWindup - 24)
+                    {
+                        Color outlineColor = Color.Lerp(Color.Cyan, Color.Blue, 0.13f);
+                        Color fillColor = Color.Lerp(outlineColor, Color.Teal, 0.2f);
+                        Vector2 particleAnchor = NPC.Center + innerEyePosition;
+                        Vector2 offset = Main.rand.NextVector2Circular(90, 90);
+                        ParticleManager.AddParticle(new BallOutlined(
+                            particleAnchor + offset, -offset * 0.05f,
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.12f, 0.18f)), 4, 0, 0.97f, 50),
+                            ParticleManager.ParticleLayer.AfterProjectiles);
+                    }
+                }
+                else if (NPC.ai[1] < SpinBeamWindup + SpinBeamFireDuration)
+                {
+                    int fireTime = (int)NPC.ai[1] - SpinBeamWindup;
+                    if (fireTime == 0)
+                    {
+                        SoundEngine.PlaySound(SoundID.Zombie104 with { Volume = 0.7f, Pitch = -0.4f, PitchVariance = 0 }, NPC.Center + innerEyePosition);
+
+                        float startRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                        NPC.direction = targetPos.X > NPC.Center.X ? 1 : -1;
+                        float rotPerCycle = MathHelper.TwoPi / 6f;
+                        Vector2 projReferencePos = innerEyePosition;
+                        for (int i = 0; i < 6; i++)
+                        {
+                            float rot = startRot + i * rotPerCycle;
+                            Vector2 projSpawnPos = NPC.Center + innerEyePosition + rot.ToRotationVector2() * 4;
+                            int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y);
+                            Main.projectile[proj].rotation = rot;
+                        }
+                    }
+                    for (int i = 0; i < SpinBeamTrueEyeTimes.Length; i++)
+                    {
+                        int spawnTime = SpinBeamTrueEyeTimes[i];
+                        if (fireTime == spawnTime)
+                        {
+                            float radius = 160;
+                            float rot = (targetPos - NPC.Center - innerEyePosition).ToRotation();
+                            rot += -NPC.direction * (Main.rand.NextFloat(-1.2f, 1.2f) + MathHelper.PiOver2);
+                            Vector2 rotVect = rot.ToRotationVector2();
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0);
+                        }
+                    }
+                }
+                else
+                {
+
+                }
                 if (NPC.ai[1] == SpinBeam.Duration)
                 {
                     teleportTargetPos = new Vector2(-1);
@@ -686,7 +748,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, Teleport};
+            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport};
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
             if (teleportAttackCooldown > 0)
                 potentialAttacks.RemoveAll(x => x.Id == Teleport.Id);

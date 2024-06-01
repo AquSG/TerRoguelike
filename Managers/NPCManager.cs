@@ -123,6 +123,7 @@ namespace TerRoguelike.Managers
                 new MoonLord(),
                 new MoonLordHand(),
                 new MoonLordHead(),
+                new TrueBrain(),
             };
         }
         internal static void Unload()

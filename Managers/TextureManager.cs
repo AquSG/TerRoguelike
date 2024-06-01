@@ -165,6 +165,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/MoonDeadSpine",
                 "TerRoguelike/ExtraTextures/MoonDeadTorso",
                 "TerRoguelike/ExtraTextures/Moon",
+                "TerRoguelike/ExtraTextures/PhantasmalBeamWave",
             };
             foreach (string path in pathList)
             {
