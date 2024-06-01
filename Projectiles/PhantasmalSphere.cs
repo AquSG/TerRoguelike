@@ -42,11 +42,16 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             Projectile.rotation = Projectile.velocity.ToRotation();
-            Projectile.ai[1] = Projectile.velocity.Length();
+            if (Projectile.ai[1] <= 0)
+                Projectile.ai[1] = Projectile.velocity.Length();
             Projectile.velocity = Vector2.Zero;
-            NPC npc = Main.npc[(int)Projectile.ai[0]];
-            if (!npc.active)
-                Projectile.ai[0] = -1;
+            if (Projectile.ai[0] >= 0)
+            {
+                NPC npc = Main.npc[(int)Projectile.ai[0]];
+                if (!npc.active)
+                    Projectile.ai[0] = -1;
+            }
+            Projectile.timeLeft -= (int)Projectile.ai[2];
         }
         public override void AI()
         {
@@ -153,7 +158,7 @@ namespace TerRoguelike.Projectiles
                     21, outlineColor, Color.White * 0.75f, new Vector2(0.3f), 5, 0, 0.96f, 15));
             }
         }
-        public override bool? CanDamage() => maxTimeLeft - Projectile.timeLeft >= 30 ? null : false;
+        public override bool? CanDamage() => maxTimeLeft - (Projectile.timeLeft + (int)(Projectile.ai[2])) >= 30 ? null : false;
         public override bool PreDraw(ref Color lightColor)
         {
             Texture2D tex = TextureAssets.Projectile[Type].Value;
@@ -162,7 +167,7 @@ namespace TerRoguelike.Projectiles
             Rectangle frame = new Rectangle(0, frameHeight * Projectile.frame, tex.Width, frameHeight);
             Vector2 offset = new Vector2(Projectile.localAI[0], Projectile.localAI[1]);
 
-            int time = maxTimeLeft - Projectile.timeLeft;
+            int time = maxTimeLeft - (Projectile.timeLeft + (int)(Projectile.ai[2]));
             float spawnCompletion = 1f;
             if (time < 30)
             {
