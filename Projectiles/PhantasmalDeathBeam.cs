@@ -24,8 +24,9 @@ using System.IO.Pipes;
 
 namespace TerRoguelike.Projectiles
 {
-    public class HellBeam : ModProjectile, ILocalizedModType
+    public class PhantasmalDeathBeam : ModProjectile, ILocalizedModType
     {
+        public override string Texture => "TerRoguelike/Projectiles/HellBeam";
         public int maxTimeLeft;
         public List<Vector2> specialOldPos = [];
         public List<Vector2> specialOldVel = [];
@@ -33,6 +34,7 @@ namespace TerRoguelike.Projectiles
         public Texture2D waveTex;
         public Texture2D squareTex;
         public List<StoredDraw> draws = [];
+        public Vector2 ParentRotCenterOffset = Vector2.Zero;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 10000;
@@ -41,7 +43,7 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.width = 16;
             Projectile.height = 16;
-            Projectile.timeLeft = maxTimeLeft = 1500;
+            Projectile.timeLeft = maxTimeLeft = 600;
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
@@ -50,13 +52,12 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            waveTex = TexDict["HellBeamWave"];
+            waveTex = TexDict["PhantasmalBeamWave"];
             squareTex = TexDict["Square"];
-            Projectile.hide = true;
         }
-        public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
+        public override void OnSpawn(IEntitySource source)
         {
-            behindNPCs.Add(index);
+            ParentRotCenterOffset = new Vector2(Projectile.ai[0], Projectile.ai[1]);
         }
         public override void AI()
         {
@@ -71,14 +72,24 @@ namespace TerRoguelike.Projectiles
                     if (RoomSystem.RoomList[modNPC.sourceRoomListID].bossDead)
                         allow = false;
                 }
+                float addedRot = 0.008f * npc.direction;
+                Vector2 rotPoint = npc.Center + ParentRotCenterOffset;
+                Projectile.Center = (Projectile.Center - rotPoint).RotatedBy(addedRot) + rotPoint;
+                Projectile.rotation += addedRot;
             }
 
             int maxSpecialPos = 240;
+            if (Projectile.timeLeft <= maxSpecialPos)
+            {
+                int checkIndex = maxSpecialPos - Projectile.timeLeft;
+                if (checkIndex < specialOldPos.Count)
+                    specialOldDead[checkIndex] = true;
+            }
             int time = maxTimeLeft - Projectile.timeLeft;
             if (specialOldPos.Count < maxSpecialPos && allow)
             {
-                Color outlineColor = Color.Lerp(Color.LightPink, Color.OrangeRed, 0.13f);
-                Color fillColor = Color.Lerp(outlineColor, Color.DarkRed, 0.2f);
+                Color outlineColor = Color.Lerp(Color.Cyan, Color.Blue, 0.13f);
+                Color fillColor = Color.Lerp(outlineColor, Color.Teal, 0.2f);
                 for (int j = -6; j <= 6; j++)
                 {
                     if (!Main.rand.NextBool(12) || j == 0)
@@ -87,7 +98,8 @@ namespace TerRoguelike.Projectiles
                     Vector2 particleVel = (Projectile.rotation.ToRotationVector2()).RotatedBy(Math.Sign(j) * 0.5f + j * 0.12f + Main.rand.NextFloat(-0.02f, 0.02f)) * Main.rand.NextFloat(0.5f, 1f) * 4;
                     ParticleManager.AddParticle(new BallOutlined(
                         particleSpawnPos, particleVel,
-                        60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50));
+                        60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50),
+                        ParticleManager.ParticleLayer.AfterProjectiles);
                 }
 
                 specialOldPos.Add(Projectile.Center);
@@ -109,8 +121,8 @@ namespace TerRoguelike.Projectiles
                 if (!specialOldDead[i] && !CanHitInLine(pos, predictedPos))
                 {
                     specialOldDead[i] = true;
-                    Color outlineColor = Color.Lerp(Color.Salmon, Color.OrangeRed, 0.13f);
-                    Color fillColor = Color.Lerp(outlineColor, Color.LightPink, 0.2f);
+                    Color outlineColor = Color.Lerp(Color.Cyan, Color.Blue, 0.13f);
+                    Color fillColor = Color.Lerp(outlineColor, Color.Teal, 0.2f);
                     for (int j = -6; j <= 6; j++)
                     {
                         if (!Main.rand.NextBool(7) || j == 0)
@@ -119,7 +131,8 @@ namespace TerRoguelike.Projectiles
                         Vector2 particleVel = -specialOldVel[i].SafeNormalize(Vector2.UnitY).RotatedBy(Math.Sign(j) * 0.5f + j * 0.12f + Main.rand.NextFloat(-0.02f, 0.02f)) * Main.rand.NextFloat(0.5f, 1f) * 4;
                         ParticleManager.AddParticle(new BallOutlined(
                             particleSpawnPos, particleVel,
-                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50));
+                            60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50),
+                            ParticleManager.ParticleLayer.AfterProjectiles);
                     }
                 }
                 if (i % 2 == 0 && Projectile.timeLeft % 1 == 0 && !specialOldDead[i] && i > 0)
@@ -130,16 +143,11 @@ namespace TerRoguelike.Projectiles
                     {
                         ParticleManager.AddParticle(new ThinSpark(
                             particlePos + (rot + MathHelper.PiOver2 * j).ToRotationVector2() * 24 - specialOldVel[i], specialOldVel[i],
-                            10, Color.Red, new Vector2(0.1f, 0.4f) * 5, rot + (MathHelper.PiOver4 * 0.1f * j), true, false));
+                            10, Color.Cyan, new Vector2(0.1f, 0.4f) * 5, rot + (MathHelper.PiOver4 * 0.1f * j), true, false),
+                            ParticleManager.ParticleLayer.AfterProjectiles);
                     }
 
                 }
-            }
-            if (!specialOldDead[last] && time < 300)
-            {
-                float completion = time < 60 ? MathHelper.Clamp(time / 4f, 0, 1) : (1f - MathHelper.Clamp((time - 240) / 60f, 0, 1));
-                Point lPos = (Projectile.Center + Projectile.rotation.ToRotationVector2() * -20).ToTileCoordinates();
-                Lighting.AddLight(lPos.X, lPos.Y, TorchID.Orange, completion);
             }
 
             if (deadCount >= specialOldPos.Count)
@@ -256,17 +264,23 @@ namespace TerRoguelike.Projectiles
             Main.spriteBatch.End();
             Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
             Color tint = Color.Lerp(Color.LightSalmon, Color.White, 0.6f);
             maskEffect.Parameters["screenOffset"].SetValue(new Vector2(Main.GlobalTimeWrappedHourly * 10, (float)Math.Cos(Main.GlobalTimeWrappedHourly * 10) * 0.01f));
             maskEffect.Parameters["stretch"].SetValue(new Vector2(1, 1));
             maskEffect.Parameters["replacementTexture"].SetValue(waveTex);
             maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            Rectangle screenRect = new Rectangle((int)Main.screenPosition.X, (int)Main.screenPosition.Y, Main.screenWidth, Main.screenHeight);
             for (int i = 0; i < draws.Count; i++)
             {
                 var draw = draws[i];
-                draw.Draw(-Main.screenPosition);
+                Rectangle checkRect = new Rectangle((int)draw.position.X, (int)draw.position.Y, 1, 1);
+                checkRect.Inflate(100, 100);
+                if (checkRect.Intersects(screenRect))
+                    draw.Draw(-Main.screenPosition);
             }
             StartVanillaSpritebatch();
+
             if (false)
             {
                 int cap = draws.Count - 1;
@@ -284,7 +298,7 @@ namespace TerRoguelike.Projectiles
                     i += 8 - Math.Clamp(width, 0, 8);
                     for (int j = 0; j < 60; j++)
                     {
-                        Main.EntitySpriteDraw(squareTex, pos - Main.screenPosition + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Cyan, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                        Main.EntitySpriteDraw(squareTex, pos - Main.screenPosition + (j * MathHelper.TwoPi / 60f).ToRotationVector2() * 24, null, Color.Magenta, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
                     }
                 }
             }

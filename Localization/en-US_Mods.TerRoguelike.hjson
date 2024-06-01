@@ -103,6 +103,8 @@ Projectiles: {
 	PhantasmalDeathray.DisplayName: Phantasmal Deathray
 	PhantasmalResidue.DisplayName: Phantasmal Residue
 	PhantasmalLaser.DisplayName: Phantasmal Laser
+	PhantasmalDeathBeam.DisplayName: Phantasmal Death Beam
+	PhantasmalBoltShooter.DisplayName: Phantasmal Bolt
 }
 
 Items: {
