@@ -72,6 +72,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int ProjChargeCycleTime = 100;
         public int ProjChargeTelegraph = 20;
         public int ProjChargeFireRate = 5;
+        public int FakeChargeWindup = 90;
+        public int FakeChargeTelegraph = 30;
+        public int FakeChargeDashDuration = 60;
+        public int FakeChargeFireRate = 2;
 
         public override void SetStaticDefaults()
         {
@@ -94,6 +98,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             modNPC.AdaptiveArmorEnabled = true;
             modNPC.AdaptiveArmorAddRate = 50;
+            modNPC.AdaptiveArmorDecayRate = 40;
             innerEyeTex = TexDict["MoonLordInnerEye"];
             eyeTex = TexDict["TrueBrainEye"];
             modNPC.drawCenter = new Vector2(0, 32);
@@ -106,11 +111,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
+            NPC.Center += new Vector2(0, -280);
             NPC.ai[2] = None.Id;
             ableToHit = false;
         }
         public override void PostAI()
         {
+            FakeChargeFireRate = 3;
+            FakeCharge.Duration = 210;
             if (NPC.localAI[0] >= -(cutsceneDuration + 30))
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
@@ -178,7 +186,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             bool eyeCenter = false;
-            bool eyeVelocity = NPC.ai[0] == ProjCharge.Id && (int)NPC.ai[1] % ProjChargeCycleTime >= teleportMoveTimestamp + ProjChargeTelegraph;
+            bool eyeVelocity = 
+                (NPC.ai[0] == ProjCharge.Id && (int)NPC.ai[1] % ProjChargeCycleTime >= teleportMoveTimestamp + ProjChargeTelegraph) ||
+                (NPC.ai[0] == FakeCharge.Id && NPC.ai[1] >= FakeChargeTelegraph + FakeChargeWindup);
             float rate = 0.15f;
             if (eyeCenter)
             {
@@ -216,7 +226,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 return;
             }
 
-            ableToHit = NPC.localAI[0] >= 0 && NPC.ai[3] == 0 && deadTime == 0;
+            ableToHit = NPC.localAI[0] >= 0 && NPC.ai[3] == 0 && deadTime == 0 && 
+                !(NPC.ai[0] == FakeCharge.Id && NPC.ai[1] < FakeChargeWindup + FakeChargeTelegraph);
 
             if (NPC.localAI[0] < 0)
             {
@@ -411,8 +422,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     if (time == ProjChargeCycleTime - 20)
                         NPC.ai[3] = 1;
-                    {
-                    }
                 }
 
                 if (NPC.ai[1] == ProjCharge.Duration)
@@ -429,6 +438,132 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == FakeCharge.Id)
             {
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                Vector2 targetVect = targetPos - NPC.Center;
+                if (NPC.ai[1] < FakeChargeWindup)
+                {
+                    if (NPC.ai[1] == 0)
+                    {
+                        Vector2 anchor = spawnPos;
+                        Vector2 oldSelectedPos = Vector2.Zero;
+                        float startRot = Main.rand.NextFloat(MathHelper.TwoPi);
+                        float stepRate = Main.rand.NextFloat(0.8f, 0.9f);
+                        float currentRot = 0;
+                        for (int i = 0; i < 23; i++)
+                        {
+                            for (int j = 0; j <= 100; j++)
+                            {
+                                bool force = j == 100;
+                                currentRot += stepRate;
+                                Vector2 offsetCalc = (currentRot + startRot).ToRotationVector2() * (currentRot * 60); // kinda spiral-y
+                                Vector2 checkPos = offsetCalc + anchor;
+                                if (oldSelectedPos.Distance(checkPos) > 360 || force)
+                                {
+                                    if (!ParanoidTileRetrieval(checkPos.ToTileCoordinates()).IsTileSolidGround(true) || force)
+                                    {
+                                        oldSelectedPos = checkPos;
+                                        phantomPositions.Add(checkPos);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        List<Vector2> potentialPositions = [];
+                        Vector2 chosenPos = Vector2.Zero;
+                        for (int i = 0; i < phantomPositions.Count; i++)
+                        {
+                            Vector2 pos = phantomPositions[i];
+                            if (pos.Distance(targetPos) < 500)
+                                potentialPositions.Add(pos);
+                        }
+                        if (potentialPositions.Count == 0)
+                        {
+                            float distanceToBeat = 10000000;
+                            for (int i = 0; i < phantomPositions.Count; i++)
+                            {
+                                Vector2 pos = phantomPositions[i];
+                                float dist = pos.Distance(targetPos);
+                                if (dist < distanceToBeat)
+                                {
+                                    distanceToBeat = dist;
+                                    chosenPos = pos;
+                                }
+                            }
+                            if (distanceToBeat == 10000000)
+                            {
+                                chosenPos = phantomPositions[0];
+                            }
+                        }
+                        else
+                        {
+                            chosenPos = potentialPositions[Main.rand.Next(potentialPositions.Count)];
+                        }
+                        phantomPositions.Remove(chosenPos);
+                        teleportTargetPos = chosenPos;
+                    }
+                    NPC.velocity = Vector2.Zero;
+                }
+                else if (NPC.ai[1] < FakeChargeWindup + FakeChargeTelegraph)
+                {
+                    if (NPC.ai[1] == FakeChargeWindup)
+                    {
+                        ChargeSlot = SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.45f, PitchVariance = 0.2f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                    }
+                    float completion = (NPC.ai[1] - (FakeChargeWindup)) / FakeChargeTelegraph;
+                    NPC.velocity = -targetVect.SafeNormalize(Vector2.UnitY) * 10 * (1 - completion);
+                }
+                else if (NPC.ai[1] < FakeChargeWindup + FakeChargeTelegraph + FakeChargeDashDuration)
+                {
+                    int time = (int)NPC.ai[1] - (FakeChargeWindup + FakeChargeTelegraph);
+                    if (time == 0)
+                    {
+                        NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 18;
+                        ChargeSlot = SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.3f, Pitch = -0.1f }, NPC.Center);
+                    }
+                    if (time % FakeChargeFireRate == 0)
+                    {
+                        int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + NPC.velocity + innerEyePosition, Vector2.Zero, ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1, 10, 120);
+                        Main.projectile[proj].ai[2] -= 10;
+                    }
+
+                    int amount = 3;
+                    float velRot = NPC.velocity.ToRotation();
+                    Vector2 baseParticlePos = NPC.Center + -NPC.velocity.SafeNormalize(Vector2.UnitY) * 75;
+                    for (int i = 0; i < amount; i++)
+                    {
+                        Vector2 particlePos = baseParticlePos + (Vector2.UnitY * Main.rand.NextFloat(-75, 75)).RotatedBy(velRot);
+                        Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
+                        ParticleManager.AddParticle(new Wriggler(
+                            particlePos, NPC.velocity * -0.15f,
+                            26, particleColor, new Vector2(0.5f), Main.rand.Next(4), velRot + Main.rand.NextFloat(-0.2f, 0.2f), 0.98f, 16,
+                            Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipVertically));
+
+                        Vector2 offset = Main.rand.NextVector2Circular(2, 2);
+                        ParticleManager.AddParticle(new Ball(
+                            particlePos + offset, offset,
+                            20, Color.Teal, new Vector2(0.25f), 0, 0.96f, 12));
+                    }
+                }
+                else
+                {
+                    if (false && NPC.ai[1] == FakeChargeWindup + FakeChargeTelegraph + FakeChargeDashDuration + 30) // scrapped followup attack from clones
+                    {
+                        if (phantomPositions.Count > 0)
+                        {
+                            for (int i = 0; i < phantomPositions.Count; i++)
+                            {
+                                Vector2 projSpawnPos = phantomPositions[i] + new Vector2(0, -20);
+                                if (projSpawnPos.Distance(targetPos) > 1000)
+                                    continue;
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (-Vector2.UnitY * 10).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)), ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1);
+                            }
+                        }
+                    }
+                    if (NPC.velocity.Length() > 1.6f)
+                        NPC.velocity *= 0.97f;
+                    NPC.velocity += targetVect.SafeNormalize(Vector2.UnitY) * 0.2f;
+                }
+
                 if (NPC.ai[1] == FakeCharge.Duration)
                 {
                     teleportTargetPos = new Vector2(-1);
@@ -436,6 +571,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= FakeCharge.Duration + teleportMoveTimestamp - 1)
                 {
+                    phantomPositions.Clear();
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = FakeCharge.Id;
@@ -528,7 +664,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, Teleport};
+            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, Teleport};
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
 
             int totalWeight = 0;
@@ -658,7 +794,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             position = NPC.Center + new Vector2(0, 116);
-            return true;
+            return !(NPC.ai[0] == FakeCharge.Id && NPC.ai[1] < FakeChargeWindup + 15);
         }
         public override void FindFrame(int frameHeight)
         {
@@ -676,11 +812,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Color phantomColor = Color.Lerp(Color.DarkBlue, Color.Cyan, 0.4f) * 0.65f;
             Vector2 scale = new Vector2(NPC.scale);
             Vector2 drawOff = -Main.screenPosition;
+            if (NPC.ai[0] == FakeCharge.Id)
+            {
+                if (NPC.ai[1] < FakeChargeWindup + FakeChargeTelegraph)
+                {
+                    float interpolant = MathHelper.Clamp((NPC.ai[1] - FakeChargeWindup) / FakeChargeTelegraph, 0, 1);
+                    npcColor = Color.Lerp(phantomColor, npcColor, interpolant);
+                }
+            }
 
             if (phantomPositions.Count > 0)
             {
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
-                bool center = false;
+                bool center = NPC.ai[0] == FakeCharge.Id;
                 float teleportInterpolant = NPC.ai[3] / teleportTime;
                 for (int i = 0; i < phantomPositions.Count; i++)
                 {
