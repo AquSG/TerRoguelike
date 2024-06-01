@@ -58,12 +58,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 teleportTargetPos = new Vector2(-1);
         public List<Vector2> phantomPositions = [];
 
+        public int teleportAttackSetCooldown = 600;
+        public int teleportAttackCooldown = 0;
+
         public static Attack None = new Attack(0, 0, 90);
         public static Attack TeleportBolt = new Attack(1, 30, 340);
         public static Attack ProjCharge = new Attack(2, 30, 280);
         public static Attack FakeCharge = new Attack(3, 30, 180);
         public static Attack CrossBeam = new Attack(4, 30, 180);
-        public static Attack SpinBeam = new Attack(5, 30, 180);
+        public static Attack SpinBeam = new Attack(5, 30, 179);
         public static Attack Teleport = new Attack(6, 30, 115);
         public static Attack Summon = new Attack(7, 18, 180);
         public int TeleportBoltCycleTime = 90;
@@ -76,6 +79,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int FakeChargeTelegraph = 30;
         public int FakeChargeDashDuration = 60;
         public int FakeChargeFireRate = 2;
+        public int CrossBeamCycleTime = 30;
 
         public override void SetStaticDefaults()
         {
@@ -258,6 +262,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
+            if (teleportAttackCooldown > 0)
+                teleportAttackCooldown--;
 
             if (NPC.ai[0] == None.Id)
             {
@@ -522,8 +528,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     if (time % FakeChargeFireRate == 0)
                     {
-                        int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + NPC.velocity + innerEyePosition, Vector2.Zero, ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1, 10, 120);
+                        Vector2 projSpawnPos = NPC.Center + NPC.velocity + innerEyePosition;
+                        int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1, 10, 120);
                         Main.projectile[proj].ai[2] -= 10;
+
+                        SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 0.85f, MaxInstances = 100, Pitch = 1f }, projSpawnPos);
                     }
 
                     int amount = 3;
@@ -579,6 +588,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == CrossBeam.Id)
             {
+                DefaultMovement();
+                Vector2 targetPos = target != null ? target.Center : spawnPos;
+                if (NPC.ai[1] % CrossBeamCycleTime == 0)
+                {
+                    float radius = 370;
+                    float rot = Main.rand.NextFloat(MathHelper.TwoPi);
+                    Vector2 rotVect = rot.ToRotationVector2();
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * radius * 1.5f, ModContent.ProjectileType<PhantasmalLaser>(), NPC.damage, 0); 
+
+                    rot += Main.rand.NextFloat(0.7f, 1.3f);
+                    rotVect = rot.ToRotationVector2();
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * radius * 1.5f, ModContent.ProjectileType<PhantasmalLaser>(), NPC.damage, 0);
+                }
                 if (NPC.ai[1] == CrossBeam.Duration)
                 {
                     teleportTargetPos = new Vector2(-1);
@@ -622,9 +644,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] >= Teleport.Duration + teleportMoveTimestamp - 1)
                 {
+                    teleportAttackCooldown = teleportAttackSetCooldown;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
-                    NPC.ai[2] = Teleport.Id;
                 }
             }
             else if (NPC.ai[0] == Summon.Id)
@@ -664,8 +686,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int chosenAttack = 0;
 
             //List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, SpinBeam, Teleport, Summon };
-            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, Teleport};
+            List<Attack> potentialAttacks = new List<Attack>() { TeleportBolt, ProjCharge, FakeCharge, CrossBeam, Teleport};
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+            if (teleportAttackCooldown > 0)
+                potentialAttacks.RemoveAll(x => x.Id == Teleport.Id);
 
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)

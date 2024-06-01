@@ -102,6 +102,7 @@ Projectiles: {
 	Tentacle.DisplayName: Tentacle
 	PhantasmalDeathray.DisplayName: Phantasmal Deathray
 	PhantasmalResidue.DisplayName: Phantasmal Residue
+	PhantasmalLaser.DisplayName: Phantasmal Laser
 }
 
 Items: {
