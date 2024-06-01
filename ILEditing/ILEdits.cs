@@ -33,6 +33,7 @@ using Terraria.GameContent.Shaders;
 using TerRoguelike.NPCs.Enemy.Boss;
 using System.Reflection;
 using Terraria.Graphics.Effects;
+using TerRoguelike.Managers;
 
 namespace TerRoguelike.ILEditing
 {
@@ -55,10 +56,25 @@ namespace TerRoguelike.ILEditing
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
+            IL_Main.DoDraw += IL_Main_DoDraw;
             //On_MoonLordScreenShaderData.UpdateMoonLordIndex += TerRoguelikeMoonLordIndexInjectionIntoShader;
         }
 
-		/* 
+        private void IL_Main_DoDraw(ILContext il)
+        {
+			ILCursor cursor = new(il);
+			if (!cursor.TryGotoNext(MoveType.After, i => i.MatchCall<Main>("DrawProjectiles")))
+			{
+				TerRoguelike.Instance.Logger.Warn("Failed to find DrawProjectiles in Main.DoDraw");
+				return;
+			}
+			cursor.EmitDelegate<Action>(() =>
+			{
+				ParticleManager.DrawParticles_AfterProjectiles();
+			});
+        }
+
+        /* 
 		This was from a time where I wanted the moon lord shader to appear on the npc itself. 
 		I have come to realise that it's not very cool when you are somewhat far away from moon lord. 
 		it has been quarantined for now. Instead it is displayed on the player like the monolith, but with a high piority.
