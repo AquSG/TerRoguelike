@@ -28,6 +28,7 @@ namespace TerRoguelike.Rooms
         public override string Key => "SurfaceRoom1";
         public override string Filename => "Schematics/RoomSchematics/SurfaceRoom1.csch";
         public override bool IsStartRoom => true;
+        public override bool IsBossRoom => true;
         public override Point WallInflateModifier => new Point(-48, 0);
         public override bool AllowWallDrawing => false;
         public override void Update()
@@ -39,6 +40,14 @@ namespace TerRoguelike.Rooms
         public override void RoomClearReward()
         {
             ClearSpecificProjectiles();
+        }
+        public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            return false;
+        }
+        public override bool CanDescend(Player player, TerRoguelikePlayer modPlayer)
+        {
+            return false;
         }
     }
 }
