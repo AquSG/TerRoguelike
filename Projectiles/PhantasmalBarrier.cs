@@ -56,8 +56,11 @@ namespace TerRoguelike.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             Color color = Color.Cyan;
+            float scaleMulti = 1;
+            if (Projectile.timeLeft < 120)
+                scaleMulti *= Projectile.timeLeft / 120f;
             StartAdditiveSpritebatch();
-            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, color * 0.3f, 0, glowTex.Size() * 0.5f, Main.rand.NextFloat(0.96f, 1f), SpriteEffects.None); // random scale to mix up the interference pattern
+            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, color * 0.3f, 0, glowTex.Size() * 0.5f, Main.rand.NextFloat(0.96f, 1f) * scaleMulti, SpriteEffects.None); // random scale to mix up the interference pattern
             StartVanillaSpritebatch();
             return false;
         }
@@ -72,7 +75,7 @@ namespace TerRoguelike.Projectiles
             }
             Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat());
             ParticleManager.AddParticle(new Smoke(
-                    Projectile.Center + new Vector2(Main.rand.NextFloat(-25, 25), Main.rand.NextFloat(-25, 25)), Main.rand.NextVector2CircularEdge(2f, 2f) * Main.rand.NextFloat(0.6f, 0.86f), lifetime, color * 0.8f, new Vector2(0.5f) * scaleMulti,
+                    Projectile.Center + new Vector2(Main.rand.NextFloat(-25, 25), Main.rand.NextFloat(-25, 25)), Main.rand.NextVector2CircularEdge(1.5f, 1.5f) * Main.rand.NextFloat(0.6f, 0.86f), lifetime, color * 0.8f, new Vector2(0.5f) * scaleMulti,
                     Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.98f),
                     ParticleManager.ParticleLayer.BehindTiles);
         }
