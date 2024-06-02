@@ -678,23 +678,23 @@ namespace TerRoguelike.NPCs
                             burrowPos = ((Vector2.UnitX * (room.RoomCenter16.X + room.RoomPosition16.X - target.Center.X)).SafeNormalize(Vector2.UnitX) * minBurrowDist) + target.Center;
                         }
 
-                        int blockX = (int)(burrowPos.X / 16f);
-                        int blockY = (int)(burrowPos.Y / 16f);
+                        burrowPos.Y = (int)(burrowPos.Y / 16) * 16f;
+                        Point block = burrowPos.ToTileCoordinates();
 
                         bool validPos = false;
                         int validYoffset = 0;
-                        int checkDirection = TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY].TileType] && Main.tile[blockX, blockY].HasTile ? -1 : 1;
+                        int checkDirection = ParanoidTileRetrieval(block).IsTileSolidGround(true) ? -1 : 1;
 
-                        for (int j = 0; j < 25; j++)
+                        for (int j = 0; j < 50; j++)
                         {
                             if (checkDirection == 1)
                             {
-                                if (TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY + j].TileType] && Main.tile[blockX, blockY + j].HasTile)
+                                if (ParanoidTileRetrieval(block + new Point(0, j)).IsTileSolidGround(true))
                                 {
                                     if (roomCondition)
                                     {
-                                        Vector2 potentialBurrowPos = ((burrowPos + (Vector2.UnitY * 16 * j)) - npc.Center) + npc.position;
-                                        Rectangle potentialBurrowRect = new Rectangle((int)potentialBurrowPos.X, (int)potentialBurrowPos.Y, npc.width, npc.height);
+                                        Vector2 potentialBurrowPos = burrowPos + (Vector2.UnitY * 16 * j);
+                                        Rectangle potentialBurrowRect = new Rectangle((int)potentialBurrowPos.X, (int)potentialBurrowPos.Y, 1, 1);
                                         if (potentialBurrowRect != room.CheckRectWithWallCollision(potentialBurrowRect))
                                             continue;
                                     }
@@ -705,12 +705,12 @@ namespace TerRoguelike.NPCs
                             }
                             else
                             {
-                                if (!(TileID.Sets.BlockMergesWithMergeAllBlock[Main.tile[blockX, blockY - j].TileType] && Main.tile[blockX, blockY - j].HasTile))
+                                if (!ParanoidTileRetrieval(block + new Point(0, -j)).IsTileSolidGround(true))
                                 {
                                     if (roomCondition)
                                     {
-                                        Vector2 potentialBurrowPos = ((burrowPos + (Vector2.UnitY * -16 * j)) - npc.Center) + npc.position;
-                                        Rectangle potentialBurrowRect = new Rectangle((int)potentialBurrowPos.X, (int)potentialBurrowPos.Y, npc.width, npc.height);
+                                        Vector2 potentialBurrowPos = burrowPos + (Vector2.UnitY * -16 * j);
+                                        Rectangle potentialBurrowRect = new Rectangle((int)potentialBurrowPos.X, (int)potentialBurrowPos.Y, 1, 1);
                                         if (potentialBurrowRect != room.CheckRectWithWallCollision(potentialBurrowRect))
                                             continue;
                                     }
@@ -722,13 +722,12 @@ namespace TerRoguelike.NPCs
                         }
                         if (validPos)
                         {
-                            burrowPos = new Vector2(blockX, blockY + validYoffset) * 16f;
+                            burrowPos = new Vector2(block.X, block.Y + validYoffset) * 16f;
                             break;
                         }
 
                         if (i == 49)
                             burrowPos = npc.Center;
-
                     }
                 }
                 npc.ai[2] = burrowPos.X;
