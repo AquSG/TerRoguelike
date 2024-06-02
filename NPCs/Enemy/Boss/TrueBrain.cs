@@ -54,8 +54,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneLookOverTime = 270;
         public int cutsceneLookRoarTime = 280;
         public int cutsceneLookLeaveTime = 300;
-        public Vector2 cutsceneTeleportPos1 = new Vector2(-1800, -340);
-        public Vector2 cutsceneTeleportPos2 = new Vector2(1800, -340);
+        public Vector2 cutsceneTeleportPos1 = new Vector2(-1800, -120);
+        public Vector2 cutsceneTeleportPos2 = new Vector2(1800, -120);
         public Vector2 cutsceneTeleportPos3 = new Vector2(-2000, -1000);
         public int cutsceneSideSweepTime = 120;
         public int cutsceneTopSweepTime = 260;
@@ -269,6 +269,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 NPC.localAI[0]++;
 
+                float cameraLerp = 0.1f;
                 Vector2 newCutscenePos = CutsceneSystem.cameraTargetCenter;
                 int time = (int)NPC.localAI[0] + cutsceneDuration;
                 int sweepingTime = time - cutsceneLookLeaveTime;
@@ -319,11 +320,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                         if (sweepingTime < cutsceneSideSweepTime * 2)
                         {
-                            NPC.velocity = -Vector2.UnitY * 8;
+                            NPC.velocity = -Vector2.UnitY * 10;
                         }
                         else
                         {
                             NPC.velocity = Vector2.UnitX * 15;
+                            if (NPC.ai[3] == 0)
+                                cameraLerp *= 1 + (sweepingTime - cutsceneSideSweepTime * 2) / (float)cutsceneTopSweepTime * 3f;
                         }
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
                     }
@@ -332,18 +335,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (time == cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
                         {
                             ZoomSystem.SetZoomAnimation(2f, 120);
-                            SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.3f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                            SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f, Pitch = 0.3f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                         }
                         
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
                         NPC.velocity = Vector2.Zero;
                     }
                 }
-                CutsceneSystem.cameraTargetCenter += (newCutscenePos - CutsceneSystem.cameraTargetCenter) * 0.1f;
+                
+                CutsceneSystem.cameraTargetCenter += (newCutscenePos - CutsceneSystem.cameraTargetCenter) * cameraLerp;
 
                 Room room = modNPC.GetParentRoom();
                 if (room != null)
                 {
+                    Vector2 soundPos = -Vector2.One;
                     if (time >= cutsceneLookLeaveTime && time < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
                     {
                         Rectangle roomRect = room.GetRect();
@@ -351,6 +356,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         int increment = 32;
                         if (sweepingTime < cutsceneSideSweepTime)
                         {
+                            if (sweepingTime == 0)
+                                ChargeSlot = SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.15f, Pitch = -0.5f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                             Vector2 baseProjPos = new Vector2(roomRect.X, roomRect.Y);
                             Vector2 hitPos = TileCollidePositionInLine(baseProjPos, baseProjPos + Vector2.UnitY * roomRect.Height);
                             float length = baseProjPos.Distance(hitPos);
@@ -370,6 +377,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         else if (sweepingTime < cutsceneSideSweepTime * 2)
                         {
                             int thisTime = sweepingTime - cutsceneSideSweepTime;
+                            if (thisTime == 0)
+                                ChargeSlot = SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.15f, Pitch = -0.36f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                             Vector2 baseProjPos = new Vector2(roomRect.X + roomRect.Width, roomRect.Y);
                             Vector2 hitPos = TileCollidePositionInLine(baseProjPos, baseProjPos + Vector2.UnitY * roomRect.Height);
                             float length = baseProjPos.Distance(hitPos);
@@ -389,6 +398,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         else
                         {
                             int thisTime = sweepingTime - (cutsceneSideSweepTime * 2);
+                            if (thisTime == 0)
+                                ChargeSlot = SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.15f, Pitch = -0.25f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                             Vector2 baseProjPos = new Vector2(roomRect.X, roomRect.Y);
                             Vector2 hitPos = baseProjPos + Vector2.UnitX * roomRect.Width;
                             float length = baseProjPos.Distance(hitPos);
@@ -409,11 +420,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             }
                         }
                     }
-                    
+                    NPC.localAI[2]--;
+                    if (soundPos != -Vector2.One && NPC.localAI[2] <= 0)
+                    {
+                        NPC.localAI[2] = Main.rand.Next(3, 5);
+                        SoundEngine.PlaySound(SoundID.Item88 with { Volume = 0.5f, Pitch = 0.05f, MaxInstances = 1,  SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, soundPos);
+                        
+                    }
+
                     void TrySpawnBorderProj(Vector2 pos)
                     {
                         if (!ParanoidTileRetrieval(pos.ToTileCoordinates()).IsTileSolidGround(true))
+                        {
                             Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<PhantasmalBarrier>(), NPC.damage, 0);
+                            soundPos = pos;
+                        }
                         cutsceneEyeVector = pos;
                     }
                 }
@@ -909,8 +930,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         spawnedNPC.rotation = summonVelocity.ToRotation() + MathHelper.PiOver2;
                         spawnedNPC.localAI[0] = 10;
 
-                        SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 2 }, summonPos);
-                        SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 2 }, summonPos);
+                        SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, MaxInstances = 4 }, summonPos);
+                        SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, MaxInstances = 4 }, summonPos);
                     }
                 }
                 if (NPC.ai[1] == Summon.Duration)
