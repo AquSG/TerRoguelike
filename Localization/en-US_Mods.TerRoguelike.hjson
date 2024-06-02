@@ -105,6 +105,7 @@ Projectiles: {
 	PhantasmalLaser.DisplayName: Phantasmal Laser
 	PhantasmalDeathBeam.DisplayName: Phantasmal Death Beam
 	PhantasmalBoltShooter.DisplayName: Phantasmal Bolt
+	PhantasmalBarrier.DisplayName: Phantasmal Barrier
 }
 
 Items: {

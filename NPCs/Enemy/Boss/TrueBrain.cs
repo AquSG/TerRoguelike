@@ -247,6 +247,37 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 NPC.localAI[0]++;
 
+                Room room = modNPC.GetParentRoom();
+                if (room != null)
+                {
+                    if (NPC.localAI[0] == -90)
+                    {
+                        Rectangle roomRect = room.GetRect();
+                        roomRect.Inflate(room.WallInflateModifier.X * 16 + 48, room.WallInflateModifier.Y * 16 + 48);
+                        int increment = 32;
+                        for (int s = 0; s <= 1; s++)
+                        {
+                            int yOff = s * roomRect.Height;
+                            int xOff = s * roomRect.Width;
+                            for (int x = increment; x < roomRect.Width; x += increment)
+                            {
+                                Vector2 projPos = new Vector2(x + roomRect.X, yOff + roomRect.Y);
+                                TrySpawnBorderProj(projPos);
+                            }
+                            for (int y = 0; y < roomRect.Height; y += increment)
+                            {
+                                Vector2 projPos = new Vector2(xOff + roomRect.X, y + roomRect.Y);
+                                TrySpawnBorderProj(projPos);
+                            }
+                        }
+                    }
+                    
+                    void TrySpawnBorderProj(Vector2 pos)
+                    {
+                        if (!ParanoidTileRetrieval(pos.ToTileCoordinates()).IsTileSolidGround(true))
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<PhantasmalBarrier>(), NPC.damage, 0);
+                    }
+                }
 
                 if (NPC.localAI[0] == -30)
                 {
