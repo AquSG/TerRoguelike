@@ -71,6 +71,9 @@ namespace TerRoguelike.Rooms
             var finalRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
             player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
             SetBossTrack(FinalBoss2Theme);
+            Vector2 storedBossSpawnPos = finalRoom.bossSpawnPos;
+            ResetRoomID(finalRoom.ID);
+            finalRoom.bossSpawnPos = storedBossSpawnPos;
             finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
 
             NewFloorEffects(finalRoom, player.ModPlayer());

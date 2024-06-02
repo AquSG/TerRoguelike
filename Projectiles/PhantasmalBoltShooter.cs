@@ -96,7 +96,7 @@ namespace TerRoguelike.Projectiles
             {
                 if (shootingTime / 8 % 2 == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.4f , MaxInstances = 8, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, Projectile.Center);
+                    SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.6f , MaxInstances = 8, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, Projectile.Center);
                 }
                 int maxLength = 15;
                 Vector2 vectToTarget = (targetPos - Projectile.Center);

@@ -49,8 +49,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
         public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
 
+        public int cutsceneDuration = 930;
+        public int cutsceneLookingDownTime = 240;
+        public int cutsceneLookOverTime = 270;
+        public int cutsceneLookRoarTime = 280;
+        public int cutsceneLookLeaveTime = 300;
+        public Vector2 cutsceneTeleportPos1 = new Vector2(-1700, -240);
+        public Vector2 cutsceneTeleportPos2 = new Vector2(1700, -240);
+        public Vector2 cutsceneTeleportPos3 = new Vector2(-1800, -1000);
+        public int cutsceneSideSweepTime = 120;
+        public int cutsceneTopSweepTime = 260;
+
         public int deadTime = 0;
-        public int cutsceneDuration = 120;
         public int deathCutsceneDuration = 120;
 
         public static int teleportTime = 40;
@@ -243,14 +253,80 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center + eyePosition, cutsceneDuration, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(NPC.Center + eyePosition, cutsceneDuration, 30, 30, 1.1f);
                 }
                 NPC.localAI[0]++;
+
+                Vector2 newCutscenePos = CutsceneSystem.cameraTargetCenter;
+                int time = (int)NPC.localAI[0] + cutsceneDuration;
+                if (time < cutsceneLookOverTime)
+                {
+                    NPC.velocity = Vector2.Zero;
+                    if (time < cutsceneLookingDownTime)
+                    {
+
+                    }
+                }
+                else if (time < cutsceneLookLeaveTime)
+                {
+                    NPC.velocity = Vector2.Zero;
+                    if (time == cutsceneLookRoarTime)
+                    {
+
+                    }
+                    if (time == cutsceneLookLeaveTime - 20)
+                    {
+                        NPC.ai[3] = 1;
+                        teleportTargetPos = spawnPos + cutsceneTeleportPos1;
+                    }
+                    if (NPC.ai[3] != 0)
+                    {
+                        newCutscenePos = teleportTargetPos;
+                    }
+                }
+                else
+                {
+                    if (time < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
+                    {
+                        int sweepingTime = time - cutsceneLookLeaveTime;
+                        if (sweepingTime == cutsceneSideSweepTime - 20)
+                        {
+                            NPC.ai[3] = 1;
+                            teleportTargetPos = spawnPos + cutsceneTeleportPos2;
+                        }
+                        else if (sweepingTime == cutsceneSideSweepTime * 2 - 20)
+                        {
+                            NPC.ai[3] = 1;
+                            teleportTargetPos = spawnPos + cutsceneTeleportPos3;
+                        }
+                        else if (sweepingTime == cutsceneSideSweepTime * 2 + cutsceneTopSweepTime - 20)
+                        {
+                            NPC.ai[3] = 1;
+                            teleportTargetPos = spawnPos + new Vector2(0, -280);
+                        }
+
+                        if (sweepingTime < cutsceneSideSweepTime * 2)
+                        {
+                            NPC.velocity = -Vector2.UnitY * 8;
+                        }
+                        else
+                        {
+                            NPC.velocity = Vector2.UnitX * 12;
+                        }
+                        newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
+                    }
+                    else
+                    {
+                        newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
+                        NPC.velocity = Vector2.Zero;
+                    }
+                }
+                CutsceneSystem.cameraTargetCenter += (newCutscenePos - CutsceneSystem.cameraTargetCenter) * 0.1f;
 
                 Room room = modNPC.GetParentRoom();
                 if (room != null)
                 {
-                    if (NPC.localAI[0] == -90)
+                    if (time == 500)
                     {
                         Rectangle roomRect = room.GetRect();
                         roomRect.Inflate(room.WallInflateModifier.X * 16 + 48, room.WallInflateModifier.Y * 16 + 48);
