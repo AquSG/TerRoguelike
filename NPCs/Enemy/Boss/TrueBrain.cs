@@ -54,11 +54,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int cutsceneLookOverTime = 270;
         public int cutsceneLookRoarTime = 280;
         public int cutsceneLookLeaveTime = 300;
-        public Vector2 cutsceneTeleportPos1 = new Vector2(-1700, -240);
-        public Vector2 cutsceneTeleportPos2 = new Vector2(1700, -240);
-        public Vector2 cutsceneTeleportPos3 = new Vector2(-1800, -1000);
+        public Vector2 cutsceneTeleportPos1 = new Vector2(-1800, -340);
+        public Vector2 cutsceneTeleportPos2 = new Vector2(1800, -340);
+        public Vector2 cutsceneTeleportPos3 = new Vector2(-2000, -1000);
         public int cutsceneSideSweepTime = 120;
         public int cutsceneTopSweepTime = 260;
+        public Vector2 cutsceneEyeVector = Vector2.Zero;
 
         public int deadTime = 0;
         public int deathCutsceneDuration = 120;
@@ -131,7 +132,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
-            NPC.Center += new Vector2(0, -280);
+            NPC.Center += new Vector2(800, 160);
             NPC.ai[2] = None.Id;
             ableToHit = false;
         }
@@ -203,12 +204,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            int cutsceneTime = (int)NPC.localAI[0] + cutsceneDuration;
             bool eyeCenter = NPC.ai[0] == SpinBeam.Id && NPC.ai[1] < SpinBeamWindup + SpinBeamFireDuration + 30;
+            bool eyeCutscene = NPC.localAI[0] < -30 && (cutsceneTime < cutsceneLookingDownTime || (cutsceneTime > cutsceneLookLeaveTime && cutsceneTime < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime));
             bool eyeVelocity = 
                 (NPC.ai[0] == ProjCharge.Id && (int)NPC.ai[1] % ProjChargeCycleTime >= teleportMoveTimestamp + ProjChargeTelegraph) ||
                 (NPC.ai[0] == FakeCharge.Id && NPC.ai[1] >= FakeChargeTelegraph + FakeChargeWindup);
             float rate = 0.15f;
-            if (eyeCenter)
+            if (eyeCutscene)
+            {
+                float maxEyeOffset = 12;
+
+                Vector2 targetVect = cutsceneEyeVector - (NPC.Center + innerEyePosition.RotatedBy(NPC.rotation));
+                if (targetVect.Length() > maxEyeOffset)
+                    targetVect = targetVect.SafeNormalize(Vector2.UnitY) * maxEyeOffset;
+                eyeVector = Vector2.Lerp(eyeVector, targetVect, rate);
+            }
+            else if (eyeCenter)
             {
                 eyeVector = Vector2.Lerp(eyeVector, Vector2.Zero, rate);
             }
@@ -259,12 +271,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 Vector2 newCutscenePos = CutsceneSystem.cameraTargetCenter;
                 int time = (int)NPC.localAI[0] + cutsceneDuration;
+                int sweepingTime = time - cutsceneLookLeaveTime;
                 if (time < cutsceneLookOverTime)
                 {
                     NPC.velocity = Vector2.Zero;
                     if (time < cutsceneLookingDownTime)
                     {
-
+                        cutsceneEyeVector = NPC.Center + Vector2.UnitY * 100;
                     }
                 }
                 else if (time < cutsceneLookLeaveTime)
@@ -288,7 +301,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     if (time < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
                     {
-                        int sweepingTime = time - cutsceneLookLeaveTime;
                         if (sweepingTime == cutsceneSideSweepTime - 20)
                         {
                             NPC.ai[3] = 1;
@@ -311,12 +323,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         }
                         else
                         {
-                            NPC.velocity = Vector2.UnitX * 12;
+                            NPC.velocity = Vector2.UnitX * 15;
                         }
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
                     }
                     else
                     {
+                        if (time == cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
+                        {
+                            ZoomSystem.SetZoomAnimation(2f, 120);
+                            SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.3f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                        }
+                        
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
                         NPC.velocity = Vector2.Zero;
                     }
@@ -326,24 +344,68 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Room room = modNPC.GetParentRoom();
                 if (room != null)
                 {
-                    if (time == 500)
+                    if (time >= cutsceneLookLeaveTime && time < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
                     {
                         Rectangle roomRect = room.GetRect();
                         roomRect.Inflate(room.WallInflateModifier.X * 16 + 48, room.WallInflateModifier.Y * 16 + 48);
                         int increment = 32;
-                        for (int s = 0; s <= 1; s++)
+                        if (sweepingTime < cutsceneSideSweepTime)
                         {
-                            int yOff = s * roomRect.Height;
-                            int xOff = s * roomRect.Width;
-                            for (int x = increment; x < roomRect.Width; x += increment)
+                            Vector2 baseProjPos = new Vector2(roomRect.X, roomRect.Y);
+                            Vector2 hitPos = TileCollidePositionInLine(baseProjPos, baseProjPos + Vector2.UnitY * roomRect.Height);
+                            float length = baseProjPos.Distance(hitPos);
+
+                            float completion = sweepingTime / (float)cutsceneSideSweepTime;
+                            float oldCompletion = (sweepingTime - 1) / (float)cutsceneSideSweepTime;
+                            int start = (int)((1 - completion) * length);
+                            int end = (int)((1 - oldCompletion) * length);
+                            for (int i = start; i < end; i++)
                             {
-                                Vector2 projPos = new Vector2(x + roomRect.X, yOff + roomRect.Y);
-                                TrySpawnBorderProj(projPos);
+                                if (i % increment == 0)
+                                {
+                                    TrySpawnBorderProj(baseProjPos + Vector2.UnitY * i);
+                                }
                             }
-                            for (int y = 0; y < roomRect.Height; y += increment)
+                        }
+                        else if (sweepingTime < cutsceneSideSweepTime * 2)
+                        {
+                            int thisTime = sweepingTime - cutsceneSideSweepTime;
+                            Vector2 baseProjPos = new Vector2(roomRect.X + roomRect.Width, roomRect.Y);
+                            Vector2 hitPos = TileCollidePositionInLine(baseProjPos, baseProjPos + Vector2.UnitY * roomRect.Height);
+                            float length = baseProjPos.Distance(hitPos);
+
+                            float completion = thisTime / (float)cutsceneSideSweepTime;
+                            float oldCompletion = (thisTime - 1) / (float)cutsceneSideSweepTime;
+                            int start = (int)((1 - completion) * length);
+                            int end = (int)((1 - oldCompletion) * length);
+                            for (int i = start; i < end; i++)
                             {
-                                Vector2 projPos = new Vector2(xOff + roomRect.X, y + roomRect.Y);
-                                TrySpawnBorderProj(projPos);
+                                if (i % increment == 0)
+                                {
+                                    TrySpawnBorderProj(baseProjPos + Vector2.UnitY * i);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            int thisTime = sweepingTime - (cutsceneSideSweepTime * 2);
+                            Vector2 baseProjPos = new Vector2(roomRect.X, roomRect.Y);
+                            Vector2 hitPos = baseProjPos + Vector2.UnitX * roomRect.Width;
+                            float length = baseProjPos.Distance(hitPos);
+
+                            float completion = thisTime / (float)cutsceneTopSweepTime;
+                            float oldCompletion = (thisTime - 1) / (float)cutsceneTopSweepTime;
+                            int start = (int)((completion) * length);
+                            int end = (int)((oldCompletion) * length);
+                            if (end > 0)
+                            {
+                                for (int i = end; i < start; i++)
+                                {
+                                    if (i % increment == 0)
+                                    {
+                                        TrySpawnBorderProj(baseProjPos + Vector2.UnitX * i);
+                                    }
+                                }
                             }
                         }
                     }
@@ -352,6 +414,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         if (!ParanoidTileRetrieval(pos.ToTileCoordinates()).IsTileSolidGround(true))
                             Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<PhantasmalBarrier>(), NPC.damage, 0);
+                        cutsceneEyeVector = pos;
                     }
                 }
 
