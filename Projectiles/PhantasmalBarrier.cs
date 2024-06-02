@@ -38,6 +38,16 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             //SpawnSmokeParticles();
+            ParticleManager.AddParticle(new MoonExplosion(Projectile.Center, Main.rand.Next(14, 22), Color.White, new Vector2(1f), Main.rand.NextFloat(MathHelper.TwoPi)));
+            for (int i = 0; i < 12; i++)
+            {
+                float completion = i / 12f;
+                float rot = MathHelper.TwoPi * completion + Main.rand.NextFloat(-0.4f, 0.4f);
+                Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.5f));
+                ParticleManager.AddParticle(new ThinSpark(
+                    Projectile.Center + rot.ToRotationVector2() * 10, rot.ToRotationVector2() * 4,
+                    30, color * 0.9f, new Vector2(0.13f, 0.27f) * Main.rand.NextFloat(0.4f, 1f) * 0.6f, rot, true, false));
+            }
         }
         public override void AI()
         {
@@ -55,10 +65,13 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            int time = maxTimeLeft - Projectile.timeLeft;
             Color color = Color.Cyan;
             float scaleMulti = 1;
             if (Projectile.timeLeft < 120)
                 scaleMulti *= Projectile.timeLeft / 120f;
+            else if (time < 10)
+                scaleMulti *= time / 10f;
             StartAdditiveSpritebatch();
             Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, color * 0.3f, 0, glowTex.Size() * 0.5f, Main.rand.NextFloat(0.96f, 1f) * scaleMulti, SpriteEffects.None); // random scale to mix up the interference pattern
             StartVanillaSpritebatch();
