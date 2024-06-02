@@ -113,12 +113,18 @@ namespace TerRoguelike.Managers
                 return;
             if (ActiveParticles.Count == 0)
                 return;
+            Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
+            Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+            Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
             StartAlphaBlendSpritebatch(false);
             for (int i = 0; i < ActiveParticles.Count; i++)
             {
                 Particle particle = ActiveParticles[i];
                 if (particle.additive)
                     continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
                 particle.Draw();
             }
             StartAdditiveSpritebatch();
@@ -127,6 +133,9 @@ namespace TerRoguelike.Managers
                 Particle particle = ActiveParticles[i];
                 if (!particle.additive)
                     continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
                 particle.Draw();
             }
             Main.spriteBatch.End();
@@ -137,12 +146,18 @@ namespace TerRoguelike.Managers
                 return;
             if (ActiveParticlesBehindTiles.Count == 0)
                 return;
+            Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
+            Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+            Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
             StartAlphaBlendSpritebatch();
             for (int i = 0; i < ActiveParticlesBehindTiles.Count; i++)
             {
                 Particle particle = ActiveParticlesBehindTiles[i];
                 if (particle.additive)
                     continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
                 particle.Draw();
             }
             StartAdditiveSpritebatch();
@@ -151,6 +166,9 @@ namespace TerRoguelike.Managers
                 Particle particle = ActiveParticlesBehindTiles[i];
                 if (!particle.additive)
                     continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
                 particle.Draw();
             }
             StartVanillaSpritebatch();
@@ -161,12 +179,18 @@ namespace TerRoguelike.Managers
                 return;
             if (ActiveParticlesAfterProjectiles.Count == 0)
                 return;
+            Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
+            Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+            Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
             StartAlphaBlendSpritebatch(false);
             for (int i = 0; i < ActiveParticlesAfterProjectiles.Count; i++)
             {
                 Particle particle = ActiveParticlesAfterProjectiles[i];
                 if (particle.additive)
                     continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
                 particle.Draw();
             }
             StartAdditiveSpritebatch();
@@ -175,9 +199,29 @@ namespace TerRoguelike.Managers
                 Particle particle = ActiveParticlesAfterProjectiles[i];
                 if (!particle.additive)
                     continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
                 particle.Draw();
             }
             Main.spriteBatch.End();
+        }
+        public static bool DrawScreenCheckWithFluff(Vector2 position, int fluff = 100, Rectangle? screenRect = null)
+        {
+            Rectangle checkRect = new Rectangle((int)position.X, (int)position.Y, 1, 1);
+            checkRect.Inflate(fluff, fluff);
+            Rectangle ScreenRect;
+            if (screenRect == null)
+            {
+                Point ScreenPos = (Main.Camera.ScaledPosition - Main.screenPosition).ToPoint();
+                Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+                ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
+            }
+            else
+            {
+                ScreenRect = (Rectangle)screenRect;
+            }
+            return ScreenRect.Intersects(checkRect);
         }
     }
 }

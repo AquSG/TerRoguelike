@@ -57,13 +57,21 @@ namespace TerRoguelike.Skies
 
                 if (backgroundParticles.Count > 0)
                 {
+                    Vector2 particleDrawOff = paralaxOff + moonAnchor;
+                    Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
+                    Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+                    Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
+
                     StartAlphaBlendSpritebatch();
                     for (int i = 0; i < backgroundParticles.Count; i++)
                     {
                         Particle particle = backgroundParticles[i];
                         if (particle.additive)
                             continue;
-                        particle.Draw(paralaxOff + moonAnchor);
+                        if (!ParticleManager.DrawScreenCheckWithFluff(particle.position + particleDrawOff, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                            continue;
+
+                        particle.Draw(particleDrawOff);
                     }
                     StartAdditiveSpritebatch();
                     for (int i = 0; i < backgroundParticles.Count; i++)
@@ -71,7 +79,10 @@ namespace TerRoguelike.Skies
                         Particle particle = backgroundParticles[i];
                         if (!particle.additive)
                             continue;
-                        particle.Draw(paralaxOff + moonAnchor);
+                        if (!ParticleManager.DrawScreenCheckWithFluff(particle.position + particleDrawOff, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                            continue;
+
+                        particle.Draw(particleDrawOff);
                     }
                 }
                 float globalCompletion = Main.GlobalTimeWrappedHourly / 3600;
