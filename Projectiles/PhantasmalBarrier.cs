@@ -20,7 +20,7 @@ namespace TerRoguelike.Projectiles
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
 
         public int maxTimeLeft;
-        public Texture2D glowTex = null;
+        public Texture2D glowTex;
         public override void SetDefaults()
         {
             Projectile.width = 160;
@@ -32,6 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.localNPCHitCooldown = -1;
             Projectile.friendly = true;
             Projectile.hostile = false;
+            glowTex = TexDict["CircularGlow"];
         }
 
         public override void OnSpawn(IEntitySource source)
@@ -54,7 +55,6 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            glowTex ??= TexDict["CircularGlow"];
             Color color = Color.Cyan;
             StartAdditiveSpritebatch();
             Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, color * 0.3f, 0, glowTex.Size() * 0.5f, Main.rand.NextFloat(0.96f, 1f), SpriteEffects.None); // random scale to mix up the interference pattern
