@@ -41,6 +41,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int modNPCID => ModContent.NPCType<TrueBrain>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Lunar"] };
         public override int CombatStyle => -1;
+        public static readonly SoundStyle QuakeCooking = new SoundStyle("TerRoguelike/Sounds/QuakeCooking");
         public int currentFrame = 0;
         public SlotId TeleportSlot;
         public SlotId ChargeSlot;
@@ -50,9 +51,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
 
         public int cutsceneDuration = 930;
-        public int cutsceneLookingDownTime = 240;
-        public int cutsceneLookOverTime = 270;
-        public int cutsceneLookRoarTime = 280;
+        public int cutsceneLookingDownTime = 210;
+        public int cutsceneLookOverTime = 240;
+        public int cutsceneLookRoarTime = 258;
         public int cutsceneLookLeaveTime = 300;
         public Vector2 cutsceneTeleportPos1 = new Vector2(-1800, -120);
         public Vector2 cutsceneTeleportPos2 = new Vector2(1800, -120);
@@ -102,6 +103,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Main.npcFrameCount[Type] = 5;
             NPCID.Sets.MustAlwaysDraw[Type] = true;
+            SoundEngine.PlaySound(QuakeCooking with { Volume = 0 }); // Play sounds in mod load to force the sound to be ready when first played ingame. otherwise long sounds hitch to load on the fly
         }
         public override void SetDefaults()
         {
@@ -261,6 +263,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.localAI[0] < 0)
             {
+                if (NPC.localAI[0] == -cutsceneDuration - 30)
+                {
+                    ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(QuakeCooking with { Volume = 0.12f, Pitch = -0.1f }, NPC.Center), 1, cutsceneLookRoarTime + 25, 40));
+                    ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.12f, Pitch = -0.5f }, NPC.Center), 1, cutsceneLookRoarTime + 25, 40));
+                }
                 target = modNPC.GetTarget(NPC);
 
                 if (NPC.localAI[0] == -cutsceneDuration)
@@ -276,18 +283,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (time < cutsceneLookOverTime)
                 {
                     NPC.velocity = Vector2.Zero;
-                    if (time < cutsceneLookingDownTime)
-                    {
-                        cutsceneEyeVector = NPC.Center + Vector2.UnitY * 100;
-                    }
                 }
                 else if (time < cutsceneLookLeaveTime)
                 {
-                    NPC.velocity = Vector2.Zero;
                     if (time == cutsceneLookRoarTime)
                     {
-
+                        SoundEngine.PlaySound(SoundID.Zombie100 with { Volume = 0.2f, Pitch = 0.4f, PitchVariance = 0 }, NPC.Center);
                     }
+                    NPC.velocity = Vector2.Zero;
+                    
                     if (time == cutsceneLookLeaveTime - 20)
                     {
                         NPC.ai[3] = 1;
@@ -329,20 +333,67 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 cameraLerp *= 1 + (sweepingTime - cutsceneSideSweepTime * 2) / (float)cutsceneTopSweepTime * 3f;
                         }
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
+
+                        int amount = NPC.ai[3] == 0 ? 3 : (NPC.ai[3] < 15 || NPC.ai[3] > 30 ? 1 : 0);
+                        float velRot = NPC.velocity.ToRotation();
+                        bool top = NPC.velocity.Y == 0;
+                        Vector2 baseParticlePos = NPC.Center + -NPC.velocity.SafeNormalize(Vector2.UnitY) * (top ? 104 : 84);
+                        for (int i = 0; i < amount; i++)
+                        {
+                            Vector2 particlePos = baseParticlePos + (Vector2.UnitY * (top ? Main.rand.NextFloat(-68, 68) : Main.rand.NextFloat(-75, 75))).RotatedBy(velRot);
+                            Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
+                            ParticleManager.AddParticle(new Wriggler(
+                                particlePos, NPC.velocity * -0.15f,
+                                26, particleColor, new Vector2(0.5f), Main.rand.Next(4), velRot + Main.rand.NextFloat(-0.2f, 0.2f), 0.98f, 16,
+                                Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipVertically));
+
+                            Vector2 offset = Main.rand.NextVector2Circular(2, 2);
+                            ParticleManager.AddParticle(new Ball(
+                                particlePos + offset, offset,
+                                20, Color.Teal, new Vector2(0.25f), 0, 0.96f, 10));
+                        }
                     }
                     else
                     {
-                        if (time == cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime)
+                        int thisTime = time - (cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime);
+                        if (thisTime == 0)
                         {
-                            ZoomSystem.SetZoomAnimation(2f, 120);
+                            ZoomSystem.SetZoomAnimation(2f, 60);
                             SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f, Pitch = 0.3f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                         }
-                        
+                        if (thisTime < 60)
+                        {
+                            if (thisTime < 30 || thisTime % 3 == 0)
+                            {
+                                Vector2 particlePos = NPC.Center + innerEyePosition;
+                                Vector2 offset = Main.rand.NextVector2CircularEdge(104, 75);
+                                ParticleManager.AddParticle(new Ball(
+                                    particlePos + offset, offset.SafeNormalize(Vector2.UnitY) * 5 * Main.rand.NextFloat(0.8f, 1f),
+                                    20, Color.Lerp(Color.Teal, Color.White, 0.5f), new Vector2(0.25f), 0, 0.96f, 10));
+                            }
+                        }
+
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
                         NPC.velocity = Vector2.Zero;
                     }
                 }
-                
+                Vector2 ballPos = NPC.Center + new Vector2(0, 160);
+                if (time < cutsceneLookRoarTime)
+                {
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(26, 26) * Main.rand.NextFloat(0.7f, 1f);
+                    ParticleManager.AddParticle(new Ball(
+                          ballPos + offset, offset * 0.15f, 40, Color.White * 0.5f, new Vector2(0.3f, 0.1f), offset.ToRotation(), 0.98f, 20, false));
+                    cutsceneEyeVector = NPC.Center + Vector2.UnitY * 100;
+                }
+                if (time < cutsceneLookRoarTime + 15)
+                {
+                    float scaleMulti = MathHelper.Clamp(1 - ((time - cutsceneLookRoarTime) / 15f), 0, 1);
+                    ParticleManager.AddParticle(new Glow(
+                        ballPos, Main.rand.NextVector2Circular(6, 6), 5, Color.Cyan, new Vector2(0.25f) * scaleMulti, 0, 0.98f, 5, true));
+                    ParticleManager.AddParticle(new Ball(
+                        ballPos, Main.rand.NextVector2Circular(6, 6), 5, Color.White * 0.3f, new Vector2(2.4f) * scaleMulti, 0, 0.96f, 5, false));
+                }
+
                 CutsceneSystem.cameraTargetCenter += (newCutscenePos - CutsceneSystem.cameraTargetCenter) * cameraLerp;
 
                 Room room = modNPC.GetParentRoom();
