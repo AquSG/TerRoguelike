@@ -167,6 +167,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/Moon",
                 "TerRoguelike/ExtraTextures/PhantasmalBeamWave",
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainDeathFrames",
+                "TerRoguelike/NPCs/Enemy/Boss/TrueBrainGoreFrames",
             };
             foreach (string path in pathList)
             {
