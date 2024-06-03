@@ -1129,7 +1129,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             deadTime++;
-            
+
+            int timeToEnd = (deathCutsceneDuration - 30) - deadTime;
             for (int i = 0; i < deathTentacleBreakTimes.Length; i++)
             {
                 int breakTime = deathTentacleBreakTimes[i];
@@ -1188,8 +1189,67 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         ParticleManager.AddParticle(new OrbitingGore(
                             goreTex, gorePos, goreVel.RotatedBy(Main.rand.NextFloat(-0.4f, 0.4f)), 0.995f, Main.rand.NextFloat(0.04f, 0.08f), orbitAnchor, goreFrame, deathVortexLifetime, 
                             Color.White, new Vector2(1f), 0, 1, 240 - Main.rand.Next(60), 0.075f * Main.rand.NextFloat(0.5f, 2f)));
+
+                        for (int b = 0; b < 5; b++)
+                        {
+                            Vector2 velocity = new Vector2((x < 3 ? -1 : 1) * Main.rand.NextFloat(0.5f, 1f), Main.rand.NextFloat(-2, 0)) * Main.rand.NextFloat(1f, 1.7f);
+                            velocity.X *= Main.rand.NextFloat(0.5f, 3f);
+
+                            if (Main.rand.NextBool(3))
+                                velocity *= 1.5f;
+                            Vector2 scale = new Vector2(0.25f, 0.4f) * 0.65f;
+                            int time = 110 + Main.rand.Next(70);
+                            Color color = Color.Lerp(Color.Cyan * 0.65f, Color.Teal, Main.rand.NextFloat(0.75f));
+                            Vector2 randParticlePos = gorePos + Main.rand.NextVector2Circular(16, 16);
+                            ParticleManager.AddParticle(new Blood(randParticlePos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                            ParticleManager.AddParticle(new Blood(randParticlePos, velocity, time, color, scale, velocity.ToRotation(), true));
+                        }
                     }
                 }
+                for (int i = 0; i < 50; i++)
+                {
+                    Vector2 particlePos = NPC.Center + innerEyePosition;
+                    Vector2 offset = Main.rand.NextVector2Circular(104, 75);
+                    ParticleManager.AddParticle(new Ball(
+                        particlePos + offset, offset.SafeNormalize(Vector2.UnitY) * 5 * Main.rand.NextFloat(0.8f, 1f),
+                        60, Color.Lerp(Color.Teal, Color.White, 0.5f), new Vector2(0.4f) * Main.rand.NextFloat(0.5f, 1f), 0, 0.96f, 40));
+                }
+            }
+            if (deadTime >= deathExplodeTime && deadTime < deathExplodeTime + deathVortexLifetime)
+            {
+                int portalTime = deadTime - deathExplodeTime;
+                float portalScale = 1f;
+                if (portalTime < 150)
+                {
+                    float completion = portalTime / 150f;
+                    portalScale *= MathHelper.Clamp((float)Math.Pow(-(completion + 1), -5) + 1.031f, 0, 1);
+                }
+                if (portalTime >= deathVortexLifetime - 240)
+                {
+                    float completion = (portalTime - (deathVortexLifetime - 240)) / 240f;
+                    portalScale *= MathHelper.SmoothStep(1f, 0, completion);
+                }
+
+                if (portalScale > 0.05f)
+                {
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(160, 160) * portalScale;
+                    ParticleManager.AddParticle(new Ball(
+                          (NPC.Center + innerEyePosition) + offset, offset.RotatedBy(1f) * 0.06f, 40, Color.Cyan * 0.7f, new Vector2(0.3f, 0.1f), offset.ToRotation(), 0.98f, 20, false));
+                }
+            }
+            else if (deadTime >= deathExplodeTime + deathVortexLifetime)
+            {
+                int thisTime = deadTime - (deathExplodeTime + deathVortexLifetime);
+                Vector2 cutsceneMoveVector = new Vector2(0, -2f);
+                if (thisTime < 120)
+                {
+                    cutsceneMoveVector *= MathHelper.Clamp(thisTime / 120f, 0, 1);
+                }
+                else if (timeToEnd < 180)
+                {
+                    cutsceneMoveVector *= MathHelper.Clamp((timeToEnd - 60) / 120f, 0, 1);
+                }
+                CutsceneSystem.cameraTargetCenter += cutsceneMoveVector;
             }
 
             if (deadTime >= deathCutsceneDuration - 30)
@@ -1258,9 +1318,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (deadTime >= deathExplodeTime)
             {
-                int portalTime = deadTime - deathExplodeTime;
                 StartAlphaBlendSpritebatch();
                 Vector2 drawPos = NPC.Center + innerEyePosition;
+                int portalTime = deadTime - deathExplodeTime;
                 float portalScale = 1f;
                 if (portalTime < 150)
                 {

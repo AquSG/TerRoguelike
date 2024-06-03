@@ -84,7 +84,7 @@ namespace TerRoguelike.Particles
             if (fadeOutInterpolant == 1)
                 outerLength = position.Distance(orbitAnchor);
 
-            position = ((position - orbitAnchor).SafeNormalize(Vector2.UnitY) * outerLength).RotatedBy(effectiveOrbitRate) * fadeOutInterpolant + orbitAnchor;
+            position = ((position - orbitAnchor).SafeNormalize(Vector2.UnitY) * outerLength).RotatedBy(effectiveOrbitRate) * (float)Math.Pow(fadeOutInterpolant, 1.25f) + orbitAnchor;
         }
     }
 }
