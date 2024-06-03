@@ -48,7 +48,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathHorizFrameCount = 5;
         public SlotId TeleportSlot;
         public SlotId ChargeSlot;
-        public Texture2D eyeTex, innerEyeTex, deathTex, circleTex, portalFillTex, glowTex, goreTex;
+        public Texture2D eyeTex, innerEyeTex, deathTex, circleTex, portalFillTex, glowTex, goreTex, sparkTex, backSparkTex;
         public Vector2 eyeVector = Vector2.Zero;
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
         public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
@@ -70,6 +70,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int[] deathTentacleBreakTimes = [60, 100, 140, 180];
         public int deathExplodeTime = 260;
         public int deathVortexLifetime = 480;
+        public Vector2 deathStarPosition = Vector2.Zero;
 
         public static int teleportTime = 40;
         public static int teleportMoveTimestamp = 20;
@@ -133,7 +134,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             goreTex = TexDict["TrueBrainGoreFrames"]; 
             circleTex = TexDict["Circle"]; 
             portalFillTex = TexDict["StarrySky"]; 
-            glowTex = TexDict["CircularGlow"]; 
+            glowTex = TexDict["CircularGlow"];
+            sparkTex = TexDict["ThinSpark"];
+            backSparkTex = TexDict["Spark"];
             modNPC.drawCenter = new Vector2(0, 32);
         }
         public override void OnSpawn(IEntitySource source)
@@ -147,8 +150,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.Center += new Vector2(800, 160);
             NPC.ai[2] = None.Id;
             ableToHit = false;
-
-            //NPC.localAI[0] = -31;
         }
         public override void PostAI()
         {
@@ -172,7 +173,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[3] == 5)
                 {
-                    TeleportSlot = SoundEngine.PlaySound(CrimsonVessel.TeleportSound with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center);
+                    if (NPC.localAI[0] <= -30)
+                        SoundEngine.PlaySound(CrimsonVessel.TeleportSound with { Volume = 0.27f, MaxInstances = 2 });
+                    else
+                        TeleportSlot = SoundEngine.PlaySound(CrimsonVessel.TeleportSound with { Volume = 0.4f, MaxInstances = 2 }, NPC.Center);
                 }
                 else if (NPC.ai[3] == teleportMoveTimestamp)
                 {
@@ -1093,6 +1097,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 modNPC.bleedingStacks.Clear();
                 phantomPositions.Clear();
                 cutsceneEyeVector = teleportTargetPos + innerEyePosition;
+                deathStarPosition = teleportTargetPos + innerEyePosition;
 
                 if (modNPC.isRoomNPC)
                 {
@@ -1171,8 +1176,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.6f, PitchVariance = 0f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                 if (thisTime < 24 || thisTime % 3 == 0)
                 {
-                    Vector2 particlePos = NPC.Center + innerEyePosition;
-                    Vector2 offset = Main.rand.NextVector2CircularEdge(104, 75);
+                    Vector2 particlePos = NPC.Center;
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(104, 73);
                     ParticleManager.AddParticle(new Ball(
                         particlePos + offset, offset.SafeNormalize(Vector2.UnitY) * 5 * Main.rand.NextFloat(0.8f, 1f),
                         20, Color.Lerp(Color.Teal, Color.White, 0.5f), new Vector2(0.25f), 0, 0.96f, 10));
@@ -1251,15 +1256,33 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 int thisTime = deadTime - (deathExplodeTime + deathVortexLifetime);
                 Vector2 cutsceneMoveVector = new Vector2(0, -2f);
+                Vector2 starMoveVector = new Vector2(0, -2.6f);
+                float period = thisTime / ((deathCutsceneDuration - 30f) - (deathExplodeTime + deathVortexLifetime)) * MathHelper.TwoPi * 1.55f;
+                float xWave = -(float)Math.Sin(period) * 4;
                 if (thisTime < 120)
                 {
-                    cutsceneMoveVector *= MathHelper.Clamp(thisTime / 120f, 0, 1);
+                    float multiplier = MathHelper.Clamp(thisTime / 120f, 0, 1);
+                    cutsceneMoveVector *= multiplier;
+                    starMoveVector *= multiplier;
+                    xWave *= multiplier;
                 }
                 else if (timeToEnd < 180)
                 {
-                    cutsceneMoveVector *= MathHelper.Clamp((timeToEnd - 60) / 120f, 0, 1);
+                    float multiplier = MathHelper.Clamp((timeToEnd - 60) / 120f, 0, 1);
+                    cutsceneMoveVector *= multiplier;
+                    starMoveVector *= multiplier;
+                    xWave *= multiplier;
                 }
+
+                if (period > MathHelper.Pi)
+                    xWave *= 1.5f;
+                starMoveVector.X += xWave;
                 CutsceneSystem.cameraTargetCenter += cutsceneMoveVector;
+                deathStarPosition += starMoveVector;
+                if (deadTime % 3 == 0 && starMoveVector.Length() > 2.2f)
+                {
+                    ParticleManager.AddParticle(new Square(deathStarPosition + Main.rand.NextVector2CircularEdge(4, 4), Main.rand.NextVector2Circular(1, 1), 60, Color.White, new Vector2(0.7f), 0, 0.98f, 60, true));
+                }
             }
 
             if (deadTime >= deathCutsceneDuration - 30)
@@ -1364,6 +1387,39 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 StartNonPremultipliedSpritebatch();
 
                 Main.EntitySpriteDraw(glowTex, drawPos - Main.screenPosition, null, Color.Black, 0, glowTex.Size() * 0.5f, portalScale * 0.6f, SpriteEffects.None);
+
+                if (deadTime > deathExplodeTime + deathVortexLifetime - 60)
+                {
+                    int thisTime = deadTime - (deathExplodeTime + deathVortexLifetime);
+                    int timeToEnd = (deathCutsceneDuration - 30) - deadTime;
+
+                    StartAlphaBlendSpritebatch();
+                    float starScale = 1f;
+                    Color starColor = Color.LightCyan;
+                    starColor.A = 0;
+                    if (timeToEnd <= 95)
+                    {
+                        if (timeToEnd > 85)
+                        {
+                            float completion = (timeToEnd - 85) / 10f;
+                            starScale *= MathHelper.SmoothStep(1.3f, 1f, completion);
+                        }
+                        else
+                        {
+                            float completion = timeToEnd / 85f;
+                            starScale *= MathHelper.SmoothStep(0, 1.3f, completion);
+                        }
+                    }
+
+                    if (thisTime < 0)
+                    {
+                        float completion = Math.Abs(thisTime) / 60f;
+                        starScale *= MathHelper.SmoothStep(1f, 0, completion);
+                    }
+                    starScale *= 0.975f + (float)Math.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * 0.025f;
+                    postDrawEverythingCache.Add(new StoredDraw(sparkTex, deathStarPosition, null, starColor, 0, sparkTex.Size() * 0.5f, new Vector2(0.1f, 0.15f) * starScale, SpriteEffects.None));
+                    postDrawEverythingCache.Add(new StoredDraw(sparkTex, deathStarPosition, null, starColor, MathHelper.PiOver2, sparkTex.Size() * 0.5f, new Vector2(0.15f, 0.15f) * starScale, SpriteEffects.None));
+                }
 
                 StartVanillaSpritebatch();
 
