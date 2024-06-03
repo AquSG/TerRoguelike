@@ -49,7 +49,7 @@ namespace TerRoguelike
         public void LoadClient()
         {
             TerRoguelikeShaders.LoadShaders();
-            Filters.Scene["TerRoguelike:MoonLordClone"] = new Filter(new MoonLordScreenShaderData("FilterMoonLord", true), EffectPriority.VeryHigh);
+            Filters.Scene["TerRoguelike:MoonLordClone"] = new Filter(new ModifiedMoonLordScreenShaderData("FilterMoonLord"), EffectPriority.VeryHigh);
             SkyManager.Instance["TerRoguelike:MoonLordSkyClone"] = new MoonLordSkyClone();
         }
         public override void PostSetupContent()

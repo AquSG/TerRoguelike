@@ -48,7 +48,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathHorizFrameCount = 5;
         public SlotId TeleportSlot;
         public SlotId ChargeSlot;
-        public Texture2D eyeTex, innerEyeTex, deathTex;
+        public Texture2D eyeTex, innerEyeTex, deathTex, circleTex, portalFillTex, glowTex;
         public Vector2 eyeVector = Vector2.Zero;
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
         public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
@@ -130,6 +130,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             innerEyeTex = TexDict["MoonLordInnerEye"];
             eyeTex = TexDict["TrueBrainEye"];
             deathTex = TexDict["TrueBrainDeathFrames"]; 
+            circleTex = TexDict["Circle"]; 
+            portalFillTex = TexDict["StarrySky"]; 
+            glowTex = TexDict["CircularGlow"]; 
             modNPC.drawCenter = new Vector2(0, 32);
         }
         public override void OnSpawn(IEntitySource source)
@@ -1141,8 +1144,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (deadTime == breakTime)
                     {
                         deathHorizFrame++;
-                        SoundEngine.PlaySound(SoundID.NPCDeath1, gorePos);
-                        SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.5f }, gorePos);
+                        SoundEngine.PlaySound(SoundID.NPCDeath1 with { Volume = 0.7f }, gorePos);
+                        SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.35f }, gorePos);
 
                         cutsceneEyeVector = gorePos;
                         for (int p = 0; p < 14; p++)
@@ -1152,9 +1155,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         }
                     }
                 }
-                if (breakTime - deadTime > 0 && breakTime - deadTime < 40 && deadTime % 10 == 0)
+                if (breakTime - deadTime > 0 && breakTime - deadTime < 40 && deadTime % 11 == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.NPCHit18 with { Volume = 0.5f}, gorePos);
+                    SoundEngine.PlaySound(SoundID.NPCHit18 with { Volume = 0.4f, Pitch = -0.2f }, gorePos);
                     ParticleManager.AddParticle(new Ball(gorePos, (breakRot + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(3f, 5f),
                         30, Color.Lerp(Color.Teal, Color.Cyan, Main.rand.NextFloat(0.8f)) * 0.85f, new Vector2(Main.rand.NextFloat(0.37f, 0.5f)), 0, 0.96f, 30));
                 }
@@ -1234,7 +1237,48 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
             if (deadTime >= deathExplodeTime)
+            {
+                int portalTime = deadTime - deathExplodeTime;
+                StartAlphaBlendSpritebatch();
+                Vector2 drawPos = NPC.Center + innerEyePosition;
+                float portalScale = 1f;
+                if (portalTime < 150)
+                {
+                    float completion = portalTime / 150f;
+                    portalScale *= MathHelper.Clamp((float)Math.Pow(-(completion + 1), -5) + 1.031f, 0, 1);
+                }
+                if (portalTime >= deathVortexLifetime - 240)
+                {
+                    float completion = (portalTime - (deathVortexLifetime - 240)) / 240f;
+                    portalScale *= MathHelper.SmoothStep(1f, 0, completion);
+                }
+
+                for (int i = 0; i < 8; i++)
+                {
+                    Main.EntitySpriteDraw(circleTex, drawPos + (Vector2.UnitX * 2).RotatedBy(i * MathHelper.PiOver4) - Main.screenPosition, null, Color.Cyan, 0, circleTex.Size() * 0.5f, portalScale, SpriteEffects.None);
+                }
+                Main.spriteBatch.End();
+                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                Vector2 screenOff = new Vector2(((deadTime + 700) / 300f) % 1, 0);
+                Color tint = Color.White;
+
+                maskEffect.Parameters["screenOffset"].SetValue(screenOff * portalScale);
+                maskEffect.Parameters["stretch"].SetValue(new Vector2(2 * portalScale));
+                maskEffect.Parameters["replacementTexture"].SetValue(portalFillTex);
+                maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+
+                Main.EntitySpriteDraw(circleTex, drawPos - Main.screenPosition, null, Color.White, 0, circleTex.Size() * 0.5f, portalScale, SpriteEffects.None);
+
+                StartNonPremultipliedSpritebatch();
+
+                Main.EntitySpriteDraw(glowTex, drawPos - Main.screenPosition, null, Color.Black, 0, glowTex.Size() * 0.5f, portalScale * 0.6f, SpriteEffects.None);
+
+                StartVanillaSpritebatch();
+
                 return false;
+            }
 
             var tex = deadTime == 0 ? TextureAssets.Npc[Type].Value : deathTex;
             Color npcColor = Color.White;
