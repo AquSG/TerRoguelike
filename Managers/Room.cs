@@ -623,7 +623,7 @@ namespace TerRoguelike.Managers
         }
         public void PlayerItemsUpdate()
         {
-            if (TerRoguelikeWorld.escape)
+            if (TerRoguelikeWorld.escape || bossDead)
                 return;
 
             int totalAutomaticDefibrillator = 0;
