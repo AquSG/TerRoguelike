@@ -43,9 +43,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override int CombatStyle => -1;
         public static readonly SoundStyle QuakeCooking = new SoundStyle("TerRoguelike/Sounds/QuakeCooking");
         public int currentFrame = 0;
+        public int deathHorizFrame = 0;
+        public int deathVertFrameCount = 4;
+        public int deathHorizFrameCount = 5;
         public SlotId TeleportSlot;
         public SlotId ChargeSlot;
-        public Texture2D eyeTex, innerEyeTex;
+        public Texture2D eyeTex, innerEyeTex, deathTex;
         public Vector2 eyeVector = Vector2.Zero;
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
         public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
@@ -63,7 +66,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 cutsceneEyeVector = Vector2.Zero;
 
         public int deadTime = 0;
-        public int deathCutsceneDuration = 120;
+        public int deathCutsceneDuration = 1380;
+        public int[] deathTentacleBreakTimes = [60, 100, 140, 180];
+        public int deathExplodeTime = 260;
+        public int deathVortexLifetime = 480;
 
         public static int teleportTime = 40;
         public static int teleportMoveTimestamp = 20;
@@ -113,7 +119,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.aiStyle = -1;
             NPC.damage = 36;
             NPC.lifeMax = 60000;
-            NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.OverrideIgniteVisual = true;
@@ -124,6 +129,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.AdaptiveArmorDecayRate = 40;
             innerEyeTex = TexDict["MoonLordInnerEye"];
             eyeTex = TexDict["TrueBrainEye"];
+            deathTex = TexDict["TrueBrainDeathFrames"]; 
             modNPC.drawCenter = new Vector2(0, 32);
         }
         public override void OnSpawn(IEntitySource source)
@@ -137,6 +143,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.Center += new Vector2(800, 160);
             NPC.ai[2] = None.Id;
             ableToHit = false;
+
+            //NPC.localAI[0] = -31;
         }
         public override void PostAI()
         {
@@ -207,8 +215,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             int cutsceneTime = (int)NPC.localAI[0] + cutsceneDuration;
-            bool eyeCenter = NPC.ai[0] == SpinBeam.Id && NPC.ai[1] < SpinBeamWindup + SpinBeamFireDuration + 30;
-            bool eyeCutscene = NPC.localAI[0] < -30 && (cutsceneTime < cutsceneLookingDownTime || (cutsceneTime > cutsceneLookLeaveTime && cutsceneTime < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime));
+            bool eyeCenter = 
+                (NPC.ai[0] == SpinBeam.Id && NPC.ai[1] < SpinBeamWindup + SpinBeamFireDuration + 30) ||
+                (deadTime >= 20);
+            bool eyeCutscene = 
+                (NPC.localAI[0] < -30 && (cutsceneTime < cutsceneLookingDownTime || (cutsceneTime > cutsceneLookLeaveTime && cutsceneTime < cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime))) ||
+                (deadTime >= 20 && deadTime < deathExplodeTime - 40);
             bool eyeVelocity = 
                 (NPC.ai[0] == ProjCharge.Id && (int)NPC.ai[1] % ProjChargeCycleTime >= teleportMoveTimestamp + ProjChargeTelegraph) ||
                 (NPC.ai[0] == FakeCharge.Id && NPC.ai[1] >= FakeChargeTelegraph + FakeChargeWindup);
@@ -579,7 +591,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         float pitch = Main.rand.NextFloat(-0.05f, 0.05f);
                         for (int i = 0; i < projSpawnRefPositions.Count; i++)
                         {
-                            SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.7f / (projSpawnRefPositions.Count * 0.66f), Pitch = pitch, PitchVariance = 0, MaxInstances = 8, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest}, projSpawnRefPositions[i]);
+                            SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.6f / (projSpawnRefPositions.Count * 0.66f), Pitch = pitch, PitchVariance = 0, MaxInstances = 8, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest}, projSpawnRefPositions[i]);
                         }
                     }
                     float maxLength = 12;
@@ -1068,12 +1080,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
-                ExtraSoundSystem.ForceStopAllExtraSounds();
+                NPC.ai[3] = 1;
+                teleportTargetPos = spawnPos + new Vector2(0, -320);
                 enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
                 phantomPositions.Clear();
+                cutsceneEyeVector = teleportTargetPos + innerEyePosition;
 
                 if (modNPC.isRoomNPC)
                 {
@@ -1083,7 +1098,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     room.bossDead = true;
                     ClearChildren();
                 }
-                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
+                CutsceneSystem.SetCutscene(teleportTargetPos, deathCutsceneDuration, 30, 30, 1.25f);
             }
 
             void ClearChildren()
@@ -1110,6 +1125,49 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             deadTime++;
+            
+            for (int i = 0; i < deathTentacleBreakTimes.Length; i++)
+            {
+                int breakTime = deathTentacleBreakTimes[i];
+                int dir = i % 2 == 0 ? 1 : -1;
+                bool outer = i < 2;
+                Vector2 gorePos = NPC.Center + Vector2.UnitY * 75;
+                gorePos += outer ? new Vector2(86 * dir, 0) : new Vector2(45 * dir, 8);
+                float breakRot = MathHelper.PiOver2 + (outer ? -1f : -0.25f) * dir;
+
+                if (deadTime >= breakTime)
+                {
+                    
+                    if (deadTime == breakTime)
+                    {
+                        deathHorizFrame++;
+                        SoundEngine.PlaySound(SoundID.NPCDeath1, gorePos);
+                        SoundEngine.PlaySound(SoundID.NPCDeath21 with { Volume = 0.5f }, gorePos);
+
+                        cutsceneEyeVector = gorePos;
+                        for (int p = 0; p < 14; p++)
+                        {
+                            ParticleManager.AddParticle(new Ball(gorePos, (breakRot + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(3f, 5f),
+                                30, Color.Lerp(Color.Teal, Color.Cyan, Main.rand.NextFloat(0.8f)) * 0.85f, new Vector2(Main.rand.NextFloat(0.37f, 0.5f)), 0, 0.96f, 30));
+                        }
+                    }
+                }
+                if (breakTime - deadTime > 0 && breakTime - deadTime < 40 && deadTime % 10 == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCHit18 with { Volume = 0.5f}, gorePos);
+                    ParticleManager.AddParticle(new Ball(gorePos, (breakRot + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(3f, 5f),
+                        30, Color.Lerp(Color.Teal, Color.Cyan, Main.rand.NextFloat(0.8f)) * 0.85f, new Vector2(Main.rand.NextFloat(0.37f, 0.5f)), 0, 0.96f, 30));
+                }
+            }
+            if (deadTime == deathExplodeTime - 46)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.6f, PitchVariance = 0f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+            }
+            else if (deadTime == deathExplodeTime)
+            {
+                SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 1f, Pitch = -0.4f }, NPC.Center);
+            }
 
             if (deadTime >= deathCutsceneDuration - 30)
             {
@@ -1122,8 +1180,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if (NPC.life > 0)
+            if (NPC.life > 0 && deadTime == 0)
             {
+                SoundEngine.PlaySound(SoundID.NPCHit1, NPC.Center);
                 for (int i = 0; (double)i < hit.Damage * 0.01d; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f, 0, default, 0.9f);
@@ -1146,7 +1205,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void ModifyHoverBoundingBox(ref Rectangle boundingBox)
         {
-            boundingBox = NPC.Hitbox;
+            if (deadTime < deathExplodeTime)
+                boundingBox = NPC.Hitbox;
+            else
+                boundingBox = new Rectangle(0, 0, 1, 1);
         }
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
@@ -1155,16 +1217,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
-            var tex = TextureAssets.Npc[Type].Value;
+            bool dead = deadTime > 0;
+            var tex = dead ? deathTex : TextureAssets.Npc[Type].Value;
 
-            currentFrame = (int)NPC.frameCounter % (Main.npcFrameCount[Type] - 1) + 1;
+            currentFrame = dead ? (int)NPC.frameCounter % deathVertFrameCount : (int)NPC.frameCounter % (Main.npcFrameCount[Type] - 1) + 1;
             if (!NPC.active)
                 currentFrame = 0;
-            NPC.frame = new Rectangle(0, frameHeight * currentFrame, tex.Width, frameHeight - 2);
+            if (dead)
+            {
+                int frameWidth = tex.Width / deathHorizFrameCount;
+                NPC.frame = new Rectangle(frameWidth * deathHorizFrame, frameHeight * currentFrame, frameWidth, frameHeight - 2);
+            }
+            else
+                NPC.frame = new Rectangle(0, frameHeight * currentFrame, tex.Width, frameHeight - 2);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            var tex = TextureAssets.Npc[Type].Value;
+            if (deadTime >= deathExplodeTime)
+                return false;
+
+            var tex = deadTime == 0 ? TextureAssets.Npc[Type].Value : deathTex;
             Color npcColor = Color.White;
             Color phantomColor = Color.Lerp(Color.DarkBlue, Color.Cyan, 0.4f) * 0.65f;
             Vector2 scale = new Vector2(NPC.scale);
@@ -1194,7 +1266,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            
             if (NPC.ai[3] > 0)
             {
                 float interpolant = NPC.ai[3] < teleportMoveTimestamp ? NPC.ai[3] / (teleportMoveTimestamp) : 1f - ((NPC.ai[3] - teleportMoveTimestamp) / (teleportTime - teleportMoveTimestamp));
