@@ -148,7 +148,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[2] = None.Id;
             ableToHit = false;
 
-            NPC.localAI[0] = -31;
+            //NPC.localAI[0] = -31;
         }
         public override void PostAI()
         {
@@ -1164,9 +1164,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         30, Color.Lerp(Color.Teal, Color.Cyan, Main.rand.NextFloat(0.8f)) * 0.85f, new Vector2(Main.rand.NextFloat(0.37f, 0.5f)), 0, 0.96f, 30));
                 }
             }
-            if (deadTime == deathExplodeTime - 46)
+            if (deadTime >= deathExplodeTime - 46 && deadTime < deathExplodeTime)
             {
-                SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.6f, PitchVariance = 0f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                int thisTime = deadTime - (deathExplodeTime - 46);
+                if (thisTime == 0)
+                    SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.6f, PitchVariance = 0f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                if (thisTime < 24 || thisTime % 3 == 0)
+                {
+                    Vector2 particlePos = NPC.Center + innerEyePosition;
+                    Vector2 offset = Main.rand.NextVector2CircularEdge(104, 75);
+                    ParticleManager.AddParticle(new Ball(
+                        particlePos + offset, offset.SafeNormalize(Vector2.UnitY) * 5 * Main.rand.NextFloat(0.8f, 1f),
+                        20, Color.Lerp(Color.Teal, Color.White, 0.5f), new Vector2(0.25f), 0, 0.96f, 10));
+                }
             }
             else if (deadTime == deathExplodeTime)
             {
@@ -1234,7 +1244,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     Vector2 offset = Main.rand.NextVector2CircularEdge(160, 160) * portalScale;
                     ParticleManager.AddParticle(new Ball(
-                          (NPC.Center + innerEyePosition) + offset, offset.RotatedBy(1f) * 0.06f, 40, Color.Cyan * 0.7f, new Vector2(0.3f, 0.1f), offset.ToRotation(), 0.98f, 20, false));
+                          (NPC.Center + innerEyePosition) + offset, offset.RotatedBy(1f) * 0.06f, 40, Color.Cyan * 0.7f, new Vector2(0.3f, 0.1f), offset.ToRotation() + 1f, 0.98f, 30, false));
                 }
             }
             else if (deadTime >= deathExplodeTime + deathVortexLifetime)
@@ -1263,7 +1273,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
-            if (NPC.life > 0 && deadTime == 0)
+            if (NPC.life > 0 && deadTime <= 1)
             {
                 SoundEngine.PlaySound(SoundID.NPCHit1, NPC.Center);
                 for (int i = 0; (double)i < hit.Damage * 0.01d; i++)
