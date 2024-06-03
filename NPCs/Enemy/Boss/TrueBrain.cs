@@ -48,7 +48,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int deathHorizFrameCount = 5;
         public SlotId TeleportSlot;
         public SlotId ChargeSlot;
-        public Texture2D eyeTex, innerEyeTex, deathTex, circleTex, portalFillTex, glowTex;
+        public Texture2D eyeTex, innerEyeTex, deathTex, circleTex, portalFillTex, glowTex, goreTex;
         public Vector2 eyeVector = Vector2.Zero;
         public Vector2 eyePosition { get { return new Vector2(0, -18) + modNPC.drawCenter; } }
         public Vector2 innerEyePosition { get { return new Vector2(0, -20) + modNPC.drawCenter; } }
@@ -130,6 +130,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             innerEyeTex = TexDict["MoonLordInnerEye"];
             eyeTex = TexDict["TrueBrainEye"];
             deathTex = TexDict["TrueBrainDeathFrames"]; 
+            goreTex = TexDict["TrueBrainGoreFrames"]; 
             circleTex = TexDict["Circle"]; 
             portalFillTex = TexDict["StarrySky"]; 
             glowTex = TexDict["CircularGlow"]; 
@@ -147,7 +148,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[2] = None.Id;
             ableToHit = false;
 
-            //NPC.localAI[0] = -31;
+            NPC.localAI[0] = -31;
         }
         public override void PostAI()
         {
@@ -1170,6 +1171,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 1f, Pitch = -0.4f }, NPC.Center);
+                int goreHorizFrameCount = 6;
+                int goreVertiFrameCount = 4;
+                int goreFrameWidth = goreTex.Width / goreHorizFrameCount;
+                int goreFrameHeight = goreTex.Height / goreVertiFrameCount;
+                Vector2 goreOrigin = new Vector2(goreFrameWidth, goreFrameHeight) * 0.5f;
+                Vector2 basePos = (NPC.Center + modNPC.drawCenter) - NPC.frame.Size() * 0.5f + goreOrigin;
+                Vector2 orbitAnchor = NPC.Center + innerEyePosition;
+                for (int x = 0; x < goreHorizFrameCount; x++)
+                {
+                    for (int  y = 0; y < goreVertiFrameCount; y++)
+                    {
+                        Rectangle goreFrame = new Rectangle(x * goreFrameWidth, y * goreFrameHeight, goreFrameWidth - 2, goreFrameHeight - 2);
+                        Vector2 gorePos = basePos + new Vector2(x * goreFrameWidth, y * goreFrameHeight);
+                        Vector2 goreVel = (gorePos - orbitAnchor).SafeNormalize(Vector2.UnitY) * 6 * Main.rand.NextFloat(0.5f, 1f);
+                        ParticleManager.AddParticle(new OrbitingGore(
+                            goreTex, gorePos, goreVel.RotatedBy(Main.rand.NextFloat(-0.4f, 0.4f)), 0.995f, Main.rand.NextFloat(0.04f, 0.08f), orbitAnchor, goreFrame, deathVortexLifetime, 
+                            Color.White, new Vector2(1f), 0, 1, 240 - Main.rand.Next(60), 0.075f * Main.rand.NextFloat(0.5f, 2f)));
+                    }
+                }
             }
 
             if (deadTime >= deathCutsceneDuration - 30)
