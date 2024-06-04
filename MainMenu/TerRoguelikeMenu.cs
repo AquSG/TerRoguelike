@@ -41,26 +41,27 @@ namespace TerRoguelike.MainMenu
             {
                 if (wipeTempWorld)
                 {
+                    bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
                     WorldFileData activeWorldFileData = Main.ActiveWorldFileData;
                     if (Main.netMode == NetmodeID.SinglePlayer)
                     {
                         bool isCloudSave = activeWorldFileData.IsCloudSave;
                         if (FileUtilities.Exists(Main.worldPathName, isCloudSave))
                         {
-                            FileUtilities.Delete(Main.worldPathName, isCloudSave, true);
+                            FileUtilities.Delete(Main.worldPathName, isCloudSave, fullyDelete);
                         }
                         if (FileUtilities.Exists(Main.worldPathName + ".bak", isCloudSave))
                         {
-                            FileUtilities.Delete(Main.worldPathName + ".bak", isCloudSave, true);
+                            FileUtilities.Delete(Main.worldPathName + ".bak", isCloudSave, fullyDelete);
                         }
                         string moddedWorldPathName = Path.ChangeExtension(Main.worldPathName, ".twld");
                         if (FileUtilities.Exists(moddedWorldPathName, isCloudSave))
                         {
-                            FileUtilities.Delete(moddedWorldPathName, isCloudSave, true);
+                            FileUtilities.Delete(moddedWorldPathName, isCloudSave, fullyDelete);
                         }
                         if (FileUtilities.Exists(moddedWorldPathName + ".bak", isCloudSave))
                         {
-                            FileUtilities.Delete(moddedWorldPathName + ".bak", isCloudSave, true);
+                            FileUtilities.Delete(moddedWorldPathName + ".bak", isCloudSave, fullyDelete);
                         }
                         Main.ActiveWorldFileData = new WorldFileData();
                     }
@@ -74,26 +75,27 @@ namespace TerRoguelike.MainMenu
                 {
                     if (Main.LocalPlayer.ModPlayer() != null && Main.LocalPlayer.ModPlayer().isDeletableOnExit)
                     {
+                        bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
                         PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
                         if (!activePlayerFileData.ServerSideCharacter)
                         {
                             bool isCloudSave = activePlayerFileData.IsCloudSave;
                             if (FileUtilities.Exists(Main.playerPathName, isCloudSave))
                             {
-                                FileUtilities.Delete(Main.playerPathName, isCloudSave, true);
+                                FileUtilities.Delete(Main.playerPathName, isCloudSave, fullyDelete);
                             }
                             if (FileUtilities.Exists(Main.playerPathName + ".bak", isCloudSave))
                             {
-                                FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave, true);
+                                FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave, fullyDelete);
                             }
                             string moddedPlayerPathName = Path.ChangeExtension(Main.playerPathName, ".tplr");
                             if (FileUtilities.Exists(moddedPlayerPathName, isCloudSave))
                             {
-                                FileUtilities.Delete(moddedPlayerPathName, isCloudSave, true);
+                                FileUtilities.Delete(moddedPlayerPathName, isCloudSave, fullyDelete);
                             }
                             if (FileUtilities.Exists(moddedPlayerPathName + ".bak", isCloudSave))
                             {
-                                FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave, true);
+                                FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave, fullyDelete);
                             }
                             Main.ActivePlayerFileData = new PlayerFileData();
                         }
