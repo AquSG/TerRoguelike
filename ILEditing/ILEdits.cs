@@ -502,6 +502,7 @@ namespace TerRoguelike.ILEditing
         {
             SkyManager.Instance.Deactivate("TerRoguelike:MoonLordSkyClone");
             MusicSystem.ClearMusic();
+			TerRoguelikeMenu.permitPlayerDeletion = Main.LocalPlayer.ModPlayer() != null ? Main.LocalPlayer.ModPlayer().isDeletableOnExit : false;
 			if (TerRoguelikeWorld.IsDeletableOnExit && !TerRoguelikeMenu.wipeTempPlayer && !TerRoguelikeMenu.wipeTempWorld)
             {
 				TerRoguelikeMenu.wipeTempPlayer = true;
@@ -526,6 +527,10 @@ namespace TerRoguelike.ILEditing
 			if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
 			{
 				Player _player = Main.PendingPlayer;
+				if (_player.ModPlayer() != null)
+				{
+					_player.ModPlayer().isDeletableOnExit = true;
+				}
 				int num = 0;
 				if (_player.difficulty == 3)
 				{
