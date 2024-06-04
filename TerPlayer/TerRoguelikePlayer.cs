@@ -2368,5 +2368,10 @@ namespace TerRoguelike.TerPlayer
         {
             isDeletableOnExit = tag.GetBool("isDeletableOnExit");
         }
+        public static void HealthUpIndicator(Player player)
+        {
+            string healthUp = Language.GetOrRegister("Mods.TerRoguelike.HealthUpAlert").Value;
+            CombatText.NewText(player.getRect(), CombatText.HealLife, healthUp, true);
+        }
     }
 }

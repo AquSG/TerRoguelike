@@ -452,7 +452,9 @@ namespace TerRoguelike.Managers
             else
             {
                 if (nextStage > TerRoguelikeWorld.currentStage)
+                {
                     TerRoguelikeWorld.currentStage = nextStage;
+                }
             }
 
             Floor nextFloor;
@@ -481,7 +483,10 @@ namespace TerRoguelike.Managers
                 modPlayer.currentFloor = nextFloor;
             }
             player.Center = targetRoom.DescendTeleportPosition();
-
+            if (!IsSanctuary)
+            {
+                TerRoguelikePlayer.HealthUpIndicator(player);
+            }
             if (nextFloor.Name != "Lunar")
             {
                 SetCalm(nextFloor.Soundtrack.CalmTrack);

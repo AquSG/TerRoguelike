@@ -139,7 +139,7 @@ namespace TerRoguelike.UI
         #region Draw Credits UI
         private static void DrawCreditsUI(SpriteBatch spriteBatch, TerRoguelikePlayer modPlayer, Vector2 screenPos, Player player, bool mainMenuHover, bool restartHover)
         {
-            float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (modPlayer.creditsViewTime - 20) / 80f), 0, 1f);
+            float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (modPlayer.creditsViewTime - 60) / 90f), 0, 1f);
             spriteBatch.Draw(baseUITex, screenPos, null, Color.White * 0.85f * opacity, 0f, baseUITex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             string itemsString = Language.GetOrRegister("Mods.TerRoguelike.DeathItems").Value;
             string victoryString = Language.GetOrRegister("Mods.TerRoguelike.CreditsVictory").Value;

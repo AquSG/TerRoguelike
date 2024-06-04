@@ -4,6 +4,7 @@ DeathItems: Items:
 DeathMainMenu: Main Menu
 DeathQuickRestart: Quick Restart
 BlockedAlert: blocked!
+HealthUpAlert: Health Up!
 BarrierName: Barrier
 CreditsVictory: Victory!
 CreditDirector: Director
