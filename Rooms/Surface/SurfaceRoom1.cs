@@ -40,6 +40,7 @@ namespace TerRoguelike.Rooms
         public override void RoomClearReward()
         {
             ClearSpecificProjectiles();
+            CreditsSystem.StartCredits();
         }
         public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
         {
