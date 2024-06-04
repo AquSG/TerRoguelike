@@ -136,11 +136,7 @@ namespace TerRoguelike.UI
         #region Draw Death UI
         private static void DrawDeathUI(SpriteBatch spriteBatch, TerRoguelikePlayer modPlayer, Vector2 screenPos, Player player, bool mainMenuHover, bool restartHover)
         {
-            //if (!modPlayer.inWorld)
-                //return;
-
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (modPlayer.deadTime - 120) / 60f), 0, 1f);
-            // Draw the border of the Barrier Bar first
             spriteBatch.Draw(baseUITex, screenPos, null, Color.White * 0.85f * opacity, 0f, baseUITex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             string deathKilledBy = Language.GetOrRegister("Mods.TerRoguelike.DeathKilledBy").Value;
             string deathItems = Language.GetOrRegister("Mods.TerRoguelike.DeathItems").Value;

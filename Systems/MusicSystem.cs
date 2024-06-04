@@ -72,9 +72,45 @@ namespace TerRoguelike.Systems
             0.5f);
 
         public static FloorSoundtrack BaseTheme = new(
-            "TerRoguelike/Tracks/Calm",
-            "TerRoguelike/Tracks/Combat",
-            0.18f);
+            "TerRoguelike/Tracks/BaseThemeCalm",
+            "TerRoguelike/Tracks/BaseThemeCombat",
+            0.26f);
+        public static FloorSoundtrack ForestTheme = new(
+            "TerRoguelike/Tracks/ForestThemeCalm",
+            "TerRoguelike/Tracks/ForestThemeCombat",
+            0.22f);
+        public static FloorSoundtrack CrimsonTheme = new(
+            "TerRoguelike/Tracks/CrimsonThemeCalm",
+            "TerRoguelike/Tracks/CrimsonThemeCombat",
+            0.22f);
+        public static FloorSoundtrack CorruptTheme = new(
+            "TerRoguelike/Tracks/CorruptThemeCalm",
+            "TerRoguelike/Tracks/CorruptThemeCombat",
+            0.22f);
+        public static FloorSoundtrack SnowTheme = new(
+            "TerRoguelike/Tracks/SnowThemeCalm",
+            "TerRoguelike/Tracks/SnowThemeCombat",
+            0.22f);
+        public static FloorSoundtrack DesertTheme = new(
+            "TerRoguelike/Tracks/DesertThemeCalm",
+            "TerRoguelike/Tracks/DesertThemeCombat",
+            0.22f);
+        public static FloorSoundtrack JungleTheme = new(
+            "TerRoguelike/Tracks/JungleThemeCalm",
+            "TerRoguelike/Tracks/JungleThemeCombat",
+            0.22f);
+        public static FloorSoundtrack HellTheme = new(
+            "TerRoguelike/Tracks/HellThemeCalm",
+            "TerRoguelike/Tracks/HellThemeCombat",
+            0.22f);
+        public static FloorSoundtrack DungeonTheme = new(
+            "TerRoguelike/Tracks/DungeonThemeCalm",
+            "TerRoguelike/Tracks/DungeonThemeCombat",
+            0.22f);
+        public static FloorSoundtrack TempleTheme = new(
+            "TerRoguelike/Tracks/TempleThemeCalm",
+            "TerRoguelike/Tracks/TempleThemeCombat",
+            0.22f);
 
         public static BossTheme PaladinTheme = new(
             "TerRoguelike/Tracks/PaladinTheme",
@@ -162,6 +198,24 @@ namespace TerRoguelike.Systems
                 SanctuaryTheme.CalmTrack,
                 BaseTheme.CalmTrack,
                 BaseTheme.CombatTrack,
+                ForestTheme.CalmTrack,
+                ForestTheme.CombatTrack,
+                CrimsonTheme.CalmTrack,
+                CrimsonTheme.CombatTrack,
+                CorruptTheme.CalmTrack,
+                CorruptTheme.CombatTrack,
+                SnowTheme.CalmTrack,
+                SnowTheme.CombatTrack,
+                DesertTheme.CalmTrack,
+                DesertTheme.CombatTrack,
+                JungleTheme.CalmTrack,
+                JungleTheme.CombatTrack,
+                HellTheme.CalmTrack,
+                HellTheme.CombatTrack,
+                DungeonTheme.CalmTrack,
+                DungeonTheme.CombatTrack,
+                TempleTheme.CalmTrack,
+                TempleTheme.CombatTrack,
                 PaladinTheme.BattleTrack,
                 PaladinTheme.StartTrack,
                 PaladinTheme.EndTrack,

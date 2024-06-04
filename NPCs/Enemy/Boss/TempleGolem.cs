@@ -375,7 +375,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (time == 0)
                             SoundEngine.PlaySound(SoundID.DD2_BetsyFlameBreath with { Volume = 1 }, projSpawnPos);
                         else
-                            SoundEngine.PlaySound(SoundID.DD2_BetsyFlameBreath with { Volume = 0.3f, MaxInstances = 10, PitchVariance = 0.1f }, projSpawnPos);
+                            SoundEngine.PlaySound(SoundID.DD2_BetsyFlameBreath with { Volume = 0.5f, MaxInstances = 10, PitchVariance = 0.1f }, projSpawnPos);
                         
                     }
 

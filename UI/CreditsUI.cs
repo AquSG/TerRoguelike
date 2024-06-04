@@ -140,7 +140,6 @@ namespace TerRoguelike.UI
         private static void DrawCreditsUI(SpriteBatch spriteBatch, TerRoguelikePlayer modPlayer, Vector2 screenPos, Player player, bool mainMenuHover, bool restartHover)
         {
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, (modPlayer.creditsViewTime - 20) / 80f), 0, 1f);
-            // Draw the border of the Barrier Bar first
             spriteBatch.Draw(baseUITex, screenPos, null, Color.White * 0.85f * opacity, 0f, baseUITex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             string itemsString = Language.GetOrRegister("Mods.TerRoguelike.DeathItems").Value;
             string victoryString = Language.GetOrRegister("Mods.TerRoguelike.CreditsVictory").Value;
@@ -151,7 +150,7 @@ namespace TerRoguelike.UI
             Vector2 creditsTextPos = screenPos + new Vector2(240, 80);
             float offsetPerCredit = 32;
             float maxOffset = (creditsList.Count) * offsetPerCredit;
-            float baseOffset = -MathHelper.Clamp(modPlayer.creditsViewTime * 0.24f, 0, maxOffset);
+            float baseOffset = -MathHelper.Clamp(modPlayer.creditsViewTime * 0.31f, 0, maxOffset);
 
             // Enforce a cutoff on everything. Thank you Calamity for letting me know how to do this
             Rectangle textCutoffRegion = new Rectangle((int)creditsTextPos.X, (int)creditsTextPos.Y, 1, 1);
@@ -300,41 +299,81 @@ namespace TerRoguelike.UI
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditMusic").Value;
                         headerColor = Color.GreenYellow;
                         strings = [
+                        "'Into the Fire'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
+                        " ",
                         "'You're Gonna Need a Bigger Ukelele'",
                         "Chris Christodoulou",
                         "Risk of Rain 2",
+                        " ",
+                        "'Dancer in the Darkness'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
                         " ",
                         "'Surface Tension'",
                         "Chris Christodoulou",
                         "Risk of Rain Returns",
                         " ",
+                        "'Cold Winds'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
+                        " ",
                         "'Hemolysis'",
                         "Chris Christodoulou",
                         "Deadbolt",
+                        " ",
+                        "'Panic Betrayer'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
                         " ",
                         "'The Great Beyond'",
                         "Chris Christodoulou",
                         "Deadbolt",
                         " ",
+                        "'Deep Blue'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
+                        " ",
                         "'Arctic Oscillation'",
                         "Chris Christodoulou",
                         "Risk of Rain Returns",
+                        " ",
+                        "'Sands of Tide'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
                         " ",
                         "'Having Fallen, it was Blood'",
                         "Chris Christodoulou",
                         "RoR2: Survivors of the Void",
                         " ",
+                        "'Danse Macabre'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
+                        " ",
                         "'Hailstorm'",
                         "Chris Christodoulou",
                         "Risk of Rain Returns",
+                        " ",
+                        "'Glory'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
                         " ",
                         "'Double F***king Rainbow'",
                         "Chris Christodoulou",
                         "Risk of Rain Returns",
                         " ",
+                        "'Tenebre Rosso Sangue'",
+                        "KEYGEN CHURCH",
+                        "Ultrakill",
+                        " ",
                         "'Dies Irae'",
                         "Chris Christodoulou",
                         "Deadbolt",
+                        " ",
+                        "'Altars of Apostasy'",
+                        "Heaven Pierce Her",
+                        "Ultrakill",
                         " ",
                         "'Double F***king Rainbow Returns'",
                         "Chris Christodoulou",
