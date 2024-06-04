@@ -136,7 +136,7 @@ namespace TerRoguelike.ILEditing
         //Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
         private void On_WorldGen_SectionTileFrameWithCheck(On_WorldGen.orig_SectionTileFrameWithCheck orig, int startX, int startY, int endX, int endY)
         {
-			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || noMapUpdate || !Program.IsMainThread) // don't fuck with this if not in a dungeon, or, assumedly for the second bool, if you just loaded into the world and are initializing all the shit around you. I'm pissed at this hardcrashing so much and this worked the best.
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || !ModContent.GetInstance<TerRoguelikeConfig>().TileFramingOptimization || noMapUpdate || !Program.IsMainThread) // don't fuck with this if not in a dungeon, or, assumedly for the second bool, if you just loaded into the world and are initializing all the shit around you. I'm pissed at this hardcrashing so much and this worked the best.
             {
 				orig.Invoke(startX, startY, endX, endY);
 				return;

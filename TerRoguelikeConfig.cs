@@ -39,5 +39,11 @@ namespace TerRoguelike
         [SliderColor(50, 165, 220, 128)]
         [Range(0f, 10f)]
         public float ScreenshakeIntensity;
+
+        [Header("Mods.TerRoguelike.MiscConfig")]
+        [DefaultValue(true)]
+        public bool FullyDeletePlayerAndWorldFiles;
+        [DefaultValue(true)]
+        public bool TileFramingOptimization;
     }
 }
