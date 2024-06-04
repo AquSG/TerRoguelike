@@ -3189,6 +3189,14 @@ namespace TerRoguelike.NPCs
         #endregion
 
         public override bool InstancePerEntity => true;
+        public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
+        {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                spawnRate = int.MaxValue;
+                maxSpawns = 0;
+            }
+        }
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
             whoAmI = npc.whoAmI;
