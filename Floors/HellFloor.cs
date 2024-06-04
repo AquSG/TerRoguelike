@@ -19,5 +19,6 @@ namespace TerRoguelike.Floors
         public override int Stage => 3;
         public override bool InHell => true;
         public override string Name => "Hell";
+        public override FloorSoundtrack Soundtrack => MusicSystem.HellTheme;
     }
 }

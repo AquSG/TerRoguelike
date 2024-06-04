@@ -18,5 +18,6 @@ namespace TerRoguelike.Floors
         public override List<int> BossRoomIDs => new List<int>() { RoomDict["SnowBossRoom1"] };
         public override int Stage => 2;
         public override string Name => "Snow";
+        public override FloorSoundtrack Soundtrack => MusicSystem.SnowTheme;
     }
 }
