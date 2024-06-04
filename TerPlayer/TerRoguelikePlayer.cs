@@ -870,14 +870,14 @@ namespace TerRoguelike.TerPlayer
                     portableGeneratorImmuneTime--;
                     if (portableGeneratorImmuneTime == 0)
                     {
-                        Player.immuneTime = 60;
+                        Player.SetImmuneTimeForAllTypes(60);
                         Player.immuneNoBlink = false;
                         Player.immune = true;
                         SoundEngine.PlaySound(SoundID.NPCHit43 with { Volume = 0.3f });
                     }
                     else
                     {
-                        Player.immuneTime = 2;
+                        Player.SetImmuneTimeForAllTypes(2);
                         Player.immuneNoBlink = true;
                         Player.immune = true;
                     }
@@ -1005,6 +1005,7 @@ namespace TerRoguelike.TerPlayer
             if (deathEffectTimer > 0)
             {
                 Player.immuneTime = 360;
+                Player.SetImmuneTimeForAllTypes(360);
                 Player.immune = true;
                 Player.immuneNoBlink = true;
                 Player.velocity = Vector2.Zero;
@@ -1031,6 +1032,7 @@ namespace TerRoguelike.TerPlayer
             else if (CutsceneSystem.cutsceneDisableControl)
             {
                 Player.immuneTime = 60;
+                Player.SetImmuneTimeForAllTypes(60);
                 Player.immune = true;
                 Player.immuneNoBlink = true;
                 Player.controlDown = false;
@@ -1056,7 +1058,10 @@ namespace TerRoguelike.TerPlayer
                 {
                     DashDirCache = DashDir;
                     SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot with { Volume = 1f });
-                    Player.immuneTime += 7;
+                    for (int i = -1; i < 5; i++)
+                    {
+                        Player.AddImmuneTime(i, 7);
+                    }
                     DashTime += 15;
                     int dashDelayAdd = (int)(600 * 4 / (float)(jetLeg + 3));
                     if (dashDelayAdd < 30)
@@ -1361,7 +1366,10 @@ namespace TerRoguelike.TerPlayer
                     string blocked = Language.GetOrRegister("Mods.TerRoguelike.BlockedAlert").Value;
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.1f }, Player.Center);
                     CombatText.NewText(Player.getRect(), Color.LightGray, blocked);
-                    Player.immuneTime += 40;
+                    for (int i = -1; i < 5; i++)
+                    {
+                        Player.AddImmuneTime(i, 40);
+                    }
                     Player.immune = true;
                     dodgeAttack = true;
                     return;
@@ -1413,7 +1421,11 @@ namespace TerRoguelike.TerPlayer
             SoundStyle soundStyle = damageToBarrier < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
             SoundEngine.PlaySound(soundStyle, Player.Center);
             barrierHealth -= damageToBarrier;
-            Player.immuneTime += fullHitDamage == 1 ? 20 : 40;
+            int addImmuneTime = fullHitDamage == 1 ? 20 : 40;
+            for (int i = -1; i < 5; i++)
+            {
+                Player.AddImmuneTime(i, addImmuneTime);
+            }
             Player.immune = true;
             HurtEffects(fullHitDamage);
             
@@ -1469,7 +1481,10 @@ namespace TerRoguelike.TerPlayer
             {
                 if (soulOfLenaUses < soulOfLena && Player.statLife / (float)Player.statLifeMax2 <= 0.25f)
                 {
-                    Player.immuneTime += 300;
+                    for (int i = -1; i < 5; i++)
+                    {
+                        Player.AddImmuneTime(i, 300);
+                    }
                     Player.immuneNoBlink = true;
                     Player.immune = true;
                     soulOfLenaUses++;
@@ -2225,7 +2240,10 @@ namespace TerRoguelike.TerPlayer
         public void JetLegDashMovement()
         {
             Player.velocity.X = Player.maxRunSpeed * DashDirCache * 1.5f;
-            Player.immuneTime++;
+            for (int i = -1; i < 5; i++)
+            {
+                Player.AddImmuneTime(i, 1);
+            }
             Player.immune = true;
             Player.immuneNoBlink = true;
         }

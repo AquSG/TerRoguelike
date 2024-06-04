@@ -168,6 +168,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/PhantasmalBeamWave",
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainDeathFrames",
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainGoreFrames",
+                "TerRoguelike/UI/QuestionMark",
             };
             foreach (string path in pathList)
             {

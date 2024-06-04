@@ -29,7 +29,7 @@ namespace TerRoguelike.UI
 {
     public static class DeathUI
     {
-        private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex;
+        private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex, questionMarkTex;
         private static Vector2 mainMenuButtonOffset = new Vector2(-200, 206);
         private static Vector2 restartButtonOffset = new Vector2(200, 206);
         public static List<Item> itemsToDraw;
@@ -40,6 +40,7 @@ namespace TerRoguelike.UI
             baseUITex = TexDict["DeathUI"];
             mainMenuButtonTex = TexDict["MenuButton"];
             mainMenuButtonHoverTex = TexDict["MenuButtonHover"];
+            questionMarkTex = TexDict["QuestionMark"];
             itemsToDraw = new List<Item>();
             Reset();
         }
@@ -47,7 +48,7 @@ namespace TerRoguelike.UI
         internal static void Unload()
         {
             Reset();
-            baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = null;
+            baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = questionMarkTex = null;
             itemsToDraw = null;
         }
 
@@ -181,6 +182,10 @@ namespace TerRoguelike.UI
                 if (scale > 4f)
                     scale = 4f;
                 spriteBatch.Draw(projTex, screenPos + new Vector2(240, -40), new Rectangle(0, 0, projTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(projTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
+            }
+            else
+            {
+                Main.EntitySpriteDraw(questionMarkTex, screenPos + new Vector2(240, -40), null, Color.White * opacity, 0, questionMarkTex.Size() * 0.5f, 1f, SpriteEffects.None);
             }
 
             if (itemsToDraw.Count == 0)
