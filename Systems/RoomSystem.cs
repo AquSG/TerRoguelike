@@ -54,6 +54,12 @@ namespace TerRoguelike.Systems
         }
         public override void PostUpdateWorld()
         {
+            if (IsTerRoguelikeWorld)
+            {
+                Main.time = 34920;
+                Main.dayTime = true;
+            }
+
             postDrawAllBlack = false;
 
             if (escapeTime > 0 && escape)

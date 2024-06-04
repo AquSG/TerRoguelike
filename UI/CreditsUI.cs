@@ -238,7 +238,7 @@ namespace TerRoguelike.UI
             Vector2 normalScale = new Vector2(0.45f);
             var font = FontAssets.DeathText.Value;
 
-            for (int i = 0; i <= 8; i++)
+            for (int i = 0; i <= 9; i++)
             {
                 string headerString;
                 List<string> strings;
@@ -269,6 +269,13 @@ namespace TerRoguelike.UI
                         ];
                         break;
                     case 3:
+                        headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditRoomBuilding").Value;
+                        headerColor = Color.Lerp(Color.Brown, Color.White, 0.35f);
+                        strings = [
+                        "AquaSG"
+                        ];
+                        break;
+                    case 4:
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditSpriting").Value;
                         headerColor = Color.Cyan;
                         strings = [
@@ -276,7 +283,7 @@ namespace TerRoguelike.UI
                         "Potatostego",
                         ];
                         break;
-                    case 4:
+                    case 5:
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditExternalAssets").Value;
                         headerColor = Color.Lerp(Color.Cyan, Color.Teal, 0.5f);
                         strings = [
@@ -289,7 +296,7 @@ namespace TerRoguelike.UI
                         "Adobe Stock"
                         ];
                         break;
-                    case 5:
+                    case 6:
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditMusic").Value;
                         headerColor = Color.GreenYellow;
                         strings = [
@@ -360,21 +367,21 @@ namespace TerRoguelike.UI
                         "Deadbolt",
                         ];
                         break;
-                    case 6:
+                    case 7:
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditTesting").Value;
                         headerColor = Color.MediumPurple;
                         strings = [
                         "AquaSG"
                         ];
                         break;
-                    case 7:
+                    case 8:
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditSpecialThanks").Value;
                         headerColor = Color.Goldenrod;
                         strings = [
                         "Calamity Mod's Schematic System"
                         ];
                         break;
-                    case 8:
+                    case 9:
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditFinal").Value;
                         headerColor = Color.Gray;
                         strings = [
