@@ -35,7 +35,7 @@ namespace TerRoguelike.MainMenu
         public static bool permitPlayerDeletion = false;
 
         public static string DisplayName => "TerRoguelike";
-        public static void DrawTerRoguelikeMenu()
+        public static void TerRoguelikeMenuInteractionLogic()
         {
             if (Main.menuMode == 0)
             {
@@ -115,11 +115,6 @@ namespace TerRoguelike.MainMenu
                 else
                     mouseHover = false;
 
-                Texture2D xButtonTex = TexDict["XButton"];
-                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, "Play TerRoguelike", position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, Vector2.Zero, new Vector2(0.8f));
-                if (PlayerInput.UsingGamepadUI)
-                    Main.spriteBatch.Draw(xButtonTex, position + new Vector2(-36, 8), Color.White);
-
                 if (PlayerInput.UsingGamepad ? GamePad.GetState(PlayerIndex.One).Buttons.X == ButtonState.Pressed : mouseHover && Mouse.GetState().LeftButton == ButtonState.Pressed)
                 {
                     SoundEngine.PlaySound(SoundID.MenuOpen);
@@ -148,7 +143,19 @@ namespace TerRoguelike.MainMenu
                 Main.menuMode = 10;
                 WorldGen.playWorld();
             }
-            permitPlayerDeletion = false;
+        }
+        public static void DrawTerRoguelikeMenu()
+        {
+            if (Main.menuMode == 0)
+            {
+
+                Vector2 position = new Vector2(Main.screenWidth / 2 - 150, Main.screenHeight * 0.75f);
+
+                Texture2D xButtonTex = TexDict["XButton"];
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.DeathText.Value, "Play TerRoguelike", position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, Vector2.Zero, new Vector2(0.8f));
+                if (PlayerInput.UsingGamepadUI)
+                    Main.spriteBatch.Draw(xButtonTex, position + new Vector2(-36, 8), Color.White);
+            }
         }
         public static void QuickCreateWorld()
         {
