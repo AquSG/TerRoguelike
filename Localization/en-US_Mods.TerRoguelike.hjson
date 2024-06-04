@@ -5,6 +5,18 @@ DeathMainMenu: Main Menu
 DeathQuickRestart: Quick Restart
 BlockedAlert: blocked!
 BarrierName: Barrier
+CreditsVictory: Victory!
+CreditDirector: Director
+CreditProgramming: Programming
+CreditExternalCode: External Code
+CreditSpriting: Spriting
+CreditExternalAssets: External Assets
+CreditMusic: Music
+CreditTesting: Testing
+CreditSpecialThanks: Special Thanks
+CreditFinal: And Finally...
+CreditThankYou: Thank You
+CreditForPlaying: For Playing!
 
 Projectiles: {
 	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile

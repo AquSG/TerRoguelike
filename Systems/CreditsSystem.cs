@@ -13,6 +13,7 @@ using TerRoguelike.Managers;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent;
 using static TerRoguelike.Systems.MusicSystem;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Systems
 {
@@ -102,6 +103,11 @@ namespace TerRoguelike.Systems
         {
             if (creditsActive)
             {
+                Player player = Main.LocalPlayer;
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null)
+                    modPlayer.creditsViewTime++;
+
                 int fadingTime = 180;
                 if (fadeIn && creditsTime < fadingTime)
                 {

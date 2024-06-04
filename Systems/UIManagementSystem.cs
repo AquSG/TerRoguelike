@@ -42,7 +42,7 @@ namespace TerRoguelike.Systems
                 Player player = Main.player[Main.myPlayer];
                 TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
 
-                if (modPlayer.deathEffectTimer != 0 || player.dead)
+                if (modPlayer.deathEffectTimer != 0 || player.dead || CreditsSystem.creditsActive)
                 {
                     for (int i = 0; i < layers.Count; i++)
                     {
@@ -87,20 +87,36 @@ namespace TerRoguelike.Systems
                         }, InterfaceScaleType.None));
                     }
                 }
+                else if (CreditsSystem.creditsActive)
+                {
+                    int creditsIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
+                    if (creditsIndex != -1)
+                    {
+                        layers.Insert(creditsIndex, new LegacyGameInterfaceLayer("Credits UI", () =>
+                        {
+                            CreditsUI.Draw(Main.spriteBatch, Main.LocalPlayer);
+                            return true;
+                        }, InterfaceScaleType.None));
+                    }
+                }
             }
 
             int mouseIndex = layers.FindIndex(layer => layer.Name == "Vanilla: Resource Bars");
             if (mouseIndex == -1)
                 return;
 
-            layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Barrier Bar", () =>
-            {
-                BarrierUI.Draw(Main.spriteBatch, Main.LocalPlayer);
-                return true;
-            }, InterfaceScaleType.None));
             layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Debug UI", () =>
             {
                 DebugUI.Draw(Main.spriteBatch, Main.LocalPlayer);
+                return true;
+            }, InterfaceScaleType.None));
+
+            if (CreditsSystem.creditsActive)
+                return;
+
+            layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Barrier Bar", () =>
+            {
+                BarrierUI.Draw(Main.spriteBatch, Main.LocalPlayer);
                 return true;
             }, InterfaceScaleType.None));
             layers.Insert(mouseIndex, new LegacyGameInterfaceLayer("Item Basin UI", () =>
