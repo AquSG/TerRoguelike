@@ -176,6 +176,7 @@ namespace TerRoguelike.TerPlayer
         public bool moonLordVisualEffect = false;
         public bool moonLordSkyEffect = false;
         public bool deathrayDeathReason = false;
+        public int creditsViewTime = 0;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -1645,7 +1646,9 @@ namespace TerRoguelike.TerPlayer
                     Player.armor[3] = new Item();
             }
             DeathUI.itemsToDraw.Clear();
+            CreditsUI.itemsToDraw.Clear();
             deadTime = 0;
+            creditsViewTime = 0;
         }
         #endregion
 
@@ -2334,6 +2337,7 @@ namespace TerRoguelike.TerPlayer
             killerProj = -1;
             DeathUI.itemsToDraw.Clear();
             deadTime = 0;
+            creditsViewTime = 0;
         }
         #endregion
     }

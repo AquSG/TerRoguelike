@@ -39,6 +39,7 @@ namespace TerRoguelike
             specialPendingItems = null;
             BarrierUI.Unload();
             DeathUI.Unload();
+            CreditsUI.Unload();
             DebugUI.Unload();
             ItemBasinUI.Unload();
             ItemManager.Unload();
@@ -57,6 +58,7 @@ namespace TerRoguelike
             TextureManager.SetStaticDefaults();
             BarrierUI.Load();
             DeathUI.Load();
+            CreditsUI.Load();
             DebugUI.Load();
             ItemBasinUI.Load();
             EnemyHealthbarUI.Load();

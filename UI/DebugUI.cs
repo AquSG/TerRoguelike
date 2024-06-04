@@ -99,6 +99,9 @@ namespace TerRoguelike.UI
                     TerRoguelikeWorld.lunarBossSpawned = false;
                     TerRoguelikeWorld.escape = false;
                     Main.LocalPlayer.ModPlayer().escaped = false;
+                    Main.LocalPlayer.ModPlayer().creditsViewTime = 0;
+                    CreditsUI.creditsList = null;
+                    CreditsSystem.StopCredits();
                     TerRoguelikeWorld.escapeTime = 0;
                     for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                     {
