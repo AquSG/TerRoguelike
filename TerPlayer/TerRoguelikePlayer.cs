@@ -177,6 +177,7 @@ namespace TerRoguelike.TerPlayer
         public bool moonLordSkyEffect = false;
         public bool deathrayDeathReason = false;
         public int creditsViewTime = 0;
+        public bool isDeletableOnExit = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -556,7 +557,7 @@ namespace TerRoguelike.TerPlayer
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage)
+                    if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly)
                         continue;
 
                     float requiredDistance = 128f;
@@ -1722,7 +1723,7 @@ namespace TerRoguelike.TerPlayer
             {
                 NPC npc = Main.npc[i];
 
-                if (npc == null || !npc.active)
+                if (npc == null || !npc.active || npc.friendly)
                     continue;
 
                 if (closestNPCDistance == -1f)
@@ -2340,5 +2341,14 @@ namespace TerRoguelike.TerPlayer
             creditsViewTime = 0;
         }
         #endregion
+
+        public override void SaveData(TagCompound tag)
+        {
+            tag["isDeletableOnExit"] = TerRoguelikeMenu.prepareForRoguelikeGeneration ? isDeletableOnExit : false;
+        }
+        public override void LoadData(TagCompound tag)
+        {
+            isDeletableOnExit = tag.GetBool("isDeletableOnExit");
+        }
     }
 }

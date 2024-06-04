@@ -21,6 +21,7 @@ using Terraria.UI.Gamepad;
 using Terraria.GameInput;
 using TerRoguelike.Managers;
 using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.MainMenu
 {
@@ -31,6 +32,7 @@ namespace TerRoguelike.MainMenu
         public static bool wipeTempWorld = false;
         public static PlayerFileData desiredPlayer = null;
         public static bool mouseHover = false;
+        public static bool permitPlayerDeletion = false;
 
         public static string DisplayName => "TerRoguelike";
         public static void DrawTerRoguelikeMenu()
@@ -70,28 +72,31 @@ namespace TerRoguelike.MainMenu
                 }
                 if (wipeTempPlayer)
                 {
-                    PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
-                    if (!activePlayerFileData.ServerSideCharacter)
+                    if (Main.LocalPlayer.ModPlayer() != null && Main.LocalPlayer.ModPlayer().isDeletableOnExit)
                     {
-                        bool isCloudSave = activePlayerFileData.IsCloudSave;
-                        if (FileUtilities.Exists(Main.playerPathName, isCloudSave))
+                        PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
+                        if (!activePlayerFileData.ServerSideCharacter)
                         {
-                            FileUtilities.Delete(Main.playerPathName, isCloudSave, true);
+                            bool isCloudSave = activePlayerFileData.IsCloudSave;
+                            if (FileUtilities.Exists(Main.playerPathName, isCloudSave))
+                            {
+                                FileUtilities.Delete(Main.playerPathName, isCloudSave, true);
+                            }
+                            if (FileUtilities.Exists(Main.playerPathName + ".bak", isCloudSave))
+                            {
+                                FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave, true);
+                            }
+                            string moddedPlayerPathName = Path.ChangeExtension(Main.playerPathName, ".tplr");
+                            if (FileUtilities.Exists(moddedPlayerPathName, isCloudSave))
+                            {
+                                FileUtilities.Delete(moddedPlayerPathName, isCloudSave, true);
+                            }
+                            if (FileUtilities.Exists(moddedPlayerPathName + ".bak", isCloudSave))
+                            {
+                                FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave, true);
+                            }
+                            Main.ActivePlayerFileData = new PlayerFileData();
                         }
-                        if (FileUtilities.Exists(Main.playerPathName + ".bak", isCloudSave))
-                        {
-                            FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave, true);
-                        }
-                        string moddedPlayerPathName = Path.ChangeExtension(Main.playerPathName, ".tplr");
-                        if (FileUtilities.Exists(moddedPlayerPathName, isCloudSave))
-                        {
-                            FileUtilities.Delete(moddedPlayerPathName, isCloudSave, true);
-                        }
-                        if (FileUtilities.Exists(moddedPlayerPathName + ".bak", isCloudSave))
-                        {
-                            FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave, true);
-                        }
-                        Main.ActivePlayerFileData = new PlayerFileData();
                     }
                     wipeTempPlayer = false;
                 }
@@ -143,6 +148,7 @@ namespace TerRoguelike.MainMenu
                 Main.menuMode = 10;
                 WorldGen.playWorld();
             }
+            permitPlayerDeletion = false;
         }
         public static void QuickCreateWorld()
         {

@@ -30,34 +30,38 @@ namespace TerRoguelike.Systems
             if (WorldGen.currentWorldSeed == "TerRoguelikeMakeRoomDebugWorldPleaseTY")
             {
                 GenDebugWorld = true;
+                TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
             }
         }
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
-            tasks.RemoveAll(x => x.Name != "Reset");
-            tasks.Add(new PassLegacy("Building the Map", (progress, config) =>
+            if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
             {
-                progress.CurrentPassWeight = 1;
-                progress.Value = 0;
-                progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
-                Main.worldSurface = 200;
-                Main.rockLayer = 225;
-                if (!GenDebugWorld)
-                    FillTheFuckingWorld(ref progress);
-                RoomManager.GenerateRoomStructure();
-                Main.spawnTileX = (Main.maxTilesX / 32) + 12;
-                Main.spawnTileY = (Main.maxTilesY / 2) + 12;
-                if (GenDebugWorld)
+                tasks.RemoveAll(x => x.Name != "Reset");
+                tasks.Add(new PassLegacy("Building the Map", (progress, config) =>
                 {
-                    Main.spawnTileY = (Main.maxTilesY / 12) + 12;
-                    GenDebugWorld = false;
-                    TerRoguelikeWorld.IsDebugWorld = true;
-                }
-                ItemManager.RoomRewardCooldown = 0;
-                TerRoguelikeWorld.IsTerRoguelikeWorld = true;
-                if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
-                    TerRoguelikeWorld.IsDeletableOnExit = true;
-            }));
+                    progress.CurrentPassWeight = 1;
+                    progress.Value = 0;
+                    progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
+                    Main.worldSurface = 200;
+                    Main.rockLayer = 225;
+                    if (!GenDebugWorld)
+                        FillTheFuckingWorld(ref progress);
+                    RoomManager.GenerateRoomStructure();
+                    Main.spawnTileX = (Main.maxTilesX / 32) + 12;
+                    Main.spawnTileY = (Main.maxTilesY / 2) + 12;
+                    if (GenDebugWorld)
+                    {
+                        Main.spawnTileY = (Main.maxTilesY / 12) + 12;
+                        GenDebugWorld = false;
+                        TerRoguelikeWorld.IsDebugWorld = true;
+                    }
+                    ItemManager.RoomRewardCooldown = 0;
+                    TerRoguelikeWorld.IsTerRoguelikeWorld = true;
+                    if (!GenDebugWorld)
+                        TerRoguelikeWorld.IsDeletableOnExit = true;
+                }));
+            }
         }
         public void FillTheFuckingWorld(ref GenerationProgress progress)
         {
