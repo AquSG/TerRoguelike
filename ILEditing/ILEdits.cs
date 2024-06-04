@@ -449,9 +449,12 @@ namespace TerRoguelike.ILEditing
 
         private void On_Main_DrawMenu(On_Main.orig_DrawMenu orig, Main self, GameTime gameTime)
 		{
-			TerRoguelikeMenu.DrawTerRoguelikeMenu();
+			TerRoguelikeMenu.TerRoguelikeMenuInteractionLogic();
 			orig.Invoke(self, gameTime);
-		}
+            Main.spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+            TerRoguelikeMenu.DrawTerRoguelikeMenu();
+			Main.spriteBatch.End();
+        }
 
         private void FuckUnderGroundUpdating(On_WorldGen.orig_UpdateWorld_UndergroundTile orig, int i, int j, bool checkNPCSpawns, int wallDist)
         {
@@ -502,7 +505,6 @@ namespace TerRoguelike.ILEditing
         {
             SkyManager.Instance.Deactivate("TerRoguelike:MoonLordSkyClone");
             MusicSystem.ClearMusic();
-			TerRoguelikeMenu.permitPlayerDeletion = Main.LocalPlayer.ModPlayer() != null ? Main.LocalPlayer.ModPlayer().isDeletableOnExit : false;
 			if (TerRoguelikeWorld.IsDeletableOnExit && !TerRoguelikeMenu.wipeTempPlayer && !TerRoguelikeMenu.wipeTempWorld)
             {
 				TerRoguelikeMenu.wipeTempPlayer = true;
