@@ -3,3 +3,5 @@ Battle through over 100 different rooms, spread across 11 different floors!
 Engage in combat with 12 unique bosses, and over 60 unique enemies!
 Take advantage of over 60 unique roguelike items, spread across 3 rarities, infinitely stackable, with potential synergies with eachother!
 To play this gamemode, simply install and enable this mod, navigate to the main menu, interact with the "Play TerRoguelike" button, and make a character. You will automatically be placed in a newly generated roguelike world. Have fun!
+
+It is recommended that you play this gamemode with as few gameplay-altering mods as possible, as they may drastically interfere with the intended gameplay experience.
