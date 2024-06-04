@@ -22,6 +22,7 @@ using TerRoguelike.Utilities;
 using TerRoguelike.NPCs.Enemy.Boss;
 using Terraria.GameContent;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.World
 {
@@ -100,6 +101,7 @@ namespace TerRoguelike.World
             Player player = Main.LocalPlayer;
             if (player == null)
                 return;
+            TerRoguelikePlayer.HealthUpIndicator(player);
             var modPlayer = player.ModPlayer();
             if (modPlayer == null)
                 return;
