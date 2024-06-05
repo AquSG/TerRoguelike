@@ -69,7 +69,7 @@ namespace TerRoguelike.Rooms
         public override void Ascend(Player player)
         {
             var modPlayer = player.ModPlayer();
-            modPlayer.teleporting = true;
+            modPlayer.teleporting = 5;
             var finalRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
             player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
             SetBossTrack(FinalBoss2Theme);

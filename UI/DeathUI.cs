@@ -96,6 +96,8 @@ namespace TerRoguelike.UI
                  restartHover = mouseHitbox.Intersects(restartBar);
             }
 
+            DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);
+
             bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) : ms.LeftButton == ButtonState.Pressed;
             if (pressed && mainMenuHover && modPlayer.deadTime > 150)
             {
@@ -129,8 +131,6 @@ namespace TerRoguelike.UI
                 modPlayer.killerProj = -1;
                 WorldGen.SaveAndQuit();
             }
-
-            DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);   
         }
 
         #region Draw Death UI

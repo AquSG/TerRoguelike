@@ -144,9 +144,9 @@ namespace TerRoguelike.ILEditing
 
 			Player player = Main.LocalPlayer;
 			var modPlayer = player.ModPlayer();
-			if (modPlayer != null && modPlayer.teleporting) // try to avoid running this when entering a portal as that is when there is the highest chance of access violation error. It's not the biggest deal, I care more about the moment to moment gameplay being smooth.
+			if (modPlayer != null && modPlayer.teleporting > 0) // try to avoid running this when entering a portal as that is when there is the highest chance of access violation error. It's not the biggest deal, I care more about the moment to moment gameplay being smooth.
 			{
-				modPlayer.teleporting = false;
+				modPlayer.teleporting--;
                 orig.Invoke(startX, startY, endX, endY);
                 return;
             }
