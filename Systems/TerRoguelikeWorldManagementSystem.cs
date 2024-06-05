@@ -30,12 +30,13 @@ namespace TerRoguelike.Systems
             if (WorldGen.currentWorldSeed == "TerRoguelikeMakeRoomDebugWorldPleaseTY")
             {
                 GenDebugWorld = true;
-                TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
             }
+            else
+                GenDebugWorld = false;
         }
         public override void ModifyWorldGenTasks(List<GenPass> tasks, ref double totalWeight)
         {
-            if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
+            if (TerRoguelikeMenu.prepareForRoguelikeGeneration || GenDebugWorld)
             {
                 tasks.RemoveAll(x => x.Name != "Reset");
                 tasks.Add(new PassLegacy("Building the Map", (progress, config) =>
