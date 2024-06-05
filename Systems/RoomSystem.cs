@@ -1038,13 +1038,6 @@ namespace TerRoguelike.Systems
             quakeTime = 0;
             quakeCooldown = 0;
             postDrawEverythingCache.Clear();
-
-            Player player = Main.LocalPlayer;
-            var modPlayer = player.ModPlayer();
-            if (modPlayer != null)
-            {
-                modPlayer.escaped = false;
-            }
         }
         public override void SetStaticDefaults()
         {
