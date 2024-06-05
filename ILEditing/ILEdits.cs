@@ -136,7 +136,7 @@ namespace TerRoguelike.ILEditing
         //Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
         private void On_WorldGen_SectionTileFrameWithCheck(On_WorldGen.orig_SectionTileFrameWithCheck orig, int startX, int startY, int endX, int endY)
         {
-			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || !ModContent.GetInstance<TerRoguelikeConfig>().TileFramingOptimization || noMapUpdate || !Program.IsMainThread) // don't fuck with this if not in a dungeon, or, assumedly for the second bool, if you just loaded into the world and are initializing all the shit around you. I'm pissed at this hardcrashing so much and this worked the best.
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || !ModContent.GetInstance<TerRoguelikeConfig>().TileFramingOptimization || noMapUpdate || Main.mapFullscreen || !Program.IsMainThread) // don't fuck with this if not in a dungeon, or, assumedly for the second bool, if you just loaded into the world and are initializing all the shit around you. I'm pissed at this hardcrashing so much and this worked the best.
             {
 				orig.Invoke(startX, startY, endX, endY);
 				return;
@@ -144,7 +144,7 @@ namespace TerRoguelike.ILEditing
 
 			Player player = Main.LocalPlayer;
 			var modPlayer = player.ModPlayer();
-			if (modPlayer != null && modPlayer.teleporting > 0) // try to avoid running this when entering a portal as that is when there is the highest chance of access violation error. It's not the biggest deal, I care more about the moment to moment gameplay being smooth.
+            if (modPlayer != null && modPlayer.teleporting > 0) // try to avoid running this when entering a portal as that is when there is the highest chance of access violation error. It's not the biggest deal, I care more about the moment to moment gameplay being smooth.
 			{
 				modPlayer.teleporting--;
                 orig.Invoke(startX, startY, endX, endY);

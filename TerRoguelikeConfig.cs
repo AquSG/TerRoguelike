@@ -43,7 +43,7 @@ namespace TerRoguelike
         [Header("Mods.TerRoguelike.MiscConfig")]
         [DefaultValue(true)]
         public bool FullyDeletePlayerAndWorldFiles;
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool TileFramingOptimization;
     }
 }

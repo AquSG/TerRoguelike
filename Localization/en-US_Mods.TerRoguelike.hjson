@@ -909,8 +909,8 @@ Configs: {
 			Tooltip:
 				'''
 				If enabled, greatly reduces the duration of lag spikes when loading new areas of the world ingame while playing TerRoguelike Mode.
-				Very rarely can cause your game to instantly close itself.
-				Disable to go back to the vanilla tile framing speed, and have no risk of this optimization closing the game.
+				Rarely can cause your game to instantly close itself.
+				Disable to go back to the vanilla tile framing code, and have no risk of this optimization closing the game.
 				'''
 		}
 	}

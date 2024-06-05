@@ -307,6 +307,7 @@ namespace TerRoguelike.TerPlayer
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
+                Player.noBuilding = !DebugUI.allowBuilding;
                 Player.noFallDmg = true;
                 Player.noKnockback = true;
                 Player.GetCritChance(DamageClass.Generic) -= 3f;
@@ -1665,6 +1666,7 @@ namespace TerRoguelike.TerPlayer
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
             }
+            escaped = false;
             DeathUI.itemsToDraw.Clear();
             CreditsUI.itemsToDraw.Clear();
             deadTime = 0;
