@@ -217,8 +217,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.hide = false;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
-                    NPC.ai[1] = 0;
+                    NPC.ai[1] = 90;
                     NPC.ai[3] = 0;
+                    NPC.ai[2] = Summon.Id;
                     enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
                 if (NPC.localAI[0] < -30)

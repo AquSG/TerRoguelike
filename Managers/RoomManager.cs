@@ -151,6 +151,8 @@ namespace TerRoguelike.Managers
                     return "Lunar";
                 case 11:
                     return "Sanctuary";
+                case 12:
+                    return "Surface";
                 default:
                     return null;
             }
@@ -582,6 +584,8 @@ namespace TerRoguelike.Managers
             {
                 currentFloorGen++;
                 if (currentFloorGen == FloorDict["Sanctuary"])
+                    currentFloorGen++;
+                if (currentFloorGen == FloorDict["Surface"])
                     currentFloorGen++;
                 if (currentFloorGen >= FloorID.Count)
                     currentFloorGen = -1;
