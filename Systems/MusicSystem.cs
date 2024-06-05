@@ -110,7 +110,7 @@ namespace TerRoguelike.Systems
         public static FloorSoundtrack TempleTheme = new(
             "TerRoguelike/Tracks/TempleThemeCalm",
             "TerRoguelike/Tracks/TempleThemeCombat",
-            0.22f);
+            0.24f);
 
         public static BossTheme PaladinTheme = new(
             "TerRoguelike/Tracks/PaladinTheme",
