@@ -24,7 +24,7 @@ namespace TerRoguelike.Rooms
             base.InitializeRoom();
             AddRoomNPC(PercentPosition(0.2f, 0.33f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f);
             AddRoomNPC(PercentPosition(0.8f, 0.33f), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.15f, 0.85f), ChooseEnemy(AssociatedFloor, 0), 180, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.21f, 0.85f) - Vector2.UnitY * 16, ChooseEnemy(AssociatedFloor, 0), 180, 120, 0.45f);
 
             AddRoomNPC(PercentPosition(0.2f, 0.33f), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 1);
             AddRoomNPC(PercentPosition(0.8f, 0.33f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);

@@ -110,6 +110,7 @@ namespace TerRoguelike.Managers
         public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {
             pendingItems.Add(new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize));
+            SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [itemTier], MaxInstances = 10 }, position);
         }
         public static void UpdatePendingItems()
         {
@@ -145,6 +146,7 @@ namespace TerRoguelike.Managers
                 {
                     item.TelegraphSize *= 2f;
                     int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
+                    SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
                     for (int i = 0; i < 15; i++)
                     {
                         Dust dust = Dust.NewDustDirect(item.Position - new Vector2(15f * item.TelegraphSize, 15f * item.TelegraphSize), (int)(30 * item.TelegraphSize), (int)(30 * item.TelegraphSize), item.particleTier, Scale: 0.75f);

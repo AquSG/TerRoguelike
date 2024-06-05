@@ -68,6 +68,8 @@ namespace TerRoguelike.Rooms
         }
         public override void Ascend(Player player)
         {
+            var modPlayer = player.ModPlayer();
+            modPlayer.teleporting = true;
             var finalRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
             player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
             SetBossTrack(FinalBoss2Theme);
@@ -76,7 +78,7 @@ namespace TerRoguelike.Rooms
             finalRoom.bossSpawnPos = storedBossSpawnPos;
             finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
 
-            NewFloorEffects(finalRoom, player.ModPlayer());
+            NewFloorEffects(finalRoom, modPlayer);
         }
     }
 }

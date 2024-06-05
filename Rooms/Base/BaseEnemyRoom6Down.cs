@@ -23,14 +23,14 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(PercentPosition(0.16f, 0.94f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.84f, 0.94f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.16f, 0.55f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.84f, 0.55f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.16f, 0.25f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.84f, 0.25f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.33f, 0.28f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.67f, 0.28f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.185f, 0.94f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.815f, 0.94f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.185f, 0.58f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.815f, 0.58f), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.185f, 0.31f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.815f, 0.31f), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.35f, 0.35f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.65f, 0.35f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f);
             AddRoomNPC(PercentPosition(0.05f, 0.08f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f);
             AddRoomNPC(PercentPosition(0.95f, 0.08f), ChooseEnemy(AssociatedFloor, 1), 180, 120, 0.45f);
             AddRoomNPC(PercentPosition(0.5f, 0.08f), ChooseEnemy(AssociatedFloor, 0), 180, 120, 0.45f);
