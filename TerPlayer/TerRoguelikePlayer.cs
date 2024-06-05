@@ -178,6 +178,7 @@ namespace TerRoguelike.TerPlayer
         public bool deathrayDeathReason = false;
         public int creditsViewTime = 0;
         public bool isDeletableOnExit = false;
+        public bool teleporting = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 

@@ -26,10 +26,10 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(PercentPosition(0.1f, 0.45f), ModContent.NPCType<Ballista>(), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.9f, 0.45f), ModContent.NPCType<Ballista>(), 60, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.1f, 0.10f), ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f);
-            AddRoomNPC(PercentPosition(0.9f, 0.10f), ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.1f, 0.45f) + Vector2.UnitY * 24, ModContent.NPCType<Ballista>(), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.9f, 0.45f) + Vector2.UnitY * 24, ModContent.NPCType<Ballista>(), 60, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.1f, 0.13f) + Vector2.UnitY * 24, ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f);
+            AddRoomNPC(PercentPosition(0.9f, 0.13f) + Vector2.UnitY * 24, ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f);
         }
     }
 }
