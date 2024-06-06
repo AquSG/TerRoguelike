@@ -26,7 +26,7 @@ namespace TerRoguelike.Projectiles
         public bool ableToHit = true;
         public TerRoguelikeGlobalProjectile modProj;
         TerRoguelikePlayer modPlayer;
-        public int setTimeLeft = 6300;
+        public int setTimeLeft = 9000;
         public Vector2 originalDirection;
         public override void SetStaticDefaults()
         {
