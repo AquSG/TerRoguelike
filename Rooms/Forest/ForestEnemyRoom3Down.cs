@@ -19,7 +19,6 @@ namespace TerRoguelike.Rooms
         public override string Key => "ForestEnemyRoom3Down";
         public override string Filename => "Schematics/RoomSchematics/ForestEnemyRoom3Down.csch";
         public override bool CanExitRight => true;
-        public override bool CanExitDown => true;
         public override void InitializeRoom()
         {
             base.InitializeRoom();
