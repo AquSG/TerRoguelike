@@ -726,7 +726,7 @@ Items: {
 	}
 
 	MinigunComponent: {
-		DisplayName: Minigun Component
+		DisplayName: Salvaged Minigun
 		Tooltip:
 			'''
 			3.5x attack speed
