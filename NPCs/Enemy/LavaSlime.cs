@@ -54,8 +54,8 @@ namespace TerRoguelike.NPCs.Enemy
                 dust.noLight = true;
             }
             int attackTelegraph = 40;
-            int attackTimeBetween = 20;
-            modNPC.RogueCrawlerShooterAI(NPC, 2.5f, 0.04f, 70, 320f, attackTelegraph, 99, attackTimeBetween, 200, ModContent.ProjectileType<BouncingFire>(), 6.5f, NPC.damage);
+            int attackTimeBetween = 30;
+            modNPC.RogueCrawlerShooterAI(NPC, 2.5f, 0.04f, 70, 320f, attackTelegraph, 39, attackTimeBetween, 260, ModContent.ProjectileType<BouncingFire>(), 6.5f, NPC.damage);
             if (NPC.ai[0] == 0)
             {
                 NPC.frameCounter += 0.13d;

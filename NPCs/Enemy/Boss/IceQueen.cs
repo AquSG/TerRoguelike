@@ -517,7 +517,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int progress = (int)NPC.ai[1] - iceRainTelegraph;
                     if (progress % iceRainFireRate == 0)
                     {
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.1f, 0.1f)) * 2, ModContent.ProjectileType<Iceflake>(), NPC.damage, 0);
+                        int projType = ModContent.ProjectileType<Iceflake>();
+                        float speed = 2;
+                        if (progress != 0 && progress / iceRainFireRate % 6 == 0)
+                        {
+                            projType = ModContent.ProjectileType<IceBomb>();
+                            speed = 8;
+                        }
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.1f, 0.1f)) * speed, projType, NPC.damage, 0);
                     }
                 }
                 

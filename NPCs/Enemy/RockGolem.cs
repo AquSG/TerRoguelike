@@ -49,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
-            int attackCooldown = 90;
+            int attackCooldown = 180;
             NPC.frameCounter += NPC.velocity.Length() * 0.1d;
             modNPC.RogueRockGolemAI(NPC, 1f, -6f, 48f, meleeDuration, 60, 240f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<Rock>(), 9f, -Vector2.UnitY * 16, NPC.damage, true, false, attackExtend);
 

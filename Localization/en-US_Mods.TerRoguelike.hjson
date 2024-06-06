@@ -486,7 +486,7 @@ Items: {
 		DisplayName: Unencumbering Stone
 		Tooltip:
 			'''
-			25% increased movement speed after not attacking for 5 seconds
+			25% increased movement speed after not attacking for 1 second
 			Extra copies of this item increase the movement speed bonus by 25%
 			'''
 	}
