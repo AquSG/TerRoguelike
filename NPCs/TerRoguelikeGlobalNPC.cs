@@ -3631,6 +3631,12 @@ namespace TerRoguelike.NPCs
                     if (npc.type == NPCID.CrimsonAxe)
                         position += new Vector2(0, -9);
                     break;
+                case NPCAIStyleID.CritterWorm:
+                    if (npc.type == NPCID.Grubby)
+                        position += new Vector2(0, -3);
+                    else
+                        position += new Vector2(0, 0);
+                    break;
             }
             return position;
         }

@@ -57,7 +57,64 @@ namespace TerRoguelike.ILEditing
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
             IL_Main.DoDraw += IL_Main_DoDraw;
-            //On_MoonLordScreenShaderData.UpdateMoonLordIndex += TerRoguelikeMoonLordIndexInjectionIntoShader;
+            IL_Player.Update += IL_Player_Update;
+        }
+
+        private void IL_Player_Update(ILContext il)
+        {
+            ILCursor cursor = new(il);
+            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdcR4(0.02f)))
+            {
+				TerRoguelike.Instance.Logger.Warn("Failed to find stealth subtraction");
+                return;
+            }
+            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdcR4(0.02f)))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find rope slow upwards acceleration");
+                return;
+            }
+			cursor.Remove();
+            cursor.EmitDelegate<Func<float>>(() => TerRoguelikeWorld.IsTerRoguelikeWorld ? 0.04f : 0.02f);
+
+            if (!cursor.TryGotoPrev(MoveType.Before, i => i.MatchLdcR4(0.7f)))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find rope upwards deceleration");
+                return;
+            }
+            cursor.Remove();
+            cursor.EmitDelegate<Func<float>>(() => TerRoguelikeWorld.IsTerRoguelikeWorld ? 0.5f : 0.7f);
+
+            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdcR4(0.2f)))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find rope upwards acceleration");
+                return;
+            }
+            cursor.Remove();
+            cursor.EmitDelegate<Func<float>>(() => TerRoguelikeWorld.IsTerRoguelikeWorld ? 0.4f : 0.2f);
+
+            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdcR4(0.2f)))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find rope downwards acceleration");
+                return;
+            }
+            cursor.Remove();
+            cursor.EmitDelegate<Func<float>>(() => TerRoguelikeWorld.IsTerRoguelikeWorld ? 0.4f : 0.2f);
+
+            if (!cursor.TryGotoPrev(MoveType.Before, i => i.MatchLdcR4(0.7f)))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find rope downwards deceleration");
+                return;
+            }
+            cursor.Remove();
+            cursor.EmitDelegate<Func<float>>(() => TerRoguelikeWorld.IsTerRoguelikeWorld ? 0.5f : 0.7f);
+
+            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchLdcR4(0.1f)))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find rope slow downwards acceleration");
+                return;
+            }
+            cursor.Remove();
+            cursor.EmitDelegate<Func<float>>(() => TerRoguelikeWorld.IsTerRoguelikeWorld ? 0.2f : 0.1f);
         }
 
         private void IL_Main_DoDraw(ILContext il)
@@ -73,50 +130,6 @@ namespace TerRoguelike.ILEditing
 				ParticleManager.DrawParticles_AfterProjectiles();
 			});
         }
-
-        /* 
-		This was from a time where I wanted the moon lord shader to appear on the npc itself. 
-		I have come to realise that it's not very cool when you are somewhat far away from moon lord. 
-		it has been quarantined for now. Instead it is displayed on the player like the monolith, but with a high piority.
-
-        private void TerRoguelikeMoonLordIndexInjectionIntoShader(On_MoonLordScreenShaderData.orig_UpdateMoonLordIndex orig, MoonLordScreenShaderData self)
-        {
-            Player player = Main.LocalPlayer;
-			if (player == null)
-			{
-                orig.Invoke(self);
-                return;
-            }
-			var modPlayer = player.ModPlayer();
-			if (modPlayer == null || !modPlayer.moonLordVisualEffect)
-			{
-                orig.Invoke(self);
-                return;
-            }
-
-			int moonLordType = ModContent.NPCType<MoonLord>();
-			int trueBrainType = -2;
-
-			var moonIndex = (int)self.GetType().GetField("_moonLordIndex", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-			var aimAtPlayer = (bool)self.GetType().GetField("_aimAtPlayer", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(self);
-
-            if (aimAtPlayer || (moonIndex >= 0 && Main.npc[moonIndex].active && (Main.npc[moonIndex].type == moonLordType || Main.npc[moonIndex].type == trueBrainType)))
-            {
-                return;
-            }
-            int moonLordIndex = -1;
-            for (int i = 0; i < Main.npc.Length; i++)
-            {
-                if (Main.npc[i].active && (Main.npc[i].type == moonLordType || Main.npc[i].type == trueBrainType))
-                {
-                    moonLordIndex = i;
-                    break;
-                }
-            }
-
-			self.GetType().GetField("_moonLordIndex", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(self, moonLordIndex);
-        }
-		*/
 
         private void PostDrawBasicallyEverything(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
         {

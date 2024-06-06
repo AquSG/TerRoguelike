@@ -73,8 +73,8 @@ namespace TerRoguelike.NPCs.Enemy
 
             int attackTelegraph = 60;
             int attackShootCooldown = 8;
-            int attackDuration = 120;
-            modNPC.RogueTumbletwigAI(NPC, 2.5f, 0.02f, 400f, ModContent.ProjectileType<WoodSliver>(), 10f, NPC.damage, attackTelegraph, attackDuration, attackShootCooldown, 240, MathHelper.PiOver4 * 0.2f);
+            int attackDuration = 60;
+            modNPC.RogueTumbletwigAI(NPC, 2.5f, 0.02f, 400f, ModContent.ProjectileType<WoodSliver>(), 10f, NPC.damage, attackTelegraph, attackDuration, attackShootCooldown, 300, MathHelper.PiOver4 * 0.2f);
             if ((NPC.ai[0] - attackTelegraph) % attackShootCooldown == 0 && NPC.ai[0] <= attackTelegraph + attackDuration && NPC.ai[0] >= attackTelegraph)
             {
                 SoundEngine.PlaySound(SoundID.Item39 with { Volume = 1f, MaxInstances = 8 }, NPC.Center);

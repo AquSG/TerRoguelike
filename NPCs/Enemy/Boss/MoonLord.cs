@@ -821,7 +821,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             float shootRot = MathHelper.PiOver2 + MathHelper.PiOver4 * 0.5f * i;
                             Vector2 shootRotVect = shootRot.ToRotationVector2();
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos + shootRotVect * 3, shootRotVect * 7.5f, ModContent.ProjectileType<Tentacle>(), NPC.damage, 0);
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos + shootRotVect * 3, shootRotVect * 6.75f, ModContent.ProjectileType<Tentacle>(), NPC.damage, 0);
                         }
                     }
                 }

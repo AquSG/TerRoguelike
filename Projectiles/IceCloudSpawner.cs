@@ -24,7 +24,7 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.width = 16;
             Projectile.height = 16;
-            Projectile.timeLeft = maxTimeLeft = 450;
+            Projectile.timeLeft = maxTimeLeft = 570;
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;

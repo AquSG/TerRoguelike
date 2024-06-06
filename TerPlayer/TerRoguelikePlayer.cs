@@ -619,7 +619,7 @@ namespace TerRoguelike.TerPlayer
             {
                 extraDoubleJumps += airCanister;
             }
-            if (unencumberingStone > 0 && timeAttacking <= -300)
+            if (unencumberingStone > 0 && timeAttacking <= -60)
             {
                 float speedIncrease = unencumberingStone * 0.25f;
                 Player.moveSpeed += speedIncrease;

@@ -47,7 +47,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             int attackTelegraph = 120;
-            modNPC.RogueEvilToolAI(NPC, 8f, attackTelegraph, 60, 12, 60, ModContent.ProjectileType<BloodOrb>(), 6f, NPC.damage);
+            modNPC.RogueEvilToolAI(NPC, 8f, attackTelegraph, 60, 12, 120, ModContent.ProjectileType<BloodOrb>(), 6f, NPC.damage);
 
             NPC.frameCounter += 0.1d;
             if (NPC.ai[0] >= 0 && NPC.ai[0] < attackTelegraph)

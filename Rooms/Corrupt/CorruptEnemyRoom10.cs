@@ -10,6 +10,8 @@ using Terraria;
 using Terraria.ID;
 using static TerRoguelike.Managers.NPCManager;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -23,7 +25,7 @@ namespace TerRoguelike.Rooms
         {
             base.InitializeRoom();
             AddRoomNPC(MakeEnemySpawnPos(Center, 12, 1), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
-            AddRoomNPC(MakeEnemySpawnPos(Center, -7, -2), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Center, -7, -2), ModContent.NPCType<GiantSpider>(), 60, 120, 0.45f, 0);
 
             AddRoomNPC(MakeEnemySpawnPos(Bottom, -5, -4), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 1);
             AddRoomNPC(MakeEnemySpawnPos(Center, -12, 1), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
