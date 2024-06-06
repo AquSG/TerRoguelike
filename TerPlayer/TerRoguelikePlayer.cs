@@ -1264,7 +1264,7 @@ namespace TerRoguelike.TerPlayer
 
             if (hotPepper > 0 && !modTarget.activatedHotPepper)
             {
-                float radius = 128f + (48f * (hotPepper - 1));
+                float radius = 144f + (64f * (hotPepper - 1));
                 int igniteDamage = 300 + (75 * (hotPepper - 1));
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
