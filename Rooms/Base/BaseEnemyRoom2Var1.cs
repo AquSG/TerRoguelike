@@ -19,7 +19,6 @@ namespace TerRoguelike.Rooms
         public override string Key => "BaseEnemyRoom2";
         public override string Filename => "Schematics/RoomSchematics/BaseEnemyRoom2.csch";
         public override bool CanExitRight => true;
-        public override bool CanExitDown => true;
         public override bool CanExitUp => true;
         public override bool IsRoomVariant => true;
         public override void InitializeRoom()
