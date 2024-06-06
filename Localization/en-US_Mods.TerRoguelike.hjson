@@ -716,7 +716,7 @@ Items: {
 	}
 
 	SniperComponent: {
-		DisplayName: Sniper Component
+		DisplayName: Sniper Kit
 		Tooltip:
 			'''
 			6x damage
