@@ -472,7 +472,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (protectiveBubble > 0 && outOfDangerTime >= 420)
             {
-                float drIncrease = protectiveBubble * 50f;
+                float drIncrease = protectiveBubble * 30f;
                 diminishingDR += drIncrease;
             }
 
@@ -1671,6 +1671,7 @@ namespace TerRoguelike.TerPlayer
             CreditsUI.itemsToDraw.Clear();
             deadTime = 0;
             creditsViewTime = 0;
+            escapeFail = false;
         }
         #endregion
 

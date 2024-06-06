@@ -454,8 +454,8 @@ Items: {
 		DisplayName: Protective Bubble
 		Tooltip:
 			'''
-			+50 diminishing DR after avoiding damage for 7 seconds
-			Extra copies of this item increase the diminishing DR by 50
+			+30 diminishing DR after avoiding damage for 7 seconds
+			Extra copies of this item increase the diminishing DR by 30
 			'''
 	}
 
