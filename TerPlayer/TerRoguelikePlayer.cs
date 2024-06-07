@@ -1110,6 +1110,31 @@ namespace TerRoguelike.TerPlayer
             moonLordVisualEffect = false;
             moonLordSkyEffect = false;
         }
+        public override void PostUpdateMiscEffects()
+        {
+            if (Player.pulley && TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                if (Player.pulleyDir == 2)
+                {
+                    if (Player.direction == -1 && Player.controlLeft)
+                    {
+                        Player.pulley = false;
+                        if (Player.velocity.X == 0)
+                        {
+                            Player.velocity.X = -1;
+                        }
+                    }
+                    else if (Player.direction == 1 && Player.controlRight)
+                    {
+                        Player.pulley = false;
+                        if (Player.velocity.X == 0)
+                        {
+                            Player.velocity.X = 1;
+                        }
+                    }
+                }
+            }
+        }
         #endregion
 
         #region On Hit Enemy
