@@ -1195,11 +1195,14 @@ namespace TerRoguelike.TerPlayer
             }
             if (bloodSiphon > 0)
             {
-                float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
-                int healAmt = (int)(bloodSiphon * multiplier);
-                if (healAmt < 1)
-                    healAmt = 1;
-                ScaleableHeal(healAmt);
+                if (ChanceRollWithLuck(0.5f, procLuck))
+                {
+                    float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
+                    int healAmt = (int)(bloodSiphon * multiplier);
+                    if (healAmt < 1)
+                        healAmt = 1;
+                    ScaleableHeal(healAmt);
+                }
             }
             if (enchantingEye > 0 && hit.Crit)
             {
@@ -1226,12 +1229,8 @@ namespace TerRoguelike.TerPlayer
 
             if (proj.type == ModContent.ProjectileType<ThrownBackupDagger>())
             {
-                if (ChanceRollWithLuck(0.5f, procLuck))
-                {
-                    int bleedDamage = 120;
-                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
-                }
-                
+                int bleedDamage = 120;
+                modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
             }
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
