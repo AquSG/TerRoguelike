@@ -56,7 +56,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 76;
             NPC.aiStyle = -1;
             NPC.damage = 36;
-            NPC.lifeMax = 15000;
+            NPC.lifeMax = 10000;
             NPC.HitSound = SoundID.NPCHit1;
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 0);

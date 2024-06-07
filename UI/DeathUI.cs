@@ -123,6 +123,7 @@ namespace TerRoguelike.UI
                                                      select x.Clone();
                     List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
                     PlayerLoader.SetStartInventory(player, startingItems);
+                    player.trashItem = new(ItemID.None, 0);
                     TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
                     TerRoguelikeMenu.wipeTempWorld = true;
                     TerRoguelikeMenu.prepareForRoguelikeGeneration = true;

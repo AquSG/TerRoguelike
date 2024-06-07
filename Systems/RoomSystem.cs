@@ -703,7 +703,7 @@ namespace TerRoguelike.Systems
                             continue;
 
                         TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
-                        modPlayer.ScaleableHeal((int)(player.statLifeMax2 / 2f));
+                        modPlayer.ScaleableHeal((int)(player.statLifeMax2 * 0.3f));
                         SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 1f });
                     }
                 }

@@ -370,7 +370,7 @@ namespace TerRoguelike.TerPlayer
 
             if (cornucopia > 0)
             {
-                float healMultiIncrease = (float)cornucopia;
+                float healMultiIncrease = cornucopia * 0.5f;
                 healMultiplier += healMultiIncrease;
                 Player.lifeRegen *= (int)(1f + healMultiIncrease);
             }
@@ -594,7 +594,8 @@ namespace TerRoguelike.TerPlayer
                         }
                         NPC.HitInfo info = new NPC.HitInfo();
                         info.HideCombatText = true;
-                        info.Damage = hitDamage;
+                        int actualHitDamage = hitDamage * 10;
+                        info.Damage = actualHitDamage;
                         info.InstantKill = false;
                         info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                         info.Knockback = 0f;
@@ -602,7 +603,7 @@ namespace TerRoguelike.TerPlayer
 
                         target.StrikeNPC(info);
                         NetMessage.SendStrikeNPC(target, info);
-                        CombatText.NewText(target.getRect(), Color.DarkGreen, hitDamage);
+                        CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
 
                         totalHealAmt += hitDamage;
                     }
@@ -848,7 +849,8 @@ namespace TerRoguelike.TerPlayer
                     }
                     NPC.HitInfo info = new NPC.HitInfo();
                     info.HideCombatText = true;
-                    info.Damage = hitDamage;
+                    int actualHitDamage = hitDamage * 10;
+                    info.Damage = actualHitDamage;
                     info.InstantKill = false;
                     info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                     info.Knockback = 0f;
@@ -856,7 +858,7 @@ namespace TerRoguelike.TerPlayer
 
                     target.StrikeNPC(info);
                     NetMessage.SendStrikeNPC(target, info);
-                    CombatText.NewText(target.getRect(), Color.DarkGreen, hitDamage);
+                    CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
 
                     allSeeingEyeHitCooldown += 30;
                     ScaleableHeal(hitDamage);
@@ -1220,7 +1222,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (bloodSiphon > 0)
             {
-                if (ChanceRollWithLuck(0.5f, procLuck))
+                if (ChanceRollWithLuck(0.25f, procLuck))
                 {
                     float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
                     int healAmt = (int)(bloodSiphon * multiplier);
