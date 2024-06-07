@@ -341,7 +341,7 @@ Items: {
 		DisplayName: Blood Siphon
 		Tooltip:
 			'''
-			+1 HP upon hitting enemies
+			50% chance upon hitting an enemy to heal for 1 HP
 			The healing amount is affected by bonus damage and main weapon damage multipliers
 			Extra copies of this item increase the healing amount by 1
 			'''
@@ -476,7 +476,7 @@ Items: {
 			'''
 			Stock up to 4 daggers while attacking
 			Stop attacking to release a flurry of all stocked daggers
-			Daggers home in on enemies, deal 100 base damage on hit, and have a 50% chance to inflict bleeding on hit
+			Daggers home in on enemies, deal 100 base damage on hit, and inflict bleeding on hit
 			Bleeding deals 120 base damage over a duration, which can be extended by inflicting bleeding again
 			Extra copies of this item make daggers stock faster, and increase the maximum daggers by 1
 			'''
