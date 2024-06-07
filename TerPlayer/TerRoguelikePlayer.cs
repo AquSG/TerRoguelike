@@ -372,7 +372,6 @@ namespace TerRoguelike.TerPlayer
             {
                 float healMultiIncrease = cornucopia * 0.5f;
                 healMultiplier += healMultiIncrease;
-                Player.lifeRegen *= (int)(1f + healMultiIncrease);
             }
             //max life effects happen before barrier calculations
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -463,7 +462,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (memoryFoam > 0 && outOfDangerTime >= 420)
             {
-                int regenIncrease = memoryFoam * 8;
+                int regenIncrease = 2 + (memoryFoam * 4);
                 Player.lifeRegen += regenIncrease;
             }
             if (runningShoe > 0)
@@ -935,6 +934,10 @@ namespace TerRoguelike.TerPlayer
                 Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
                 Player.GetDamage(DamageClass.Generic) *= finalDamageMultiplier;
             }
+            if (cornucopia > 0)
+            {
+                Player.lifeRegen = (int)((1f + healMultiplier) * Player.lifeRegen);
+            }
 
             if (!Player.GetJumpState(ExtraJump.CloudInABottle).Available && timesDoubleJumped < extraDoubleJumps)
             {
@@ -1387,7 +1390,7 @@ namespace TerRoguelike.TerPlayer
         {
             if (timesHaveBeenTougher > 0)
             {
-                float chance = (0.15f * timesHaveBeenTougher) / (0.15f * timesHaveBeenTougher + 1);
+                float chance = (0.17f * timesHaveBeenTougher) / ((0.17f * timesHaveBeenTougher + 1) * 1.8f);
 
                 if (ChanceRollWithLuck(chance, procLuck))
                 {

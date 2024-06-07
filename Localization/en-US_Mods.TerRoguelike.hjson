@@ -304,7 +304,7 @@ Items: {
 		DisplayName: Times Have Been Tougher
 		Tooltip:
 			'''
-			13% chance to block an incoming attack
+			8% chance to block an incoming attack
 			Extra copies of this item increase block chance by a diminishing amount
 			'''
 	}
@@ -418,8 +418,8 @@ Items: {
 		DisplayName: Memory Foam
 		Tooltip:
 			'''
-			+4 HP/s after avoiding damage for 7 seconds
-			Extra copies of this item increase the regen by +4 HP/s
+			+3 HP/s after avoiding damage for 7 seconds
+			Extra copies of this item increase the regen by +2 HP/s
 			'''
 	}
 
@@ -708,7 +708,7 @@ Items: {
 	}
 
 	ShotgunComponent: {
-		DisplayName: Shotgun Component
+		DisplayName: Shotgun Assembly Kit
 		Tooltip:
 			'''
 			4x main attacks per weapon use

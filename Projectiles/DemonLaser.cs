@@ -26,7 +26,7 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 4;
             Projectile.friendly = true;
             Projectile.ignoreWater = true;
-            Projectile.tileCollide = true;
+            Projectile.tileCollide = false;
             Projectile.timeLeft = 5400;
             Projectile.penetrate = 1;
             modProj = Projectile.ModProj();
