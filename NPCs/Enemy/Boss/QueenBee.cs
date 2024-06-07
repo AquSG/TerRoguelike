@@ -53,7 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public static Attack None = new Attack(0, 0, 75);
         public static Attack Shotgun = new Attack(1, 30, 224);
-        public static Attack BeeSwarm = new Attack(2, 20, 600);
+        public static Attack BeeSwarm = new Attack(2, 13, 600);
         public static Attack Charge = new Attack(3, 30, 230);
         public static Attack HoneyVomit = new Attack(4, 30, 80);
         public static Attack Summon = new Attack(5, 30, 110);
