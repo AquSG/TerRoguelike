@@ -168,8 +168,8 @@ Items: {
 		Tooltip:
 			'''
 			Enemies drop their soul as a healing orb on kill
-			The orb homes in towards the soul stealer and heals for 10% max life on contact
-			Extra copies of this item increase the healing amount by 5% max life
+			The orb homes in towards the soul stealer and heals for 8% max life on contact
+			Extra copies of this item increase the healing amount by 4% max life
 			'''
 	}
 
@@ -224,6 +224,7 @@ Items: {
 		Tooltip:
 			'''
 			+1 bounce for main projectiles
+			+15% projecitle damage after every bounce
 			Extra copies of this item also grant +1 bounce
 			'''
 	}
@@ -341,7 +342,7 @@ Items: {
 		DisplayName: Blood Siphon
 		Tooltip:
 			'''
-			50% chance upon hitting an enemy to heal for 1 HP
+			25% chance upon hitting an enemy to heal for 1 HP
 			The healing amount is affected by bonus damage and main weapon damage multipliers
 			Extra copies of this item increase the healing amount by 1
 			'''
@@ -351,8 +352,8 @@ Items: {
 		DisplayName: Cornucopia
 		Tooltip:
 			'''
-			+100% healing effectiveness
-			Extra copies of this item also grant +100% healing effectiveness
+			+50% healing effectiveness
+			Extra copies of this item also grant +50% healing effectiveness
 			'''
 	}
 
@@ -399,7 +400,7 @@ Items: {
 		DisplayName: Automatic Defibrillator
 		Tooltip:
 			'''
-			Every 20 seconds in an active room, summon a pulse that heals for 50% max life
+			Every 20 seconds in an active room, summon a pulse that heals for 30% max life
 			Extra copies of this item reduce the time needed by a diminishing amount
 			'''
 	}
@@ -564,6 +565,7 @@ Items: {
 			'''
 			Steal life from 1 enemy within 8 tiles of you
 			The amount of life you steal is equal to 2% of your max life and is affected by bonus damage
+			Enemies take 10x the amount of life you steal as damage
 			Extra copies of this item increase the amount of enemies that you can steal life from by 1
 			'''
 	}
@@ -644,6 +646,7 @@ Items: {
 			'''
 			Place your cursor on enemies to steal life from them
 			The amount of life you steal is equal to 2% of your max life and is affected by bonus damage
+			Enemies take 10x the amount of life you steal as damage
 			Extra copies of this item increase the healing amount by 2%
 			'''
 	}

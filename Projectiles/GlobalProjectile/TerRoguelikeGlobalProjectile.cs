@@ -53,7 +53,10 @@ namespace TerRoguelike.Projectiles
             {
                 modifiers.DamageVariationScale *= 0;
             }
-
+            if (modPlayer.bouncyBall > 0)
+            {
+                modifiers.SourceDamage *= 1 + (0.15f * bounceCount);
+            }
             
             //Crit inheritance and custom crit chance supported by proc luck
             if (procChainBools.critPreviously)

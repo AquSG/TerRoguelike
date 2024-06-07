@@ -119,7 +119,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.height = 150;
             NPC.aiStyle = -1;
             NPC.damage = 36;
-            NPC.lifeMax = 60000;
+            NPC.lifeMax = 40000;
             NPC.knockBackResist = 0f;
             modNPC.IgnoreRoomWallCollision = true;
             modNPC.OverrideIgniteVisual = true;
