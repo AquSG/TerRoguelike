@@ -36,6 +36,8 @@ namespace TerRoguelike.TerPlayer
 {
     public class TerRoguelikePlayer : ModPlayer
     {
+        public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
+
         #region Item Variables
         public int coolantBarrel;
         public int clingyGrenade;
@@ -1090,7 +1092,13 @@ namespace TerRoguelike.TerPlayer
                 DashDelay--;
                 if (DashDelay == 0)
                 {
-                    SoundEngine.PlaySound(SoundID.Item20 with { Volume = 0.8f });
+                    for (int i = 0; i < 20; i++)
+                    {
+                        Vector2 randVel = Main.rand.NextVector2Circular(6, 12) + Player.velocity;
+                        Dust.NewDustDirect(Player.Center + new Vector2(-8, -16), 16, 32, DustID.Torch, randVel.X, randVel.Y, 0, default, 1.3f);
+                    }
+                    
+                    SoundEngine.PlaySound(JetLegCooldown with { Volume = 0.9f });
                 }
             }
 
