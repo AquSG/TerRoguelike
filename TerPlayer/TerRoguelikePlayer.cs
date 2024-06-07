@@ -368,6 +368,12 @@ namespace TerRoguelike.TerPlayer
             }
             brainSucked = false;
 
+            if (cornucopia > 0)
+            {
+                float healMultiIncrease = (float)cornucopia;
+                healMultiplier += healMultiIncrease;
+                Player.lifeRegen *= (int)(1f + healMultiIncrease);
+            }
             //max life effects happen before barrier calculations
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
@@ -937,12 +943,6 @@ namespace TerRoguelike.TerPlayer
             {
                 Player.moveSpeed *= 1.30f;
                 Player.maxRunSpeed *= 1.30f;
-            }
-            if (cornucopia > 0)
-            {
-                float healMultiIncrease = (float)cornucopia;
-                healMultiplier += healMultiIncrease;
-                Player.lifeRegen *= (int)(1f + healMultiIncrease);
             }
 
             Player.jumpSpeedBoost += 5f * jumpSpeedMultiplier;
