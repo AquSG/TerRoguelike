@@ -49,7 +49,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void AI()
         {
             NPC.frameCounter += 0.2d;
-            modNPC.RogueTeleportingShooterAI(NPC, 96f, 240f, 360, attackTelegraph, attackCooldown, ModContent.ProjectileType<DesertSpiritCurse>(), 1f, Main.rand.NextVector2CircularEdge(48f, 48f), NPC.damage);
+            modNPC.RogueTeleportingShooterAI(NPC, 96f, 240f, 360, attackTelegraph, attackCooldown, ModContent.ProjectileType<DesertSpiritCurse>(), 1f, Main.rand.NextVector2CircularEdge(48f, 48f), NPC.damage, true);
             NPC.velocity *= 0.95f;
             if (NPC.ai[0] == 0)
             {
