@@ -220,6 +220,13 @@ namespace TerRoguelike.UI
                     }
                 }
             }
+
+            string timeHeaderString = Language.GetOrRegister("Mods.TerRoguelike.CreditTimeHeader").Value;
+            string runTime = modPlayer.playthroughTime.Elapsed.ToString();
+            runTime = runTime.Substring(1, 11);
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, timeHeaderString, screenPos + new Vector2(130, -251), Color.GreenYellow * opacity, 0f, Vector2.Zero, new Vector2(0.5f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, runTime, screenPos + new Vector2(130, -231), Color.GreenYellow * opacity, 0f, Vector2.Zero, new Vector2(0.5f));
+
             string deathMainMenu = Language.GetOrRegister("Mods.TerRoguelike.DeathMainMenu").Value;
             string deathQuickRestart = Language.GetOrRegister("Mods.TerRoguelike.DeathQuickRestart").Value;
             Texture2D finalMainMenuButtonTex = mainMenuHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
