@@ -224,7 +224,7 @@ Items: {
 		Tooltip:
 			'''
 			+1 bounce for main projectiles
-			+15% projecitle damage after every bounce
+			+15% projectile damage after every bounce
 			Extra copies of this item also grant +1 bounce
 			'''
 	}
@@ -367,7 +367,7 @@ Items: {
 	}
 
 	InstigatorsBrace: {
-		DisplayName: Instigator's Brace
+		DisplayName: Instigator's Gauntlet
 		Tooltip:
 			'''
 			Enemies take 75% bonus damage when above 90% life
@@ -641,7 +641,7 @@ Items: {
 	}
 
 	AllSeeingEye: {
-		DisplayName: All-Seeing Eye
+		DisplayName: Haemokinetic Grasp
 		Tooltip:
 			'''
 			Place your cursor on enemies to steal life from them
