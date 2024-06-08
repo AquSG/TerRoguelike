@@ -539,8 +539,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == IceFog.Id)
             {
                 Vector2 wantedPos = target == null ? spawnPos : target.Center + new Vector2(0, distanceAbove - 25);
-                if (wantedPos.Y > spawnPos.Y)
-                    wantedPos.Y = spawnPos.Y;
+                float attackStartYFloor = spawnPos.Y + 240;
+                if (wantedPos.Y > attackStartYFloor)
+                    wantedPos.Y = attackStartYFloor;
 
                 bool inRoom = true;
                 if (modNPC.isRoomNPC)
@@ -556,7 +557,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
 
                 float targetDist = 64f;
-                if (NPC.ai[1] <= 1 && (Math.Abs(NPC.Center.X - wantedPos.X) > targetDist || NPC.Center.Y > spawnPos.Y || !inRoom))
+                if (NPC.ai[1] <= 1 && (Math.Abs(NPC.Center.X - wantedPos.X) > targetDist || NPC.Center.Y > attackStartYFloor || !inRoom))
                 {
                     NPC.velocity *= 0.98f;
                     if (NPC.ai[1] == 1)

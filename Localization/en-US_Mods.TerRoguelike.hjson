@@ -121,6 +121,7 @@ Projectiles: {
 	PhantasmalDeathBeam.DisplayName: Phantasmal Death Beam
 	PhantasmalBoltShooter.DisplayName: Phantasmal Bolt
 	PhantasmalBarrier.DisplayName: Phantasmal Barrier
+	TrumpCardProjectile.DisplayName: Trump Card
 }
 
 Items: {
@@ -675,7 +676,8 @@ Items: {
 		Tooltip:
 			'''
 			+1 revive
-			Upon death, this item is consumed instead.
+			Upon death, this item is consumed instead, releasing 20 homing cards in a burst
+			Homing cards deal 300 base damage
 			You also gain some immunity frames, and heal to maximum health and barrier
 			Extra copies of this item grant +1 more revive
 			'''
