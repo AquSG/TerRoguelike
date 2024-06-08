@@ -427,6 +427,17 @@ namespace TerRoguelike.TerPlayer
             }
 
             if (deathEffectTimer > 0)
+                deathEffectTimer--;
+            if (deathEffectTimer == 1 && reviveDeathEffect)
+            {
+                ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 1f }, Player.Center), 2));
+                for (int i = 0; i < 20; i++)
+                {
+                    Vector2 projVel = Main.rand.NextVector2CircularEdge(4, 4) * Main.rand.NextFloat(0.5f, 1f);
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, projVel, ModContent.ProjectileType<TrumpCardProjectile>(), 300, 0.25f);
+                }
+            }
+            if (deathEffectTimer > 0)
                 return;
 
             //everything else
@@ -1561,6 +1572,10 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+            else
+            {
+                reviveDeathEffect = false;
+            }
             if (damageSource.SourceNPCIndex > -1 && damageSource.SourceNPCIndex < Main.maxNPCs)
             {
                 killerNPC = damageSource.SourceNPCIndex;
@@ -2383,7 +2398,8 @@ namespace TerRoguelike.TerPlayer
             Main.EntitySpriteDraw(ghostTex, Player.Center - Main.screenPosition + (offset), new Rectangle(0, frameHeight * frame, ghostTex.Width, frameHeight), Color.White * 0.5f * opacity, 0f, new Vector2(ghostTex.Width * 0.5f, (frameHeight * 0.5f)), 1f, SpriteEffects.None);
             Main.spriteBatch.End();
 
-            deathEffectTimer--;
+            if (!reviveDeathEffect)
+                deathEffectTimer--;
             if (deathEffectTimer <= 0)
             {
                 if (reviveDeathEffect)
