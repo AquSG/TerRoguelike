@@ -181,6 +181,7 @@ namespace TerRoguelike.TerPlayer
         public int creditsViewTime = 0;
         public bool isDeletableOnExit = false;
         public int teleporting = 0;
+        public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -1710,6 +1711,7 @@ namespace TerRoguelike.TerPlayer
             creditsViewTime = 0;
             escapeFail = false;
             barrierHealth = 0;
+            playthroughTime.Restart();
         }
         #endregion
 

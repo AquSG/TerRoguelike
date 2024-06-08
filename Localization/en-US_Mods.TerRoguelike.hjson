@@ -19,6 +19,7 @@ CreditSpecialThanks: Special Thanks
 CreditFinal: And Finally...
 CreditThankYou: Thank You
 CreditForPlaying: For Playing!
+CreditTimeHeader: Time:
 
 Projectiles: {
 	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile

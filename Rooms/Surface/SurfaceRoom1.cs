@@ -41,6 +41,15 @@ namespace TerRoguelike.Rooms
         {
             ClearSpecificProjectiles();
             CreditsSystem.StartCredits();
+            Player player = Main.LocalPlayer;
+            if (player != null)
+            {
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null)
+                {
+                    modPlayer.playthroughTime.Stop();
+                }
+            }
         }
         public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
         {
