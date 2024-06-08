@@ -1709,6 +1709,7 @@ namespace TerRoguelike.TerPlayer
             deadTime = 0;
             creditsViewTime = 0;
             escapeFail = false;
+            barrierHealth = 0;
         }
         #endregion
 

@@ -281,6 +281,8 @@ namespace TerRoguelike.UI
                         strings = [
                         "AquaSG",
                         "Potatostego",
+                        "Sagittariod",
+                        "Xyk"
                         ];
                         break;
                     case 5:
@@ -292,6 +294,7 @@ namespace TerRoguelike.UI
                         "Ultrakill",
                         "Undertale",
                         "Undertale Yellow",
+                        "Minecraft",
                         "Pixbay",
                         "Adobe Stock"
                         ];
@@ -411,7 +414,14 @@ namespace TerRoguelike.UI
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditTesting").Value;
                         headerColor = Color.MediumPurple;
                         strings = [
-                        "AquaSG"
+                        "AquaSG",
+                        "Potatostego",
+                        "Sagittariod",
+                        "Xyk",
+                        "Eddie Spaghetti",
+                        "Fabsol",
+                        "Kirn",
+                        "Memes",
                         ];
                         break;
                     case 8:
