@@ -28,6 +28,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -209,6 +210,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
+            bool hardMode = difficulty == Difficulty.BloodMoon;
+
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
             NPC.velocity *= 0.98f;
@@ -221,7 +224,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-
+                    if (hardMode)
+                        NPC.ai[1]++;
                 }
             }
 

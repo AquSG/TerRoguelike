@@ -24,6 +24,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -193,6 +194,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.localAI[0] < 0)
             {
+                bool hardMode = difficulty == Difficulty.BloodMoon;
+
                 target = modNPC.GetTarget(NPC);
 
                 if (NPC.localAI[0] == -cutsceneDuration)
@@ -217,7 +220,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.hide = false;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
-                    NPC.ai[1] = 90;
+                    if (!hardMode)
+                        NPC.ai[1] = 90;
+                    else
+                        NPC.ai[1] = -60;
                     NPC.ai[3] = 0;
                     NPC.ai[2] = Summon.Id;
                     enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
@@ -236,6 +242,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
+            bool hardMode = difficulty == Difficulty.BloodMoon;
+
             target = modNPC.GetTarget(NPC);
 
 
@@ -259,7 +267,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-
+                    if (hardMode)
+                        NPC.ai[1]++;
                 }
             }
 

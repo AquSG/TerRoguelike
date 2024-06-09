@@ -27,7 +27,7 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
-            Projectile.timeLeft = 5400;
+            Projectile.timeLeft = 240;
             Projectile.penetrate = 1;
             modProj = Projectile.ModProj();
         }
@@ -45,9 +45,9 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             float rot = Projectile.velocity.ToRotation();
-            Vector2 step = -Projectile.velocity / 30;
+            Vector2 step = -Projectile.velocity / 5;
             Vector2 off = Projectile.velocity;
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 5; i++)
             {
                 if (Main.rand.NextBool(3))
                     continue;
@@ -55,9 +55,9 @@ namespace TerRoguelike.Projectiles
                 Vector2 position = Main.rand.NextVector2FromRectangle(Projectile.getRect());
                 position += step * i + off;
                 ParticleManager.AddParticle(new Square(
-                    position, -Projectile.velocity.SafeNormalize(Vector2.UnitY), 15, Color.Lerp(Color.MediumPurple, Color.Magenta, 0.4f), new Vector2(1.5f), rot, 1f, 15, false));
+                    position, -Projectile.velocity.SafeNormalize(Vector2.UnitY), 15, Color.Lerp(Color.MediumPurple, Color.Magenta, 0.4f), new Vector2(2.5f, 1.5f), rot, 1f, 15, false));
                 ParticleManager.AddParticle(new Square(
-                    position, -Projectile.velocity.SafeNormalize(Vector2.UnitY), 15, Color.White, new Vector2(0.4f), rot, 1f, 15, true));
+                    position, -Projectile.velocity.SafeNormalize(Vector2.UnitY), 15, Color.White, new Vector2(0.9f, 0.6f), rot, 1f, 15, true));
             }
         }
         

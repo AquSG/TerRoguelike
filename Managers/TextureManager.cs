@@ -169,6 +169,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainDeathFrames",
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainGoreFrames",
                 "TerRoguelike/UI/QuestionMark",
+                "TerRoguelike/MainMenu/UiMoon",
             };
             foreach (string path in pathList)
             {

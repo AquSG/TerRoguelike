@@ -30,7 +30,7 @@ namespace TerRoguelike.UI
 {
     public static class CreditsUI
     {
-        private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex;
+        private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex, moonTex;
         private static Vector2 mainMenuButtonOffset = new Vector2(-200, 206);
         private static Vector2 restartButtonOffset = new Vector2(200, 206);
         public static List<Item> itemsToDraw;
@@ -42,6 +42,7 @@ namespace TerRoguelike.UI
             baseUITex = TexDict["DeathUI"];
             mainMenuButtonTex = TexDict["MenuButton"];
             mainMenuButtonHoverTex = TexDict["MenuButtonHover"];
+            moonTex = TexDict["UiMoon"];
             itemsToDraw = new List<Item>();
             Reset();
         }
@@ -49,7 +50,7 @@ namespace TerRoguelike.UI
         internal static void Unload()
         {
             Reset();
-            baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = null;
+            baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = moonTex = null;
             itemsToDraw = null;
         }
 
@@ -226,6 +227,15 @@ namespace TerRoguelike.UI
             runTime = runTime.Substring(1, 11);
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, timeHeaderString, screenPos + new Vector2(130, -251), Color.GreenYellow * opacity, 0f, Vector2.Zero, new Vector2(0.5f));
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, runTime, screenPos + new Vector2(130, -231), Color.GreenYellow * opacity, 0f, Vector2.Zero, new Vector2(0.5f));
+
+            string difficultyString = Language.GetOrRegister("Mods.TerRoguelike.MenuDifficulty").Value;
+            Vector2 difficultyStringDimensions = font.MeasureString(difficultyString);
+            Vector2 difficultyStringDrawPos = screenPos + new Vector2(-360, 100);
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, difficultyString, difficultyStringDrawPos, Color.Tomato * opacity, 0f, Vector2.Zero, new Vector2(0.6f));
+
+            int moonFrameHeight = moonTex.Height / 3;
+            Rectangle moonFrame = new Rectangle(0, moonFrameHeight * (int)TerRoguelikeMenu.difficulty, moonTex.Width, moonFrameHeight - 2);
+            Main.EntitySpriteDraw(moonTex, difficultyStringDrawPos + new Vector2(12 + difficultyStringDimensions.X * 0.6f, -12), moonFrame, Color.White * opacity, 0, Vector2.Zero, 1f, SpriteEffects.None);
 
             string deathMainMenu = Language.GetOrRegister("Mods.TerRoguelike.DeathMainMenu").Value;
             string deathQuickRestart = Language.GetOrRegister("Mods.TerRoguelike.DeathQuickRestart").Value;

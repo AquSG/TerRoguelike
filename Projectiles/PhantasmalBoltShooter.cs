@@ -27,6 +27,7 @@ namespace TerRoguelike.Projectiles
         public int maxTimeLeft;
         public int LaserActivateTime = 40;
         public Entity target = null;
+        public bool playShootSound = true;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = 4;
@@ -48,6 +49,8 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnSpawn(IEntitySource source)
         {
+            if (Projectile.ai[0] == 1)
+                playShootSound = false;
             Projectile.rotation = Projectile.velocity.ToRotation();
             Projectile.ai[0] = Projectile.velocity.Length();
             Projectile.velocity = Vector2.Zero;
@@ -70,7 +73,7 @@ namespace TerRoguelike.Projectiles
             }
             if (time >= 20 && shootingTime < 0)
             {
-                if (time == 20)
+                if (playShootSound && time == 20)
                 {
                     SoundEngine.PlaySound(SoundID.Item13 with { Volume = 1f, Pitch = 0.2f, PitchVariance = 0, MaxInstances = 4 }, Projectile.Center);
                 }
@@ -94,7 +97,7 @@ namespace TerRoguelike.Projectiles
             }
             if (shootingTime >= 0 && shootingTime % 8 == 0 && Projectile.timeLeft > 20)
             {
-                if (shootingTime / 8 % 2 == 0)
+                if (playShootSound && shootingTime / 8 % 2 == 0)
                 {
                     SoundEngine.PlaySound(SoundID.Item125 with { Volume = 0.6f , MaxInstances = 8, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, Projectile.Center);
                 }

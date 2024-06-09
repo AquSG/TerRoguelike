@@ -1044,6 +1044,8 @@ namespace TerRoguelike.Systems
             quakeTime = 0;
             quakeCooldown = 0;
             postDrawEverythingCache.Clear();
+
+            TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
         }
         public override void SetStaticDefaults()
         {

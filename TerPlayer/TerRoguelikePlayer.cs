@@ -31,11 +31,14 @@ using Terraria.GameInput;
 using TerRoguelike.Schematics;
 using System.Diagnostics;
 using TerRoguelike.NPCs.Enemy.Boss;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.TerPlayer
 {
     public class TerRoguelikePlayer : ModPlayer
     {
+        public static float BloodMoonIframeMultiplier = 0.75f;
+        public static float NewMoonIframeMultiplier = 1.5f;
         public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
 
         #region Item Variables
@@ -320,6 +323,9 @@ namespace TerRoguelike.TerPlayer
                 Player.runSlowdown *= 1.75f;
                 Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
                 Player.lifeRegen += 4;
+                if (NewMoonActive)
+                    Player.lifeRegen += 4;
+
                 Player.lifeRegenTime = 0;
                 if (Player.controlDown)
                 {
@@ -370,7 +376,6 @@ namespace TerRoguelike.TerPlayer
                     brainSucklerTime++;
             }
             brainSucked = false;
-
             if (cornucopia > 0)
             {
                 float healMultiIncrease = cornucopia * 0.5f;
@@ -493,6 +498,10 @@ namespace TerRoguelike.TerPlayer
             {
                 float drIncrease = protectiveBubble * 30f;
                 diminishingDR += drIncrease;
+            }
+            if (NewMoonActive)
+            {
+                diminishingDR += 30;
             }
 
             if (evilEye > 0)
@@ -1417,9 +1426,18 @@ namespace TerRoguelike.TerPlayer
                     string blocked = Language.GetOrRegister("Mods.TerRoguelike.BlockedAlert").Value;
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.1f }, Player.Center);
                     CombatText.NewText(Player.getRect(), Color.LightGray, blocked);
+                    int addImmuneTime = 40;
+                    if (BloodMoonActive)
+                    {
+                        addImmuneTime = (int)(addImmuneTime * BloodMoonIframeMultiplier);
+                    }
+                    else if (NewMoonActive)
+                    {
+                        addImmuneTime = (int)(addImmuneTime * NewMoonIframeMultiplier);
+                    }
                     for (int i = -1; i < 5; i++)
                     {
-                        Player.AddImmuneTime(i, 40);
+                        Player.AddImmuneTime(i, addImmuneTime);
                     }
                     Player.immune = true;
                     dodgeAttack = true;
@@ -1473,6 +1491,14 @@ namespace TerRoguelike.TerPlayer
             SoundEngine.PlaySound(soundStyle, Player.Center);
             barrierHealth -= damageToBarrier;
             int addImmuneTime = fullHitDamage == 1 ? 20 : 40;
+            if (BloodMoonActive)
+            {
+                addImmuneTime = (int)(addImmuneTime * BloodMoonIframeMultiplier);
+            }
+            else if (NewMoonActive)
+            {
+                addImmuneTime = (int)(addImmuneTime * NewMoonIframeMultiplier);
+            }
             for (int i = -1; i < 5; i++)
             {
                 Player.AddImmuneTime(i, addImmuneTime);
@@ -1528,6 +1554,22 @@ namespace TerRoguelike.TerPlayer
         }
         public override void PostHurt(Player.HurtInfo info)
         {
+            if (BloodMoonActive)
+            {
+                Player.immuneTime = (int)(Player.immuneTime * BloodMoonIframeMultiplier);
+                for (int i = 0; i < Player.hurtCooldowns.Length; i++)
+                {
+                    Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * BloodMoonIframeMultiplier);
+                }
+            }
+            if (NewMoonActive)
+            {
+                Player.immuneTime = (int)(Player.immuneTime * NewMoonIframeMultiplier);
+                for (int i = 0; i < Player.hurtCooldowns.Length; i++)
+                {
+                    Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * NewMoonIframeMultiplier);
+                }
+            }
             if (soulOfLena > 0)
             {
                 if (soulOfLenaUses < soulOfLena && Player.statLife / (float)Player.statLifeMax2 <= 0.25f)
@@ -1576,6 +1618,10 @@ namespace TerRoguelike.TerPlayer
             {
                 reviveDeathEffect = false;
             }
+
+            if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+                return true;
+
             if (damageSource.SourceNPCIndex > -1 && damageSource.SourceNPCIndex < Main.maxNPCs)
             {
                 killerNPC = damageSource.SourceNPCIndex;

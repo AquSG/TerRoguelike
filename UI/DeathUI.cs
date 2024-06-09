@@ -29,7 +29,7 @@ namespace TerRoguelike.UI
 {
     public static class DeathUI
     {
-        private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex, questionMarkTex;
+        private static Texture2D baseUITex, mainMenuButtonTex, mainMenuButtonHoverTex, questionMarkTex, moonTex;
         private static Vector2 mainMenuButtonOffset = new Vector2(-200, 206);
         private static Vector2 restartButtonOffset = new Vector2(200, 206);
         public static List<Item> itemsToDraw;
@@ -41,6 +41,7 @@ namespace TerRoguelike.UI
             mainMenuButtonTex = TexDict["MenuButton"];
             mainMenuButtonHoverTex = TexDict["MenuButtonHover"];
             questionMarkTex = TexDict["QuestionMark"];
+            moonTex = TexDict["UiMoon"];
             itemsToDraw = new List<Item>();
             Reset();
         }
@@ -48,7 +49,7 @@ namespace TerRoguelike.UI
         internal static void Unload()
         {
             Reset();
-            baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = questionMarkTex = null;
+            baseUITex = mainMenuButtonTex = mainMenuButtonHoverTex = questionMarkTex = moonTex = null;
             itemsToDraw = null;
         }
 
@@ -231,14 +232,25 @@ namespace TerRoguelike.UI
                     }
                 }
             }
+
+            var deathFont = FontAssets.DeathText.Value;
+            string difficultyString = Language.GetOrRegister("Mods.TerRoguelike.MenuDifficulty").Value;
+            Vector2 difficultyStringDimensions = deathFont.MeasureString(difficultyString);
+            Vector2 difficultyStringDrawPos = screenPos + new Vector2(-360, 100);
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, deathFont, difficultyString, difficultyStringDrawPos, Color.Tomato * opacity, 0f, Vector2.Zero, new Vector2(0.6f));
+
+            int moonFrameHeight = moonTex.Height / 3;
+            Rectangle moonFrame = new Rectangle(0, moonFrameHeight * (int)TerRoguelikeMenu.difficulty, moonTex.Width, moonFrameHeight - 2);
+            Main.EntitySpriteDraw(moonTex, difficultyStringDrawPos + new Vector2(12 + difficultyStringDimensions.X * 0.6f, -12), moonFrame, Color.White * opacity, 0, Vector2.Zero, 1f, SpriteEffects.None);
+
             string deathMainMenu = Language.GetOrRegister("Mods.TerRoguelike.DeathMainMenu").Value;
             string deathQuickRestart = Language.GetOrRegister("Mods.TerRoguelike.DeathQuickRestart").Value;
             Texture2D finalMainMenuButtonTex = mainMenuHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
             Texture2D finalRestartButtonTex = restartHover ? mainMenuButtonHoverTex : mainMenuButtonTex;
             spriteBatch.Draw(finalMainMenuButtonTex, screenPos + mainMenuButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathMainMenu, screenPos + mainMenuButtonOffset, (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, mainMenuButtonTex.Size() * new Vector2(0.4f, 0.3f), new Vector2(mainMenuHover ? 1f : 0.9f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, deathFont, deathMainMenu, screenPos + mainMenuButtonOffset, (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, mainMenuButtonTex.Size() * new Vector2(0.4f, 0.3f), new Vector2(mainMenuHover ? 1f : 0.9f));
             spriteBatch.Draw(finalRestartButtonTex, screenPos + restartButtonOffset, null, Color.White * opacity, 0f, mainMenuButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathQuickRestart, screenPos + restartButtonOffset, (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, mainMenuButtonTex.Size() * new Vector2(0.48f, 0.3f), new Vector2(restartHover ? 1f : 0.9f));
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, deathFont, deathQuickRestart, screenPos + restartButtonOffset, (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity, 0f, mainMenuButtonTex.Size() * new Vector2(0.48f, 0.3f), new Vector2(restartHover ? 1f : 0.9f));
         }
         #endregion
     }

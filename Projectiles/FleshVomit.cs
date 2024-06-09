@@ -89,9 +89,11 @@ namespace TerRoguelike.Projectiles
                 scale *= interpolant;
             }
                 
-
-            ParticleManager.AddParticle(new Blood(Projectile.Center + Projectile.velocity, velocity, time, Color.Black * 1f, scale, velocity.ToRotation(), false));
-            ParticleManager.AddParticle(new Blood(Projectile.Center + Projectile.velocity, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
+            if (!Main.rand.NextBool(3))
+            {
+                ParticleManager.AddParticle(new Blood(Projectile.Center + Projectile.velocity, velocity, time, Color.Black * 1f, scale, velocity.ToRotation(), false));
+                ParticleManager.AddParticle(new Blood(Projectile.Center + Projectile.velocity, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
+            }
         }
         public override void OnKill(int timeLeft)
         {
