@@ -439,6 +439,7 @@ namespace TerRoguelike.UI
                         "Fabsol",
                         "Kirn",
                         "Memes",
+                        "Spider Mod",
                         ];
                         break;
                     case 8:

@@ -57,7 +57,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static Attack BeeSwarm = new Attack(2, 13, 600);
         public static Attack Charge = new Attack(3, 30, 230);
         public static Attack HoneyVomit = new Attack(4, 30, 80);
-        public static Attack Summon = new Attack(5, 30, 110);
+        public static Attack Summon = new Attack(5, 20, 110);
         public int shotgunFireRate = 24;
         public float shotgunRecoilInterpolant = 0;
         public Vector2 shotgunRecoilAnchorPos = Vector2.Zero;
@@ -163,6 +163,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.localAI[3] = 0;
+            if (modNPC.isRoomNPC)
+            {
+                int checkType = ModContent.NPCType<Hornet>();
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.life <= 0 || npc.friendly || npc.ModNPC() == null)
+                        continue;
+                    if (npc.type == checkType && npc.ModNPC().sourceRoomListID == modNPC.sourceRoomListID)
+                    {
+                        NPC.localAI[3]++;
+                    }
+                }
+            }
+
             NPC.frameCounter += 0.25d;
 
             if (deadTime > 0)
@@ -654,6 +670,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             List<Attack> potentialAttacks = new List<Attack>() { Shotgun, BeeSwarm, Charge, HoneyVomit, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
+            if (NPC.localAI[3] > 0)
+            {
+                potentialAttacks.RemoveAll(x => x.Id == Summon.Id);
+            }
 
             int totalWeight = 0;
             for (int i = 0; i < potentialAttacks.Count; i++)
