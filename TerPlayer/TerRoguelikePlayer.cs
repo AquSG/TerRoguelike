@@ -1266,7 +1266,7 @@ namespace TerRoguelike.TerPlayer
             if (enchantingEye > 0 && hit.Crit)
             {
                 float multiplier = PlayerBaseDamageMultiplier * previousBonusDamageMulti * proj.ModProj().notedBoostedDamage;
-                int healAmt = (int)(enchantingEye * 4 * multiplier);
+                int healAmt = (int)(1 + enchantingEye * 2 * multiplier);
                 if (healAmt < 1)
                     healAmt = 1;
                 ScaleableHeal(healAmt);

@@ -246,9 +246,9 @@ Items: {
 		Tooltip:
 			'''
 			5% increased critical strike chance
-			+4 HP upon critically striking enemies
+			+3 HP upon critically striking enemies
 			The healing amount is affected by bonus damage and main weapon damage multipliers
-			Extra copies of this item increase the healing amount by 4
+			Extra copies of this item increase the healing amount by 2
 			'''
 	}
 
