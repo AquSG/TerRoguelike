@@ -23,6 +23,7 @@ namespace TerRoguelike.Systems
 {
     public class TerRoguelikeWorldManagementSystem : ModSystem
     {
+        public static bool currentlyGeneratingTerRoguelikeWorld = false;
         public static bool GenDebugWorld = false;
         //int taskCounter = 0;
         public override void PreWorldGen()
@@ -41,6 +42,8 @@ namespace TerRoguelike.Systems
                 tasks.RemoveAll(x => x.Name != "Reset");
                 tasks.Add(new PassLegacy("Building the Map", (progress, config) =>
                 {
+                    currentlyGeneratingTerRoguelikeWorld = true;
+
                     progress.CurrentPassWeight = 1;
                     progress.Value = 0;
                     progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;

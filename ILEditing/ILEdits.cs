@@ -49,6 +49,7 @@ namespace TerRoguelike.ILEditing
             On_PlayerDrawLayers.DrawPlayer_04_ElectrifiedDebuffBack += EditElectrifiedDisplayCondition1;
             On_PlayerDrawLayers.DrawPlayer_34_ElectrifiedDebuffFront += EditElectrifiedDisplayCondition2;
             On_WorldGen.UpdateWorld_UndergroundTile += FuckUnderGroundUpdating;
+            IL_Main.DrawMenu += DrawTerRogulikeMenuInjection;
             On_Main.DrawMenu += On_Main_DrawMenu;
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
@@ -57,10 +58,10 @@ namespace TerRoguelike.ILEditing
             On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
             IL_Main.DoDraw += IL_Main_DoDraw;
-            IL_Player.Update += IL_Player_Update;
+            IL_Player.Update += RopeMovementILEdit;
         }
 
-        private void IL_Player_Update(ILContext il)
+        private void RopeMovementILEdit(ILContext il)
         {
             ILCursor cursor = new(il);
             if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdcR4(0.02f)))
@@ -473,9 +474,27 @@ namespace TerRoguelike.ILEditing
 		{
 			TerRoguelikeMenu.TerRoguelikeMenuInteractionLogic();
 			orig.Invoke(self, gameTime);
-            Main.spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
-            TerRoguelikeMenu.DrawTerRoguelikeMenu();
-			Main.spriteBatch.End();
+        }
+        private void DrawTerRogulikeMenuInjection(ILContext il)
+        {
+            ILCursor cursor = new(il);
+
+            if (!cursor.TryGotoNext(MoveType.Before, i => i.MatchCall<Main>("DrawThickCursor")))
+            {
+                TerRoguelike.Instance.Logger.Warn("Failed to find DrawThickCursor in Main.DrawMenu");
+                return;
+            }
+
+            cursor.EmitDelegate<Action>(() =>
+            {
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, Main.Rasterizer, null, Main.UIScaleMatrix);
+
+                TerRoguelikeMenu.DrawTerRoguelikeMenu();
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, Main.SamplerStateForCursor, DepthStencilState.None, RasterizerState.CullCounterClockwise, null, Main.UIScaleMatrix);
+            });
         }
 
         private void FuckUnderGroundUpdating(On_WorldGen.orig_UpdateWorld_UndergroundTile orig, int i, int j, bool checkNPCSpawns, int wallDist)

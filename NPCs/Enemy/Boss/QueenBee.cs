@@ -23,6 +23,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.ExtraSoundSystem;
 using Terraria.GameContent.Animations;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -214,6 +215,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
+            bool hardMode = difficulty == Difficulty.BloodMoon;
+
             target = modNPC.GetTarget(NPC);
 
             NPC.ai[1]++;
@@ -223,7 +226,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 UpdateDirection();
 
-                if (NPC.ai[1] == None.Duration)
+                if (NPC.ai[1] >= None.Duration)
                 {
                     Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
                     if (room != null)
@@ -242,6 +245,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
+                    if (hardMode && Math.Abs(NPC.rotation) < 0.1f && NPC.ai[1] < None.Duration - 2)
+                    {
+                        NPC.ai[1]++;
+                    }
+                        
+
                     if (target != null)
                     {
                         Vector2 targetPos = target.Center + new Vector2(0, -240);

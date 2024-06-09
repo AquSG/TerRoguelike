@@ -20,6 +20,16 @@ CreditFinal: And Finally...
 CreditThankYou: Thank You
 CreditForPlaying: For Playing!
 CreditTimeHeader: Time:
+MenuPlayTerRoguelike: Play TerRoguelike
+MenuDifficulty: Difficulty:
+NewMoonName: New Moon
+NewMoonDescription1: Turn things down a notch
+NewMoonDescription2: Increased hurt immune time, take reduced damage, increased natural life regen
+FullMoonName: Full Moon
+FullMoonDescription: The intended TerRoguelike experience
+BloodMoonName: Blood Moon
+BloodMoonDescription1: Turn things up a notch
+BloodMoonDescription2: Decreased hurt immune time, bosses attack more often
 
 Projectiles: {
 	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile

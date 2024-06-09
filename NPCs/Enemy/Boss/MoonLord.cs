@@ -30,6 +30,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -493,6 +494,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
+            bool hardMode = difficulty == Difficulty.BloodMoon;
+
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
 
@@ -508,6 +511,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
+                    if (hardMode)
+                        NPC.ai[1]++;
+
                     leftHandTargetPos = leftHandAnchor;
                     rightHandTargetPos = rightHandAnchor;
                 }
@@ -1456,6 +1462,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            bool hardMode = difficulty == Difficulty.BloodMoon;
+
             bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;
             bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;
             bool headAlive = headWho >= 0 && Main.npc[headWho].life > 1;
@@ -1472,7 +1480,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == None.Id)
             {
-                sharedFrame = (int)(NPC.ai[1] * 0.125f);
+                float rate = 0.125f;
+                if (hardMode)
+                    rate *= 0.5f;
+                sharedFrame = (int)(NPC.ai[1] * rate);
             }
             else if (NPC.ai[0] == PhantBolt.Id && NPC.ai[1] >= (phantBoltWindup + phantBoltFiringDuration) * 2)
             {

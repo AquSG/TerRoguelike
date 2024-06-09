@@ -29,6 +29,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -526,6 +527,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
+            bool hardMode = difficulty == Difficulty.BloodMoon;
+
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
             if (teleportAttackCooldown > 0)
@@ -540,10 +543,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else
                 {
                     DefaultMovement();
+                        
                     if (NPC.ai[1] == None.Duration - teleportMoveTimestamp + 1)
                     {
                         teleportTargetPos = new Vector2(-1);
                         NPC.ai[3] = 1;
+                    }
+
+                    if (hardMode)
+                    {
+                        if (NPC.ai[3] == 0)
+                        {
+                            NPC.ai[1]++;
+                        }
                     }
                 }
             }
@@ -935,6 +947,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             rot += -NPC.direction * (Main.rand.NextFloat(-1.2f, 1.2f) + MathHelper.PiOver2);
                             Vector2 rotVect = rot.ToRotationVector2();
                             Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0);
+
+                            if (hardMode)
+                            {
+                                radius *= 2.7f;
+                                rot = (targetPos - NPC.Center - innerEyePosition).ToRotation();
+                                rot += -NPC.direction * (Main.rand.NextFloat(-0.8f, 0.8f) - MathHelper.PiOver2 * 1.12f);
+                                rotVect = rot.ToRotationVector2();
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0, -1, 1);
+                            }
                         }
                     }
                 }
