@@ -227,6 +227,12 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new LunarPillarRoomBottomRight());
             RoomID.Add(new SanctuaryRoom1());
             RoomID.Add(new SurfaceRoom1());
+            RoomID.Add(new BaseEnemyRoom8Down());
+            RoomID.Add(new BaseEnemyRoom8Up());
+            RoomID.Add(new BaseEnemyRoom9());
+            RoomID.Add(new ForestEnemyRoom7());
+            RoomID.Add(new ForestEnemyRoom7Down());
+            RoomID.Add(new ForestEnemyRoom8Up());
 
             for (int i = 0; i < RoomID.Count; i++)
             {

@@ -26,7 +26,7 @@ namespace TerRoguelike.Rooms
             AddRoomNPC(MakeEnemySpawnPos(BottomRight, -4, -3), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(TopLeft, 9, 28), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(TopRight, -5, 19), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
-            AddRoomNPC(MakeEnemySpawnPos(Bottom, 0, -13), ChooseEnemy(AssociatedFloor, 2), 180, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(Top, 0, 13), ChooseEnemy(AssociatedFloor, 2), 180, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(Center, 0, 1), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(BottomLeft, 3, -21), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
         }
