@@ -291,7 +291,8 @@ namespace TerRoguelike.UI
                         headerString = Language.GetOrRegister("Mods.TerRoguelike.CreditRoomBuilding").Value;
                         headerColor = Color.Lerp(Color.Brown, Color.White, 0.35f);
                         strings = [
-                        "AquaSG"
+                        "AquaSG",
+                        "Sagittariod"
                         ];
                         break;
                     case 4:
