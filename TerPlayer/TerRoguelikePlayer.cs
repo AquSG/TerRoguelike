@@ -32,6 +32,7 @@ using TerRoguelike.Schematics;
 using System.Diagnostics;
 using TerRoguelike.NPCs.Enemy.Boss;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using Terraria.WorldBuilding;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -1444,14 +1445,6 @@ namespace TerRoguelike.TerPlayer
                 }
             }
 
-            if (diminishingDR != 0f)
-            {
-                if (diminishingDR > 0)
-                    modifiers.SourceDamage *= (100f / (100f + diminishingDR));
-                else
-                    modifiers.SourceDamage *= 2 - (100f / (100f - diminishingDR));
-            }
-
             modifiers.ModifyHurtInfo += ModifyHurtInfo_TerRoguelike;
         }
         private void ModifyHurtInfo_TerRoguelike(ref Player.HurtInfo info)
@@ -1461,6 +1454,17 @@ namespace TerRoguelike.TerPlayer
                 int reductedDamage = 3 + (flimsyPauldron - 1) * 2;
                 info.Damage -= reductedDamage;
             }
+
+            float damageMultiplierFromDR = 1;
+            if (diminishingDR != 0f)
+            {
+                if (diminishingDR > 0)
+                    damageMultiplierFromDR *= (100f / (100f + diminishingDR));
+                else
+                    damageMultiplierFromDR *= 2 - (100f / (100f - diminishingDR));
+            }
+            info.Damage = (int)(info.Damage * damageMultiplierFromDR);
+
             if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)
             {
                 int preBarrierDamage = info.Damage;
