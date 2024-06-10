@@ -15,6 +15,7 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -42,25 +43,35 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.5f;
             modNPC.drawCenter = new Vector2(0, -4);
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            NPC.localAI[0] = -30;
+        }
         public override void AI()
         {
-            modNPC.RogueTeleportingShooterAI(NPC, 96f, 240f, 570, attackTelegraph, attackCooldown, ModContent.ProjectileType<ShadowBlast>(), 0.4f, new Vector2(16 * NPC.direction, -20), NPC.damage, true, true);
+            if (NPC.localAI[0] < 0)
+                NPC.localAI[0]++;
+            else
+            {
+                modNPC.RogueTeleportingShooterAI(NPC, 96f, 240f, 570, attackTelegraph, attackCooldown, ModContent.ProjectileType<ShadowBlast>(), 0.4f, new Vector2(16 * NPC.direction, -20), NPC.damage, true, true);
+                if (NPC.ai[0] == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
+                    for (int i = 0; i < 50; i++)
+                    {
+                        int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.ShadowbeamStaff, 0f, 0f, 100, default(Color), 1.8f);
+                        Dust dust = Main.dust[d];
+                        dust.velocity *= 3f;
+                        dust.noGravity = true;
+                        dust.noLight = true;
+                        dust.noLightEmittence = true;
+                    }
+                }
+            }
 
             NPC.velocity.X *= 0.8f;
 
-            if (NPC.ai[0] == 0)
-            {
-                SoundEngine.PlaySound(SoundID.Item8 with { Volume = 1f }, NPC.Center);
-                for (int i = 0; i < 50; i++)
-                {
-                    int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.ShadowbeamStaff, 0f, 0f, 100, default(Color), 1.8f);
-                    Dust dust = Main.dust[d];
-                    dust.velocity *= 3f;
-                    dust.noGravity = true;
-                    dust.noLight = true;
-                    dust.noLightEmittence = true;
-                }
-            }
+            
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
@@ -87,7 +98,7 @@ namespace TerRoguelike.NPCs.Enemy
             
         public override void FindFrame(int frameHeight)
         {
-            int currentFrame = NPC.ai[0] % (attackCooldown + attackTelegraph) <= attackTelegraph ? 1 : 0;
+            int currentFrame = NPC.ai[0] % (attackCooldown + attackTelegraph) <= attackTelegraph && NPC.localAI[0] >= 0 ? 1 : 0;
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
         }
         public override bool CanHitNPC(NPC target) => false;

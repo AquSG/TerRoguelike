@@ -443,7 +443,6 @@ namespace TerRoguelike.Managers
         public void Descend(Player player)
         {
             var modPlayer = player.ModPlayer();
-            modPlayer.teleporting = 5;
             int nextStage = !IsSanctuary ? modPlayer.currentFloor.Stage + 1 : TerRoguelikeWorld.currentStage;
             if (nextStage >= RoomManager.FloorIDsInPlay.Count) // if FloorIDsInPlay overflows, send back to the start
             {
@@ -504,7 +503,6 @@ namespace TerRoguelike.Managers
         public virtual void Ascend(Player player)
         {
             var modPlayer = player.ModPlayer();
-            modPlayer.teleporting = 5;
             int nextStage = modPlayer.currentFloor.Stage - 1;
             if (nextStage < 0) // if FloorIDsInPlay underflows, send back to the start
             {

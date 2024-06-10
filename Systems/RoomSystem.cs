@@ -36,6 +36,7 @@ using Terraria.GameInput;
 using TerRoguelike.Particles;
 using TerRoguelike.NPCs.Enemy.Boss;
 using Terraria.Graphics.Effects;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace TerRoguelike.Systems
 {
@@ -763,6 +764,11 @@ namespace TerRoguelike.Systems
             if (chainList.Count == 0)
                 return;
 
+            int vortex = ModContent.NPCType<VortexPillar>();
+            int nebula = ModContent.NPCType<NebulaPillar>();
+            int stardust = ModContent.NPCType<StardustPillar>();
+            int solar = ModContent.NPCType<SolarPillar>();
+
             for (int i = 0; i < chainList.Count; i++)
             {
                 Chain chain = chainList[i];
@@ -791,7 +797,7 @@ namespace TerRoguelike.Systems
                 }
                 if (chain.AttachedNPC != -1)
                 {
-                    if (!Main.npc[chain.AttachedNPC].active)
+                    if (!Main.npc[chain.AttachedNPC].active || !PillarTypeCheck(Main.npc[chain.AttachedNPC].type))
                     {
                         chain.TimeLeft--;
                         chain.AttachedNPC = -1;
@@ -803,6 +809,11 @@ namespace TerRoguelike.Systems
                 }
             }
             chainList.RemoveAll(x => x.TimeLeft <= 0);
+
+            bool PillarTypeCheck(int type)
+            {
+                return type == vortex || type == nebula || type == stardust || type == solar;
+            }
         }
         public static void DrawChains()
         {

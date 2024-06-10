@@ -919,15 +919,5 @@ Configs: {
 				If disabled, all player and world files used while playing TerRoguelike Mode are sent to the recycle bin.
 				'''
 		}
-
-		TileFramingOptimization: {
-			Label: Tile Framing Optimization
-			Tooltip:
-				'''
-				If enabled, greatly reduces the duration of lag spikes when loading new areas of the world ingame while playing TerRoguelike Mode.
-				Rarely can cause your game to instantly close itself.
-				Disable to go back to the vanilla tile framing code, and have no risk of this optimization closing the game.
-				'''
-		}
 	}
 }
