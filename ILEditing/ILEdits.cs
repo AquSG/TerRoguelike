@@ -55,7 +55,6 @@ namespace TerRoguelike.ILEditing
             On_NPC.UpdateCollision += On_NPC_UpdateCollision;
 			On_Main.DoDraw_DrawNPCsBehindTiles += PreDrawTilesInjection;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
-            On_WorldGen.SectionTileFrameWithCheck += On_WorldGen_SectionTileFrameWithCheck;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
             IL_Main.DoDraw += IL_Main_DoDraw;
             IL_Player.Update += RopeMovementILEdit;
@@ -145,58 +144,6 @@ namespace TerRoguelike.ILEditing
             RoomSystem.PostDrawWalls_PreNPCsBehindTiles(Main.spriteBatch);
             orig.Invoke(self);
             RoomSystem.PostDrawWalls(Main.spriteBatch);
-        }
-
-        //Holy fucking shit chuck loading is so slow and causes massive hitches in vanilla. This is unacceptable, especially in an action setting.
-        private void On_WorldGen_SectionTileFrameWithCheck(On_WorldGen.orig_SectionTileFrameWithCheck orig, int startX, int startY, int endX, int endY)
-        {
-			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || !ModContent.GetInstance<TerRoguelikeConfig>().TileFramingOptimization || noMapUpdate || Main.mapFullscreen || !Program.IsMainThread) // don't fuck with this if not in a dungeon, or, assumedly for the second bool, if you just loaded into the world and are initializing all the shit around you. I'm pissed at this hardcrashing so much and this worked the best.
-            {
-				orig.Invoke(startX, startY, endX, endY);
-				return;
-            }
-
-			Player player = Main.LocalPlayer;
-			var modPlayer = player.ModPlayer();
-            if (modPlayer != null && modPlayer.teleporting > 0) // try to avoid running this when entering a portal as that is when there is the highest chance of access violation error. It's not the biggest deal, I care more about the moment to moment gameplay being smooth.
-			{
-				modPlayer.teleporting--;
-                orig.Invoke(startX, startY, endX, endY);
-                return;
-            }
-
-			int sectionX3 = Netplay.GetSectionX(startX);
-			int sectionY = Netplay.GetSectionY(startY);
-			int sectionX2 = Netplay.GetSectionX(endX);
-			int sectionY2 = Netplay.GetSectionY(endY);
-
-			int forStart = sectionX3;
-			int forEnd = sectionX2 + 1;
-			//Can't have fast parallel count backwards. Never happened until randomly one time I opened a world and then it threw an error?? still have no clue why it happened, but it wasn't a harmful error. the game kept running. but this should ideally stop it throwing an error in chat in the rare event that it happens again.
-
-			if (forEnd - forStart <= 0)
-			{
-				orig.Invoke(startX, startY, endX, endY);
-				return;
-            }
-
-            FastParallel.For(forStart, forEnd, delegate (int start, int end, object context)
-			{
-                for (int i = start; i < end; i++)
-                {
-                    for (int j = sectionY; j <= sectionY2; j++)
-                    {
-                        if (Main.sectionManager.SectionLoaded(i, j) && !Main.sectionManager.SectionFramed(i, j))
-                        {
-                            SectionTileFrame(i, j, i, j);
-                            if (!Main.sectionManager.AnyUnfinishedSections)
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         private void StopOnKillHeartsAndMana(On_NPC.orig_NPCLoot_DropCommonLifeAndMana orig, NPC self, Player closestPlayer)

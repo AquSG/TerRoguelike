@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Audio;
 using TerRoguelike.Projectiles;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -42,6 +43,10 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.DeathSound = SoundID.NPCDeath2;
             NPC.knockBackResist = 0.5f;
             modNPC.drawCenter = new Vector2(0, -4);
+        }
+        public override void OnSpawn(IEntitySource source)
+        {
+            NPC.ai[1] = -30;
         }
         public override void AI()
         {

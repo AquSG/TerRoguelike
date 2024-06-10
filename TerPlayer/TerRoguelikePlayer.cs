@@ -183,7 +183,6 @@ namespace TerRoguelike.TerPlayer
         public bool deathrayDeathReason = false;
         public int creditsViewTime = 0;
         public bool isDeletableOnExit = false;
-        public int teleporting = 0;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -1761,7 +1760,6 @@ namespace TerRoguelike.TerPlayer
             {
                 Main.BlackFadeIn = 255;
                 Main.SetCameraLerp(1, 1);
-                teleporting = 5;
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
             }
