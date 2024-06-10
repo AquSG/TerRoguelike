@@ -162,6 +162,7 @@ namespace TerRoguelike.UI
             rasterizer.ScissorTestEnable = true;
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, rasterizer, null, Matrix.Identity);
+            Rectangle cachedOldScissor = Main.spriteBatch.GraphicsDevice.ScissorRectangle;
             Main.spriteBatch.GraphicsDevice.ScissorRectangle = textCutoffRegion;
 
             for (int i = 0; i < creditsList.Count; i++)
@@ -174,6 +175,7 @@ namespace TerRoguelike.UI
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
             rasterizer.ScissorTestEnable = false;
+            Main.spriteBatch.GraphicsDevice.ScissorRectangle = cachedOldScissor;
 
             if (itemsToDraw.Count == 0)
             {
