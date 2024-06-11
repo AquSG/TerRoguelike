@@ -814,7 +814,7 @@ namespace TerRoguelike.Managers
 
             Main.EntitySpriteDraw(wallTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, 0f, Vector2.Zero, 0.25f, SpriteEffects.None);
             Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Top * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
-            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (TopLeft * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 2, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
+            Main.EntitySpriteDraw(wallTex, RoomPosition16 + (TopRight * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 2, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
             Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Right * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 3, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
             Main.EntitySpriteDraw(wallTex, RoomPosition16 + (BottomRight * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 4, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
             Main.EntitySpriteDraw(wallTex, RoomPosition16 + (Bottom * 16) - Main.screenPosition, null, Color.White, MathHelper.PiOver4 * 5, wallTex.Size() * 0.5f, 0.25f, SpriteEffects.None);
