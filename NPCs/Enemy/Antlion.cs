@@ -32,6 +32,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackCooldown = 60;
         public int burrowDownTime = 60;
         public int burrowUpTime = 60;
+        public bool ableToHit = true;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 2;
@@ -72,7 +73,10 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Sand, 0, 0, 0, default, 0.8f);
             }
+            ableToHit = NPC.ai[0] >= 10;
         }
+        public override bool CanHitNPC(NPC target) => ableToHit;
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot) => ableToHit;
         public override void HitEffect(NPC.HitInfo hit)
         {
             if (NPC.life > 0)
