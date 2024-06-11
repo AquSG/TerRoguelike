@@ -21,7 +21,7 @@ namespace TerRoguelike.Rooms
         public override string Key => "SnowEnemyRoom3Down";
         public override string Filename => "Schematics/RoomSchematics/SnowEnemyRoom3Down.csch";
         public override bool CanExitRight => true;
-        public override bool CanExitDown => true;
+        public override bool CanExitDown => false;
         public override void InitializeRoom()
         {
             base.InitializeRoom();
