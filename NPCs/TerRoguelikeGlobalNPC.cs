@@ -2007,15 +2007,15 @@ namespace TerRoguelike.NPCs
                 if (target != null)
                 {
                     npc.velocity += (target.Center - npc.Center).SafeNormalize(Vector2.UnitX) * acceleration;
-                }
 
-                if (npc.collideX && ((npc.oldVelocity.X < 0 && (target.Center.X - npc.Center.X) < 0) || (npc.oldVelocity.X > 0 && (target.Center.X - npc.Center.X) > 0)))
-                {
-                    npc.velocity.X = 1f * Math.Sign(npc.oldVelocity.X) * -speedCap;
-                }
-                if (npc.collideY && ((npc.oldVelocity.Y < 0 && (target.Center.Y - npc.Center.Y) < 0) || (npc.oldVelocity.Y > 0 && (target.Center.Y - npc.Center.Y) > 0)))
-                {
-                    npc.velocity.Y = 1f * Math.Sign(npc.oldVelocity.Y) * -speedCap;
+                    if (npc.collideX && ((npc.oldVelocity.X < 0 && (target.Center.X - npc.Center.X) < 0) || (npc.oldVelocity.X > 0 && (target.Center.X - npc.Center.X) > 0)))
+                    {
+                        npc.velocity.X = 1f * Math.Sign(npc.oldVelocity.X) * -speedCap;
+                    }
+                    if (npc.collideY && ((npc.oldVelocity.Y < 0 && (target.Center.Y - npc.Center.Y) < 0) || (npc.oldVelocity.Y > 0 && (target.Center.Y - npc.Center.Y) > 0)))
+                    {
+                        npc.velocity.Y = 1f * Math.Sign(npc.oldVelocity.Y) * -speedCap;
+                    }
                 }
             }
             else if (npc.ai[1] == 1)
