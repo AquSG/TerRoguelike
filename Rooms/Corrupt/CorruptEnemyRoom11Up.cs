@@ -15,13 +15,13 @@ using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
-    public class CorruptEnemyRoom11Down : Room
+    public class CorruptEnemyRoom11Up : Room
     {
         public override int AssociatedFloor => FloorDict["Corrupt"];
-        public override string Key => "CorruptEnemyRoom11Down";
-        public override string Filename => "Schematics/RoomSchematics/CorruptEnemyRoom11Down.csch";
+        public override string Key => "CorruptEnemyRoom11Up";
+        public override string Filename => "Schematics/RoomSchematics/CorruptEnemyRoom11Up.csch";
         public override bool CanExitRight => true;
-        public override bool CanExitDown => true;
+        public override bool CanExitUp => true;
         public override void InitializeRoom()
         {
             base.InitializeRoom();
