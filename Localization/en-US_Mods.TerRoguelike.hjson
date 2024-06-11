@@ -523,7 +523,7 @@ Items: {
 	}
 
 	EmeraldRing: {
-		DisplayName: Emerald Ring
+		DisplayName: Emerald Knuckles
 		Tooltip:
 			'''
 			+20 diminishing DR while utilizing a melee weapon
