@@ -627,7 +627,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     WormSegment tailSegment = modNPC.Segments[modNPC.Segments.Count - 1];
                     Vector2 tailPos = tailSegment.Position;
-                    if (ParanoidTileRetrieval(tailPos.ToTileCoordinates()).IsTileSolidGround(true))
+                    Room room = modNPC.GetParentRoom();
+                    if (ParanoidTileRetrieval(tailPos.ToTileCoordinates()).IsTileSolidGround(true) || (room != null && !room.GetRect().Contains(tailPos.ToPoint())))
                     {
                         NPC.ai[1] = (((int)NPC.ai[1] / summonTime) * summonTime) + summonTime - 15;
                     }

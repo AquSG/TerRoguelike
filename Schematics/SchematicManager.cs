@@ -234,7 +234,7 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new ForestEnemyRoom7Down());
             RoomID.Add(new ForestEnemyRoom8Up());
             RoomID.Add(new CorruptEnemyRoom11());
-            RoomID.Add(new CorruptEnemyRoom11Down());
+            RoomID.Add(new CorruptEnemyRoom11Up());
             RoomID.Add(new CorruptEnemyRoom12Down());
             RoomID.Add(new CorruptEnemyRoom12Up());
             RoomID.Add(new CrimsonEnemyRoom8());

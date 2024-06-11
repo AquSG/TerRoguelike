@@ -1143,6 +1143,14 @@ namespace TerRoguelike.TerPlayer
         {
             moonLordVisualEffect = false;
             moonLordSkyEffect = false;
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                for (int i = 0; i < Player.buffType.Length; i++)
+                {
+                    if (Player.buffType[i] == BuffID.MonsterBanner)
+                        Player.buffType[i] = 0;
+                }
+            }   
         }
         public override void PostUpdateMiscEffects()
         {
