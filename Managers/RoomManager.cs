@@ -379,6 +379,7 @@ namespace TerRoguelike.Managers
 
             //sanity check to really try to stop softlocks
             Vector2 roomTopLeft = selectedRoom.RoomPosition + selectedRoom.TopLeft;
+            int ropePlaceThreshold = 4;
             for (int i = 0; i < selectedRoom.RoomDimensions.X; i++)
             {
                 Vector2 tileCheckPos = roomTopLeft + Vector2.UnitX * i;
@@ -391,7 +392,26 @@ namespace TerRoguelike.Managers
                         {
                             if (tileCheckPos.X % 3 == 0)
                             {
-                                offCheckTile.TileType = TileID.Rope;
+                                if (y < ropePlaceThreshold)
+                                {
+                                    offCheckTile.HasTile = false;
+                                }
+                                else
+                                {
+                                    if (y == ropePlaceThreshold)
+                                    {
+                                        for (int y2 = 1; y2 <= ropePlaceThreshold; y2++)
+                                        {
+                                            Tile ropeColumnTile = ParanoidTileRetrieval((tileCheckPos - Vector2.UnitY * y2).ToPoint());
+                                            ropeColumnTile.TileType = TileID.Rope;
+                                            ropeColumnTile.HasTile = true;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        offCheckTile.TileType = TileID.Rope;
+                                    }
+                                }
                             }
                             else
                             {
