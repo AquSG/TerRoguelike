@@ -14,6 +14,8 @@ using TerRoguelike.Systems;
 using TerRoguelike.Floors;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.TerRoguelikeWorldManagementSystem;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.ID;
 
 namespace TerRoguelike.Managers
 {
@@ -375,6 +377,33 @@ namespace TerRoguelike.Managers
 
             PlaceSchematic(mapKey, placementPoint, anchorType);
 
+            //sanity check to really try to stop softlocks
+            Vector2 roomTopLeft = selectedRoom.RoomPosition + selectedRoom.TopLeft;
+            for (int i = 0; i < selectedRoom.RoomDimensions.X; i++)
+            {
+                Vector2 tileCheckPos = roomTopLeft + Vector2.UnitX * i;
+                if (TileID.Sets.Platforms[ParanoidTileRetrieval(tileCheckPos.ToPoint()).TileType])
+                {
+                    for (int y = 1; y < 5; y++)
+                    {
+                        Tile offCheckTile = ParanoidTileRetrieval((tileCheckPos - Vector2.UnitY * y).ToPoint());
+                        if (offCheckTile.IsTileSolidGround(true))
+                        {
+                            if (tileCheckPos.X % 3 == 0)
+                            {
+                                offCheckTile.TileType = TileID.Rope;
+                            }
+                            else
+                            {
+                                offCheckTile.HasTile = false;
+                            }
+                        }
+                        else
+                            break;
+                    }
+                }
+            }
+
             return selectedRoom;
         }
         public static Room PlaceUp(Room previousRoom)
@@ -397,6 +426,33 @@ namespace TerRoguelike.Managers
             RoomSystem.NewRoom(selectedRoom);
 
             PlaceSchematic(mapKey, placementPoint, anchorType);
+
+            //sanity check to really try to stop softlocks
+            Vector2 roomBottomLeft = selectedRoom.RoomPosition + selectedRoom.BottomLeft;
+            for (int i = 0; i < selectedRoom.RoomDimensions.X; i++)
+            {
+                Vector2 tileCheckPos = roomBottomLeft + Vector2.UnitX * i;
+                if (TileID.Sets.Platforms[ParanoidTileRetrieval(tileCheckPos.ToPoint()).TileType])
+                {
+                    for (int y = 1; y < 5; y++)
+                    {
+                        Tile offCheckTile = ParanoidTileRetrieval((tileCheckPos + Vector2.UnitY * y).ToPoint());
+                        if (offCheckTile.IsTileSolidGround(true))
+                        {
+                            if (tileCheckPos.X % 3 == 0)
+                            {
+                                offCheckTile.TileType = TileID.Rope;
+                            }
+                            else
+                            {
+                                offCheckTile.HasTile = false;
+                            }
+                        }
+                        else
+                            break;
+                    }
+                }
+            }
 
             return selectedRoom;
         }
