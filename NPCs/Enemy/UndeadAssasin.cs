@@ -29,6 +29,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackTelegraph = 30;
         public int attackCooldown = 270;
         public int attackExhaust = 60;
+        public bool ableToHit = true;
 
         public override void SetStaticDefaults()
         {
@@ -64,6 +65,8 @@ namespace TerRoguelike.NPCs.Enemy
                     dust.velocity *= 0.75f;
                 }
             }
+
+            ableToHit = NPC.ai[1] < attackTelegraph + attackCooldown;
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
@@ -93,5 +96,7 @@ namespace TerRoguelike.NPCs.Enemy
             int currentFrame = NPC.ai[1] > attackCooldown ? (NPC.ai[1] > attackTelegraph + attackCooldown ? 16 : 17) : (NPC.velocity.Y != 0 ? 1 : (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 4)) + 2);
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
         }
+        public override bool CanHitNPC(NPC target) => ableToHit;
+        public override bool CanHitPlayer(Player target, ref int cooldownSlot) => ableToHit;
     }
 }
