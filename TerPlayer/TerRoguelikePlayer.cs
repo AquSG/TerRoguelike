@@ -269,7 +269,7 @@ namespace TerRoguelike.TerPlayer
             previousBonusDamageMulti = 1f;
 
             onGround = (ParanoidTileRetrieval((int)(Player.Bottom.X / 16f), (int)((Player.Bottom.Y) / 16f)).IsTileSolidGround() && Math.Abs(Player.velocity.Y) <= 0.1f);
-            if (onGround && !Player.controlDown && !Player.controlUp && !Player.controlLeft && !Player.controlRight)
+            if (Player.velocity.Y == 0 && !Player.controlDown && !Player.controlUp && !Player.controlLeft && !Player.controlRight)
                 standingStillTime++;
             else
                 standingStillTime = 0;

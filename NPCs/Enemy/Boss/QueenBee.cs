@@ -244,14 +244,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.ai[1] >= None.Duration)
                 {
-                    Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
-                    if (room != null)
+                    Room room = modNPC.GetParentRoom();
+                    bool centerCollide = NPC.Center.Distance(spawnPos) > 480 && (ParanoidTileRetrieval(NPC.Center.ToTileCoordinates()).IsTileSolidGround(true) || ParanoidTileRetrieval((NPC.Center + Vector2.UnitY * -17).ToTileCoordinates()).IsTileSolidGround(true));
+                    bool roomCollide = room != null && !room.GetRect().Contains(NPC.getRect());
+                    
+                    if (roomCollide || centerCollide)
                     {
-                        if (!room.GetRect().Contains(NPC.getRect()))
+                        if (roomCollide)
                         {
                             NPC.velocity += (room.GetRect().ClosestPointInRect(NPC.Center) - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.1f;
-                            NPC.ai[1]--;
                         }
+                        else if (centerCollide)
+                        {
+                            NPC.velocity += (spawnPos - NPC.Center).SafeNormalize(Vector2.UnitY) * 0.15f;
+                        }
+                        NPC.ai[1]--;
                     }
                 }
 

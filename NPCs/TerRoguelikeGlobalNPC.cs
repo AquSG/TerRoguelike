@@ -2348,6 +2348,8 @@ namespace TerRoguelike.NPCs
             {
                 if (npc.ai[1] > 0)
                     npc.ai[1] = 0;
+                if (npc.ai[2] >= meleeDuration)
+                    npc.ai[2] = -meleeCooldown;
             }
             else
             {
