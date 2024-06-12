@@ -1770,7 +1770,7 @@ namespace TerRoguelike.NPCs
                                 {
                                     Room room = RoomList[sourceRoomListID];
                                     Rectangle potentialTeleportRect = new Rectangle((int)((targetBlock.X * 16f) + 8) - (npc.width / 2), (int)(targetBlock.Y * 16f) - npc.height, npc.width, npc.height);
-                                    if (potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
+                                    if (room.wallActive && potentialTeleportRect != room.CheckRectWithWallCollision(potentialTeleportRect))
                                     {
                                         continue;
                                     }

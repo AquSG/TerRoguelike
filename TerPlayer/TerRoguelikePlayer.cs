@@ -1082,6 +1082,11 @@ namespace TerRoguelike.TerPlayer
                 Player.gravControl2 = false;
             }
 
+            if (Player.pulley && TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                Player.RefreshExtraJumps();
+            }
+
             if (jetLeg > 0)
             {
                 if (DashDir != 0 && DashDelay == 0)
@@ -1145,6 +1150,7 @@ namespace TerRoguelike.TerPlayer
             moonLordSkyEffect = false;
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
+                Player.accWatch = 0;
                 for (int i = 0; i < Player.buffType.Length; i++)
                 {
                     if (Player.buffType[i] == BuffID.MonsterBanner)
@@ -1154,11 +1160,14 @@ namespace TerRoguelike.TerPlayer
         }
         public override void PostUpdateMiscEffects()
         {
+            
+
             if (Player.pulley && TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
+                bool upOrDown = Player.controlUp || Player.controlDown;
                 if (Player.pulleyDir == 2)
                 {
-                    if (Player.direction == -1 && Player.controlLeft)
+                    if (Player.direction == -1 && Player.controlLeft && !upOrDown)
                     {
                         Player.pulley = false;
                         if (Player.velocity.X == 0)
@@ -1166,7 +1175,7 @@ namespace TerRoguelike.TerPlayer
                             Player.velocity.X = -1;
                         }
                     }
-                    else if (Player.direction == 1 && Player.controlRight)
+                    else if (Player.direction == 1 && Player.controlRight && !upOrDown)
                     {
                         Player.pulley = false;
                         if (Player.velocity.X == 0)

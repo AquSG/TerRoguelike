@@ -153,6 +153,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
                 {
                     sound.Volume -= deadTime > 0 ? 0.025f : 0.0015f;
+                    if (sound.Volume <= 0)
+                        sound.Stop();
                 }
             }
             else
@@ -949,6 +951,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 0.7f, Pitch = 1f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.7f, Pitch = 0 }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.DD2_WitherBeastDeath with { Volume = 1f, Pitch = 0 }, NPC.Center);
+                if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Stop();
+                }
 
                 Vector2 goreOffset = new Vector2(-28);
                 Gore.NewGore(NPC.GetSource_Death(), NPC.Top + goreOffset, Vector2.Zero, 513, NPC.scale);
@@ -986,8 +992,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnKill()
         {
-            
+
         }
+            
         public override void FindFrame(int frameHeight)
         {
             Texture2D tex = TextureAssets.Npc[Type].Value;
