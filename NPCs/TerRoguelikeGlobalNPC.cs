@@ -1987,10 +1987,14 @@ namespace TerRoguelike.NPCs
             }
             else
             {
-                npc.ai[0] = 0;
+                npc.ai[0]++;
+                if (npc.ai[0] >= boredomTime)
+                {
+                    npc.ai[1] = 1;
+                }
             }
 
-            if (npc.ai[1] != 2)
+            if (npc.ai[1] != 2 || (target == null && npc.ai[1] == 2))
             {
                 if ((npc.Center - homePos).Length() <= homeRadius)
                 {
@@ -2660,6 +2664,11 @@ namespace TerRoguelike.NPCs
 
                     npc.ai[0]++;
                 }
+            }
+            else if (npc.ai[0] == attackTelegraph)
+            {
+                npc.velocity = (npc.rotation - MathHelper.PiOver4 * 3).ToRotationVector2() * dashSpeed;
+                npc.ai[0]++;
             }
 
             if (npc.ai[0] <= attackTelegraph)
