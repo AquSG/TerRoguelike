@@ -64,6 +64,7 @@ namespace TerRoguelike.Rooms
         }
         public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
         {
+            modPlayer.enableCampfire = true;
             return player.position.X <= (RoomPosition.X * 16f) + 22f && !player.dead && modPlayer.escaped;
         }
         public override void Ascend(Player player)

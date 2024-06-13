@@ -181,9 +181,9 @@ namespace TerRoguelike.TerPlayer
         public Vector2 escapeArrowTarget = Vector2.Zero;
         public bool moonLordVisualEffect = false;
         public bool moonLordSkyEffect = false;
-        public bool deathrayDeathReason = false;
         public int creditsViewTime = 0;
         public bool isDeletableOnExit = false;
+        public bool enableCampfire = false;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -191,8 +191,6 @@ namespace TerRoguelike.TerPlayer
         #region Reset Variables
         public override void PreUpdate()
         {
-            deathrayDeathReason = false;
-
             startDirection = Player.direction;
 
             coolantBarrel = 0;
@@ -1144,24 +1142,41 @@ namespace TerRoguelike.TerPlayer
 
             oldPulley = Player.pulley;
         }
+        public override void PreUpdateBuffs()
+        {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+            {
+                Player.accWatch = 0;
+                if (!enableCampfire)
+                {
+                    for (int i = 0; i < Player.buffType.Length; i++)
+                    {
+                        if (Player.buffType[i] == BuffID.Campfire)
+                        {
+                            Player.buffType[i] = 0;
+                            Player.lifeRegen -= 1;
+                        }
+                    }
+                }
+            }
+            enableCampfire = false;
+        }
         public override void PostUpdate()
         {
             moonLordVisualEffect = false;
             moonLordSkyEffect = false;
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
-            {
+            {    
                 Player.accWatch = 0;
                 for (int i = 0; i < Player.buffType.Length; i++)
                 {
                     if (Player.buffType[i] == BuffID.MonsterBanner)
                         Player.buffType[i] = 0;
                 }
-            }   
+            }
         }
         public override void PostUpdateMiscEffects()
         {
-            
-
             if (Player.pulley && TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 bool upOrDown = Player.controlUp || Player.controlDown;
@@ -1792,6 +1807,7 @@ namespace TerRoguelike.TerPlayer
             escapeFail = false;
             barrierHealth = 0;
             playthroughTime.Restart();
+            currentFloor = null;
         }
         #endregion
 
