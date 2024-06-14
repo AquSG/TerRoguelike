@@ -804,6 +804,25 @@ Items: {
 			Extra copies of this item further increase the chance by 10%
 			'''
 	}
+
+	ThermitePowder: {
+		DisplayName: Thermite Powder
+		Tooltip:
+			'''
+			Every second, ignite all vulnerable enemies
+			Ignite deals 70 base damage in total over a duration
+			Extra copies of this item increase the base damage by 70
+			'''
+	}
+
+	MicrobotDefense: {
+		DisplayName: Microbot Defense
+		Tooltip:
+			'''
+			+12 diminishing DR while below 50% max life
+			Extra copies of this item increase the diminishing DR by 12
+			'''
+	}
 }
 
 NPCs: {

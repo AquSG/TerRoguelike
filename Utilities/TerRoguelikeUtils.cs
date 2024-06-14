@@ -89,7 +89,7 @@ namespace TerRoguelike.Utilities
         /// Determines if a tile is solid ground based on whether it's active and not actuated or if the tile is solid in any way, including just the top.
         /// </summary>
         /// <param name="tile">The tile to check.</param>
-        public static bool IsTileSolidGround(this Tile tile, bool IgnorePlatforms = false) => tile != null && tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]) && (!IgnorePlatforms || !TileID.Sets.Platforms[tile.TileType]); //function lifted from the Calamity Mod
+        public static bool IsTileSolidGround(this Tile tile, bool IgnorePlatforms = false) => tile != null && tile.HasUnactuatedTile && (Main.tileSolid[tile.TileType] || Main.tileSolidTop[tile.TileType]) && (!IgnorePlatforms || !Main.tileSolidTop[tile.TileType]); //function lifted from the Calamity Mod
 
         public static Tile ParanoidTileRetrieval(int x, int y)
         {
