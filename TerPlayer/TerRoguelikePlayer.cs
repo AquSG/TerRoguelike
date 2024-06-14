@@ -1330,7 +1330,8 @@ namespace TerRoguelike.TerPlayer
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
                     int igniteDamage = (int)(hit.Damage * 1.5f);
-                    modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                    int burnCap = Math.Min(igniteDamage / 6, 50);
+                    modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
                     Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
                     int particleDir = -1;
                     if (proj.owner >= 0)

@@ -3254,24 +3254,27 @@ namespace TerRoguelike.NPCs
                 {
                     int hitDamage = 0;
                     int targetDamage = (int)(npc.lifeMax * 0.01f);
-                    int damageCap = 50;
                     int owner = -1;
-                    if (targetDamage > damageCap)
-                        targetDamage = damageCap;
-                    else if (targetDamage < 1)
-                        targetDamage = 1;
 
                     for (int i = 0; i < ignitedStacks.Count; i++)
                     {
-                        if (ignitedStacks[i].DamageToDeal < targetDamage)
+                        var igniteStack = ignitedStacks[i];
+                        int myDamageCap = igniteStack.DamageCapPerTick;
+                        int myTargetDamage = targetDamage;
+                        if (myTargetDamage > myDamageCap)
+                            myTargetDamage = myDamageCap;
+                        else if (myTargetDamage < 1)
+                            myTargetDamage = 1;
+
+                        if (ignitedStacks[i].DamageToDeal < myTargetDamage)
                         {
                             hitDamage += ignitedStacks[i].DamageToDeal;
                             ignitedStacks[i].DamageToDeal = 0;
                         }
                         else
                         {
-                            hitDamage += targetDamage;
-                            ignitedStacks[i].DamageToDeal -= targetDamage;
+                            hitDamage += myTargetDamage;
+                            ignitedStacks[i].DamageToDeal -= myTargetDamage;
                         }
                         if (i == ignitedStacks.Count - 1)
                         {
@@ -3837,14 +3840,16 @@ namespace TerRoguelike.NPCs
 
     public class IgnitedStack
     {
-        public IgnitedStack(int damageToDeal, int owner)
+        public IgnitedStack(int damageToDeal, int owner, int damageCapPerTick = 50)
         {
             Owner = owner;
             damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
             DamageToDeal = damageToDeal;
+            DamageCapPerTick = damageCapPerTick;
         }
         public int DamageToDeal = 0;
         public int Owner = -1;
+        public int DamageCapPerTick;
     }
     public class BleedingStack
     {
