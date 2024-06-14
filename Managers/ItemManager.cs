@@ -247,6 +247,8 @@ namespace TerRoguelike.Managers
                 new AmberBead(),
                 new FlimsyPauldron(),
                 new ProtectiveBubble(),
+                new BurningCharcoal(),
+
                 new EvilEye(),
                 new SpentShell(),
                 new HeatSeekingChip(),
@@ -269,6 +271,7 @@ namespace TerRoguelike.Managers
                 new AmberRing(),
                 new ThrillOfTheHunt(),
                 new GiftBox(),
+
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new DroneBuddy(),
@@ -286,7 +289,9 @@ namespace TerRoguelike.Managers
                 new GiantDoorShield(),
                 new TrumpCard(),
                 new PortableGenerator(),
-                new ForgottenBioWeapon()
+                new ForgottenBioWeapon(),
+                new LunarCharm(),
+                new CeremonialCrown(),
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();
