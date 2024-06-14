@@ -775,6 +775,35 @@ Items: {
 		DisplayName: Item Basin
 		Tooltip: ""
 	}
+
+	LunarCharm: {
+		DisplayName: Lunar Charm
+		Tooltip:
+			'''
+			Guaranteed to be warped to the Lunar Sanctuary upon teleporting deeper into the dungeon
+			Produce an item upon entering the Lunar Sanctuary
+			Extra copies of this item increase the chance of producing higher tier items
+			'''
+	}
+
+	CeremonialCrown: {
+		DisplayName: Ceremonial Crown
+		Tooltip:
+			'''
+			Enemies take 10% bonus damage for every vulnerable enemy alive
+			Extra copies of this item increase the bonus damage per enemy by 10%
+			'''
+	}
+
+	BurningCharcoal: {
+		DisplayName: Burning Charcoal
+		Tooltip:
+			'''
+			10% chance upon hitting an enemy to ignite them
+			Ignite deals 150% total damage over a duration
+			Extra copies of this item further increase the chance by 10%
+			'''
+	}
 }
 
 NPCs: {
@@ -917,6 +946,15 @@ Configs: {
 				'''
 				If enabled, all player and world files used while playing TerRoguelike Mode are fully deleted automatically.
 				If disabled, all player and world files used while playing TerRoguelike Mode are sent to the recycle bin.
+				'''
+		}
+
+		LoadEntireWorldUponEnteringWorld: {
+			Label: Load Entire World Upon Entering World
+			Tooltip:
+				'''
+				If enabled, upon entering a TerRoguelike world, the game will pause and attempt to frame the majority of the tiles in the world.
+				This essentially moves most if not all tile framing related lag spikes to when you enter the world instead of while you are playing.
 				'''
 		}
 	}

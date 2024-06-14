@@ -18,6 +18,7 @@ using TerRoguelike.World;
 using TerRoguelike.MainMenu;
 using Microsoft.Xna.Framework;
 using ReLogic.Threading;
+using System.Reflection.PortableExecutable;
 
 namespace TerRoguelike.Systems
 {
@@ -91,8 +92,7 @@ namespace TerRoguelike.Systems
                         WorldGen.PlaceWall(x, i, ModContent.WallType<Tiles.BlackWall>(), true);
                     }
                 }
-            });
-            
+            });   
         }
     }
 }

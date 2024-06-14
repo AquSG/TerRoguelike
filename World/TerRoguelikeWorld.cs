@@ -52,8 +52,16 @@ namespace TerRoguelike.World
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
         public static readonly SoundStyle EarthPound = new SoundStyle("TerRoguelike/Sounds/EarthPound", 4);
         public static readonly SoundStyle WorldTeleport = new SoundStyle("TerRoguelike/Sounds/WorldTeleport", 2);
-        public static bool TryWarpToSanctuary()
+        public static bool TryWarpToSanctuary(TerRoguelikePlayer modPlayer)
         {
+            if (modPlayer.lunarCharm > 0)
+            {
+                sanctuaryTries = 0;
+                sanctuaryCount++;
+                if (sanctuaryCount == sanctuaryMaxVisits && currentStage <= 2) // same thing as below
+                    sanctuaryCount--;
+                return true;
+            }
             if (sanctuaryCount >= sanctuaryMaxVisits)
                 return false;
             if (currentStage == 5)

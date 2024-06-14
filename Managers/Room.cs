@@ -472,11 +472,15 @@ namespace TerRoguelike.Managers
             }
             
 
-            if (!IsSanctuary && TerRoguelikeWorld.TryWarpToSanctuary())
+            if (!IsSanctuary && TerRoguelikeWorld.TryWarpToSanctuary(modPlayer))
             {
                 modPlayer.currentFloor = FloorID[FloorDict["Sanctuary"]];
                 targetRoom = RoomID[modPlayer.currentFloor.StartRoomID];
                 nextFloor = modPlayer.currentFloor;
+                if (modPlayer.lunarCharm > 0)
+                {
+                    modPlayer.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                }
             }
             else
             {
@@ -583,6 +587,10 @@ namespace TerRoguelike.Managers
             else
             {
                 targetRoom = RoomID[FloorID[FloorDict["Sanctuary"]].StartRoomID];
+                if (modPlayer.lunarCharm > 0)
+                {
+                    modPlayer.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                }
                 player.Center = targetRoom.RoomPosition16 + targetRoom.RoomDimensions16 * new Vector2(0.9f, 0.5f);
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                 modPlayer.escaped = true;

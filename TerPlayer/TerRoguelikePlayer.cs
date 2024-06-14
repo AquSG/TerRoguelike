@@ -33,6 +33,7 @@ using System.Diagnostics;
 using TerRoguelike.NPCs.Enemy.Boss;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using Terraria.WorldBuilding;
+using TerRoguelike.Items.Common;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -65,6 +66,8 @@ namespace TerRoguelike.TerPlayer
         public int amberBead;
         public int flimsyPauldron;
         public int protectiveBubble;
+        public int burningCharcoal;
+
         public int lockOnMissile;
         public int evilEye;
         public int spentShell;
@@ -87,6 +90,7 @@ namespace TerRoguelike.TerPlayer
         public int amberRing;
         public int thrillOfTheHunt;
         public int giftBox;
+
         public int volatileRocket;
         public int theDreamsoul;
         public int droneBuddy;
@@ -105,6 +109,8 @@ namespace TerRoguelike.TerPlayer
         public int trumpCard;
         public int portableGenerator;
         public int forgottenBioWeapon;
+        public int lunarCharm;
+        public int ceremonialCrown;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
@@ -124,6 +130,8 @@ namespace TerRoguelike.TerPlayer
         public int overclockerTime = 0;
         public int portableGeneratorImmuneTime = 0;
         public int symbioticFungusHealCooldown = 60;
+        public int ceremonialCrownStacks;
+        public int oldCeremonialCrownStacks;
         #endregion
 
         #region Misc Variables
@@ -215,6 +223,8 @@ namespace TerRoguelike.TerPlayer
             amberBead = 0;
             flimsyPauldron = 0;
             protectiveBubble = 0;
+            burningCharcoal = 0;
+
             lockOnMissile = 0;
             evilEye = 0;
             spentShell = 0;
@@ -237,6 +247,7 @@ namespace TerRoguelike.TerPlayer
             amberRing = 0;
             thrillOfTheHunt = 0;
             giftBox = 0;
+
             volatileRocket = 0;
             theDreamsoul = 0;
             droneBuddy = 0;
@@ -255,6 +266,8 @@ namespace TerRoguelike.TerPlayer
             trumpCard = 0;
             portableGenerator = 0;
             forgottenBioWeapon = 0;
+            lunarCharm = 0;
+            ceremonialCrown = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -915,6 +928,61 @@ namespace TerRoguelike.TerPlayer
             }
             else
                 portableGeneratorImmuneTime = 0;
+
+            oldCeremonialCrownStacks = ceremonialCrownStacks;
+            ceremonialCrownStacks = 0;
+            if (ceremonialCrown > 0)
+            {
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly)
+                        continue;
+                    ceremonialCrownStacks++;
+                }
+            }
+            if (oldCeremonialCrownStacks != ceremonialCrownStacks)
+            {
+                int fullCycle = 12;
+                float baseRot = Main.GlobalTimeWrappedHourly * MathHelper.Pi;
+                float baseOutDist = 40;
+                if (oldCeremonialCrownStacks > ceremonialCrownStacks)
+                {
+                    for (int i = ceremonialCrownStacks; i < oldCeremonialCrownStacks; i++)
+                    {
+                        int cycleCount = i / fullCycle;
+                        int dir = cycleCount % 2 == 0 ? 1 : -1;
+                        float outerRot = cycleCount * MathHelper.PiOver4;
+                        float extraRot = i / (float)fullCycle * MathHelper.TwoPi;
+                        float outDist = baseOutDist + 15 * cycleCount;
+                        float thisRot = extraRot + outerRot + baseRot * (1 - ((cycleCount + 1f) / (cycleCount + 2f))) * dir;
+                        Vector2 drawPos = Player.Center + Vector2.UnitY * Player.gfxOffY + thisRot.ToRotationVector2() * outDist;
+                        Color particleColor = i % 3 == 0 ? Color.Red : (i % 3 == 1 ? Color.LimeGreen : Color.Lerp(Color.Blue, Color.Cyan, 0.4f));
+                        for (int p = 0; p < 5; p++)
+                        {
+                            ParticleManager.AddParticle(new Square(drawPos, (p / 6f * MathHelper.TwoPi + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(0.2f, 1f) + Player.velocity, 40, particleColor, new Vector2(1), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 30, false));
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = oldCeremonialCrownStacks; i < ceremonialCrownStacks; i++)
+                    {
+                        int cycleCount = i / fullCycle;
+                        int dir = cycleCount % 2 == 0 ? 1 : -1;
+                        float outerRot = cycleCount * MathHelper.PiOver4;
+                        float extraRot = i / (float)fullCycle * MathHelper.TwoPi;
+                        float outDist = baseOutDist + 15 * cycleCount;
+                        float thisRot = extraRot + outerRot + baseRot * (1 - ((cycleCount + 1f) / (cycleCount + 2f))) * dir;
+                        Vector2 drawPos = Player.Center + Vector2.UnitY * Player.gfxOffY + thisRot.ToRotationVector2() * outDist;
+                        Color particleColor = i % 3 == 0 ? Color.Red : (i % 3 == 1 ? Color.LimeGreen : Color.Lerp(Color.Blue, Color.Cyan, 0.4f));
+                        for (int p = 0; p < 5; p++)
+                        {
+                            ParticleManager.AddParticle(new Square(drawPos, (p / 6f * MathHelper.TwoPi + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * Main.rand.NextFloat(0.2f, 1f) + Player.velocity, 40, particleColor, new Vector2(1), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 40, false));
+                        }
+                    }
+                }
+            }
         }
         public override void PostUpdateEquips()
         {
@@ -1256,6 +1324,34 @@ namespace TerRoguelike.TerPlayer
                     modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
                 }
             }
+            if (burningCharcoal > 0)
+            {
+                float chance = 0.1f * burningCharcoal;
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    int igniteDamage = (int)(hit.Damage * 1.5f);
+                    modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                    Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
+                    int particleDir = -1;
+                    if (proj.owner >= 0)
+                    {
+                        particleDir = targetPos.X > Main.player[proj.owner].Center.X ? 1 : -1;
+                    }
+                    for (int i = -5; i <= 5; i++)
+                    {
+                        float scale = 1f;
+                        if (i % 5 != 0)
+                            scale *= 0.6f;
+                        float baseRot = particleDir == -1 ? MathHelper.Pi : 0;
+                        baseRot += i * MathHelper.Pi * 0.06f;
+                        ParticleManager.AddParticle(new Debris(targetPos, baseRot.ToRotationVector2() * 4f * Main.rand.NextFloat(0.5f, 1f) - Vector2.UnitY, 
+                            20, Color.Lerp(Color.Black, Color.DarkGray, Main.rand.NextFloat()), new Vector2(0.75f) * scale, Main.rand.Next(3), Main.rand.NextFloat(MathHelper.TwoPi), 
+                            Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.2f, 6, Main.rand.Next(10, 15), true));
+                    }
+                    SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.44f, Pitch = 0.4f, PitchVariance = 0.13f }, targetPos);
+                }
+            }
+
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
             {
                 float chance = 0.1f;
@@ -1340,6 +1436,11 @@ namespace TerRoguelike.TerPlayer
             if (brazenNunchucks > 0 && Vector2.Distance(Player.Center, hitPosition) <= 128f)
             {
                 float bonusDamage = 0.2f * brazenNunchucks;
+                bonusDamageMultiplier *= 1 + bonusDamage;
+            }
+            if (ceremonialCrownStacks > 0)
+            {
+                float bonusDamage = 0.1f * ceremonialCrownStacks * ceremonialCrown;
                 bonusDamageMultiplier *= 1 + bonusDamage;
             }
             previousBonusDamageMulti = bonusDamageMultiplier;
@@ -1737,6 +1838,32 @@ namespace TerRoguelike.TerPlayer
 
             SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f);
         }
+        public void LunarCharmLogic(Vector2 position)
+        {
+            float commonWeight = 0.8f;
+            float uncommonWeight = 0.18f + 0.18f * ((lunarCharm - 1) * 2);
+            float rareWeight = 0.02f + 0.02f * (float)Math.Pow((lunarCharm - 1) * 2, 2);
+            float chance = Main.rand.NextFloat(commonWeight + uncommonWeight + rareWeight + float.Epsilon);
+            int itemType;
+            int itemTier;
+            if (chance <= commonWeight)
+            {
+                itemType = ItemManager.GiveCommon(false);
+                itemTier = 0;
+            }
+            else if (chance <= commonWeight + uncommonWeight)
+            {
+                itemType = ItemManager.GiveUncommon(false);
+                itemTier = 1;
+            }
+            else
+            {
+                itemType = ItemManager.GiveRare(false);
+                itemTier = 2;
+            }
+
+            SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f);
+        }
         public void SpawnRoguelikeItem(Vector2 position)
         {
             int chance = Main.rand.Next(1, 101);
@@ -1798,6 +1925,18 @@ namespace TerRoguelike.TerPlayer
                 Main.SetCameraLerp(1, 1);
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
+                if (RoomSystem.RoomList != null && ModContent.GetInstance<TerRoguelikeConfig>().LoadEntireWorldUponEnteringWorld)
+                {
+                    for (int i = 0; i < RoomSystem.RoomList.Count; i++)
+                    {
+                        Room room = RoomSystem.RoomList[i];
+                        Point topLeft = room.RoomPosition.ToPoint();
+                        Point dimensions = room.RoomDimensions.ToPoint();
+                        Rectangle frameRect = new Rectangle(topLeft.X, topLeft.Y, dimensions.X, dimensions.Y);
+                        frameRect.Inflate(2000, 2000);
+                        WorldGen.SectionTileFrameWithCheck(frameRect.X, frameRect.Y, frameRect.Width, frameRect.Height);
+                    }
+                }
             }
             escaped = false;
             DeathUI.itemsToDraw.Clear();
@@ -1808,6 +1947,7 @@ namespace TerRoguelike.TerPlayer
             barrierHealth = 0;
             playthroughTime.Restart();
             currentFloor = null;
+
         }
         #endregion
 
@@ -2178,6 +2318,28 @@ namespace TerRoguelike.TerPlayer
                 Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowColor * opacity * 0.7f, arrowRot, origin, scale, SpriteEffects.None);
                 arrowFrame.Y += frameHeight;
                 Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowOutlineColor * opacity * 0.9f, arrowRot, origin, scale, SpriteEffects.None);
+            }
+
+            if (ceremonialCrownStacks > 0)
+            {
+                var crownTex = TexDict["CeremonialCrownGems"];
+                int vertiFrameCount = 3;
+                int frameHeight = crownTex.Height / vertiFrameCount;
+                int fullCycle = 12;
+                float baseRot = Main.GlobalTimeWrappedHourly * MathHelper.Pi;
+                float baseOutDist = 40;
+                for (int i = 0; i < ceremonialCrownStacks; i++)
+                {
+                    int cycleCount = i / fullCycle;
+                    int dir = cycleCount % 2 == 0 ? 1 : -1;
+                    float outerRot = cycleCount * MathHelper.PiOver4;
+                    Rectangle gemFrame = new Rectangle(0, i % vertiFrameCount * frameHeight, crownTex.Width, frameHeight - 2);
+                    float extraRot = i / (float)fullCycle * MathHelper.TwoPi;
+                    float outDist = baseOutDist + 15 * cycleCount;
+                    float thisRot = extraRot + outerRot + baseRot * (1 - ((cycleCount + 1f) / (cycleCount + 2f))) * dir;
+                    Vector2 drawPos = Player.Center + Vector2.UnitY * Player.gfxOffY + thisRot.ToRotationVector2() * outDist;
+                    Main.EntitySpriteDraw(crownTex, drawPos - Main.screenPosition, gemFrame, Color.White * 0.75f, thisRot + MathHelper.PiOver2, gemFrame.Size() * 0.5f, 1f, SpriteEffects.None);
+                }
             }
 
             return;

@@ -170,6 +170,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/TrueBrainGoreFrames",
                 "TerRoguelike/UI/QuestionMark",
                 "TerRoguelike/MainMenu/UiMoon",
+                "TerRoguelike/TerPlayer/CeremonialCrownGems",
             };
             foreach (string path in pathList)
             {
