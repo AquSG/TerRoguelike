@@ -67,6 +67,7 @@ namespace TerRoguelike.TerPlayer
         public int flimsyPauldron;
         public int protectiveBubble;
         public int burningCharcoal;
+        public int microbotDefense;
 
         public int lockOnMissile;
         public int evilEye;
@@ -111,6 +112,7 @@ namespace TerRoguelike.TerPlayer
         public int forgottenBioWeapon;
         public int lunarCharm;
         public int ceremonialCrown;
+        public int thermitePowder;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
@@ -132,6 +134,7 @@ namespace TerRoguelike.TerPlayer
         public int symbioticFungusHealCooldown = 60;
         public int ceremonialCrownStacks;
         public int oldCeremonialCrownStacks;
+        public int thermitePowderCooldown = 0;
         #endregion
 
         #region Misc Variables
@@ -224,6 +227,7 @@ namespace TerRoguelike.TerPlayer
             flimsyPauldron = 0;
             protectiveBubble = 0;
             burningCharcoal = 0;
+            microbotDefense = 0;
 
             lockOnMissile = 0;
             evilEye = 0;
@@ -268,6 +272,7 @@ namespace TerRoguelike.TerPlayer
             forgottenBioWeapon = 0;
             lunarCharm = 0;
             ceremonialCrown = 0;
+            thermitePowder = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -509,6 +514,12 @@ namespace TerRoguelike.TerPlayer
             {
                 float drIncrease = protectiveBubble * 30f;
                 diminishingDR += drIncrease;
+            }
+            if (microbotDefense > 0 && Player.statLife <= Player.statLifeMax2 * 0.5f)
+            {
+                float drIncrease = microbotDefense * 12;
+                diminishingDR += drIncrease;
+                ParticleManager.AddParticle(new Square(Main.rand.NextVector2FromRectangle(Player.getRect()), Main.rand.NextVector2Circular(3, 3), 7, Color.LightSteelBlue, new Vector2(1f), 0, 0.96f, 7));
             }
             if (NewMoonActive)
             {
@@ -983,6 +994,48 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+
+            if (thermitePowderCooldown > 0)
+                thermitePowderCooldown--;
+            if (thermitePowder > 0)
+            {
+                if (thermitePowderCooldown <= 0)
+                {
+                    int igniteDamage = 70 * thermitePowder;
+                    int burnRate = 7;
+                    bool procced = false;
+                    int burnCap = igniteDamage / burnRate;
+                    for (int i = 0; i < Main.maxNPCs; i++)
+                    {
+                        NPC npc = Main.npc[i];
+                        if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly)
+                            continue;
+                        var modNPC = npc.ModNPC();
+                        if (modNPC == null)
+                            continue;
+                        procced = true;
+                        modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
+                    }
+                    if (procced)
+                    {
+                        SoundEngine.PlaySound(SoundID.Item45 with { Volume = 0.9f, Pitch = 0.3f, PitchVariance = 0.25f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, Player.Center);
+                        for (int i = 0; i < 32; i++)
+                        {
+                            float completion = i / 32f;
+                            float rot = MathHelper.TwoPi * completion + Main.rand.NextFloat(-0.04f, 0.04f);
+                            Color color = Color.Lerp(Color.Red, Color.Yellow, Main.rand.NextFloat(0.5f));
+                            ParticleManager.AddParticle(new ThinSpark(
+                                Player.Center + rot.ToRotationVector2() * 20, rot.ToRotationVector2() * 5 * Main.rand.NextFloat(0.3f, 1f),
+                                34, color * 0.9f, new Vector2(0.13f, 0.27f) * Main.rand.NextFloat(0.7f, 1f) * 0.6f, rot, true, false));
+                            if (i % 3 == 0)
+                            {
+                                ParticleManager.AddParticle(new Snow(Player.Center, rot.ToRotationVector2() * 5 * Main.rand.NextFloat(0.3f, 1f), 60, color, new Vector2(0.04f)));
+                            }
+                        }
+                        thermitePowderCooldown = 60;
+                    }
+                }
+            }
         }
         public override void PostUpdateEquips()
         {
@@ -1329,7 +1382,10 @@ namespace TerRoguelike.TerPlayer
                 float chance = 0.1f * burningCharcoal;
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
-                    int igniteDamage = (int)(hit.Damage * 1.5f);
+                    int internalHitDamage = hit.Damage;
+                    if (hit.Crit)
+                        internalHitDamage /= 2;
+                    int igniteDamage = (int)(internalHitDamage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
                     int burnCap = Math.Min(igniteDamage / 6, 50);
                     modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
                     Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;

@@ -9,6 +9,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Default;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs.Enemy.Boss;
 using TerRoguelike.Projectiles;
@@ -617,6 +618,7 @@ namespace TerRoguelike.NPCs
             if (npc.ai[0] < 0)
             {
                 npc.noGravity = true;
+                npc.noTileCollide = true;
                 if (npc.ai[0] == -burrowUpTime)
                 {
                     npc.rotation = MathHelper.PiOver2;
@@ -631,7 +633,10 @@ namespace TerRoguelike.NPCs
                 {
                     npc.Center -= Vector2.UnitY * (burrowDepth / burrowUpTime);
                 }
-
+            }
+            else
+            {
+                npc.noTileCollide = false;
             }
 
             if (npc.ai[0] >= burrowCooldown)
@@ -3393,7 +3398,8 @@ namespace TerRoguelike.NPCs
 
             npc.StrikeNPC(info);
             NetMessage.SendStrikeNPC(npc, info);
-            CombatText.NewText(npc.getRect(), Color.DarkKhaki, hitDamage);
+            if (npc.Center.Distance(Main.Camera.Center) < 1600)
+                CombatText.NewText(npc.getRect(), Color.DarkKhaki, hitDamage);
             ignitedHitCooldown += 10; // hits 6 times a second
         }
         public void BleedingHit(int hitDamage, NPC npc, int owner)
