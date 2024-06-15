@@ -248,7 +248,7 @@ namespace TerRoguelike.Managers
                 new FlimsyPauldron(),
                 new ProtectiveBubble(),
                 new BurningCharcoal(),
-                new MicrobotDefense(),
+                new ReactiveMicrobots(),
 
                 new EvilEye(),
                 new SpentShell(),
@@ -294,6 +294,7 @@ namespace TerRoguelike.Managers
                 new LunarCharm(),
                 new CeremonialCrown(),
                 new ThermitePowder(),
+                new EverlastingJellyfish(),
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();

@@ -43,6 +43,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             NPC.noTileCollide = true;
             NPC.behindTiles = true;
             modNPC.drawCenter = new Vector2(0, -18);
+            NPC.immortal = true;
         }
         public override void AI()
         {
@@ -61,6 +62,9 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
                 else
                     NPC.immortal = true;
             }
+            else
+                NPC.immortal = false;
+
             NPC.velocity.Y = MathHelper.Lerp(0, 0.1f, (float)Math.Cos(NPC.ai[0] / 60));
         }
         public override Color? GetAlpha(Color drawColor) => Color.White;
