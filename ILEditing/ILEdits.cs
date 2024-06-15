@@ -230,8 +230,8 @@ namespace TerRoguelike.ILEditing
                             }
 							if (platSlopeType == SlopeType.SlopeDownRight && Velocity.X < 0)
 							{
-                                Vector2 relativePos = player.BottomRight - checkTilePos + Vector2.UnitX * 16;
-								if (relativePos.Y < relativePos.X)
+                                Vector2 relativePos = player.BottomRight - checkTilePos;
+								if (16 - relativePos.X < relativePos.Y)
 									flag = false;
                             }	
 						}

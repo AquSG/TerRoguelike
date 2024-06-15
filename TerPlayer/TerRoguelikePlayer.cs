@@ -2745,11 +2745,11 @@ namespace TerRoguelike.TerPlayer
 
         public override void SaveData(TagCompound tag)
         {
-            tag["isDeletableOnExit"] = TerRoguelikeMenu.prepareForRoguelikeGeneration ? isDeletableOnExit : false;
+            tag["isDeletableOnExit"] = isDeletableOnExit;
         }
         public override void LoadData(TagCompound tag)
         {
-            isDeletableOnExit = tag.GetBool("isDeletableOnExit");
+            isDeletableOnExit = TerRoguelikeMenu.prepareForRoguelikeGeneration ? tag.GetBool("isDeletableOnExit") : false;
         }
         public static void HealthUpIndicator(Player player)
         {
