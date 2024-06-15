@@ -40,6 +40,7 @@ namespace TerRoguelike.ILEditing
     public class ILEdits : ModSystem
     {
 		public int passInNPC = -1;
+		public int passInPlayer = -1;
         public override void OnModLoad()
         {
             On_Main.DamageVar_float_int_float += AdjustDamageVariance;
@@ -52,12 +53,13 @@ namespace TerRoguelike.ILEditing
             IL_Main.DrawMenu += DrawTerRogulikeMenuInjection;
             On_Main.DrawMenu += On_Main_DrawMenu;
             On_Collision.SlopeCollision += On_Collision_SlopeCollision;
-            On_NPC.UpdateCollision += On_NPC_UpdateCollision;
 			On_Main.DoDraw_DrawNPCsBehindTiles += PreDrawTilesInjection;
             On_NPC.NPCLoot_DropCommonLifeAndMana += StopOnKillHeartsAndMana;
             On_ScreenObstruction.Draw += PostDrawBasicallyEverything;
             IL_Main.DoDraw += IL_Main_DoDraw;
             IL_Player.Update += RopeMovementILEdit;
+            On_Player.SlopingCollision += On_Player_SlopingCollision;
+            On_NPC.Collision_MoveSlopesAndStairFall += On_NPC_Collision_MoveSlopesAndStairFall;
         }
 
         private void RopeMovementILEdit(ILContext il)
@@ -151,14 +153,19 @@ namespace TerRoguelike.ILEditing
 			if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
 				orig.Invoke(self, closestPlayer);
         }
-
-        private void On_NPC_UpdateCollision(On_NPC.orig_UpdateCollision orig, NPC self)
+        private void On_Player_SlopingCollision(On_Player.orig_SlopingCollision orig, Player self, bool fallThrough, bool ignorePlats)
         {
-			if (TerRoguelikeWorld.IsTerRoguelikeWorld && self.type != 72 && self.type != 247 && self.type != 248 && (self.type < 542 || self.type > 545) && (!NPCID.Sets.BelongsToInvasionOldOnesArmy[self.type] || !self.noGravity))
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+				passInPlayer = self.whoAmI;
+
+			orig.Invoke(self, fallThrough, ignorePlats);
+        }
+        private void On_NPC_Collision_MoveSlopesAndStairFall(On_NPC.orig_Collision_MoveSlopesAndStairFall orig, NPC self, bool fall)
+        {
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld)
 				passInNPC = self.whoAmI;
 
-			orig.Invoke(self);
-			return;
+            orig.Invoke(self, fall);
         }
 
         private Vector4 On_Collision_SlopeCollision(On_Collision.orig_SlopeCollision orig, Vector2 Position, Vector2 Velocity, int Width, int Height, float gravity, bool fall)
@@ -167,6 +174,7 @@ namespace TerRoguelike.ILEditing
 				return orig.Invoke(Position, Velocity, Width, Height, gravity, fall);
 
 			NPC npc = passInNPC == -1 ? null : Main.npc[passInNPC];
+			Player player = passInPlayer == -1 ? null : Main.player[passInPlayer];
 			stair = false;
 			stairFall = false;
 			bool[] array = new bool[5];
@@ -175,41 +183,57 @@ namespace TerRoguelike.ILEditing
 			sloping = false;
 			Vector2 savedPosition = Position;
 			Vector2 savedVelocity = Velocity;
-			int value5 = (int)(Position.X / 16f) - 1;
-			int value2 = (int)((Position.X + (float)Width) / 16f) + 2;
-			int value3 = (int)(Position.Y / 16f) - 1;
-			int value4 = (int)((Position.Y + (float)Height) / 16f) + 2;
-			int num19 = Utils.Clamp(value5, 0, Main.maxTilesX - 1);
-			value2 = Utils.Clamp(value2, 0, Main.maxTilesX - 1);
-			value3 = Utils.Clamp(value3, 0, Main.maxTilesY - 1);
-			value4 = Utils.Clamp(value4, 0, Main.maxTilesY - 1);
-			Vector2 vector4 = default(Vector2);
-			for (int i = num19; i < value2; i++)
+			int leftTile = (int)(Position.X / 16f) - 1;
+			int rightTile = (int)((Position.X + (float)Width) / 16f) + 2;
+			int topTile = (int)(Position.Y / 16f) - 1;
+			int bottomTile = (int)((Position.Y + (float)Height) / 16f) + 2;
+			int safeLeftTile = Utils.Clamp(leftTile, 0, Main.maxTilesX - 1);
+			rightTile = Utils.Clamp(rightTile, 0, Main.maxTilesX - 1);
+			topTile = Utils.Clamp(topTile, 0, Main.maxTilesY - 1);
+			bottomTile = Utils.Clamp(bottomTile, 0, Main.maxTilesY - 1);
+			Vector2 checkTilePos = default(Vector2);
+			for (int i = safeLeftTile; i < rightTile; i++)
 			{
-				for (int j = value3; j < value4; j++)
+				for (int j = topTile; j < bottomTile; j++)
 				{
 					if (Main.tile[i, j] == null || !Main.tile[i, j].HasTile || Main.tile[i, j].IsActuated || (!Main.tileSolid[Main.tile[i, j].TileType] && (!Main.tileSolidTop[Main.tile[i, j].TileType] || Main.tile[i, j].TileFrameY != 0)))
 					{
 						continue;
 					}
-					vector4.X = i * 16;
-					vector4.Y = j * 16;
+					checkTilePos.X = i * 16;
+					checkTilePos.Y = j * 16;
 					int num11 = 16;
 					if (Main.tile[i, j].IsHalfBlock)
 					{
-						vector4.Y += 8f;
+						checkTilePos.Y += 8f;
 						num11 -= 8;
 					}
-					if (!(Position.X + (float)Width > vector4.X) || !(Position.X < vector4.X + 16f) || !(Position.Y + (float)Height > vector4.Y) || !(Position.Y < vector4.Y + (float)num11))
+					if (!(Position.X + (float)Width > checkTilePos.X) || !(Position.X < checkTilePos.X + 16f) || !(Position.Y + (float)Height > checkTilePos.Y) || !(Position.Y < checkTilePos.Y + (float)num11))
 					{
 						continue;
 					}
 					bool flag = true;
 					if (TileID.Sets.Platforms[Main.tile[i, j].TileType])
 					{
-						if (Velocity.Y < 0f)
+						if (Velocity.Y < 0f && (player == null || (Main.tile[i, j].Slope == SlopeType.Solid)))
 						{
 							flag = false;
+						}
+						if (player != null && Velocity.Y < 0 && Main.tile[i, j].Slope != SlopeType.Solid)
+						{
+							var platSlopeType = Main.tile[i, j].Slope;
+							if (platSlopeType == SlopeType.SlopeDownLeft && Velocity.X > 0)
+							{
+								Vector2 relativePos = player.BottomLeft - checkTilePos;
+								if (relativePos.X < relativePos.Y)
+									flag = false;
+                            }
+							if (platSlopeType == SlopeType.SlopeDownRight && Velocity.X < 0)
+							{
+                                Vector2 relativePos = player.BottomRight - checkTilePos + Vector2.UnitX * 16;
+								if (relativePos.Y < relativePos.X)
+									flag = false;
+                            }	
 						}
 						if (Position.Y + (float)Height < (float)(j * 16) || Position.Y + (float)Height - (1f + Math.Abs(Velocity.X)) > (float)(j * 16 + 16))
 						{
@@ -230,9 +254,9 @@ namespace TerRoguelike.ILEditing
 						flag2 = true;
 					}
 					SlopeType slopeType = Main.tile[i, j].Slope;
-					vector4.X = i * 16;
-					vector4.Y = j * 16;
-					if (!(Position.X + (float)Width > vector4.X) || !(Position.X < vector4.X + 16f) || !(Position.Y + (float)Height > vector4.Y) || !(Position.Y < vector4.Y + 16f))
+					checkTilePos.X = i * 16;
+					checkTilePos.Y = j * 16;
+					if (!(Position.X + (float)Width > checkTilePos.X) || !(Position.X < checkTilePos.X + 16f) || !(Position.Y + (float)Height > checkTilePos.Y) || !(Position.Y < checkTilePos.Y + 16f))
 					{
 						continue;
 					}
@@ -241,17 +265,17 @@ namespace TerRoguelike.ILEditing
 					{
 						if (slopeType == SlopeType.SlopeUpLeft)
 						{
-							num13 = Position.X - vector4.X;
+							num13 = Position.X - checkTilePos.X;
 						}
 						if (slopeType == SlopeType.SlopeUpRight)
 						{
-							num13 = vector4.X + 16f - (Position.X + (float)Width);
+							num13 = checkTilePos.X + 16f - (Position.X + (float)Width);
 						}
 						if (num13 >= 0f)
 						{
-							if (Position.Y <= vector4.Y + 16f - num13)
+							if (Position.Y <= checkTilePos.Y + 16f - num13)
 							{
-								float num14 = vector4.Y + 16f - Position.Y - num13;
+								float num14 = checkTilePos.Y + 16f - Position.Y - num13;
 								if (Position.Y + num14 > y2)
 								{
 									if (npc != null)
@@ -269,14 +293,14 @@ namespace TerRoguelike.ILEditing
 								}
 							}
 						}
-						else if (Position.Y > vector4.Y)
+						else if (Position.Y > checkTilePos.Y)
 						{
 							if (npc != null)
 							{
 								if (npc.velocity.Y < 0)
 									npc.collideY = true;
 							}
-							float num15 = vector4.Y + 16f;
+							float num15 = checkTilePos.Y + 16f;
 							if (savedPosition.Y < num15)
 							{
 								savedPosition.Y = num15;
@@ -293,19 +317,19 @@ namespace TerRoguelike.ILEditing
 					}
 					if (slopeType == SlopeType.SlopeDownLeft)
 					{
-						num13 = Position.X - vector4.X;
+						num13 = Position.X - checkTilePos.X;
 					}
 					if (slopeType == SlopeType.SlopeDownRight)
 					{
-						num13 = vector4.X + 16f - (Position.X + (float)Width);
+						num13 = checkTilePos.X + 16f - (Position.X + (float)Width);
 					}
 					if (num13 >= 0f)
 					{
-						if (!(Position.Y + (float)Height >= vector4.Y + num13))
+						if (!(Position.Y + (float)Height >= checkTilePos.Y + num13))
 						{
 							continue;
 						}
-						float num16 = vector4.Y - (Position.Y + (float)Height) + num13;
+						float num16 = checkTilePos.Y - (Position.Y + (float)Height) + num13;
 						if (!(Position.Y + num16 < y))
 						{
 							continue;
@@ -338,7 +362,7 @@ namespace TerRoguelike.ILEditing
 						array[(int)slopeType] = true;
 						continue;
 					}
-					if (TileID.Sets.Platforms[Main.tile[i, j].TileType] && !(Position.Y + (float)Height - 4f - Math.Abs(Velocity.X) <= vector4.Y))
+					if (TileID.Sets.Platforms[Main.tile[i, j].TileType] && !(Position.Y + (float)Height - 4f - Math.Abs(Velocity.X) <= checkTilePos.Y))
 					{
 						if (flag2)
 						{
@@ -346,7 +370,7 @@ namespace TerRoguelike.ILEditing
 						}
 						continue;
 					}
-					float num17 = vector4.Y - (float)Height;
+					float num17 = checkTilePos.Y - (float)Height;
 					if (!(savedPosition.Y > num17))
 					{
 						continue;
@@ -414,6 +438,7 @@ namespace TerRoguelike.ILEditing
 			}
 
 			passInNPC = -1;
+			passInPlayer = -1;
 			return new Vector4(savedPosition, savedVelocity.X, savedVelocity.Y);
 		}
 
