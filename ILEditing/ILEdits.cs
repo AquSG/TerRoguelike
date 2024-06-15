@@ -215,7 +215,7 @@ namespace TerRoguelike.ILEditing
 					bool flag = true;
 					if (TileID.Sets.Platforms[Main.tile[i, j].TileType])
 					{
-						if (Velocity.Y < 0f && (player == null || (Main.tile[i, j].Slope == SlopeType.Solid)))
+						if (Velocity.Y < 0f && (player == null || (Main.tile[i, j].Slope == SlopeType.Solid || Velocity.X == 0)))
 						{
 							flag = false;
 						}
