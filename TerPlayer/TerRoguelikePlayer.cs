@@ -67,7 +67,7 @@ namespace TerRoguelike.TerPlayer
         public int flimsyPauldron;
         public int protectiveBubble;
         public int burningCharcoal;
-        public int microbotDefense;
+        public int reactiveMicrobots;
 
         public int lockOnMissile;
         public int evilEye;
@@ -113,6 +113,7 @@ namespace TerRoguelike.TerPlayer
         public int lunarCharm;
         public int ceremonialCrown;
         public int thermitePowder;
+        public int everlastingJellyfish;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
@@ -227,7 +228,7 @@ namespace TerRoguelike.TerPlayer
             flimsyPauldron = 0;
             protectiveBubble = 0;
             burningCharcoal = 0;
-            microbotDefense = 0;
+            reactiveMicrobots = 0;
 
             lockOnMissile = 0;
             evilEye = 0;
@@ -273,6 +274,7 @@ namespace TerRoguelike.TerPlayer
             lunarCharm = 0;
             ceremonialCrown = 0;
             thermitePowder = 0;
+            everlastingJellyfish = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -448,7 +450,12 @@ namespace TerRoguelike.TerPlayer
             }
 
             if (deathEffectTimer > 0)
+            {
                 deathEffectTimer--;
+                if (!reviveDeathEffect && deathEffectTimer <= 1)
+                    ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 60);
+            }
+                
             if (deathEffectTimer == 1 && reviveDeathEffect)
             {
                 ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 1f }, Player.Center), 2));
@@ -515,9 +522,9 @@ namespace TerRoguelike.TerPlayer
                 float drIncrease = protectiveBubble * 30f;
                 diminishingDR += drIncrease;
             }
-            if (microbotDefense > 0 && Player.statLife <= Player.statLifeMax2 * 0.5f)
+            if (reactiveMicrobots > 0 && Player.statLife <= Player.statLifeMax2 * 0.5f)
             {
-                float drIncrease = microbotDefense * 12;
+                float drIncrease = reactiveMicrobots * 12;
                 diminishingDR += drIncrease;
                 ParticleManager.AddParticle(new Square(Main.rand.NextVector2FromRectangle(Player.getRect()), Main.rand.NextVector2Circular(3, 3), 7, Color.LightSteelBlue, new Vector2(1f), 0, 0.96f, 7));
             }
@@ -1653,8 +1660,22 @@ namespace TerRoguelike.TerPlayer
                 else
                     damageMultiplierFromDR *= 2 - (100f / (100f - diminishingDR));
             }
-            info.Damage = (int)(info.Damage * damageMultiplierFromDR);
+            int newDamage = (int)(info.Damage * damageMultiplierFromDR);
+            int damageDifference = info.Damage - newDamage;
+            info.Damage = newDamage;
 
+            if (everlastingJellyfish > 0 && damageDifference > barrierHealth)
+            {
+                int damageDifferenceAfterBarrierReduction = damageDifference - (int)barrierHealth;
+                if (damageDifferenceAfterBarrierReduction > 0)
+                {
+                    float targetedHealingPercentage = ((everlastingJellyfish + 1f) / (everlastingJellyfish + 3f));
+                    int finalHealingAmount = (int)(damageDifferenceAfterBarrierReduction * targetedHealingPercentage);
+                    if (finalHealingAmount < 1)
+                        finalHealingAmount = 1;
+                    ScaleableHeal(finalHealingAmount);
+                }
+            }
             if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)
             {
                 int preBarrierDamage = info.Damage;

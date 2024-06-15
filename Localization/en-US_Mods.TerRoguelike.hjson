@@ -815,12 +815,21 @@ Items: {
 			'''
 	}
 
-	MicrobotDefense: {
-		DisplayName: Microbot Defense
+	ReactiveMicrobots: {
+		DisplayName: Reactive Microbots
 		Tooltip:
 			'''
 			+12 diminishing DR while below 50% max life
 			Extra copies of this item increase the diminishing DR by 12
+			'''
+	}
+
+	EverlastingJellyfish: {
+		DisplayName: Everlasting Jellyfish
+		Tooltip:
+			'''
+			Upon taking damage, recieve 50% of health damage reduced by diminishing DR as healing
+			Extra copies of this item increase the healing percentage by a diminishing amount
 			'''
 	}
 }

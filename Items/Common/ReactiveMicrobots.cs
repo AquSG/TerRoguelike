@@ -5,9 +5,9 @@ using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Items.Common
 {
-    public class MicrobotDefense : BaseRoguelikeItem, ILocalizedModType
+    public class ReactiveMicrobots : BaseRoguelikeItem, ILocalizedModType
     {
-        public override int modItemID => ModContent.ItemType<MicrobotDefense>();
+        public override int modItemID => ModContent.ItemType<ReactiveMicrobots>();
         public override bool UtilityItem => true;
         public override int itemTier => 0;
         public override void SetDefaults()
@@ -18,7 +18,7 @@ namespace TerRoguelike.Items.Common
         }
         public override void ItemEffects(Player player)
         {
-            player.GetModPlayer<TerRoguelikePlayer>().microbotDefense += Item.stack;
+            player.GetModPlayer<TerRoguelikePlayer>().reactiveMicrobots += Item.stack;
         }
     }
 }
