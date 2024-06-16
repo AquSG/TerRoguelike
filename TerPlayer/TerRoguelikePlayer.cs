@@ -764,9 +764,9 @@ namespace TerRoguelike.TerPlayer
                 {
                     wayfarersWaistclothDirTime = 0;
                 }
-                if (Math.Abs(wayfarersWaistclothDirTime) >= 120)
+                if (Math.Abs(wayfarersWaistclothDirTime) >= 90)
                 {
-                    if (Math.Abs(wayfarersWaistclothDirTime) == 120)
+                    if (Math.Abs(wayfarersWaistclothDirTime) == 90)
                     {
                         SoundEngine.PlaySound(WayfarerProc with { Volume = 1f,  Pitch = 0.4f }, Player.Center);
                         int particleDir = -Math.Sign(wayfarersWaistclothDirTime);
@@ -1512,7 +1512,7 @@ namespace TerRoguelike.TerPlayer
             {
                 Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
                 Vector2 targetVect = targetPos - proj.getRect().ClosestPointInRect(Player.Center);
-                Projectile.NewProjectile(Player.GetSource_FromThis(), targetPos, targetVect.SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * Main.rand.NextFloat(2f, 2.5f), ModContent.ProjectileType<RemedialHealingOrb>(), 0, 0);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), targetPos, targetVect.SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * Main.rand.NextFloat(8f, 10f), ModContent.ProjectileType<RemedialHealingOrb>(), 0, 0);
             }
 
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
