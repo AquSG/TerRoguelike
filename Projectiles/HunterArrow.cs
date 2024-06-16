@@ -106,6 +106,14 @@ namespace TerRoguelike.Projectiles
                 d.noLightEmittence = true;
             }
         }
+        public override void OnHitPlayer(Player target, Player.HurtInfo info)
+        {
+            Projectile.Kill();
+        }
+        public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            Projectile.Kill();
+        }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             if (Projectile.ai[0] == 0)

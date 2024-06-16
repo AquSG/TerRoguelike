@@ -666,14 +666,14 @@ namespace TerRoguelike.TerPlayer
 
                         hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.ModNPC().ClosestPosition(target.getRect().ClosestPointInRect(Player.Center), Player.Center, target)));
 
-                        if (target.life - hitDamage <= 0)
-                        {
-                            OnKillEffects(target);
-                        }
                         NPC.HitInfo info = new NPC.HitInfo();
                         info.HideCombatText = true;
                         int actualHitDamage = hitDamage * 10;
                         info.Damage = actualHitDamage;
+                        if (target.life - actualHitDamage <= 0)
+                        {
+                            OnKillEffects(target);
+                        }
                         info.InstantKill = false;
                         info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                         info.Knockback = 0f;
@@ -923,14 +923,14 @@ namespace TerRoguelike.TerPlayer
                     int hitDamage = (int)(Player.statLifeMax2 * 0.02f * allSeeingEye);
                     hitDamage = (int)(hitDamage * GetBonusDamageMulti(target, target.ModNPC().ClosestPosition(target.getRect().ClosestPointInRect(Player.Center), Player.Center, target)));
 
-                    if (target.life - hitDamage <= 0)
-                    {
-                        OnKillEffects(target);
-                    }
                     NPC.HitInfo info = new NPC.HitInfo();
                     info.HideCombatText = true;
                     int actualHitDamage = hitDamage * 10;
                     info.Damage = actualHitDamage;
+                    if (target.life - actualHitDamage <= 0)
+                    {
+                        OnKillEffects(target);
+                    }
                     info.InstantKill = false;
                     info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                     info.Knockback = 0f;
