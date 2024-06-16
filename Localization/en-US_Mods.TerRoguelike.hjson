@@ -866,6 +866,15 @@ Items: {
 			Extra copies of this item increase the chance of spawning a turret by a diminishing amount
 			'''
 	}
+
+	WayfarersWaistcloth: {
+		DisplayName: Wayfarer's Waistcloth
+		Tooltip:
+			'''
+			20% increased movement speed after running in one direction uninterrupted for 2 seconds
+			Extra copies of this item increase the movement speed bonus by 20%
+			'''
+	}
 }
 
 NPCs: {

@@ -43,6 +43,7 @@ namespace TerRoguelike.TerPlayer
         public static float BloodMoonIframeMultiplier = 0.75f;
         public static float NewMoonIframeMultiplier = 1.5f;
         public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
+        public static readonly SoundStyle WayfarerProc = new SoundStyle("TerRoguelike/Sounds/WayfarerProc");
 
         #region Item Variables
         public int coolantBarrel;
@@ -95,6 +96,7 @@ namespace TerRoguelike.TerPlayer
         public int giftBox;
         public int ancientTwig;
         public int disposableTurret;
+        public int wayfarersWaistcloth;
 
         public int volatileRocket;
         public int theDreamsoul;
@@ -143,6 +145,7 @@ namespace TerRoguelike.TerPlayer
         public int ancientTwigLastStruckTimer = 0;
         public int ancientTwigCooldown = 0;
         public int ancientTwigSetRestoreRate = 100;
+        public int wayfarersWaistclothDirTime = 0;
         #endregion
 
         #region Misc Variables
@@ -262,6 +265,7 @@ namespace TerRoguelike.TerPlayer
             giftBox = 0;
             ancientTwig = 0;
             disposableTurret = 0;
+            wayfarersWaistcloth = 0;
 
             volatileRocket = 0;
             theDreamsoul = 0;
@@ -734,6 +738,57 @@ namespace TerRoguelike.TerPlayer
             }
             else if (thrillOfTheHuntStacks.Count > 0)
                 thrillOfTheHuntStacks.Clear();
+
+            if (wayfarersWaistcloth > 0)
+            {
+                if (!(Player.controlLeft && Player.controlRight))
+                {
+                    if (Player.controlLeft && Player.velocity.X != 0)
+                    {
+                        if (wayfarersWaistclothDirTime > 0)
+                            wayfarersWaistclothDirTime = 0;
+                        wayfarersWaistclothDirTime--;
+                    }
+                    else if (Player.controlRight && Player.velocity.X != 0)
+                    {
+                        if (wayfarersWaistclothDirTime < 0)
+                            wayfarersWaistclothDirTime = 0;
+                        wayfarersWaistclothDirTime++;
+                    }
+                    else
+                    {
+                        wayfarersWaistclothDirTime = 0;
+                    }
+                }
+                else
+                {
+                    wayfarersWaistclothDirTime = 0;
+                }
+                if (Math.Abs(wayfarersWaistclothDirTime) >= 120)
+                {
+                    if (Math.Abs(wayfarersWaistclothDirTime) == 120)
+                    {
+                        SoundEngine.PlaySound(WayfarerProc with { Volume = 1f,  Pitch = 0.4f }, Player.Center);
+                        int particleDir = -Math.Sign(wayfarersWaistclothDirTime);
+
+                        for (int i = -1; i <= 1; i++)
+                        {
+                            Vector2 particlePos = Player.Center + new Vector2(Player.width * 0.5f * particleDir, Player.height * 0.25f * i + Player.gfxOffY);
+                            Vector2 particleVel = Vector2.UnitX * particleDir * 2f;
+                            ParticleManager.AddParticle(new ThinSpark(particlePos, particleVel, 30, Color.Lerp(Color.Blue, Color.Cyan, 0.5f), new Vector2(0.16f, 0.1f) * Main.rand.NextFloat(0.9f, 1f), 0, true, false));
+                        }
+                        for (int i = 0; i < 9; i++)
+                        {
+                            ParticleManager.AddParticle(new Ball(Player.Center, (i / 9f * MathHelper.TwoPi + Main.rand.NextFloat(-0.3f, 0.3f)).ToRotationVector2() * 5 * Main.rand.NextFloat(0.3f, 1f) + Vector2.UnitX * particleDir,
+                                37, Color.Lerp(Color.Blue, Color.Cyan, Main.rand.NextFloat(0.6f, 1f)), new Vector2(0.1f), 0, 0.9f, 24, false));
+                        }
+                    }
+                    float speedIncrease = wayfarersWaistcloth * 0.2f;
+                    Player.moveSpeed += speedIncrease;
+                }
+            }
+            else
+                wayfarersWaistclothDirTime = 0;
 
             if (theDreamsoul > 0)
             {

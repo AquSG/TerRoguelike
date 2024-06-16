@@ -275,6 +275,7 @@ namespace TerRoguelike.Managers
                 new GiftBox(),
                 new AncientTwig(),
                 new DisposableTurret(),
+                new WayfarersWaistcloth(),
 
                 new VolatileRocket(),
                 new TheDreamsoul(),
