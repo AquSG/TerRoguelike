@@ -264,7 +264,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.velocity *= (float)Math.Pow(startupCompletion, 4);
                     if (NPC.ai[1] == 0)
                     {
-                        SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.9f }, NPC.Center);
+                        SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.9f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                     }
                 }
                 else

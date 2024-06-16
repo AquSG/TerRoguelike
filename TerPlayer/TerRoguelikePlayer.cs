@@ -1914,6 +1914,14 @@ namespace TerRoguelike.TerPlayer
                     Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * NewMoonIframeMultiplier);
                 }
             }
+            if (info.Damage == 1 && barrierInHurt > 0)
+            {
+                Player.immuneTime *= 2;
+                for (int i = 0; i < Player.hurtCooldowns.Length; i++)
+                {
+                    Player.hurtCooldowns[i] *= 2;
+                }
+            }
             if (soulOfLena > 0)
             {
                 if (soulOfLenaUses < soulOfLena && Player.statLife / (float)Player.statLifeMax2 <= 0.25f)
