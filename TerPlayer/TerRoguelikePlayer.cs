@@ -893,26 +893,35 @@ namespace TerRoguelike.TerPlayer
             {
                 if (allSeeingEyeTarget != -1)
                 {
+                    Rectangle wantedScreenRect = new Rectangle((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
+                    wantedScreenRect.Inflate(200, 200);
+
                     NPC npc = Main.npc[allSeeingEyeTarget];
-                    if (npc.life <= 0 || !npc.CanBeChasedBy())
+                    if (npc.life <= 0 || !npc.CanBeChasedBy() || !wantedScreenRect.Contains(AimWorld().ToPoint()))
                         allSeeingEyeTarget = -1;
                 }
 
                 if (allSeeingEyeHitCooldown <= 0)
                 {
+                    Rectangle wantedScreenRect = new Rectangle((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
+                    wantedScreenRect.Inflate(200, 200);
+                    Point checkPoint = AimWorld().ToPoint();
                     allSeeingEyeTarget = -1;
-                    for (int i = 0; i < Main.maxNPCs; i++)
+                    if (wantedScreenRect.Contains(checkPoint))
                     {
-                        NPC npc = Main.npc[i];
-                        if (npc.life <= 0 || !npc.CanBeChasedBy())
-                            continue;
-
-                        var modNPC = npc.ModNPC();
-                        if (modNPC.Segments.Count > 0 ? npc.ModNPC().IsPointInsideSegment(npc, Main.MouseWorld.ToPoint()) : 
-                            (modNPC.specialAllSeeingEyeHoverBox != null ? ((Rectangle)modNPC.specialAllSeeingEyeHoverBox).Contains(Main.MouseWorld.ToPoint()) : npc.getRect().Contains(Main.MouseWorld.ToPoint())))
+                        for (int i = 0; i < Main.maxNPCs; i++)
                         {
-                            allSeeingEyeTarget = i;
-                            break;
+                            NPC npc = Main.npc[i];
+                            if (npc.life <= 0 || !npc.CanBeChasedBy())
+                                continue;
+
+                            var modNPC = npc.ModNPC();
+                            if (modNPC.Segments.Count > 0 ? npc.ModNPC().IsPointInsideSegment(npc, checkPoint) :
+                                (modNPC.specialAllSeeingEyeHoverBox != null ? ((Rectangle)modNPC.specialAllSeeingEyeHoverBox).Contains(checkPoint) : npc.getRect().Contains(checkPoint)))
+                            {
+                                allSeeingEyeTarget = i;
+                                break;
+                            }
                         }
                     }
                 }
@@ -2431,7 +2440,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     NPC npc = Main.npc[allSeeingEyeTarget];
 
-                    Vector2 distanceVector = Main.MouseWorld - Player.Center;
+                    Vector2 distanceVector = AimWorld() - Player.Center;
                     for (int d = 0; d < 2; d++)
                     {
                         Vector2 placement = distanceVector.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(1f, distanceVector.Length());

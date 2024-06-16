@@ -18,6 +18,11 @@ using Terraria.Localization;
 using TerRoguelike.Projectiles;
 using ReLogic.Content;
 using Microsoft.Build.Tasks;
+using Terraria.GameContent.ObjectInteractions;
+using Terraria.Audio;
+using TerRoguelike.UI;
+using static TerRoguelike.World.TerRoguelikeWorld;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Tiles
 {
@@ -41,6 +46,37 @@ namespace TerRoguelike.Tiles
         public override void PostSetDefaults()
         {
             
+        }
+        public override bool HasSmartInteract(int i, int j, SmartInteractScanSettings settings) => true;
+        public override bool RightClick(int i, int j)
+        {
+            var modPlayer = Main.LocalPlayer.ModPlayer();
+            if (modPlayer == null)
+                return false;
+
+            for (int b = 0; b < itemBasins.Count; b++)
+            {
+                var basin = itemBasins[b];
+
+                if (basin.nearby > 0)
+                {
+                    if (basin.rect.Contains(new Point(i, j)))
+                    {
+                        if (modPlayer.selectedBasin == basin)
+                        {
+                            modPlayer.selectedBasin = null;
+                        }
+                        else
+                        {
+                            modPlayer.selectedBasin = basin;
+                            ItemBasinUI.gamepadSelectedOption = 0;
+                            SoundEngine.PlaySound(SoundID.MenuOpen);
+                        }
+                    }
+                }
+            }
+
+            return true;
         }
         public override void NearbyEffects(int i, int j, bool closer)
         {
@@ -73,6 +109,7 @@ namespace TerRoguelike.Tiles
         public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
         {
             glowTex ??= TexDict["ItemBasinGlow"];
+            highlightTex ??= TexDict["ItemBasin_Highlight"];
 
             Point tilePos = new Point(i, j);
             ItemTier tier = new();
@@ -106,7 +143,22 @@ namespace TerRoguelike.Tiles
             Vector2 offset = Main.drawToScreen ? Vector2.Zero : new Vector2(Main.offScreenRange);
             Vector2 drawPos = new Vector2(i, j) * 16 - Main.screenPosition + offset;
 
-            Main.spriteBatch.Draw(glowTex, drawPos, new Rectangle?(new Rectangle(xPos, yPos + currentFrame * AnimationFrameHeight, 18, 18)), color, 0, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
+            Rectangle? thisTileFrame = new Rectangle?(new Rectangle(xPos, yPos + currentFrame * AnimationFrameHeight, 16, 16));
+            Main.spriteBatch.Draw(glowTex, drawPos, thisTileFrame, color, 0, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
+
+            int selectionTier = 0;
+            if (Main.InSmartCursorHighlightArea(i, j, out var actuallySelected))
+            {
+                selectionTier = actuallySelected ? 2 : 1;
+            }
+            if (selectionTier > 0)
+            {
+                Color baseTileColor = Lighting.GetColor(i, j);
+                int averageBrightness = (baseTileColor.R + baseTileColor.G + baseTileColor.B) / 3;
+                Color selectionColor = Colors.GetSelectionGlowColor(selectionTier == 2, averageBrightness);
+
+                Main.spriteBatch.Draw(highlightTex, drawPos, thisTileFrame, selectionColor, 0, Vector2.Zero, 1f, SpriteEffects.None, 0.0f);
+            }
         }
         public override void PlaceInWorld(int i, int j, Item item)
         {

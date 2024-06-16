@@ -134,6 +134,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/TempleGolemGlow",
                 "TerRoguelike/Projectiles/RockDebris",
                 "TerRoguelike/Tiles/ItemBasinGlow",
+                "TerRoguelike/Tiles/ItemBasin_Highlight",
                 "TerRoguelike/UI/Random",
                 "TerRoguelike/UI/NoCircle",
                 "TerRoguelike/UI/BasinOptionBox",
