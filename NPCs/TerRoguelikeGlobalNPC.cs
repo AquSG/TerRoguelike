@@ -31,6 +31,7 @@ namespace TerRoguelike.NPCs
         public bool IgnoreRoomWallCollision = false;
         public Vector2 RoomWallCollisionShrink = Vector2.Zero;
         public bool SpecialProjectileCollisionRules = false; // Makes certain things happen on the attacking projectile rather than the closest point in the NPC rect to the projectile
+        public Rectangle? specialAllSeeingEyeHoverBox = null;
         public bool ignoreForRoomClearing = false;
         public int baseMaxHP = 0;
         public int baseDamage = 0;
@@ -57,8 +58,11 @@ namespace TerRoguelike.NPCs
         public bool activatedHotPepper = false;
         public bool activatedSoulstealCoating = false;
         public bool activatedAmberBead = false;
+
         public bool activatedThrillOfTheHunt = false;
         public bool activatedClusterBombSatchel = false;
+        public bool activatedDisposableTurret= false;
+
         public bool activatedSteamEngine = false;
         public bool activatedNutritiousSlime = false;
         public bool activatedItemPotentiometer = false;

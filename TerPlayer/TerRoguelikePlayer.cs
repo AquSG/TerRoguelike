@@ -34,6 +34,7 @@ using TerRoguelike.NPCs.Enemy.Boss;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using Terraria.WorldBuilding;
 using TerRoguelike.Items.Common;
+using TerRoguelike.Items.Uncommon;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -68,6 +69,7 @@ namespace TerRoguelike.TerPlayer
         public int protectiveBubble;
         public int burningCharcoal;
         public int reactiveMicrobots;
+        public int remedialTapeworm;
 
         public int lockOnMissile;
         public int evilEye;
@@ -91,6 +93,8 @@ namespace TerRoguelike.TerPlayer
         public int amberRing;
         public int thrillOfTheHunt;
         public int giftBox;
+        public int ancientTwig;
+        public int disposableTurret;
 
         public int volatileRocket;
         public int theDreamsoul;
@@ -136,6 +140,9 @@ namespace TerRoguelike.TerPlayer
         public int ceremonialCrownStacks;
         public int oldCeremonialCrownStacks;
         public int thermitePowderCooldown = 0;
+        public int ancientTwigLastStruckTimer = 0;
+        public int ancientTwigCooldown = 0;
+        public int ancientTwigSetRestoreRate = 100;
         #endregion
 
         #region Misc Variables
@@ -229,6 +236,7 @@ namespace TerRoguelike.TerPlayer
             protectiveBubble = 0;
             burningCharcoal = 0;
             reactiveMicrobots = 0;
+            remedialTapeworm = 0;
 
             lockOnMissile = 0;
             evilEye = 0;
@@ -252,6 +260,8 @@ namespace TerRoguelike.TerPlayer
             amberRing = 0;
             thrillOfTheHunt = 0;
             giftBox = 0;
+            ancientTwig = 0;
+            disposableTurret = 0;
 
             volatileRocket = 0;
             theDreamsoul = 0;
@@ -444,10 +454,27 @@ namespace TerRoguelike.TerPlayer
             }
             if (barrierHealth > barrierFloor)
             {
-                barrierHealth -= Player.statLifeMax2 * (0.04f * 0.0166f);
+                float decayRate = 0.04f * 0.0166f;
+                if (ancientTwig > 0 && ancientTwigLastStruckTimer > 0)
+                {
+                    decayRate *= (float)Math.Pow(0.85f, ancientTwig);
+                }
+                barrierHealth -= Player.statLifeMax2 * (decayRate);
                 if (barrierHealth < barrierFloor)
                     barrierHealth = barrierFloor;
             }
+            if (ancientTwigLastStruckTimer > 0)
+            {
+                if (ancientTwig > 0 && ancientTwigCooldown <= 0)
+                {
+                    int barrierHealAmt = ancientTwig * 2 + 3;
+                    AddBarrierHealth(barrierHealAmt);
+                    ancientTwigCooldown = ancientTwigSetRestoreRate;
+                }
+                ancientTwigLastStruckTimer--;
+            }
+            if (ancientTwigCooldown > 0)
+                ancientTwigCooldown--;
 
             if (deathEffectTimer > 0)
             {
@@ -880,7 +907,9 @@ namespace TerRoguelike.TerPlayer
                         if (npc.life <= 0 || !npc.CanBeChasedBy())
                             continue;
 
-                        if (npc.ModNPC().Segments.Count > 0 ? npc.ModNPC().IsPointInsideSegment(npc, Main.MouseWorld.ToPoint()) : npc.getRect().Contains(Main.MouseWorld.ToPoint()))
+                        var modNPC = npc.ModNPC();
+                        if (modNPC.Segments.Count > 0 ? npc.ModNPC().IsPointInsideSegment(npc, Main.MouseWorld.ToPoint()) : 
+                            (modNPC.specialAllSeeingEyeHoverBox != null ? ((Rectangle)modNPC.specialAllSeeingEyeHoverBox).Contains(Main.MouseWorld.ToPoint()) : npc.getRect().Contains(Main.MouseWorld.ToPoint())))
                         {
                             allSeeingEyeTarget = i;
                             break;
@@ -1415,6 +1444,12 @@ namespace TerRoguelike.TerPlayer
                     SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.44f, Pitch = 0.4f, PitchVariance = 0.13f }, targetPos);
                 }
             }
+            if (remedialTapeworm > 0)
+            {
+                Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
+                Vector2 targetVect = targetPos - proj.getRect().ClosestPointInRect(Player.Center);
+                Projectile.NewProjectile(Player.GetSource_FromThis(), targetPos, targetVect.SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * Main.rand.NextFloat(2f, 2.5f), ModContent.ProjectileType<RemedialHealingOrb>(), 0, 0);
+            }
 
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
             {
@@ -1476,6 +1511,10 @@ namespace TerRoguelike.TerPlayer
             {
                 int barrierGainAmt = 5 * amberRing;
                 AddBarrierHealth(barrierGainAmt);
+            }
+            if (ancientTwig > 0)
+            {
+                ancientTwigLastStruckTimer = 300;
             }
 
             if (proj.type == ModContent.ProjectileType<ThrownBackupDagger>())
@@ -1572,6 +1611,33 @@ namespace TerRoguelike.TerPlayer
             {
                 steamEngineStacks.Add(7200);
                 modTarget.activatedSteamEngine = true;
+            }
+            if (disposableTurret > 0 && !modTarget.activatedDisposableTurret)
+            {
+                float chance = (disposableTurret + 0.5f) / (disposableTurret + 5f);
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    Vector2 wantedPos = FindAirToPlayer(target.Center);
+                    Point wantedTilePos = wantedPos.ToTileCoordinates();
+
+                    bool found = false;
+                    for (int y = 0; y < 200; y++)
+                    {
+                        Point belowTilePos = wantedTilePos + new Point(0, y);
+                        if (ParanoidTileRetrieval(belowTilePos).IsTileSolidGround())
+                        {
+                            wantedPos = belowTilePos.ToWorldCoordinates(8, -12);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found)
+                        wantedPos = target.Center;
+                    int spawnedProj = Projectile.NewProjectile(Player.GetSource_FromThis(), wantedPos, Vector2.Zero, ModContent.ProjectileType<DisposableTurretMinion>(), 100, 0);
+                    Main.projectile[spawnedProj].localAI[0] = wantedPos.X < Player.Center.X ? -1 : 1;
+                }
+
+                modTarget.activatedDisposableTurret = true;
             }
             if (nutritiousSlime > 0 && !modTarget.activatedNutritiousSlime)
             {
@@ -1974,7 +2040,7 @@ namespace TerRoguelike.TerPlayer
             Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
             if (tile != null)
             {
-                if (!tile.HasTile)
+                if (!tile.IsTileSolidGround(true))
                 {
                     return position;
                 }
@@ -2194,6 +2260,51 @@ namespace TerRoguelike.TerPlayer
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
+            }
+
+            if (ancientTwigCooldown > 0)
+            {
+                float completion = (1f - (ancientTwigCooldown / (float)ancientTwigSetRestoreRate)) * 2;
+                float logCompletion = (float)Math.Log(completion + 1, 4);
+
+                Main.spriteBatch.End();
+                Effect shieldEffect = Filters.Scene["TerRoguelike:AncientTwigEffect"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, shieldEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                // Noise scale also grows and shrinks, although out of sync with the shield
+                float noiseScale = 1f;
+
+                // Define shader parameters
+
+                shieldEffect.Parameters["time"].SetValue(Main.GlobalTimeWrappedHourly * 1);
+                shieldEffect.Parameters["blowUpPower"].SetValue(2.5f);
+                shieldEffect.Parameters["blowUpSize"].SetValue(0.5f);
+                shieldEffect.Parameters["noiseScale"].SetValue(noiseScale);
+
+                // Shield opacity multiplier slightly changes, this is independent of current shield strength
+                float opacity = MathHelper.Clamp(MathHelper.Lerp(1f, -1f, completion), 0f, 1f);
+                shieldEffect.Parameters["shieldOpacity"].SetValue(opacity);
+                shieldEffect.Parameters["shieldEdgeBlendStrenght"].SetValue(4f);
+
+                Color edgeColor;
+                Color shieldColor;
+
+
+                edgeColor = Color.Goldenrod * 1f;
+                shieldColor = Color.Yellow * 0.8f;
+
+                // Define shader parameters for shield color
+                shieldEffect.Parameters["shieldColor"].SetValue(shieldColor.ToVector4());
+                shieldEffect.Parameters["shieldEdgeColor"].SetValue(edgeColor.ToVector4());
+
+                // Fetch shield noise overlay texture (this is the techy overlay fed to the shader)
+                Vector2 pos = Player.MountedCenter + Player.gfxOffY * Vector2.UnitY - Main.screenPosition;
+                Texture2D tex = TexDict["Crust"];
+
+                float scale = MathHelper.Lerp(0, 0.55f, logCompletion);
+                Main.spriteBatch.Draw(tex, pos, null, Color.White, 0, tex.Size() / 2f, scale, 0, 0);
+
+                StartVanillaSpritebatch();
             }
 
             if (overclockerTime > 0)

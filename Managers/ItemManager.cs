@@ -249,6 +249,7 @@ namespace TerRoguelike.Managers
                 new ProtectiveBubble(),
                 new BurningCharcoal(),
                 new ReactiveMicrobots(),
+                new RemedialTapeworm(),
 
                 new EvilEye(),
                 new SpentShell(),
@@ -272,6 +273,8 @@ namespace TerRoguelike.Managers
                 new AmberRing(),
                 new ThrillOfTheHunt(),
                 new GiftBox(),
+                new AncientTwig(),
+                new DisposableTurret(),
 
                 new VolatileRocket(),
                 new TheDreamsoul(),
