@@ -871,7 +871,7 @@ Items: {
 		DisplayName: Wayfarer's Waistcloth
 		Tooltip:
 			'''
-			20% increased movement speed after running in one direction uninterrupted for 2 seconds
+			20% increased movement speed after running in one direction uninterrupted for 1.5 seconds
 			Extra copies of this item increase the movement speed bonus by 20%
 			'''
 	}

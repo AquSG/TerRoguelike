@@ -20,7 +20,7 @@ namespace TerRoguelike.Projectiles
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.TrailingMode[Projectile.type] = 0;
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 20;
+            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 5;
         }
         public override void SetDefaults()
         {
@@ -30,13 +30,13 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
-            Projectile.MaxUpdates = 4;
+            Projectile.MaxUpdates = 1;
             Projectile.timeLeft = 300 * Projectile.MaxUpdates;
         }
 
         public override void AI()
         {
-            Projectile.velocity *= 0.97f;
+            Projectile.velocity *= 0.885f;
             TerRoguelikePlayer ownerModPlayer = Main.player[Projectile.owner].GetModPlayer<TerRoguelikePlayer>();
             Projectile.ai[0]++;
             if (Projectile.numUpdates != -1 || Projectile.ai[0] < 30 * Projectile.MaxUpdates || Projectile.timeLeft < 30 * Projectile.MaxUpdates)
