@@ -112,6 +112,7 @@ namespace TerRoguelike.UI
                 modPlayer.killerProj = -1;
                 SystemLoader.PreSaveAndQuit();
                 WorldGen.SaveAndQuit();
+                modPlayer.deadTime = 0;
             }
             else if (pressed && restartHover && modPlayer.deadTime > 150)
             {
@@ -132,6 +133,7 @@ namespace TerRoguelike.UI
                 modPlayer.killerNPC = -1;
                 modPlayer.killerProj = -1;
                 WorldGen.SaveAndQuit();
+                modPlayer.deadTime = 0;
             }
         }
 
