@@ -2259,10 +2259,11 @@ namespace TerRoguelike.NPCs
 
             if (npc.ai[3] == 1) // down collide
             {
+                bool antiStuck = npc.oldVelocity.X != 0 && npc.velocity.X == 0;
                 if (!attacking)
                     npc.velocity.X += acceleration * npc.direction;
                 npc.velocity.Y += 16f;
-                if (npc.collideX)
+                if (npc.collideX || antiStuck)
                 {
                     npc.ai[3] = npc.direction == 1 ? 0 : 2;
                     npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
@@ -2298,10 +2299,11 @@ namespace TerRoguelike.NPCs
             }
             else if (npc.ai[3] == 3) // up collide
             {
+                bool antiStuck = npc.oldVelocity.X != 0 && npc.velocity.X == 0;
                 if (!attacking)
                     npc.velocity.X += -acceleration * npc.direction;
                 npc.velocity.Y += -16f;
-                if (npc.collideX)
+                if (npc.collideX || antiStuck)
                 {
                     npc.ai[3] = npc.direction == 1 ? 2 : 0;
                     npc.velocity.Y = Math.Abs(npc.oldVelocity.X);

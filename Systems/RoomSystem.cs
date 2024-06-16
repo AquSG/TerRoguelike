@@ -974,16 +974,6 @@ namespace TerRoguelike.Systems
                         basin.nearby--;
                         if (spawnParticles)
                             basin.SpawnParticles();
-                        if (interact && basin.rect16.Contains(Main.MouseWorld.ToPoint()))
-                        {
-                            Vector2 checkPos = basin.position.ToWorldCoordinates(24, 16);
-                            if (player.Center.Distance(checkPos) > 200)
-                                continue;
-
-                            modPlayer.selectedBasin = basin;
-                            ItemBasinUI.gamepadSelectedOption = 0;
-                            SoundEngine.PlaySound(SoundID.MenuOpen);
-                        }
                     }
                 }
             }
