@@ -23,6 +23,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using TerRoguelike.Items.Rare;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -119,9 +120,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = NPC.Center;
             NPC.ai[2] = None.Id;
             ableToHit = false;
+            modNPC.specialAllSeeingEyeHoverBox = hitboxes[0].GetHitbox(NPC.Center, NPC.rotation);
         }
         public override void PostAI()
         {
+            modNPC.specialAllSeeingEyeHoverBox = hitboxes[0].GetHitbox(NPC.Center, NPC.rotation);
+
             NPC.localAI[1]++;
             if (target != null)
             {

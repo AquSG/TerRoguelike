@@ -171,6 +171,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/UI/QuestionMark",
                 "TerRoguelike/MainMenu/UiMoon",
                 "TerRoguelike/TerPlayer/CeremonialCrownGems",
+                "TerRoguelike/Projectiles/DisposableTurretMinionHead",
             };
             foreach (string path in pathList)
             {

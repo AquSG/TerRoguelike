@@ -132,6 +132,8 @@ Projectiles: {
 	PhantasmalBoltShooter.DisplayName: Phantasmal Bolt
 	PhantasmalBarrier.DisplayName: Phantasmal Barrier
 	TrumpCardProjectile.DisplayName: Trump Card
+	RemedialHealingOrb.DisplayName: Remedial Healing Orb
+	DisposableTurretMinion.DisplayName: Disposable Turret Minion
 }
 
 Items: {
@@ -830,6 +832,38 @@ Items: {
 			'''
 			Upon taking damage, recieve 50% of health damage reduced by diminishing DR as healing
 			Extra copies of this item increase the healing percentage by a diminishing amount
+			'''
+	}
+
+	RemedialTapeworm: {
+		DisplayName: Remedial Tapeworm
+		Tooltip:
+			'''
+			Upon hitting an enemy, a healing orb is shot out from the enemy
+			+1 HP upon touching the healing orb
+			Healing orbs fade away after 4 seconds
+			Extra copies of this item increase the healing amount by 1
+			'''
+	}
+
+	AncientTwig: {
+		DisplayName: Ancient Twig
+		Tooltip:
+			'''
+			If an enemy has been hit in the past 5 seconds, this item is active
+			When active, gain 5 barrier every 1.66 seconds, and reduce barrier decay rate by 15%
+			Extra copies of this item increase the barrier gain by 2, and further reduce decay rate by 15%
+			'''
+	}
+
+	DisposableTurret: {
+		DisplayName: Disposable Turret
+		Tooltip:
+			'''
+			25% chance to spawn a turret on kill
+			The turret automatically fires bullets at nearby enemies for 100 base damage
+			The turret leaves after 20 seconds pass
+			Extra copies of this item increase the chance of spawning a turret by a diminishing amount
 			'''
 	}
 }

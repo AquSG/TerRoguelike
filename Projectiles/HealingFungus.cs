@@ -44,7 +44,7 @@ namespace TerRoguelike.Projectiles
             {
                 Player player = Main.player[i];
 
-                if (player == null || !player.active) // herobrine touched my bungus
+                if (player == null || !player.active || player.dead) // herobrine touched my bungus
                     continue;
 
                 Vector2 playerVector = player.Center - Projectile.Center;
