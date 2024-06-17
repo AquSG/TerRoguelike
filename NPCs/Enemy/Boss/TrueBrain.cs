@@ -321,6 +321,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[3] != 0)
                     {
                         newCutscenePos = teleportTargetPos;
+                        if (NPC.ai[3] < 20)
+                            cameraLerp *= MathHelper.Lerp(0, 1, NPC.ai[3] / 20f);
                     }
                 }
                 else
@@ -346,12 +348,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (sweepingTime < cutsceneSideSweepTime * 2)
                         {
                             NPC.velocity = -Vector2.UnitY * 10;
+                            if (NPC.ai[3] > 0 && NPC.ai[3] < 20)
+                                cameraLerp *= MathHelper.Lerp(0, 1, NPC.ai[3] / 20f);
                         }
                         else
                         {
                             NPC.velocity = Vector2.UnitX * 15;
                             if (NPC.ai[3] == 0)
                                 cameraLerp *= 1 + (sweepingTime - cutsceneSideSweepTime * 2) / (float)cutsceneTopSweepTime * 3f;
+                            if (NPC.ai[3] > 0 && NPC.ai[3] < 20)
+                                cameraLerp *= MathHelper.Lerp(0, 1, NPC.ai[3] / 20f);
                         }
                         newCutscenePos = NPC.ai[3] != 0 && NPC.ai[3] <= teleportMoveTimestamp ? teleportTargetPos : NPC.Center;
 
