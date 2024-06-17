@@ -120,6 +120,7 @@ namespace TerRoguelike.TerPlayer
         public int ceremonialCrown;
         public int thermitePowder;
         public int everlastingJellyfish;
+        public int heartyHoneycomb;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
@@ -289,6 +290,7 @@ namespace TerRoguelike.TerPlayer
             ceremonialCrown = 0;
             thermitePowder = 0;
             everlastingJellyfish = 0;
+            heartyHoneycomb = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -1135,6 +1137,12 @@ namespace TerRoguelike.TerPlayer
                         thermitePowderCooldown = 60;
                     }
                 }
+            }
+
+            if (heartyHoneycomb > 0)
+            {
+                int regenIncrease = (int)((1 - Player.statLife / (float)Player.statLifeMax2) / 0.05f) * (1 + heartyHoneycomb);
+                Player.lifeRegen += regenIncrease;
             }
         }
         public override void PostUpdateEquips()
