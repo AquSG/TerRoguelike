@@ -875,6 +875,15 @@ Items: {
 			Extra copies of this item increase the movement speed bonus by 20%
 			'''
 	}
+
+	HeartyHoneycomb: {
+		DisplayName: Hearty Honeycomb
+		Tooltip:
+			'''
+			+1 HP/s for every 5% max life missing
+			Extra copies of this item grant +0.5 HP/s for every 5% max life missing
+			'''
+	}
 }
 
 NPCs: {
