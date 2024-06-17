@@ -107,6 +107,7 @@ namespace TerRoguelike.UI
                     Main.LocalPlayer.ModPlayer().creditsViewTime = 0;
                     CreditsUI.creditsList = null;
                     CreditsSystem.StopCredits();
+                    CutsceneSystem.cutsceneDisableControl = false;
                     TerRoguelikeWorld.escapeTime = 0;
                     for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                     {
