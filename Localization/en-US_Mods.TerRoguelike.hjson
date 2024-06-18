@@ -884,6 +884,17 @@ Items: {
 			Extra copies of this item grant +0.5 HP/s for every 5% max life missing
 			'''
 	}
+
+	PrimevalRattle: {
+		DisplayName: Primeval Rattle
+		Tooltip:
+			'''
+			Gain a stackable movement speed and diminishing DR buff every time you restore 10 barrier or 10 health at once
+			Each stack lasts 9 seconds and grants 8% increased movement speed and 10 diminishing DR
+			However, the amount of stacks is capped at 5
+			Extra copies of this item increase the stack cap by 3
+			'''
+	}
 }
 
 NPCs: {

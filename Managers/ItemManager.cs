@@ -300,6 +300,7 @@ namespace TerRoguelike.Managers
                 new ThermitePowder(),
                 new EverlastingJellyfish(),
                 new HeartyHoneycomb(),
+                new PrimevalRattle(),
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();
