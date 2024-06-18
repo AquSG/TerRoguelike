@@ -1141,8 +1141,19 @@ namespace TerRoguelike.TerPlayer
 
             if (heartyHoneycomb > 0)
             {
-                int regenIncrease = (int)((1 - Player.statLife / (float)Player.statLifeMax2) / 0.05f) * (1 + heartyHoneycomb);
+                int honeyStrength = (int)((1 - Player.statLife / (float)Player.statLifeMax2) / 0.05f);
+                int regenIncrease = honeyStrength * (1 + heartyHoneycomb);
                 Player.lifeRegen += regenIncrease;
+                if (honeyStrength > 0 && (int)(Main.GlobalTimeWrappedHourly * 60) % (21 - honeyStrength) == 0)
+                {
+                    for (int i = 0; i < Main.rand.Next(2, 4); i++)
+                    {
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(12, 24);
+                        ParticleManager.AddParticle(new Ball(Player.Center + Vector2.UnitY * Player.gfxOffY + offset, offset.SafeNormalize(Vector2.UnitY) * 1 + Vector2.UnitY * 0.25f,
+                            16, Color.Lerp(Color.Goldenrod, Color.Yellow, Main.rand.NextFloat()), new Vector2(Main.rand.NextFloat(0.14f, 0.2f)), 0, 0.98f, 10));
+                    }
+                    
+                }
             }
         }
         public override void PostUpdateEquips()
