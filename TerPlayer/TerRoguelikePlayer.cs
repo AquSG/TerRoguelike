@@ -44,6 +44,7 @@ namespace TerRoguelike.TerPlayer
         public static float NewMoonIframeMultiplier = 1.5f;
         public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
         public static readonly SoundStyle WayfarerProc = new SoundStyle("TerRoguelike/Sounds/WayfarerProc");
+        public static readonly SoundStyle PrimevalRattleProc = new SoundStyle("TerRoguelike/Sounds/PrimevalRattleProc", 3);
 
         #region Item Variables
         public int coolantBarrel;
@@ -121,6 +122,7 @@ namespace TerRoguelike.TerPlayer
         public int thermitePowder;
         public int everlastingJellyfish;
         public int heartyHoneycomb;
+        public int primevalRattle;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
@@ -147,6 +149,7 @@ namespace TerRoguelike.TerPlayer
         public int ancientTwigCooldown = 0;
         public int ancientTwigSetRestoreRate = 100;
         public int wayfarersWaistclothDirTime = 0;
+        public List<int> primevalRattleStacks = [];
         #endregion
 
         #region Misc Variables
@@ -291,6 +294,7 @@ namespace TerRoguelike.TerPlayer
             thermitePowder = 0;
             everlastingJellyfish = 0;
             heartyHoneycomb = 0;
+            primevalRattle = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
@@ -1155,6 +1159,30 @@ namespace TerRoguelike.TerPlayer
                     
                 }
             }
+
+            if (primevalRattle > 0)
+            {
+                if (primevalRattleStacks.Count > 0)
+                {
+                    for (int i = 0; i < primevalRattleStacks.Count; i++)
+                    {
+                        primevalRattleStacks[i]--;
+                    }
+
+                    primevalRattleStacks.RemoveAll(time => time <= 0);
+
+                    int count = Math.Min(primevalRattleStacks.Count, 2 + 3 * primevalRattle);
+                    if (count > 0)
+                    {
+                        float moveSpeedIncrease = 0.08f * count;
+                        float drIncrease = 10 * count;
+                        Player.moveSpeed += moveSpeedIncrease;
+                        diminishingDR += drIncrease;
+                    }
+                }
+            }
+            else if (primevalRattleStacks.Count > 0)
+                primevalRattleStacks.Clear();
         }
         public override void PostUpdateEquips()
         {
@@ -2038,6 +2066,9 @@ namespace TerRoguelike.TerPlayer
                 }
             }
             Player.Heal(healAmt);
+
+            if (primevalRattle > 0 && healAmt >= 10)
+                PrimevalRattleAdd();
         }
         public void AddBarrierHealth(int barrierGainAmt)
         {
@@ -2046,6 +2077,28 @@ namespace TerRoguelike.TerPlayer
                 barrierHealth = Player.statLifeMax2;
 
             CombatText.NewText(Player.getRect(), Color.LightGoldenrodYellow, barrierGainAmt);
+
+            if (primevalRattle > 0 && barrierGainAmt >= 10)
+                PrimevalRattleAdd();
+        }
+        public void PrimevalRattleAdd()
+        {
+            primevalRattleStacks ??= [];
+
+            primevalRattleStacks.Add(540);
+            int potentialCap = 2 + 3 * primevalRattle;
+            if (primevalRattleStacks.Count > potentialCap + 10)
+            {
+                int least = 100000;
+                for (int i = 0; i < primevalRattleStacks.Count; i++)
+                {
+                    int check = primevalRattleStacks[i];
+                    if (check < least)
+                        least = check;
+                }
+                primevalRattleStacks.Remove(least);
+            }
+            SoundEngine.PlaySound(PrimevalRattleProc with { Volume = 0.24f, Pitch = -0.2f, PitchVariance = 0.13f, Variants = [2] }, Player.Center);
         }
         public void GiftBoxLogic(Vector2 position)
         {
