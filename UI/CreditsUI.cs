@@ -314,8 +314,9 @@ namespace TerRoguelike.UI
                         "Ultrakill",
                         "Undertale",
                         "Undertale Yellow",
+                        "Armored Core VI",
                         "Minecraft",
-                        "Pixbay",
+                        "Pixabay",
                         "Adobe Stock"
                         ];
                         break;

@@ -3230,7 +3230,10 @@ namespace TerRoguelike.NPCs
 
             if (npc.type == NPCID.OldMan || npc.type == NPCID.Guide)
                 npc.active = false;
-
+            if (source is EntitySource_TileBreak breakSource)
+            {
+                npc.active = false;
+            }
             if (source is EntitySource_Parent parentSource)
             {
                 if (parentSource.Entity is NPC)
