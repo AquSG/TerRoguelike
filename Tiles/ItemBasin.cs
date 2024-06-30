@@ -120,10 +120,6 @@ namespace TerRoguelike.Tiles
                 if (basin.rect.Contains(tilePos))
                 {
                     tier = basin.tier;
-                    if (basin.nearby > 0 && tilePos == basin.position)
-                    {
-                        DrawItemDisplay(basin);
-                    }
                     break;
                 }
             }
@@ -163,37 +159,6 @@ namespace TerRoguelike.Tiles
         public override void PlaceInWorld(int i, int j, Item item)
         {
             TerRoguelikeWorld.itemBasins.Add(new ItemBasinEntity(new Point(i - 1, j - 1), (ItemTier)(TerRoguelikeWorld.itemBasins.Count % 3)));
-        }
-
-        public void DrawItemDisplay(ItemBasinEntity basin)
-        {
-            if (basin.itemDisplay == 0)
-                return;
-
-            Vector2 drawPos = (basin.position.ToVector2() + new Vector2(1, 0)).ToWorldCoordinates(8, 0) + new Vector2(0, -32);
-            float period = (Main.GlobalTimeWrappedHourly + basin.position.X + basin.position.Y);
-            drawPos.Y += (float)Math.Cos(period * 0.5f) * 4;
-
-            Vector2 itemDisplayDimensions = new Vector2(48, 48);
-            Item item = new Item(basin.itemDisplay);
-            Texture2D itemTex;
-            float scale;
-            Rectangle rect;
-            Main.GetItemDrawFrame(item.type, out itemTex, out rect);
-            if (itemTex.Width < itemTex.Height)
-            {
-                scale = 1f / (rect.Height / itemDisplayDimensions.Y);
-            }
-            else
-            {
-                scale = 1f / (itemTex.Width / itemDisplayDimensions.X);
-            }
-            if (scale > 1f)
-                scale = 1f;
-
-            float opacity = 0.7f + (float)Math.Cos(period * 2) * 0.15f;
-            Color color = Color.White * opacity;
-            Main.EntitySpriteDraw(itemTex, drawPos - Main.screenPosition + new Vector2(Main.offScreenRange), rect, color, 0f, rect.Size() * 0.5f, scale, SpriteEffects.None, 0);
         }
     }
 }
