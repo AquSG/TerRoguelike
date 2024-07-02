@@ -45,6 +45,7 @@ namespace TerRoguelike.TerPlayer
         public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
         public static readonly SoundStyle WayfarerProc = new SoundStyle("TerRoguelike/Sounds/WayfarerProc");
         public static readonly SoundStyle PrimevalRattleProc = new SoundStyle("TerRoguelike/Sounds/PrimevalRattleProc", 3);
+        public static readonly SoundStyle PrimevalBoost = new SoundStyle("TerRoguelike/Sounds/PrimevalBoost");
 
         #region Item Variables
         public int coolantBarrel;
@@ -150,6 +151,7 @@ namespace TerRoguelike.TerPlayer
         public int ancientTwigSetRestoreRate = 100;
         public int wayfarersWaistclothDirTime = 0;
         public List<int> primevalRattleStacks = [];
+        public bool primevalRattleBoost = false;
         #endregion
 
         #region Misc Variables
@@ -184,6 +186,7 @@ namespace TerRoguelike.TerPlayer
         public float droneBuddyRotation = 0f;
         public float droneSeenRot = 0f;
         public List<VisualFungus> visualFungi = new List<VisualFungus>();
+        public List<VisualFungus> primevalStreaks = [];
         public int currentRoom = -1;
         public int DashDir = 0;
         public int DashDelay = 0;
@@ -1171,7 +1174,8 @@ namespace TerRoguelike.TerPlayer
 
                     primevalRattleStacks.RemoveAll(time => time <= 0);
 
-                    int count = Math.Min(primevalRattleStacks.Count, 2 + 3 * primevalRattle);
+                    int cap = 2 + 3 * primevalRattle;
+                    int count = Math.Min(primevalRattleStacks.Count, cap);
                     if (count > 0)
                     {
                         float moveSpeedIncrease = 0.08f * count;
@@ -1179,10 +1183,26 @@ namespace TerRoguelike.TerPlayer
                         Player.moveSpeed += moveSpeedIncrease;
                         diminishingDR += drIncrease;
                     }
+                    if (count == cap)
+                    {
+                        if (!primevalRattleBoost && primevalStreaks.Count == 0)
+                        {
+                            ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(PrimevalBoost with { Volume = 0.3f }, Player.Center), 1, -1, 1, true));
+                        }
+                        primevalRattleBoost = true;
+                    }
+                    else
+                    {
+                        primevalRattleBoost = false;
+                    }
                 }
             }
-            else if (primevalRattleStacks.Count > 0)
-                primevalRattleStacks.Clear();
+            else
+            {
+                if (primevalRattleStacks.Count > 0)
+                    primevalRattleStacks.Clear();
+                primevalRattleBoost = false;
+            }
         }
         public override void PostUpdateEquips()
         {
@@ -1655,6 +1675,12 @@ namespace TerRoguelike.TerPlayer
             if (ceremonialCrownStacks > 0)
             {
                 float bonusDamage = 0.1f * ceremonialCrownStacks * ceremonialCrown;
+                bonusDamageMultiplier *= 1 + bonusDamage;
+            }
+            if (primevalRattle > 0 && primevalRattleBoost)
+            {
+                int cap = 2 + 3 * primevalRattle;
+                float bonusDamage = 0.15f * cap;
                 bonusDamageMultiplier *= 1 + bonusDamage;
             }
             previousBonusDamageMulti = bonusDamageMultiplier;
@@ -2592,6 +2618,10 @@ namespace TerRoguelike.TerPlayer
             {
                 DrawVisualFungi();
             }
+            if (primevalRattleBoost || primevalStreaks.Count > 0)
+            {
+                DrawPrimevalVisuals();
+            }
 
             if (brainSucklerTime > 0)
             {
@@ -2938,6 +2968,50 @@ namespace TerRoguelike.TerPlayer
             public Vector2 Position = Vector2.Zero;
             public int Type = -1;
             public SpriteEffects Effects = SpriteEffects.None;
+        }
+        #endregion
+
+        #region Primeval Visuals
+        public void DrawPrimevalVisuals()
+        {
+            if (primevalRattleBoost)
+            {
+                if (Main.GlobalTimeWrappedHourly % 0.166667 < 0.016667f)
+                {
+                    Vector2 position = (Vector2.UnitY * 40f) + Main.rand.NextVector2CircularEdge(24f, 12f);
+                    primevalStreaks.Add(new VisualFungus(Main.rand.Next(60, 90), position, Main.rand.Next(100), SpriteEffects.None));
+                }
+            }
+            if (primevalStreaks.Count == 0)
+            {
+                return;
+            }
+
+            StartNonPremultipliedSpritebatch();
+            Texture2D streakTex = TexDict["LerpLineGradient"];
+            for (int i = 0; i < primevalStreaks.Count; i++)
+            {
+                var streak = primevalStreaks[i];
+
+                float opacity = 1f;
+
+                if (streak.Lifetime < 30)
+                    opacity = MathHelper.Lerp(0f, 1f, streak.Lifetime / 30f);
+                else if (streak.MaxLifetime - streak.Lifetime < 30)
+                    opacity = MathHelper.Lerp(0f, 1f, (streak.MaxLifetime - streak.Lifetime) / 30f);
+
+                Color streakColor = Color.Lerp(Color.Red, Color.Yellow, streak.Type * 0.008f);
+                streakColor.A = (byte)(streakColor.A * opacity);
+                for (int r = 0; r <= 1; r++)
+                {
+                    Main.EntitySpriteDraw(streakTex, Player.Center + streak.Position - Main.screenPosition + Player.gfxOffY * Vector2.UnitY, null, streakColor, MathHelper.Pi * r + MathHelper.PiOver2, streakTex.Size() * new Vector2(0, 0.5F), new Vector2(0.15f, 0.2f), streak.Effects);
+                }
+                streak.Position.Y -= 1f;
+
+                streak.Lifetime--;
+            }
+            primevalStreaks.RemoveAll(x => x.Lifetime <= 0);
+            StartAlphaBlendSpritebatch();
         }
         #endregion
 

@@ -314,6 +314,7 @@ namespace TerRoguelike.UI
                         "Ultrakill",
                         "Undertale",
                         "Undertale Yellow",
+                        "The Binding of Isaac",
                         "Armored Core VI",
                         "Minecraft",
                         "Pixabay",
