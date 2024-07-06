@@ -329,7 +329,7 @@ namespace TerRoguelike.UI
                         "Heaven Pierce Her",
                         "Ultrakill",
                         " ",
-                        "'You're Gonna Need a Bigger Ukelele'",
+                        "'You're Gonna Need a Bigger Ukulele'",
                         "Chris Christodoulou",
                         "Risk of Rain 2",
                         " ",
