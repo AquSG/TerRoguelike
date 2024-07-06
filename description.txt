@@ -12,3 +12,5 @@ It is recommended that you play this gamemode with as few gameplay-altering mods
 The gamemode added by this mod does not support multiplayer.
 
 Special thanks to the Calamity Mod for their schematic system, which is used in this mod.
+
+https://github.com/AquSG/TerRoguelike
