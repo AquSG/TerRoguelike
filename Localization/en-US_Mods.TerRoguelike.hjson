@@ -830,7 +830,7 @@ Items: {
 		DisplayName: Everlasting Jellyfish
 		Tooltip:
 			'''
-			Upon taking damage, recieve 50% of health damage reduced by diminishing DR as healing
+			Upon taking damage, receive 50% of health damage reduced by diminishing DR as healing
 			Extra copies of this item increase the healing percentage by a diminishing amount
 			'''
 	}
