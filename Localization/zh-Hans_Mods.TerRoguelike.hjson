@@ -276,8 +276,8 @@ Items: {
 		DisplayName: 梦中灵魂
 		Tooltip:
 			'''
-			Failed chance rolls are rerolled 1 time for a potential positive outcome
-			Extra copies of this item add 1 more reroll attempt
+			当判定失败后额外增加一次判定机会（包括暴击以及其余涉及概率判定的物品）
+			每拥有一件该物品将增加一次判定机会
 			'''
 	}
 
