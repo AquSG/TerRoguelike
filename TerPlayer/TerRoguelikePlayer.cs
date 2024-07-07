@@ -2879,6 +2879,9 @@ namespace TerRoguelike.TerPlayer
 
             protected override void Draw(ref PlayerDrawSet drawInfo)
             {
+                if (drawInfo.shadow != 0)
+                    return;
+
                 Player drawPlayer = drawInfo.drawPlayer;
                 TerRoguelikePlayer modPlayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
 
