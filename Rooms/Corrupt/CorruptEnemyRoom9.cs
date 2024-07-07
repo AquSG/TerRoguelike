@@ -10,6 +10,8 @@ using Terraria;
 using Terraria.ID;
 using static TerRoguelike.Managers.NPCManager;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -22,10 +24,10 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 7, 4), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 7, 4), ModContent.NPCType<Corruptor>(), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(Bottom, 3, -2), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
 
-            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -4, -4), ChooseEnemy(AssociatedFloor, 2), 60, 120, 0.45f, 1);
+            AddRoomNPC(MakeEnemySpawnPos(BottomRight, -4, -4), ModContent.NPCType<Corruptor>(), 60, 120, 0.45f, 1);
             AddRoomNPC(MakeEnemySpawnPos(TopLeft, 7, 4), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 1);
         }
     }
