@@ -1,0 +1,1053 @@
+MapBuildingMessage: 生成地牢中
+DeathKilledBy: 凶手：
+DeathItems: 物品：
+DeathMainMenu: 主菜单
+DeathQuickRestart: 重新开始
+BlockedAlert: 格挡！
+HealthUpAlert: 生命值提升！
+BarrierName: 屏障
+CreditsVictory: 胜利！
+CreditDirector: 监制
+CreditProgramming: 编程
+CreditExternalCode: 外部代码
+CreditRoomBuilding: 房间建设
+CreditSpriting: 贴图
+CreditExternalAssets: 外部资源
+CreditMusic: 音乐
+CreditTesting: 测试
+CreditSpecialThanks: 特别感谢
+CreditFinal: 最后……
+CreditThankYou: 感谢
+CreditForPlaying: 游玩！
+CreditTimeHeader: 时间：
+MenuPlayTerRoguelike: 开始玩TerRoguelike
+MenuDifficulty: 难度：
+NewMoonName: 新月
+NewMoonDescription1: 事物降低一个档次
+NewMoonDescription2: 增加受伤后的无敌时间，受到的伤害降低，自然生命再生增加
+FullMoonName: 满月
+FullMoonDescription: 预期的TerRoguelike之旅
+BloodMoonName: 血月
+BloodMoonDescription1: 事物提升一个档次
+BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
+
+Projectiles: {
+	EnemySpawningProjectile.DisplayName: 敌怪生成弹幕
+	ItemSpawningProjectile.DisplayName: 物品生成弹幕
+	ClingyGrenade.DisplayName: 粘性手雷
+	ClingyGrenadeExplosion.DisplayName: 粘性手雷爆炸
+	AdaptiveGunHoldout.DisplayName: 初始枪
+	AdaptiveGunBullet.DisplayName: 初始枪子弹
+	SoulstealHealingOrb.DisplayName: 摄魂治疗球
+	Explosion.DisplayName: 爆炸
+	Missile.DisplayName: 导弹
+	AdaptiveBladeHoldout.DisplayName: 初始剑
+	AdaptiveBladeSlash.DisplayName: 初始剑斩
+	HealingFungus.DisplayName: 治疗真菌
+	PlanRocket.DisplayName: 计划火箭
+	StuckClingyGrenade.DisplayName: 粘性粘性手雷
+	ThrownBackupDagger.DisplayName: 掷出的备份匕首
+	ClusterHandler.DisplayName: 集束处理器
+	MagicFist.DisplayName: 魔法拳头
+	SlimeGlob.DisplayName: 粘液滴
+	Snowflake.DisplayName: 雪花
+	DesertSpiritCurse.DisplayName: 沙漠幽魂诅咒
+	SandBlast.DisplayName: 沙爆
+	Stinger.DisplayName: 毒刺
+	Spectre.DisplayName: 幽灵
+	FireBlast.DisplayName: 火焰爆炸
+	SniperBullet.DisplayName: 狙击子弹
+	SpikedBall.DisplayName: 尖球
+	BallistaShot.DisplayName: 弩箭
+	WoodSliver.DisplayName: 木薄片
+	IchorBlob.DisplayName: 灵液滴
+	GreenPetal.DisplayName: 绿色花瓣
+	CursedFlame.DisplayName: 诅咒焰
+	BouncingFire.DisplayName: 弹跳火焰
+	ShadowBlast.DisplayName: 暗影爆炸
+	VileSpit.DisplayName: 魔唾液
+	BloodClot.DisplayName: 血块
+	BloodOrb.DisplayName: 血珠
+	Iceflake.DisplayName: 冰花
+	MothDust.DisplayName: 蛾尘
+	SporeCloud.DisplayName: 孢子云
+	HunterArrow.DisplayName: 猎人箭
+	LihzahrdLaser.DisplayName: 丛林蜥蜴激光
+	SeekerArrow.DisplayName: 追踪箭
+	TempleBoulder.DisplayName: 神庙巨石
+	Daybreak.DisplayName: 破晓
+	SolarFlare.DisplayName: 日炎
+	NebulaLaser.DisplayName: 星云激光
+	NebulaSphere.DisplayName: 星云球
+	VortexLightning.DisplayName: 星旋闪电
+	VortexLaser.DisplayName: 星旋激光
+	BlackVortex.DisplayName: 黑色星旋
+	SeekingStarCell.DisplayName: 追踪星细胞
+	FlowSpawn.DisplayName: 流体
+	Bone.DisplayName: 骨头
+	Rock.DisplayName: 岩石
+	Shockwave.DisplayName: 冲击波
+	PaladinHammer.DisplayName: 圣骑士锤
+	RockDebris.DisplayName: 岩石碎块
+	LeafBall.DisplayName: 叶球
+	VineWall.DisplayName: 藤蔓墙
+	RootPillar.DisplayName: 根柱
+	SeerBallBase.DisplayName: 预言球
+	CorruptVomit.DisplayName: 腐化喷吐
+	IceWave.DisplayName: 冰霜波
+	RoyalSnowflake.DisplayName: 皇家雪花
+	IceBomb.DisplayName: 冰炸弹
+	IceCloud.DisplayName: 冰云
+	IceCloudSpawner.DisplayName: 冰云生成者
+	Sandnado.DisplayName: 沙龙卷
+	Locust.DisplayName: 蝗虫
+	SandTurret.DisplayName: 沙炮塔
+	ShiningSand.DisplayName: 闪耀沙
+	DarkTendril.DisplayName: 深色卷须
+	Bee.DisplayName: 蜜蜂
+	HoneyGlob.DisplayName: 蜂蜜滴
+	CutsceneBee.DisplayName: 剧情蜜蜂
+	HellBeam.DisplayName: 地狱光束
+	DemonLaser.DisplayName: 恶魔激光
+	FleshVomit.DisplayName: 血肉喷吐
+	FleshBall.DisplayName: 血肉球
+	VolatileFlesh.DisplayName: 挥发性血肉
+	SeekingSoulBlast.DisplayName: 追踪灵魂爆炸
+	SoulBlast.DisplayName: 灵魂爆炸
+	BoneSpear.DisplayName: 骨矛
+	SoulTurret.DisplayName: 灵魂炮塔
+	LihzahrdSpikeBall.DisplayName: 丛林蜥蜴尖球
+	Flames.DisplayName: 火焰
+	DartTrap.DisplayName: 飞镖机关
+	Dart.DisplayName: 飞镖
+	RollingBoulder.DisplayName: 滚动巨石
+	PhantasmalEye.DisplayName: 幻影眼
+	PhantasmalBolt.DisplayName: 幻影矢
+	PhantasmalSphere.DisplayName: 幻影球
+	Tentacle.DisplayName: 触手
+	PhantasmalDeathray.DisplayName: 幻影死亡射线
+	PhantasmalResidue.DisplayName: 幻影残渣
+	PhantasmalLaser.DisplayName: 幻影激光
+	PhantasmalDeathBeam.DisplayName: 幻影死亡光束
+	PhantasmalBoltShooter.DisplayName: 幻影矢
+	PhantasmalBarrier.DisplayName: 幻影屏障
+	TrumpCardProjectile.DisplayName: 王牌
+	RemedialHealingOrb.DisplayName: 治疗球
+	DisposableTurretMinion.DisplayName: 一次性炮塔仆从
+}
+
+Items: {
+	ClingyGrenade: {
+		DisplayName: 粘性手雷
+		Tooltip:
+			'''
+			击中敌怪时5%概率将一个粘性手雷粘到它们身上
+			粘性手雷会在短暂延迟后在小范围内爆炸，总共造成150%伤害
+			每额外拥有一件此物品会增加5%概率
+			'''
+	}
+
+	PocketSpotter: {
+		DisplayName: 袖珍观测器
+		Tooltip:
+			'''
+			增加10%暴击率
+			每额外拥有一件此物品也会增加10%暴击率
+			'''
+	}
+
+	AdaptiveGun: {
+		DisplayName: 初始枪
+		Tooltip:
+			'''
+			此次旅程最可靠的枪
+			可以被你可能找到的物品以无数种方式结合
+			'''
+	}
+
+	EvilEye: {
+		DisplayName: 邪恶之眼
+		Tooltip:
+			'''
+			增加5%暴击率
+			对敌怪暴击时会获得可叠加的攻速增益
+			每次叠加持续3秒并增加10%攻速
+			但是叠加上限为5次
+			每额外拥有一件此物品会增加2次叠加上限，并再增加10%攻速加成
+			'''
+	}
+
+	SoulstealCoating: {
+		DisplayName: 摄魂涂层
+		Tooltip:
+			'''
+			敌怪被击杀时会掉落它们的灵魂作为治疗球
+			球会追踪摄魂者并在接触时治疗他们8%最大生命值
+			每额外拥有一件此物品会使治疗量增加4%
+			'''
+	}
+
+	SpentShell: {
+		DisplayName: 失效壳
+		Tooltip:
+			'''
+			每次使用武器时主攻击次数增加1
+			作为补偿，攻击速度会以一定乘数降低
+			每额外拥有一件此物品也会在每次使用武器时增加1次主要攻击，并再次降低攻击速度
+			'''
+	}
+
+	RunningShoe: {
+		DisplayName: 跑鞋
+		Tooltip:
+			'''
+			增加8%移动速度
+			每额外拥有一件此物品也会增加8%移动速度
+			'''
+	}
+
+	BunnyHopper: {
+		DisplayName: 兔子漏斗
+		Tooltip:
+			'''
+			增加12%跳跃速度
+			每额外拥有一件此物品也会提供12%跳跃速度
+			'''
+	}
+
+	LivingCrystal: {
+		DisplayName: 活性水晶
+		Tooltip:
+			'''
+			+1HP/s生命再生
+			每额外拥有一件此物品也会提供+1HP/s生命再生
+			'''
+	}
+
+	HeatSeekingChip: {
+		DisplayName: 寻热芯片
+		Tooltip:
+			'''
+			主弹幕会略微追踪
+			每额外拥有一件此物品会增加追踪能力的强度
+			'''
+	}
+
+	BouncyBall: {
+		DisplayName: 弹跳球
+		Tooltip:
+			'''
+			主弹幕反弹次数增加1
+			每次反弹后弹幕伤害增加15%
+			每额外拥有一件此物品也会使反弹次数增加1
+			'''
+	}
+
+	EnchantingEye: {
+		DisplayName: 附魔之眼
+		Tooltip:
+			'''
+			增加5%暴击率
+			对敌怪暴击时增加3点生命值
+			治疗量受伤害加成和主武器的伤害乘数影响
+			每额外拥有一件此物品会增加2点治疗量
+			'''
+	}
+
+	AirCanister: {
+		DisplayName: 空气罐
+		Tooltip:
+			'''
+			增加一次二段跳
+			每额外拥有一件此物品也会提供一次二段跳
+			'''
+	}
+
+	VolatileRocket: {
+		DisplayName: 挥发性火箭
+		Tooltip:
+			'''
+			原始攻击会爆炸并造成60%总伤害
+			每额外拥有一件此物品会增加100%爆炸范围
+			'''
+	}
+
+	TheDreamsoul: {
+		DisplayName: 梦中灵魂
+		Tooltip:
+			'''
+			Failed chance rolls are rerolled 1 time for a potential positive outcome
+			Extra copies of this item add 1 more reroll attempt
+			'''
+	}
+
+	LockOnMissile: {
+		DisplayName: 追踪导弹
+		Tooltip:
+			'''
+			击中敌怪时10%概率向它们发射一枚追踪导弹
+			导弹会追踪敌怪并对它们造成300%总伤害
+			每额外拥有一件此物品会使总伤害再增加300%
+			'''
+	}
+
+	AdaptiveBlade: {
+		DisplayName: 初始剑
+		Tooltip:
+			'''
+			此次旅程最可靠的剑
+			可以被你可能找到的物品以无数种方式结合
+			按住攻击键为剑充能以造成更高伤害
+			满充能时释放造成的伤害最高
+			满充能前的伤害乘数：1倍至3倍
+			满充能时的伤害乘数：4倍
+			攻速在3倍及以上时可获得自动挥舞能力
+			'''
+	}
+
+	AntiqueLens: {
+		DisplayName: 古老棱镜
+		Tooltip:
+			'''
+			增加10%主攻击的大小
+			每额外拥有一件此物品也会增加10%主攻击的大小
+			'''
+	}
+
+	TimesHaveBeenTougher: {
+		DisplayName: 日子越来越艰难
+		Tooltip:
+			'''
+			8%概率格挡一次接下来的攻击
+			每额外拥有一件此物品会以递减的数值增加格挡距离
+			'''
+	}
+
+	RustedShield: {
+		DisplayName: 锈蚀护盾
+		Tooltip:
+			'''
+			屏障下限变为最大屏障值的8%
+			屏障不会自然降低至下限以下
+			未受到伤害7秒后屏障会快速充能至下限
+			每额外拥有一件此物品会将屏障下限再增加8%
+			'''
+	}
+
+	AmberBead: {
+		DisplayName: 琥珀珠
+		Tooltip:
+			'''
+			击杀敌怪时获得15点屏障
+			每额外拥有一件此物品会使获得的屏障再增加15点
+			'''
+	}
+
+	BottleOfVigor: {
+		DisplayName: 活力瓶
+		Tooltip:
+			'''
+			最大生命值增加15点
+			每额外拥有一件此物品也会增加15点最大生命值
+			'''
+	}
+
+	BloodSiphon: {
+		DisplayName: 鲜血虹吸
+		Tooltip:
+			'''
+			击中敌怪时25%概率治疗1点生命值
+			治疗量受伤害加成和主武器的伤害乘数影响
+			每额外拥有一件此物品会使治疗量增加1点
+			'''
+	}
+
+	Cornucopia: {
+		DisplayName: 丰饶之角
+		Tooltip:
+			'''
+			增加50%治疗效果
+			每额外拥有一件此物品也会增加50%治疗效果
+			'''
+	}
+
+	ItemPotentiometer: {
+		DisplayName: 物品电位计
+		Tooltip:
+			'''
+			敌怪被击杀时有2%概率掉落一件物品
+			每额外拥有一件此物品会增加2%概率
+			'''
+	}
+
+	InstigatorsBrace: {
+		DisplayName: 组织者的手套
+		Tooltip:
+			'''
+			敌怪生命值高于90%时会受到75%额外伤害
+			每额外拥有一件此物品会再增加75%额外伤害
+			'''
+	}
+
+	BenignFungus: {
+		DisplayName: 良性真菌
+		Tooltip:
+			'''
+			在地上奔跑时生成治疗真菌
+			接触治疗真菌时增加1点生命值
+			每额外拥有一件此物品会增加1点治疗量
+			'''
+	}
+
+	HotPepper: {
+		DisplayName: 辣椒
+		Tooltip:
+			'''
+			敌怪被击杀时会点燃附近敌怪
+			点燃会在一段时间内总共造成300点基础伤害
+			点燃半径为9格物块
+			每额外拥有一件此物品会增加4格半径以及100点基础伤害
+			'''
+	}
+
+	AutomaticDefibrillator: {
+		DisplayName: 自动除颤器
+		Tooltip:
+			'''
+			每20秒在激活的房间中召唤一道治疗30%最大生命值的脉冲
+			每额外拥有一件此物品会以递减的数值降低所需时间
+			'''
+	}
+
+	SentientPutty: {
+		DisplayName: 感性油灰
+		Tooltip:
+			'''
+			受击后增加5点生命值并不受伤害2秒
+			每额外拥有一件此物品会再增加5点治疗量
+			'''
+	}
+
+	MemoryFoam: {
+		DisplayName: 记忆泡沫
+		Tooltip:
+			'''
+			不受伤害7秒后增加3HP/s生命再生
+			每额外拥有一件此物品会再增加2HP/s生命再生
+			'''
+	}
+
+	BrazenNunchucks: {
+		DisplayName: 坚硬双截棍
+		Tooltip:
+			'''
+			在你8格物块内的敌怪会受到20%额外伤害
+			每额外拥有一件此物品会再增加20%额外伤害
+			'''
+	}
+
+	AttackPlan: {
+		DisplayName: 攻击计划
+		Tooltip:
+			'''
+			进入房间后从房间中心部署8枚追踪火箭
+			追踪火箭造成70点基础伤害
+			每额外拥有一件此物品会增加4枚追踪火箭和15点火箭基础伤害
+			'''
+	}
+
+	FlimsyPauldron: {
+		DisplayName: 薄肩甲
+		Tooltip:
+			'''
+			降低3点所受伤害
+			每额外拥有一件此物品会使受到的伤害再降低2点
+			'''
+	}
+
+	ProtectiveBubble: {
+		DisplayName: 保护性泡泡
+		Tooltip:
+			'''
+			不受伤害7秒后增加30点递减的伤害减免
+			每额外拥有一件此物品会再增加30点递减的伤害减免
+			'''
+	}
+
+	SanguineOrb: {
+		DisplayName: 血红珠
+		Tooltip:
+			'''
+			击中敌怪时8%概率施加流血
+			流血会在一段时间内总共造成240点基础伤害，可以通过再次施加流血提升
+			施加流血也会延长敌怪身上其他流血性叠加的持续时间
+			每额外拥有一件此物品会再增加4%概率
+			'''
+	}
+
+	BackupDagger: {
+		DisplayName: 备份匕首
+		Tooltip:
+			'''
+			攻击时最多储存4把匕首
+			停止攻击会释放所有储存的匕首
+			匕首会追踪敌怪，击中时造成100点基础伤害并施加流血
+			流血在一段时间内造成120点基础伤害，并可以再次同时施加流血提升
+			每额外拥有一件此物品会使匕首储存更快并使储存的最大匕首数增加1
+			'''
+	}
+
+	UnencumberingStone: {
+		DisplayName: 无负重石
+		Tooltip:
+			'''
+			不攻击1秒后增加25%移动速度
+			每额外拥有一件此物品会增加25%移动速度加成
+			'''
+	}
+
+	BallAndChain: {
+		DisplayName: 球镣
+		Tooltip:
+			'''
+			击中时降低敌怪15%速度，持续2秒
+			每额外拥有一件此物品会再增加2秒持续时间
+			'''
+	}
+
+	SoulOfLena: {
+		DisplayName: Lena之魂
+		Tooltip:
+			'''
+			受击后若生命值降低到最大生命值25%以下，会进入5秒的无形状态，每层楼可触发一次
+			每额外拥有一件此物品会使每层楼可触发效果的次数增加1
+			'''
+	}
+
+	EmeraldRing: {
+		DisplayName: 翡翠指虎
+		Tooltip:
+			'''
+			使用近战武器时增加20点递减的伤害减免
+			每额外拥有一件此物品会再增加20点递减的伤害减免
+			'''
+	}
+
+	AmberRing: {
+		DisplayName: 琥珀戒指
+		Tooltip:
+			'''
+			用近战伤害击中敌怪时获得5点屏障
+			每额外拥有一件此物品会增加5点获得的屏障
+			'''
+	}
+
+	ThrillOfTheHunt: {
+		DisplayName: 狩猎的快感
+		Tooltip:
+			'''
+			击杀时获得可叠加的攻速和移速增益
+			每次叠加持续8秒并增加15%攻速和移速
+			但是叠加上限为5次
+			每额外拥有一件此物品会使叠加上限增加2次，并额外增加15%攻速
+			'''
+	}
+
+	ClusterBombSatchel: {
+		DisplayName: 集束炸弹背包
+		Tooltip:
+			'''
+			击杀敌怪时释放集束炸弹
+			集束炸弹会在短暂延迟后爆炸
+			爆炸会对中心8格物块内的敌怪造成500点基础伤害
+			每额外拥有一件此物品会增加12%爆炸范围和150点基础伤害
+			'''
+	}
+
+	StimPack: {
+		DisplayName: 兴奋剂注射包
+		Tooltip:
+			'''
+			进入房间后的10秒增加8HP/s生命再生
+			每额外拥有一件此物品会再增加8HP/s生命再生
+			'''
+	}
+
+	BarbedLasso: {
+		DisplayName: 倒刺绳
+		Tooltip:
+			'''
+			从你8格物块内的一个敌怪偷取生命
+			偷取的生命值等于你最大生命值的2%且受伤害加成影响
+			敌怪会受到你偷取生命值10倍的伤害
+			每额外拥有一件此物品会使你能偷取生命的敌怪数量增加1
+			'''
+	}
+
+	SteamEngine: {
+		DisplayName: 蒸汽引擎
+		Tooltip:
+			'''
+			击杀敌怪后的2分钟内最大生命值增加2点
+			此方式获得的最大生命值无上限
+			每额外拥有一件此物品会使每次击杀获得的暂时最大生命值增加2点
+			'''
+	}
+
+	GiftBox: {
+		DisplayName: 礼物盒
+		Tooltip:
+			'''
+			进入新楼层时产生一件物品
+			每额外拥有一件此物品会增加产出高等级物品的概率
+			'''
+	}
+
+	RetaliatoryFist: {
+		DisplayName: 反击之拳
+		Tooltip:
+			'''
+			受到伤害后会向12格物块内的敌怪打出至多3拳
+			拳头造成250点基础伤害
+			每额外拥有一件此物品会使最大拳头数量增加2，范围增加2格，基础伤害增加125
+			'''
+	}
+
+	BarrierSynthesizer: {
+		DisplayName: 屏障合成器
+		Tooltip:
+			'''
+			超过最大生命值的治疗量会以50%转化率治疗屏障
+			每额外拥有一件此物品会增加50%治疗转化率
+			'''
+	}
+
+	JetLeg: {
+		DisplayName: 喷气腿
+		Tooltip:
+			'''
+			获得一次快速且无敌的冲刺，但需要冷却
+			冲刺会给予1/3秒无敌并有10秒冷却
+			双击左键或右键以进行冲刺
+			每额外拥有一件此物品会降低冲刺冷却
+			'''
+	}
+
+	NutritiousSlime: {
+		DisplayName: 营养丰富的粘液
+		Tooltip:
+			'''
+			敌怪被击杀时释放4颗粘液滴
+			每次接触粘液滴会治疗2%最大生命值，每秒2次
+			每额外拥有一件此物品会使治疗量再增加2%
+			'''
+	}
+
+	DroneBuddy: {
+		DisplayName: 无人机伙伴
+		Tooltip:
+			'''
+			召唤一个无人机伙伴为你战斗
+			自动向附近敌怪发射基础伤害为100的子弹
+			当视线内没有敌怪时定期以8HP/s的速度治疗你
+			每额外拥有一件此物品会增加无人机的开火速度以及8HP/s的治疗量
+			'''
+	}
+
+	AllSeeingEye: {
+		DisplayName: 嗜血握爪
+		Tooltip:
+			'''
+			将你的光标放在敌怪上以从它们偷取生命
+			偷取的生命值等于你最大生命值的2%且受伤害加成影响
+			敌怪会受到你偷取生命值10倍的伤害
+			每额外拥有一件此物品会增加2%治疗量
+			'''
+	}
+
+	Overclocker: {
+		DisplayName: 超频仪
+		Tooltip:
+			'''
+			在不攻击至多6秒后攻击速度会爆发增加400%
+			每额外拥有一件此物品会使爆发频率加快100%
+			'''
+	}
+
+	GiantDoorShield: {
+		DisplayName: 巨型门护盾
+		Tooltip:
+			'''
+			增加100点递减的伤害减免，只影响屏障生命值
+			每额外拥有一件此物品会增加100点递减的伤害减免
+			'''
+	}
+
+	TrumpCard: {
+		DisplayName: 王牌
+		Tooltip:
+			'''
+			增加1次复活
+			死亡时此物品会被消耗，同时一次性释放20张追踪卡片
+			追踪卡片造成300点基础伤害
+			你也会获得一些无敌帧并被治疗到最大生命值和屏障
+			每额外拥有一件此物品会使复活次数增加1
+			'''
+	}
+
+	PortableGenerator: {
+		DisplayName: 便携式发电机
+		Tooltip:
+			'''
+			进入新楼层后的20秒内无敌
+			每额外拥有一件此物品会延长10秒持续时间
+			'''
+	}
+
+	ForgottenBioWeapon: {
+		DisplayName: 被遗忘的生物武器
+		Tooltip:
+			'''
+			敌怪身上的减益持续时间延长100%
+			每额外拥有一件此物品会使减益的持续时间再延长100%
+			'''
+	}
+
+	SymbioticFungus: {
+		DisplayName: 共生真菌
+		Tooltip:
+			'''
+			站立不动超过1秒后每秒治疗8%最大生命值
+			每额外拥有一件此物品会使治疗量增加4%
+			'''
+	}
+
+	ShotgunComponent: {
+		DisplayName: 霰弹枪装配套件
+		Tooltip:
+			'''
+			每次使用武器时主攻击变为4倍
+			作为补偿，攻击速度会以一定乘数降低
+			子弹会有略微扩散
+			每额外拥有一件此物品会使主攻击的乘数增加4，并再次降低攻击速度
+			'''
+	}
+
+	SniperComponent: {
+		DisplayName: 狙击套件
+		Tooltip:
+			'''
+			6倍伤害
+			根据乘数大幅降低攻击速度
+			每额外拥有一件此物品会使伤害乘数增加6，并再次降低攻击速度
+			'''
+	}
+
+	MinigunComponent: {
+		DisplayName: 捞出的迷你枪
+		Tooltip:
+			'''
+			3.5倍攻击速度
+			0.4倍伤害
+			子弹会扩散
+			每额外拥有一件此物品会使攻击速度乘数增加2
+			'''
+	}
+
+	CoolantBarrel: {
+		DisplayName: 冷凝桶
+		Tooltip:
+			'''
+			增加10%攻击速度
+			每额外拥有一件此物品也会增加10%攻击速度
+			'''
+	}
+
+	BlackTile: {
+		DisplayName: 黑色物块
+		Tooltip: ""
+	}
+
+	BlackWall: {
+		DisplayName: 黑墙
+		Tooltip: ""
+	}
+
+	ItemBasin: {
+		DisplayName: 物品火盆
+		Tooltip: ""
+	}
+
+	LunarCharm: {
+		DisplayName: 月亮护符
+		Tooltip:
+			'''
+			向地牢深处传送时必定传送到月亮圣殿
+			进入月亮圣殿时产生一件物品
+			每额外拥有一件此物品会增加产出高等级物品的概率
+			'''
+	}
+
+	CeremonialCrown: {
+		DisplayName: 礼仪王冠
+		Tooltip:
+			'''
+			每个可受击敌怪存活时会额外受到10%伤害加成
+			每额外拥有一件此物品会使每个敌怪所受的伤害加成增加10%
+			'''
+	}
+
+	BurningCharcoal: {
+		DisplayName: 燃烧的木炭
+		Tooltip:
+			'''
+			击中敌怪时10%概率点燃它们
+			点燃会在一段时间内总共造成150%伤害
+			每额外拥有一件此物品会再增加10%概率
+			'''
+	}
+
+	ThermitePowder: {
+		DisplayName: 铝热粉末
+		Tooltip:
+			'''
+			每秒钟都会点燃所有可受击敌怪
+			点燃会在一段时间内造成70点基础伤害
+			每额外拥有一件此物品会增加70点基础伤害
+			'''
+	}
+
+	ReactiveMicrobots: {
+		DisplayName: 响应式微型机器人
+		Tooltip:
+			'''
+			低于50%生命值时增加12点递减的伤害减免
+			每额外拥有一件此物品也会增加12点递减的伤害减免
+			'''
+	}
+
+	EverlastingJellyfish: {
+		DisplayName: 永生水母
+		Tooltip:
+			'''
+			受到伤害后，将失去生命值的50%扣除伤害减免作为治疗
+			每额外拥有一件此物品会以递减的数值增加治疗百分比
+			'''
+	}
+
+	RemedialTapeworm: {
+		DisplayName: 治疗性蠕虫
+		Tooltip:
+			'''
+			击中敌怪时会从敌怪身上射出一颗治疗球
+			接触治疗球会增加1点生命值
+			治疗球会在4秒后消失
+			每额外拥有一件此物品会增加1点治疗量
+			'''
+	}
+
+	AncientTwig: {
+		DisplayName: 远古嫩枝
+		Tooltip:
+			'''
+			如果过去的5秒内有敌怪被击中，此物品激活
+			激活时每1.66秒获得5点屏障并使屏障衰减速率降低15%
+			每额外拥有一件此物品会使获得的屏障增加2点并使屏障衰减速率再降低15%
+			'''
+	}
+
+	DisposableTurret: {
+		DisplayName: 一次性炮塔
+		Tooltip:
+			'''
+			击杀敌怪时25%概率生成一个炮塔
+			炮塔会自动向附近敌怪发射基础伤害为100的子弹
+			炮塔存在20秒后消失
+			每额外拥有一件此物品会略微增加生成炮塔的概率
+			'''
+	}
+
+	WayfarersWaistcloth: {
+		DisplayName: 旅行者的背心
+		Tooltip:
+			'''
+			朝一个方向不间断奔跑1.5秒后增加20%移动速度
+			每额外拥有一件此物品会增加20%移动速度加成
+			'''
+	}
+
+	HeartyHoneycomb: {
+		DisplayName: 饱满蜂窝
+		Tooltip:
+			'''
+			每失去5%生命值增加1HP/s生命再生
+			每额外拥有一件此物品会使每失去5%生命值增加0.5HP/s生命再生
+			'''
+	}
+
+	PrimevalRattle: {
+		DisplayName: 原始响板
+		Tooltip:
+			'''
+			一次回复10点屏障或10生命值时获得可叠加的移动速度和递减伤害减免增益
+			每次叠加持续9秒并增加8%移动速度和10点递减的伤害减免
+			但是叠加上限为5次
+			当处于最大叠加次数时，每层会对敌怪造成15%额外伤害
+			每额外拥有一件此物品会增加3次叠加上限
+			'''
+	}
+}
+
+NPCs: {
+	Splinter.DisplayName: 树精
+	Spookrow.DisplayName: 稻草人
+	UndeadGuard.DisplayName: 不死守卫
+	SandWorm.DisplayName: 沙虫
+	NebulaPillar.DisplayName: 星云柱
+	SolarPillar.DisplayName: 日耀柱
+	StardustPillar.DisplayName: 星尘柱
+	VortexPillar.DisplayName: 星旋柱
+	GiantBat.DisplayName: 巨型蝙蝠
+	IcyMerman.DisplayName: 冰雪鱼人
+	IceTortoise.DisplayName: 冰雪陆龟
+	Frostbiter.DisplayName: 冻伤者
+	UndeadViking.DisplayName: 亡灵维京海盗
+	DesertSpirit.DisplayName: 沙漠幽魂
+	AntlionCharger.DisplayName: 蚁狮马
+	Antlion.DisplayName: 蚁狮
+	Tortoise.DisplayName: 乌龟
+	Lamia.DisplayName: 拉弥亚
+	AntlionSwarmer.DisplayName: 蚁狮蜂
+	Hornet.DisplayName: 黄蜂
+	SpectreMaster.DisplayName: 幽灵大师
+	Diabolist.DisplayName: 魔教徒
+	UndeadSharpshooter.DisplayName: 亡灵神枪手
+	DungeonSpirit.DisplayName: 地牢幽魂
+	UndeadAssasin.DisplayName: 亡灵刺客
+	UndeadBrute.DisplayName: 亡灵猛兽
+	CrimsonDreg.DisplayName: 猩红渣滓
+	Ballista.DisplayName: 弩车
+	WrathfulRoot.DisplayName: 愤怒根茎
+	IchorSticker.DisplayName: 灵液黏黏怪
+	BloodCrawler.DisplayName: 血爬虫
+	BlackRecluse.DisplayName: 黑隐士
+	GiantSpider.DisplayName: 大蜘蛛
+	JungleCreeper.DisplayName: 丛林蜘蛛
+	CrawlingSludge.DisplayName: 爬行污泥
+	UndeadPrisoner.DisplayName: 不死囚犯
+	StoneDrone.DisplayName: 岩石无人机
+	UndeadEnforcer.DisplayName: 不死执法者
+	Tumbletwig.DisplayName: 滚枝
+	RockGolem.DisplayName: 岩石巨人
+	SeedLobber.DisplayName: 种子投掷者
+	CursedSlime.DisplayName: 诅咒史莱姆
+	IchorSlime.DisplayName: 灵液史莱姆
+	LavaSlime.DisplayName: 熔岩史莱姆
+	ShadowCaster.DisplayName: 暗影施法者
+	Corruptor.DisplayName: 腐化者
+	Crimator.DisplayName: 血腥者
+	Clinger.DisplayName: 爬藤怪
+	BloodthirstyAxe.DisplayName: 嗜血斧
+	IceSpirit.DisplayName: 冰雪幽魂
+	LavaBat.DisplayName: 熔岩蝙蝠
+	BoneSerpent.DisplayName: 骨蛇
+	FireImp.DisplayName: 火焰小鬼
+	Demon.DisplayName: 恶魔
+	EliteDemon.DisplayName: 精英恶魔
+	GiantMoth.DisplayName: 巨型蛾
+	OvergrownBat.DisplayName: 过度生长的蝙蝠
+	UndeadHunter.DisplayName: 不死猎人
+	FlyingSnake.DisplayName: 飞蛇
+	Lihzahrd.DisplayName: 丛林蜥蜴
+	DomesticatedHornet.DisplayName: 被驯化的黄蜂
+	LihzahrdSentry.DisplayName: 丛林蜥蜴哨卫
+	TempleDevotee.DisplayName: 神庙信徒
+	LihzahrdConstruct.DisplayName: 丛林蜥蜴构造体
+	Corite.DisplayName: 流星火怪
+	Daybreaker.DisplayName: 破晓者
+	Soladile.DisplayName: 火龙怪
+	BrainSuckler.DisplayName: 吮脑怪
+	Omniwatcher.DisplayName: 全能观察者
+	Predictor.DisplayName: 预言怪
+	AlienHornet.DisplayName: 异星黄蜂
+	StormDiver.DisplayName: 漩泥怪
+	VortexWatcher.DisplayName: 星旋观察者
+	StarCell.DisplayName: 星细胞
+	StarSpewer.DisplayName: 流星喷吐者
+	FlowInvader.DisplayName: 流体入侵怪
+	Paladin.DisplayName: 圣骑士
+	BrambleHollow.DisplayName: 荆棘空洞
+	CrimsonVessel.DisplayName: 血腥容器
+	CrimsonSeer.DisplayName: 血腥先知
+	CorruptionParasite.DisplayName: 腐化寄生虫
+	ParasiticEgg.DisplayName: 寄生卵
+	PossessedHammer.DisplayName: 魔锤
+	IceQueen.DisplayName: 冰雪女王
+	PharaohSpirit.DisplayName: 法老幽魂
+	QueenBee.DisplayName: 蜂王
+	WallOfFlesh.DisplayName: 血肉墙
+	Hungry.DisplayName: 饿鬼
+	HungryAnchored.DisplayName: 饿鬼
+	Skeletron.DisplayName: 骷髅王
+	TempleGolem.DisplayName: 神庙石巨人
+	MoonLord.DisplayName: 月亮领主
+	MoonLordHand.DisplayName: 月亮领主眼
+	MoonLordHead.DisplayName: 月亮领主眼
+	TrueServant.DisplayName: 真·克苏鲁之仆
+	TrueBrain.DisplayName: 真·克苏鲁之脑
+}
+
+ItemBasin.DisplayName: 物品火盆
+
+Configs: {
+	TerRoguelikeConfig: {
+		DisplayName: TerRoguelike配置
+
+		Headers: {
+			Mods: {
+				TerRoguelike: {
+					VisualConfig: 视觉配置
+					MiscConfig: 杂项配置
+				}
+			}
+		}
+
+		EnemyLocationArrow: {
+			Label: 敌怪位置箭头
+			Tooltip: ""
+		}
+
+		ObjectiveLocationArrow: {
+			Label: 客观位置箭头
+			Tooltip: ""
+		}
+
+		BossHealthbar: {
+			Label: Boss血条
+			Tooltip: ""
+		}
+
+		ScreenshakeIntensity: {
+			Label: 屏幕震动强度
+			Tooltip: ""
+		}
+
+		FullyDeletePlayerAndWorldFiles: {
+			Label: 完全删除玩家和世界文件
+			Tooltip:
+				'''
+				如果开启，所有游玩TerRoguelike模式使用的玩家和世界文件会被自动地完全删除。
+				如果关闭，所有游玩TerRoguelike模式使用的玩家和世界文件会放入回收站。
+				'''
+		}
+
+		LoadEntireWorldUponEnteringWorld: {
+			Label: 进入世界时加载整个世界
+			Tooltip:
+				'''
+				如果开启，进入TerRoguelike世界时游戏会暂停并尝试框定世界中的大部分物块。
+				这基本上会将大部分物块帧导致的延迟问题移动到你进入世界时而不是游玩时。
+				'''
+		}
+	}
+}
