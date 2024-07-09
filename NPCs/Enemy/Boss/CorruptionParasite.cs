@@ -251,6 +251,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                NPC.localAI[1] = 0;
                 if (target != null)
                 {
                     if (target.Center.X > NPC.Center.X)
@@ -281,8 +282,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (chargeProgress <= 3)
                 {
+                    NPC.localAI[1]++;
                     Vector2 targetPos = chargeDesiredPos;
-                    bool close = (NPC.Center - targetPos).Length() <= 160;
+                    bool close = (NPC.Center - targetPos).Length() <= 160 + (NPC.localAI[1] * 0.34f);
                     float rotToTarget = (targetPos - NPC.Center).ToRotation();
 
                     float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, close ? 0.2f : defaultMaxRotation * (NPC.velocity.Length() / 10f));
@@ -316,6 +318,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (chargeProgress >= 3)
                 {
+                    NPC.localAI[1] = 0;
                     Vector2 targetPos = target == null ? spawnPos : target.Center;
 
                     if (chargeProgress == 3)
@@ -376,9 +379,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] <= waveTunnelTelegraphBurrowTime)
                 {
+                    NPC.localAI[1]++;
                     Vector2 targetPos = waveTunnelDesiredPos + new Vector2(0, Math.Sign(waveTunnelDesiredPos.Y - room.RoomPosition16.Y) * 240);
                     float rotToTarget = (targetPos - NPC.Center).ToRotation();
-                    bool close = (NPC.Center - targetPos).Length() <= 160;
+                    bool close = (NPC.Center - targetPos).Length() <= 160 + (NPC.localAI[1] * 0.34f);
 
                     float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToTarget, close ? 0.2f : defaultMaxRotation * (NPC.velocity.Length() / 10f));
 
@@ -557,12 +561,24 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (NPC.ai[1] <= 3)
                 {
+                    NPC.localAI[1]++;
                     Vector2 chargePos = chargeDesiredPos;
                     float rotToChargePos = (chargePos - NPC.Center).ToRotation();
 
+                    bool close = (NPC.Center - chargePos).Length() <= 160 + (NPC.localAI[1] * 0.34f);
+
                     float potentialRot = NPC.velocity.ToRotation().AngleTowards(rotToChargePos, defaultMaxRotation * (NPC.velocity.Length() / 10f));
 
-                    if (NPC.velocity.Length() < hastyMaxVelocity * 2)
+                    if (close)
+                    {
+                        if (NPC.velocity.Length() > defaultMinVelocity * 0.5f)
+                        {
+                            NPC.velocity -= NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 6;
+                            if (NPC.velocity.Length() < defaultMinVelocity * 0.5f)
+                                NPC.velocity = NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultMinVelocity * 0.5f;
+                        }
+                    }
+                    else if (NPC.velocity.Length() < hastyMaxVelocity * 2)
                     {
                         NPC.velocity += NPC.velocity.SafeNormalize(Vector2.UnitY) * defaultAcceleration * 2;
                         if (NPC.velocity.Length() > hastyMaxVelocity * 2)
