@@ -225,6 +225,7 @@ namespace TerRoguelike.Managers
         {
             AllItems = new List<BaseRoguelikeItem>()
             {
+                //commons
                 new ClingyGrenade(),
                 new PocketSpotter(),
                 new CoolantBarrel(),
@@ -245,12 +246,14 @@ namespace TerRoguelike.Managers
                 new TimesHaveBeenTougher(),
                 new RustedShield(),
                 new AmberBead(),
+                new SavageRing(),
                 new FlimsyPauldron(),
                 new ProtectiveBubble(),
                 new BurningCharcoal(),
                 new ReactiveMicrobots(),
                 new RemedialTapeworm(),
 
+                //uncommons
                 new EvilEye(),
                 new SpentShell(),
                 new HeatSeekingChip(),
@@ -277,6 +280,7 @@ namespace TerRoguelike.Managers
                 new DisposableTurret(),
                 new WayfarersWaistcloth(),
 
+                //rares
                 new VolatileRocket(),
                 new TheDreamsoul(),
                 new DroneBuddy(),

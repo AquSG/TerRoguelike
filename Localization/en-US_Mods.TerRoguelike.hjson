@@ -896,6 +896,15 @@ Items: {
 			Extra copies of this item increase the stack cap by 3
 			'''
 	}
+
+	SavageRing: {
+		DisplayName: Savage Ring
+		Tooltip:
+			'''
+			15% increased damage
+			Extra copies of this item also grant 15% increased damage
+			'''
+	}
 }
 
 NPCs: {

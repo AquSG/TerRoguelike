@@ -48,6 +48,8 @@ namespace TerRoguelike.TerPlayer
         public static readonly SoundStyle PrimevalBoost = new SoundStyle("TerRoguelike/Sounds/PrimevalBoost");
 
         #region Item Variables
+
+        //commons
         public int coolantBarrel;
         public int clingyGrenade;
         public int pocketSpotter;
@@ -74,6 +76,7 @@ namespace TerRoguelike.TerPlayer
         public int reactiveMicrobots;
         public int remedialTapeworm;
 
+        //uncommons
         public int lockOnMissile;
         public int evilEye;
         public int spentShell;
@@ -99,7 +102,9 @@ namespace TerRoguelike.TerPlayer
         public int ancientTwig;
         public int disposableTurret;
         public int wayfarersWaistcloth;
+        public int savageRing;
 
+        //rares
         public int volatileRocket;
         public int theDreamsoul;
         public int droneBuddy;
@@ -247,6 +252,7 @@ namespace TerRoguelike.TerPlayer
             burningCharcoal = 0;
             reactiveMicrobots = 0;
             remedialTapeworm = 0;
+            savageRing = 0;
 
             lockOnMissile = 0;
             evilEye = 0;
@@ -1665,6 +1671,11 @@ namespace TerRoguelike.TerPlayer
             if (instigatorsBrace > 0 && (npc.life / (float)npc.lifeMax) >= 0.9f)
             {
                 float bonusDamage = 0.75f * instigatorsBrace;
+                bonusDamageMultiplier *= 1 + bonusDamage;
+            }
+            if (savageRing > 0)
+            {
+                float bonusDamage = 0.15f * savageRing;
                 bonusDamageMultiplier *= 1 + bonusDamage;
             }
             if (brazenNunchucks > 0 && Vector2.Distance(Player.Center, hitPosition) <= 128f)
