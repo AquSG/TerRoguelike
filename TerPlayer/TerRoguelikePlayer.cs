@@ -1640,7 +1640,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (amberRing > 0 && proj.DamageType == DamageClass.Melee)
             {
-                int barrierGainAmt = 5 * amberRing;
+                int barrierGainAmt = (int)(2 * amberRing * modProj.notedBoostedDamage);
                 AddBarrierHealth(barrierGainAmt);
             }
             if (ancientTwig > 0)
@@ -2278,7 +2278,8 @@ namespace TerRoguelike.TerPlayer
             IEnumerable<Item> items = new List<Item>()
             {
                 createItem(ModContent.ItemType<AdaptiveGun>()),
-                createItem(ModContent.ItemType<AdaptiveBlade>())
+                createItem(ModContent.ItemType<AdaptiveBlade>()),
+                createItem(ModContent.ItemType<AdaptiveSpear>())
             };
 
             return items;
@@ -2354,7 +2355,15 @@ namespace TerRoguelike.TerPlayer
 
             if (bladeFlashTime > 0)
             {
-                drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 23f);
+                if (Player.HeldItem.type == ModContent.ItemType<AdaptiveSpear>())
+                {
+                    drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Magenta, (float)bladeFlashTime / 23f);
+                }
+                else
+                {
+                    drawInfo.heldItem.color = Color.Lerp(Color.White, Color.Cyan, (float)bladeFlashTime / 23f);
+                }
+                
                 bladeFlashTime--;
             }
 
