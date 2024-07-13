@@ -134,6 +134,8 @@ Projectiles: {
 	TrumpCardProjectile.DisplayName: Trump Card
 	RemedialHealingOrb.DisplayName: Remedial Healing Orb
 	DisposableTurretMinion.DisplayName: Disposable Turret Minion
+	AdaptiveSpearHoldout.DisplayName: Adaptive Spear Holdout
+	AdaptiveSpearStab.DisplayName: Adaptive Spear Stab
 }
 
 Items: {
@@ -537,8 +539,9 @@ Items: {
 		DisplayName: Amber Ring
 		Tooltip:
 			'''
-			Gain 5 barrier upon hitting enemies with melee damage
-			Extra copies of this item increase the barrier gain by 5
+			Gain 2 barrier upon hitting enemies with melee damage
+			The barrier gain amount is affected by melee weapon charge multipliers 
+			Extra copies of this item increase the barrier gain by 2
 			'''
 	}
 
@@ -894,6 +897,20 @@ Items: {
 			However, the amount of stacks is capped at 5
 			While at the maximum amount of stacks, enemies take 15% bonus damage per stack
 			Extra copies of this item increase the stack cap by 3
+			'''
+	}
+
+	AdaptiveSpear: {
+		DisplayName: Adaptive Spear
+		Tooltip:
+			'''
+			Your trusty spear for this journey
+			Can be messed with in countless ways by the items you may find
+			Hold attack to charge up the spear for potential damage
+			Releasing when fully charged deals the most damage
+			Damage multiplier before fully charged: 1x - 4x
+			Damage multiplier when fully charged: 5x
+			Gains auto-swing capabilities at 3x attack speed or more
 			'''
 	}
 }
