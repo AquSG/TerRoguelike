@@ -17,7 +17,7 @@ namespace TerRoguelike.Projectiles
 {
     public class AdaptiveDaggerHoldout : ModProjectile, ILocalizedModType
     {
-        //This manages whatever happens when you hold down with adaptive blade
+        //This manages whatever happens when you hold down with adaptive dagger
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
 
         public ref float Charge => ref Projectile.ai[0];

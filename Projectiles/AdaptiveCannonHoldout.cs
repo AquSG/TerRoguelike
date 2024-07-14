@@ -18,7 +18,7 @@ namespace TerRoguelike.Projectiles
 {
     public class AdaptiveCannonHoldout : ModProjectile, ILocalizedModType
     {
-        //This manages whatever happens when you hold down with adaptive gun
+        //This manages whatever happens when you hold down with adaptive cannon
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
 
         public ref float Charge => ref Projectile.ai[0];
