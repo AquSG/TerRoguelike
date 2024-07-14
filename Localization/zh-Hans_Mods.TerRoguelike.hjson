@@ -134,6 +134,12 @@ Projectiles: {
 	TrumpCardProjectile.DisplayName: 王牌
 	RemedialHealingOrb.DisplayName: 治疗球
 	DisposableTurretMinion.DisplayName: 一次性炮塔仆从
+	// AdaptiveSpearHoldout.DisplayName: Adaptive Spear Holdout
+	// AdaptiveSpearStab.DisplayName: Adaptive Spear Stab
+	// AdaptiveCannonHoldout.DisplayName: Adaptive Cannon Holdout
+	// AdaptiveCannonBlast.DisplayName: Adaptive Cannon Blast
+	// AdaptiveDaggerHoldout.DisplayName: Adaptive Dagger Holdout
+	// AdaptiveDaggerStab.DisplayName: Adaptive Dagger Stab
 }
 
 Items: {
@@ -895,6 +901,39 @@ Items: {
 			当处于最大叠加次数时，每层会对敌怪造成15%额外伤害
 			每额外拥有一件此物品会增加3次叠加上限
 			'''
+	}
+
+	AdaptiveSpear: {
+		// DisplayName: Adaptive Spear
+		/* Tooltip:
+			'''
+			Your trusty spear for this journey
+			Can be messed with in countless ways by the items you may find
+			Hold attack to charge up the spear for potential damage
+			Releasing when fully charged deals the most damage
+			Damage multiplier before fully charged: 1x - 4x
+			Damage multiplier when fully charged: 5x
+			Gains auto-swing capabilities at 3x attack speed or more
+			''' */
+	}
+
+	AdaptiveCannon: {
+		// DisplayName: Adaptive Cannon
+		/* Tooltip:
+			'''
+			Your trusty cannon for this journey
+			Can be messed with in countless ways by the items you may find
+			''' */
+	}
+
+	AdaptiveDagger: {
+		// DisplayName: Adaptive Dagger
+		/* Tooltip:
+			'''
+			Your trusty dagger for this journey
+			Can be messed with in countless ways by the items you may find
+			Always has auto-swing capabilities
+			''' */
 	}
 }
 

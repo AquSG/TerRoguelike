@@ -138,6 +138,8 @@ Projectiles: {
 	AdaptiveSpearStab.DisplayName: Adaptive Spear Stab
 	AdaptiveCannonHoldout.DisplayName: Adaptive Cannon Holdout
 	AdaptiveCannonBlast.DisplayName: Adaptive Cannon Blast
+	AdaptiveDaggerHoldout.DisplayName: Adaptive Dagger Holdout
+	AdaptiveDaggerStab.DisplayName: Adaptive Dagger Stab
 }
 
 Items: {
@@ -922,6 +924,16 @@ Items: {
 			'''
 			Your trusty cannon for this journey
 			Can be messed with in countless ways by the items you may find
+			'''
+	}
+
+	AdaptiveDagger: {
+		DisplayName: Adaptive Dagger
+		Tooltip:
+			'''
+			Your trusty dagger for this journey
+			Can be messed with in countless ways by the items you may find
+			Always has auto-swing capabilities
 			'''
 	}
 }

@@ -18,7 +18,7 @@ using TerRoguelike.Particles;
 
 namespace TerRoguelike.Projectiles
 {
-    public class AdaptiveSpearStab : ModProjectile, ILocalizedModType
+    public class AdaptiveDaggerStab : ModProjectile, ILocalizedModType
     {
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public TerRoguelikeGlobalProjectile modProj;
@@ -75,22 +75,9 @@ namespace TerRoguelike.Projectiles
             }
             Projectile.position = player.position - stuckPosition + (Vector2.UnitY * player.gfxOffY);
             Projectile.localAI[0] += 1 * player.GetAttackSpeed(DamageClass.Generic); // animation speed scales with attack speed
-            if (Projectile.localAI[0] >= 20 && Projectile.timeLeft != 1000) // kill when done animating
+            if (Projectile.localAI[0] >= 12 && Projectile.timeLeft != 1000) // kill when done animating
             {
                 Projectile.Kill();
-            }
-
-            if (Projectile.localAI[0] < 12)
-            {
-                float tipInterpolant = 1f - Math.Min(Projectile.localAI[0] / animStopTime, 1);
-                Vector2 tipPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-54 * tipInterpolant + 24);
-                for (int i = -1; i <= 1; i += 2)
-                {
-                    if (!Main.rand.NextBool(5))
-                        continue;
-                    float particleRot = Projectile.rotation + MathHelper.Pi + 0.44f * i;
-                    ParticleManager.AddParticle(new Square(tipPos + particleRot.ToRotationVector2() * Main.rand.NextFloat(30 * Projectile.scale), Vector2.Zero, 10, Color.Lerp(Color.Red, Color.Yellow, Main.rand.NextFloat()), new Vector2(Main.rand.NextFloat(0.5f, 1f)), Main.rand.NextFloat(MathHelper.TwoPi), 0.96f, 10, false), ParticleManager.ParticleLayer.AfterProjectiles);
-                }
             }
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
@@ -98,12 +85,11 @@ namespace TerRoguelike.Projectiles
             if (Projectile.owner < 0)
                 return null;
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 4; i++)
             {
-                float interpolant = 1f - Math.Min(Projectile.localAI[0] / animStopTime, 1);
-                Vector2 hitboxPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * ((-54 * interpolant) - (i * 12));
+                Vector2 hitboxPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-8 + i * 9 + MathHelper.Lerp(-10, 0, Projectile.scale));
 
-                float radius = Projectile.height * 0.2f;
+                float radius = Projectile.height * 0.1f;
 
                 if (targetHitbox.ClosestPointInRect(hitboxPos).Distance(hitboxPos) <= radius)
                     return true;
@@ -119,35 +105,34 @@ namespace TerRoguelike.Projectiles
             modifiers.HitDirectionOverride = direction;
         }
 
-        public override bool? CanDamage() => Projectile.localAI[0] < animStopTime + 6 ? null : (Projectile.timeLeft == 1000 ? null : false);
+        public override bool? CanDamage() => Projectile.localAI[0] < animStopTime + 5 ? (bool?)null : (Projectile.timeLeft == 1000 ? null : false);
         public override bool PreDraw(ref Color lightColor)
         {
             float tipInterpolant = 1f - Math.Min(Projectile.localAI[0] / animStopTime, 1);
-            Vector2 tipPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-54 * tipInterpolant + 24 + MathHelper.Lerp(-10, 0, Projectile.scale));
-            Color sparkColor = Color.Red;
+            Vector2 tipPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-16 * tipInterpolant + 28 + MathHelper.Lerp(-16, 0, Projectile.scale));
+            Color sparkColor = Color.White;
             sparkColor.A = 0;
 
-            if (Projectile.localAI[0] > animStopTime - 3)
+            if (Projectile.localAI[0] > animStopTime)
             {
-                sparkColor *= 1 - ((Projectile.localAI[0] - animStopTime) / 13f);
+                sparkColor *= 1 - ((Projectile.localAI[0] - animStopTime) / 7f);
             }
             for (int i = -1; i <= 1; i += 2)
             {
-                Main.EntitySpriteDraw(sparkTex, tipPos - Main.screenPosition, null, sparkColor, Projectile.rotation + i * 0.44f, sparkTex.Size() * new Vector2(0.9f, 0.5f), 0.1f * Projectile.scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(sparkTex, tipPos - Main.screenPosition, null, sparkColor, Projectile.rotation + i * 0.44f, sparkTex.Size() * new Vector2(0.9f, 0.5f), 0.05f * Projectile.scale, SpriteEffects.None);
             }
 
             if (false)
             {
-                for (int i = 0; i < 3; i++)
+                for (int i = 0; i < 4; i++)
                 {
-                    float interpolant = 1f - Math.Min(Projectile.localAI[0] / animStopTime, 1);
-                    Vector2 hitboxPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * ((-54 * interpolant) - (i * 12));
+                    Vector2 hitboxPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-8 + i * 9 + MathHelper.Lerp(-10, 0, Projectile.scale));
 
-                    float radius = Projectile.height * 0.2f;
+                    float radius = Projectile.height * 0.1f;
 
                     for (int j = 0; j < 120; j++)
                     {
-                        Main.EntitySpriteDraw(squareTex, hitboxPos + ((j / 120f * MathHelper.TwoPi).ToRotationVector2() * radius) - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 1f, SpriteEffects.None);
+                        Main.EntitySpriteDraw(squareTex, hitboxPos + ((j / 120f * MathHelper.TwoPi).ToRotationVector2() * radius) - Main.screenPosition, null, Color.Red, 0, squareTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                     }
                 }
             }
