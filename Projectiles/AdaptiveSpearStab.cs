@@ -102,7 +102,7 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < 2; i++)
             {
                 float interpolant = 1f - Math.Min(Projectile.localAI[0] / animStopTime, 1);
-                Vector2 hitboxPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-54 + i * 24) * interpolant;
+                Vector2 hitboxPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-54 + i * 24 + MathHelper.Lerp(-10, 0, Projectile.scale)) * interpolant;
 
                 float radius = Projectile.height * 0.2f;
 
@@ -124,7 +124,7 @@ namespace TerRoguelike.Projectiles
         public override bool PreDraw(ref Color lightColor)
         {
             float tipInterpolant = 1f - Math.Min(Projectile.localAI[0] / animStopTime, 1);
-            Vector2 tipPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-54 * tipInterpolant + 24);
+            Vector2 tipPos = Projectile.Center + Projectile.rotation.ToRotationVector2() * (-54 * tipInterpolant + 24 + MathHelper.Lerp(-10, 0, Projectile.scale));
             Color sparkColor = Color.Red;
             sparkColor.A = 0;
 

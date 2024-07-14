@@ -136,6 +136,8 @@ Projectiles: {
 	DisposableTurretMinion.DisplayName: Disposable Turret Minion
 	AdaptiveSpearHoldout.DisplayName: Adaptive Spear Holdout
 	AdaptiveSpearStab.DisplayName: Adaptive Spear Stab
+	AdaptiveCannonHoldout.DisplayName: Adaptive Cannon Holdout
+	AdaptiveCannonBlast.DisplayName: Adaptive Cannon Blast
 }
 
 Items: {
@@ -911,6 +913,15 @@ Items: {
 			Damage multiplier before fully charged: 1x - 4x
 			Damage multiplier when fully charged: 5x
 			Gains auto-swing capabilities at 3x attack speed or more
+			'''
+	}
+
+	AdaptiveCannon: {
+		DisplayName: Adaptive Cannon
+		Tooltip:
+			'''
+			Your trusty cannon for this journey
+			Can be messed with in countless ways by the items you may find
 			'''
 	}
 }

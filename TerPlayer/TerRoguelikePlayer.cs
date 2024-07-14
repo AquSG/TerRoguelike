@@ -1487,6 +1487,17 @@ namespace TerRoguelike.TerPlayer
                         }
                     }
                 }
+                if (Player.pulley)
+                {
+                    if (Player.ItemAnimationActive && (Player.controlRight || Player.controlLeft) && !upOrDown)
+                    {
+                        Player.pulley = false;
+                        if (Player.velocity.X == 0)
+                        {
+                            Player.velocity.X = Player.controlRight ? 1 : -1;
+                        }
+                    }
+                }
             }
         }
         #endregion
@@ -2279,6 +2290,7 @@ namespace TerRoguelike.TerPlayer
             {
                 createItem(ModContent.ItemType<AdaptiveGun>()),
                 createItem(ModContent.ItemType<AdaptiveBlade>()),
+                createItem(ModContent.ItemType<AdaptiveCannon>()),
                 createItem(ModContent.ItemType<AdaptiveSpear>())
             };
 
