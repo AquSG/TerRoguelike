@@ -56,10 +56,8 @@ namespace TerRoguelike.Projectiles
             if (Owner.channel) //Keep the player's hands full relative to attack speed
             {
                 Projectile.timeLeft = 2;
-                Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
                 if (Owner.itemTime < 2)
                     Owner.itemTime = 2;
-                Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
                 if (Owner.itemAnimation < 2)
                     Owner.itemAnimation = 2;
                 Owner.heldProj = Projectile.whoAmI;
@@ -79,6 +77,13 @@ namespace TerRoguelike.Projectiles
 
         public void ShootBullet()
         {
+            Owner.itemTime = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
+            if (Owner.itemTime < 2)
+                Owner.itemTime = 2;
+            Owner.itemAnimation = (int)(20 / Owner.GetAttackSpeed(DamageClass.Generic));
+            if (Owner.itemAnimation < 2)
+                Owner.itemAnimation = 2;
+
             float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             if (modPlayer.shotgunComponent > 0)

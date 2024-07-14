@@ -35,6 +35,7 @@ using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using Terraria.WorldBuilding;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Items.Uncommon;
+using static Terraria.Player;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -2291,7 +2292,8 @@ namespace TerRoguelike.TerPlayer
                 createItem(ModContent.ItemType<AdaptiveGun>()),
                 createItem(ModContent.ItemType<AdaptiveBlade>()),
                 createItem(ModContent.ItemType<AdaptiveCannon>()), // NOTICE: I plan to only let the player select 1 ranged and 1 melee weapon. I just haven't gotten to making any UI for it yet.
-                createItem(ModContent.ItemType<AdaptiveSpear>())
+                createItem(ModContent.ItemType<AdaptiveSpear>()),
+                createItem(ModContent.ItemType<AdaptiveDagger>())
             };
 
             return items;
@@ -3108,6 +3110,27 @@ namespace TerRoguelike.TerPlayer
         {
             string healthUp = Language.GetOrRegister("Mods.TerRoguelike.HealthUpAlert").Value;
             CombatText.NewText(player.getRect(), CombatText.HealLife, healthUp, true);
+        }
+
+        public Vector2 GetPositionRelativeToFrontHand(float length)
+        {
+            float rotation = Player.compositeFrontArm.rotation;
+
+            float num = rotation + (float)Math.PI / 2f;
+            Vector2 vector = new Vector2((float)Math.Cos(num), (float)Math.Sin(num)) * length;
+
+            if (Player.direction == -1)
+            {
+                vector += new Vector2(4f, -2f);
+                vector += new Vector2(0f, -3f).RotatedBy(rotation + (float)Math.PI / 2f);
+            }
+            else
+            {
+                vector += new Vector2(-4f, -2f);
+                vector += new Vector2(0f, 3f).RotatedBy(rotation + (float)Math.PI / 2f);
+            }
+
+            return Player.MountedCenter + vector;
         }
     }
 }
