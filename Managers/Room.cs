@@ -281,8 +281,8 @@ namespace TerRoguelike.Managers
             for (int playerID = 0; playerID < Main.maxPlayers; playerID++) // keep players in the fucking room
             {
                 var player = Main.player[playerID];
-                bool boundLeft = (player.position.X + player.velocity.X + playerCollisionShrink.X) < (RoomPosition.X + 1f) * 16f;
-                bool boundRight = (player.position.X + (float)player.width + player.velocity.X - playerCollisionShrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
+                bool boundLeft = !player.pulley && (player.position.X + player.velocity.X + playerCollisionShrink.X) < (RoomPosition.X + 1f) * 16f;
+                bool boundRight = !player.pulley && (player.position.X + (float)player.width + player.velocity.X - playerCollisionShrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
                 bool boundTop = (player.position.Y + player.velocity.Y + playerCollisionShrink.Y) < (RoomPosition.Y + 1f) * 16f;
                 bool boundBottom = (player.position.Y + (float)player.height + player.velocity.Y - playerCollisionShrink.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
                 if (boundLeft)

@@ -140,6 +140,7 @@ Projectiles: {
 	AdaptiveCannonBlast.DisplayName: Adaptive Cannon Blast
 	AdaptiveDaggerHoldout.DisplayName: Adaptive Dagger Holdout
 	AdaptiveDaggerStab.DisplayName: Adaptive Dagger Stab
+	AdaptiveRifleHoldout.DisplayName: Adaptive Rifle Holdout
 }
 
 Items: {
@@ -934,6 +935,17 @@ Items: {
 			Your trusty dagger for this journey
 			Can be messed with in countless ways by the items you may find
 			Always has auto-swing capabilities
+			'''
+	}
+
+	AdaptiveRifle: {
+		DisplayName: Adaptive Rifle
+		Tooltip:
+			'''
+			Your trusty rifle for this journey
+			Can be messed with in countless ways by the items you may find
+			Hold attack to narrow the spread of the rifle
+			Gains auto-fire capabilities at 2x attack speed or more
 			'''
 	}
 }
