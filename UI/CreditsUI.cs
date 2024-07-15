@@ -182,10 +182,23 @@ namespace TerRoguelike.UI
                 for (int invItem = 0; invItem < 50; invItem++)
                 {
                     Item item = player.inventory[invItem];
+                    int rangedItemType = ItemManager.StarterRanged.FindIndex(x => x.id == item.type);
+                    if (rangedItemType != -1)
+                    {
+                        itemsToDraw.Add(item);
+                        continue;
+                    }
+                    int meleeItemType = ItemManager.StarterMelee.FindIndex(x => x.id == item.type);
+                    if (meleeItemType != -1)
+                    {
+                        itemsToDraw.Add(item);
+                        continue;
+                    }
                     int rogueItemType = ItemManager.AllItems.FindIndex(x => x.modItemID == item.type);
                     if (rogueItemType != -1)
                     {
                         itemsToDraw.Add(item);
+                        continue;
                     }
                 }
             }

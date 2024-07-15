@@ -19,11 +19,39 @@ using TerRoguelike.Items.Rare;
 using Terraria.ModLoader.Core;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Audio;
+using TerRoguelike.Items.Weapons;
 
 namespace TerRoguelike.Managers
 {
     public class ItemManager
     {
+        public static List<StarterItem> StarterRanged = [];
+        public static List<StarterItem> StarterMelee = [];
+        public static void LoadStarterItems()
+        {
+            StarterRanged = [
+                new(ModContent.ItemType<AdaptiveGun>()),
+                new(ModContent.ItemType<AdaptiveCannon>()),
+                new(ModContent.ItemType<AdaptiveRifle>())];
+            StarterMelee = [
+                new(ModContent.ItemType<AdaptiveBlade>()),
+                new(ModContent.ItemType<AdaptiveSpear>()),
+                new(ModContent.ItemType<AdaptiveDagger>())];
+        }
+        public static void UnloadStarterItems()
+        {
+            StarterRanged = null;
+            StarterMelee = null;
+        }
+        public class StarterItem
+        {
+            public int id;
+            public StarterItem(int ID)
+            {
+                id = ID;
+            }
+        }
+
         public static readonly SoundStyle ItemSpawn = new SoundStyle("TerRoguelike/Sounds/ItemSpawn", 3);
         public static readonly SoundStyle ItemLand = new SoundStyle("TerRoguelike/Sounds/ItemLand", 3);
         public enum ItemTier
