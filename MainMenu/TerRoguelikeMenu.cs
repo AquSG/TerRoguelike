@@ -334,6 +334,8 @@ namespace TerRoguelike.MainMenu
                 void DifficultyDrawing()
                 {
                     Vector2 centerPos = new Vector2(Main.screenWidth * 0.5f, Main.screenHeight * 0.72f);
+                    if (Main.screenHeight < 860)
+                        centerPos.Y = Main.screenHeight - 100;
                     Vector2 buttonDimensionsInflate = new Vector2(52);
                     int backgroundInflateAmt = 6;
                     int buttonCount = 3;
