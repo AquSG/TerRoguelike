@@ -84,7 +84,7 @@ namespace TerRoguelike.Projectiles
             if (Owner.itemAnimation < 2)
                 Owner.itemAnimation = 2;
 
-            float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 30f : 5f;
+            float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 28f : 5f;
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             if (modPlayer.shotgunComponent > 0)
             {

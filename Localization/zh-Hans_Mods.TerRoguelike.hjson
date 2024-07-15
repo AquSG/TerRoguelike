@@ -939,7 +939,13 @@ Items: {
 
 	AdaptiveRifle: {
 		// DisplayName: Adaptive Rifle
-		// Tooltip: ""
+		/* Tooltip:
+			'''
+			Your trusty rifle for this journey
+			Can be messed with in countless ways by the items you may find
+			Hold attack to narrow the spread of the rifle
+			Gains auto-fire capabilities at 2x attack speed or more
+			''' */
 	}
 }
 

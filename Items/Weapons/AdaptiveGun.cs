@@ -47,9 +47,12 @@ namespace TerRoguelike.Items.Weapons
             Vector2 playerToCursor = (AimWorld() - player.Center).SafeNormalize(Vector2.UnitX);
             float armPointingDirection = (playerToCursor.ToRotation());
 
-            player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2);
-            CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(42, 30), new Vector2(-12, -4));
+            Vector2 anchor = player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor();
+            CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, anchor, new Vector2(42, 30), new Vector2(-12, -4));
+
+            player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2 + 0.3f * player.direction);
+            player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, (anchor - player.ModPlayer().GetPositionRelativeToFrontHand(0)).ToRotation() - MathHelper.PiOver2 + 0.2f * player.direction);
 
             if (AimWorld().X > player.Center.X)
             {
