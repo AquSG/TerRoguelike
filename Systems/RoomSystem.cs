@@ -1093,6 +1093,10 @@ namespace TerRoguelike.Systems
         {
             
         }
+        public override void PostSetupContent()
+        {
+            ItemManager.LoadStarterItems();
+        }
     }
     public class HealingPulse
     {

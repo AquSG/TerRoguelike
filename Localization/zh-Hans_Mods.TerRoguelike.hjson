@@ -910,6 +910,7 @@ Items: {
 			'''
 			Your trusty spear for this journey
 			Can be messed with in countless ways by the items you may find
+			Stab the spear with precision from a distance
 			Hold attack to charge up the spear for potential damage
 			Releasing when fully charged deals the most damage
 			Damage multiplier before fully charged: 1x - 4x
@@ -924,6 +925,7 @@ Items: {
 			'''
 			Your trusty cannon for this journey
 			Can be messed with in countless ways by the items you may find
+			Shoot slow moving bombs at snail speed
 			''' */
 	}
 
@@ -933,6 +935,7 @@ Items: {
 			'''
 			Your trusty dagger for this journey
 			Can be messed with in countless ways by the items you may find
+			Rapidly stab the dagger with little range
 			Always has auto-swing capabilities
 			''' */
 	}
@@ -943,6 +946,7 @@ Items: {
 			'''
 			Your trusty rifle for this journey
 			Can be messed with in countless ways by the items you may find
+			Shoot powerful bullets at a moderate rate
 			Hold attack to narrow the spread of the rifle
 			Gains auto-fire capabilities at 2x attack speed or more
 			''' */

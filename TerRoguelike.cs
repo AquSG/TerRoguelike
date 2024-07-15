@@ -46,6 +46,7 @@ namespace TerRoguelike
             EnemyHealthbarUI.Unload();
             NPCManager.Unload();
             TextureManager.Unload();
+            ItemManager.UnloadStarterItems();
         }
         public void LoadClient()
         {

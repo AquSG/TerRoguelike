@@ -173,6 +173,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/MainMenu/UiMoon",
                 "TerRoguelike/TerPlayer/CeremonialCrownGems",
                 "TerRoguelike/Projectiles/DisposableTurretMinionHead",
+                "TerRoguelike/MainMenu/LStickButton",
             };
             foreach (string path in pathList)
             {
