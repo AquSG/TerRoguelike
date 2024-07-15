@@ -24,6 +24,7 @@ namespace TerRoguelike.Shaders
         internal static Effect AncientTwigEffect;
         internal static Effect MaskOverlay;
         internal static Effect SideFade;
+        internal static Effect ConeFade;
         internal static Effect Pixelation;
 
         public static void LoadShaders()
@@ -52,6 +53,9 @@ namespace TerRoguelike.Shaders
 
             SideFade = LoadShader("SideFade");
             RegisterScreenShader(SideFade, "SideFadePass", "SideFade");
+
+            ConeFade = LoadShader("ConeFade");
+            RegisterScreenShader(ConeFade, "ConeFadePass", "ConeFade");
 
             Pixelation = LoadShader("Pixelation");
             RegisterScreenShader(Pixelation, "PixelationPass", "Pixelation");

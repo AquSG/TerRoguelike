@@ -2293,6 +2293,7 @@ namespace TerRoguelike.TerPlayer
                 createItem(ModContent.ItemType<AdaptiveBlade>()),
                 createItem(ModContent.ItemType<AdaptiveCannon>()), // NOTICE: I plan to only let the player select 1 ranged and 1 melee weapon. I just haven't gotten to making any UI for it yet.
                 createItem(ModContent.ItemType<AdaptiveSpear>()),
+                createItem(ModContent.ItemType<AdaptiveRifle>()),
                 createItem(ModContent.ItemType<AdaptiveDagger>())
             };
 

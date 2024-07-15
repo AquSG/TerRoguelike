@@ -22,8 +22,8 @@ namespace TerRoguelike.Items.Weapons
         {
             Item.damage = 100;
             Item.DamageType = DamageClass.Ranged;
-            Item.width = 62;
-            Item.height = 32;
+            Item.width = 38;
+            Item.height = 38;
             Item.useTime = 26;
             Item.useAnimation = 26;
             Item.useStyle = ItemUseStyleID.Shoot;
