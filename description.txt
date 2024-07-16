@@ -1,3 +1,5 @@
+Version 1.1 out now, introducing new starting weapons! Select from 6 starting weapons in character creation!
+
 TerRoguelike is a mod that adds a completely new gamemode to Terraria, allowing you to play through a roguelike experience!
 Battle through over 150 different rooms, spread across 11 different floors!
 Engage in combat with 12 unique bosses, and over 60 unique enemies!
