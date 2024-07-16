@@ -13,6 +13,7 @@ using Terraria.Graphics.Renderers;
 using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.ResourceSets;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Projectiles
 {
@@ -43,21 +44,22 @@ namespace TerRoguelike.Projectiles
             modProj = Projectile.ModProj();
             squareTex = TextureManager.TexDict["Square"];
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            //scale support
+            Projectile.position = Projectile.Center + new Vector2(-34 * Projectile.scale, -34 * Projectile.scale);
+            Projectile.width = (int)(68 * Projectile.scale);
+            Projectile.height = (int)(68 * Projectile.scale);
 
+            player ??= Main.player[Projectile.owner];
+            modPlayer ??= player.ModPlayer();
+
+            stuckPosition = player.position - Projectile.position;
+        }
         public override void AI()
         {
-            if (Projectile.localAI[0] == 0)
-            {
-                //scale support
-                Projectile.position = Projectile.Center + new Vector2(-34 * Projectile.scale, -34 * Projectile.scale);
-                Projectile.width = (int)(68 * Projectile.scale);
-                Projectile.height = (int)(68 * Projectile.scale);
-            }
-
-            if (player == null)
-                player = Main.player[Projectile.owner];
-            if (modPlayer == null)
-                modPlayer = player.ModPlayer();
+            player ??= Main.player[Projectile.owner];
+            modPlayer ??= player.ModPlayer();
 
             if (stuckPosition == Vector2.Zero)
             {
