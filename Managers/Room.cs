@@ -285,28 +285,37 @@ namespace TerRoguelike.Managers
                 bool boundRight = !player.pulley && (player.position.X + (float)player.width + player.velocity.X - playerCollisionShrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
                 bool boundTop = (player.position.Y + player.velocity.Y + playerCollisionShrink.Y) < (RoomPosition.Y + 1f) * 16f;
                 bool boundBottom = (player.position.Y + (float)player.height + player.velocity.Y - playerCollisionShrink.Y) > (RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f;
+                bool boundProc = false;
+                Vector2 playerPreBoundPosition = player.position;
                 if (boundLeft)
                 {
                     player.position.X = (RoomPosition.X + 1f) * 16f - playerCollisionShrink.X;
                     player.velocity.X = 0;
+                    boundProc = true;
                 }
                 if (boundRight)
                 {
                     player.position.X = ((RoomPosition.X - 1f + RoomDimensions.X) * 16f + playerCollisionShrink.X) - (float)player.width;
                     player.velocity.X = 0;
+                    boundProc = true;
                 }
                 if (boundTop)
                 {
                     player.position.Y = (RoomPosition.Y + 1f) * 16f - playerCollisionShrink.Y;
                     player.velocity.Y = 0.01f;
                     player.jump = 0;
+                    boundProc = true;
                 }
                 if (boundBottom)
                 {
                     player.position.Y = ((RoomPosition.Y - (1f) + RoomDimensions.Y) * 16f + playerCollisionShrink.Y) - (float)player.height;
                     player.velocity.Y = 0;
+                    boundProc = true;
                 }
-
+                if (boundProc)
+                {
+                    player.HeldItem.position += player.position - playerPreBoundPosition;
+                }
             }
             for (int npcID = 0; npcID < Main.maxNPCs; npcID++) // keep npcs in the fucking room
             {

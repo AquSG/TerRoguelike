@@ -60,6 +60,7 @@ namespace TerRoguelike.Projectiles
             }
 
             float pointingRotation = (AimWorld() - Owner.MountedCenter).ToRotation();
+            Projectile.rotation = pointingRotation;
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 35f;
 
             if (Owner.channel) //Keep the player's hands full relative to attack speed
@@ -145,6 +146,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            float baseRot = Projectile.rotation;
             float opacity = MathHelper.Lerp(0.3f, 1, Charge / wantedCharge);
             Main.spriteBatch.End();
             Effect fadeEffect = Filters.Scene["TerRoguelike:ConeFade"].GetShader().Shader;
@@ -157,7 +159,17 @@ namespace TerRoguelike.Projectiles
             fadeEffect.Parameters["coneFadeStrength"].SetValue(0.99990f);
 
             Texture2D tex = TextureManager.TexDict["Square"];
-            Main.EntitySpriteDraw(tex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White, (Projectile.Center - Owner.MountedCenter).ToRotation(), tex.Size() * 0.5f, 300, SpriteEffects.None);
+            Main.EntitySpriteDraw(tex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White, baseRot, tex.Size() * 0.5f, 300, SpriteEffects.None);
+
+            StartAdditiveSpritebatch();
+
+            var lineTex = TextureManager.TexDict["LerpLineGradient"];
+            float spread = ChargeSpread;
+            for (int i = -1; i <= 1; i += 2)
+            {
+                Main.EntitySpriteDraw(lineTex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White * 0.50f * opacity, baseRot + spread * i, lineTex.Size() * new Vector2(0, 0.5f), new Vector2(0.7f, 0.35f), SpriteEffects.None);
+            }
+            
 
             StartAlphaBlendSpritebatch();
             return false;
