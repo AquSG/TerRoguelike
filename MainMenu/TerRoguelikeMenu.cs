@@ -128,6 +128,10 @@ namespace TerRoguelike.MainMenu
                     desiredPlayer = null;
 
                 Vector2 position = new Vector2(Main.screenWidth / 2 - 150, Main.screenHeight * 0.75f);
+                if (Main.screenHeight < 800)
+                {
+                    position.Y += 60;
+                }
                 if (new Rectangle((int)position.X, (int)position.Y, 290, 40).Contains((int)Main.MouseScreen.X, (int)Main.MouseScreen.Y))
                 {
                     if (!mouseHover)
@@ -165,6 +169,8 @@ namespace TerRoguelike.MainMenu
                 void DifficultyInteraction()
                 {
                     Vector2 centerPos = new Vector2(Main.screenWidth * 0.5f, Main.screenHeight * 0.72f);
+                    if (Main.screenHeight < 860)
+                        centerPos.Y = Main.screenHeight - 105;
                     Vector2 buttonDimensionsInflate = new Vector2(52);
                     int backgroundInflateAmt = 6;
                     int buttonCount = 3;
@@ -335,7 +341,7 @@ namespace TerRoguelike.MainMenu
                 {
                     Vector2 centerPos = new Vector2(Main.screenWidth * 0.5f, Main.screenHeight * 0.72f);
                     if (Main.screenHeight < 860)
-                        centerPos.Y = Main.screenHeight - 100;
+                        centerPos.Y = Main.screenHeight - 105;
                     Vector2 buttonDimensionsInflate = new Vector2(52);
                     int backgroundInflateAmt = 6;
                     int buttonCount = 3;
