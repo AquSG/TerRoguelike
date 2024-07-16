@@ -79,12 +79,12 @@ namespace TerRoguelike.Items.Weapons
             }
 
             float itemRot = armPointingDirection;
-            Vector2 handWantedPos = player.MountedCenter + new Vector2(10 * player.direction, 4).RotatedBy(itemRot + (player.direction == -1 ? MathHelper.Pi : 0));
+            Vector2 handWantedPos = player.MountedCenter + new Vector2(10 * player.direction, 5).RotatedBy(itemRot + (player.direction == -1 ? MathHelper.Pi : 0));
             Vector2 frontArmAnchor = modPlayer.GetPositionRelativeToFrontHand(0);
             float frontWantedRot = (handWantedPos - frontArmAnchor).ToRotation();
             player.SetCompositeArmFront(true, Player.CompositeArmStretchAmount.Full, frontWantedRot - MathHelper.PiOver2);
             player.SetCompositeArmBack(true, Player.CompositeArmStretchAmount.Full, armPointingDirection - MathHelper.PiOver2 + 0.3f * player.direction);
-            CleanHoldStyle(player, itemRot, player.MountedCenter, new Vector2(62, 22), new Vector2(-14, -3));
+            CleanHoldStyle(player, itemRot, player.MountedCenter, new Vector2(62, 22), new Vector2(-14, -4));
         }
 
         public override void UseStyle(Player player, Rectangle heldItemFrame)
