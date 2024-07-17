@@ -134,13 +134,13 @@ Projectiles: {
 	TrumpCardProjectile.DisplayName: 王牌
 	RemedialHealingOrb.DisplayName: 治疗球
 	DisposableTurretMinion.DisplayName: 一次性炮塔仆从
-	// AdaptiveSpearHoldout.DisplayName: Adaptive Spear Holdout
-	// AdaptiveSpearStab.DisplayName: Adaptive Spear Stab
-	// AdaptiveCannonHoldout.DisplayName: Adaptive Cannon Holdout
-	// AdaptiveCannonBlast.DisplayName: Adaptive Cannon Blast
-	// AdaptiveDaggerHoldout.DisplayName: Adaptive Dagger Holdout
-	// AdaptiveDaggerStab.DisplayName: Adaptive Dagger Stab
-	// AdaptiveRifleHoldout.DisplayName: Adaptive Rifle Holdout
+	AdaptiveSpearHoldout.DisplayName: 长矛握持
+	AdaptiveSpearStab.DisplayName: 长矛刺击
+	AdaptiveCannonHoldout.DisplayName: 加农炮握持
+	AdaptiveCannonBlast.DisplayName: 加农炮轰击
+	AdaptiveDaggerHoldout.DisplayName: 匕首握持
+	AdaptiveDaggerStab.DisplayName: 匕首刺击
+	AdaptiveRifleHoldout.DisplayName: 来福枪握持
 }
 
 Items: {
@@ -300,7 +300,7 @@ Items: {
 	}
 
 	AdaptiveBlade: {
-		DisplayName: 初始剑
+		DisplayName: 自适应剑
 		Tooltip:
 			'''
 			此次旅程最可靠的剑
@@ -911,48 +911,48 @@ Items: {
 			'''
 			此次旅程最可靠的矛
 			通过你找到的各种物品，它可以千变万化
-			Stab the spear with precision from a distance
-			Hold attack to charge up the spear for potential damage
-			Releasing when fully charged deals the most damage
-			Damage multiplier before fully charged: 1x - 4x
-			Damage multiplier when fully charged: 5x
-			Gains auto-swing capabilities at 3x attack speed or more
+			长矛可远距离刺击
+			按住攻击键为矛充能以造成更高伤害
+			满充能时释放造成的伤害最高
+			满充能前的伤害乘数：1倍至4倍
+			满充能时的伤害乘数：5倍
+			攻速在3倍及以上时可获得自动挥舞能力
 			'''
 	}
 
 	AdaptiveCannon: {
-		// DisplayName: Adaptive Cannon
-		/* Tooltip:
+		DisplayName: 自适应加农炮
+		Tooltip:
 			'''
-			Your trusty cannon for this journey
-			Can be messed with in countless ways by the items you may find
-			Shoot slow moving bombs at snail speed
-			''' */
+			此次旅程最可靠的加农炮
+			通过你找到的各种物品，它可以千变万化
+			以蜗牛速射出慢速移动的炮弹
+			'''
 	}
 
 	AdaptiveDagger: {
-		// DisplayName: Adaptive Dagger
-		/* Tooltip:
+		DisplayName:自适应匕首
+		Tooltip:
 			'''
-			Your trusty dagger for this journey
-			Can be messed with in countless ways by the items you may find
-			Rapidly stab the dagger with little range
-			Always has auto-swing capabilities
-			''' */
+			此次旅程中最可靠的匕首
+			通过你找到的各种物品，它可以千变万化
+			匕首可快速且范围有限地刺击
+			始终有用自动挥舞能力
+			'''
 	}
 
 	AdaptiveRifle: {
-		// DisplayName: Adaptive Rifle
-		/* Tooltip:
+		DisplayName: 自适应来福枪
+		Tooltip:
 			'''
-			Your trusty rifle for this journey
-			Can be messed with in countless ways by the items you may find
-			Shoot powerful bullets at a moderate rate
-			Hold attack to narrow the spread of the rifle
-			Gains auto-fire capabilities at 2x attack speed or more
-			''' */
+			此次旅程中最可靠的来福枪
+			通过你找到的各种物品，它可以千变万化
+			射速适中同时发射强大的子弹
+			按住攻击键来缩小步枪的瞄准范围 
+			攻速在2倍及以上时可获得自动开火能力
+			'''
 	}
-}
+
 
 NPCs: {
 	Splinter.DisplayName: 树精
