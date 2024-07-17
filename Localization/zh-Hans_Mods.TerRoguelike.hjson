@@ -933,7 +933,7 @@ Items: {
 	}
 
 	AdaptiveDagger: {
-		DisplayName:自适应匕首
+		DisplayName: 自适应匕首
 		Tooltip:
 			'''
 			此次旅程中最可靠的匕首
