@@ -557,7 +557,7 @@ namespace TerRoguelike.Systems
         {
             Player player = Main.player[Main.myPlayer];
             if (IsTerRoguelikeWorld && player.dead)
-                player.respawnTimer = 60;
+                player.respawnTimer = 65;
 
             DrawDeathScene();
             DrawPendingEnemies();
