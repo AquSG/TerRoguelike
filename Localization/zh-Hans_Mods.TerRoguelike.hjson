@@ -954,7 +954,7 @@ Items: {
 			攻速在2倍及以上时可获得自动开火能力
 			'''
 	}
-
+}
 
 NPCs: {
 	Splinter.DisplayName: 树精
