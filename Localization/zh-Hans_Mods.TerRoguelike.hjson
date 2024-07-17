@@ -1,4 +1,4 @@
-MapBuildingMessage: 生成地牢中
+MapBuildingMessage: 地牢生成中
 DeathKilledBy: 凶手：
 DeathItems: 物品：
 DeathMainMenu: 主菜单
@@ -10,7 +10,7 @@ CreditsVictory: 胜利！
 CreditDirector: 监制
 CreditProgramming: 编程
 CreditExternalCode: 外部代码
-CreditRoomBuilding: 房间建设
+CreditRoomBuilding: 场地搭建
 CreditSpriting: 贴图
 CreditExternalAssets: 外部资源
 CreditMusic: 音乐
@@ -23,12 +23,12 @@ CreditTimeHeader: 时间：
 MenuPlayTerRoguelike: 开始玩TerRoguelike
 MenuDifficulty: 难度：
 NewMoonName: 新月
-NewMoonDescription1: 事物降低一个档次
+NewMoonDescription1: 低调行事
 NewMoonDescription2: 增加受伤后的无敌时间，受到的伤害降低，自然生命再生增加
 FullMoonName: 满月
 FullMoonDescription: 预期的TerRoguelike之旅
 BloodMoonName: 血月
-BloodMoonDescription1: 事物提升一个档次
+BloodMoonDescription1: 火力全开
 BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
 
 Projectiles: {
@@ -44,9 +44,9 @@ Projectiles: {
 	AdaptiveBladeHoldout.DisplayName: 初始剑
 	AdaptiveBladeSlash.DisplayName: 初始剑斩
 	HealingFungus.DisplayName: 治疗真菌
-	PlanRocket.DisplayName: 计划火箭
-	StuckClingyGrenade.DisplayName: 粘性粘性手雷
-	ThrownBackupDagger.DisplayName: 掷出的备份匕首
+	PlanRocket.DisplayName: 火箭
+	StuckClingyGrenade.DisplayName: 粘粘手雷
+	ThrownBackupDagger.DisplayName: 匕首
 	ClusterHandler.DisplayName: 集束处理器
 	MagicFist.DisplayName: 魔法拳头
 	SlimeGlob.DisplayName: 粘液滴
@@ -91,7 +91,7 @@ Projectiles: {
 	RockDebris.DisplayName: 岩石碎块
 	LeafBall.DisplayName: 叶球
 	VineWall.DisplayName: 藤蔓墙
-	RootPillar.DisplayName: 根柱
+	RootPillar.DisplayName: 树根
 	SeerBallBase.DisplayName: 预言球
 	CorruptVomit.DisplayName: 腐化喷吐
 	IceWave.DisplayName: 冰霜波
@@ -134,13 +134,13 @@ Projectiles: {
 	TrumpCardProjectile.DisplayName: 王牌
 	RemedialHealingOrb.DisplayName: 治疗球
 	DisposableTurretMinion.DisplayName: 一次性炮塔仆从
-	// AdaptiveSpearHoldout.DisplayName: Adaptive Spear Holdout
-	// AdaptiveSpearStab.DisplayName: Adaptive Spear Stab
-	// AdaptiveCannonHoldout.DisplayName: Adaptive Cannon Holdout
-	// AdaptiveCannonBlast.DisplayName: Adaptive Cannon Blast
-	// AdaptiveDaggerHoldout.DisplayName: Adaptive Dagger Holdout
-	// AdaptiveDaggerStab.DisplayName: Adaptive Dagger Stab
-	// AdaptiveRifleHoldout.DisplayName: Adaptive Rifle Holdout
+	AdaptiveSpearHoldout.DisplayName: 长矛握持
+	AdaptiveSpearStab.DisplayName: 长矛刺击
+	AdaptiveCannonHoldout.DisplayName: 加农炮握持
+	AdaptiveCannonBlast.DisplayName: 加农炮轰击
+	AdaptiveDaggerHoldout.DisplayName: 匕首握持
+	AdaptiveDaggerStab.DisplayName: 匕首刺击
+	AdaptiveRifleHoldout.DisplayName: 来福枪握持
 }
 
 Items: {
@@ -150,7 +150,7 @@ Items: {
 			'''
 			击中敌怪时5%概率将一个粘性手雷粘到它们身上
 			粘性手雷会在短暂延迟后在小范围内爆炸，总共造成150%伤害
-			每额外拥有一件此物品会增加5%概率
+			每额外拥有一件会再增加5%概率
 			'''
 	}
 
@@ -159,16 +159,17 @@ Items: {
 		Tooltip:
 			'''
 			增加10%暴击率
-			每额外拥有一件此物品也会增加10%暴击率
+			每额外拥有一件会再增加10%暴击率
 			'''
 	}
 
 	AdaptiveGun: {
-		DisplayName: 初始枪
+		DisplayName: 自适应手枪
 		Tooltip:
 			'''
 			此次旅程最可靠的枪
-			可以被你可能找到的物品以无数种方式结合
+			通过你找到的各种物品，它可以千变万化
+			快速射出子弹
 			'''
 	}
 
@@ -178,9 +179,9 @@ Items: {
 			'''
 			增加5%暴击率
 			对敌怪暴击时会获得可叠加的攻速增益
-			每次叠加持续3秒并增加10%攻速
-			但是叠加上限为5次
-			每额外拥有一件此物品会增加2次叠加上限，并再增加10%攻速加成
+			每次增益持续3秒并增加10%攻速
+			最高计算5层
+			每额外拥有一件会再增加1层叠加上限，每层再增加10%攻速
 			'''
 	}
 
@@ -188,19 +189,19 @@ Items: {
 		DisplayName: 摄魂涂层
 		Tooltip:
 			'''
-			敌怪被击杀时会掉落它们的灵魂作为治疗球
-			球会追踪摄魂者并在接触时治疗他们8%最大生命值
-			每额外拥有一件此物品会使治疗量增加4%
+			击杀敌人时，敌人的灵魂会化为治疗珠掉落
+			治疗珠会追踪击杀者并在接触时治疗8%最大生命值
+			每额外拥有一件会再增加4%的治疗量
 			'''
 	}
 
 	SpentShell: {
-		DisplayName: 失效壳
+		DisplayName: 空弹壳
 		Tooltip:
 			'''
-			每次使用武器时主攻击次数增加1
+			每次使用武器时主攻击数量增加1
 			作为补偿，攻击速度会以一定乘数降低
-			每额外拥有一件此物品也会在每次使用武器时增加1次主要攻击，并再次降低攻击速度
+			每额外拥有一件会再增加1次主攻击，同时降低攻击速度
 			'''
 	}
 
@@ -209,55 +210,55 @@ Items: {
 		Tooltip:
 			'''
 			增加8%移动速度
-			每额外拥有一件此物品也会增加8%移动速度
+			每额外拥有一件会再增加8%移动速度
 			'''
 	}
 
 	BunnyHopper: {
-		DisplayName: 兔子漏斗
+		DisplayName: 兔子跳
 		Tooltip:
 			'''
 			增加12%跳跃速度
-			每额外拥有一件此物品也会提供12%跳跃速度
+			每额外拥有一件会再提供12%跳跃速度
 			'''
 	}
 
 	LivingCrystal: {
-		DisplayName: 活性水晶
+		DisplayName: 活水晶
 		Tooltip:
 			'''
 			+1HP/s生命再生
-			每额外拥有一件此物品也会提供+1HP/s生命再生
+			每额外拥有一件会再提供+1HP/s生命再生
 			'''
 	}
 
 	HeatSeekingChip: {
-		DisplayName: 寻热芯片
+		DisplayName: 红外线制导芯片
 		Tooltip:
 			'''
 			主弹幕会略微追踪
-			每额外拥有一件此物品会增加追踪能力的强度
+			每额外拥有一件会再增加追踪能力的强度
 			'''
 	}
 
 	BouncyBall: {
-		DisplayName: 弹跳球
+		DisplayName: 弹球
 		Tooltip:
 			'''
 			主弹幕反弹次数增加1
 			每次反弹后弹幕伤害增加15%
-			每额外拥有一件此物品也会使反弹次数增加1
+			每额外拥有一件也会使反弹次数增加1
 			'''
 	}
 
 	EnchantingEye: {
-		DisplayName: 附魔之眼
+		DisplayName: 蕴魔之眼
 		Tooltip:
 			'''
 			增加5%暴击率
-			对敌怪暴击时增加3点生命值
-			治疗量受伤害加成和主武器的伤害乘数影响
-			每额外拥有一件此物品会增加2点治疗量
+			对敌怪暴击时治疗3点生命值
+			实际治疗量受伤害加成和主武器的伤害乘数影响
+			每额外拥有一件会增加2点治疗量
 			'''
 	}
 
@@ -266,16 +267,16 @@ Items: {
 		Tooltip:
 			'''
 			增加一次二段跳
-			每额外拥有一件此物品也会提供一次二段跳
+			每额外拥有一件也会提供一次二段跳
 			'''
 	}
 
 	VolatileRocket: {
-		DisplayName: 挥发性火箭
+		DisplayName: 不稳定火箭
 		Tooltip:
 			'''
 			原始攻击会爆炸并造成60%总伤害
-			每额外拥有一件此物品会增加100%爆炸范围
+			每额外拥有一件会增加100%爆炸范围
 			'''
 	}
 
@@ -284,7 +285,7 @@ Items: {
 		Tooltip:
 			'''
 			当判定失败后额外增加一次判定机会（包括暴击以及其他涉及概率判定的物品）
-			每拥有一件该物品将增加一次判定机会
+			每拥有一件此物品将增加一次判定机会
 			'''
 	}
 
@@ -294,12 +295,12 @@ Items: {
 			'''
 			击中敌怪时10%概率向它们发射一枚追踪导弹
 			导弹会追踪敌怪并对它们造成300%总伤害
-			每额外拥有一件此物品会使总伤害再增加300%
+			每额外拥有一件会使总伤害再增加300%
 			'''
 	}
 
 	AdaptiveBlade: {
-		DisplayName: 初始剑
+		DisplayName: 自适应剑
 		Tooltip:
 			'''
 			此次旅程最可靠的剑
@@ -317,7 +318,7 @@ Items: {
 		Tooltip:
 			'''
 			增加10%主攻击的大小
-			每额外拥有一件此物品也会增加10%主攻击的大小
+			每额外拥有一件也会增加10%主攻击的大小
 			'''
 	}
 
@@ -326,7 +327,7 @@ Items: {
 		Tooltip:
 			'''
 			8%概率格挡一次接下来的攻击
-			每额外拥有一件此物品会以递减的数值增加格挡距离
+			每额外拥有一件会以递减的数值增加格挡距离
 			'''
 	}
 
@@ -337,7 +338,7 @@ Items: {
 			屏障下限变为最大屏障值的8%
 			屏障不会自然降低至下限以下
 			未受到伤害7秒后屏障会快速充能至下限
-			每额外拥有一件此物品会将屏障下限再增加8%
+			每额外拥有一件会将屏障下限再增加8%
 			'''
 	}
 
@@ -346,7 +347,7 @@ Items: {
 		Tooltip:
 			'''
 			击杀敌怪时获得15点屏障
-			每额外拥有一件此物品会使获得的屏障再增加15点
+			每额外拥有一件会使获得的屏障再增加15点
 			'''
 	}
 
@@ -355,7 +356,7 @@ Items: {
 		Tooltip:
 			'''
 			最大生命值增加15点
-			每额外拥有一件此物品也会增加15点最大生命值
+			每额外拥有一件也会增加15点最大生命值
 			'''
 	}
 
@@ -365,7 +366,7 @@ Items: {
 			'''
 			击中敌怪时25%概率治疗1点生命值
 			治疗量受伤害加成和主武器的伤害乘数影响
-			每额外拥有一件此物品会使治疗量增加1点
+			每额外拥有一件会使治疗量增加1点
 			'''
 	}
 
@@ -374,7 +375,7 @@ Items: {
 		Tooltip:
 			'''
 			增加50%治疗效果
-			每额外拥有一件此物品也会增加50%治疗效果
+			每额外拥有一件也会增加50%治疗效果
 			'''
 	}
 
@@ -383,7 +384,7 @@ Items: {
 		Tooltip:
 			'''
 			敌怪被击杀时有2%概率掉落一件物品
-			每额外拥有一件此物品会增加2%概率
+			每额外拥有一件会增加2%概率
 			'''
 	}
 
@@ -392,7 +393,7 @@ Items: {
 		Tooltip:
 			'''
 			敌怪生命值高于90%时会受到75%额外伤害
-			每额外拥有一件此物品会再增加75%额外伤害
+			每额外拥有一件会再增加75%额外伤害
 			'''
 	}
 
@@ -402,7 +403,7 @@ Items: {
 			'''
 			在地上奔跑时生成治疗真菌
 			接触治疗真菌时增加1点生命值
-			每额外拥有一件此物品会增加1点治疗量
+			每额外拥有一件会增加1点治疗量
 			'''
 	}
 
@@ -413,7 +414,7 @@ Items: {
 			敌怪被击杀时会点燃附近敌怪
 			点燃会在一段时间内总共造成300点基础伤害
 			点燃半径为9格物块
-			每额外拥有一件此物品会增加4格半径以及100点基础伤害
+			每额外拥有一件会增加4格半径以及100点基础伤害
 			'''
 	}
 
@@ -422,7 +423,7 @@ Items: {
 		Tooltip:
 			'''
 			每20秒在激活的房间中召唤一道治疗30%最大生命值的脉冲
-			每额外拥有一件此物品会以递减的数值降低所需时间
+			每额外拥有一件会以递减的数值降低所需时间
 			'''
 	}
 
@@ -431,7 +432,7 @@ Items: {
 		Tooltip:
 			'''
 			受击后增加5点生命值并不受伤害2秒
-			每额外拥有一件此物品会再增加5点治疗量
+			每额外拥有一件会再增加5点治疗量
 			'''
 	}
 
@@ -440,7 +441,7 @@ Items: {
 		Tooltip:
 			'''
 			不受伤害7秒后增加3HP/s生命再生
-			每额外拥有一件此物品会再增加2HP/s生命再生
+			每额外拥有一件会再增加2HP/s生命再生
 			'''
 	}
 
@@ -449,7 +450,7 @@ Items: {
 		Tooltip:
 			'''
 			在你8格物块内的敌怪会受到20%额外伤害
-			每额外拥有一件此物品会再增加20%额外伤害
+			每额外拥有一件会再增加20%额外伤害
 			'''
 	}
 
@@ -459,7 +460,7 @@ Items: {
 			'''
 			进入房间后从房间中心部署8枚追踪火箭
 			追踪火箭造成70点基础伤害
-			每额外拥有一件此物品会增加4枚追踪火箭和15点火箭基础伤害
+			每额外拥有一件会增加4枚追踪火箭和15点火箭基础伤害
 			'''
 	}
 
@@ -468,7 +469,7 @@ Items: {
 		Tooltip:
 			'''
 			降低3点所受伤害
-			每额外拥有一件此物品会使受到的伤害再降低2点
+			每额外拥有一件会使受到的伤害再降低2点
 			'''
 	}
 
@@ -477,7 +478,7 @@ Items: {
 		Tooltip:
 			'''
 			不受伤害7秒后增加30点递减的伤害减免
-			每额外拥有一件此物品会再增加30点递减的伤害减免
+			每额外拥有一件会再增加30点递减的伤害减免
 			'''
 	}
 
@@ -488,7 +489,7 @@ Items: {
 			击中敌怪时8%概率施加流血
 			流血会在一段时间内总共造成240点基础伤害，可以通过再次施加流血提升
 			施加流血也会延长敌怪身上其他流血性叠加的持续时间
-			每额外拥有一件此物品会再增加4%概率
+			每额外拥有一件会再增加4%概率
 			'''
 	}
 
@@ -500,7 +501,7 @@ Items: {
 			停止攻击会释放所有储存的匕首
 			匕首会追踪敌怪，击中时造成100点基础伤害并施加流血
 			流血在一段时间内造成120点基础伤害，并可以再次同时施加流血提升
-			每额外拥有一件此物品会使匕首储存更快并使储存的最大匕首数增加1
+			每额外拥有一件会使匕首储存更快并使储存的最大匕首数增加1
 			'''
 	}
 
@@ -509,7 +510,7 @@ Items: {
 		Tooltip:
 			'''
 			不攻击1秒后增加25%移动速度
-			每额外拥有一件此物品会增加25%移动速度加成
+			每额外拥有一件会增加25%移动速度加成
 			'''
 	}
 
@@ -518,7 +519,7 @@ Items: {
 		Tooltip:
 			'''
 			击中时降低敌怪15%速度，持续2秒
-			每额外拥有一件此物品会再增加2秒持续时间
+			每额外拥有一件会再增加2秒持续时间
 			'''
 	}
 
@@ -527,7 +528,7 @@ Items: {
 		Tooltip:
 			'''
 			受击后若生命值降低到最大生命值25%以下，会进入5秒的无形状态，每层楼可触发一次
-			每额外拥有一件此物品会使每层楼可触发效果的次数增加1
+			每额外拥有一件会使每层楼可触发效果的次数增加1
 			'''
 	}
 
@@ -536,7 +537,7 @@ Items: {
 		Tooltip:
 			'''
 			使用近战武器时增加20点递减的伤害减免
-			每额外拥有一件此物品会再增加20点递减的伤害减免
+			每额外拥有一件会再增加20点递减的伤害减免
 			'''
 	}
 
@@ -545,7 +546,7 @@ Items: {
 		Tooltip:
 			'''
 			用近战伤害击中敌怪时获得5点屏障
-			每额外拥有一件此物品会增加5点获得的屏障
+			每额外拥有一件会增加5点获得的屏障
 			'''
 	}
 
@@ -556,7 +557,7 @@ Items: {
 			击杀时获得可叠加的攻速和移速增益
 			每次叠加持续8秒并增加15%攻速和移速
 			但是叠加上限为5次
-			每额外拥有一件此物品会使叠加上限增加2次，并额外增加15%攻速
+			每额外拥有一件会使叠加上限增加2次，并额外增加15%攻速
 			'''
 	}
 
@@ -567,7 +568,7 @@ Items: {
 			击杀敌怪时释放集束炸弹
 			集束炸弹会在短暂延迟后爆炸
 			爆炸会对中心8格物块内的敌怪造成500点基础伤害
-			每额外拥有一件此物品会增加12%爆炸范围和150点基础伤害
+			每额外拥有一件会增加12%爆炸范围和150点基础伤害
 			'''
 	}
 
@@ -576,7 +577,7 @@ Items: {
 		Tooltip:
 			'''
 			进入房间后的10秒增加8HP/s生命再生
-			每额外拥有一件此物品会再增加8HP/s生命再生
+			每额外拥有一件会再增加8HP/s生命再生
 			'''
 	}
 
@@ -587,7 +588,7 @@ Items: {
 			从你8格物块内的一个敌怪偷取生命
 			偷取的生命值等于你最大生命值的2%且受伤害加成影响
 			敌怪会受到你偷取生命值10倍的伤害
-			每额外拥有一件此物品会使你能偷取生命的敌怪数量增加1
+			每额外拥有一件会使你能偷取生命的敌怪数量增加1
 			'''
 	}
 
@@ -597,7 +598,7 @@ Items: {
 			'''
 			击杀敌怪后的2分钟内最大生命值增加2点
 			此方式获得的最大生命值无上限
-			每额外拥有一件此物品会使每次击杀获得的暂时最大生命值增加2点
+			每额外拥有一件会使每次击杀获得的暂时最大生命值增加2点
 			'''
 	}
 
@@ -606,7 +607,7 @@ Items: {
 		Tooltip:
 			'''
 			进入新楼层时产生一件物品
-			每额外拥有一件此物品会增加产出高等级物品的概率
+			每额外拥有一件会增加产出高等级物品的概率
 			'''
 	}
 
@@ -616,7 +617,7 @@ Items: {
 			'''
 			受到伤害后会向12格物块内的敌怪打出至多3拳
 			拳头造成250点基础伤害
-			每额外拥有一件此物品会使最大拳头数量增加2，范围增加2格，基础伤害增加125
+			每额外拥有一件会使最大拳头数量增加2，范围增加2格，基础伤害增加125
 			'''
 	}
 
@@ -625,7 +626,7 @@ Items: {
 		Tooltip:
 			'''
 			超过最大生命值的治疗量会以50%转化率治疗屏障
-			每额外拥有一件此物品会增加50%治疗转化率
+			每额外拥有一件会增加50%治疗转化率
 			'''
 	}
 
@@ -636,7 +637,7 @@ Items: {
 			获得一次快速且无敌的冲刺，但需要冷却
 			冲刺会给予1/3秒无敌并有10秒冷却
 			双击左键或右键以进行冲刺
-			每额外拥有一件此物品会降低冲刺冷却
+			每额外拥有一件会降低冲刺冷却
 			'''
 	}
 
@@ -646,7 +647,7 @@ Items: {
 			'''
 			敌怪被击杀时释放4颗粘液滴
 			每次接触粘液滴会治疗2%最大生命值，每秒2次
-			每额外拥有一件此物品会使治疗量再增加2%
+			每额外拥有一件会使治疗量再增加2%
 			'''
 	}
 
@@ -657,7 +658,7 @@ Items: {
 			召唤一个无人机伙伴为你战斗
 			自动向附近敌怪发射基础伤害为100的子弹
 			当视线内没有敌怪时定期以8HP/s的速度治疗你
-			每额外拥有一件此物品会增加无人机的开火速度以及8HP/s的治疗量
+			每额外拥有一件会增加无人机的开火速度以及8HP/s的治疗量
 			'''
 	}
 
@@ -668,7 +669,7 @@ Items: {
 			将你的光标放在敌怪上以从它们偷取生命
 			偷取的生命值等于你最大生命值的2%且受伤害加成影响
 			敌怪会受到你偷取生命值10倍的伤害
-			每额外拥有一件此物品会增加2%治疗量
+			每额外拥有一件会增加2%治疗量
 			'''
 	}
 
@@ -677,7 +678,7 @@ Items: {
 		Tooltip:
 			'''
 			在不攻击至多6秒后攻击速度会爆发增加400%
-			每额外拥有一件此物品会使爆发频率加快100%
+			每额外拥有一件会使爆发频率加快100%
 			'''
 	}
 
@@ -686,7 +687,7 @@ Items: {
 		Tooltip:
 			'''
 			增加100点递减的伤害减免，只影响屏障生命值
-			每额外拥有一件此物品会增加100点递减的伤害减免
+			每额外拥有一件会增加100点递减的伤害减免
 			'''
 	}
 
@@ -698,7 +699,7 @@ Items: {
 			死亡时此物品会被消耗，同时一次性释放20张追踪卡片
 			追踪卡片造成300点基础伤害
 			你也会获得一些无敌帧并被治疗到最大生命值和屏障
-			每额外拥有一件此物品会使复活次数增加1
+			每额外拥有一件会使复活次数增加1
 			'''
 	}
 
@@ -707,7 +708,7 @@ Items: {
 		Tooltip:
 			'''
 			进入新楼层后的20秒内无敌
-			每额外拥有一件此物品会延长10秒持续时间
+			每额外拥有一件会延长10秒持续时间
 			'''
 	}
 
@@ -716,7 +717,7 @@ Items: {
 		Tooltip:
 			'''
 			敌怪身上的减益持续时间延长100%
-			每额外拥有一件此物品会使减益的持续时间再延长100%
+			每额外拥有一件会使减益的持续时间再延长100%
 			'''
 	}
 
@@ -725,7 +726,7 @@ Items: {
 		Tooltip:
 			'''
 			站立不动超过1秒后每秒治疗8%最大生命值
-			每额外拥有一件此物品会使治疗量增加4%
+			每额外拥有一件会使治疗量增加4%
 			'''
 	}
 
@@ -736,7 +737,7 @@ Items: {
 			每次使用武器时主攻击变为4倍
 			作为补偿，攻击速度会以一定乘数降低
 			子弹会有略微扩散
-			每额外拥有一件此物品会使主攻击的乘数增加4，并再次降低攻击速度
+			每额外拥有一件会使主攻击的乘数增加4，并再次降低攻击速度
 			'''
 	}
 
@@ -746,7 +747,7 @@ Items: {
 			'''
 			6倍伤害
 			根据乘数大幅降低攻击速度
-			每额外拥有一件此物品会使伤害乘数增加6，并再次降低攻击速度
+			每额外拥有一件会使伤害乘数增加6，并再次降低攻击速度
 			'''
 	}
 
@@ -757,7 +758,7 @@ Items: {
 			3.5倍攻击速度
 			0.4倍伤害
 			子弹会扩散
-			每额外拥有一件此物品会使攻击速度乘数增加2
+			每额外拥有一件会使攻击速度乘数增加2
 			'''
 	}
 
@@ -766,7 +767,7 @@ Items: {
 		Tooltip:
 			'''
 			增加10%攻击速度
-			每额外拥有一件此物品也会增加10%攻击速度
+			每额外拥有一件也会增加10%攻击速度
 			'''
 	}
 
@@ -791,7 +792,7 @@ Items: {
 			'''
 			向地牢深处传送时必定传送到月亮圣殿
 			进入月亮圣殿时产生一件物品
-			每额外拥有一件此物品会增加产出高等级物品的概率
+			每额外拥有一件会增加产出高等级物品的概率
 			'''
 	}
 
@@ -800,7 +801,7 @@ Items: {
 		Tooltip:
 			'''
 			每个可受击敌怪存活时会额外受到10%伤害加成
-			每额外拥有一件此物品会使每个敌怪所受的伤害加成增加10%
+			每额外拥有一件会使每个敌怪所受的伤害加成增加10%
 			'''
 	}
 
@@ -810,7 +811,7 @@ Items: {
 			'''
 			击中敌怪时10%概率点燃它们
 			点燃会在一段时间内总共造成150%伤害
-			每额外拥有一件此物品会再增加10%概率
+			每额外拥有一件会再增加10%概率
 			'''
 	}
 
@@ -820,7 +821,7 @@ Items: {
 			'''
 			每秒钟都会点燃所有可受击敌怪
 			点燃会在一段时间内造成70点基础伤害
-			每额外拥有一件此物品会增加70点基础伤害
+			每额外拥有一件会增加70点基础伤害
 			'''
 	}
 
@@ -829,7 +830,7 @@ Items: {
 		Tooltip:
 			'''
 			低于50%生命值时增加12点递减的伤害减免
-			每额外拥有一件此物品也会增加12点递减的伤害减免
+			每额外拥有一件也会增加12点递减的伤害减免
 			'''
 	}
 
@@ -838,7 +839,7 @@ Items: {
 		Tooltip:
 			'''
 			受到伤害后，将失去生命值的50%扣除伤害减免作为治疗
-			每额外拥有一件此物品会以递减的数值增加治疗百分比
+			每额外拥有一件会以递减的数值增加治疗百分比
 			'''
 	}
 
@@ -849,7 +850,7 @@ Items: {
 			击中敌怪时会从敌怪身上射出一颗治疗球
 			接触治疗球会增加1点生命值
 			治疗球会在4秒后消失
-			每额外拥有一件此物品会增加1点治疗量
+			每额外拥有一件会增加1点治疗量
 			'''
 	}
 
@@ -859,7 +860,7 @@ Items: {
 			'''
 			如果过去的5秒内有敌怪被击中，此物品激活
 			激活时每1.66秒获得5点屏障并使屏障衰减速率降低15%
-			每额外拥有一件此物品会使获得的屏障增加2点并使屏障衰减速率再降低15%
+			每额外拥有一件会使获得的屏障增加2点并使屏障衰减速率再降低15%
 			'''
 	}
 
@@ -870,7 +871,7 @@ Items: {
 			击杀敌怪时25%概率生成一个炮塔
 			炮塔会自动向附近敌怪发射基础伤害为100的子弹
 			炮塔存在20秒后消失
-			每额外拥有一件此物品会略微增加生成炮塔的概率
+			每额外拥有一件会略微增加生成炮塔的概率
 			'''
 	}
 
@@ -879,7 +880,7 @@ Items: {
 		Tooltip:
 			'''
 			朝一个方向不间断奔跑1.5秒后增加20%移动速度
-			每额外拥有一件此物品会增加20%移动速度加成
+			每额外拥有一件会增加20%移动速度加成
 			'''
 	}
 
@@ -888,7 +889,7 @@ Items: {
 		Tooltip:
 			'''
 			每失去5%生命值增加1HP/s生命再生
-			每额外拥有一件此物品会使每失去5%生命值增加0.5HP/s生命再生
+			每额外拥有一件会使每失去5%生命值增加0.5HP/s生命再生
 			'''
 	}
 
@@ -900,58 +901,58 @@ Items: {
 			每次叠加持续9秒并增加8%移动速度和10点递减的伤害减免
 			但是叠加上限为5次
 			当处于最大叠加次数时，每层会对敌怪造成15%额外伤害
-			每额外拥有一件此物品会增加3次叠加上限
+			每额外拥有一件会增加3次叠加上限
 			'''
 	}
 
 	AdaptiveSpear: {
-		// DisplayName: Adaptive Spear
-		/* Tooltip:
+		DisplayName: 自适应长矛
+		Tooltip:
 			'''
-			Your trusty spear for this journey
-			Can be messed with in countless ways by the items you may find
-			Stab the spear with precision from a distance
-			Hold attack to charge up the spear for potential damage
-			Releasing when fully charged deals the most damage
-			Damage multiplier before fully charged: 1x - 4x
-			Damage multiplier when fully charged: 5x
-			Gains auto-swing capabilities at 3x attack speed or more
-			''' */
+			此次旅程最可靠的矛
+			通过你找到的各种物品，它可以千变万化
+			长矛可远距离刺击
+			按住攻击键为矛充能以造成更高伤害
+			满充能时释放造成的伤害最高
+			满充能前的伤害乘数：1倍至4倍
+			满充能时的伤害乘数：5倍
+			攻速在3倍及以上时可获得自动挥舞能力
+			'''
 	}
 
 	AdaptiveCannon: {
-		// DisplayName: Adaptive Cannon
-		/* Tooltip:
+		DisplayName: 自适应加农炮
+		Tooltip:
 			'''
-			Your trusty cannon for this journey
-			Can be messed with in countless ways by the items you may find
-			Shoot slow moving bombs at snail speed
-			''' */
+			此次旅程最可靠的加农炮
+			通过你找到的各种物品，它可以千变万化
+			以蜗牛速射出慢速移动的炮弹
+			'''
 	}
 
 	AdaptiveDagger: {
-		// DisplayName: Adaptive Dagger
-		/* Tooltip:
+		DisplayName:自适应匕首
+		Tooltip:
 			'''
-			Your trusty dagger for this journey
-			Can be messed with in countless ways by the items you may find
-			Rapidly stab the dagger with little range
-			Always has auto-swing capabilities
-			''' */
+			此次旅程中最可靠的匕首
+			通过你找到的各种物品，它可以千变万化
+			匕首可快速且范围有限地刺击
+			始终有用自动挥舞能力
+			'''
 	}
 
 	AdaptiveRifle: {
-		// DisplayName: Adaptive Rifle
-		/* Tooltip:
+		DisplayName: 自适应来福枪
+		Tooltip:
 			'''
-			Your trusty rifle for this journey
-			Can be messed with in countless ways by the items you may find
-			Shoot powerful bullets at a moderate rate
-			Hold attack to narrow the spread of the rifle
-			Gains auto-fire capabilities at 2x attack speed or more
-			''' */
+			此次旅程中最可靠的来福枪
+			通过你找到的各种物品，它可以千变万化
+			射速适中同时发射强大的子弹
+			按住攻击键来缩小步枪的瞄准范围 
+			攻速在2倍及以上时可获得自动开火能力
+			'''
 	}
-}
+
 
 NPCs: {
 	Splinter.DisplayName: 树精
