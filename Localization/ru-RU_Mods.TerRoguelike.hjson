@@ -32,8 +32,6 @@ BloodMoonDescription1: Значительно усложняет игру
 BloodMoonDescription2: Меньше кадров неуязвимости, боссы атакуют чаще
 
 Projectiles: {
-	EnemySpawningProjectile.DisplayName: Создающий Врагов Снаряд
-	ItemSpawningProjectile.DisplayName: Создающий Предметы Снаряд
 	ClingyGrenade.DisplayName: Цепкая Граната
 	ClingyGrenadeExplosion.DisplayName: Взрыв Цепкой Гранаты
 	AdaptiveGunHoldout.DisplayName: Адаптивный Пистолет в Руке

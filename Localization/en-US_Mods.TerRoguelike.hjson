@@ -32,8 +32,6 @@ BloodMoonDescription1: Turn things up a notch
 BloodMoonDescription2: Decreased hurt immune time, bosses attack more often
 
 Projectiles: {
-	EnemySpawningProjectile.DisplayName: Enemy Spawning Projectile
-	ItemSpawningProjectile.DisplayName: Item Spawning Projectile
 	ClingyGrenade.DisplayName: Clingy Grenade
 	ClingyGrenadeExplosion.DisplayName: Clingy Grenade Explosion
 	AdaptiveGunHoldout.DisplayName: Adaptive Gun Holdout
