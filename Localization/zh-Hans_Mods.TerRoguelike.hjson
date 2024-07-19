@@ -32,8 +32,6 @@ BloodMoonDescription1: 火力全开
 BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
 
 Projectiles: {
-	EnemySpawningProjectile.DisplayName: 敌怪生成弹幕
-	ItemSpawningProjectile.DisplayName: 物品生成弹幕
 	ClingyGrenade.DisplayName: 粘性手雷
 	ClingyGrenadeExplosion.DisplayName: 粘性手雷爆炸
 	AdaptiveGunHoldout.DisplayName: 初始枪
