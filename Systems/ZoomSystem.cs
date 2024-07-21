@@ -25,7 +25,7 @@ namespace TerRoguelike.Systems
 
         public static float effectiveResolutionZoomDifference
         {
-            get { return MathHelper.Clamp(Main.screenHeight, 108, 1080) / 1080f; }
+            get { return Math.Max(108, Main.screenHeight) / 1080f; }
         }
         public static float ExtraZoomTarget
         {
