@@ -1,0 +1,1108 @@
+MapBuildingMessage: Creando il Dungeon
+DeathKilledBy: Ucciso da:
+DeathItems: Oggetti:
+DeathMainMenu: Menu Principale
+DeathQuickRestart: Riavvio Rapido
+BlockedAlert: bloccato!
+HealthUpAlert: Incremento Salute!
+BarrierName: Barriera
+CreditsVictory: Vittoria!
+CreditDirector: Direttore
+CreditProgramming: Programmatori
+CreditExternalCode: Codice Esterno
+CreditRoomBuilding: Creatori delle Stanze
+CreditSpriting: Accelerare
+CreditExternalAssets: Risorse Esterne
+CreditMusic: Musica
+CreditTesting: Tester
+CreditSpecialThanks: Ringraziamenti Speciali
+CreditFinal: E Finalmente...
+CreditThankYou: Grazie
+CreditForPlaying: Per Aver Giocato!
+CreditTimeHeader: Tempo:
+MenuPlayTerRoguelike: Gioca TerRoguelike
+MenuDifficulty: Difficoltà:
+NewMoonName: Luna Nuova
+NewMoonDescription1: Diminuisce un pò la difficoltà
+NewMoonDescription2: Aumenta il tempo di invincibilità, riduce il danno subito, aumenta la rigenerazione naturale della vita
+FullMoonName: Luna Piena
+FullMoonDescription: L'esperienza prevista di TerRoguelike
+BloodMoonName: Luna di Sangue
+BloodMoonDescription1: Aumenta un pò la difficoltà
+BloodMoonDescription2: Diminuisce il tempo di invincibilità, i boss attaccano più spesso
+
+Projectiles: {
+	ClingyGrenade.DisplayName: Granata Appiccicosa
+	ClingyGrenadeExplosion.DisplayName: Esplosione della Granata Appiccicosa
+	AdaptiveGunHoldout.DisplayName: Impugnare Pistola Adattiva
+	AdaptiveGunBullet.DisplayName: Proiettile Pistola Adattiva
+	SoulstealHealingOrb.DisplayName: Sfera di Cura Rubanime
+	Explosion.DisplayName: Esplosione
+	Missile.DisplayName: Missile
+	AdaptiveBladeHoldout.DisplayName: Impugnare Spada Adattiva
+	AdaptiveBladeSlash.DisplayName: Taglio Spada Attiva
+	HealingFungus.DisplayName: Fungo Curativo
+	PlanRocket.DisplayName: Razzo del Piano
+	StuckClingyGrenade.DisplayName: Granata Appiccicosa Bloccata
+	ThrownBackupDagger.DisplayName: Pugnale di Riserva Lanciato
+	ClusterHandler.DisplayName: Gestore Grappolo
+	MagicFist.DisplayName: Pugno Magico
+	SlimeGlob.DisplayName: Goccia di Slime
+	Snowflake.DisplayName: Fiocco di Neve
+	DesertSpiritCurse.DisplayName: Maledizione dello Spirito del Deserto
+	SandBlast.DisplayName: Esplosione di Sabbia
+	Stinger.DisplayName: Pungiglione
+	Spectre.DisplayName: Spettro
+	FireBlast.DisplayName: Deflagrazione di Fuoco
+	SniperBullet.DisplayName: Proiettile Cecchino
+	SpikedBall.DisplayName: Palla Chiodata
+	BallistaShot.DisplayName: Dardo di Balestra
+	WoodSliver.DisplayName: Scheggia di Legno
+	IchorBlob.DisplayName: Schizzo di Icore
+	GreenPetal.DisplayName: Petalo Verde
+	CursedFlame.DisplayName: Fiamme Maledette
+	BouncingFire.DisplayName: Fuoco Rimbalzante
+	ShadowBlast.DisplayName: Deflagrazione d'Ombra
+	VileSpit.DisplayName: Bava Disgustosa
+	BloodClot.DisplayName: Coagulo di Sangue
+	BloodOrb.DisplayName: Sfera di Sangue
+	Iceflake.DisplayName: Fiocco di Ghiaccio
+	MothDust.DisplayName: Polvere di Falena
+	SporeCloud.DisplayName: Nuvola di Spore
+	HunterArrow.DisplayName: Freccia del Cacciatore
+	LihzahrdLaser.DisplayName: Laser Rettiliano
+	SeekerArrow.DisplayName: Freccia a Ricerca
+	TempleBoulder.DisplayName: Masso del Tempio
+	Daybreak.DisplayName: Alba
+	SolarFlare.DisplayName: Eruzione Solare
+	NebulaLaser.DisplayName: Laser Nebulare
+	NebulaSphere.DisplayName: Sfera Nebulare
+	VortexLightning.DisplayName: Fulmine del Vortice
+	VortexLaser.DisplayName: Laser del Vortice
+	BlackVortex.DisplayName: Buconero del Vortice
+	SeekingStarCell.DisplayName: Cellula Stellare a Ricerca
+	FlowSpawn.DisplayName: Invasore del Flusso
+	Bone.DisplayName: Ossa
+	Rock.DisplayName: Roccia
+	Shockwave.DisplayName: Onda d'Urto
+	PaladinHammer.DisplayName: Martello del Paladino
+	RockDebris.DisplayName: Detriti di Roccia
+	LeafBall.DisplayName: Palla di Foglie
+	VineWall.DisplayName: Muro di Liane
+	RootPillar.DisplayName: Pilastro di Radici
+	SeerBallBase.DisplayName: Proiettile Base dell'Osservatore
+	CorruptVomit.DisplayName: Vomito Corrotto
+	IceWave.DisplayName: Onda di Ghiaccio
+	RoyalSnowflake.DisplayName: Fiocco di Neve Regale
+	IceBomb.DisplayName: Bomba di Ghiaccio
+	IceCloud.DisplayName: Nuvola di Ghiaccio
+	IceCloudSpawner.DisplayName: Crea Nuvola di Ghiaccio
+	Sandnado.DisplayName: Sabbiornado
+	Locust.DisplayName: Locuste
+	SandTurret.DisplayName: Torretta di Sabbia
+	ShiningSand.DisplayName: Sabbia Splendente
+	DarkTendril.DisplayName: Viticcio Oscuro
+	Bee.DisplayName: Ape
+	HoneyGlob.DisplayName: Gocchia di Miele
+	CutsceneBee.DisplayName: Api della Animazione
+	HellBeam.DisplayName: Fascio Infernale
+	DemonLaser.DisplayName: Laser Demoniaco
+	FleshVomit.DisplayName: Vomito di Carne
+	FleshBall.DisplayName: Palla di Carne
+	VolatileFlesh.DisplayName: Carne Esplosiva
+	SeekingSoulBlast.DisplayName: Deflagrazione d'Anima a Ricerca
+	SoulBlast.DisplayName: Deflagrazione d'Anima
+	BoneSpear.DisplayName: Lancia d'Ossa
+	SoulTurret.DisplayName: Torretta d'Anima
+	LihzahrdSpikeBall.DisplayName: Palla Chiodata Rettiliana
+	Flames.DisplayName: Fiamma
+	DartTrap.DisplayName: Trappola con Dardo
+	Dart.DisplayName: Dardo
+	RollingBoulder.DisplayName: Masso Rotolante
+	PhantasmalEye.DisplayName: Occhio Fantasma
+	PhantasmalBolt.DisplayName: Saetta Fantasma
+	PhantasmalSphere.DisplayName: Sfera Fantasma
+	Tentacle.DisplayName: Tentacolo
+	PhantasmalDeathray.DisplayName: Raggio Mortale Fantasma
+	PhantasmalResidue.DisplayName: Residuo Fantasma
+	PhantasmalLaser.DisplayName: Laser Fantasma
+	PhantasmalDeathBeam.DisplayName: Fascio Mortale Fantasma
+	PhantasmalBoltShooter.DisplayName: Dardo Fantasma
+	PhantasmalBarrier.DisplayName: Barriera Fantasma
+	TrumpCardProjectile.DisplayName: Carta Vincente
+	RemedialHealingOrb.DisplayName: Sfera di Cura Riparativa
+	DisposableTurretMinion.DisplayName: Seguace Torretta Monouso
+	AdaptiveSpearHoldout.DisplayName: Impugnare Lancia Adattiva
+	AdaptiveSpearStab.DisplayName: Fendente Lancia Adattiva
+	AdaptiveCannonHoldout.DisplayName: Impugnare Cannone Adattivo
+	AdaptiveCannonBlast.DisplayName: Esplosione Cannone Adattivo
+	AdaptiveDaggerHoldout.DisplayName: Impugnare Pugnale Adattivo
+	AdaptiveDaggerStab.DisplayName: Pugnalare Pugnale Adattivo
+	AdaptiveRifleHoldout.DisplayName: Impugnare Fucile Adattivo
+}
+
+Items: {
+	ClingyGrenade: {
+		DisplayName: Granata Appiccicosa
+		Tooltip:
+			'''
+			5% di probabilità do attaccare una granata appiccicosa ad un nemico dopo averlo colpito
+			Le granate appiccicose esplodono in una piccola area causando il 150% dei danni dopo una piccola pausa
+			Ogni copie extra dell'oggetto aumentano la possibilità del 5%
+			'''
+	}
+
+	PocketSpotter: {
+		DisplayName: Spotter Tascabile
+		Tooltip:
+			'''
+			Aumenta la probabilità di colpi critici del 10%
+			Ogni copie extra di questo oggetto aumentano ulteriormente la probabilità di colpi critici del 10%
+	}
+
+	AdaptiveGun: {
+		DisplayName: Pistola Adattiva
+		Tooltip:
+			'''
+			La tua fidata pistola per questa avventura
+			Può essere modificata in infiniti modi dagli oggetti che potresti trovare
+			Spara proiettili velocemente
+			'''
+	}
+
+	EvilEye: {
+		DisplayName: Occhio Maledetto
+		Tooltip:
+			'''
+			Aumenta la probabilità di colpi critici del 5%
+			Colpire un nemico con un colpo critico fornisce una miglioria accumulabile alla velocità di attacco
+			Ogni carica dura 3 secondi e fornisce un incremento del 10% alla velocità di attacco
+			La quantità di cariche è limitato a 5
+			Ogni copie extra di questo oggetto aumentano il limite di cariche di 2, e aumentano la miglioria alla velocità di attacco del 10%
+			'''
+	}
+
+	SoulstealCoating: {
+		DisplayName: Rivestimento Rubanime
+		Tooltip:
+			'''
+			I nemici rilasciano la loro anima come una sfera curativa alla loro morte
+			La sfera va verso chi ha rubato l'anima e lo cura per 8% della sua vita massima al contatto
+			Ogni copie extra di questo oggetto aumentano la cura del 4% della vita massima
+			'''
+	}
+
+	SpentShell: {
+		DisplayName: Bossolo di Proiettile
+		Tooltip:
+			'''
+			+1 attacco per uso d'arma principale
+			La velocità di attacco è diminuita di un moltiplicatore per compensare
+			Ogni copie extra di questo oggetto forniscono +1 attacco per uso d'arma, ma riducendo ulteriormente la velocità d'attacco
+			'''
+	}
+
+	RunningShoe: {
+		DisplayName: Scarpe da Corsa
+		Tooltip:
+			'''
+			Aumento dell'8% alla velocità di movimento
+			Ogni copie extra dell'oggetto forniscono ulteriore aumento dell'8% alla velocità di movimento
+			'''
+	}
+
+	BunnyHopper: {
+		DisplayName: Zampa di Coniglio
+		Tooltip:
+			'''
+			Aumento del 12% alla velocità di salto
+			Ogni copie extra dell'oggetto forniscono ulteriore aumento dell'12% alla velocità di salto
+			'''
+	}
+
+	LivingCrystal: {
+		DisplayName: Cristallo Vivente
+		Tooltip:
+			'''
+			+1 HP/s
+			Ogni copie extra dell'oggetto forniscono un'ulteriore +1 HP/s
+			'''
+	}
+
+	HeatSeekingChip: {
+		DisplayName: Chip a Ricerca Termica
+		Tooltip:
+			'''
+			I proiettili delle armi principali ottengono un leggero effetto a ricerca
+			Ogni copie extra dell'oggetto rafforzano l'effetto a ricerca
+			'''
+	}
+
+	BouncyBall: {
+		DisplayName: Palla Rimbalzante
+		Tooltip:
+			'''
+			+1 rimbalzo ad i proiettili delle armi principali
+			+15% danno ai proiettili dopo ogni rimbalzo
+			Ogni copie extra dell'oggetto forniscono +1 rimbalzo
+			'''
+	}
+
+	EnchantingEye: {
+		DisplayName: Occhio Benedetto
+		Tooltip:
+			'''
+			Aumenta la probabilità di colpi critici del 5%
+			+3 HP quando si colpisce un nemico in modo critico
+			La quantità di cura è influenzata dal danno bonus e dai moltiplicatori di danno dell'arma principale
+			Ogni copie extra dell'oggetto aumentano la cura di 2
+			'''
+	}
+
+	AirCanister: {
+		DisplayName: Bombola d'Aria
+		Tooltip:
+			'''
+			+1 doppio salto
+			Ogni copie extra dell'oggetto forniscono +1 doppio salto
+			'''
+	}
+
+	VolatileRocket: {
+		DisplayName: Razzo Volatile
+		Tooltip:
+			'''
+			Attacchi originali esplodono per il 60% del danno
+			Ogni copie extra dell'oggetto aumentano le dimensioni dell'esplosione del 100%
+			'''
+	}
+
+	TheDreamsoul: {
+		DisplayName: La Sognanima
+		Tooltip:
+			'''
+			Le probabilità fallite di tirare i dadi sono ritirate 1 volta per potenzialmente cambiare il risultato
+			Ogni copie extra dell'oggetto aggiungono 1 tentativo extra
+			'''
+	}
+
+	LockOnMissile: {
+		DisplayName: Missile a Ricerca
+		Tooltip:
+			'''
+			10% di probabilità di lanciare un missile a ricerca su un nemico dopo averlo colpito 
+			I missili a ricerca seguono i nemici e li copiscono per il 300% del danno originale
+			Ogni copie extra dell'oggetto aumentano il danno del 300%
+			'''
+	}
+
+	AdaptiveBlade: {
+		DisplayName: Spada Adattiva
+		Tooltip:
+			'''
+			La tua spada fidata in questa avventura
+			Può essere modificata in infiniti modi dagli oggetti che potresti trovare
+			Brandisci la spada in un ampio raggio
+			Tieni premuto per caricare la spada per aumentare il danno
+			Rilasciando quando è pienamente carica fa il danno maggiore
+			Moltiplicatore del danno prima della carica massima: 1x - 3x
+			Moltiplicatore del danno quando è carica: 4x
+			Ottiene uso automatico a 3x velocità di attacco o maggiore
+			'''
+	}
+
+	AntiqueLens: {
+		DisplayName: Lente Antica
+		Tooltip:
+			'''
+			Aumenta del 10% la dimensione dell'attacco principale
+			Ogni copie extra dell'oggetto forniscono un ulteriore aumento del 10%
+			'''
+	}
+
+	TimesHaveBeenTougher: {
+		DisplayName: Sono Tempi Duri
+		Tooltip:
+			'''
+			8% probabilità di bloccare un attacco incombente
+			Ogni copie extra dell'oggetto aumentano la probabiltà di bloccare con un'efficacia diminuente
+			'''
+	}
+
+	RustedShield: {
+		DisplayName: Scudo Arrugginito
+		Tooltip:
+			'''
+			Il limite inferiore della barriera diventa l'8% della stessa
+			La barriera non può scendere in modo naturale sotto questa soglia
+			Dopo aver evitato danni per 7 secondi, la barriera si rigenera rapidamente fino ad arrivare alla soglia
+			Ogni copie extra dell'oggetto aumentano il limite inferiore di un ulteriore 8%
+			'''
+	}
+
+	AmberBead: {
+		DisplayName: Perla d'Ambra
+		Tooltip:
+			'''
+			Ottieni 15 di barriera ad uccisione
+			Ogni copie extra dell'oggetto aumentano il guadagno di 15
+			'''
+	}
+
+	BottleOfVigor: {
+		DisplayName: Bottiglia di Vigore
+		Tooltip:
+			'''
+			+15 vita massima
+			Ogni copie extra dell'oggetto forniscono ulteriore +15 vita massima
+			'''
+	}
+
+	BloodSiphon: {
+		DisplayName: Sifone di Sangue
+		Tooltip:
+			'''
+			25% di probabilità di ottenere 1 HP colpendo un nemico
+			La quantità di cura è influenzata dal danno bonus e dai moltiplicatori di danno dell'arma principale
+			Ogni copie extra dell'oggetto aumentano la cura di 1
+			'''
+	}
+
+	Cornucopia: {
+		DisplayName: Cornucopia
+		Tooltip:
+			'''
+			+50% all'efficacia della cura
+			Ogni copie extra dell'oggetto aumentano ulteriormente la efficacia del 50%
+			'''
+	}
+
+	ItemPotentiometer: {
+		DisplayName: Potenziometro degli Oggetti
+		Tooltip:
+			'''
+			I nemici hanno un 2% di possibilità di rilasciare un oggetto alla morte
+			Ogni copie extra dell'oggetto aumentano la possibilità del 2%
+			'''
+	}
+
+	InstigatorsBrace: {
+		DisplayName: Guanto dell'Instigatore
+		Tooltip:
+			'''
+			I nemici subiscono il 75% dei danni in più quando hanno più del 90% della vita
+			Ogni copie extra dell'oggetto aumentano il danno bonus del 75%
+			'''
+	}
+
+	BenignFungus: {
+		DisplayName: Fungo Benigno
+		Tooltip:
+			'''
+			Crea funghi curativi quando corri per terra
+			+1 HP quando tocci un fungo curativo
+			Ogni copie extra dell'oggetto aumentano la quantità di cura di 1
+			'''
+	}
+
+	HotPepper: {
+		DisplayName: Peperoncino Piccante
+		Tooltip:
+			'''
+			I nemici incendiano nemici vicini alla morte
+			L'incendiamento infligge 300 danni base in totale in un lasso di tempo
+			La gittata dell'incendiamento è di 9 blocchi
+			Ogni copie extra dell'oggetto aumentano la gittata di 4 blocchi ed il danno base di 100
+			'''
+	}
+
+	AutomaticDefibrillator: {
+		DisplayName: Defibrillatore Automatico
+		Tooltip:
+			'''
+			Ogni 20 secondi, in una stanza attiva, evoca un impulso curativo che ti cura del 30% vita massima
+			Ogni copie extra dell'oggetto riducono il tempo necessario con un'efficacia diminuente
+			'''
+	}
+
+	SentientPutty: {
+		DisplayName: Mastice Senziente
+		Tooltip:
+			'''
+			+5 HP dopo essere stati colpiti ed aver evitato danni per 2 secondi
+			Ogni copie extra dell'oggetto aumentano la quantità di cura di 5
+			'''
+	}
+
+	MemoryFoam: {
+		DisplayName: Memory Foam
+		Tooltip:
+			'''
+			+3 HP/s dopo aver evitato danni per 7 secondi
+			Ogni copie extra dell'oggetto aumentano la rigenerazione di 2 HP/s
+			'''
+	}
+
+	BrazenNunchucks: {
+		DisplayName: Nunchaku Sfacciati
+		Tooltip:
+			'''
+			I nemici entro 8 blocchi da te prendono il 20% di danni bonus
+			Ogni copie extra dell'oggetto aumentano il danno bonus del 20%
+			'''
+	}
+
+	AttackPlan: {
+		DisplayName: Piano d'Attacco
+		Tooltip:
+			'''
+			Quando entri in una stanza, vengono sparati 8 razzi dal centro della stanza
+			I razzi a ricerca fanno 70 danni base
+			Ogni copie extra dell'oggetto aumentano le quantità di razzi di 4, ed il danno dei razzi di 15 
+			'''
+	}
+
+	FlimsyPauldron: {
+		DisplayName: Spallaccio Fragile
+		Tooltip:
+			'''
+			Riduce il danno preso di 3
+			Ogni copie extra dell'oggetto riducono il danno preso di 2
+			'''
+	}
+
+	ProtectiveBubble: {
+		DisplayName: Bolla Protettiva
+		Tooltip:
+			'''
+			Aumenta di +30 la RD dopo non aver preso danno per 7 secondi
+			Ogni copie extra dell'oggetto aumentano la RD di +30
+			'''
+	}
+
+	SanguineOrb: {
+		DisplayName: Sfera Sanguinea
+		Tooltip:
+			'''
+			8% di probabilità di infliggere sanguinamento dopo aver colpito un nemico
+			Il sanguinamento infligge 240 danni base in totale dopo la durata, la quale può essere estesa infliggendo di nuovo il sanguinamento
+			Infliggere sanguinamento estende anche la durata del sanguinamento da altre fonti sul nemico
+			Ogni copie extra dell'oggetto aumentano la probabilità di infliggere il sanguinamento del 4%
+			'''
+	}
+
+	BackupDagger: {
+		DisplayName: Pugnale di Riserva
+		Tooltip:
+			'''
+			Prepara fino a 4 pugnali mentre attacchi
+			Quando smetti di attaccare lanci tutti i pugnali che avevi preparato
+			I pugnali cercano i nemici, causando 100 danni base quando colpiscono e infliggendo sanguinamento
+			Il sanguinamento infligge 120 danni base in totale dopo la durata, la quale può essere estesa infliggendo di nuovo il sanguinamento
+			Ogni copie extra dell'oggetto fanno preparare i pugnali più velocemente, ed aumentano il numero massimo di pugnali di 1
+			'''
+	}
+
+	UnencumberingStone: {
+		DisplayName: Pietra Sgombrante
+		Tooltip:
+			'''
+			Aumento del 25% della velocità di movimento dopo non attaccato per 1 secondo
+			Ogni copie extra dell'oggetto aumentano il bonus di velocità del 25%
+			'''
+	}
+
+	BallAndChain: {
+		DisplayName: Palla al Piede
+		Tooltip:
+			'''
+			Riduce la velocità dei nemici del 15% per 2 secondi quando li colpisci
+			Ogni copie extra dell'oggetto aumentano la durata di 2 secondi
+			'''
+	}
+
+	SoulOfLena: {
+		DisplayName: Anima di Lena
+		Tooltip:
+			'''
+			Una volta per livello, quando sei colpito e cadi sotto il 25% della tua vita massima, diventi intangibile per 5 secondi
+			Ogni copie extra dell'oggetto aumentano la quantità di volte che l'effetto può avvenire di 1
+			'''
+	}
+
+	EmeraldRing: {
+		DisplayName: Tirapugni di Smeraldo
+		Tooltip:
+			'''
+			Quando usi un'arma di mischia ottieni +20 RD
+			Ogni copie extra dell'oggetto aumentano la RD di +20
+			'''
+	}
+
+	AmberRing: {
+		DisplayName: Anello Ambrato
+		Tooltip:
+			'''
+			Ottieni 2 di barriera quando colpisci un nemico con un'arma di mischia
+			La quantità di barriera ottenuta è influenzata dal moltiplicatore di carica dell'arma 
+			Ogni copie extra dell'oggetto aumentano la barriera ottenuta di 2
+			'''
+	}
+
+	ThrillOfTheHunt: {
+		DisplayName: Brivido della Caccia
+		Tooltip:
+			'''
+			Ottieni un bonus accumulabile di velocità d'attacco e velocità di movimento quando uccidi un nemico
+			Ogni carica dura 8 secondi e fornisce un incremento del 15% alla velocità di attacco e alla velocità di movimento
+			La quantità di cariche è limitata a 5
+			Ogni copie extra dell'oggetto aumentano le cariche di 2 e incrementa il bonus di velocità d'attacco del 15%
+			'''
+	}
+
+	ClusterBombSatchel: {
+		DisplayName: Borsa di Bombe a Grappolo
+		Tooltip:
+			'''
+			I nemici rilasciano un grappolo di bombe quando muoiono
+			Il grappolo esplode cumulativamente dopo poco tempo
+			L'esplosione infligge 500 danni base ai nemici entro 8 blocchi dal centro
+			Ogni copie extra dell'oggetto aumentano la dimensione dell'esplosione del 12% e il danno di 150
+			'''
+	}
+
+	StimPack: {
+		DisplayName: Stim-Pack
+		Tooltip:
+			'''
+			+8 HP/s per 10 secondi quando entri in una stanza
+			Ogni copie extra dell'oggetto aumentano la rigenerazione di 8 HP/s
+			'''
+	}
+
+	BarbedLasso: {
+		DisplayName: Lazo Spinato
+		Tooltip:
+			'''
+			Ruba la vita da 1 nemico entro 8 blocchi da te
+			La quantità di vita rubata equivale al 2% della tua vita massima ed è influenzato da bonus al danno
+			I nemici prendono il 10x della vita rubata come danno
+			Ogni copie extra dell'oggetto aumentano la quantità di nemici a cui puoi rubare la vita di 1
+			'''
+	}
+
+	SteamEngine: {
+		DisplayName: Motore a Vapore
+		Tooltip:
+			'''
+			+2 vita massima per 2 minuti dopo aver ucciso un nemico
+			Non c'è un limite a quanta vita può essere ottenuta così
+			Ogni copie extra dell'oggetto aumentano la quantità di vita temporanea di 2
+			'''
+	}
+
+	GiftBox: {
+		DisplayName: Pacco Regalo
+		Tooltip:
+			'''
+			Crea un oggetto quando entri in un nuovo livello
+			Ogni copie extra dell'oggetto aumentano la possibilità di creare oggetti di rarità superiore
+			'''
+	}
+
+	RetaliatoryFist: {
+		DisplayName: Pugno Vendicativo
+		Tooltip:
+			'''
+			Quando prendi danni manifesta fino a 3 pugni su nemici entro 12 blocchi da te
+			I pugni infliggono 250 danni base
+			Ogni copie extra dell'oggetto aumentano il numero massimo di pugni di 2, la gittata di 2 blocchi e il danno base di 125
+			'''
+	}
+
+	BarrierSynthesizer: {
+		DisplayName: Sintetizzatore di Barriera
+		Tooltip:
+			'''
+			Curarsi oltre la vita massima genera barriera, ad un fattore di conversione del 50%
+			Ogni copie extra dell'oggetto aumentano il fattore di conversione del 50%
+			'''
+	}
+
+	JetLeg: {
+		DisplayName: Gamba Jet
+		Tooltip:
+			'''
+			Ottieni uno rapido scatto con invincibilità limitato da un tempo di recupero
+			Lo scatto ti da 1/3 di secondo di invincibilità ed ha un tempo di recupero di 10 secondi
+			Clicca due volte destra o sinistra per attivare lo scatto
+			Ogni copie extra dell'oggetto diminuiscono il tempo di recupero dello scatto
+			'''
+	}
+
+	NutritiousSlime: {
+		DisplayName: Slime Nutrizionale
+		Tooltip:
+			'''
+			I nemici rilasciano 4 goccie di slime quando li uccidi
+			Ogni goccia di slime cura del 2% della vita massima 2 volte al secondo quando è toccata
+			Ogni copie extra dell'oggetto aumentano la quantità di cura di ulteriori 2% vita massima
+			'''
+	}
+
+	DroneBuddy: {
+		DisplayName: Drone Amico
+		Tooltip:
+			'''
+			Ottieni un drone che combatte per te
+			Spara automaticamente proiettili a nemici vicini per 100 danni base
+			Ti cura di 8 HP/s se non ci sono nemici in linea di vista
+			Ogni copie extra dell'oggetto aumentano la velocità di attacco del drone e la cura di 8 HP/s
+			'''
+	}
+
+	AllSeeingEye: {
+		DisplayName: Presa Emocinetica
+		Tooltip:
+			'''
+			Piazza il tuo cursore sui nemici per rubargli la vita
+			La quantità di vita rubata è equivalente al 2% della tua vita massima ed è influenzata da bonus di danno
+			I nemici prendono il 10x di vita rubata come danno
+			Ogni copie extra dell'oggetto aumentano la cura del 2%
+			'''
+	}
+
+	Overclocker: {
+		DisplayName: Overclocker
+		Tooltip:
+			'''
+			Build up a burst of up to 400% increased attack speed after not attacking for up to 6 seconds
+			Extra copies of this item increase the buildup rate by 100%
+			'''
+	}
+
+	GiantDoorShield: {
+		DisplayName: Scudo Porta Gigante
+		Tooltip:
+			'''
+			+100 RD alla salute della barriera
+			Ogni copie extra dell'oggetto aumentano la RD di +100
+			'''
+	}
+
+	TrumpCard: {
+		DisplayName: Carta Vincente
+		Tooltip:
+			'''
+			+1 risurrezione
+			Quando muori questo oggetto viene consumato, rilasciando 20 carte a ricerca tutte insieme
+			Le carte fanno 300 danni base
+			Ottieni alcuni frame di invincibilità e vieni curato a vita piena e massima barriera
+			Ogni copie extra dell'oggetto forniscono +1 risurrezioni
+			'''
+	}
+
+	PortableGenerator: {
+		DisplayName: Generatore Portabile
+		Tooltip:
+			'''
+			Diventa immune al danno per 20 secondi quando entri un nuovo livello
+			Ogni copie extra dell'oggetto aumentano la durata di 20 secondi
+			'''
+	}
+
+	ForgottenBioWeapon: {
+		DisplayName: Arma Biologica Dimenticata
+		Tooltip:
+			'''
+			Gli status negativi sui nemici durano il 100% in più
+			Ogni copie extra dell'oggetto fanno durare del 100% in più gli status
+			'''
+	}
+
+	SymbioticFungus: {
+		DisplayName: Fungo Simbiotico
+		Tooltip:
+			'''
+			Ti curi dell'8% della vita massima al secondo se stai fermo per più di 1 secondo
+			Ogni copie extra dell'oggetto aumentano la cura del 4% della vita massima
+			'''
+	}
+
+	ShotgunComponent: {
+		DisplayName: Kit di Assemblaggio per Fucili a Pompa
+		Tooltip:
+			'''
+			4x attacchi per uso dell'arma principale
+			La velocità di attacco è diminuita di un moltiplicatore per compensare
+			I proiettili ottengono un pò di inaccuratezza
+			Ogni copie extra di questo oggetto forniscono +4 attacchi per uso d'arma, ma riducendo ulteriormente la velocità d'attacco
+			'''
+	}
+
+	SniperComponent: {
+		DisplayName: Kit del Cecchino
+		Tooltip:
+			'''
+			6x danno
+			Decrementa massivamente la velocità d'attacco di un moltiplicatore
+			Ogni copie extra dell'oggetto aumentano il moltiplicatore del danno del 6x, riducendo ulteriormente la velocità d'attacco
+			'''
+	}
+
+	MinigunComponent: {
+		DisplayName: Minigun Recuperato
+		Tooltip:
+			'''
+			3.5x velocità d'attacco
+			0.4x danno
+			I proiettili ottengono inaccuratezza 
+			Ogni copie extra dell'oggetto aumentano il moltiplcatore della velocità d'attacco di 2
+			'''
+	}
+
+	CoolantBarrel: {
+		DisplayName: Barile di Refrigerante
+		Tooltip:
+			'''
+			Aumento del 10% alla velocità d'attacco
+			Ogni copie extra dell'oggetto forniscono ulteriore aumento del 10% alla velocità d'attacco
+			'''
+	}
+
+	BlackTile: {
+		DisplayName: Blocco Nero
+		Tooltip: ""
+	}
+
+	BlackWall: {
+		DisplayName: Muro Nero
+		Tooltip: ""
+	}
+
+	ItemBasin: {
+		DisplayName: Fontana degli Oggetti
+		Tooltip: ""
+	}
+
+	LunarCharm: {
+		DisplayName: Amuleto Lunare
+		Tooltip:
+			'''
+			Ti è garantito l'accesso al Santuario Lunare quando discendi ulteriormente nel Dungeon
+			Crea un oggetto quando entri nel Santuario Lunare
+			Ogni copie extra dell'oggetto aumentano la probabilità di produrre oggetti di qualità superiore
+			'''
+	}
+
+	CeremonialCrown: {
+		DisplayName: Corona Cerimoniale
+		Tooltip:
+			'''
+			I nemici prendono il 10% di danno extra per ogni nemico vulnerabile vivo
+			Ogni copie extra dell'oggetto aumentano il danno bonus del 10%
+			'''
+	}
+
+	BurningCharcoal: {
+		DisplayName: Carbonella Ardente
+		Tooltip:
+			'''
+			10% di probabilità di incendiare un nemico quando lo colpisci
+			Incendiare fa il 150% dei danni totali dopo una durata
+			Ogni copie extra dell'oggetto aumentano la probabilità del 10%
+			'''
+	}
+
+	ThermitePowder: {
+		DisplayName: Polvere di Termite
+		Tooltip:
+			'''
+			Ogni secondo incendia tutti i nemici vulnerabili
+			L'incendiamento fa 70 danni base totali dopo una durata
+			Ogni copie extra dell'oggetto aumentano il danno base di 70
+			'''
+	}
+
+	ReactiveMicrobots: {
+		DisplayName: Microbots Reattivi
+		Tooltip:
+			'''
+			+12 RD mentre stai sotto il 50% della vita
+			Ogni copie extra dell'oggetto aumentano la RD di 12
+			'''
+	}
+
+	EverlastingJellyfish: {
+		DisplayName: Medusa Eterna
+		Tooltip:
+			'''
+			Quando prendi danno ottieni il 50% di esso come cura, ridotto da eventuale RD
+			Ogni copie extra dell'oggetto aumentano la percentuale di cura di una quantità diminuente
+			'''
+	}
+
+	RemedialTapeworm: {
+		DisplayName: Tenia Correttiva
+		Tooltip:
+			'''
+			Quando colpisci un nemico una sfera di cura viene rilasciato da esso
+			+1 HP quando tocchi la sfera
+			Le sfere curative scompaiono dopo 4 secondi
+			Ogni copie extra dell'oggetto aumentano la cura di 1
+			'''
+	}
+
+	AncientTwig: {
+		DisplayName: Bastoncino Antico
+		Tooltip:
+			'''
+			Questo oggetto si attiva per 5 secondi dopo aver colpito un nemico
+			Mentre è aattivo ottieni 5 barriera ogni 1,66 secondi e diminuisci il decadimento naturale della barriera del 15%
+			Ogni copie extra dell'oggetto aumentano il guadagno di barriera di 2 e riduce ulteriormente il decadimento della barriera del 15%
+			'''
+	}
+
+	DisposableTurret: {
+		DisplayName: Torretta Monouso
+		Tooltip:
+			'''
+			25% di probabilità di creare una torretta ad uccisione
+			La torretta spara automaticamente ad i nemici per 100 danni base
+			La torretta scompare dopo 20 secondi
+			Ogni copie extra dell'oggetto aumentano la probabilità di creare una torretta di una quantità diminuente
+			'''
+	}
+
+	WayfarersWaistcloth: {
+		DisplayName: Panciotto del Viandante
+		Tooltip:
+			'''
+			Aumento del 20% di velocità di movimento dopo aver corso senza interruzioni in una direzione per 1,5 secondi
+			Ogni copie extra dell'oggetto aumentano ulteriormente la velocità di movimeto del 20%
+			'''
+	}
+
+	HeartyHoneycomb: {
+		DisplayName: Favo Vigoroso
+		Tooltip:
+			'''
+			+1 HP/s per ogni 5% di vita massima mancante
+			Ogni copie extra dell'oggetto aumentano di +0.5 HP/s per ogni 5% di vita massima mancante
+			'''
+	}
+
+	PrimevalRattle: {
+		DisplayName: Sonaglio Primordiale
+		Tooltip:
+			'''
+			Ottieni un miglioramento accumulabil alla velocità di movimento e alla RD ogni volta che ripristini 10 barriera o 10 vita in un colpo solo 
+			Ogni carica dura 9 secondi e fornisce 8% aumento della velocità di movimento e 10 RD
+			Il limite delle cariche è di 5
+			Quando sei al limite delle cariche, i nemici prendono il 15% in più di danni per ogni carica
+			Ogni copie extra dell'oggetto aumentano il limite delle cariche di 3
+			'''
+	}
+
+	AdaptiveSpear: {
+		DisplayName: Lancia Adattiva
+		Tooltip:
+			'''
+			La tua fidata lancia in questa avventura
+			Può essere modificata in infiniti modi dagli oggetti che potresti trovare
+			Infilza con la lancia a distanza con precisione 
+			Tieni premuto per caricare la lancia per aumentare il danno
+			Rilasciando quando è pienamente carica fa il danno maggiore
+			Moltiplicatore del danno prima della carica massima: 1x - 4x
+			Moltiplicatore del danno quando è carica: 5x
+			Ottiene uso automatico a 3x velocità di attacco o maggiore
+			'''
+	}
+
+	AdaptiveCannon: {
+		DisplayName: Cannone Adattivo
+		Tooltip:
+			'''
+			Il tuo fidato cannone per questa avventura
+			Può essere modificato in infiniti modi dagli oggetti che potresti trovare
+			Spara bombe che si muovono lentamente con un tempismo da lumaca 
+			'''
+	}
+
+	AdaptiveDagger: {
+		DisplayName: Pungnale Adattivo
+		Tooltip:
+			'''
+			Il tuo fidato pugnale per questa avventura
+			Può essere modificato in infiniti modi dagli oggetti che potresti trovare
+			Pugnala velocemente con il pugnale con una gittata ridotta
+			Ha sempre l'uso automatico attivo
+			'''
+	}
+
+	AdaptiveRifle: {
+		DisplayName: Fucile Adattivo
+		Tooltip:
+			'''
+			Il tuo fidato fucile per questa avventura
+			Può essere modificato in infiniti modi dagli oggetti che potresti trovare
+			Spara potenti proiettili con un tempismo moderato
+			Tieni premuto per mirare meglio
+			Ottiene il uso automatico da 2x di velocità di attacco o maggiore
+			'''
+	}
+}
+
+NPCs: {
+	Splinter.DisplayName: Scheggia
+	Spookrow.DisplayName: Spaventapasseri
+	UndeadGuard.DisplayName: Guardia Non Morta
+	SandWorm.DisplayName: Verme di Sabbia
+	NebulaPillar.DisplayName: Colonna della Nebula
+	SolarPillar.DisplayName: Colonna del Sole
+	StardustPillar.DisplayName: Colonna della Polvere Stellare
+	VortexPillar.DisplayName: Colonna del Vortice
+	GiantBat.DisplayName: Pipistrello Gigante
+	IcyMerman.DisplayName: Tritone del Ghiaccio
+	IceTortoise.DisplayName: Tartaruga Ghiacciata
+	Frostbiter.DisplayName: Assideramentatore
+	UndeadViking.DisplayName: Vichingo Non Morto
+	DesertSpirit.DisplayName: Spirito del Deserto
+	AntlionCharger.DisplayName: Formicaleone Caricante
+	Antlion.DisplayName: Formicaleone
+	Tortoise.DisplayName: Tartaruga
+	Lamia.DisplayName: Lamia
+	AntlionSwarmer.DisplayName: Formicaleone Sciamante
+	Hornet.DisplayName: Calabrone
+	SpectreMaster.DisplayName: Maestro degli Spettri
+	Diabolist.DisplayName: Satanico
+	UndeadSharpshooter.DisplayName: Cecchino Non Morto
+	DungeonSpirit.DisplayName: Spirito del Dungeon
+	UndeadAssasin.DisplayName: Assassino Non Morto
+	UndeadBrute.DisplayName: Bruto Non Morto
+	CrimsonDreg.DisplayName: Feccia del Cremisi
+	Ballista.DisplayName: Balestra
+	WrathfulRoot.DisplayName: Radice Adirata
+	IchorSticker.DisplayName: Sputaicore
+	BloodCrawler.DisplayName: Acaro del Sangue
+	BlackRecluse.DisplayName: Vedova Eremita
+	GiantSpider.DisplayName: Ragno Gigante
+	JungleCreeper.DisplayName: Ragno della Giungla
+	CrawlingSludge.DisplayName: Melma Strisciante
+	UndeadPrisoner.DisplayName: Prigioniero Non Morto
+	StoneDrone.DisplayName: Drone di Pietra
+	UndeadEnforcer.DisplayName: Polizzioto Non Morto
+	Tumbletwig.DisplayName: Bastoncini Rotolanti
+	RockGolem.DisplayName: Golem di Roccia
+	SeedLobber.DisplayName: Lancia Semi
+	CursedSlime.DisplayName: Slime Maledetto
+	IchorSlime.DisplayName: Slime di Icore
+	LavaSlime.DisplayName: Slime di Lava
+	ShadowCaster.DisplayName: Stregone delle Ombre
+	Corruptor.DisplayName: Corruttore
+	Crimator.DisplayName: Cremera
+	Clinger.DisplayName: Appiccicoso
+	BloodthirstyAxe.DisplayName: Ascia Assetata di Sangue
+	IceSpirit.DisplayName: Spirito del Ghiaccio
+	LavaBat.DisplayName: Pipistrello di Lava
+	BoneSerpent.DisplayName: Serpente di Ossa
+	FireImp.DisplayName: Diavoletto del Fuoco
+	Demon.DisplayName: Demone
+	EliteDemon.DisplayName: Demone Superiore
+	GiantMoth.DisplayName: Falena Gigantesca
+	OvergrownBat.DisplayName: Pipistrello Sovracresciuto
+	UndeadHunter.DisplayName: Cacciatore Non Morto
+	FlyingSnake.DisplayName: Serpente Volante
+	Lihzahrd.DisplayName: Rettiliano
+	DomesticatedHornet.DisplayName: Calabrone Addomesticato
+	LihzahrdSentry.DisplayName: Sentinella Rettiliana
+	TempleDevotee.DisplayName: Devoto del Tempio
+	LihzahrdConstruct.DisplayName: Construtto Rettiliano
+	Corite.DisplayName: Corite
+	Daybreaker.DisplayName: Spezzagiorno
+	Soladile.DisplayName: Solardillo
+	BrainSuckler.DisplayName: Succhiacervelli
+	Omniwatcher.DisplayName: Omniosservatore
+	Predictor.DisplayName: Predittore
+	AlienHornet.DisplayName: Calabrone Alieno
+	StormDiver.DisplayName: Tuffatore della Tempesta
+	VortexWatcher.DisplayName: Osservatore del Vortice
+	StarCell.DisplayName: Cellula Stellare
+	StarSpewer.DisplayName: Sputa Stelle
+	FlowInvader.DisplayName: Invasore del Flusso
+	Paladin.DisplayName: Paladino
+	BrambleHollow.DisplayName: Empio Rovo
+	CrimsonVessel.DisplayName: Recipiente del Cremisi
+	CrimsonSeer.DisplayName: Osservatore del Cremisi
+	CorruptionParasite.DisplayName: Parassita della Corruzione
+	ParasiticEgg.DisplayName: Uovo Parassita
+	PossessedHammer.DisplayName: Martello Posseduto
+	IceQueen.DisplayName: Regina del Ghiaccio
+	PharaohSpirit.DisplayName: Spirito del Faraone
+	QueenBee.DisplayName: Ape Regina
+	WallOfFlesh.DisplayName: Muro di Carne
+	Hungry.DisplayName: Affamato
+	HungryAnchored.DisplayName: Affamato
+	Skeletron.DisplayName: Skeletron
+	TempleGolem.DisplayName: Golem del Tempio
+	MoonLord.DisplayName: Signore della Luna
+	MoonLordHand.DisplayName: Occhio del Signore della Luna
+	MoonLordHead.DisplayName: Occhio del Signore della Luna
+	TrueServant.DisplayName: Vero Servo di Cthulhu
+	TrueBrain.DisplayName: Vero Cervello di Cthulhu
+}
+
+ItemBasin.DisplayName: Fontana degli Oggetti
+
+Configs: {
+	TerRoguelikeConfig: {
+		DisplayName: Configurazione TerRoguelike
+
+		Headers: {
+			Mods: {
+				TerRoguelike: {
+					VisualConfig: Configurazione Visiva
+					MiscConfig: Configurazione Miscellanea
+				}
+			}
+		}
+
+		EnemyLocationArrow: {
+			Label: Freccia della Posizione dei Nemici
+			Tooltip: ""
+		}
+
+		ObjectiveLocationArrow: {
+			Label: Freccia della Posizione degli Obbiettivi
+			Tooltip: ""
+		}
+
+		BossHealthbar: {
+			Label: Barra della Vita dei Boss
+			Tooltip: ""
+		}
+
+		ScreenshakeIntensity: {
+			Label: Intensità dello Scuotimento dello Schermo
+			Tooltip: ""
+		}
+
+		FullyDeletePlayerAndWorldFiles: {
+			Label: Cancella Permanentemente File dei Personaggi e Mondi 
+			Tooltip:
+				'''
+				Se abilitatà, tutti i personaggi ed i mondo usati mentre si gioca con TerRogueLike sono cancellati permanentemente.
+				Se disabilitatà, tutti i personaggi ed i mondo usati mentre si gioca con TerRogueLike sono mandati nel cestino.
+				'''
+		}
+
+		LoadEntireWorldUponEnteringWorld: {
+			Label: Carica l'Intero Mondo Quando Entri nel Mondo
+			Tooltip:
+				'''
+				Se abilitata, appena entri in un mondo TerRogueLike, il gioco si metterà in pausa e proverà a caricare tutti blocchi nel mondo.
+				Questo in pratica sposta quasi tutti i problemi di lag spike (il bloccarsi del gioco) legati ai blocchi del mondo solo a quando lo apri piuttosto che quando giochi.
+				'''
+		}
+	}
+}
