@@ -158,6 +158,7 @@ Items: {
 			'''
 			Aumenta la probabilità di colpi critici del 10%
 			Ogni copie extra di questo oggetto aumentano ulteriormente la probabilità di colpi critici del 10%
+			'''
 	}
 
 	AdaptiveGun: {
@@ -1088,7 +1089,7 @@ Configs: {
 		}
 
 		FullyDeletePlayerAndWorldFiles: {
-			Label: Cancella Permanentemente File dei Personaggi e Mondi 
+			Label: Cancella Permanentemente File dei Personaggi e Mondi
 			Tooltip:
 				'''
 				Se abilitatà, tutti i personaggi ed i mondo usati mentre si gioca con TerRogueLike sono cancellati permanentemente.
