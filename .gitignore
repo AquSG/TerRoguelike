@@ -1,3 +1,6 @@
+# tracks folder is not to be included
+[Tt]racks/
+
 # manually added cronscript
 cronpull.sh
 
