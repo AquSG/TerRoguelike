@@ -3041,7 +3041,14 @@ namespace TerRoguelike.TerPlayer
         #region Death Effect
         public void DoDeathEffect()
         {
-            Texture2D ghostTex = TextureAssets.Npc[NPCID.Ghost].Value;
+
+            var wantedTex = TextureAssets.Npc[NPCID.Ghost];
+            if (wantedTex.State == AssetState.NotLoaded)
+            {
+                Main.Assets.Request<Texture2D>(TextureAssets.Npc[NPCID.Ghost].Name, AssetRequestMode.ImmediateLoad);
+            }
+            var ghostTex = wantedTex.Value;
+
             int frameCount = Main.npcFrameCount[NPCID.Ghost];
             int frameHeight = ghostTex.Height / frameCount;
             int frame = (int)((Main.GlobalTimeWrappedHourly / 0.15f) % frameCount);
