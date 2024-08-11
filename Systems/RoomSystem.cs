@@ -37,6 +37,7 @@ using TerRoguelike.Particles;
 using TerRoguelike.NPCs.Enemy.Boss;
 using Terraria.Graphics.Effects;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using TerRoguelike.ILEditing;
 
 namespace TerRoguelike.Systems
 {
@@ -424,6 +425,8 @@ namespace TerRoguelike.Systems
         }
         public static void PostDrawEverything(SpriteBatch spritebatch)
         {
+            ILEdits.dualContrastTileShader = false;
+
             Player player = Main.LocalPlayer;
             if (player != null)
             {
