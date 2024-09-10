@@ -25,6 +25,7 @@ namespace TerRoguelike.Shaders
         internal static Effect MaskOverlay;
         internal static Effect SideFade;
         internal static Effect ConeFade;
+        internal static Effect ConeSnippet;
         internal static Effect Pixelation;
         internal static Effect DualContrast;
 
@@ -57,6 +58,9 @@ namespace TerRoguelike.Shaders
 
             ConeFade = LoadShader("ConeFade");
             RegisterScreenShader(ConeFade, "ConeFadePass", "ConeFade");
+
+            ConeSnippet = LoadShader("ConeSnippet");
+            RegisterScreenShader(ConeSnippet, "ConeSnippetPass", "ConeSnippet");
 
             Pixelation = LoadShader("Pixelation");
             RegisterScreenShader(Pixelation, "PixelationPass", "Pixelation");

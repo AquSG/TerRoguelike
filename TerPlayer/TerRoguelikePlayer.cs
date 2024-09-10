@@ -36,6 +36,7 @@ using Terraria.WorldBuilding;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Items.Uncommon;
 using static Terraria.Player;
+using System.CodeDom;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -2340,6 +2341,50 @@ namespace TerRoguelike.TerPlayer
                 a = 0f;
                 fullBright = false;
                 return;
+            }
+
+            if (false)
+            {
+                Point lightpos = Player.Center.ToTileCoordinates();
+                Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f);
+
+                Main.spriteBatch.End();
+                Effect coneEffect = Filters.Scene["TerRoguelike:ConeSnippet"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, coneEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                int rayCount = 400;
+
+                coneEffect.Parameters["tint"].SetValue((Color.Lerp(Color.Orange, Color.Yellow, 0.3f) * 0.75f).ToVector4());
+                coneEffect.Parameters["minDOT"].SetValue(Vector2.Dot(Vector2.UnitX, Vector2.UnitX.RotatedBy(1f / rayCount * MathHelper.Pi)));
+
+                Vector2 basePos = Player.Center;
+                
+                float maxRayLength = 240;
+                List<float> rayLengths = [];
+                for (int i = 0; i < rayCount; i++)
+                {
+                    float completion = (float)i / rayCount;
+                    float thisRot = completion * MathHelper.TwoPi;
+                    Vector2 endPos = TileCollidePositionInLine(basePos, basePos + thisRot.ToRotationVector2() * maxRayLength);
+                    rayLengths.Add(basePos.Distance(endPos));
+                }
+                var glowTex = TexDict["CircularGlow"];
+
+                for (int i = 0; i < rayLengths.Count; i++)
+                {
+                    float completion = (float)i / rayCount;
+                    float thisRot = completion * MathHelper.TwoPi;
+                    float length = rayLengths[i];
+
+                    float scaling = length / maxRayLength;
+                    Rectangle thisRect = new(0, 0, (int)(glowTex.Width * 0.30f * scaling + (glowTex.Width * 0.5f)), glowTex.Height);
+                    thisRect.X = glowTex.Width - thisRect.Width;
+                    thisRect.Width = glowTex.Width - (thisRect.X * 2);
+
+                    Main.EntitySpriteDraw(glowTex, basePos - Main.screenPosition, thisRect, Color.White, thisRot, thisRect.Size() * 0.5f, new Vector2(0.802f), SpriteEffects.None);
+                }
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
 
             float closestNPCDistance = -1f;
