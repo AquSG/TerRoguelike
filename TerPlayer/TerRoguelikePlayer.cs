@@ -2343,10 +2343,13 @@ namespace TerRoguelike.TerPlayer
                 return;
             }
 
-            if (false)
+            if (Main.hasFocus)
             {
-                Point lightpos = Player.Center.ToTileCoordinates();
-                Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f);
+                float intensity = 1;
+
+                Vector2 basePos = Player.Center + Vector2.UnitY * Player.gfxOffY;
+                Point lightpos = basePos.ToTileCoordinates();
+                Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * intensity);
 
                 Main.spriteBatch.End();
                 Effect coneEffect = Filters.Scene["TerRoguelike:ConeSnippet"].GetShader().Shader;
@@ -2357,16 +2360,14 @@ namespace TerRoguelike.TerPlayer
                 coneEffect.Parameters["tint"].SetValue((Color.Lerp(Color.Orange, Color.Yellow, 0.3f) * 0.75f).ToVector4());
                 coneEffect.Parameters["minDOT"].SetValue(Vector2.Dot(Vector2.UnitX, Vector2.UnitX.RotatedBy(1f / rayCount * MathHelper.Pi)));
 
-                Vector2 basePos = Player.Center;
                 
-                float maxRayLength = 240;
+                float maxRayLength = 240 * intensity;
                 List<float> rayLengths = [];
                 for (int i = 0; i < rayCount; i++)
                 {
                     float completion = (float)i / rayCount;
                     float thisRot = completion * MathHelper.TwoPi;
-                    Vector2 endPos = TileCollidePositionInLine(basePos, basePos + thisRot.ToRotationVector2() * maxRayLength);
-                    rayLengths.Add(basePos.Distance(endPos));
+                    rayLengths.Add(FalseSunLightCollisionCheck(basePos, thisRot, maxRayLength, 3));
                 }
                 var glowTex = TexDict["CircularGlow"];
 
@@ -2381,8 +2382,54 @@ namespace TerRoguelike.TerPlayer
                     thisRect.X = glowTex.Width - thisRect.Width;
                     thisRect.Width = glowTex.Width - (thisRect.X * 2);
 
-                    Main.EntitySpriteDraw(glowTex, basePos - Main.screenPosition, thisRect, Color.White, thisRot, thisRect.Size() * 0.5f, new Vector2(0.802f), SpriteEffects.None);
+                    Main.EntitySpriteDraw(glowTex, basePos - Main.screenPosition, thisRect, Color.White, thisRot, thisRect.Size() * 0.5f, new Vector2(0.802f * intensity), SpriteEffects.None);
                 }
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                var ballGlowTex = TexDict["LenaGlow"];
+                Main.EntitySpriteDraw(ballGlowTex, basePos - Main.screenPosition, null, Color.Lerp(Color.Orange, Color.LightYellow, 0.3f) * 0.7f, Main.rand.NextFloat(MathHelper.TwoPi), ballGlowTex.Size() * 0.5f, 2f * intensity * new Vector2(Main.rand.NextFloat(0.97f, 1.03f), Main.rand.NextFloat(0.92f, 1.06f)), SpriteEffects.None);
+                Main.EntitySpriteDraw(ballGlowTex, basePos - Main.screenPosition, null, Color.Lerp(Color.Orange, Color.LightYellow, 0.3f) * 0.7f, Main.rand.NextFloat(MathHelper.TwoPi), ballGlowTex.Size() * 0.5f, 2f * intensity * new Vector2(Main.rand.NextFloat(0.97f, 1.03f), Main.rand.NextFloat(0.92f, 1.06f)), SpriteEffects.None);
+
+
+
+                Main.spriteBatch.End();
+                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                float opacity = 1f;
+                float time = Main.GlobalTimeWrappedHourly;
+                Vector2 screenOff = new Vector2(time * 0.5f, time);
+                Color tint = Color.DarkRed;
+                tint *= opacity;
+                var ballTex = TexDict["Circle"];
+                var noiseTex = TexDict["BlobbyNoiseSmall"];
+
+                maskEffect.Parameters["screenOffset"].SetValue(screenOff);
+                maskEffect.Parameters["stretch"].SetValue(new Vector2(0.75f) / 2.5f);
+                maskEffect.Parameters["replacementTexture"].SetValue(noiseTex);
+                maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+                float ballScale = 0.24f;
+                float ballRot = time * 1.3f;
+
+                Main.EntitySpriteDraw(ballTex, basePos - Main.screenPosition, null, Color.White, ballRot, ballTex.Size() * 0.5f, intensity * ballScale, SpriteEffects.None);
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                maskEffect.Parameters["screenOffset"].SetValue(screenOff);
+                maskEffect.Parameters["stretch"].SetValue(new Vector2(0.35f));
+                maskEffect.Parameters["replacementTexture"].SetValue(noiseTex);
+                maskEffect.Parameters["tint"].SetValue((Color.Lerp(Color.Orange, Color.Yellow, 0.9f)).ToVector4());
+                Main.EntitySpriteDraw(ballTex, basePos - Main.screenPosition, null, Color.White * opacity, ballRot + 0.5f, ballTex.Size() * 0.5f, intensity * ballScale, SpriteEffects.None);
+
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                var invGlowTex = TexDict["InverseGlow"];
+                Main.EntitySpriteDraw(invGlowTex, basePos - Main.screenPosition, null, Color.White * 0.95f, Main.rand.NextFloat(MathHelper.TwoPi), invGlowTex.Size() * 0.5f, 0.078f * intensity * new Vector2(Main.rand.NextFloat(1f, 1.04f), Main.rand.NextFloat(1f, 1.04f)), SpriteEffects.None);
+
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
