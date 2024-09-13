@@ -481,6 +481,81 @@ namespace TerRoguelike.Utilities
             else
                 return collidingVector.SafeNormalize(Vector2.Zero);
         }
+        public static float FalseSunLightCollisionCheck(Vector2 start, float rot, float length, int step)
+        {
+            Vector2 unitVect = rot.ToRotationVector2();
+
+            if (length < 1f)
+            {
+                Point endWorldPos = (start + unitVect * length).ToTileCoordinates();
+                return ParanoidTileRetrieval(endWorldPos.X, endWorldPos.Y).IsTileSolidGround(true) ? 0 : length;
+            }
+
+            for (int r = 0; r < 4; r++)
+            {
+                float checkRot = r * MathHelper.PiOver2 - MathHelper.PiOver4;
+                if (Math.Abs(AngleSizeBetween(rot, checkRot)) < 0.05f)
+                {
+                    step = 1;
+                    break;
+                }
+            }
+
+            Vector2 currentPos = start;
+            Point lastAirPos = new Point(-1, -1);
+            for (int i = 0; i < (int)length; i += step)
+            {
+                currentPos += unitVect * step;
+
+                Point tilePos = currentPos.ToTileCoordinates();
+
+                if (tilePos == lastAirPos)
+                    continue;
+
+                if (!WorldGen.InWorld(tilePos.X, tilePos.Y))
+                    continue;
+
+                Tile tile = Main.tile[tilePos.X, tilePos.Y];
+                if (!tile.IsTileSolidGround(true))
+                {
+                    lastAirPos = tilePos;
+                    continue;
+                }
+
+                if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
+                    return i;
+
+                Vector2 tileWorldPos = new Vector2(tilePos.X * 16, tilePos.Y * 16);
+                Vector2 currentPosInTile = currentPos - tileWorldPos;
+                if (tile.IsHalfBlock)
+                {
+                    if (currentPosInTile.Y >= 8f)
+                        return i;
+                }
+                else if (tile.Slope == SlopeType.SlopeDownLeft)
+                {
+                    if (currentPosInTile.X <= currentPosInTile.Y)
+                        return i;
+                }
+                else if (tile.Slope == SlopeType.SlopeDownRight)
+                {
+                    if ((16 - currentPosInTile.X) <= currentPosInTile.Y)
+                        return i;
+                }
+                else if (tile.Slope == SlopeType.SlopeUpLeft)
+                {
+                    if (currentPosInTile.X <= (16 - currentPosInTile.Y))
+                        return i;
+                }
+                else if (tile.Slope == SlopeType.SlopeUpRight)
+                {
+                    if (currentPosInTile.X >= currentPosInTile.Y)
+                        return i;
+                }
+            }
+
+            return length;
+        }
         public static void StartAdditiveSpritebatch(bool end = true)
         {
             if (end)

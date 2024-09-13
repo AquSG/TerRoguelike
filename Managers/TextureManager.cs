@@ -174,6 +174,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/TerPlayer/CeremonialCrownGems",
                 "TerRoguelike/Projectiles/DisposableTurretMinionHead",
                 "TerRoguelike/MainMenu/LStickButton",
+                "TerRoguelike/ExtraTextures/InverseGlow",
             };
             foreach (string path in pathList)
             {
