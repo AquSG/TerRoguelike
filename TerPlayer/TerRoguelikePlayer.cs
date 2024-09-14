@@ -1276,7 +1276,7 @@ namespace TerRoguelike.TerPlayer
                                 }
                                 else if (modNPC.ExtraIgniteTargetPoints.Count > 0)
                                 {
-                                    targetPos = modNPC.ExtraIgniteTargetPoints[targetExtra];
+                                    targetPos = modNPC.ExtraIgniteTargetPoints[targetExtra] + npc.Center;
                                 }
                                 else
                                 {
@@ -1341,7 +1341,13 @@ namespace TerRoguelike.TerPlayer
                                 }
                             }
                             else
-                                checkList = modNPC.ExtraIgniteTargetPoints;
+                            {
+                                for (int s = 0; s < modNPC.ExtraIgniteTargetPoints.Count; s++)
+                                {
+                                    checkList.Add(modNPC.ExtraIgniteTargetPoints[s] + npc.Center);
+                                }
+                            }
+                                
 
                             int closest = -1;
                             float closestDistance = 0;
@@ -1405,7 +1411,7 @@ namespace TerRoguelike.TerPlayer
                             if (extraTarget >= 0)
                             {
                                 var modTarget = Main.npc[target].ModNPC();
-                                laserPos = modTarget.Segments.Count > 0 ? modTarget.Segments[extraTarget].Position : modTarget.ExtraIgniteTargetPoints[extraTarget];
+                                laserPos = modTarget.Segments.Count > 0 ? modTarget.Segments[extraTarget].Position : modTarget.ExtraIgniteTargetPoints[extraTarget] + Main.npc[target].Center;
                             }
                             else
                             {
@@ -1435,7 +1441,7 @@ namespace TerRoguelike.TerPlayer
                         for (int b = -1; b <= 1; b += 2)
                         {
                             ParticleManager.AddParticle(new BallOutlined(
-                                laserPos, Vector2.UnitX.RotatedBy((laserPos - Player.Center).ToRotation() + (MathHelper.PiOver2 + Main.rand.NextFloat(0.1f, 0.6f)) * b) * Main.rand.NextFloat(4f, 8f) * scaleModifier,
+                                laserPos, Vector2.UnitX.RotatedBy((laserPos - Player.Center).ToRotation() + (MathHelper.PiOver2 + Main.rand.NextFloat(0.1f, 0.6f)) * b) * Main.rand.NextFloat(4f, 8f) * scaleModifier * MathHelper.Lerp(0.4f, 1f, theFalseSunIntensity),
                                 30, Color.White, Color.Lerp(Color.Yellow, Color.Orange, Main.rand.NextFloat()), 
                                 new Vector2(Main.rand.NextFloat(0.15f, 0.3f) * theFalseSunIntensity) * scaleModifier, 4, 0, 0.96f, 30));
                         }
