@@ -2351,6 +2351,8 @@ namespace TerRoguelike.TerPlayer
                 Point lightpos = basePos.ToTileCoordinates();
                 Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * intensity);
 
+                #region Glow Drawing
+
                 Main.spriteBatch.End();
                 Effect coneEffect = Filters.Scene["TerRoguelike:ConeSnippet"].GetShader().Shader;
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, coneEffect, Main.GameViewMatrix.TransformationMatrix);
@@ -2384,6 +2386,51 @@ namespace TerRoguelike.TerPlayer
 
                     Main.EntitySpriteDraw(glowTex, basePos - Main.screenPosition, thisRect, Color.White, thisRot, thisRect.Size() * 0.5f, new Vector2(0.802f * intensity), SpriteEffects.None);
                 }
+                #endregion
+
+                #region Laser Drawing
+                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                var laserTex = TexDict["Square"];
+                var laserNoiseTex = TexDict["Streaks"];
+                Vector2 laserTarget = Main.MouseWorld;
+                Vector2 laserStart = basePos + (laserTarget - basePos).SafeNormalize(Vector2.UnitY) * 40 * intensity;
+                float laserRot = (laserTarget - laserStart).ToRotation();
+                float laserLength = laserStart.Distance(laserTarget);
+                float lengthRatio = laserLength / 240f;
+                if (lengthRatio == 0)
+                    lengthRatio += 0.00001f;
+
+                Main.EntitySpriteDraw(laserTex, laserStart - Main.screenPosition, null, Color.Lerp(Color.Orange, Color.Black, 0.6f) * 0.8f, laserRot, new Vector2(0, laserTex.Height * 0.5f), new Vector2(laserLength * 0.25f, 4 * intensity), SpriteEffects.None);
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                float time = Main.GlobalTimeWrappedHourly;
+
+                maskEffect.Parameters["screenOffset"].SetValue(new Vector2(-2 * time / lengthRatio, time * 4f));
+                maskEffect.Parameters["stretch"].SetValue(new Vector2(1 * lengthRatio, 0.25f));
+                maskEffect.Parameters["replacementTexture"].SetValue(laserNoiseTex);
+                maskEffect.Parameters["tint"].SetValue((Color.Yellow).ToVector4());
+
+                Main.EntitySpriteDraw(laserTex, laserStart - Main.screenPosition, null, Color.White, laserRot, new Vector2(0, laserTex.Height * 0.5f), new Vector2(laserLength * 0.25f, 4 * intensity), SpriteEffects.None);
+
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                var lineGlowTex = TexDict["LineGradient"];
+
+                for (int i = -1; i <= 1; i += 2)
+                {
+                    Main.EntitySpriteDraw(lineGlowTex, laserStart - Main.screenPosition + Vector2.UnitY.RotatedBy(laserRot) * i * 10 * intensity, null, Color.Lerp(Color.Yellow, Color.OrangeRed, (float)Math.Cos(time * 9) * 0.2f + 0.55f), laserRot, new Vector2(0, lineGlowTex.Height * 0.5f), new Vector2(laserLength * 0.5f, 1), SpriteEffects.None);
+                }
+
+                #endregion
+
+                #region Ball Drawing
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
@@ -2392,13 +2439,11 @@ namespace TerRoguelike.TerPlayer
                 Main.EntitySpriteDraw(ballGlowTex, basePos - Main.screenPosition, null, Color.Lerp(Color.Orange, Color.LightYellow, 0.3f) * 0.7f, Main.rand.NextFloat(MathHelper.TwoPi), ballGlowTex.Size() * 0.5f, 2f * intensity * new Vector2(Main.rand.NextFloat(0.97f, 1.03f), Main.rand.NextFloat(0.92f, 1.06f)), SpriteEffects.None);
 
 
-
                 Main.spriteBatch.End();
-                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
 
                 float opacity = 1f;
-                float time = Main.GlobalTimeWrappedHourly;
+                
                 Vector2 screenOff = new Vector2(time * 0.5f, time);
                 Color tint = Color.DarkRed;
                 tint *= opacity;
@@ -2432,6 +2477,7 @@ namespace TerRoguelike.TerPlayer
 
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                #endregion
             }
 
             float closestNPCDistance = -1f;
