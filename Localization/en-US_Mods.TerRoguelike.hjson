@@ -139,6 +139,7 @@ Projectiles: {
 	AdaptiveDaggerHoldout.DisplayName: Adaptive Dagger Holdout
 	AdaptiveDaggerStab.DisplayName: Adaptive Dagger Stab
 	AdaptiveRifleHoldout.DisplayName: Adaptive Rifle Holdout
+	FalseSunBeam.DisplayName: False Sun Beam
 }
 
 Items: {

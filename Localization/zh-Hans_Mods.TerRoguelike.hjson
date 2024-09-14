@@ -139,6 +139,7 @@ Projectiles: {
 	AdaptiveDaggerHoldout.DisplayName: 匕首握持
 	AdaptiveDaggerStab.DisplayName: 匕首刺击
 	AdaptiveRifleHoldout.DisplayName: 来福枪握持
+	// FalseSunBeam.DisplayName: False Sun Beam
 }
 
 Items: {
