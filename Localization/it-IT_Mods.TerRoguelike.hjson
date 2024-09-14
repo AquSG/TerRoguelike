@@ -139,6 +139,7 @@ Projectiles: {
 	AdaptiveDaggerHoldout.DisplayName: Impugnare Pugnale Adattivo
 	AdaptiveDaggerStab.DisplayName: Pugnalare Pugnale Adattivo
 	AdaptiveRifleHoldout.DisplayName: Impugnare Fucile Adattivo
+	// FalseSunBeam.DisplayName: False Sun Beam
 }
 
 Items: {

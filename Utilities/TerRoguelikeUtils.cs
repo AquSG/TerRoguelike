@@ -13,6 +13,7 @@ using TerRoguelike.NPCs;
 using Terraria.GameInput;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Items;
+using Terraria.DataStructures;
 
 namespace TerRoguelike.Utilities
 {
@@ -523,34 +524,76 @@ namespace TerRoguelike.Utilities
                 }
 
                 if (tile.Slope == SlopeType.Solid && !tile.IsHalfBlock)
-                    return i;
+                {
+                    if (EndFalseSunCheck())
+                        return i;
+                    else
+                        continue;
+                }
 
                 Vector2 tileWorldPos = new Vector2(tilePos.X * 16, tilePos.Y * 16);
                 Vector2 currentPosInTile = currentPos - tileWorldPos;
                 if (tile.IsHalfBlock)
                 {
                     if (currentPosInTile.Y >= 8f)
-                        return i;
+                    {
+                        if (EndFalseSunCheck())
+                            return i;
+                        else
+                            continue;
+                    }
                 }
                 else if (tile.Slope == SlopeType.SlopeDownLeft)
                 {
                     if (currentPosInTile.X <= currentPosInTile.Y)
-                        return i;
+                    {
+                        if (EndFalseSunCheck())
+                            return i;
+                        else
+                            continue;
+                    }
                 }
                 else if (tile.Slope == SlopeType.SlopeDownRight)
                 {
                     if ((16 - currentPosInTile.X) <= currentPosInTile.Y)
-                        return i;
+                    {
+                        if (EndFalseSunCheck())
+                            return i;
+                        else
+                            continue;
+                    }
                 }
                 else if (tile.Slope == SlopeType.SlopeUpLeft)
                 {
                     if (currentPosInTile.X <= (16 - currentPosInTile.Y))
-                        return i;
+                    {
+                        if (EndFalseSunCheck())
+                            return i;
+                        else
+                            continue;
+                    }
                 }
                 else if (tile.Slope == SlopeType.SlopeUpRight)
                 {
                     if (currentPosInTile.X >= currentPosInTile.Y)
-                        return i;
+                    {
+                        if (EndFalseSunCheck())
+                            return i;
+                        else
+                            continue;
+                    }
+                }
+
+                bool EndFalseSunCheck()
+                {
+                    if (step != 1)
+                    {
+                        i -= step;
+                        currentPos -= unitVect * step;
+                        step = 1;
+                        return false;
+                    }
+                    return true;
                 }
             }
 

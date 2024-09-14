@@ -139,6 +139,7 @@ Projectiles: {
 	AdaptiveDaggerHoldout.DisplayName: Адаптивный Кинжал в Руке
 	AdaptiveDaggerStab.DisplayName: Удар Адаптивного Кинжала
 	AdaptiveRifleHoldout.DisplayName: Адаптивная Винтовка в Руке
+	// FalseSunBeam.DisplayName: False Sun Beam
 }
 
 Items: {
