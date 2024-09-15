@@ -1222,6 +1222,7 @@ namespace TerRoguelike.TerPlayer
             //if (theFalseSun > 0)
             if (true)
             {
+                Player.GetCritChance(DamageClass.Generic) += 5f;
                 if (theFalseSunIntensity < theFalseSunIntensityTarget)
                 {
                     theFalseSunIntensity = Math.Min(MathHelper.Lerp(theFalseSunIntensity, theFalseSunIntensityTarget, 0.1f) + 0.005f, theFalseSunIntensityTarget);
@@ -1441,7 +1442,7 @@ namespace TerRoguelike.TerPlayer
                         for (int b = -1; b <= 1; b += 2)
                         {
                             ParticleManager.AddParticle(new BallOutlined(
-                                laserPos, Vector2.UnitX.RotatedBy((laserPos - Player.Center).ToRotation() + (MathHelper.PiOver2 + Main.rand.NextFloat(0.1f, 0.6f)) * b) * Main.rand.NextFloat(4f, 8f) * scaleModifier * MathHelper.Lerp(0.4f, 1f, theFalseSunIntensity),
+                                laserPos, Vector2.UnitX.RotatedBy((laserPos - (Player.Center + Player.gfxOffY * Vector2.UnitY)).ToRotation() + (MathHelper.PiOver2 + Main.rand.NextFloat(0.1f, 0.6f)) * b) * Main.rand.NextFloat(4f, 8f) * scaleModifier * MathHelper.Lerp(0.4f, 1f, theFalseSunIntensity),
                                 30, Color.White, Color.Lerp(Color.Yellow, Color.Orange, Main.rand.NextFloat()), 
                                 new Vector2(Main.rand.NextFloat(0.15f, 0.3f) * theFalseSunIntensity) * scaleModifier, 4, 0, 0.96f, 30));
                         }
