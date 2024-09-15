@@ -1286,7 +1286,9 @@ namespace TerRoguelike.TerPlayer
                                 }
                             }
                             else
+                            {
                                 targetPos = npc.Center;
+                            }
 
                             if (Player.Center.Distance(targetPos) < maxLaserLength + 32 && CanHitInLine(Player.Center, targetPos))
                                 continue;
@@ -1418,12 +1420,24 @@ namespace TerRoguelike.TerPlayer
                             {
                                 laserPos = Main.npc[target].Center;
                             }
-                            if (canHit)
+                            if (beamTime == 1)
+                                theFalseSunLaserPositionOld[i] = laserPos;
+                            if (laserPos.Distance(theFalseSunLaserPositionOld[i]) <= 80)
                             {
-                                theFalseSunHitCooldown = 8;
-                                int falseSunDamage = Math.Max((int)(75 * theFalseSunIntensity), 1);
-                                
-                                Projectile.NewProjectile(Player.GetSource_FromThis(), laserPos, Vector2.Zero, ModContent.ProjectileType<FalseSunBeam>(), falseSunDamage, 0.5f, Player.whoAmI, target, Main.npc[target].type);
+                                if (canHit)
+                                {
+                                    theFalseSunHitCooldown = 8;
+                                    int falseSunDamage = Math.Max((int)(75 * theFalseSunIntensity), 1);
+
+                                    Projectile.NewProjectile(Player.GetSource_FromThis(), laserPos, Vector2.Zero, ModContent.ProjectileType<FalseSunBeam>(), falseSunDamage, 0.5f, Player.whoAmI, target, Main.npc[target].type);
+                                }
+                            }
+                            else
+                            {
+                                laserPos = theFalseSunLaserPositionOld[i];
+                                theFalseSunTarget[i] = target = -1;
+                                theFalseSunTargetExtra[i] = extraTarget = -1;
+                                theFalseSunTime[i] = beamTime = -10;
                             }
                         }
                     }
@@ -2686,7 +2700,7 @@ namespace TerRoguelike.TerPlayer
                     
 
                     float whiteLerp = 0;
-                    if (!moonLordVisualEffect)
+                    if (true)
                     {
                         if (beamTime < 0)
                             whiteLerp = 1 - (-beamTime / 10f);
