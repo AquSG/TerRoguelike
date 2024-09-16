@@ -743,7 +743,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage * 0.04d; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.t_Lihzahrd, hit.HitDirection, -1f);
                 }

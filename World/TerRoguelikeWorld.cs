@@ -47,6 +47,9 @@ namespace TerRoguelike.World
         public static readonly int sanctuaryMaxTries = 3;
         public static readonly int sanctuaryMaxVisits = 2;
         public static int sanctuaryCount = 0;
+        public static int currentLoop = 0;
+        public static bool promoteLoop = false;
+        public static int currentStageForScaling => currentStage + currentLoop * 6;
         public static float sanctuaryChance => 1 / MathHelper.Clamp(sanctuaryMaxTries - sanctuaryTries, 1, sanctuaryMaxTries);
 
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);

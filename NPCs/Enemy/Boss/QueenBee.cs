@@ -887,7 +887,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / 34d; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 18, hit.HitDirection, -1f, NPC.alpha, NPC.color, NPC.scale);
                 }

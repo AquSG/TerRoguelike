@@ -957,7 +957,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             SoundEngine.PlaySound(SoundID.NPCHit1, segment.Position);
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / 25.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
                 {
                     Dust.NewDust(segment.Position + new Vector2(-segment.Height * 0.5f), (int)segment.Height, (int)segment.Height, 5, hit.HitDirection, -1f);
                 }
