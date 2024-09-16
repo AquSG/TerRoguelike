@@ -440,7 +440,7 @@ namespace TerRoguelike.TerPlayer
             //max life effects happen before barrier calculations
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
-                int maxLifeIncrease = TerRoguelikeWorld.currentStage * 20;
+                int maxLifeIncrease = TerRoguelikeWorld.currentStageForScaling * 20;
                 Player.statLifeMax2 += maxLifeIncrease;
             }
             if (bottleOfVigor > 0)
@@ -1219,8 +1219,7 @@ namespace TerRoguelike.TerPlayer
                 primevalRattleBoost = false;
             }
 
-            //if (theFalseSun > 0)
-            if (true)
+            if (theFalseSun > 0)
             {
                 Player.GetCritChance(DamageClass.Generic) += 5f;
                 if (theFalseSunIntensity < theFalseSunIntensityTarget)
@@ -1427,7 +1426,7 @@ namespace TerRoguelike.TerPlayer
                                 if (canHit)
                                 {
                                     theFalseSunHitCooldown = 8;
-                                    int falseSunDamage = Math.Max((int)(75 * theFalseSunIntensity), 1);
+                                    int falseSunDamage = Math.Max((int)(75 * theFalseSunIntensity * theFalseSun), 1);
 
                                     Projectile.NewProjectile(Player.GetSource_FromThis(), laserPos, Vector2.Zero, ModContent.ProjectileType<FalseSunBeam>(), falseSunDamage, 0.5f, Player.whoAmI, target, Main.npc[target].type);
                                 }
@@ -1474,6 +1473,12 @@ namespace TerRoguelike.TerPlayer
             {
                 theFalseSunIntensity = 0;
                 theFalseSunIntensityTarget = 0;
+                for (int i = 0; i < theFalseSunTarget.Length; i++)
+                {
+                    theFalseSunTarget[i] = -1;
+                    theFalseSunTargetExtra[i] = -1;
+                    theFalseSunTime[i] = 0;
+                }
             }
         }
         public override void PostUpdateEquips()
@@ -1844,7 +1849,8 @@ namespace TerRoguelike.TerPlayer
                     {
                         particleDir = targetPos.X > Main.player[proj.owner].Center.X ? 1 : -1;
                     }
-                    for (int i = -5; i <= 5; i++)
+                    int particleCount = (int)(5f / (TerRoguelikeWorld.currentLoop * 2 + 1));
+                    for (int i = -particleCount; i <= particleCount; i++)
                     {
                         float scale = 1f;
                         if (i % 5 != 0)
@@ -1930,8 +1936,8 @@ namespace TerRoguelike.TerPlayer
             {
                 ancientTwigLastStruckTimer = 300;
             }
-            //if (theFalseSun > 0)
-            if (true)
+
+            if (theFalseSun > 0)
             {
                 if (hit.Crit && theFalseSunIntensityTarget < 1 && proj.type != ModContent.ProjectileType<FalseSunBeam>())
                 {
@@ -2546,6 +2552,7 @@ namespace TerRoguelike.TerPlayer
                     }
                 }
             }
+            escapeArrowTime = 0;
             escaped = false;
             DeathUI.itemsToDraw.Clear();
             CreditsUI.itemsToDraw.Clear();
@@ -2553,7 +2560,8 @@ namespace TerRoguelike.TerPlayer
             creditsViewTime = 0;
             escapeFail = false;
             barrierHealth = 0;
-            playthroughTime.Restart();
+            if (TerRoguelikeWorld.currentLoop == 0)
+                playthroughTime.Restart();
             currentFloor = null;
 
         }

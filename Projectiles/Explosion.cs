@@ -9,6 +9,7 @@ using TerRoguelike.Managers;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Projectiles
 {
@@ -47,7 +48,8 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.localAI[0] != 1)
             {
-                for (int i = 0; i < 15; i++)
+                int dustCount = (int)(15f / (TerRoguelikeWorld.currentLoop * 2 + 1));
+                for (int i = 0; i < dustCount; i++)
                 {
                     Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.SolarFlare, Scale: 0.85f);
                 }

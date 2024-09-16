@@ -59,7 +59,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < 5.0 + hit.Damage / 10.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 200.0; i++)
                 {
                     int width = NPC.width / 4;
                     int dust = Dust.NewDust(NPC.Center - Vector2.One * (float)width, width * 2, width * 2, DustID.Clentaminator_Cyan);

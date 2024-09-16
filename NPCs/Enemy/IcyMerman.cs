@@ -62,7 +62,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.ai[0] = 0;
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / 20.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 30.0; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 137, hit.HitDirection, -1f);
                 }

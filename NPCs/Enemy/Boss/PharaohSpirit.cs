@@ -693,7 +693,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Color color = new Color(222, 108, 48) * 0.7f;
             if (NPC.life > 0)
             {
-                for (int i = 0; i < hit.Damage / 33d; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
                 {
                     Dust d = Main.dust[Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Sandstorm)];
                     d.color = color;

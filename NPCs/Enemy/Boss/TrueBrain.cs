@@ -1326,7 +1326,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.life > 0 && deadTime <= 1)
             {
                 SoundEngine.PlaySound(SoundID.NPCHit1, NPC.Center);
-                for (int i = 0; (double)i < hit.Damage * 0.01d; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 3000.0; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f, 0, default, 0.9f);
                     Main.dust[d].noLight = true;

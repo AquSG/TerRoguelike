@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             if (NPC.life > 0)
             {
-                for (int i = 0; (double)i < hit.Damage / 10.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)
                 {
                     Dust dust = Dust.NewDustDirect(NPC.position, NPC.width, NPC.height, 67, hit.HitDirection, -1f);
                     dust.noGravity = true;

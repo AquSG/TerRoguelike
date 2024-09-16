@@ -160,4 +160,31 @@ namespace TerRoguelike.UI
                 DebugUI.DebugUIActive = false;
         }
     }
+    public class LoopCommand : ModCommand
+    {
+        public override CommandType Type => CommandType.Chat;
+        public override string Command => "Loop";
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+            if (TerRoguelikeWorld.IsDeletableOnExit)
+            {
+                TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                TerRoguelikeMenu.wipeTempWorld = true;
+                TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+                TerRoguelikeWorld.promoteLoop = true;
+            }
+            var player = Main.LocalPlayer;
+            if (player != null)
+            {
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null)
+                {
+                    modPlayer.killerNPC = -1;
+                    modPlayer.killerProj = -1;
+                }
+            }
+            WorldGen.SaveAndQuit();
+        }
+    }
 }
