@@ -953,6 +953,11 @@ Items: {
 			Ottiene il uso automatico da 2x di velocità di attacco o maggiore
 			'''
 	}
+
+	LunarGambit: {
+		// DisplayName: Lunar Gambit
+		// Tooltip: ""
+	}
 }
 
 NPCs: {

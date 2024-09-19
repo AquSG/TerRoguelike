@@ -953,6 +953,11 @@ Items: {
 			Получает способность автоатаки при 2x скорости атаки или больше
 			'''
 	}
+
+	LunarGambit: {
+		// DisplayName: Lunar Gambit
+		// Tooltip: ""
+	}
 }
 
 NPCs: {
