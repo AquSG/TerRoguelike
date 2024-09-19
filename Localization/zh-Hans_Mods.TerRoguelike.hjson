@@ -953,6 +953,11 @@ Items: {
 			攻速在2倍及以上时可获得自动开火能力
 			'''
 	}
+
+	LunarGambit: {
+		// DisplayName: Lunar Gambit
+		// Tooltip: ""
+	}
 }
 
 NPCs: {

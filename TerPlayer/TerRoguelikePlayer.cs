@@ -227,6 +227,7 @@ namespace TerRoguelike.TerPlayer
         public int creditsViewTime = 0;
         public bool isDeletableOnExit = false;
         public bool enableCampfire = false;
+        public int lunarGambit = 0;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -313,6 +314,8 @@ namespace TerRoguelike.TerPlayer
             heartyHoneycomb = 0;
             primevalRattle = 0;
             theFalseSun = 0;
+
+            lunarGambit = 0;
 
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;

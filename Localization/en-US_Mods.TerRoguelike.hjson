@@ -953,6 +953,11 @@ Items: {
 			Gains auto-fire capabilities at 2x attack speed or more
 			'''
 	}
+
+	LunarGambit: {
+		DisplayName: Lunar Gambit
+		Tooltip: ""
+	}
 }
 
 NPCs: {
