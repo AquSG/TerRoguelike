@@ -40,7 +40,7 @@ namespace TerRoguelike.Items
         }
         public void DrawLunarGambit(Vector2 position, float scale, float rotation = 0)
         {
-            var tex = TextureAssets.Item[Type].Value;
+            var tex = TextureAssets.Item[ModContent.ItemType<LunarGambit>()].Value;
             Vector2 origin = tex.Size() * 0.5f;
             Color glowColor = Color.Cyan * ((float)Math.Cos(Main.GlobalTimeWrappedHourly * MathHelper.PiOver4) * 0.1f + 0.4f);
             glowColor.A = 25;
@@ -51,7 +51,7 @@ namespace TerRoguelike.Items
                 float completion = i / 6f * MathHelper.TwoPi;
                 float thisRot = completion + rotOff + rotation;
                 float magnitude = (float)Math.Cos(completion + rotOff * 1.5f + i * 2.122456) * 0.28f + 0.64f;
-                Main.EntitySpriteDraw(tex, position + thisRot.ToRotationVector2() * 6 * magnitude, null, glowColor, rotation, origin, scale, SpriteEffects.None);
+                Main.EntitySpriteDraw(tex, position + thisRot.ToRotationVector2() * 8 * magnitude * scale, null, glowColor, rotation, origin, scale, SpriteEffects.None);
             }
 
             Main.EntitySpriteDraw(tex, position, null, Color.White * 0.9f, rotation, origin, scale, SpriteEffects.None);

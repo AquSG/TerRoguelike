@@ -38,6 +38,7 @@ using TerRoguelike.NPCs.Enemy.Boss;
 using Terraria.Graphics.Effects;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TerRoguelike.ILEditing;
+using TerRoguelike.Items;
 
 namespace TerRoguelike.Systems
 {
@@ -466,6 +467,27 @@ namespace TerRoguelike.Systems
                 Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
 
                 Main.spriteBatch.End();
+            }
+
+            if (lunarGambitSceneTime > 0)
+            {
+                Vector2 drawPos = lunarGambitSceneDisplayPos;
+
+                if (drawPos.Distance(Main.Camera.Center) < 2500)
+                {
+                    drawPos -= Main.screenPosition;
+                    if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
+                    {
+                        Main.NewText("By the 9 I'm drawing");
+                    }
+                    if (lunarGambitSceneTime <= lunarGambitStartDuration + lunarGambitFloatOverDuration)
+                    {
+                        LunarGambit item = new();
+                        StartAlphaBlendSpritebatch(false);
+                        item.DrawLunarGambit(drawPos, 1f, 0);
+                        Main.spriteBatch.End();
+                    }
+                }
             }
 
             if (postDrawEverythingCache == null || postDrawEverythingCache.Count == 0)
@@ -1000,10 +1022,37 @@ namespace TerRoguelike.Systems
                     worldTeleportTime = 0;
             }
 
+            if (lunarGambitSceneTime > 0)
+            {
+                lunarGambitSceneTime++;
+
+                Vector2 drawPos = lunarGambitSceneDisplayPos;
+
+                if (drawPos.Distance(Main.Camera.Center) < 2500)
+                {
+                    if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
+                    {
+
+                    }
+                    if (lunarGambitSceneTime <= lunarGambitStartDuration + lunarGambitFloatOverDuration)
+                    {
+                        int randBoolValue = lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration - 30 ? 5 : 2;
+                        if (Main.rand.NextBool(randBoolValue))
+                        {
+                            ParticleManager.AddParticle(new Ball(
+                                drawPos,
+                                Main.rand.NextVector2CircularEdge(3, 3) * Main.rand.NextFloat(0.5f, 1f),
+                                30, Color.Lerp(Color.White, Color.Cyan, Main.rand.NextFloat(0.3f, 1f)) * 1,
+                                new Vector2(Main.rand.NextFloat(0.5f, 1f) * 0.12f), 0, 0.96f, 30, true, false), ParticleManager.ParticleLayer.Default);
+                        }
+                    }
+                }
+            }
+
             if (itemBasins.Count > 0)
             {
                 bool spawnParticles = (int)(Main.GlobalTimeWrappedHourly * 60) % 4 == 0;
-                int basinTileType = ModContent.TileType<ItemBasin>();
+                int basinTileType = ModContent.TileType<Tiles.ItemBasin>();
                 bool interact = PlayerInput.Triggers.JustPressed.MouseRight && !Main.mapFullscreen;
                 Player player = Main.LocalPlayer;
                 if (player == null || !player.active || player.ModPlayer() == null)
@@ -1098,6 +1147,8 @@ namespace TerRoguelike.Systems
             quakeTime = 0;
             quakeCooldown = 0;
             postDrawEverythingCache.Clear();
+            lunarGambitSceneTime = 0;
+            lunarGambitSceneStartPos = Vector2.Zero;
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
         }

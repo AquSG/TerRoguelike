@@ -20,6 +20,9 @@ using static TerRoguelike.Systems.RoomSystem;
 using Terraria.GameContent.Events;
 using TerRoguelike.NPCs.Enemy.Boss;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.Utilities;
+using TerRoguelike.Items.Rare;
+using TerRoguelike.Items;
 
 namespace TerRoguelike.Rooms
 {
@@ -80,6 +83,39 @@ namespace TerRoguelike.Rooms
         {
             base.RoomClearReward();
             TerRoguelikeWorld.StartEscapeSequence();
+
+            bool allowLunarGambitSequence = false;
+            Vector2 lunarGambitStartPos = Vector2.Zero;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null)
+                {
+                    if (modPlayer.lunarGambit > 0)
+                    {
+                        int checkType = ModContent.ItemType<LunarGambit>();
+                        for (int i = 0; i < 50; i++)
+                        {
+                            Item item = player.inventory[i];
+                            if (item.type == checkType)
+                            {
+                                item.stack--;
+                                allowLunarGambitSequence = true;
+                                lunarGambitStartPos = player.Center;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (allowLunarGambitSequence)
+                    break;
+            }
+
+            if (allowLunarGambitSequence)
+            {
+                TerRoguelikeWorld.lunarGambitSceneTime = 1;
+                TerRoguelikeWorld.lunarGambitSceneStartPos = lunarGambitStartPos;
+            }
         }
         public override void PostDrawTilesRoom()
         {
