@@ -20,6 +20,12 @@ using static TerRoguelike.Systems.RoomSystem;
 using TerRoguelike.Utilities;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.Items;
+using TerRoguelike.Particles;
+using Terraria.Utilities.Terraria.Utilities;
+using Terraria.ModLoader.IO;
+using Terraria.GameContent;
+using Microsoft.CodeAnalysis;
 
 namespace TerRoguelike.Rooms
 {
@@ -31,6 +37,8 @@ namespace TerRoguelike.Rooms
         public override bool IsStartRoom => true;
         public override bool IsSanctuary => true;
         public override bool ActivateNewFloorEffects => false;
+        public override bool AllowSettingPlayerCurrentRoom => true;
+        public bool lunarGambitGranted = false;
         public override void InitializeRoom()
         {
             if (!initialized && Main.LocalPlayer != null)
@@ -52,6 +60,57 @@ namespace TerRoguelike.Rooms
             active = false;
             base.Update();
             awake = false;
+
+            if (!lunarGambitGranted)
+            {
+                foreach(Player player in Main.ActivePlayers)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer != null)
+                    {
+                        if (modPlayer.darkSanctuaryTime > 0)
+                        {
+                            Vector2 itemPosition = RoomPosition16 + RoomCenter16 + new Vector2(-328, -48);
+
+                            if (modPlayer.darkSanctuaryTime >= 180)
+                            {
+                                int i = Item.NewItem(Item.GetSource_None(), itemPosition, ModContent.ItemType<LunarGambit>());
+                                Main.item[i].velocity = Vector2.Zero;
+
+                                ParticleManager.AddParticle(new Glow(itemPosition, Vector2.Zero, 20, Color.Cyan * 0.40f, new Vector2(0.3f), 0, 0.96f, 20, true));
+                                ParticleManager.AddParticle(new Glow(itemPosition, Vector2.Zero, 20, Color.White * 0.60f, new Vector2(0.15f), 0, 0.96f, 20, true));
+
+                                lunarGambitGranted = true;
+                            }
+                            else
+                            {
+                                float completion = modPlayer.darkSanctuaryTime / 180f;
+                                Vector2 randVect = Main.rand.NextVector2Circular(20, 20) * Main.rand.NextFloat(0.5f, 1f);
+                                ParticleManager.AddParticle(new Ball(
+                                    itemPosition + randVect * 2, -randVect * 0.2f, 20, 
+                                    Color.Lerp(Color.White, Color.Cyan, Main.rand.NextFloat(0.3f, 1f)) * completion, 
+                                    new Vector2(Main.rand.NextFloat(0.5f, 1f) * 0.12f), 
+                                    0, 0.96f, 20, true));
+                                ParticleManager.AddParticle(new Glow(itemPosition, Vector2.Zero, 20, Color.Cyan * 0.20f, new Vector2(0.19f) * (float)Math.Pow(completion, 2), 0, 0.96f, 20, true));
+                                ParticleManager.AddParticle(new Glow(itemPosition, Vector2.Zero, 20, Color.White * 0.30f, new Vector2(0.1f) * (float)Math.Pow(completion, 3), 0, 0.96f, 20, true));
+
+                                if (Main.rand.NextBool(3))
+                                {
+                                    int lifetime = 40;
+                                    float scaleMulti = 1f * MathHelper.Lerp(0.25f, 1f, completion);
+
+                                    Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat());
+                                    ParticleManager.AddParticle(new Smoke(
+                                            itemPosition, Main.rand.NextVector2CircularEdge(1.3f, 1.3f) * Main.rand.NextFloat(0.6f, 0.86f) * scaleMulti, lifetime, color * 0.4f, new Vector2(0.18f) * scaleMulti,
+                                            Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.98f, 20));
+                                }
+                                
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
         }
         public override bool CanDescend(Player player, TerRoguelikePlayer modPlayer)
         {
@@ -79,6 +138,38 @@ namespace TerRoguelike.Rooms
             finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
 
             NewFloorEffects(finalRoom, modPlayer);
+        }
+
+        public override void PreResetRoom()
+        {
+            lunarGambitGranted = false;
+        }
+
+        public override void PostDrawTilesRoom()
+        {
+            if (!lunarGambitGranted)
+            {
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer != null)
+                    {
+                        if (modPlayer.darkSanctuaryTime > 0 && modPlayer.darkSanctuaryTime < 180)
+                        {
+                            float completion = modPlayer.darkSanctuaryTime / 180f;
+                            Vector2 itemPosition = RoomPosition16 + RoomCenter16 + new Vector2(-328, -48);
+                            var tex = TextureAssets.Item[ModContent.ItemType<LunarGambit>()].Value;
+                            Color color = Color.White * 0.3f;
+                            color.A = 0;
+                            for (int i = 0; i < 5; i++)
+                            {
+                                postDrawEverythingCache.Add(new(tex, itemPosition, null, color * completion, 0, tex.Size() * 0.5f, (float)Math.Pow((completion - 0.5f) * 2, 0.25f), SpriteEffects.None));
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 }
