@@ -157,7 +157,7 @@ namespace TerRoguelike.Systems
                         modPlayer.currentRoom = -1; //Current room is -1 unless the player is inside an active room in RoomList
                         if (room.AssociatedFloor != -1)
                             modPlayer.currentFloor = FloorID[room.AssociatedFloor]; //If player is inside a room with a valid value for an associated floor, set it to that.
-                        if (room.active)
+                        if (room.AllowSettingPlayerCurrentRoom)
                             modPlayer.currentRoom = room.myRoom;
 
                         if (modPlayer.currentFloor.ID == 10 && !lunarFloorInitialized)
@@ -395,6 +395,7 @@ namespace TerRoguelike.Systems
         public static void ResetRoomID(int id)
         {
             Room room = RoomID[id];
+            room.PreResetRoom();
             room.active = true;
             room.initialized = false;
             room.awake = false;

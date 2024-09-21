@@ -86,6 +86,8 @@ namespace TerRoguelike.Managers
             return ((anchor + new Vector2(addTileX, addTileY)) * 16f) + new Vector2(autoAddX, autoAddY);
         }
 
+        public virtual bool AllowSettingPlayerCurrentRoom => active;
+
         //potential NPC variables
         public Vector2[] NPCSpawnPosition = new Vector2[RoomSpawnCap];
         public int[] NPCToSpawn = new int[RoomSpawnCap];
@@ -642,6 +644,10 @@ namespace TerRoguelike.Managers
         public virtual Vector2 DescendTeleportPosition()
         {
             return (RoomPosition + (RoomDimensions / 2f)) * 16f;
+        }
+        public virtual void PreResetRoom()
+        {
+
         }
         public void PlayerItemsUpdate()
         {

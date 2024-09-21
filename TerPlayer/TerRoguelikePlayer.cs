@@ -228,6 +228,7 @@ namespace TerRoguelike.TerPlayer
         public bool isDeletableOnExit = false;
         public bool enableCampfire = false;
         public int lunarGambit = 0;
+        public int darkSanctuaryTime = 0;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -389,6 +390,27 @@ namespace TerRoguelike.TerPlayer
                 if (Player.controlDown)
                 {
                     Player.gravity *= 1.5f;
+                }
+
+                if (currentFloor != null && currentFloor.ID == SchematicManager.FloorDict["Sanctuary"] && Player.sitting.isSitting)
+                {
+                    bool allow = true;
+                    for (int i = 0; i < Player.buffType.Length; i++)
+                    {
+                        if (Player.buffType[i] == BuffID.Campfire)
+                        {
+                            allow = false;
+                            break;
+                        }
+                    }
+                    if (allow)
+                        darkSanctuaryTime++;
+                    else
+                        darkSanctuaryTime = 0;
+                }
+                else
+                {
+                    darkSanctuaryTime = 0;
                 }
             }
             outOfDangerTime++;

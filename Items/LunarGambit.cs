@@ -35,7 +35,7 @@ namespace TerRoguelike.Items
         }
         public override bool PreDrawInWorld(SpriteBatch spriteBatch, Color lightColor, Color alphaColor, ref float rotation, ref float scale, int whoAmI)
         {
-            DrawLunarGambit(Item.Center - Main.screenPosition, scale, rotation);
+            DrawLunarGambit(Item.Center - Main.screenPosition + Vector2.UnitY * (float)Math.Sin(Item.timeSinceItemSpawned / 60f * MathHelper.PiOver2) * 3, scale, rotation);
             return false;
         }
         public void DrawLunarGambit(Vector2 position, float scale, float rotation = 0)
@@ -50,7 +50,7 @@ namespace TerRoguelike.Items
             {
                 float completion = i / 6f * MathHelper.TwoPi;
                 float thisRot = completion + rotOff + rotation;
-                float magnitude = (float)Math.Cos(completion + rotOff * 1.5f + i * 2.122456) * 0.3f + 0.6f;
+                float magnitude = (float)Math.Cos(completion + rotOff * 1.5f + i * 2.122456) * 0.28f + 0.64f;
                 Main.EntitySpriteDraw(tex, position + thisRot.ToRotationVector2() * 6 * magnitude, null, glowColor, rotation, origin, scale, SpriteEffects.None);
             }
 
@@ -60,13 +60,16 @@ namespace TerRoguelike.Items
         {
             gravity = 0.045f;
             maxFallSpeed = 0;
-            if (Main.rand.NextBool(3))
+            Vector2 itemPos = Item.Center + Vector2.UnitY * (float)Math.Sin(Item.timeSinceItemSpawned / 60f * MathHelper.PiOver2) * 3;
+            if (Main.rand.NextBool(5))
             {
                 ParticleManager.AddParticle(new Ball(
-                    Item.Center, Main.rand.NextVector2CircularEdge(3, 3) * Main.rand.NextFloat(0.5f, 1f) + Item.velocity,
-                    30, Color.Lerp(Color.White, Color.Cyan, Main.rand.NextFloat(0.3f, 1f)) * 0.85f,
+                    itemPos, 
+                    Main.rand.NextVector2CircularEdge(3, 3) * Main.rand.NextFloat(0.5f, 1f) + Item.velocity,
+                    30, Color.Lerp(Color.White, Color.Cyan, Main.rand.NextFloat(0.3f, 1f)) * 1,
                     new Vector2(Main.rand.NextFloat(0.5f, 1f) * 0.12f), 0, 0.96f, 30, true, false), ParticleManager.ParticleLayer.Default);
-            }   
+            }
+            
         }
     }
 }
