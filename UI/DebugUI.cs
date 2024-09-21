@@ -114,6 +114,8 @@ namespace TerRoguelike.UI
                         Room room = RoomSystem.RoomList[i];
                         RoomSystem.ResetRoomID(room.ID);
                     }
+                    TerRoguelikeWorld.lunarGambitSceneTime = 0;
+                    TerRoguelikeWorld.lunarGambitSceneStartPos = Vector2.Zero;
                 }
             }
             else if (pressed && buildingHover)

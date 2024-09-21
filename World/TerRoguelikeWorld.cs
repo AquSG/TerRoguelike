@@ -43,6 +43,27 @@ namespace TerRoguelike.World
         public static int quakeTime = 0;
         public static readonly int setQuateTime = 180;
         public static int quakeCooldown = 0;
+        public static int lunarGambitSceneTime = 0;
+        public static Vector2 lunarGambitSceneStartPos = Vector2.Zero;
+        public static int lunarGambitStartDuration = 80;
+        public static int lunarGambitFloatOverDuration = 80;
+        public static Vector2 lunarGambitSceneDisplayPos { get
+            {
+                Vector2 drawPos = lunarGambitSceneStartPos;
+                var targetRoom = SchematicManager.RoomID[SchematicManager.RoomDict["LunarBossRoom1"]];
+                Vector2 endTargetPos = targetRoom.RoomPosition16 + targetRoom.RoomCenter16 + Vector2.UnitY * 240;
+                if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
+                    drawPos = endTargetPos;
+                else
+                {
+                    float startInterpolant = MathHelper.Clamp(((float)lunarGambitSceneTime / lunarGambitStartDuration), 0, 1);
+                    drawPos += -Vector2.UnitY * 64 * ((float)Math.Log(startInterpolant, 100) + 1);
+                    float floatOverInterpolant = MathHelper.Clamp((float)(lunarGambitSceneTime - lunarGambitStartDuration) / lunarGambitFloatOverDuration, 0, 1);
+                    drawPos += (endTargetPos - drawPos) * (float)Math.Pow(floatOverInterpolant, 1.7f)
+                        + Vector2.UnitY * 80 * ((float)Math.Pow((floatOverInterpolant - 0.5f) * 2, 2) + 1) * 0.5f + Vector2.UnitY * -80;
+                }
+                return drawPos;
+            } }
         public static int sanctuaryTries = 0;
         public static readonly int sanctuaryMaxTries = 3;
         public static readonly int sanctuaryMaxVisits = 2;

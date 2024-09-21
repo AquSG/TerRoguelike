@@ -228,7 +228,7 @@ namespace TerRoguelike.TerPlayer
         public bool isDeletableOnExit = false;
         public bool enableCampfire = false;
         public int lunarGambit = 0;
-        public int darkSanctuaryTime = 0;
+        public int darkSanctuaryTime = -90;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -406,11 +406,11 @@ namespace TerRoguelike.TerPlayer
                     if (allow)
                         darkSanctuaryTime++;
                     else
-                        darkSanctuaryTime = 0;
+                        darkSanctuaryTime = -90;
                 }
                 else
                 {
-                    darkSanctuaryTime = 0;
+                    darkSanctuaryTime = -90;
                 }
             }
             outOfDangerTime++;
