@@ -957,7 +957,6 @@ Items: {
 	LunarGambit: {
 		DisplayName: Lunar Gambit
 		Tooltip:
-			Tooltip:
 			'''
 			A secret trinket, hidden hastily inside the already veiled Lunar Sanctuary, by a face long lost to time
 			Grants the opportunity to loop back to the beginning of the dungeon after defeating the Moon Lord
