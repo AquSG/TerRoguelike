@@ -30,6 +30,12 @@ FullMoonDescription: The intended TerRoguelike experience
 BloodMoonName: Blood Moon
 BloodMoonDescription1: Turn things up a notch
 BloodMoonDescription2: Decreased hurt immune time, bosses attack more often
+SunnyDayName: Sunny Day
+SunnyDayDescription1: For when it's really needed
+SunnyDayDescription2: Greater New Moon effects, reduced boss health, more movement speed when the time is right
+RuinedMoonName: Ruined Moon
+RuinedMoonDescription1: Where fun goes to die
+RuinedMoonDescription2: Do not play this, seriously
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Clingy Grenade

@@ -115,6 +115,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
+            modNPC.TerRoguelikeBoss = true;
             NPC.width = 60;
             NPC.height = 88;
             NPC.aiStyle = -1;
@@ -494,7 +495,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            bool hardMode = difficulty == Difficulty.BloodMoon;
+            bool hardMode = (int)difficulty >= (int)Difficulty.BloodMoon;
 
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
@@ -1462,7 +1463,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
-            bool hardMode = difficulty == Difficulty.BloodMoon;
+            bool hardMode = (int)difficulty >= (int)Difficulty.BloodMoon;
 
             bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;
             bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;

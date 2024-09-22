@@ -183,16 +183,17 @@ namespace TerRoguelike.Systems
                         if (room.CanDescend(player, modPlayer)) //New Floor Blue Wall Portal Teleport
                         {
                             room.Descend(player);
+                            player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
                         }
                         if (room.CanAscend(player, modPlayer))
                         {
                             room.Ascend(player);
-
+                            player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
                         }
 
-                        if (room.closedTime == 1) // heal players on room clear so no waiting slog for natural life regen
+                        if (room.closedTime == 1 && !TerRoguelikeMenu.RuinedMoonActive) // heal players on room clear so no waiting slog for natural life regen
                         {
                             player.statLife = player.statLifeMax2;
                         }

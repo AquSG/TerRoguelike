@@ -30,6 +30,12 @@ FullMoonDescription: L'esperienza prevista di TerRoguelike
 BloodMoonName: Luna di Sangue
 BloodMoonDescription1: Aumenta un pò la difficoltà
 BloodMoonDescription2: Diminuisce il tempo di invincibilità, i boss attaccano più spesso
+// SunnyDayName: Sunny Day
+// SunnyDayDescription1: For when it's really needed
+// SunnyDayDescription2: Greater New Moon effects, reduced boss health, more movement speed when the time is right
+// RuinedMoonName: Ruined Moon
+// RuinedMoonDescription1: Where fun goes to die
+// RuinedMoonDescription2: Do not play this, seriously
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Granata Appiccicosa

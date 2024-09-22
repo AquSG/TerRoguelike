@@ -20,6 +20,7 @@ using Microsoft.Xna.Framework.Audio;
 using Terraria.Audio;
 using System.Threading;
 using TerRoguelike.Items.Rare;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Managers
 {
@@ -29,6 +30,8 @@ namespace TerRoguelike.Managers
         public static List<PendingEnemy> pendingEnemies = [];
         public static List<PendingItem> pendingItems = [];
         public static List<PendingItem> specialPendingItems = [];
+
+        public static List<int> trashList = [ItemID.OldShoe, ItemID.Seaweed, ItemID.TinCan];
         public static void UpdateSpawnManager()
         {
             UpdatePendingEnemies();
@@ -102,6 +105,8 @@ namespace TerRoguelike.Managers
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {
             double healthMultiplier = healthScalingMultiplier;
+            if (modNpc.TerRoguelikeBoss && TerRoguelikeMenu.SunnyDayActive)
+                healthMultiplier *= 0.8d;
             double damageMultiplier = damageScalingMultiplier;
             npc.lifeMax = (int)(modNpc.baseMaxHP * healthMultiplier);
             npc.life = npc.lifeMax;
@@ -109,6 +114,9 @@ namespace TerRoguelike.Managers
         }
         public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {
+            if (TerRoguelikeMenu.RuinedMoonActive && Main.rand.NextFloat() < 0.2f)
+                itemType = trashList[Main.rand.Next(trashList.Count)];
+
             pendingItems.Add(new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize));
             SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [itemTier], MaxInstances = 10 }, position);
         }

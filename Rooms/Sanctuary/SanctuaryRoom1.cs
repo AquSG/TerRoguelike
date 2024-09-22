@@ -147,6 +147,7 @@ namespace TerRoguelike.Rooms
 
         public override void PostDrawTilesRoom()
         {
+            base.PostDrawTilesRoom();
             if (!lunarGambitGranted)
             {
                 foreach (Player player in Main.ActivePlayers)

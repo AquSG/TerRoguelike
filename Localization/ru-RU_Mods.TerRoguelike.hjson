@@ -30,6 +30,12 @@ FullMoonDescription: Стандартный опыт прохождения TerR
 BloodMoonName: Кровавая Луна
 BloodMoonDescription1: Значительно усложняет игру
 BloodMoonDescription2: Меньше кадров неуязвимости, боссы атакуют чаще
+// SunnyDayName: Sunny Day
+// SunnyDayDescription1: For when it's really needed
+// SunnyDayDescription2: Greater New Moon effects, reduced boss health, more movement speed when the time is right
+// RuinedMoonName: Ruined Moon
+// RuinedMoonDescription1: Where fun goes to die
+// RuinedMoonDescription2: Do not play this, seriously
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Цепкая Граната

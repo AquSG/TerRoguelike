@@ -25,6 +25,7 @@ namespace TerRoguelike.NPCs
     public class TerRoguelikeGlobalNPC : GlobalNPC
     {
         #region Variables
+        public bool TerRoguelikeBoss = false;
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
         public bool hostileTurnedAlly = false;

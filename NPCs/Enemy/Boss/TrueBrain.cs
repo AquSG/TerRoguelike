@@ -116,6 +116,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
+            modNPC.TerRoguelikeBoss = true;
             NPC.width = 240;
             NPC.height = 150;
             NPC.aiStyle = -1;
@@ -533,7 +534,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void BossAI()
         {
-            bool hardMode = difficulty == Difficulty.BloodMoon;
+            bool hardMode = (int)difficulty >= (int)Difficulty.BloodMoon;
 
             target = modNPC.GetTarget(NPC);
             NPC.ai[1]++;
