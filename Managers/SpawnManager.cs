@@ -114,7 +114,7 @@ namespace TerRoguelike.Managers
         }
         public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {
-            if (TerRoguelikeMenu.RuinedMoonActive && Main.rand.NextFloat() < 0.2f)
+            if (TerRoguelikeMenu.RuinedMoonActive && Main.rand.NextFloat() < 0.15f)
                 itemType = trashList[Main.rand.Next(trashList.Count)];
 
             pendingItems.Add(new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize));

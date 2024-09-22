@@ -26,6 +26,7 @@ using TerRoguelike.World;
 using TerRoguelike.Systems;
 using Terraria.Localization;
 using static TerRoguelike.Managers.ItemManager;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TerRoguelike.MainMenu
 {
@@ -40,10 +41,13 @@ namespace TerRoguelike.MainMenu
         public static PlayerFileData desiredPlayer = null;
         public static bool mouseHover = false;
         public static bool permitPlayerDeletion = false;
-        public static bool allowDisgustingGameDesign = true;
+        public static bool allowDisgustingGameDesign = false;
+        public static int secretCodeInteraction = -1;
         public static Difficulty difficulty = Difficulty.FullMoon;
         public static ButtonState oldGamepadXState = ButtonState.Released;
         public static ButtonState oldGamepadLeftStickState = ButtonState.Released;
+        public static GamePadState oldGamepadState = GamePad.GetState(PlayerIndex.One);
+        public static List<Keys> oldPressedKeys = [];
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
         public static bool BloodMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.BloodMoon;
@@ -170,6 +174,7 @@ namespace TerRoguelike.MainMenu
                 }
                 DifficultyInteraction();
                 WeaponInteraction();
+                SecretCodeInteraction();
 
                 void DifficultyInteraction()
                 {
@@ -284,6 +289,157 @@ namespace TerRoguelike.MainMenu
                         }
                     }
                 }
+
+                void SecretCodeInteraction()
+                {
+                    if (allowDisgustingGameDesign)
+                        return;
+
+                    if (PlayerInput.UsingGamepad)
+                    {
+                        var gp = GamePad.GetState(PlayerIndex.One);
+                        if (gp.DPad.Up == ButtonState.Pressed && oldGamepadState.DPad.Up == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction <= 0)
+                                secretCodeInteraction++;
+                            else
+                                secretCodeInteraction = 0;
+                        }
+                        else if (gp.DPad.Down == ButtonState.Pressed && oldGamepadState.DPad.Down == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction == 1 || secretCodeInteraction == 2)
+                                secretCodeInteraction++;
+                            else
+                                secretCodeInteraction = -1;
+                        }
+                        else if (gp.DPad.Left == ButtonState.Pressed && oldGamepadState.DPad.Left == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction == 3 || secretCodeInteraction == 5)
+                                secretCodeInteraction++;
+                            else
+                                secretCodeInteraction = -1;
+                        }
+                        else if (gp.DPad.Right == ButtonState.Pressed && oldGamepadState.DPad.Right == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction == 4 || secretCodeInteraction == 6)
+                                secretCodeInteraction++;
+                            else
+                                secretCodeInteraction = -1;
+                        }
+                        else if (gp.Buttons.B == ButtonState.Pressed && oldGamepadState.Buttons.B == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction == 7)
+                                secretCodeInteraction++;
+                            else
+                                secretCodeInteraction = -1;
+                        }
+                        else if (gp.Buttons.A == ButtonState.Pressed && oldGamepadState.Buttons.A == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction == 8)
+                                secretCodeInteraction++;
+                            else
+                                secretCodeInteraction = -1;
+                        }
+                        else if (gp.Buttons.Start == ButtonState.Pressed && oldGamepadState.Buttons.Start == ButtonState.Released)
+                        {
+                            if (secretCodeInteraction == 9)
+                            {
+                                secretCodeInteraction++;
+                                allowDisgustingGameDesign = true;
+                            }
+                            else
+                                secretCodeInteraction = -1;
+                        }
+                        else if (gp.ThumbSticks.Right.Length() > 0.5f || gp.ThumbSticks.Left.Length() > 0.5f || gp.Buttons.X == ButtonState.Pressed || gp.Buttons.Y == ButtonState.Pressed || gp.Buttons.RightShoulder == ButtonState.Pressed || gp.Buttons.LeftShoulder == ButtonState.Pressed || gp.Triggers.Right > 0.5f || gp.Triggers.Left > 0.5f || gp.Buttons.Back == ButtonState.Pressed || gp.Buttons.BigButton == ButtonState.Pressed || gp.Buttons.LeftStick == ButtonState.Pressed || gp.Buttons.RightStick == ButtonState.Pressed)
+                            secretCodeInteraction = -1;
+                    }
+                    else
+                    {
+                        List<Keys> wantedKeys = [Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.B, Keys.A, Keys.Enter];
+                        var kb = Keyboard.GetState();
+                        var pressedKeys = kb.GetPressedKeys();
+                        bool found = pressedKeys.Length == 0;
+                        for (int i = 0; i < pressedKeys.Length; i++)
+                        {
+                            var key = pressedKeys[i];
+                            for (int j = 0; j < wantedKeys.Count; j++)
+                            {
+                                if (key == wantedKeys[j])
+                                {
+                                    found = true;
+                                    bool progress = true;
+                                    for (int k = 0; k < oldPressedKeys.Count; k++)
+                                    {
+                                        if (oldPressedKeys[k] == key)
+                                        {
+                                            progress = false;
+                                            break;
+                                        }
+                                    }
+                                    if (!progress)
+                                        break;
+
+                                    if (key == Keys.Up)
+                                    {
+                                        if (secretCodeInteraction <= 0)
+                                            secretCodeInteraction++;
+                                        else
+                                            secretCodeInteraction = 0;
+                                    }
+                                    else if (key == Keys.Down)
+                                    {
+                                        if (secretCodeInteraction == 1 || secretCodeInteraction == 2)
+                                            secretCodeInteraction++;
+                                        else
+                                            secretCodeInteraction = -1;
+                                    }
+                                    else if (key == Keys.Left)
+                                    {
+                                        if (secretCodeInteraction == 3 || secretCodeInteraction == 5)
+                                            secretCodeInteraction++;
+                                        else
+                                            secretCodeInteraction = -1;
+                                    }
+                                    else if (key == Keys.Right)
+                                    {
+                                        if (secretCodeInteraction == 4 || secretCodeInteraction == 6)
+                                            secretCodeInteraction++;
+                                        else
+                                            secretCodeInteraction = -1;
+                                    }
+                                    else if (key == Keys.B)
+                                    {
+                                        if (secretCodeInteraction == 7)
+                                            secretCodeInteraction++;
+                                        else
+                                            secretCodeInteraction = -1;
+                                    }
+                                    else if (key == Keys.A)
+                                    {
+                                        if (secretCodeInteraction == 8)
+                                            secretCodeInteraction++;
+                                        else
+                                            secretCodeInteraction = -1;
+                                    }
+                                    else if (key == Keys.Enter)
+                                    {
+                                        if (secretCodeInteraction == 9)
+                                        {
+                                            secretCodeInteraction++;
+                                            allowDisgustingGameDesign = true;
+                                        }   
+                                        else
+                                            secretCodeInteraction = -1;
+                                    }
+
+                                    break;
+                                }
+                            }
+                        }
+                        if (!found)
+                            secretCodeInteraction = -1;
+                    }
+                }
             }
 
             if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6)
@@ -310,10 +466,12 @@ namespace TerRoguelike.MainMenu
             }
             if (PlayerInput.UsingGamepad)
             {
+                oldGamepadState = GamePad.GetState(PlayerIndex.One);
                 oldGamepadXState = GamePad.GetState(PlayerIndex.One).Buttons.X;
                 oldGamepadLeftStickState = GamePad.GetState(PlayerIndex.One).Buttons.LeftStick;
-            }
                 
+            }
+            oldPressedKeys = [.. Keyboard.GetState().GetPressedKeys()];
         }
         public static void DrawTerRoguelikeMenu()
         {
@@ -397,7 +555,7 @@ namespace TerRoguelike.MainMenu
                     }
 
                     var moonTex = TexDict["UiMoon"];
-                    int moonFrameHeight = moonTex.Height / buttonCount;
+                    int moonFrameHeight = moonTex.Height / 5;
                     for (int i = 0; i < buttonCount; i++)
                     {
                         bool hover = i == (int)difficulty;
@@ -457,8 +615,9 @@ namespace TerRoguelike.MainMenu
                     {
                         Texture2D xButtonTex = TexDict["XButton"];
                         var lClickTex = TexDict["LStickButton"];
-                        Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(-114, -6), null, Color.White, 0, xButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-                        Main.spriteBatch.Draw(lClickTex, centerPos + new Vector2(-144, -6), null, Color.White, 0, lClickTex.Size() * 0.5f, 0.6f, SpriteEffects.None, 0);
+                        float distanceLeft = -buttonDimensionsInflate.X * 0.5f * buttonCount - backgroundInflateAmt - 36;
+                        Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft, -6), null, Color.White, 0, xButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                        Main.spriteBatch.Draw(lClickTex, centerPos + new Vector2(distanceLeft - 30, -6), null, Color.White, 0, lClickTex.Size() * 0.5f, 0.6f, SpriteEffects.None, 0);
                     }
                 }
 
