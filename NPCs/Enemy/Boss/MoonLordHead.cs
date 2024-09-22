@@ -52,6 +52,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetDefaults()
         {
             base.SetDefaults();
+            modNPC.TerRoguelikeBoss = true;
             NPC.width = 46;
             NPC.height = 76;
             NPC.aiStyle = -1;

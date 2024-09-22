@@ -40,18 +40,23 @@ namespace TerRoguelike.MainMenu
         public static PlayerFileData desiredPlayer = null;
         public static bool mouseHover = false;
         public static bool permitPlayerDeletion = false;
+        public static bool allowDisgustingGameDesign = true;
         public static Difficulty difficulty = Difficulty.FullMoon;
         public static ButtonState oldGamepadXState = ButtonState.Released;
         public static ButtonState oldGamepadLeftStickState = ButtonState.Released;
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
         public static bool BloodMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.BloodMoon;
+        public static bool SunnyDayActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.SunnyDay;
+        public static bool RuinedMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.RuinedMoon;
 
         public enum Difficulty
         {
-            NewMoon = 0,
-            FullMoon = 1,
-            BloodMoon = 2,
+            SunnyDay = 0,
+            NewMoon = 1,
+            FullMoon = 2,
+            BloodMoon = 3,
+            RuinedMoon = 4,
         }
 
         public static string DisplayName => "TerRoguelike";
@@ -173,7 +178,7 @@ namespace TerRoguelike.MainMenu
                         centerPos.Y = Main.screenHeight - 105;
                     Vector2 buttonDimensionsInflate = new Vector2(52);
                     int backgroundInflateAmt = 6;
-                    int buttonCount = 3;
+                    int buttonCount = allowDisgustingGameDesign ? 5 : 4;
                     Vector2 totalDimensions = new Vector2(buttonDimensionsInflate.X * buttonCount, buttonDimensionsInflate.Y);
                     Vector2 topLeft = centerPos - totalDimensions * 0.5f;
                     Rectangle backgroundDrawRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)totalDimensions.X, (int)totalDimensions.Y);
@@ -344,7 +349,7 @@ namespace TerRoguelike.MainMenu
                         centerPos.Y = Main.screenHeight - 105;
                     Vector2 buttonDimensionsInflate = new Vector2(52);
                     int backgroundInflateAmt = 6;
-                    int buttonCount = 3;
+                    int buttonCount = allowDisgustingGameDesign ? 5 : 4;
                     Vector2 totalDimensions = new Vector2(buttonDimensionsInflate.X * buttonCount, buttonDimensionsInflate.Y);
                     Vector2 topLeft = centerPos - totalDimensions * 0.5f;
                     Rectangle backgroundDrawRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)totalDimensions.X, (int)totalDimensions.Y);
@@ -432,6 +437,16 @@ namespace TerRoguelike.MainMenu
                             difficultyName = Language.GetOrRegister("Mods.TerRoguelike.FullMoonName").Value;
                             difficultyDescription1 = Language.GetOrRegister("Mods.TerRoguelike.FullMoonDescription").Value;
                             difficultyDescription2 = "";
+                            break;
+                        case Difficulty.SunnyDay:
+                            difficultyName = Language.GetOrRegister("Mods.TerRoguelike.SunnyDayName").Value;
+                            difficultyDescription1 = Language.GetOrRegister("Mods.TerRoguelike.SunnyDayDescription1").Value;
+                            difficultyDescription2 = Language.GetOrRegister("Mods.TerRoguelike.SunnyDayDescription2").Value;
+                            break;
+                        case Difficulty.RuinedMoon:
+                            difficultyName = Language.GetOrRegister("Mods.TerRoguelike.RuinedMoonName").Value;
+                            difficultyDescription1 = Language.GetOrRegister("Mods.TerRoguelike.RuinedMoonDescription1").Value;
+                            difficultyDescription2 = Language.GetOrRegister("Mods.TerRoguelike.RuinedMoonDescription2").Value;
                             break;
                     }
                     ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, difficultyName, centerPos + new Vector2(-6, 30), Color.White, 0f, font.MeasureString(difficultyName) * new Vector2(0.5f, 0), new Vector2(0.54f));

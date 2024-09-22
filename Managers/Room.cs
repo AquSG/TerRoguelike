@@ -506,7 +506,7 @@ namespace TerRoguelike.Managers
             {
                 SetCalm(nextFloor.Soundtrack.CalmTrack);
                 SetCombat(nextFloor.Soundtrack.CombatTrack);
-                SetMusicMode(MusicStyle.Dynamic);
+                SetMusicMode(nextFloor.Name == "Sanctuary" ? MusicStyle.AllCalm : MusicStyle.Dynamic);
                 CombatVolumeInterpolant = 0;
                 CalmVolumeInterpolant = 0;
                 CalmVolumeLevel = nextFloor.Soundtrack.Volume;
