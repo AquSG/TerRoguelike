@@ -254,7 +254,7 @@ namespace TerRoguelike.UI
             Vector2 difficultyStringDrawPos = screenPos + new Vector2(-360, 100);
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, deathFont, difficultyString, difficultyStringDrawPos, Color.Tomato * opacity, 0f, Vector2.Zero, new Vector2(0.6f));
 
-            int moonFrameHeight = moonTex.Height / 3;
+            int moonFrameHeight = moonTex.Height / 5;
             Rectangle moonFrame = new Rectangle(0, moonFrameHeight * (int)TerRoguelikeMenu.difficulty, moonTex.Width, moonFrameHeight - 2);
             Main.EntitySpriteDraw(moonTex, difficultyStringDrawPos + new Vector2(12 + difficultyStringDimensions.X * 0.6f, -12), moonFrame, Color.White * opacity, 0, Vector2.Zero, 1f, SpriteEffects.None);
 
