@@ -174,6 +174,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/DisposableTurretMinionHead",
                 "TerRoguelike/ExtraTextures/InverseGlow",
                 "TerRoguelike/ExtraTextures/Streaks",
+                "TerRoguelike/ExtraTextures/PortalNoise",
             };
             foreach (string path in pathList)
             {

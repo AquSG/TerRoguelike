@@ -2712,7 +2712,7 @@ namespace TerRoguelike.TerPlayer
                 return;
             }
 
-            if (Main.hasFocus && !Main.gameMenu)
+            if (theFalseSun > 0)
             {
                 float intensity = theFalseSunIntensity;
 

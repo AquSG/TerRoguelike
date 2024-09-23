@@ -28,6 +28,7 @@ namespace TerRoguelike.Shaders
         internal static Effect ConeSnippet;
         internal static Effect Pixelation;
         internal static Effect DualContrast;
+        internal static Effect SpecialPortal;
 
         public static void LoadShaders()
         {
@@ -70,6 +71,9 @@ namespace TerRoguelike.Shaders
 
             MaskOverlay = LoadShader("MaskOverlay");
             RegisterScreenShader(MaskOverlay, "MaskOverlayPass", "MaskOverlay");
+
+            SpecialPortal = LoadShader("SpecialPortal");
+            RegisterScreenShader(SpecialPortal, "SpecialPortalPass", "SpecialPortal");
             //This was some code I wrote to get it working on the ice queen boss I made
             /*
             Texture2D tex = TextureAssets.Npc[Type].Value;
