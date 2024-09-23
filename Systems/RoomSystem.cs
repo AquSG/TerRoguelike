@@ -479,7 +479,23 @@ namespace TerRoguelike.Systems
                     drawPos -= Main.screenPosition;
                     if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
-                        Main.NewText("By the 9 I'm drawing");
+                        Effect portalEffect = Filters.Scene["TerRoguelike:SpecialPortal"].GetShader().Shader;
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, portalEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                        portalEffect.Parameters["noiseScale"].SetValue(1f);
+                        portalEffect.Parameters["uvOff"].SetValue(new Vector2(0, Main.GlobalTimeWrappedHourly * 0.5f));
+                        portalEffect.Parameters["outerRing"].SetValue(0.85f);
+                        portalEffect.Parameters["innerRing"].SetValue(0.8f);
+                        portalEffect.Parameters["invisThreshold"].SetValue(0.2f);
+                        portalEffect.Parameters["edgeBlend"].SetValue(0.1f);
+                        portalEffect.Parameters["tint"].SetValue((Color.Cyan).ToVector4());
+                        portalEffect.Parameters["edgeTint"].SetValue((Color.White).ToVector4());
+
+                        var tex = TexDict["PortalNoise"];
+
+                        Main.EntitySpriteDraw(tex, drawPos, null, Color.White, 0, tex.Size() * 0.5f, new Vector2(0.5f), SpriteEffects.None);
+
+                        Main.spriteBatch.End();
                     }
                     if (lunarGambitSceneTime <= lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
