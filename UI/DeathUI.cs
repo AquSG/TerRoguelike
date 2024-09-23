@@ -99,7 +99,7 @@ namespace TerRoguelike.UI
 
             DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);
 
-            bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) : ms.LeftButton == ButtonState.Pressed;
+            bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) || gs.IsButtonDown(Buttons.B) : ms.LeftButton == ButtonState.Pressed;
             if (pressed && mainMenuHover && modPlayer.deadTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);

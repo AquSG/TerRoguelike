@@ -840,7 +840,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
-                    if (false && NPC.ai[1] == FakeChargeWindup + FakeChargeTelegraph + FakeChargeDashDuration + 30) // scrapped followup attack from clones
+                    if (RuinedMoonActive && NPC.ai[1] == FakeChargeWindup + FakeChargeTelegraph + FakeChargeDashDuration + 30) // scrapped followup attack from clones
                     {
                         if (phantomPositions.Count > 0)
                         {

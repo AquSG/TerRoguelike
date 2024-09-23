@@ -488,8 +488,10 @@ namespace TerRoguelike.MainMenu
                 ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, playString, position, mouseHover ? Color.Cyan : Color.DarkCyan, 0f, font.MeasureString(playString) * new Vector2(0.5f, 0), new Vector2(0.8f));
                 if (PlayerInput.UsingGamepadUI)
                 {
-                    Texture2D xButtonTex = TexDict["XButton"];
-                    Main.spriteBatch.Draw(xButtonTex, position + new Vector2(-36, 8) - font.MeasureString(playString) * new Vector2(0.4f, 0), Color.White);
+                    Texture2D xButtonTex = TextureAssets.TextGlyph[0].Value;
+                    int framewidth = xButtonTex.Width / 25;
+                    Rectangle xRect = new Rectangle(framewidth * 2, 0, framewidth, xButtonTex.Height);
+                    Main.spriteBatch.Draw(xButtonTex, position + new Vector2(-36, 8) - font.MeasureString(playString) * new Vector2(0.4f, 0), xRect, Color.White);
                 }
                     
             }
@@ -613,11 +615,13 @@ namespace TerRoguelike.MainMenu
 
                     if (PlayerInput.UsingGamepadUI && uiControllerCycle == 0)
                     {
-                        Texture2D xButtonTex = TexDict["XButton"];
-                        var lClickTex = TexDict["LStickButton"];
+                        Texture2D xButtonTex = TextureAssets.TextGlyph[0].Value;
+                        int framewidth = xButtonTex.Width / 25;
+                        Rectangle xRect = new Rectangle(framewidth * 2, 0, framewidth, xButtonTex.Height);
+                        var lClickRect = new Rectangle(framewidth * 10, 0, framewidth, xButtonTex.Height);
                         float distanceLeft = -buttonDimensionsInflate.X * 0.5f * buttonCount - backgroundInflateAmt - 36;
-                        Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft, -6), null, Color.White, 0, xButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-                        Main.spriteBatch.Draw(lClickTex, centerPos + new Vector2(distanceLeft - 30, -6), null, Color.White, 0, lClickTex.Size() * 0.5f, 0.6f, SpriteEffects.None, 0);
+                        Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft, -6), xRect, Color.White, 0, xRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                        Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft - 30, -6), lClickRect, Color.White, 0, lClickRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                     }
                 }
 
@@ -719,10 +723,12 @@ namespace TerRoguelike.MainMenu
 
                         if (PlayerInput.UsingGamepad && ((uiControllerCycle == 1 && s == -1) || (uiControllerCycle == 2 && s == 1)))
                         {
-                            Texture2D xButtonTex = TexDict["XButton"];
-                            var lClickTex = TexDict["LStickButton"];
-                            Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX - 30 * Vector2.UnitY, null, Color.White, 0, xButtonTex.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-                            Main.spriteBatch.Draw(lClickTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 70 * s * Vector2.UnitX - 30 * Vector2.UnitY, null, Color.White, 0, lClickTex.Size() * 0.5f, 0.6f, SpriteEffects.None, 0);
+                            Texture2D xButtonTex = TextureAssets.TextGlyph[0].Value;
+                            int framewidth = xButtonTex.Width / 25;
+                            Rectangle xRect = new Rectangle(framewidth * 2, 0, framewidth, xButtonTex.Height);
+                            var lClickRect = new Rectangle(framewidth * 10, 0, framewidth, xButtonTex.Height);
+                            Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX - 30 * Vector2.UnitY, xRect, Color.White, 0, xRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                            Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 70 * s * Vector2.UnitX - 30 * Vector2.UnitY, lClickRect, Color.White, 0, lClickRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                         }
                         int selection = s switch
                         {

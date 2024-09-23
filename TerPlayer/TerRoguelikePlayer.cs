@@ -47,6 +47,7 @@ namespace TerRoguelike.TerPlayer
         public static float BloodMoonIframeMultiplier = 0.75f;
         public static float NewMoonIframeMultiplier = 1.5f;
         public static float SunnyDayIframeMultiplier = 2f;
+        public static float RuinedMoonIframeMultiplier = 0.5f;
         public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
         public static readonly SoundStyle WayfarerProc = new SoundStyle("TerRoguelike/Sounds/WayfarerProc");
         public static readonly SoundStyle PrimevalRattleProc = new SoundStyle("TerRoguelike/Sounds/PrimevalRattleProc", 3);
@@ -471,6 +472,10 @@ namespace TerRoguelike.TerPlayer
             {
                 float healMultiIncrease = cornucopia * 0.5f;
                 healMultiplier += healMultiIncrease;
+            }
+            if (RuinedMoonActive)
+            {
+                healMultiplier *= 0.5f;
             }
             //max life effects happen before barrier calculations
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -1559,9 +1564,9 @@ namespace TerRoguelike.TerPlayer
                 Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
                 Player.GetDamage(DamageClass.Generic) *= finalDamageMultiplier;
             }
-            if (cornucopia > 0)
+            if (cornucopia > 0 || RuinedMoonActive)
             {
-                Player.lifeRegen = (int)((1f + healMultiplier) * Player.lifeRegen);
+                Player.lifeRegen = (int)(healMultiplier * Player.lifeRegen);
             }
 
             if (!Player.GetJumpState(ExtraJump.CloudInABottle).Available && timesDoubleJumped < extraDoubleJumps)
@@ -2166,7 +2171,7 @@ namespace TerRoguelike.TerPlayer
                     SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Squeak", 3) with { Volume = 0.1f }, Player.Center);
                     CombatText.NewText(Player.getRect(), Color.LightGray, blocked);
                     int addImmuneTime = 40;
-                    if (BloodMoonActive || RuinedMoonActive)
+                    if (BloodMoonActive)
                     {
                         addImmuneTime = (int)(addImmuneTime * BloodMoonIframeMultiplier);
                     }
@@ -2177,6 +2182,10 @@ namespace TerRoguelike.TerPlayer
                     else if (SunnyDayActive)
                     {
                         addImmuneTime = (int)(addImmuneTime * SunnyDayIframeMultiplier);
+                    }
+                    else if (RuinedMoonActive)
+                    {
+                        addImmuneTime = (int)(addImmuneTime * RuinedMoonIframeMultiplier);
                     }
                     for (int i = -1; i < 5; i++)
                     {
@@ -2251,7 +2260,7 @@ namespace TerRoguelike.TerPlayer
             SoundEngine.PlaySound(soundStyle, Player.Center);
             barrierHealth -= damageToBarrier;
             int addImmuneTime = fullHitDamage == 1 ? 20 : 40;
-            if (BloodMoonActive || RuinedMoonActive)
+            if (BloodMoonActive)
             {
                 addImmuneTime = (int)(addImmuneTime * BloodMoonIframeMultiplier);
             }
@@ -2262,6 +2271,10 @@ namespace TerRoguelike.TerPlayer
             else if (SunnyDayActive)
             {
                 addImmuneTime = (int)(addImmuneTime * SunnyDayIframeMultiplier);
+            }
+            else if (RuinedMoonActive)
+            {
+                addImmuneTime = (int)(addImmuneTime * RuinedMoonIframeMultiplier);
             }
             for (int i = -1; i < 5; i++)
             {
@@ -2340,6 +2353,14 @@ namespace TerRoguelike.TerPlayer
                 for (int i = 0; i < Player.hurtCooldowns.Length; i++)
                 {
                     Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * SunnyDayIframeMultiplier);
+                }
+            }
+            else if (RuinedMoonActive)
+            {
+                Player.immuneTime = (int)(Player.immuneTime * RuinedMoonIframeMultiplier);
+                for (int i = 0; i < Player.hurtCooldowns.Length; i++)
+                {
+                    Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * RuinedMoonIframeMultiplier);
                 }
             }
             if (info.Damage == 1 && barrierInHurt > 0)
@@ -2436,7 +2457,7 @@ namespace TerRoguelike.TerPlayer
         #region Mechanical Functions
         public void ScaleableHeal(int healAmt)
         {
-            healAmt = (int)(healAmt * healMultiplier);
+            healAmt = Math.Max((int)(healAmt * healMultiplier), 1);
             if (barrierSynthesizer > 0)
             {
                 if (Player.statLife + healAmt > Player.statLifeMax2)
@@ -2453,6 +2474,10 @@ namespace TerRoguelike.TerPlayer
         }
         public void AddBarrierHealth(int barrierGainAmt)
         {
+            if (RuinedMoonActive)
+            {
+                barrierGainAmt = Math.Max((int)(barrierGainAmt * 0.5f), 1);
+            }
             barrierHealth += barrierGainAmt;
             if (barrierHealth > Player.statLifeMax2)
                 barrierHealth = Player.statLifeMax2;

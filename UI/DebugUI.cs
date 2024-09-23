@@ -186,6 +186,9 @@ namespace TerRoguelike.UI
                     modPlayer.killerProj = -1;
                 }
             }
+            MusicSystem.SetCalm(MusicSystem.Silence);
+            MusicSystem.SetCombat(MusicSystem.Silence);
+            MusicSystem.SetMusicMode(MusicSystem.MusicStyle.Silent);
             WorldGen.SaveAndQuit();
         }
     }

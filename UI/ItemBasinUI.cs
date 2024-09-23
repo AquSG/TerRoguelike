@@ -119,7 +119,7 @@ namespace TerRoguelike.UI
             verticalButtonDisplay++;
 
 
-            bool mouseInteract = PlayerInput.Triggers.JustPressed.MouseLeft && player.inventory[58].type == 0;
+            bool mouseInteract = (PlayerInput.Triggers.JustPressed.MouseLeft || (PlayerInput.UsingGamepad && PlayerInput.Triggers.JustPressed.QuickMount)) && player.inventory[58].type == 0;
             Vector2 drawStartPos = anchorPos + new Vector2(buttonDimensionsInflate.X * horizButtonDisplay * -0.5f, buttonDimensionsInflate.Y * -verticalButtonDisplay);
             int currentHighlight = -1;
             bool queueShrinkClose = false;

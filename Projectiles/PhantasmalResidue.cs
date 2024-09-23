@@ -9,6 +9,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Managers;
 using TerRoguelike.Particles;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Projectiles
 {
@@ -26,7 +27,7 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.width = 80;
             Projectile.height = 80;
-            Projectile.timeLeft = maxTimeLeft = 540;
+            Projectile.timeLeft = maxTimeLeft = TerRoguelikeMenu.RuinedMoonActive ? 2700 : 540;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.usesIDStaticNPCImmunity = true;
