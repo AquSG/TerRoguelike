@@ -31,7 +31,7 @@ namespace TerRoguelike.Managers
         public static List<PendingItem> pendingItems = [];
         public static List<PendingItem> specialPendingItems = [];
 
-        public static List<int> trashList = [ItemID.OldShoe, ItemID.Seaweed, ItemID.TinCan];
+        public static List<int> trashList = [ItemID.OldShoe, ItemID.FishingSeaweed, ItemID.TinCan];
         public static void UpdateSpawnManager()
         {
             UpdatePendingEnemies();

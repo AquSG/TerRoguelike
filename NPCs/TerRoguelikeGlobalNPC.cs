@@ -10,6 +10,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Default;
+using TerRoguelike.MainMenu;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs.Enemy.Boss;
 using TerRoguelike.Projectiles;
@@ -3247,6 +3248,11 @@ namespace TerRoguelike.NPCs
                         sourceRoomListID = modparent.sourceRoomListID;
                     }
                 }
+            }
+
+            if (TerRoguelikeBoss && TerRoguelikeMenu.RuinedMoonActive)
+            {
+                AdaptiveArmorEnabled = true;
             }
 
             SpawnManager.ApplyNPCDifficultyScaling(npc, this);

@@ -76,7 +76,6 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/Projectiles/SpikedBallChain",
                 "TerRoguelike/Projectiles/TempleBoulderGlow",
                 "TerRoguelike/Projectiles/AdaptiveGunBullet",
-                "TerRoguelike/MainMenu/XButton",
                 "TerRoguelike/Shaders/OverheadWaves",
                 "TerRoguelike/TerPlayer/Lena",
                 "TerRoguelike/TerPlayer/DroneBuddyMinion",
@@ -173,7 +172,6 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/MainMenu/UiMoon",
                 "TerRoguelike/TerPlayer/CeremonialCrownGems",
                 "TerRoguelike/Projectiles/DisposableTurretMinionHead",
-                "TerRoguelike/MainMenu/LStickButton",
                 "TerRoguelike/ExtraTextures/InverseGlow",
                 "TerRoguelike/ExtraTextures/Streaks",
             };
