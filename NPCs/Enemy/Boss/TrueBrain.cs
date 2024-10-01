@@ -943,6 +943,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y);
                             Main.projectile[proj].rotation = rot;
                         }
+                        if (RuinedMoonActive)
+                        {
+                            for (int i = 0; i < 6; i++)
+                            {
+                                float rot = startRot + i * rotPerCycle;
+                                Vector2 projSpawnPos = NPC.Center + innerEyePosition + rot.ToRotationVector2() * 4;
+                                int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y, 1);
+                                Main.projectile[proj].rotation = rot;
+                            }
+                        }
                     }
                     for (int i = 0; i < SpinBeamTrueEyeTimes.Length; i++)
                     {

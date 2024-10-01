@@ -35,6 +35,7 @@ namespace TerRoguelike.Projectiles
         public Texture2D squareTex;
         public List<StoredDraw> draws = [];
         public Vector2 ParentRotCenterOffset = Vector2.Zero;
+        public int fuckYou = 1;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 10000;
@@ -58,6 +59,8 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             ParentRotCenterOffset = new Vector2(Projectile.ai[0], Projectile.ai[1]);
+            if (Projectile.ai[2] == 1)
+                fuckYou = -1;
         }
         public override void AI()
         {
@@ -72,7 +75,7 @@ namespace TerRoguelike.Projectiles
                     if (RoomSystem.RoomList[modNPC.sourceRoomListID].bossDead)
                         allow = false;
                 }
-                float addedRot = 0.008f * npc.direction;
+                float addedRot = 0.008f * npc.direction * fuckYou;
                 Vector2 rotPoint = npc.Center + ParentRotCenterOffset;
                 Projectile.Center = (Projectile.Center - rotPoint).RotatedBy(addedRot) + rotPoint;
                 Projectile.rotation += addedRot;
