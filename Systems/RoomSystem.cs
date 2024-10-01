@@ -482,16 +482,17 @@ namespace TerRoguelike.Systems
                         Effect portalEffect = Filters.Scene["TerRoguelike:SpecialPortal"].GetShader().Shader;
                         Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, portalEffect, Main.GameViewMatrix.TransformationMatrix);
 
-                        portalEffect.Parameters["noiseScale"].SetValue(1f);
+                        portalEffect.Parameters["noiseScale"].SetValue(0.75f);
                         portalEffect.Parameters["uvOff"].SetValue(new Vector2(0, Main.GlobalTimeWrappedHourly * 0.5f));
                         portalEffect.Parameters["outerRing"].SetValue(0.85f);
                         portalEffect.Parameters["innerRing"].SetValue(0.8f);
-                        portalEffect.Parameters["invisThreshold"].SetValue(0.2f);
+                        portalEffect.Parameters["invisThreshold"].SetValue(0.35f);
                         portalEffect.Parameters["edgeBlend"].SetValue(0.1f);
-                        portalEffect.Parameters["tint"].SetValue((Color.Cyan).ToVector4());
+                        portalEffect.Parameters["tint"].SetValue((Color.Cyan * 0.8f).ToVector4());
                         portalEffect.Parameters["edgeTint"].SetValue((Color.White).ToVector4());
+                        portalEffect.Parameters["finalFadeExponent"].SetValue(0.5f);
 
-                        var tex = TexDict["PortalNoise"];
+                        var tex = TexDict["BlobbyNoiseSmall"];
 
                         Main.EntitySpriteDraw(tex, drawPos, null, Color.White, 0, tex.Size() * 0.5f, new Vector2(0.5f), SpriteEffects.None);
 
@@ -1049,7 +1050,34 @@ namespace TerRoguelike.Systems
                 {
                     if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
-
+                        if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration + 180)
+                        {
+                            foreach(Player player in Main.ActivePlayers)
+                            {
+                                if (player.Center.Distance(drawPos) < 160)
+                                {
+                                    ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+                                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                                    {
+                                        TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                                        TerRoguelikeMenu.wipeTempWorld = true;
+                                        TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+                                        TerRoguelikeWorld.promoteLoop = true;
+                                    }
+                                    var modPlayer = player.ModPlayer();
+                                    if (modPlayer != null)
+                                    {
+                                        modPlayer.killerNPC = -1;
+                                        modPlayer.killerProj = -1;
+                                    }
+                                    SetCalm(Silence);
+                                    SetCombat(Silence);
+                                    SetMusicMode(MusicStyle.Silent);
+                                    WorldGen.SaveAndQuit();
+                                    break;
+                                }
+                            }
+                        }
                     }
                     if (lunarGambitSceneTime <= lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
