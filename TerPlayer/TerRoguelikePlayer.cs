@@ -1265,6 +1265,10 @@ namespace TerRoguelike.TerPlayer
 
             if (theFalseSun > 0)
             {
+                Vector2 basePos = Player.Center + Vector2.UnitY * Player.gfxOffY;
+                Point lightpos = basePos.ToTileCoordinates();
+                Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * theFalseSunIntensity);
+
                 Player.GetCritChance(DamageClass.Generic) += 5f;
                 if (theFalseSunIntensity < theFalseSunIntensityTarget)
                 {
@@ -2717,8 +2721,6 @@ namespace TerRoguelike.TerPlayer
                 float intensity = theFalseSunIntensity;
 
                 Vector2 basePos = Player.Center + Vector2.UnitY * Player.gfxOffY;
-                Point lightpos = basePos.ToTileCoordinates();
-                Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * intensity);
 
                 #region Glow Drawing
 
