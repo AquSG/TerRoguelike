@@ -14,6 +14,7 @@ using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Projectiles
 {
@@ -31,7 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 18;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 900;
+            Projectile.timeLeft = TerRoguelikeMenu.RuinedMoonActive ? 3000 : 900;
             Projectile.penetrate = -1;
             Projectile.hide = true;
             Projectile.ModProj().killOnRoomClear = true;
@@ -47,6 +48,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.localAI[0]++;
             Projectile.hostile = true;
             Projectile.friendly = false;
             if (Projectile.ai[1] > 0)
@@ -59,7 +61,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (Projectile.timeLeft < 720)
+            if (Projectile.localAI[0] >= 180)
             {
                 Projectile.ai[1]++;
             }

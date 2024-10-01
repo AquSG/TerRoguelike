@@ -7,6 +7,9 @@ float edgeBlend;
 float4 tint;
 float4 edgeTint;
 float finalFadeExponent;
+float edgeThresholdMulti;
+float centerThresholdMulti;
+float centerThresholdExponent;
 
 texture sampleTexture;
 sampler2D Texture1Sampler = sampler_state { texture = <sampleTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = wrap; AddressV = wrap; };
@@ -51,14 +54,19 @@ float4 main(float2 uv : TEXCOORD) : COLOR
             edgeInterpolant *= 1 - ((distance - innerThreshold) / edgeBlend);
         }
     }
-    edgeInterpolant = lerp(invisThreshold * 1.25, 1, edgeInterpolant);
+    float effectiveThreshold = invisThreshold;
+    if (distance < innerRing)
+    {
+        effectiveThreshold = lerp(centerThresholdMulti, effectiveThreshold, pow(distance / innerRing, centerThresholdExponent));
+    }
+    edgeInterpolant = lerp(effectiveThreshold * edgeThresholdMulti, 1, edgeInterpolant);
     edgeInterpolant *= 1 - brightness;
 
-    if (edgeInterpolant < invisThreshold)
+    if (edgeInterpolant < effectiveThreshold)
     {
         return float4(0, 0, 0, 0);
     }
-    edgeInterpolant = pow((edgeInterpolant - invisThreshold) / (1 - invisThreshold), finalFadeExponent);
+    edgeInterpolant = pow((edgeInterpolant - effectiveThreshold) / (1 - effectiveThreshold), finalFadeExponent);
 
     return lerp(edgeTint, finalColor, edgeInterpolant);
 }

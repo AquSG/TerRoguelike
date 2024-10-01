@@ -479,22 +479,31 @@ namespace TerRoguelike.Systems
                     drawPos -= Main.screenPosition;
                     if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
+                        StartAdditiveSpritebatch(false);
+
+                        var glowTex = TexDict["CircularGlow"];
+                        Main.EntitySpriteDraw(glowTex, drawPos, null, Color.LightCyan * 0.4f, 0, glowTex.Size() * 0.5f, 1.5f, SpriteEffects.None);
+                        Main.spriteBatch.End();
+
                         Effect portalEffect = Filters.Scene["TerRoguelike:SpecialPortal"].GetShader().Shader;
-                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, portalEffect, Main.GameViewMatrix.TransformationMatrix);
+                        Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, portalEffect, Main.GameViewMatrix.TransformationMatrix);
 
                         portalEffect.Parameters["noiseScale"].SetValue(0.75f);
-                        portalEffect.Parameters["uvOff"].SetValue(new Vector2(0, Main.GlobalTimeWrappedHourly * 0.5f));
+                        portalEffect.Parameters["uvOff"].SetValue(new Vector2((float)Math.Sin(Main.GlobalTimeWrappedHourly * MathHelper.PiOver4 * 0.25f) * 1f, Main.GlobalTimeWrappedHourly * 0.5f));
                         portalEffect.Parameters["outerRing"].SetValue(0.85f);
                         portalEffect.Parameters["innerRing"].SetValue(0.8f);
                         portalEffect.Parameters["invisThreshold"].SetValue(0.35f);
-                        portalEffect.Parameters["edgeBlend"].SetValue(0.1f);
+                        portalEffect.Parameters["edgeBlend"].SetValue(0.08f);
                         portalEffect.Parameters["tint"].SetValue((Color.Cyan * 0.8f).ToVector4());
                         portalEffect.Parameters["edgeTint"].SetValue((Color.White).ToVector4());
                         portalEffect.Parameters["finalFadeExponent"].SetValue(0.5f);
+                        portalEffect.Parameters["edgeThresholdMulti"].SetValue(1.12f);
+                        portalEffect.Parameters["centerThresholdMulti"].SetValue(0.001f);
+                        portalEffect.Parameters["centerThresholdExponent"].SetValue(1.4f);
 
                         var tex = TexDict["BlobbyNoiseSmall"];
 
-                        Main.EntitySpriteDraw(tex, drawPos, null, Color.White, 0, tex.Size() * 0.5f, new Vector2(0.5f), SpriteEffects.None);
+                        Main.EntitySpriteDraw(tex, drawPos, null, Color.White, 0, tex.Size() * 0.5f, new Vector2(0.5f, 0.5f), SpriteEffects.None);
 
                         Main.spriteBatch.End();
                     }
@@ -1054,7 +1063,7 @@ namespace TerRoguelike.Systems
                         {
                             foreach(Player player in Main.ActivePlayers)
                             {
-                                if (player.Center.Distance(drawPos) < 160)
+                                if (player.Center.Distance(drawPos) < 136)
                                 {
                                     ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                                     if (TerRoguelikeWorld.IsDeletableOnExit)

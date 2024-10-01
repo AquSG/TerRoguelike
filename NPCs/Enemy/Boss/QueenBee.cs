@@ -321,11 +321,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         SoundEngine.PlaySound(SoundID.Item17 with { Volume = 1f, PitchVariance = 0.05f }, NPC.Center);
                         ChargeSlot = SoundEngine.PlaySound(SoundID.Item38 with { Volume = 0.2f, Pitch = 0.2f, PitchVariance = 0.05f }, NPC.Center);
+                        bool ruin = RuinedMoonActive;
                         for (int i = 0; i < 12; i++)
                         {
                             Vector2 projSpawnPos = baseOffset + ((Vector2.UnitX * 16).RotatedBy(i * MathHelper.TwoPi / 12f) * new Vector2(1f, 0.6f));
                             projSpawnPos = projSpawnPos.RotatedBy(NPC.rotation);
                             Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<Stinger>(), NPC.damage, 0, -1, 1);
+                            if (ruin && Main.rand.NextBool(4))
+                            {
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);
+                            }
                         }
                     }
                     else
@@ -545,7 +550,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else if (NPC.ai[1] == 40)
                 {
                     SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.75f }, NPC.Center);
-                    for (int i = 0; i < 7; i++)
+                    int spawnCount = RuinedMoonActive ? 50 : 7;
+                    for (int i = 0; i < spawnCount; i++)
                     {
                         Vector2 projVel = (Vector2.UnitY * Main.rand.NextFloat(2f, 3.5f)).RotatedBy(MathHelper.PiOver2 * 1.3f * -NPC.direction + Main.rand.NextFloat(-0.3f, 0.3f));
                         Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);

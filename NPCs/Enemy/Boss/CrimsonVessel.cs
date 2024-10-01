@@ -131,6 +131,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = -48;
             NPC.localAI[1] = -1;
             ableToHit = false;
+            if (RuinedMoonActive)
+                healCountdown /= 2;
         }
         public override void AI()
         {
@@ -198,7 +200,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         rumbleSound.Update();
                     }
                 }
-                if (NPC.localAI[0] < -30 && NPC.localAI[0] >= -30 - seerSpawnTime)
+                int target = RuinedMoonActive ? -27 : -30;
+                if (NPC.localAI[0] < target && NPC.localAI[0] >= -30 - seerSpawnTime)
                 {
                     if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
                     {
@@ -209,7 +212,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     SpawnSeers();
                 }
-                if (NPC.localAI[0] == -30)
+                if (NPC.localAI[0] == target)
                 {
                     NPC.hide = false;
                     NPC.immortal = false;
@@ -218,7 +221,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[3] = 0;
                     enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
-                if (NPC.localAI[0] < -30)
+                if (NPC.localAI[0] < target)
                     NPC.ai[1]++;
             }
             else
@@ -382,6 +385,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[2] = Heal.Id;
                     NPC.ai[3] = 0;
                     healCountdown = setHealTime + Main.rand.Next(-60, 0);
+                    if (RuinedMoonActive)
+                        healCountdown /= 2;
                 }
             }
             else if (NPC.ai[0] == BouncyBall.Id)
@@ -708,7 +713,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void SpawnSeers()
         {
-            int seerCount = 8;
+            int seerCount = RuinedMoonActive ? 16 : 8;
             int seerRate = seerSpawnTime / (seerCount - 1);
             if ((NPC.ai[1] - (Heal.Duration - seerSpawnTime)) % seerRate == 0)
             {

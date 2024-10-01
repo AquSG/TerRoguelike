@@ -480,7 +480,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     pos += rot.ToRotationVector2() * 12;
 
                     SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.8f, Pitch = -0.1f }, NPC.Center);
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 6, ModContent.ProjectileType<FleshBall>(), NPC.damage, 0);
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 6, ModContent.ProjectileType<FleshBall>(), NPC.damage, 0, -1, RuinedMoonActive ? -18 : 0);
                 }
                 if (time >= 30)
                 {

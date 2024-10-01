@@ -629,6 +629,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (vectToTarget.Length() > maxLength)
                             vectToTarget = vectToTarget.SafeNormalize(Vector2.UnitY) * maxLength;
                         Vector2 projSpawnPos = anchorPos + vectToTarget * new Vector2(0.35f, 1f);
+                        if (RuinedMoonActive && target != null)
+                        {
+                            float realSpeed = 30;
+                            float targetDist = target.Center.Distance(anchorPos);
+                            float travelTime = targetDist / realSpeed;
+                            Vector2 newTargetPos = targetPos + target.velocity * travelTime * 1.1f;
+                            vectToTarget = (newTargetPos - anchorPos);
+                            if (vectToTarget.Length() > maxLength)
+                                vectToTarget = vectToTarget.SafeNormalize(Vector2.UnitY) * maxLength;
+                            projSpawnPos = anchorPos + vectToTarget * new Vector2(0.35f, 1f);
+                        }
 
                         Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, vectToTarget.SafeNormalize(Vector2.UnitY) * 15, ModContent.ProjectileType<PhantasmalBolt>(), NPC.damage, 0);
                     }
@@ -668,6 +679,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (time == 0)
                     {
                         ChargeSlot = SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.45f, PitchVariance = 0.2f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
+                    }
+                    if (RuinedMoonActive)
+                    {
+                        if (time < chargeStartTime - 2)
+                        {
+                            time += 2;
+                            NPC.ai[1] += 2;
+                        }
                     }
                     float completion = time / (float)chargeStartTime;
                     NPC.velocity = -targetVect.SafeNormalize(Vector2.UnitY) * 10 * (1 - completion);
@@ -875,7 +894,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 DefaultMovement();
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
-                if (NPC.ai[1] % CrossBeamCycleTime == 0)
+                int cycleTime = RuinedMoonActive ? CrossBeamCycleTime / 2 : CrossBeamCycleTime;
+                if (NPC.ai[1] % cycleTime == 0)
                 {
                     float radius = 370;
                     float rot = Main.rand.NextFloat(MathHelper.TwoPi);

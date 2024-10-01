@@ -27,7 +27,7 @@ namespace TerRoguelike.Projectiles
         {
             Projectile.width = 80;
             Projectile.height = 80;
-            Projectile.timeLeft = maxTimeLeft = TerRoguelikeMenu.RuinedMoonActive ? 2700 : 540;
+            Projectile.timeLeft = maxTimeLeft = TerRoguelikeMenu.RuinedMoonActive ? 5400 : 540;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.usesIDStaticNPCImmunity = true;

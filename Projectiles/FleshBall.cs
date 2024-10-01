@@ -77,7 +77,11 @@ namespace TerRoguelike.Projectiles
                 if (modNPC.isRoomNPC)
                 {
                     if (RoomSystem.RoomList[modNPC.sourceRoomListID].bossDead)
+                    {
+                        if (Projectile.ai[0] < 0)
+                            Projectile.ai[0] = 0;
                         OnTileCollide(Projectile.velocity);
+                    }
                 }
             }
 

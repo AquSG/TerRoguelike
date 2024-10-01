@@ -257,13 +257,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.velocity.X = -chargeSpeed * NPC.direction * 0.55f;
                         NPC.velocity.Y = -chargeSpeed * 0.4f;
 
-                        for (int i = 0; i < 12; i++)
+                        bool ruin = RuinedMoonActive;
+                        int spawnCount = ruin ? 48 : 12;
+                        for (int i = 0; i < spawnCount; i++)
                         {
                             Point tilePos = Point.Zero;
                             int valid = -1;
                             for (int j = 0; j < 5; j++)
                             {
-                                tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(-800, 60) * NPC.direction, -480)).ToTileCoordinates();
+                                tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(ruin ? -1800 : -800, 60) * NPC.direction, -480)).ToTileCoordinates();
                                 Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
                                 if (!tile.IsTileSolidGround(true))
                                     continue;
@@ -725,13 +727,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 10), new Vector2(i * 6, 16), ModContent.ProjectileType<Shockwave>(), NPC.damage, 0f);
             }
-            for (int i = 0; i < 8; i++)
+            bool ruin = RuinedMoonActive;
+            int spawnCount = ruin ? 40 : 8;
+            for (int i = 0; i < spawnCount; i++)
             {
                 Point tilePos = Point.Zero;
                 int valid = -1;
                 for (int j = 0; j < 5; j++)
                 {
-                    tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(-400, 400) * NPC.direction, -480)).ToTileCoordinates();
+                    int randRange = ruin ? 1200 : 400;
+                    tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(-randRange, randRange) * NPC.direction, -480)).ToTileCoordinates();
                     Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
                     if (!tile.IsTileSolidGround(true))
                         continue;

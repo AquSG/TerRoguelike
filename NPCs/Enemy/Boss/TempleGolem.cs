@@ -148,7 +148,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (npc.type == checkType && npc.ModNPC().sourceRoomListID == modNPC.sourceRoomListID)
                     {
                         NPC.localAI[3]++;
-                        summonChooseAttackCooldown = 600;
+                        summonChooseAttackCooldown = RuinedMoonActive ? 5 : 600;
                     }
                 }
             }
@@ -264,7 +264,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             Vector2 pos = eyePositions[i];
                             float rotToTarget = (targetPos - pos).ToRotation();
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rotToTarget.ToRotationVector2() * 10, ModContent.ProjectileType<LihzahrdLaser>(), NPC.damage, 0, -1, 1);
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rotToTarget.ToRotationVector2() * 10, ModContent.ProjectileType<LihzahrdLaser>(), NPC.damage, 0, -1, RuinedMoonActive ? 2 : 1);
 
                             for (int j = 0; j < 5; j++)
                             {
@@ -368,11 +368,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int time = (int)NPC.ai[1] - flameWindup;
                     if (time % flameFireRate == 0)
                     {
-                        float slowdownCone = MathHelper.PiOver4 * 0.55f;
+                        float slowdownCone = RuinedMoonActive ? 0.01f : (MathHelper.PiOver4 * 0.55f);
                         float angleBetween = MathHelper.Clamp(Math.Abs(AngleSizeBetween(NPC.ai[3], rotToTarget)), 0, slowdownCone);
                         if (target != null)
                             NPC.ai[3] = NPC.ai[3].AngleTowards(rotToTarget, 0.075f * (angleBetween / slowdownCone));
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * 7, ModContent.ProjectileType<Flames>(), NPC.damage, 0, -1, 0, 0.24f);
+                        float speed = RuinedMoonActive ? 11 : 7;
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * speed, ModContent.ProjectileType<Flames>(), NPC.damage, 0, -1, 0, 0.24f);
                     }
                     if (time % 10 == 0)
                     {
@@ -426,36 +427,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                     if (time % dartTrapFireRate == 0)
                     {
-                        for (int i = 0; i < 2; i++)
+                        int count = RuinedMoonActive ? 2 : 1;
+                        for (int c = 0; c < count; c++)
                         {
-                            Vector2 projSpawnPos;
-                            float dir;
-                            switch (i)
+                            for (int i = 0; i < 2; i++)
                             {
-                                default:
-                                case 0:
-                                    projSpawnPos = leftBound + new Vector2(0, Main.rand.NextFloat(leftBoundHeight));
-                                    dir = 0;
-                                    break;
-                                case 1:
-                                    projSpawnPos = rightBound + new Vector2(0, Main.rand.NextFloat(rightBoundHeight));
-                                    dir = MathHelper.Pi;
-                                    break;
-                            }
-                            projSpawnPos = projSpawnPos.ToTileCoordinates().ToWorldCoordinates();
-                            projSpawnPos = TileCollidePositionInLine(projSpawnPos, projSpawnPos + dir.ToRotationVector2() * -160);
-                            Room room = modNPC.GetParentRoom();
-                            if (room != null)
-                            {
-                                Rectangle roomRect = room.GetRect();
-                                roomRect.Inflate(-16, -16);
-                                if (!roomRect.Contains(projSpawnPos.ToPoint()))
+                                Vector2 projSpawnPos;
+                                float dir;
+                                switch (i)
                                 {
-                                    projSpawnPos = roomRect.ClosestPointInRect(projSpawnPos);
+                                    default:
+                                    case 0:
+                                        projSpawnPos = leftBound + new Vector2(0, Main.rand.NextFloat(leftBoundHeight));
+                                        dir = 0;
+                                        break;
+                                    case 1:
+                                        projSpawnPos = rightBound + new Vector2(0, Main.rand.NextFloat(rightBoundHeight));
+                                        dir = MathHelper.Pi;
+                                        break;
                                 }
+                                projSpawnPos = projSpawnPos.ToTileCoordinates().ToWorldCoordinates();
+                                projSpawnPos = TileCollidePositionInLine(projSpawnPos, projSpawnPos + dir.ToRotationVector2() * -160);
+                                Room room = modNPC.GetParentRoom();
+                                if (room != null)
+                                {
+                                    Rectangle roomRect = room.GetRect();
+                                    roomRect.Inflate(-16, -16);
+                                    if (!roomRect.Contains(projSpawnPos.ToPoint()))
+                                    {
+                                        projSpawnPos = roomRect.ClosestPointInRect(projSpawnPos);
+                                    }
+                                }
+                                projSpawnPos += dir.ToRotationVector2() * -4;
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, dir.ToRotationVector2() * 8, ModContent.ProjectileType<DartTrap>(), NPC.damage, 0);
                             }
-                            projSpawnPos += dir.ToRotationVector2() * -4;
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, dir.ToRotationVector2() * 8, ModContent.ProjectileType<DartTrap>(), NPC.damage, 0);
                         }
                     }
                 }
@@ -534,6 +539,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         }
                     }
                 }
+                if (RuinedMoonActive && NPC.ai[1] > boulderWindup)
+                    NPC.ai[1] = Boulder.Duration;
 
                 if (NPC.ai[1] >= Boulder.Duration)
                 {
@@ -593,6 +600,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[1] > summonWindup)
                     {
                         currentFrame = 0;
+                        if (RuinedMoonActive)
+                            NPC.ai[1] = Summon.Duration;
                     }
                 }
                 if (NPC.ai[1] >= Summon.Duration)

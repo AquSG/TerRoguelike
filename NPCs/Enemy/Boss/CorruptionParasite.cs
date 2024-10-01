@@ -639,7 +639,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
-                int summonTime = Summon.Duration / summonCount;
+                int count = RuinedMoonActive ? summonCount * 2 : summonCount;
+                int summonTime = Summon.Duration / count;
                 if ((int)NPC.ai[1] % summonTime >= summonTime - 15)
                 {
                     WormSegment tailSegment = modNPC.Segments[modNPC.Segments.Count - 1];
@@ -1051,7 +1052,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Summon.Id)
             {
-                int summonTime = Summon.Duration / summonCount;
+                int count = RuinedMoonActive ? summonCount * 2: summonCount;
+                int summonTime = Summon.Duration / count;
                 if ((int)NPC.ai[1] % summonTime < summonTime - 1)
                 {
                     WormSegment segment = modNPC.Segments[modNPC.Segments.Count - 1];

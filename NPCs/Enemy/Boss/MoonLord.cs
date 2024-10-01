@@ -899,6 +899,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else
                 {
                     int time = (int)NPC.ai[1] - deathrayWindup;
+                    if (RuinedMoonActive)
+                    {
+                        if (time > 90 && timeToEnd > 20 && Main.rand.NextBool(9))
+                        {
+                            time -= 5;
+                            NPC.ai[1] -= 5;
+                        }
+                    }
                     if (NPC.ai[1] == deathrayWindup)
                     {
                         DeathraySlot = SoundEngine.PlaySound(SoundID.Zombie104 with { Volume = 0.7f, Pitch = -0.25f }, NPC.Center + new Vector2(0, -80));
