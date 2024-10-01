@@ -293,7 +293,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else if (NPC.ai[1] >= VineWall.Duration)
                 {
-                    vineWallCooldown = 830;
+                    vineWallCooldown = RuinedMoonActive ? 0 : 830;
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     NPC.ai[2] = VineWall.Id;

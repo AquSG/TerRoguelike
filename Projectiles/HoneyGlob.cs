@@ -13,6 +13,7 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using TerRoguelike.Particles;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Projectiles
 {
@@ -31,7 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
-            Projectile.timeLeft = 800;
+            Projectile.timeLeft = TerRoguelikeMenu.RuinedMoonActive ? 4000 : 800;
             Projectile.hide = true;
         }
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)

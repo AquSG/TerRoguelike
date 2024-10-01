@@ -488,7 +488,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         int projType = ModContent.ProjectileType<Iceflake>();
                         float speed = 2f;
-                        if (NPC.ai[3] >= spinSuperProjCooldown && Main.rand.NextBool())
+                        if ((NPC.ai[3] >= spinSuperProjCooldown && Main.rand.NextBool()) || RuinedMoonActive)
                         {
                             projType = ModContent.ProjectileType<IceBomb>();
                             NPC.ai[3] = Main.rand.Next(3);

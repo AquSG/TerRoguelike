@@ -379,10 +379,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                     if (NPC.ai[1] % 2 == 0)
                     {
-                        Vector2 projSpawnPos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
-                        Vector2 projVel = soulBurstProjRot.ToRotationVector2() * 8;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<SoulBlast>(), NPC.damage, 0);
-                        soulBurstProjRot += (MathHelper.PiOver2 + Main.rand.NextFloat(-0.7f, 0.7f)) * NPC.direction;
+                        int count = RuinedMoonActive ? 4 : 1;
+                        for (int i = 0; i < count; i++)
+                        {
+                            Vector2 projSpawnPos = NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation);
+                            Vector2 projVel = soulBurstProjRot.ToRotationVector2() * 8;
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<SoulBlast>(), NPC.damage, 0);
+                            soulBurstProjRot += (MathHelper.PiOver2 + Main.rand.NextFloat(-0.7f, 0.7f)) * NPC.direction;
+                        }
                     }
 
                     bool collide = false;
@@ -931,6 +935,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();
+                if (RuinedMoonActive)
+                {
+                    for (int i = 0; i < 40; i++)
+                    {
+                        SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), NPC.Center + Main.rand.NextVector2Circular(80, 80), ModContent.NPCType<DungeonSpirit>(), modNPC.sourceRoomListID);
+                    }
+                }
+                
             }
 
             return deadTime >= cutsceneDuration - 30;

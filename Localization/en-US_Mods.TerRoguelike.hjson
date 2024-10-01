@@ -970,6 +970,19 @@ Items: {
 			However, enemies continue to get stronger every floor as well
 			'''
 	}
+
+	TheFalseSun: {
+		DisplayName: The False Sun
+		Tooltip:
+			'''
+			5% increased critical strike chance
+			Critically striking an enemy builds up decaying sun energy
+			Sun damage and range scales with the amount of sun energy
+			The false sun can rapidly hit 3 nearby enemies for up to 75 base damage
+			Critical strikes from the false sun itself do not build up decaying sun energy
+			Extra copies of this item increase the base damage by 75
+			'''
+	}
 }
 
 NPCs: {

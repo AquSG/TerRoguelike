@@ -329,6 +329,7 @@ namespace TerRoguelike.Managers
                 new EverlastingJellyfish(),
                 new HeartyHoneycomb(),
                 new PrimevalRattle(),
+                new TheFalseSun(),
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();

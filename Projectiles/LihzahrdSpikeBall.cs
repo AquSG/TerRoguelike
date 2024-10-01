@@ -14,6 +14,7 @@ using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Projectiles
 {
@@ -26,7 +27,7 @@ namespace TerRoguelike.Projectiles
             Projectile.height = 6;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.timeLeft = 420;
+            Projectile.timeLeft = TerRoguelikeMenu.RuinedMoonActive ? 1000 : 420;
             Projectile.penetrate = 1;
             Projectile.tileCollide = false;
             Projectile.hide = true;
@@ -46,7 +47,7 @@ namespace TerRoguelike.Projectiles
             if (Projectile.ai[1] == Projectile.ai[0])
                 Projectile.localAI[0] = Projectile.velocity.Y;
 
-            if (Projectile.timeLeft < 360)
+            if (Projectile.timeLeft < (TerRoguelikeMenu.RuinedMoonActive ? 940 : 360))
                 Projectile.tileCollide = true;
 
             Projectile.velocity.Y += 0.15f;
@@ -71,7 +72,11 @@ namespace TerRoguelike.Projectiles
             // If the projectile hits the top or bottom side of the tile, reverse the Y velocity
             if (Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon)
             {
-                Projectile.velocity.Y = -oldVelocity.Y * Main.rand.NextFloat(0.78f, 0.85f);
+                Projectile.velocity.Y = -oldVelocity.Y;
+                if (!TerRoguelikeMenu.RuinedMoonActive)
+                    Projectile.velocity.Y *= Main.rand.NextFloat(0.78f, 0.85f);
+                else
+                    Projectile.velocity.Y *= Main.rand.NextFloat(0.86f, 0.93f);
             }
             Projectile.localAI[0] = Projectile.velocity.Y;
             return false;

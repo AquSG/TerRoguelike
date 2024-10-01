@@ -20,6 +20,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.Graphics.Effects;
 using System.Diagnostics;
 using System.IO.Pipes;
+using TerRoguelike.MainMenu;
 
 
 namespace TerRoguelike.Projectiles
@@ -96,6 +97,7 @@ namespace TerRoguelike.Projectiles
             }
             int deadCount = 0;
             int last = specialOldPos.Count - 1;
+            bool ruin = TerRoguelikeMenu.RuinedMoonActive;
             for (int i = 0; i <= last; i++)
             {
                 if (specialOldDead[i])
@@ -106,7 +108,7 @@ namespace TerRoguelike.Projectiles
                 Vector2 pos = specialOldPos[i];
                 Vector2 predictedPos = pos + specialOldVel[i];
                 specialOldPos[i] = predictedPos;
-                if (!specialOldDead[i] && !CanHitInLine(pos, predictedPos))
+                if (!ruin && !specialOldDead[i] && !CanHitInLine(pos, predictedPos))
                 {
                     specialOldDead[i] = true;
                     Color outlineColor = Color.Lerp(Color.Salmon, Color.OrangeRed, 0.13f);

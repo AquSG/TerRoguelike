@@ -300,7 +300,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] == 30)
                 {
                     Room room = modNPC.sourceRoomListID >= 0 ? RoomList[modNPC.sourceRoomListID] : null;
-                    int nadoCount = 4;
+                    int nadoCount = RuinedMoonActive ? 7 : 4;
                     for (int i = 0; i < nadoCount; i++)
                     {
                         float completion = (i + 1f) / (nadoCount + 1f);
