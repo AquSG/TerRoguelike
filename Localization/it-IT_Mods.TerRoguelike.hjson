@@ -3,6 +3,7 @@ DeathKilledBy: Ucciso da:
 DeathItems: Oggetti:
 DeathMainMenu: Menu Principale
 DeathQuickRestart: Riavvio Rapido
+// DeathLoop: Loop:
 BlockedAlert: bloccato!
 HealthUpAlert: Incremento Salute!
 BarrierName: Barriera

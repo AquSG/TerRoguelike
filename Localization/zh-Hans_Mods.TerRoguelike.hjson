@@ -3,6 +3,7 @@ DeathKilledBy: 凶手：
 DeathItems: 物品：
 DeathMainMenu: 主菜单
 DeathQuickRestart: 重新开始
+// DeathLoop: Loop:
 BlockedAlert: 格挡！
 HealthUpAlert: 生命值提升！
 BarrierName: 屏障

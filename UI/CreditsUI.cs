@@ -250,7 +250,14 @@ namespace TerRoguelike.UI
 
             int moonFrameHeight = moonTex.Height / 5;
             Rectangle moonFrame = new Rectangle(0, moonFrameHeight * (int)TerRoguelikeMenu.difficulty, moonTex.Width, moonFrameHeight - 2);
-            Main.EntitySpriteDraw(moonTex, difficultyStringDrawPos + new Vector2(12 + difficultyStringDimensions.X * 0.6f, -12), moonFrame, Color.White * opacity, 0, Vector2.Zero, 1f, SpriteEffects.None);
+            Vector2 moonDrawPos = difficultyStringDrawPos + new Vector2(12 + difficultyStringDimensions.X * 0.6f, -12);
+            Main.EntitySpriteDraw(moonTex, moonDrawPos, moonFrame, Color.White * opacity, 0, Vector2.Zero, 1f, SpriteEffects.None);
+
+            if (TerRoguelikeWorld.currentLoop > 0)
+            {
+                string loopString = Language.GetOrRegister("Mods.TerRoguelike.DeathLoop") + " " + TerRoguelikeWorld.currentLoop.ToString();
+                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, loopString, moonDrawPos + new Vector2(75, 12), Color.Lerp(Color.Cyan, Color.Blue, 0.15f) * opacity, 0, Vector2.Zero, new Vector2(0.6f));
+            }
 
             string deathMainMenu = Language.GetOrRegister("Mods.TerRoguelike.DeathMainMenu").Value;
             string deathQuickRestart = Language.GetOrRegister("Mods.TerRoguelike.DeathQuickRestart").Value;

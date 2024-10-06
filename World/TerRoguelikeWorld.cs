@@ -64,6 +64,14 @@ namespace TerRoguelike.World
                 }
                 return drawPos;
             } }
+        public static float lunarGambitSceneScaleInterpolant
+        {
+            get
+            {
+                float interpolant = MathHelper.Clamp((lunarGambitSceneTime - lunarGambitStartDuration - lunarGambitFloatOverDuration) / 180f, 0, 1);
+                return MathHelper.SmoothStep(0.1f, 1f, interpolant);
+            }
+        }
         public static int sanctuaryTries = 0;
         public static readonly int sanctuaryMaxTries = 3;
         public static readonly int sanctuaryMaxVisits = 2;

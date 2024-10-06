@@ -849,7 +849,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Color tint = wantedColor * sandyOverlayOpacityMultiplier;
 
                 maskEffect.Parameters["screenOffset"].SetValue(screenOff);
-                maskEffect.Parameters["stretch"].SetValue(new Vector2(1f, Main.npcFrameCount[Type]));
+                maskEffect.Parameters["stretch"].SetValue(new Vector2(1, Main.npcFrameCount[Type]));
                 maskEffect.Parameters["replacementTexture"].SetValue(noiseTex);
                 maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
 
