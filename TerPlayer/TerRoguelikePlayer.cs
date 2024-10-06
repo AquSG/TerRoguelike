@@ -1754,6 +1754,12 @@ namespace TerRoguelike.TerPlayer
             }
 
             oldPulley = Player.pulley;
+
+            if (RoomSystem.loopingDrama > 0)
+            {
+                Player.velocity = new Vector2(0, -0.0000000001f);
+                Player.Center = Vector2.Lerp(Player.Center, TerRoguelikeWorld.lunarGambitSceneDisplayPos, 0.05f);
+            }
         }
         public override void PreUpdateBuffs()
         {
@@ -2634,6 +2640,11 @@ namespace TerRoguelike.TerPlayer
                         frameRect.Inflate(2000, 2000);
                         WorldGen.SectionTileFrameWithCheck(frameRect.X, frameRect.Y, frameRect.Width, frameRect.Height);
                     }
+                }
+                if (TerRoguelikeWorld.currentLoop > 0)
+                {
+                    TerRoguelikeWorld.worldTeleportTime = 1;
+                    SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2] });
                 }
             }
             escapeArrowTime = 0;

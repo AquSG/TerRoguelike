@@ -23,6 +23,7 @@ using TerRoguelike.NPCs.Enemy.Boss;
 using Terraria.GameContent;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.TerPlayer;
+using ReLogic.Utilities;
 
 namespace TerRoguelike.World
 {
@@ -84,6 +85,10 @@ namespace TerRoguelike.World
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
         public static readonly SoundStyle EarthPound = new SoundStyle("TerRoguelike/Sounds/EarthPound", 4);
         public static readonly SoundStyle WorldTeleport = new SoundStyle("TerRoguelike/Sounds/WorldTeleport", 2);
+        public static readonly SoundStyle PortalSpawn = new SoundStyle("TerRoguelike/Sounds/PortalSpawn");
+        public static readonly SoundStyle PortalLoop = new SoundStyle("TerRoguelike/Sounds/PortalLoop");
+        public static readonly SoundStyle AahLoop = new SoundStyle("TerRoguelike/Sounds/AahLoop");
+        public static SlotId PortalSlot;
         public static bool TryWarpToSanctuary(TerRoguelikePlayer modPlayer)
         {
             if (modPlayer.lunarCharm > 0)
