@@ -3,6 +3,7 @@ DeathKilledBy: Убийца:
 DeathItems: Предметы:
 DeathMainMenu: Главное Меню
 DeathQuickRestart: Быстрый Перезапуск
+// DeathLoop: Loop:
 BlockedAlert: блокировано!
 HealthUpAlert: Плюс Здоровье!
 BarrierName: Барьер

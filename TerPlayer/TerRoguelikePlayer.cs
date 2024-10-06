@@ -1889,7 +1889,7 @@ namespace TerRoguelike.TerPlayer
                     if (hit.Crit)
                         internalHitDamage /= 2;
                     int igniteDamage = (int)(internalHitDamage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
-                    int burnCap = Math.Min(igniteDamage / 6, 50);
+                    int burnCap = Math.Max(Math.Min(igniteDamage / 6, 50), 1);
                     modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
                     Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
                     int particleDir = -1;

@@ -3,6 +3,7 @@ DeathKilledBy: Killed by:
 DeathItems: Items:
 DeathMainMenu: Main Menu
 DeathQuickRestart: Quick Restart
+DeathLoop: Loop:
 BlockedAlert: blocked!
 HealthUpAlert: Health Up!
 BarrierName: Barrier
