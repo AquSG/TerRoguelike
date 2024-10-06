@@ -24,6 +24,7 @@ using TerRoguelike.Systems;
 using Terraria.GameInput;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Utilities;
+using Terraria.Audio;
 
 namespace TerRoguelike.UI
 {
@@ -116,6 +117,11 @@ namespace TerRoguelike.UI
                     }
                     TerRoguelikeWorld.lunarGambitSceneTime = 0;
                     TerRoguelikeWorld.lunarGambitSceneStartPos = Vector2.Zero;
+
+                    if (SoundEngine.TryGetActiveSound(TerRoguelikeWorld.PortalSlot, out var portalSound))
+                    {
+                        portalSound.Stop();
+                    }
                 }
             }
             else if (pressed && buildingHover)
@@ -160,16 +166,6 @@ namespace TerRoguelike.UI
             }
             else
                 DebugUI.DebugUIActive = false;
-        }
-    }
-    public class LoopCommand : ModCommand
-    {
-        public override CommandType Type => CommandType.Chat;
-        public override string Command => "Loop";
-        public override void Action(CommandCaller caller, string input, string[] args)
-        {
-            TerRoguelikeWorld.lunarGambitSceneTime = 1;
-            TerRoguelikeWorld.lunarGambitSceneStartPos = Vector2.Zero;
         }
     }
 }

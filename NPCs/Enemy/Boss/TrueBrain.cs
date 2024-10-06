@@ -112,6 +112,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.npcFrameCount[Type] = 5;
             NPCID.Sets.MustAlwaysDraw[Type] = true;
             SoundEngine.PlaySound(QuakeCooking with { Volume = 0 }); // Play sounds in mod load to force the sound to be ready when first played ingame. otherwise long sounds hitch to load on the fly
+            SoundEngine.PlaySound(TerRoguelikeWorld.PortalLoop with { Volume = 0 });
         }
         public override void SetDefaults()
         {

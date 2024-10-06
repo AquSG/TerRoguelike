@@ -109,8 +109,14 @@ namespace TerRoguelike.Managers
                 healthMultiplier *= 0.8d;
             double damageMultiplier = damageScalingMultiplier;
             npc.lifeMax = (int)(modNpc.baseMaxHP * healthMultiplier);
-            npc.life = npc.lifeMax;
             npc.damage = (int)(modNpc.baseDamage * damageMultiplier);
+
+            if (npc.lifeMax < 1)
+                npc.lifeMax = int.MaxValue;
+            if (npc.damage < 0)
+                npc.damage = int.MaxValue;
+
+            npc.life = npc.lifeMax;
         }
         public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
         {

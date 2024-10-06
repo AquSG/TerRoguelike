@@ -51,6 +51,7 @@ namespace TerRoguelike.Systems
         public static bool debugDrawNotSpawnedEnemies = false;
         public static List<StoredDraw> postDrawEverythingCache = [];
         public static bool postDrawAllBlack = false;
+        public static int loopingDrama = 0;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -466,6 +467,26 @@ namespace TerRoguelike.Systems
                 }
 
                 Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.LightGray * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
+
+                Main.spriteBatch.End();
+            }
+            if (loopingDrama > 0)
+            {
+                StartAlphaBlendSpritebatch(false);
+                float worldTeleportOpacity = 1f;
+                int fadeIn = 90;
+                int fadeOut = -1;
+                int totalTime = 120;
+                if (loopingDrama < fadeIn)
+                {
+                    worldTeleportOpacity *= loopingDrama / (float)fadeIn;
+                }
+                if (totalTime - loopingDrama < fadeOut)
+                {
+                    worldTeleportOpacity *= ((totalTime - loopingDrama) / (float)fadeOut);
+                }
+
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.White * worldTeleportOpacity, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
 
                 Main.spriteBatch.End();
             }
@@ -1061,31 +1082,41 @@ namespace TerRoguelike.Systems
                 {
                     if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
+                        if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound) && portalSound.IsPlaying)
+                        {
+                            UpdatePortalSound(portalSound);
+                        }
+                        else
+                        {
+                            if (!CreditsSystem.creditsActive)
+                                PortalSlot = SoundEngine.PlaySound(PortalLoop with { IsLooped = true, Volume = 0.64f, Pitch = -0.5f }, drawPos);
+
+                            if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound2) && portalSound2.IsPlaying)
+                            {
+                                UpdatePortalSound(portalSound2);
+                            }
+                        }
+                        void UpdatePortalSound(ActiveSound sound)
+                        {
+                            float interpolant = MathHelper.Clamp((lunarGambitSceneTime - lunarGambitStartDuration - lunarGambitFloatOverDuration) / 180f, 0, 1);
+
+                            sound.Volume = interpolant;
+                            sound.Pitch = (float)Math.Cos(Main.GlobalTimeWrappedHourly * MathHelper.TwoPi) * 0.25f - 0.5f;
+                        }
                         if (lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration + 180)
                         {
-                            foreach(Player player in Main.ActivePlayers)
+                            if (loopingDrama <= 0)
                             {
-                                if (player.Center.Distance(drawPos) < 136)
+                                foreach (Player player in Main.ActivePlayers)
                                 {
-                                    ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                                    if (!player.dead && player.Center.Distance(drawPos) < 136)
                                     {
-                                        TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
-                                        TerRoguelikeMenu.wipeTempWorld = true;
-                                        TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
-                                        TerRoguelikeWorld.promoteLoop = true;
+                                        loopingDrama++;
+                                        SoundEngine.PlaySound(WorldTeleport with { Volume = 0.3f, Variants = [1], Pitch = -0.25f });
+                                        CutsceneSystem.SetCutscene(drawPos, 120, 90, 2, 2.5f);
+                                        ScreenshakeSystem.SetScreenshake(120, 6);
+                                        break;
                                     }
-                                    var modPlayer = player.ModPlayer();
-                                    if (modPlayer != null)
-                                    {
-                                        modPlayer.killerNPC = -1;
-                                        modPlayer.killerProj = -1;
-                                    }
-                                    SetCalm(Silence);
-                                    SetCombat(Silence);
-                                    SetMusicMode(MusicStyle.Silent);
-                                    WorldGen.SaveAndQuit();
-                                    break;
                                 }
                             }
                         }
@@ -1102,6 +1133,41 @@ namespace TerRoguelike.Systems
                     }
                     if (lunarGambitSceneTime <= lunarGambitStartDuration + lunarGambitFloatOverDuration)
                     {
+                        if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound) && portalSound.IsPlaying)
+                        {
+                            UpdateMoonSound(portalSound);
+                        }
+                        else
+                        {
+                            if (!CreditsSystem.creditsActive)
+                                PortalSlot = SoundEngine.PlaySound(AahLoop with { IsLooped = true, Volume = 0.07f, Pitch = 0f }, drawPos);
+
+                            if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound2) && portalSound2.IsPlaying)
+                            {
+                                UpdateMoonSound(portalSound2);
+                            }
+                        }
+                        void UpdateMoonSound(ActiveSound sound)
+                        {
+                            if (lunarGambitSceneTime == lunarGambitStartDuration + lunarGambitFloatOverDuration)
+                            {
+                                sound.Stop();
+                                return;
+                            }
+                                
+                            sound.Position = drawPos;
+
+                            float basePitch = 0;
+                            basePitch = MathHelper.Lerp(basePitch, 1f, MathHelper.Clamp(lunarGambitSceneTime / 50f, 0, 1));
+                            if (lunarGambitSceneTime >= lunarGambitStartDuration)
+                            {
+                                basePitch = MathHelper.Lerp(basePitch, -1f, MathHelper.Clamp((float)Math.Pow(1 - ((lunarGambitSceneTime - lunarGambitStartDuration - lunarGambitFloatOverDuration) / -70f), 3), 0, 1));
+                            }
+                            sound.Pitch = basePitch;
+
+                            sound.Volume = lunarGambitSceneTime < 60 ? MathHelper.Clamp(lunarGambitSceneTime / 60f, 0, 1) : MathHelper.Clamp((lunarGambitSceneTime - lunarGambitStartDuration - lunarGambitFloatOverDuration) / -4f, 0, 1);
+                        }
+
                         int randBoolValue = lunarGambitSceneTime > lunarGambitStartDuration + lunarGambitFloatOverDuration - 30 ? 5 : 2;
                         if (Main.rand.NextBool(randBoolValue))
                         {
@@ -1113,7 +1179,8 @@ namespace TerRoguelike.Systems
                         }
                         if (lunarGambitSceneTime == lunarGambitStartDuration + lunarGambitFloatOverDuration)
                         {
-                            SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -0.35f, PitchVariance = 0, Volume = 0.6f}, drawPos);
+                            SoundEngine.PlaySound(SoundID.NPCDeath43 with { Pitch = -0.35f, PitchVariance = 0, Volume = 0.5f}, drawPos);
+                            ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(PortalSpawn with { Pitch = -0.7f, PitchVariance = 0, Volume = 1f }, drawPos), 1.5f));
                             for (int i = 0; i < 9; i++)
                             {
                                 float rot = i / 9f * MathHelper.TwoPi + MathHelper.PiOver2;
@@ -1128,6 +1195,31 @@ namespace TerRoguelike.Systems
                             }
                         }
                     }
+                }
+                else if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound))
+                {
+                    portalSound.Stop();
+                }
+
+                if (loopingDrama > 0)
+                {
+                    if (loopingDrama == 120)
+                    {
+                        loopingDrama = 0;
+                        ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+                        if (TerRoguelikeWorld.IsDeletableOnExit)
+                        {
+                            TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                            TerRoguelikeMenu.wipeTempWorld = true;
+                            TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+                            TerRoguelikeWorld.promoteLoop = true;
+                        }
+                        SetCalm(Silence);
+                        SetCombat(Silence);
+                        SetMusicMode(MusicStyle.Silent);
+                        WorldGen.SaveAndQuit();
+                    }
+                    loopingDrama++;
                 }
             }
 
@@ -1231,8 +1323,14 @@ namespace TerRoguelike.Systems
             postDrawEverythingCache.Clear();
             lunarGambitSceneTime = 0;
             lunarGambitSceneStartPos = Vector2.Zero;
+            loopingDrama = 0;
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
+
+            if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound))
+            {
+                portalSound.Stop();
+            }
         }
         public override void SetStaticDefaults()
         {
