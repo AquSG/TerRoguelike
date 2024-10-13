@@ -435,7 +435,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), cutsceneDuration, 30, 30, 1.25f);
+                    CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), cutsceneDuration, 30, 30, 1.25f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
 
@@ -484,7 +484,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.localAI[1] = 0;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
-                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI, headWho, leftHandWho, rightHandWho], NPC.FullName);
+                    if (!TerRoguelikeWorld.escape)
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI, headWho, leftHandWho, rightHandWho], NPC.FullName);
                 }
             }
             else
@@ -1105,7 +1106,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     Main.npc[rightHandWho].ai[0] = 1;
                 }
-                CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), deathCutsceneDuration, 30, 30, 1.000001f);
+                CutsceneSystem.SetCutscene(NPC.Center + new Vector2(0, -200), deathCutsceneDuration, 30, 30, 1.000001f, CutsceneSystem.CutsceneSource.Boss);
             }
 
             void ClearChildren()
@@ -1285,7 +1286,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.life > 0 && deadTime == 0)
             {
                 SoundEngine.PlaySound(SoundID.NPCHit1 with { Volume = 1f }, NPC.Center);
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 1000.0; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f);
                     Main.dust[d].noLight = true;

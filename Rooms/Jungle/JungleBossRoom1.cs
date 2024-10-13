@@ -25,8 +25,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            if (!TerRoguelikeWorld.escape)
-                AddBoss(bossSpawnPos, ModContent.NPCType<QueenBee>());
+            AddBoss(bossSpawnPos, ModContent.NPCType<QueenBee>());
         }
         public override void Update()
         {

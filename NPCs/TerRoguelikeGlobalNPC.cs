@@ -14,6 +14,7 @@ using TerRoguelike.MainMenu;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs.Enemy.Boss;
 using TerRoguelike.Projectiles;
+using TerRoguelike.Schematics;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
@@ -68,6 +69,8 @@ namespace TerRoguelike.NPCs
         public bool activatedSteamEngine = false;
         public bool activatedNutritiousSlime = false;
         public bool activatedItemPotentiometer = false;
+
+        public bool activatedJstc = false;
 
         //debuffs
         public List<IgnitedStack> ignitedStacks = [];
@@ -3256,6 +3259,11 @@ namespace TerRoguelike.NPCs
             }
 
             SpawnManager.ApplyNPCDifficultyScaling(npc, this);
+
+            if (TerRoguelikeWorld.escape && TerRoguelikeBoss)
+            {
+                EnemyHealthBarSystem.enemyHealthBar = new([npc.whoAmI], npc.FullName);
+            }
         }
         public override bool PreAI(NPC npc)
         {
@@ -3390,6 +3398,20 @@ namespace TerRoguelike.NPCs
                 if (AdaptiveArmor < 0)
                     AdaptiveArmor = 0;
             }
+        }
+        public override bool CheckDead(NPC npc)
+        {
+            if (TerRoguelikeWorld.escape)
+            {
+                if (!activatedJstc && isRoomNPC && sourceRoomListID >= 0)
+                {
+                    Floor targetFloor = SchematicManager.FloorID[RoomList[sourceRoomListID].AssociatedFloor];
+                    if (targetFloor.jstcProgress == Floor.JstcProgress.Start)
+                        targetFloor.jstc++;
+                    activatedJstc = true;
+                }
+            }
+            return true;
         }
         public void IgniteHit(int hitDamage, NPC npc, int owner)
         {

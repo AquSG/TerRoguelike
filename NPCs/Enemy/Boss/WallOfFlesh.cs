@@ -24,6 +24,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using TerRoguelike.Items.Rare;
+using TerRoguelike.World;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -45,6 +46,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             new ExtraHitbox(new Point(80, 80), new Vector2(-32, -331.2f)),
             new ExtraHitbox(new Point(80, 80), new Vector2(-32, 303.6f)),
         };
+        public Vector2 centerPos
+        {
+            get {
+                Vector2 pos = NPC.Center;
+                if (NPC.localAI[0] < -30)
+                {
+                    float completion = ((-NPC.localAI[0] - 30f) / cutsceneDuration);
+                    completion = MathHelper.SmoothStep(0, 1, completion);
+                    pos += new Vector2(160 * completion, 0);
+                }
+                return pos; 
+            }
+        }
         public static readonly SoundStyle HellBeamSound = new SoundStyle("TerRoguelike/Sounds/HellBeam");
         public static readonly SoundStyle HellBeamCharge = new SoundStyle("TerRoguelike/Sounds/DeathrayCharge");
         public Texture2D squareTex;
@@ -111,8 +125,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.immortal = true;
-            NPC.dontTakeDamage = true;
+            NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
             currentFrame = 0;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
@@ -243,7 +256,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 soundPos = NPC.Center + hitboxes[1].offset;
                     SoundEngine.PlaySound(SoundID.DD2_WitherBeastAuraPulse with { Volume = 1f, Pitch = -1f, MaxInstances = 2 }, soundPos);
                     SoundEngine.PlaySound(SoundID.DD2_SkeletonSummoned with { Volume = 1f, Pitch = -1f, MaxInstances = 2 }, soundPos);
-                    CutsceneSystem.SetCutscene(NPC.Center + hitboxes[1].offset.X * Vector2.UnitX, cutsceneDuration, 30, 30, 1.25f);
+                    CutsceneSystem.SetCutscene(NPC.Center + hitboxes[1].offset.X * Vector2.UnitX, cutsceneDuration, 30, 30, 1.25f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
 
@@ -288,7 +301,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         NPC.immortal = false;
                         NPC.dontTakeDamage = false;
-                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                        if (!TerRoguelikeWorld.escape)
+                            enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                     }
                     BossAI();
                 }
@@ -627,7 +641,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!hitboxes[i].active)
                     continue;
 
-                bool pass = targetBox.Intersects(hitboxes[i].GetHitbox(NPC.Center, NPC.rotation));
+                bool pass = targetBox.Intersects(hitboxes[i].GetHitbox(centerPos, NPC.rotation));
                 if (pass)
                 {
                     CollisionPass = ableToHit;
@@ -645,7 +659,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!hitboxes[i].active)
                     continue;
 
-                bool pass = targetBox.Intersects(hitboxes[i].GetHitbox(NPC.Center, NPC.rotation));
+                bool pass = targetBox.Intersects(hitboxes[i].GetHitbox(centerPos, NPC.rotation));
                 if (pass)
                 {
                     CollisionPass = ableToHit;
@@ -673,7 +687,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!hitboxes[i].active)
                     continue;
 
-                bool pass = projectile.Colliding(projectile.getRect(), hitboxes[i].GetHitbox(NPC.Center, NPC.rotation));
+                bool pass = projectile.Colliding(projectile.getRect(), hitboxes[i].GetHitbox(centerPos, NPC.rotation));
                 if (pass)
                 {
                     projectile.ModProj().ultimateCollideOverride = true;
@@ -713,7 +727,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     room.bossDead = true;
                     ClearChildren();
                 }
-                CutsceneSystem.SetCutscene(NPC.Center + hitboxes[1].offset.X * Vector2.UnitX, deathCutsceneDuration, 30, 30, 1.25f);
+                CutsceneSystem.SetCutscene(NPC.Center + hitboxes[1].offset.X * Vector2.UnitX, deathCutsceneDuration, 30, 30, 1.25f, CutsceneSystem.CutsceneSource.Boss);
             }
             else if (deadTime == 1 && modNPC.isRoomNPC)
                 ClearChildren();
@@ -896,7 +910,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnHitByProjectile(Projectile projectile, NPC.HitInfo hit, int damageDone)
         {
-            Rectangle rect = hitboxes[0].GetHitbox(NPC.Center, 0);
+            Rectangle rect = hitboxes[0].GetHitbox(centerPos, 0);
             rect.Inflate(-16, -100);
             rect.X -= 16;
             rect.Y += (int)(rect.Height * 0.25f);
@@ -906,7 +920,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             for (int i = 0; i < hitboxes.Count; i++)
             {
-                Rectangle hitbox = hitboxes[i].GetHitbox(NPC.Center, 0);
+                Rectangle hitbox = hitboxes[i].GetHitbox(centerPos, 0);
                 hitbox.Inflate(15, 16);
                 bool pass = hitbox.Contains(Main.MouseWorld.ToPoint());
                 if (pass)

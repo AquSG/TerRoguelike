@@ -295,7 +295,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center + eyePosition, cutsceneDuration, 30, 30, 1.1f);
+                    CutsceneSystem.SetCutscene(NPC.Center + eyePosition, cutsceneDuration, 30, 30, 1.1f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
 
@@ -524,7 +524,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.localAI[1] = 0;
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
-                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                    if (!TerRoguelikeWorld.escape)
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -1166,7 +1167,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     room.bossDead = true;
                     ClearChildren();
                 }
-                CutsceneSystem.SetCutscene(teleportTargetPos, deathCutsceneDuration, 30, 30, 1.25f);
+                CutsceneSystem.SetCutscene(teleportTargetPos, deathCutsceneDuration, 30, 30, 1.25f, CutsceneSystem.CutsceneSource.Boss);
             }
 
             void ClearChildren()
@@ -1358,7 +1359,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.life > 0 && deadTime <= 1)
             {
                 SoundEngine.PlaySound(SoundID.NPCHit1, NPC.Center);
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 3000.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 1500.0; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f, 0, default, 0.9f);
                     Main.dust[d].noLight = true;

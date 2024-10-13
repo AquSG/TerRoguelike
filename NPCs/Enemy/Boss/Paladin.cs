@@ -20,6 +20,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using TerRoguelike.World;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -79,8 +80,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.immortal = true;
-            NPC.dontTakeDamage = true;
+            NPC.immortal = NPC.dontTakeDamage = true;
             currentFrame = Main.npcFrameCount[Type] - 1;
             NPC.localAI[0] = -270;
             NPC.direction = -1;
@@ -112,19 +112,21 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spawnPos = NPC.Center;
                 if (NPC.localAI[0] == -210)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                     SoundEngine.PlaySound(SoundID.DD2_BetsyFireballShot with { Volume = 1f, Pitch = -1.3f }, NPC.Center);
                 }
                 if (NPC.localAI[0] == -150)
                 {
                     SlamEffect();
+                    NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
                 }
                 NPC.localAI[0]++;
                 if (NPC.localAI[0] == -30)
                 {
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
-                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                    if (!TerRoguelikeWorld.escape)
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
             }
             else
@@ -793,7 +795,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (deadTime == 0)
             {
                 enemyHealthBar.ForceEnd(0);
-                CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f);
+                CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 if (modNPC.isRoomNPC)
                 {
                     if (ActiveBossTheme != null)

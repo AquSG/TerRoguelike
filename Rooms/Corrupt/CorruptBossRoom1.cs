@@ -24,8 +24,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            if (!TerRoguelikeWorld.escape)
-                AddBoss(bossSpawnPos, ModContent.NPCType<CorruptionParasite>());
+            AddBoss(bossSpawnPos, ModContent.NPCType<CorruptionParasite>());
         }
         public override void Update()
         {

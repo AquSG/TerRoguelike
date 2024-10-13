@@ -75,8 +75,9 @@ namespace TerRoguelike.Projectiles
             Rectangle frame = new Rectangle(0, frameHeight * Projectile.frame, tex.Width, frameHeight);
 
             float scaleMultiplier = Projectile.timeLeft > 60 ? MathHelper.Clamp((maxTimeLeft - Projectile.timeLeft) / 10f, 0, 1) : MathHelper.Clamp(Projectile.timeLeft / 60f, 0, 1);
-            
-            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, Color.Lerp(lightColor, Color.White, 0.2f), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale * scaleMultiplier, Math.Sign(Projectile.velocity.X) == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
+
+            float opacity = Math.Min(Projectile.frameCounter / 15f, 1f);
+            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, Color.Lerp(lightColor, Color.White, 0.2f) * opacity, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale * scaleMultiplier, Math.Sign(Projectile.velocity.X) == -1 ? SpriteEffects.FlipVertically : SpriteEffects.None);
             return false;
         }
     }

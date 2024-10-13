@@ -278,6 +278,9 @@ namespace TerRoguelike.Systems
         }
         public static void SetBossTrack(BossTheme bossTheme, float fadeRateMulti = 1)
         {
+            if (TerRoguelikeWorld.escape)
+                return;
+
             BossIntroStopwatch.Reset();
 
             ActiveBossTheme = new BossTheme(bossTheme);

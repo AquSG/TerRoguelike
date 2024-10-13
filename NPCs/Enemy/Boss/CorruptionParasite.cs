@@ -25,6 +25,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using TerRoguelike.World;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -121,8 +122,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.immortal = true;
-            NPC.dontTakeDamage = true;
+            NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
             currentFrame = 0;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
@@ -201,7 +201,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
 
@@ -227,7 +227,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.ai[1] = -60;
                     NPC.ai[3] = 0;
                     NPC.ai[2] = Summon.Id;
-                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                    if (!TerRoguelikeWorld.escape)
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
                 if (NPC.localAI[0] < -30)
                 {
@@ -888,7 +889,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.velocity = (room.RoomCenter16 + room.RoomPosition16 - NPC.Center).SafeNormalize(Vector2.UnitY) * speed;
                     }
                 }
-                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
+                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
             }
             deadTime++;
 
