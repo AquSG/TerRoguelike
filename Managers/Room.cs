@@ -851,6 +851,10 @@ namespace TerRoguelike.Managers
         }
         public virtual bool StartCondition()
         {
+            if (IsBossRoom && TerRoguelikeWorld.escape && (int)FloorID[AssociatedFloor].jstcProgress < (int)(Floor.JstcProgress.Boss))
+            {
+                awake = false;
+            }
             return awake;
         }
         public Vector2 FindAirNearRoomCenter()

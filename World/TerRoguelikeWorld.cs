@@ -48,6 +48,9 @@ namespace TerRoguelike.World
         public static Vector2 lunarGambitSceneStartPos = Vector2.Zero;
         public static int lunarGambitStartDuration = 80;
         public static int lunarGambitFloatOverDuration = 80;
+        public static Vector2 jstcPortalPos = Vector2.Zero;
+        public static int jstcPortalTime = 0;
+        public static Vector2 jstcPortalScale = Vector2.Zero;
         public static Vector2 lunarGambitSceneDisplayPos { get
             {
                 Vector2 drawPos = lunarGambitSceneStartPos;
@@ -126,8 +129,6 @@ namespace TerRoguelike.World
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
                 Room room = RoomSystem.RoomList[i];
-                if (room.IsBossRoom)
-                    continue;
 
                 RoomSystem.ResetRoomID(room.ID);
                 if (room.IsStartRoom)

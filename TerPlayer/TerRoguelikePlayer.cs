@@ -231,6 +231,9 @@ namespace TerRoguelike.TerPlayer
         public bool enableCampfire = false;
         public int lunarGambit = 0;
         public int darkSanctuaryTime = -90;
+        public int jstcTeleportTime = 0;
+        public Vector2 jstcTeleportStart = Vector2.Zero;
+        public Vector2 jstcTeleportEnd = Vector2.Zero;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -2647,6 +2650,9 @@ namespace TerRoguelike.TerPlayer
                     SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2] });
                 }
             }
+            soulOfLenaUses = 0;
+            lenaVisualPosition = Vector2.Zero;
+            droneBuddyVisualPosition = Vector2.Zero;
             escapeArrowTime = 0;
             escaped = false;
             DeathUI.itemsToDraw.Clear();
@@ -2658,7 +2664,9 @@ namespace TerRoguelike.TerPlayer
             if (TerRoguelikeWorld.currentLoop == 0)
                 playthroughTime.Restart();
             currentFloor = null;
-
+            jstcTeleportTime = 0;
+            jstcTeleportStart = Vector2.Zero;
+            jstcTeleportEnd = Vector2.Zero;
         }
         #endregion
 
@@ -2690,7 +2698,7 @@ namespace TerRoguelike.TerPlayer
         #region Draw Effects
         public override void ModifyDrawInfo(ref PlayerDrawSet drawInfo)
         {
-            if (deathEffectTimer > 0) // FUCK ALL OF IT
+            if (deathEffectTimer > 0 || jstcTeleportTime > 0) // FUCK ALL OF IT
             {
                 drawInfo.hideEntirePlayer = true;
                 drawInfo.colorArmorBody = Color.Transparent;
@@ -2725,6 +2733,15 @@ namespace TerRoguelike.TerPlayer
                 a = 0f;
                 fullBright = false;
                 return;
+            }
+
+            if (jstcTeleportTime > 0)
+            {
+                r = 0f;
+                g = 0f;
+                b = 0f;
+                a = 0f;
+                fullBright = false;
             }
 
             if (theFalseSun > 0)

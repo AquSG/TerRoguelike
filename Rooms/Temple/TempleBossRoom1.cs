@@ -28,8 +28,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            if (!TerRoguelikeWorld.escape)
-                AddBoss(bossSpawnPos, ModContent.NPCType<TempleGolem>());
+            AddBoss(bossSpawnPos, ModContent.NPCType<TempleGolem>());
         }
         public override void Update()
         {

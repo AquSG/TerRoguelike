@@ -39,6 +39,8 @@ using Terraria.Graphics.Effects;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TerRoguelike.ILEditing;
 using TerRoguelike.Items;
+using TerRoguelike.Schematics;
+using Terraria.Utilities.Terraria.Utilities;
 
 namespace TerRoguelike.Systems
 {
@@ -172,7 +174,7 @@ namespace TerRoguelike.Systems
                             if (loopCount >= 2)
                             {
                                 Room jumpstartRoom = RoomList[loopCount - 2];
-                                if (!jumpstartRoom.initialized)
+                                if (!jumpstartRoom.initialized && !jumpstartRoom.IsBossRoom)
                                 {
                                     jumpstartRoom.awake = true;
                                     jumpstartRoom.InitializeRoom();
@@ -377,6 +379,11 @@ namespace TerRoguelike.Systems
                 loopcount++;
             }
             RoomManager.FloorIDsInPlay = [.. floorIDsInPlay];
+
+            foreach (var floor in FloorID)
+            {
+                floor.Reset();
+            }
 
             // for some reason vanilla isn't certain about where the spawn position is and some crazy camera lerp happens so I'm just gonna make that.. not happen
             Main.BlackFadeIn = 255;
@@ -684,6 +691,11 @@ namespace TerRoguelike.Systems
                 }
                 Main.spriteBatch.End();
             }
+
+            var thisTex = TexDict["Square"];
+            StartAlphaBlendSpritebatch(false);
+            Main.EntitySpriteDraw(thisTex, TerRoguelikeWorld.jstcPortalPos - Main.screenPosition, null, Color.White, 0, thisTex.Size() * 0.5f, new Vector2(1f / thisTex.Height) * TerRoguelikeWorld.jstcPortalScale, SpriteEffects.None);
+            Main.spriteBatch.End();
 
             DrawSpecialPendingItems();
             DrawHealingPulse();
@@ -1072,6 +1084,25 @@ namespace TerRoguelike.Systems
                     worldTeleportTime = 0;
             }
 
+            if (escape)
+            {
+                int furthest = 100;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer.currentFloor.Stage < furthest)
+                        furthest = modPlayer.currentFloor.Stage;
+                }
+                for (int i = 0; i < RoomManager.FloorIDsInPlay.Count; i++)
+                {
+                    Floor floor = FloorID[RoomManager.FloorIDsInPlay[i]];
+                    if (floor.Stage == furthest && floor.Stage >= 0 && floor.Stage <= 4)
+                    {
+                        floor.jstcUpdate();
+                    }
+                }
+            }
+
             if (lunarGambitSceneTime > 0)
             {
                 lunarGambitSceneTime++;
@@ -1324,6 +1355,8 @@ namespace TerRoguelike.Systems
             lunarGambitSceneTime = 0;
             lunarGambitSceneStartPos = Vector2.Zero;
             loopingDrama = 0;
+            jstcPortalPos = Vector2.Zero;
+            jstcPortalTime = 0;
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
 

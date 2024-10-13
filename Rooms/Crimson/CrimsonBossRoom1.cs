@@ -24,8 +24,7 @@ namespace TerRoguelike.Rooms
         public override void InitializeRoom()
         {
             base.InitializeRoom();
-            if (!TerRoguelikeWorld.escape)
-                AddBoss(bossSpawnPos, ModContent.NPCType<CrimsonVessel>());
+            AddBoss(bossSpawnPos, ModContent.NPCType<CrimsonVessel>());
         }
         public override void Update()
         {

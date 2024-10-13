@@ -23,6 +23,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using TerRoguelike.World;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -120,8 +121,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             deathGodRayRotOffset = Main.rand.NextFloat(MathHelper.TwoPi);
             deathGodRayDirection = Main.rand.NextBool() ? -1 : 1;
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;
-            NPC.immortal = true;
-            NPC.dontTakeDamage = true;
+            NPC.immortal = NPC.dontTakeDamage = true;
             currentFrame = 4;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
@@ -166,11 +166,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spawnPos = NPC.Center;
                 if (NPC.localAI[0] == -cutsceneDuration)
                 {
-                    CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f);
+                    CutsceneSystem.SetCutscene(NPC.Center, cutsceneDuration, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
                 if (NPC.localAI[0] < seerSpawnTime - 230 && NPC.localAI[0] >= seerSpawnTime - 271)
                 {
+                    NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
                     TeleportAI(spawnPos);
                     if (NPC.localAI[0] >= seerSpawnTime - 271 + teleportMoveTimestamp)
                         NPC.hide = false;
@@ -219,7 +220,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
                     NPC.ai[3] = 0;
-                    enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                    if (!TerRoguelikeWorld.escape)
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
                 }
                 if (NPC.localAI[0] < target)
                     NPC.ai[1]++;
@@ -825,7 +827,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 enemyHealthBar.ForceEnd(0);
                 TeleportSlot = SoundEngine.PlaySound(SoundID.DD2_KoboldIgniteLoop with { Volume = 0.5f }, NPC.Center);
-                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f);
+                CutsceneSystem.SetCutscene(NPC.Center, deathCutsceneDuration, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 if (modNPC.isRoomNPC)
                 {
                     if (ActiveBossTheme != null)

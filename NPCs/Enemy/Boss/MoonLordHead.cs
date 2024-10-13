@@ -183,7 +183,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
-                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
+                for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 1000.0; i++)
                 {
                     int d = Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.Vortex, hit.HitDirection, -1f, 0, default, 0.5f);
                     Main.dust[d].noLight = true;
