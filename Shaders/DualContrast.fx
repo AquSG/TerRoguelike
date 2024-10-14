@@ -3,7 +3,7 @@ float4 darkTint;
 float contrastThreshold;
 
 texture sampleTexture;
-sampler2D Texture1Sampler = sampler_state { texture = <sampleTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = wrap; AddressV = wrap; };
+sampler2D Texture1Sampler = sampler_state { texture = <sampleTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = clamp; AddressV = clamp; };
 
 float4 main(float2 uv : TEXCOORD) : COLOR
 {

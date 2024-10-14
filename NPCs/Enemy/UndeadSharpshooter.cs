@@ -164,14 +164,14 @@ namespace TerRoguelike.NPCs.Enemy
                         spriteBatch.Draw(gunTex, NPC.Center - Main.screenPosition + (j * MathHelper.TwoPi + gunRot).ToRotationVector2() * outlineThickness, null, drawColor, gunRot, new Vector2(gunTex.Size().X * 0.75f, gunTex.Size().Y * (spriteEffects == SpriteEffects.FlipVertically ? 0.35f : 0.65f)), NPC.scale, spriteEffects, 0f);
                     }
                 }
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                modNPC.EliteEffectSpritebatch(NPC, new());
             }
             
             return true;
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            modNPC.EliteEffectSpritebatch(NPC, new(1, 1, gunTex.Size(), gunTex.Frame()));
             spriteEffects = NPC.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             if (currentFrame == 16)
                 spriteBatch.Draw(gunTex, NPC.Center - Main.screenPosition, null, drawColor, gunRot, new Vector2(gunTex.Size().X * 0.75f, gunTex.Size().Y * (spriteEffects == SpriteEffects.FlipVertically ? 0.35f : 0.65f)), NPC.scale, spriteEffects, 0f);

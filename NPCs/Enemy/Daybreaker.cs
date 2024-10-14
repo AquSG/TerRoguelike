@@ -153,6 +153,7 @@ namespace TerRoguelike.NPCs.Enemy
                 SpriteEffects spriteEffects = SpriteEffects.None;
                 GetWeaponPositionAndRotation(ref weaponPos, ref weaponRot, ref spriteEffects);
 
+                modNPC.EliteEffectSpritebatch(NPC, new(1, 1, wepTex.Size(), wepTex.Frame()));
                 if (NPC.ai[1] >= -attackCooldown + 60)
                     Main.EntitySpriteDraw(wepTex, weaponPos - Main.screenPosition, null, Color.White, weaponRot, wepTex.Size() * 0.5f, NPC.scale, spriteEffects);
 
@@ -171,11 +172,10 @@ namespace TerRoguelike.NPCs.Enemy
 
                     Main.EntitySpriteDraw(wepTex, weaponPos - Main.screenPosition, null, Color.White, weaponRot, wepTex.Size() * 0.5f, NPC.scale, spriteEffects);
 
-                    Main.spriteBatch.End();
-                    Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 }
             }
 
+            modNPC.EliteEffectSpritebatch(NPC, new());
             Main.EntitySpriteDraw(armTex, NPC.Center - Main.screenPosition + modNPC.drawCenter + (Vector2.UnitY * NPC.gfxOffY), NPC.frame, NPC.GetAlpha(drawColor), NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
         }
         public void GetWeaponPositionAndRotation(ref Vector2 position, ref float rotation, ref SpriteEffects spriteEffects)

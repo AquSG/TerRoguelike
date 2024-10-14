@@ -30,6 +30,7 @@ namespace TerRoguelike.Projectiles
         public float notedBoostedDamage = 1f;
         public int targetPlayer = -1;
         public int targetNPC = -1;
+        public bool sluggedEffect = false;
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0; // set bounces in projectile ai.
@@ -89,6 +90,13 @@ namespace TerRoguelike.Projectiles
                 SpawnExplosion(projectile, modPlayer, target, crit: hit.Crit);
             }
         }
+        public override void OnHitPlayer(Projectile projectile, Player target, Player.HurtInfo info)
+        {
+            if (sluggedEffect)
+            {
+                target.ModPlayer().sluggedTime = 150;
+            }
+        }
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
             if (source is EntitySource_Parent parentSource)
@@ -111,6 +119,8 @@ namespace TerRoguelike.Projectiles
                         projectile.hostile = true;
                         projectile.damage /= 2;
                     }
+                    if (modNPC.eliteVars.slugged)
+                        sluggedEffect = true;
                 }
                 else if (parentSource.Entity is Projectile)
                 {
@@ -126,6 +136,7 @@ namespace TerRoguelike.Projectiles
                             projectile.friendly = parentProj.friendly;
                         }
                     }
+                    sluggedEffect = parentModProj.sluggedEffect;
                 }
             }
         }

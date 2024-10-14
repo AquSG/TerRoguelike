@@ -121,12 +121,12 @@ namespace TerRoguelike.NPCs.Enemy
                     spriteBatch.Draw(baseTex, NPC.Bottom + (-Vector2.UnitY * baseTex.Size().Y * 0.5f) - Main.screenPosition + (j * MathHelper.TwoPi).ToRotationVector2() * outlineThickness, null, drawColor, 0f, baseTex.Size() * 0.5f, NPC.scale, SpriteEffects.None, 0);
                     spriteBatch.Draw(texture, NPC.Center - Main.screenPosition + (-Vector2.UnitY * baseTex.Size().Y * 0.5f) + (j * MathHelper.TwoPi + NPC.rotation).ToRotationVector2() * outlineThickness, new Rectangle(0, frameHeight * currentFrame, texture.Width, frameHeight), drawColor, NPC.rotation, new Vector2(texture.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, effects, 0);
                 }
-                Main.spriteBatch.End();
-                Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
-
+            modNPC.EliteEffectSpritebatch(NPC, new(1, 1, baseTex.Size(), baseTex.Frame()));
             Main.EntitySpriteDraw(baseTex, NPC.Bottom + (-Vector2.UnitY * baseTex.Size().Y * 0.5f) - Main.screenPosition, null, drawColor, 0f, baseTex.Size() * 0.5f, NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition + (-Vector2.UnitY * baseTex.Size().Y * 0.5f), new Rectangle(0, frameHeight * currentFrame, texture.Width, frameHeight), drawColor, NPC.rotation, new Vector2(texture.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, effects);
+            var frame = new Rectangle(0, frameHeight * currentFrame, texture.Width, frameHeight);
+            modNPC.EliteEffectSpritebatch(NPC, new(Frame: frame));
+            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition + (-Vector2.UnitY * baseTex.Size().Y * 0.5f), frame, drawColor, NPC.rotation, new Vector2(texture.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, effects);
 
             return false;
         }
