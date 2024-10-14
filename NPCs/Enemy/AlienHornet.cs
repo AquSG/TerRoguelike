@@ -48,6 +48,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             modNPC.drawCenter = new Vector2(0, 0);
             lightTex = TexDict["AlienHornetGlow"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

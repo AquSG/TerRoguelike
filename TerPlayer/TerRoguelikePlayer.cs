@@ -2671,8 +2671,11 @@ namespace TerRoguelike.TerPlayer
             creditsViewTime = 0;
             escapeFail = false;
             barrierHealth = 0;
-            if (!TerRoguelikeWorld.promoteLoop)
+            if (!TerRoguelikeWorld.promoteLoop && TerRoguelikeWorld.currentLoop == 0)
+            {
                 playthroughTime.Restart();
+                SpawnManager.EliteCredits = 0;
+            }
             currentFloor = null;
             jstcTeleportTime = 0;
             jstcTeleportStart = Vector2.Zero;

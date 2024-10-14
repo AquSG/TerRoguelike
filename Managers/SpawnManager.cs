@@ -22,6 +22,7 @@ using Terraria.Audio;
 using System.Threading;
 using TerRoguelike.Items.Rare;
 using TerRoguelike.MainMenu;
+using Terraria.Localization;
 
 namespace TerRoguelike.Managers
 {
@@ -33,6 +34,7 @@ namespace TerRoguelike.Managers
         public static List<PendingItem> specialPendingItems = [];
 
         public static List<int> trashList = [ItemID.OldShoe, ItemID.FishingSeaweed, ItemID.TinCan];
+        public static float EliteCredits = 0;
         public static void UpdateSpawnManager()
         {
             UpdatePendingEnemies();
@@ -112,18 +114,18 @@ namespace TerRoguelike.Managers
             string giveName = "";
             if (modNpc.eliteVars.tainted)
             {
-                giveName += "Tainted ";
+                giveName += Language.GetOrRegister("Mods.TerRoguelike.EliteTainted").Value;
                 npc.damage = (int)(npc.damage * 1.5f);
             }
             if (modNpc.eliteVars.slugged)
             {
-                giveName += "Slugged ";
+                giveName += Language.GetOrRegister("Mods.TerRoguelike.EliteSlugged").Value; ;
 
                 npc.damage = (int)(npc.damage * 2f);
             }
             if (modNpc.eliteVars.burdened)
             {
-                giveName += "Burdened ";
+                giveName += Language.GetOrRegister("Mods.TerRoguelike.EliteBurdened").Value; ;
                 npc.damage = (int)(npc.damage * 1.5f);
             }
             if (giveName.Length > 0)

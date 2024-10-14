@@ -46,6 +46,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             NPC.noTileCollide = false;
             lightTex = TexDict["OmniwatcherGlow"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

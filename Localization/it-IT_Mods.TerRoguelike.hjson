@@ -37,6 +37,9 @@ BloodMoonDescription2: Diminuisce il tempo di invincibilità, i boss attaccano p
 // RuinedMoonName: Ruined Moon
 // RuinedMoonDescription1: Where fun goes to die
 // RuinedMoonDescription2: Do not play this, seriously
+// EliteTainted: "Tainted "
+// EliteSlugged: "Slugged "
+// EliteBurdened: "Burdened "
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Granata Appiccicosa

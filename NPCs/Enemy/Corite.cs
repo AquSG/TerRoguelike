@@ -51,6 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, -2);
             modNPC.OverrideIgniteVisual = true;
             lightTex = TexDict["CoriteGlow"];
+            NPC.lavaImmune = true;
         }
         public override void AI()
         {

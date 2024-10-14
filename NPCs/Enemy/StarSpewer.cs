@@ -45,6 +45,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0f;
             modNPC.drawCenter = new Vector2(0, 1);
             lightTex = TexDict["StarSpewerGlow"];
+            NPC.lavaImmune = true;
         }
         public override void AI()
         {

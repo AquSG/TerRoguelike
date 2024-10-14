@@ -53,6 +53,7 @@ namespace TerRoguelike.NPCs.Enemy
             lightTex = TexDict["VortexWatcherGlow"];
             ballTex = TexDict["CircularGlow"];
             vortexTex = TexDict["BlackVortex"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {
