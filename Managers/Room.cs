@@ -19,6 +19,9 @@ using Terraria.ID;
 using TerRoguelike.Schematics;
 using rail;
 using Terraria.ModLoader.Core;
+using System.Collections.Generic;
+using TerRoguelike.Rooms;
+using TerRoguelike.Floors;
 
 namespace TerRoguelike.Managers
 {
@@ -103,6 +106,15 @@ namespace TerRoguelike.Managers
         public bool wallActive = false; // whether the barriers of the room are active
         public virtual void AddRoomNPC(Vector2 npcSpawnPosition, int npcToSpawn, int timeUntilSpawn, int telegraphDuration, float telegraphSize = 0, int wave = 0)
         {
+            if (TerRoguelikeWorld.currentLoop > 0 && FloorID[AssociatedFloor].Stage != 5 && Main.rand.NextFloat() < 0.02f)
+            {
+                List<int> lunarSpawnSelect = [];
+                lunarSpawnSelect.AddRange(new LunarPillarRoomBottomLeft().SpawnSelection);
+                lunarSpawnSelect.AddRange(new LunarPillarRoomBottomRight().SpawnSelection);
+                lunarSpawnSelect.AddRange(new LunarPillarRoomTopLeft().SpawnSelection);
+                lunarSpawnSelect.AddRange(new LunarPillarRoomTopRight().SpawnSelection);
+                npcToSpawn = lunarSpawnSelect[Main.rand.Next(lunarSpawnSelect.Count)];
+            }
             for (int i = 0; i < RoomSpawnCap; i++)
             {
                 if (!NotSpawned[i])
@@ -157,25 +169,33 @@ namespace TerRoguelike.Managers
 
                     if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
+                        EliteCredits += 0.34f + 0.66f * TerRoguelikeWorld.currentLoop;
+
                         var eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
-                        if (TerRoguelikeWorld.currentLoop > 0 && Main.rand.NextFloat() < 0.1f)
+                        if (TerRoguelikeWorld.currentLoop > 0)
                         {
-                            switch (Main.rand.Next(3))
+                            float eliteRoll = (float)Math.Pow(EliteCredits, 2) / (EliteCredits + 15);
+                            if (Main.rand.NextFloat(15) < eliteRoll)
                             {
-                                default:
-                                case 0:
-                                    eliteVars.tainted = true;
-                                    break;
-                                case 1:
-                                    eliteVars.slugged = true;
-                                    break;
-                                case 2:
-                                    eliteVars.burdened = true;
-                                    break;
+                                EliteCredits = 0;
+                                switch (Main.rand.Next(3))
+                                {
+                                    default:
+                                    case 0:
+                                        eliteVars.tainted = true;
+                                        break;
+                                    case 1:
+                                        eliteVars.slugged = true;
+                                        break;
+                                    case 2:
+                                        eliteVars.burdened = true;
+                                        break;
+                                }
                             }
                         }
 
                         SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i], eliteVars);
+
                         lastTelegraphDuration = TelegraphDuration[i];
                         waveClearGraceTime = roomTime;
                         roomClearGraceTime = -1;

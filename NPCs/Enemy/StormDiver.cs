@@ -52,6 +52,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, -7);
             lightTex = TexDict["StormDiverGlow"];
             crossTex = TexDict["CrossSpark"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

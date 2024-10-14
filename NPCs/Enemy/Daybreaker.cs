@@ -52,6 +52,7 @@ namespace TerRoguelike.NPCs.Enemy
             lightTex = TexDict["DaybreakerGlow"];
             armTex = TexDict["DaybreakerArm"];
             wepTex = TexDict["Daybreak"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

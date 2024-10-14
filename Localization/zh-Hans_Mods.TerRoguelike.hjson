@@ -37,6 +37,9 @@ BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
 // RuinedMoonName: Ruined Moon
 // RuinedMoonDescription1: Where fun goes to die
 // RuinedMoonDescription2: Do not play this, seriously
+// EliteTainted: "Tainted "
+// EliteSlugged: "Slugged "
+// EliteBurdened: "Burdened "
 
 Projectiles: {
 	ClingyGrenade.DisplayName: 粘性手雷

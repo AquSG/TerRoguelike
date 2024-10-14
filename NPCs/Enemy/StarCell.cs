@@ -50,6 +50,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.noGravity = true;
             lightTex = TexDict["StarCellGlow"];
             modNPC.OverrideIgniteVisual = true;
+            NPC.lavaImmune = true;
         }
         public override void AI()
         {

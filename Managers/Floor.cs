@@ -309,10 +309,11 @@ namespace TerRoguelike.Managers
 
                         foreach (Player player2 in Main.ActivePlayers)
                         {
+                            player2.velocity = Vector2.Zero;
                             var modPlayer = player2.ModPlayer();
                             modPlayer.jstcTeleportTime = 1;
                             modPlayer.jstcTeleportStart = player2.Center;
-                            modPlayer.jstcTeleportEnd = finalTargetPos - (Vector2.UnitY * player2.height * 0.5f);
+                            modPlayer.jstcTeleportEnd = finalTargetPos - (Vector2.UnitY * player2.height);
                         }
                         jstcProgress = JstcProgress.EnemyPortal;
                         TerRoguelikeWorld.jstcPortalTime = -60;
@@ -463,6 +464,7 @@ namespace TerRoguelike.Managers
 
                         foreach (Player player2 in Main.ActivePlayers)
                         {
+                            player2.velocity = Vector2.Zero;
                             var modPlayer = player2.ModPlayer();
                             modPlayer.jstcTeleportTime = 1;
                             modPlayer.jstcTeleportStart = player2.Center;

@@ -692,10 +692,13 @@ namespace TerRoguelike.Systems
                 Main.spriteBatch.End();
             }
 
-            var thisTex = TexDict["Square"];
-            StartAlphaBlendSpritebatch(false);
-            Main.EntitySpriteDraw(thisTex, TerRoguelikeWorld.jstcPortalPos - Main.screenPosition, null, Color.White, 0, thisTex.Size() * 0.5f, new Vector2(1f / thisTex.Height) * TerRoguelikeWorld.jstcPortalScale, SpriteEffects.None);
-            Main.spriteBatch.End();
+            if (TerRoguelikeWorld.escape && TerRoguelikeWorld.jstcPortalTime != 0)
+            {
+                var thisTex = TexDict["Square"];
+                StartAlphaBlendSpritebatch(false);
+                Main.EntitySpriteDraw(thisTex, TerRoguelikeWorld.jstcPortalPos - Main.screenPosition, null, Color.White, 0, thisTex.Size() * 0.5f, new Vector2(1f / thisTex.Height) * TerRoguelikeWorld.jstcPortalScale, SpriteEffects.None);
+                Main.spriteBatch.End();
+            }
 
             DrawSpecialPendingItems();
             DrawHealingPulse();

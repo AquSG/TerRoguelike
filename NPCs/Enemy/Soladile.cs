@@ -48,6 +48,7 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.knockBackResist = 0.2f;
             modNPC.drawCenter = new Vector2(0, -4);
             lightTex = TexDict["SoladileGlow"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

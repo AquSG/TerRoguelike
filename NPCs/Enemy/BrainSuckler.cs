@@ -45,6 +45,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, 5);
             NPC.noGravity = true;
             lightTex = TexDict["BrainSucklerGlow"];
+            NPC.lavaImmune = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

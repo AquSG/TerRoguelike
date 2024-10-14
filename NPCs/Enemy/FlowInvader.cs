@@ -45,6 +45,7 @@ namespace TerRoguelike.NPCs.Enemy
             modNPC.drawCenter = new Vector2(0, -3);
             lightTex = TexDict["FlowInvaderGlow"];
             NPC.noGravity = true;
+            NPC.lavaImmune = true;
         }
         public override void AI()
         {
