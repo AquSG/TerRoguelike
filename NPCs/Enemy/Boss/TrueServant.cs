@@ -47,6 +47,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = false;
             NPC.noGravity = true;
             NPC.hide = true;
+            modNPC.IgniteCentered = true;
         }
         public override void DrawBehind(int index)
         {

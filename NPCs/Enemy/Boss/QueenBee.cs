@@ -91,6 +91,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             squareTex = TexDict["Square"];
+            modNPC.IgniteCentered = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

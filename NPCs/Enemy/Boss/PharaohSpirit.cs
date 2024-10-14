@@ -95,6 +95,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             glowTex = TexDict["PharaohSpiritGlow"];
             noiseTex = TexDict["Crust"];
             circleGlowTex = TexDict["CircularGlow"];
+            modNPC.IgniteCentered = true;
         }
         public override void DrawBehind(int index)
         {

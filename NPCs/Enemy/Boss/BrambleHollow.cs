@@ -88,6 +88,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             fireTex = TexDict["TallFire"];
             NPC.behindTiles = true;
             NPC.noGravity = true;
+            modNPC.IgniteCentered = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

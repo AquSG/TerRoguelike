@@ -88,6 +88,7 @@ namespace TerRoguelike.NPCs
         public int targetNPC = -1;
         public int friendlyFireHitCooldown = 0;
         public bool OverrideIgniteVisual = false;
+        public bool IgniteCentered = false;
 
         //elites
         public EliteVars eliteVars = new();
@@ -3346,7 +3347,7 @@ namespace TerRoguelike.NPCs
                 npc.velocity *= 0.7f;
                 sluggedSlowApplied = true;
             }
-            if (eliteVars.burdened && false)
+            if (eliteVars.burdened)
             {
                 var proj = Projectile.NewProjectileDirect(npc.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<PhantasmalResidue>(), npc.damage, 0);
                 proj.scale = 0.1f;
@@ -3717,7 +3718,7 @@ namespace TerRoguelike.NPCs
                 Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
                 Vector3 colorHSL = Main.rgbToHsl(color);
                 float outlineThickness = 1f;
-                Vector2 vector = new Vector2(npc.frame.Width / 2f, npc.frame.Height / 2f);
+                Vector2 vector = new Vector2(npc.frame.Width / 2f, texture.Height / (float)Main.npcFrameCount[npc.type] * 0.5f);
                 SpriteEffects spriteEffects = npc.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
                 GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
@@ -3725,9 +3726,13 @@ namespace TerRoguelike.NPCs
                 GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
 
                 Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
+                Vector2 halfSize = vector;
                 for (float i = 0; i < 1; i += 0.125f)
                 {
-                    spriteBatch.Draw(texture, position + (i * MathHelper.TwoPi + npc.rotation).ToRotationVector2() * outlineThickness - Main.screenPosition, npc.frame, color, npc.rotation, vector, npc.scale, spriteEffects, 0f);
+                    if (!IgniteCentered)
+                        spriteBatch.Draw(texture, npc.Bottom + (i * MathHelper.TwoPi + npc.rotation).ToRotationVector2() * outlineThickness - screenPos + new Vector2((float)(-texture.Width) * npc.scale / 2f + halfSize.X * npc.scale, (float)(-texture.Height) * npc.scale / (float)Main.npcFrameCount[npc.type] + 4f + halfSize.Y * npc.scale + Main.NPCAddHeight(npc) + npc.gfxOffY), (Rectangle?)npc.frame, Color.White, npc.rotation, halfSize, npc.scale, spriteEffects, 0f);
+                    else
+                        spriteBatch.Draw(texture, position + (i * MathHelper.TwoPi + npc.rotation).ToRotationVector2() * outlineThickness - Main.screenPosition, npc.frame, color, npc.rotation, vector, npc.scale, spriteEffects, 0f);
                 }
 
                 spriteBatch.End();
