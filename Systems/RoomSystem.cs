@@ -776,15 +776,30 @@ namespace TerRoguelike.Systems
             if (SpawnManager.pendingEnemies.Count == 0)
                 return;
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             Color color = Color.HotPink;
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             Vector3 colorHSL = Main.rgbToHsl(color);
             GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(0.4f);
             GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
             GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+
             for (int i = 0; i < SpawnManager.pendingEnemies.Count; i++)
             {
                 PendingEnemy enemy = SpawnManager.pendingEnemies[i];
+
+                Color newColor = SpawnManager.GetEliteColor(enemy.eliteVars);
+                if (newColor != color)
+                {
+                    color = newColor;
+
+                    Main.spriteBatch.End();
+                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                    colorHSL = Main.rgbToHsl(color);
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(0.4f);
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                    GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                }
+
                 Texture2D texture = enemy.dummyTex;
                 int frameCount = Main.npcFrameCount[enemy.NPCType];
                 int height = (int)(texture.Height / frameCount);

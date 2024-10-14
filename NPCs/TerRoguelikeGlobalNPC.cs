@@ -108,9 +108,9 @@ namespace TerRoguelike.NPCs
                 slugged = false;
                 burdened = false;
             }
-            public bool tainted; // kb immunity, extra update, adaptive armor
-            public bool slugged; // kb immunity, slower, inflicts slowness, innate armor, adaptive armor
-            public bool burdened; // kb immunity, spreads phantasmal residue, adaptive armor
+            public bool tainted; // kb immunity, extra update, lesser adaptive armor
+            public bool slugged; // kb immunity, slower, inflicts slowness, more damage, innate armor, adaptive armor
+            public bool burdened; // kb immunity, spreads residual burden, adaptive armor
         }
         #endregion
 
@@ -3290,10 +3290,8 @@ namespace TerRoguelike.NPCs
 
             if (TerRoguelikeWorld.escape && TerRoguelikeBoss)
             {
-                EnemyHealthBarSystem.enemyHealthBar = new([npc.whoAmI], npc.FullName);
+                EnemyHealthBarSystem.enemyHealthBar = new([npc.whoAmI], npc.GivenOrTypeName);
             }
-
-            //eliteVars.slugged = true;
         }
         public override bool PreAI(NPC npc)
         {
@@ -3315,7 +3313,7 @@ namespace TerRoguelike.NPCs
                 diminishingDR += 20;
                 if (sluggedSlowApplied)
                 {
-                    npc.velocity /= 0.7f;
+                    npc.velocity /= 0.85f;
                     sluggedSlowApplied = false;
                 }
                 npc.knockBackResist = 0;
@@ -3344,13 +3342,29 @@ namespace TerRoguelike.NPCs
             }
             if (eliteVars.slugged)
             {
-                npc.velocity *= 0.7f;
+                npc.velocity *= 0.85f;
                 sluggedSlowApplied = true;
             }
             if (eliteVars.burdened)
             {
-                var proj = Projectile.NewProjectileDirect(npc.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<PhantasmalResidue>(), npc.damage, 0);
-                proj.scale = 0.1f;
+                bool pass = true;
+                int projType = ModContent.ProjectileType<ResidualBurden>();
+                Vector2 spawnPos = npc.Center;
+                for (int i = 0; i < Main.maxProjectiles; i++)
+                {
+                    var proj = Main.projectile[i];
+                    if (!proj.active || proj.type != projType || proj.timeLeft < 45) continue;
+
+                    var projRect = proj.getRect();
+                    projRect.Inflate(6, 6);
+                    if (projRect.Contains(spawnPos.ToPoint()))
+                    {
+                        pass = false;
+                        break;
+                    }
+                }
+                if (pass)
+                    Projectile.NewProjectileDirect(npc.GetSource_FromThis(), spawnPos, Vector2.Zero, projType, npc.damage, 0);
             }
 
             if (hostileTurnedAlly)
@@ -3718,7 +3732,7 @@ namespace TerRoguelike.NPCs
                 Color color = Color.Lerp(Color.Yellow, Color.OrangeRed, Main.rand.NextFloat(0.4f, 0.6f + float.Epsilon) + 0.2f + (0.2f * (float)Math.Cos((Main.GlobalTimeWrappedHourly * 20f)))) * 0.8f;
                 Vector3 colorHSL = Main.rgbToHsl(color);
                 float outlineThickness = 1f;
-                Vector2 vector = new Vector2(npc.frame.Width / 2f, texture.Height / (float)Main.npcFrameCount[npc.type] * 0.5f);
+                Vector2 vector = IgniteCentered ? new Vector2(npc.frame.Width / 2f, npc.frame.Height / 2f) : new Vector2(npc.frame.Width / 2f, texture.Height / (float)Main.npcFrameCount[npc.type] * 0.5f);
                 SpriteEffects spriteEffects = npc.spriteDirection == -1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
                 GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);

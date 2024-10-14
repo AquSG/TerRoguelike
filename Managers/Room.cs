@@ -157,7 +157,25 @@ namespace TerRoguelike.Managers
 
                     if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
-                        SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i]);
+                        var eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
+                        if (TerRoguelikeWorld.currentLoop > 0 && Main.rand.NextFloat() < 0.1f)
+                        {
+                            switch (Main.rand.Next(3))
+                            {
+                                default:
+                                case 0:
+                                    eliteVars.tainted = true;
+                                    break;
+                                case 1:
+                                    eliteVars.slugged = true;
+                                    break;
+                                case 2:
+                                    eliteVars.burdened = true;
+                                    break;
+                            }
+                        }
+
+                        SpawnEnemy(NPCToSpawn[i], NPCSpawnPosition[i], myRoom, TelegraphDuration[i], TelegraphSize[i], eliteVars);
                         lastTelegraphDuration = TelegraphDuration[i];
                         waveClearGraceTime = roomTime;
                         roomClearGraceTime = -1;

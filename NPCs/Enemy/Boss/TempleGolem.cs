@@ -201,7 +201,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[1] = 0;
                     NPC.ai[2] = Summon.Id;
                     if (!TerRoguelikeWorld.escape)
-                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.GivenOrTypeName);
                 }
             }
             else
