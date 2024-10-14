@@ -16,6 +16,7 @@ using TerRoguelike.Particles;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.ItemManager;
+using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
 using Microsoft.Xna.Framework.Audio;
 using Terraria.Audio;
 using System.Threading;
@@ -38,9 +39,10 @@ namespace TerRoguelike.Managers
             UpdatePendingItems();
         }
 
-        public static void SpawnEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.45f)
+        public static void SpawnEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.45f, EliteVars eliteVariables = null)
         {
-            pendingEnemies.Add(new PendingEnemy(npcType, position, roomListID, telegraphDuration, telegraphSize));
+            eliteVariables ??= new EliteVars();
+            pendingEnemies.Add(new PendingEnemy(npcType, position, roomListID, telegraphDuration, telegraphSize, eliteVariables));
         }
         public static void UpdatePendingEnemies()
         {
@@ -64,7 +66,7 @@ namespace TerRoguelike.Managers
                 {
                     int x = Main.rand.Next(width);
                     Vector2 pos = topLeftPos + new Vector2(x, y);
-                    ParticleManager.AddParticle(new Square(pos, Vector2.Zero, time, Color.HotPink, new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * enemy.TelegraphSize), 0, 0.96f, time, true));
+                    ParticleManager.AddParticle(new Square(pos, Vector2.Zero, time, GetEliteColor(enemy.eliteVars), new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * enemy.TelegraphSize), 0, 0.96f, time, true));
                 }
 
                 enemy.TelegraphDuration--;
@@ -81,18 +83,56 @@ namespace TerRoguelike.Managers
                     NPC dummyNpc = new NPC();
                     dummyNpc.type = enemy.NPCType;
                     dummyNpc.SetDefaults(dummyNpc.type);
-                    SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), new Vector2(enemy.Position.X, enemy.Position.Y + (dummyNpc.height / 2f)), enemy.NPCType, enemy.RoomListID);
+                    NPC spawnedNPC = SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), new Vector2(enemy.Position.X, enemy.Position.Y + (dummyNpc.height / 2f)), enemy.NPCType, enemy.RoomListID, enemy.eliteVars);
 
                     enemy.spent = true;
                 }
             }
             pendingEnemies.RemoveAll(enemy => enemy.spent);
         }
-        public static NPC SpawnNPCTerRoguelike(IEntitySource source, Vector2 position,  int type, int roomListID = -1)
+        public static Color GetEliteColor(EliteVars eliteVars)
+        {
+            if (eliteVars.tainted)
+                return Color.Yellow;
+            if (eliteVars.slugged)
+                return Color.Purple;
+            if (eliteVars.burdened)
+                return Color.Lerp(Color.Teal, Color.Cyan, 0.3f);
+
+            return Color.HotPink;
+        }
+        public static NPC SpawnNPCTerRoguelike(IEntitySource source, Vector2 position,  int type, int roomListID = -1, EliteVars eliteVariables = null)
         {
             int spawnedNpc = NPC.NewNPC(source, (int)position.X, (int)position.Y, type);
             NPC npc = Main.npc[spawnedNpc];
             TerRoguelikeGlobalNPC modNpc = npc.ModNPC();
+
+            eliteVariables ??= new EliteVars();
+            modNpc.eliteVars = eliteVariables;
+            string giveName = "";
+            if (modNpc.eliteVars.tainted)
+            {
+                giveName += "Tainted ";
+                npc.damage = (int)(npc.damage * 1.5f);
+            }
+            if (modNpc.eliteVars.slugged)
+            {
+                giveName += "Slugged ";
+
+                npc.damage = (int)(npc.damage * 2f);
+            }
+            if (modNpc.eliteVars.burdened)
+            {
+                giveName += "Burdened ";
+                npc.damage = (int)(npc.damage * 1.5f);
+            }
+            if (giveName.Length > 0)
+            {
+                npc.GivenName = giveName + npc.GivenName + npc.TypeName;
+            }
+            if (npc.damage < 0)
+                npc.damage = int.MaxValue;
+
             if (roomListID > -1)
             {
                 modNpc.isRoomNPC = true;
@@ -269,7 +309,8 @@ namespace TerRoguelike.Managers
         public float TelegraphSize;
         public bool spent = false;
         public Texture2D dummyTex;
-        public PendingEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.5f)
+        public EliteVars eliteVars;
+        public PendingEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.5f, EliteVars EliteVars = null)
         {
             NPCType = npcType;
             Position = position;
@@ -278,6 +319,8 @@ namespace TerRoguelike.Managers
             MaxTelegraphDuration = telegraphDuration;
             TelegraphSize = telegraphSize;
             dummyTex = TextureAssets.Npc[NPCType].Value;
+            EliteVars ??= new EliteVars();
+            eliteVars = EliteVars;
         }
     }
     public class PendingItem

@@ -219,7 +219,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.dontTakeDamage = false;
                     NPC.ai[1] = 0;
                     if (!TerRoguelikeWorld.escape)
-                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.GivenOrTypeName);
                 }
             }
             else

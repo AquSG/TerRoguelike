@@ -525,7 +525,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.immortal = false;
                     NPC.dontTakeDamage = false;
                     if (!TerRoguelikeWorld.escape)
-                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.GivenOrTypeName);
                 }
             }
             else

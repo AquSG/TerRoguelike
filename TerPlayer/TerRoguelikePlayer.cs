@@ -3095,10 +3095,10 @@ namespace TerRoguelike.TerPlayer
 
             if (sluggedTime > 0)
             {
-                Color color = new Color(r, g, b).MultiplyRGB(Color.Purple);
-                r = color.R;
-                g = color.G;
-                b = color.B;
+                Color color = Color.Lerp(new Color(r, g, b), Color.Purple, 0.6f);
+                r = color.R / 255f;
+                g = color.G / 255f;
+                b = color.B / 255f;
             }
 
             if (soulOfLena > 0)

@@ -55,7 +55,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
                     NPC.immortal = false;
                     if (NPC.localAI[0] == 0)
                     {
-                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.FullName);
+                        enemyHealthBar = new EnemyHealthBar([NPC.whoAmI], NPC.GivenOrTypeName);
                         NPC.localAI[0] = 1;
                     }
                 }
