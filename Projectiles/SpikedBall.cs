@@ -103,6 +103,13 @@ namespace TerRoguelike.Projectiles
                 return true;
 
             NPC owner = Main.npc[modProj.npcOwner];
+            var modNPC = owner.ModNPC();
+            if (modNPC == null)
+                return true;
+
+
+            var ballTex = TextureAssets.Projectile[Type].Value;
+            modNPC.EliteEffectSpritebatch(owner, new(1, 1, ballTex.Size(), ballTex.Frame()));
 
             Vector2 chainVect = Projectile.Center - owner.Center;
             int chainLength = (int)(chainVect.Length() / 10);
@@ -115,7 +122,9 @@ namespace TerRoguelike.Projectiles
                 Main.spriteBatch.Draw(chainTex, pos - Main.screenPosition, null, color, rot + MathHelper.PiOver2, new Vector2(chainTex.Size().X * 0.5f, 0), 1f, SpriteEffects.None, 0);
             }
 
-            Main.spriteBatch.Draw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Lighting.GetColor(new Point((int)(Projectile.Center.X / 16), (int)(Projectile.Center.Y / 16))), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+            Main.spriteBatch.Draw(ballTex, Projectile.Center - Main.screenPosition, null, Lighting.GetColor(new Point((int)(Projectile.Center.X / 16), (int)(Projectile.Center.Y / 16))), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+
+            TerRoguelikeUtils.StartVanillaSpritebatch();
             return false;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)

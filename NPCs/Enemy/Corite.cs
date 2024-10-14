@@ -17,6 +17,7 @@ using TerRoguelike.Projectiles;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.Graphics.Shaders;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -120,6 +121,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            TerRoguelikeUtils.StartVanillaSpritebatch();
             Vector2 offset = new Vector2(NPC.width * 0.5f, NPC.height * 0.5f);
             Texture2D tex = TextureAssets.Npc[Type].Value;
             for (int i = 0; i < NPC.oldPos.Length; i++)
@@ -145,9 +147,8 @@ namespace TerRoguelike.NPCs.Enemy
                 {
                     spriteBatch.Draw(tex, NPC.Center - Main.screenPosition + ((j * MathHelper.TwoPi + NPC.rotation).ToRotationVector2() * outlineThickness) + modNPC.drawCenter, NPC.frame, drawColor, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection > 0 ? SpriteEffects.FlipHorizontally : SpriteEffects.None, 0f);
                 }
-                spriteBatch.End();
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
+            modNPC.EliteEffectSpritebatch(NPC, new());
             return true;
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

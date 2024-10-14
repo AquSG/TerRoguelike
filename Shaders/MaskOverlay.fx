@@ -5,7 +5,7 @@ float4 tint;
 
 texture sampleTexture;
 texture replacementTexture;
-sampler2D Texture1Sampler = sampler_state { texture = <sampleTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = wrap; AddressV = wrap; };
+sampler2D Texture1Sampler = sampler_state { texture = <sampleTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = clamp; AddressV = clamp; };
 sampler2D Texture2Sampler = sampler_state { texture = <replacementTexture>; magfilter = LINEAR; minfilter = LINEAR; mipfilter = LINEAR; AddressU = wrap; AddressV = wrap; };
 
 float4 main(float2 uv : TEXCOORD) : COLOR

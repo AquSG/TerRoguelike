@@ -87,6 +87,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            modNPC.EliteEffectSpritebatch(NPC, new(1, 1, headTex.Size(), headTex.Frame()));
             spriteBatch.Draw(headTex, headPosition, null, drawColor, headRotation, headTex.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
@@ -129,8 +130,7 @@ namespace TerRoguelike.NPCs.Enemy
                 {
                     spriteBatch.Draw(headTex, position + (j * MathHelper.TwoPi + headRotation + MathHelper.PiOver2).ToRotationVector2() * outlineThickness, null, color, headRotation, headTex.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
                 }
-                spriteBatch.End();
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                modNPC.EliteEffectSpritebatch(NPC, new());
             }
 
             return true;

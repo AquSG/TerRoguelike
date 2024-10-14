@@ -152,8 +152,6 @@ namespace TerRoguelike.NPCs.Enemy
                         spriteBatch.Draw(texture, position + (j * MathHelper.TwoPi + segment.Rotation + MathHelper.PiOver2).ToRotationVector2() * outlineThickness - Main.screenPosition, null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
                     }
                 }
-                spriteBatch.End();
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
             for (int i = modNPC.Segments.Count - 1; i >= 0; i--)
             {
@@ -166,6 +164,7 @@ namespace TerRoguelike.NPCs.Enemy
                 else
                     texture = bodyTex;
 
+                modNPC.EliteEffectSpritebatch(NPC, new(-1, 1, texture.Size(), texture.Frame()));
                 Color color = modNPC.ignitedStacks.Count > 0 ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor(new Point((int)(segment.Position.X / 16), (int)(segment.Position.Y / 16)));
                 spriteBatch.Draw(texture, segment.Position - screenPos, null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * 0.5f, 1f, SpriteEffects.None, 0);
             }

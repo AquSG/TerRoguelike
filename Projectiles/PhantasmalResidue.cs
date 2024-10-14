@@ -67,17 +67,17 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.timeLeft % 3 == 0)
                 {
                     ParticleManager.AddParticle(new Glow(
-                    Projectile.Center, Projectile.velocity, 5, Color.Teal * 0.4f, new Vector2(0.34f), 0, 0.96f, 3, true));
+                    Projectile.Center, Projectile.velocity, 5, Color.Teal * 0.4f, new Vector2(0.34f) * Projectile.scale, 0, 0.96f, 3, true));
                 }
                 
             }
         }
-        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, targetHitbox, Projectile.width * 0.4f);
+        public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox) => CircularHitboxCollision(Projectile.Center, targetHitbox, Projectile.width * 0.4f * Projectile.scale);
         public override bool? CanDamage() => Projectile.timeLeft > 45 ? null : false;
         public override bool PreDraw(ref Color lightColor)
         {
             int frameHeight = rockTex.Height / 3;
-            float scale = 1f;
+            float scale = Projectile.scale;
             if (Projectile.timeLeft < 60)
             {
                 scale *= Projectile.timeLeft / 60f;
@@ -92,7 +92,7 @@ namespace TerRoguelike.Projectiles
                 Rectangle frame = new Rectangle(0, frameHeight * frameCount, rockTex.Width, frameHeight - 2);
                 int dir = rockDirections[i];
                 float rotOff = Main.GlobalTimeWrappedHourly * 1f * dir;
-                Main.EntitySpriteDraw(rockTex, pos + Projectile.Center - Main.screenPosition, frame, color, rot + rotOff, frame.Size() * 0.5f, scale, dir == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
+                Main.EntitySpriteDraw(rockTex, Projectile.scale * pos + Projectile.Center - Main.screenPosition, frame, color, rot + rotOff, frame.Size() * 0.5f, scale, dir == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
             }
 
             return false;

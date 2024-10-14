@@ -39,6 +39,7 @@ using static Terraria.Player;
 using System.CodeDom;
 using Terraria.GameContent.Animations;
 using System.Linq.Expressions;
+using System.Drawing.Drawing2D;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -234,6 +235,7 @@ namespace TerRoguelike.TerPlayer
         public int jstcTeleportTime = 0;
         public Vector2 jstcTeleportStart = Vector2.Zero;
         public Vector2 jstcTeleportEnd = Vector2.Zero;
+        public int sluggedTime = 0;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -387,6 +389,7 @@ namespace TerRoguelike.TerPlayer
                 Player.accRunSpeed *= 1.15f;
                 Player.runSlowdown *= 1.75f;
                 Player.GetJumpState(ExtraJump.CloudInABottle).Enable();
+                Player.CancelAllBootRunVisualEffects();
 
                 if (!RuinedMoonActive)
                     Player.lifeRegen += 4;
@@ -1585,6 +1588,13 @@ namespace TerRoguelike.TerPlayer
             {
                 Player.moveSpeed *= 1.30f;
                 Player.maxRunSpeed *= 1.30f;
+            }
+            if (sluggedTime > 0)
+            {
+                sluggedTime--;
+                Player.moveSpeed *= 0.7f;
+                Player.accRunSpeed *= 0.7f;
+                Player.maxRunSpeed *= 0.7f;
             }
 
             Player.jumpSpeedBoost += 5f * jumpSpeedMultiplier;
@@ -3083,6 +3093,14 @@ namespace TerRoguelike.TerPlayer
                 }   
             }
 
+            if (sluggedTime > 0)
+            {
+                Color color = new Color(r, g, b).MultiplyRGB(Color.Purple);
+                r = color.R;
+                g = color.G;
+                b = color.B;
+            }
+
             if (soulOfLena > 0)
             {
                 bool hurtCheck = Player.immuneTime > 0 && soulOfLenaHurtVisual;
@@ -3666,6 +3684,29 @@ namespace TerRoguelike.TerPlayer
             DeathUI.itemsToDraw.Clear();
             deadTime = 0;
             creditsViewTime = 0;
+        }
+        #endregion
+
+        #region Slugged Effect
+        public class SluggedDrawLayer : PlayerDrawLayer
+        {
+            public override Position GetDefaultPosition() => PlayerDrawLayers.AfterLastVanillaLayer;
+
+            public override bool GetDefaultVisibility(PlayerDrawSet drawInfo)
+            {
+                Player drawPlayer = drawInfo.drawPlayer;
+                TerRoguelikePlayer modPlayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
+                if (drawInfo.shadow != 0f || drawPlayer.dead || (drawPlayer.immuneAlpha > 120) || modPlayer.deathEffectTimer > 0 || modPlayer.jstcTeleportTime > 0)
+                    return false;
+
+                return modPlayer.sluggedTime > 0;
+            }
+
+            protected override void Draw(ref PlayerDrawSet drawInfo)
+            {
+                if (drawInfo.shadow != 0)
+                    return;
+            }
         }
         #endregion
 

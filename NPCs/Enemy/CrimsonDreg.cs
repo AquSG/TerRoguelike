@@ -67,7 +67,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void FindFrame(int frameHeight)
         {
             int currentFrame = NPC.velocity.Y == 0 ? (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 2)) + 2 : 1;
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight - 1);
         }
     }
 }

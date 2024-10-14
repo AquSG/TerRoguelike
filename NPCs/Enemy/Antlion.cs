@@ -124,12 +124,13 @@ namespace TerRoguelike.NPCs.Enemy
                     spriteBatch.Draw(headTex, NPC.Center - Main.screenPosition + (Vector2.UnitY * 8) + (j * MathHelper.TwoPi + NPC.rotation - MathHelper.PiOver2).ToRotationVector2() * outlineThickness, new Rectangle(0, headFrameHeight * headFrame, headTex.Width, headFrameHeight), color * opacity, NPC.rotation - MathHelper.PiOver2, new Vector2(headTex.Width * 0.5f, (headFrameHeight * 0.5f)) + (Vector2.UnitY * 8), NPC.scale, SpriteEffects.None, 0f);
                     spriteBatch.Draw(texture, NPC.Center - Main.screenPosition + (Vector2.UnitY * 10) + (j * MathHelper.TwoPi).ToRotationVector2() * outlineThickness, new Rectangle(0, frameHeight, texture.Width, frameHeight), color * opacity, 0f, new Vector2(headTex.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, SpriteEffects.None, 0f);
                 }
-                spriteBatch.End();
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
-
-            Main.EntitySpriteDraw(headTex, NPC.Center - Main.screenPosition + (Vector2.UnitY * 8), new Rectangle(0, headFrameHeight * headFrame, headTex.Width, headFrameHeight), drawColor * opacity, NPC.rotation - MathHelper.PiOver2, new Vector2(headTex.Width * 0.5f, (headFrameHeight * 0.5f)) + (Vector2.UnitY * 8), NPC.scale, SpriteEffects.None);
-            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition + (Vector2.UnitY * 10), new Rectangle(0, frameHeight, texture.Width, frameHeight), drawColor * opacity, 0f, new Vector2(headTex.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, SpriteEffects.None);
+            var headRect = new Rectangle(0, headFrameHeight * headFrame, headTex.Width, headFrameHeight);
+            modNPC.EliteEffectSpritebatch(NPC, new(TexSize: headTex.Size(), Frame: headRect));
+            Main.EntitySpriteDraw(headTex, NPC.Center - Main.screenPosition + (Vector2.UnitY * 8), headRect, drawColor * opacity, NPC.rotation - MathHelper.PiOver2, new Vector2(headTex.Width * 0.5f, (headFrameHeight * 0.5f)) + (Vector2.UnitY * 8), NPC.scale, SpriteEffects.None);
+            var bodyFrame = new Rectangle(0, frameHeight, texture.Width, frameHeight);
+            modNPC.EliteEffectSpritebatch(NPC, new(Frame: bodyFrame));
+            Main.EntitySpriteDraw(texture, NPC.Center - Main.screenPosition + (Vector2.UnitY * 10), bodyFrame, drawColor * opacity, 0f, new Vector2(headTex.Width * 0.5f, (frameHeight * 0.5f)), NPC.scale, SpriteEffects.None);
             return false;
         }
     }

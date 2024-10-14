@@ -18,6 +18,7 @@ using TerRoguelike.Schematics;
 using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
+using Terraria.Graphics.Effects;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
@@ -56,6 +57,8 @@ namespace TerRoguelike.NPCs
         public float AdaptiveArmorAddRate = 20;
         public float AdaptiveArmorDecayRate = 60;
         public float AdaptiveArmor = 0;
+        public int currentUpdate = 1;
+        public int maxUpdates = 1;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -85,6 +88,29 @@ namespace TerRoguelike.NPCs
         public int targetNPC = -1;
         public int friendlyFireHitCooldown = 0;
         public bool OverrideIgniteVisual = false;
+
+        //elites
+        public EliteVars eliteVars = new();
+        public bool sluggedSlowApplied = false;
+        public class EliteVars
+        {
+            public EliteVars(EliteVars flags)
+            {
+                tainted = flags.tainted;
+                slugged = flags.slugged;
+                burdened = flags.burdened;
+                
+            }
+            public EliteVars()
+            {
+                tainted = false;
+                slugged = false;
+                burdened = false;
+            }
+            public bool tainted; // kb immunity, extra update, adaptive armor
+            public bool slugged; // kb immunity, slower, inflicts slowness, innate armor, adaptive armor
+            public bool burdened; // kb immunity, spreads phantasmal residue, adaptive armor
+        }
         #endregion
 
         #region Base AIs
@@ -3224,6 +3250,7 @@ namespace TerRoguelike.NPCs
                 maxSpawns = 0;
             }
         }
+
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
             whoAmI = npc.whoAmI;
@@ -3264,10 +3291,41 @@ namespace TerRoguelike.NPCs
             {
                 EnemyHealthBarSystem.enemyHealthBar = new([npc.whoAmI], npc.FullName);
             }
+
+            //eliteVars.slugged = true;
         }
         public override bool PreAI(NPC npc)
         {
             diminishingDR = 0;
+
+            maxUpdates = 1;
+            if (eliteVars.tainted)
+            {
+                AdaptiveArmorEnabled = true;
+                AdaptiveArmorDecayRate = 280;
+                AdaptiveArmorCap = 50;
+                maxUpdates = 2;
+                npc.knockBackResist = 0;
+            }
+            if (eliteVars.slugged)
+            {
+                AdaptiveArmorEnabled = true;
+                AdaptiveArmorDecayRate = 280;
+                diminishingDR += 20;
+                if (sluggedSlowApplied)
+                {
+                    npc.velocity /= 0.7f;
+                    sluggedSlowApplied = false;
+                }
+                npc.knockBackResist = 0;
+            }
+            if (eliteVars.burdened)
+            {
+                AdaptiveArmorEnabled = true;
+                AdaptiveArmorDecayRate = 280;
+                npc.knockBackResist = 0;
+            }
+
             if (ballAndChainSlowApplied) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
             {
                 npc.velocity /= 0.85f;
@@ -3277,83 +3335,21 @@ namespace TerRoguelike.NPCs
         }
         public override void PostAI(NPC npc)
         {
-            if (ignitedStacks != null && ignitedStacks.Count > 0) // ignite debuff logic
-            {
-                if (ignitedHitCooldown <= 0)
-                {
-                    int hitDamage = 0;
-                    int targetDamage = (int)(npc.lifeMax * 0.01f);
-                    int owner = -1;
-
-                    for (int i = 0; i < ignitedStacks.Count; i++)
-                    {
-                        var igniteStack = ignitedStacks[i];
-                        int myDamageCap = igniteStack.DamageCapPerTick;
-                        int myTargetDamage = targetDamage;
-                        if (myTargetDamage > myDamageCap)
-                            myTargetDamage = myDamageCap;
-                        else if (myTargetDamage < 1)
-                            myTargetDamage = 1;
-
-                        if (ignitedStacks[i].DamageToDeal < myTargetDamage)
-                        {
-                            hitDamage += ignitedStacks[i].DamageToDeal;
-                            ignitedStacks[i].DamageToDeal = 0;
-                        }
-                        else
-                        {
-                            hitDamage += myTargetDamage;
-                            ignitedStacks[i].DamageToDeal -= myTargetDamage;
-                        }
-                        if (i == ignitedStacks.Count - 1)
-                        {
-                            owner = ignitedStacks[i].Owner;
-                        }
-                    }
-                    IgniteHit(hitDamage, npc, owner);
-                    ignitedStacks.RemoveAll(x => x.DamageToDeal <= 0);
-                }
-            }
-            if (ignitedHitCooldown > 0)
-                ignitedHitCooldown--;
-
-            if (bleedingStacks != null && bleedingStacks.Count > 0) // bleeding debuff logic
-            {
-                if (bleedingHitCooldown <= 0)
-                {
-                    int hitDamage = 0;
-                    int targetDamage = 40;
-                    int owner = -1;
-
-                    for (int i = 0; i < bleedingStacks.Count; i++)
-                    {
-                        if (bleedingStacks[i].DamageToDeal < targetDamage)
-                        {
-                            hitDamage += ignitedStacks[i].DamageToDeal;
-                            bleedingStacks[i].DamageToDeal = 0;
-                        }
-                        else
-                        {
-                            hitDamage += targetDamage;
-                            bleedingStacks[i].DamageToDeal -= targetDamage;
-                        }
-                        if (i == bleedingStacks.Count - 1)
-                        {
-                            owner = bleedingStacks[i].Owner;
-                        }
-                    }
-                    BleedingHit(hitDamage, npc, owner);
-                    bleedingStacks.RemoveAll(x => x.DamageToDeal <= 0);
-                }
-            }
-            if (bleedingHitCooldown > 0)
-                bleedingHitCooldown--;
-
             if (ballAndChainSlow > 0) // slow down
             {
                 npc.velocity *= 0.85f;
                 ballAndChainSlow--;
                 ballAndChainSlowApplied = true;
+            }
+            if (eliteVars.slugged)
+            {
+                npc.velocity *= 0.7f;
+                sluggedSlowApplied = true;
+            }
+            if (eliteVars.burdened && false)
+            {
+                var proj = Projectile.NewProjectileDirect(npc.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<PhantasmalResidue>(), npc.damage, 0);
+                proj.scale = 0.1f;
             }
 
             if (hostileTurnedAlly)
@@ -3389,14 +3385,89 @@ namespace TerRoguelike.NPCs
                     friendlyFireHitCooldown--;
             }
 
-            if (AdaptiveArmor > 0)
+            if (currentUpdate == 1)
             {
-                if (AdaptiveArmor > AdaptiveArmorCap)
-                    AdaptiveArmor = AdaptiveArmorCap;
+                if (ignitedStacks != null && ignitedStacks.Count > 0) // ignite debuff logic
+                {
+                    if (ignitedHitCooldown <= 0)
+                    {
+                        int hitDamage = 0;
+                        int targetDamage = (int)(npc.lifeMax * 0.01f);
+                        int owner = -1;
 
-                AdaptiveArmor -= AdaptiveArmorDecayRate / 60f;
-                if (AdaptiveArmor < 0)
-                    AdaptiveArmor = 0;
+                        for (int i = 0; i < ignitedStacks.Count; i++)
+                        {
+                            var igniteStack = ignitedStacks[i];
+                            int myDamageCap = igniteStack.DamageCapPerTick;
+                            int myTargetDamage = targetDamage;
+                            if (myTargetDamage > myDamageCap)
+                                myTargetDamage = myDamageCap;
+                            else if (myTargetDamage < 1)
+                                myTargetDamage = 1;
+
+                            if (ignitedStacks[i].DamageToDeal < myTargetDamage)
+                            {
+                                hitDamage += ignitedStacks[i].DamageToDeal;
+                                ignitedStacks[i].DamageToDeal = 0;
+                            }
+                            else
+                            {
+                                hitDamage += myTargetDamage;
+                                ignitedStacks[i].DamageToDeal -= myTargetDamage;
+                            }
+                            if (i == ignitedStacks.Count - 1)
+                            {
+                                owner = ignitedStacks[i].Owner;
+                            }
+                        }
+                        IgniteHit(hitDamage, npc, owner);
+                        ignitedStacks.RemoveAll(x => x.DamageToDeal <= 0);
+                    }
+                }
+                if (ignitedHitCooldown > 0)
+                    ignitedHitCooldown--;
+
+                if (bleedingStacks != null && bleedingStacks.Count > 0) // bleeding debuff logic
+                {
+                    if (bleedingHitCooldown <= 0)
+                    {
+                        int hitDamage = 0;
+                        int targetDamage = 40;
+                        int owner = -1;
+
+                        for (int i = 0; i < bleedingStacks.Count; i++)
+                        {
+                            if (bleedingStacks[i].DamageToDeal < targetDamage)
+                            {
+                                hitDamage += ignitedStacks[i].DamageToDeal;
+                                bleedingStacks[i].DamageToDeal = 0;
+                            }
+                            else
+                            {
+                                hitDamage += targetDamage;
+                                bleedingStacks[i].DamageToDeal -= targetDamage;
+                            }
+                            if (i == bleedingStacks.Count - 1)
+                            {
+                                owner = bleedingStacks[i].Owner;
+                            }
+                        }
+                        BleedingHit(hitDamage, npc, owner);
+                        bleedingStacks.RemoveAll(x => x.DamageToDeal <= 0);
+                    }
+                }
+                if (bleedingHitCooldown > 0)
+                    bleedingHitCooldown--;
+
+                if (AdaptiveArmor > 0)
+                {
+                    if (AdaptiveArmor > AdaptiveArmorCap)
+                        AdaptiveArmor = AdaptiveArmorCap;
+
+                    AdaptiveArmor -= AdaptiveArmorDecayRate / 60f;
+                    if (AdaptiveArmor < 0)
+                        AdaptiveArmor = 0;
+                }
             }
         }
         public override bool CheckDead(NPC npc)
@@ -3533,6 +3604,13 @@ namespace TerRoguelike.NPCs
                 CombatText.NewText(segRect, hit.Crit ? CombatText.DamagedHostileCrit : CombatText.DamagedHostile, hit.Damage, hit.Crit);
             }
         }
+        public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
+        {
+            if (eliteVars.slugged)
+            {
+                target.ModPlayer().sluggedTime = 150;
+            }
+        }
         public override void ModifyHoverBoundingBox(NPC npc, ref Rectangle boundingBox)
         {
             if (Segments.Count > 0)
@@ -3549,6 +3627,83 @@ namespace TerRoguelike.NPCs
                     }
                 }
             }
+        }
+        public class EliteEffectHelperVars
+        {
+            public Vector2? texSize;
+            public Rectangle? frame;
+            public int vertFrameCount;
+            public int horizFrameCount;
+            public EliteEffectHelperVars(int VertFrameCount = -1, int HorizFrameCount = 1, Vector2? TexSize = null, Rectangle? Frame = null)
+            {
+                vertFrameCount = VertFrameCount;
+                horizFrameCount = HorizFrameCount;
+                texSize = TexSize;
+                frame = Frame;
+            }
+        }
+        public bool EliteEffectSpritebatch(NPC npc, EliteEffectHelperVars vars, bool end = true)
+        {
+            var sb = Main.spriteBatch;
+            if (end)
+                sb.End();
+            if (eliteVars.tainted)
+            {
+                Effect taintedEffect = Filters.Scene["TerRoguelike:DualContrast"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, taintedEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                taintedEffect.Parameters["lightTint"].SetValue(Color.Black.ToVector4());
+                taintedEffect.Parameters["darkTint"].SetValue(Color.Yellow.ToVector4());
+                taintedEffect.Parameters["contrastThreshold"].SetValue(0.3f);
+            }
+            else if (eliteVars.slugged)
+            {
+                float time = Main.GlobalTimeWrappedHourly + npc.whoAmI;
+                Vector2 texSize = vars.texSize == null ? TextureAssets.Npc[npc.type].Size() : (Vector2)vars.texSize;
+                Rectangle frame = vars.frame == null ? npc.frame : (Rectangle)vars.frame;
+                if (vars.vertFrameCount < 0)
+                    vars.vertFrameCount = Main.npcFrameCount[npc.type];
+
+                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                Vector2 screenOff = new Vector2((float)Math.Cos(time * MathHelper.PiOver4) / texSize.X * 40, time / texSize.Y * 40);
+                Vector2 frameTopLeft = new Vector2(frame.X, frame.Y);
+                screenOff -= frameTopLeft / texSize;
+                Color tint = Color.Purple;
+
+                maskEffect.Parameters["screenOffset"].SetValue(screenOff);
+                maskEffect.Parameters["stretch"].SetValue(texSize / 300);
+                maskEffect.Parameters["replacementTexture"].SetValue(TexDict["Streaks"]);
+                maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            }
+            else if (eliteVars.burdened)
+            {
+                float time = Main.GlobalTimeWrappedHourly + npc.whoAmI;
+                Vector2 texSize = vars.texSize == null ? TextureAssets.Npc[npc.type].Size() : (Vector2)vars.texSize;
+                Rectangle frame = vars.frame == null ? npc.frame : (Rectangle)vars.frame;
+                if (vars.vertFrameCount < 0)
+                    vars.vertFrameCount = Main.npcFrameCount[npc.type];
+
+                Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                Vector2 screenOff = new Vector2((float)Math.Cos(time * MathHelper.PiOver4) / texSize.X * 40, time / texSize.Y * 70);
+                Vector2 frameTopLeft = new Vector2(frame.X, frame.Y);
+                screenOff -= frameTopLeft / texSize;
+                Color tint = Color.Lerp(Color.Teal, Color.Cyan, 0.3f);
+
+                maskEffect.Parameters["screenOffset"].SetValue(screenOff);
+                maskEffect.Parameters["stretch"].SetValue(texSize / 400);
+                maskEffect.Parameters["replacementTexture"].SetValue(TexDict["Crust"]);
+                maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            }
+            else
+            {
+                StartVanillaSpritebatch(false);
+                return false;
+            }
+            return true;
         }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
@@ -3585,6 +3740,8 @@ namespace TerRoguelike.NPCs
                 DrawRotatlingBloodParticles(false, npc);
             }
 
+            EliteEffectSpritebatch(npc, new());
+
             return true;
         }
         public override void DrawEffects(NPC npc, ref Color drawColor)
@@ -3611,6 +3768,7 @@ namespace TerRoguelike.NPCs
         }
         public override void PostDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            StartVanillaSpritebatch();
             if (bleedingStacks != null && bleedingStacks.Count > 0)
             {
                 DrawRotatlingBloodParticles(true, npc);

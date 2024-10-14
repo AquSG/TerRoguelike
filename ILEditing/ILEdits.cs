@@ -63,8 +63,25 @@ namespace TerRoguelike.ILEditing
             On_TileDrawing.Draw += On_TileDrawing_Draw;
             On_TileDrawing.DrawMultiTileVines += On_TileDrawing_DrawMultiTileVines;
             On_TileDrawing.DrawReverseVines += On_TileDrawing_DrawReverseVines;
+            On_NPC.UpdateNPC_Inner += NPCExtraUpdate;
         }
-		public static bool dualContrastTileShader = false;
+
+        private void NPCExtraUpdate(On_NPC.orig_UpdateNPC_Inner orig, NPC self, int i)
+        {
+            orig.Invoke(self, i);
+            var modNPC = self.ModNPC();
+            if (modNPC != null)
+            {
+                if (modNPC.currentUpdate < modNPC.maxUpdates)
+                {
+                    modNPC.currentUpdate++;
+                    self.UpdateNPC(self.whoAmI);
+                    modNPC.currentUpdate = 1;
+                }
+            }
+        }
+
+        public static bool dualContrastTileShader = false;
         private void On_TileDrawing_DrawMultiTileVines(On_TileDrawing.orig_DrawMultiTileVines orig, TileDrawing self)
         {
             if (!dualContrastTileShader)

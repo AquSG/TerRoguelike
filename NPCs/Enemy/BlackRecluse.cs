@@ -40,11 +40,13 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.HitSound = SoundID.NPCHit29;
             NPC.DeathSound = SoundID.NPCDeath32;
             NPC.knockBackResist = 0.25f;
-            modNPC.drawCenter = new Vector2(0, -9);
+            modNPC.drawCenter = new Vector2(0, -9f);
             NPC.noGravity = true;
         }
         public override void AI()
         {
+
+            modNPC.drawCenter = new Vector2(0, -9f);
             modNPC.RogueSpiderAI(NPC, 1.5f, 0.09f, 100, 40, 120, 120f);
 
             if (NPC.ai[1] == 2)
@@ -102,7 +104,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             NPC.gfxOffY = 8;
             int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[modNPCID]);
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight - 1);
         }
     }
 }
