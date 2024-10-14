@@ -96,6 +96,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             eyeTex = TexDict["TempleGolemEyes"];
             lightTex = TexDict["TempleGolemGlow"];
             godRayTex = TexDict["GodRay"];
+            modNPC.IgniteCentered = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

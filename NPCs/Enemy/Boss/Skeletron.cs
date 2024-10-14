@@ -90,6 +90,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noGravity = true;
             eyeTex = TexDict["SkeletronEye"];
             squareTex = TexDict["Square"];
+            modNPC.IgniteCentered = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

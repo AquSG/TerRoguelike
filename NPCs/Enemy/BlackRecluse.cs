@@ -104,7 +104,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             NPC.gfxOffY = 8;
             int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[modNPCID]);
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight - 1);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight - 2);
         }
     }
 }
