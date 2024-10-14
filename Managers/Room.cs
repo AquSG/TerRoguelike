@@ -135,7 +135,7 @@ namespace TerRoguelike.Managers
             if (!initialized) // initialize the room
                 InitializeRoom();
 
-            if (closedTime <= 60 && (TerRoguelikeWorld.escapeTime > TerRoguelikeWorld.escapeTimeSet - 180 || !TerRoguelikeWorld.escape)) //wall is visually active up to 1 second after room clear
+            if (closedTime <= 60 && (TerRoguelikeWorld.escapeTime > TerRoguelikeWorld.escapeTimeSet - 180 || !TerRoguelikeWorld.escape || (TerRoguelikeWorld.escape && IsBossRoom && FloorID[AssociatedFloor].jstcProgress >= Floor.JstcProgress.Boss))) //wall is visually active up to 1 second after room clear
                 wallActive = true;
 
             if (!active) // room done, closed time increments
@@ -847,7 +847,7 @@ namespace TerRoguelike.Managers
         }
         public virtual bool ClearCondition()
         {
-            return !anyAlive && roomClearGraceTime == 0;
+            return (!anyAlive && roomClearGraceTime == 0) || (TerRoguelikeWorld.escape && IsBossRoom && bossDead && FloorID[AssociatedFloor].jstcProgress >= Floor.JstcProgress.Boss);
         }
         public virtual bool StartCondition()
         {

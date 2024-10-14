@@ -991,6 +991,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             drawPos = hitboxes[1].offset + NPC.Center;
             draws.Add(new StoredDraw(mouthTex, drawPos, mouthFrame, Lighting.GetColor(drawPos.ToTileCoordinates()), mouthRotation, mouthFrame.Size() * new Vector2(0.6f, 0.5f), 1f, SpriteEffects.FlipHorizontally));
 
+            Vector2 drawOff = -Main.screenPosition;
+            if (NPC.localAI[0] < -30)
+            {
+                float completion = ((-NPC.localAI[0] - 30f) / cutsceneDuration);
+                completion = MathHelper.SmoothStep(0, 1, completion);
+                drawOff += new Vector2(160 * completion, 0);
+            }
             if (modNPC.ignitedStacks.Count > 0)
             {
                 StartAlphaBlendSpritebatch();
@@ -1006,19 +1013,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     var draw = draws[i];
                     for (int j = 0; j < 8; j++)
                     {
-                        draw.Draw(-Main.screenPosition + Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
+                        draw.Draw(drawOff + Vector2.UnitX.RotatedBy(j * MathHelper.PiOver4 + draw.rotation) * 2);
                     }
                 }
 
                 StartVanillaSpritebatch();
             }
-            Vector2 drawOff = -Main.screenPosition;
-            if (NPC.localAI[0] < -30)
-            {
-                float completion = ((-NPC.localAI[0] - 30f) / cutsceneDuration);
-                completion = MathHelper.SmoothStep(0, 1, completion);
-                drawOff += new Vector2(160 * completion, 0);
-            }
+
             for (int i = 0; i < draws.Count; i++)
             {
                 var draw = draws[i];

@@ -2661,7 +2661,7 @@ namespace TerRoguelike.TerPlayer
             creditsViewTime = 0;
             escapeFail = false;
             barrierHealth = 0;
-            if (TerRoguelikeWorld.currentLoop == 0)
+            if (!TerRoguelikeWorld.promoteLoop)
                 playthroughTime.Restart();
             currentFloor = null;
             jstcTeleportTime = 0;
@@ -2725,7 +2725,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void DrawEffects(PlayerDrawSet drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
-            if (deathEffectTimer > 0 || Player.dead)
+            if (deathEffectTimer > 0 || Player.dead || jstcTeleportTime > 0)
             {
                 r = 0f;
                 g = 0f;
@@ -2733,15 +2733,6 @@ namespace TerRoguelike.TerPlayer
                 a = 0f;
                 fullBright = false;
                 return;
-            }
-
-            if (jstcTeleportTime > 0)
-            {
-                r = 0f;
-                g = 0f;
-                b = 0f;
-                a = 0f;
-                fullBright = false;
             }
 
             if (theFalseSun > 0)
@@ -3467,7 +3458,7 @@ namespace TerRoguelike.TerPlayer
             {
                 Player drawPlayer = drawInfo.drawPlayer;
                 TerRoguelikePlayer modPlayer = drawPlayer.GetModPlayer<TerRoguelikePlayer>();
-                if (drawInfo.shadow != 0f || drawPlayer.dead || (drawPlayer.immuneAlpha > 120) || modPlayer.deathEffectTimer > 0)
+                if (drawInfo.shadow != 0f || drawPlayer.dead || (drawPlayer.immuneAlpha > 120) || modPlayer.deathEffectTimer > 0 || modPlayer.jstcTeleportTime > 0)
                     return false;
 
                 return drawInfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().barrierHealth > 1f;
