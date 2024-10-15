@@ -236,6 +236,7 @@ namespace TerRoguelike.TerPlayer
         public Vector2 jstcTeleportStart = Vector2.Zero;
         public Vector2 jstcTeleportEnd = Vector2.Zero;
         public int sluggedTime = 0;
+        public bool sluggedAttempt = false;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -325,6 +326,7 @@ namespace TerRoguelike.TerPlayer
 
             lunarGambit = 0;
 
+            sluggedAttempt = false;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
@@ -2309,6 +2311,12 @@ namespace TerRoguelike.TerPlayer
         }
         public void HurtEffects(int damage)
         {
+            if (sluggedAttempt)
+            {
+                sluggedAttempt = false;
+                sluggedTime = 150;
+            }
+
             if (protectiveBubble > 0 && outOfDangerTime >= 420)
             {
                 SoundEngine.PlaySound(SoundID.Item87 with { Volume = 1f }, Player.Center);
