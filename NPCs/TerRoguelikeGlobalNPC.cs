@@ -3295,6 +3295,7 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreAI(NPC npc)
         {
+            eliteVars.slugged = true;
             diminishingDR = 0;
 
             maxUpdates = 1;
@@ -3619,11 +3620,11 @@ namespace TerRoguelike.NPCs
                 CombatText.NewText(segRect, hit.Crit ? CombatText.DamagedHostileCrit : CombatText.DamagedHostile, hit.Damage, hit.Crit);
             }
         }
-        public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
+        public override void ModifyHitPlayer(NPC npc, Player target, ref Player.HurtModifiers modifiers)
         {
             if (eliteVars.slugged)
             {
-                target.ModPlayer().sluggedTime = 150;
+                target.ModPlayer().sluggedAttempt = true;
             }
         }
         public override void ModifyHoverBoundingBox(NPC npc, ref Rectangle boundingBox)

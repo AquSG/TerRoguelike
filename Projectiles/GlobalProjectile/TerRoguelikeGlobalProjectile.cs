@@ -10,6 +10,7 @@ using TerRoguelike.NPCs;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
 using static TerRoguelike.Managers.NPCManager;
+using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.Projectiles
@@ -44,6 +45,13 @@ namespace TerRoguelike.Projectiles
                 return true;
             }
             return null;
+        }
+        public override void ModifyHitPlayer(Projectile projectile, Player target, ref Player.HurtModifiers modifiers)
+        {
+            if (sluggedEffect)
+            {
+                target.ModPlayer().sluggedAttempt = true;
+            }
         }
         public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
         {
@@ -88,13 +96,6 @@ namespace TerRoguelike.Projectiles
             if (modPlayer.volatileRocket > 0 && procChainBools.originalHit && projectile.type != ModContent.ProjectileType<Explosion>())
             {
                 SpawnExplosion(projectile, modPlayer, target, crit: hit.Crit);
-            }
-        }
-        public override void OnHitPlayer(Projectile projectile, Player target, Player.HurtInfo info)
-        {
-            if (sluggedEffect)
-            {
-                target.ModPlayer().sluggedTime = 150;
             }
         }
         public override void OnSpawn(Projectile projectile, IEntitySource source)
