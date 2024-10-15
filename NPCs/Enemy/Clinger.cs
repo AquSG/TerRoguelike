@@ -173,8 +173,6 @@ namespace TerRoguelike.NPCs.Enemy
                             spriteBatch.Draw(tex, position + (k * MathHelper.TwoPi + direction).ToRotationVector2() * outlineThickness - Main.screenPosition, !end ? null : new Rectangle(tex.Width - (tetherLength % segmentLength), 0, (tetherLength % segmentLength), tex.Height), color, direction, tex.Size() * 0.5f, NPC.scale, spriteEffects, 0f);
                         }
                     }
-                    spriteBatch.End();
-                    spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
                 }
                 for (int i = 0; i < tetherLength; i += segmentLength)
                 {
@@ -184,8 +182,10 @@ namespace TerRoguelike.NPCs.Enemy
 
                     Vector2 drawPos = start + (Vector2.UnitX * i).RotatedBy(direction);
                     Texture2D tex = (i / segmentLength) % 2 == 0 ? segment1Tex : segment2Tex;
+                    modNPC.EliteEffectSpritebatch(NPC, new(1, 1, tex.Size(), tex.Frame()));
                     spriteBatch.Draw(tex, drawPos - Main.screenPosition, !end ? null : new Rectangle(tex.Width - (tetherLength % segmentLength), 0, (tetherLength % segmentLength), tex.Height), modNPC.ignitedStacks.Count > 0 ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Lighting.GetColor((int)(drawPos.X / 16), (int)(drawPos.Y / 16)), direction, tex.Size() * 0.5f, NPC.scale, SpriteEffects.FlipHorizontally, 0);
                 }
+                modNPC.EliteEffectSpritebatch(NPC, new());
             }
             return true;
         }
