@@ -169,11 +169,10 @@ namespace TerRoguelike.Managers
 
                     if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
-                        EliteCredits += 0.34f + 0.66f * TerRoguelikeWorld.currentLoop;
-
                         var eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
                         if (TerRoguelikeWorld.currentLoop > 0)
                         {
+                            EliteCredits += 0.34f + 0.66f * TerRoguelikeWorld.currentLoop;
                             float eliteRoll = (float)Math.Pow(EliteCredits, 2) / (EliteCredits + 15);
                             if (Main.rand.NextFloat(15) < eliteRoll)
                             {
