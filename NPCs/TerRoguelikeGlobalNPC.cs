@@ -3295,7 +3295,6 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreAI(NPC npc)
         {
-            eliteVars.slugged = true;
             diminishingDR = 0;
 
             maxUpdates = 1;

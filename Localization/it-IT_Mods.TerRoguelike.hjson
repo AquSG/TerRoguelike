@@ -966,19 +966,19 @@ Items: {
 	}
 
 	LunarGambit: {
-		// DisplayName: Mossa Lunare
-		/* Tooltip:
+		DisplayName: Mossa Lunare
+		Tooltip:
 			'''
 			Un cimelio segreto, nascosto frettolosamente nel già velato Santuario Lunare, da una faccia da molto perduta nel tempo
 			Permette l'opportunità di ritornare all'inizo del dungeon dopo aver sconfitto il Signore della Luna
 			Ritornare in questo modo ti permette di affrontare il dungeon con tutti i tuoi oggetti e dandoti la possibilità di ottenerne di nuovi
 			In compenso, i nemici continueranno a diventare più forti ad ogni piano che superi
-			''' */
+			'''
 	}
 
 	TheFalseSun: {
-		// DisplayName: Il Sole Falso
-		/* Tooltip:
+		DisplayName: Il Sole Falso
+		Tooltip:
 			'''
 			Aumenta la probabilità di colpi critici del 5%
 			Infliggere un colpo critico su un nemico fa accumulare energia solare che decade nel tempo
@@ -986,7 +986,7 @@ Items: {
 			Il sole falso può colpire 3 nemici vicini ad esso infliggendo fino a 75 danni base
 			I colpi critici dal sole falso stesso non creano energia solare
 			Ogni copie extra dell'oggetto aumentano il danno base di 75
-			''' */
+			'''
 	}
 }
 

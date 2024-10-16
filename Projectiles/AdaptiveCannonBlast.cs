@@ -55,10 +55,13 @@ namespace TerRoguelike.Projectiles
             Projectile.rotation += Main.rand.NextFloat(MathHelper.TwoPi);
 
             Projectile.scale = Projectile.ai[0];
-            //scale support
-            Projectile.position = Projectile.Center + new Vector2(-12 * Projectile.scale, -12 * Projectile.scale);
-            Projectile.width = (int)(24 * Projectile.scale);
-            Projectile.height = (int)(24 * Projectile.scale);
+            if (false)
+            {
+                //scale support
+                Projectile.position = Projectile.Center + new Vector2(-12 * Projectile.scale, -12 * Projectile.scale);
+                Projectile.width = (int)(24 * Projectile.scale);
+                Projectile.height = (int)(24 * Projectile.scale);
+            }
 
             modPlayer = Main.player[Projectile.owner].ModPlayer();
             if (CollidingVector(Projectile.position, new Vector2(Projectile.width, Projectile.height)) != null)
