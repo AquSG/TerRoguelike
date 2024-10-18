@@ -2679,6 +2679,7 @@ namespace TerRoguelike.TerPlayer
             creditsViewTime = 0;
             escapeFail = false;
             barrierHealth = 0;
+            swingAnimCompletion = 0;
             if (!TerRoguelikeWorld.promoteLoop && TerRoguelikeWorld.currentLoop == 0)
             {
                 playthroughTime.Restart();
@@ -3695,6 +3696,7 @@ namespace TerRoguelike.TerPlayer
             DeathUI.itemsToDraw.Clear();
             deadTime = 0;
             creditsViewTime = 0;
+            swingAnimCompletion = 0;
         }
         #endregion
 
