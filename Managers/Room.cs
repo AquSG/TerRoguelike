@@ -22,6 +22,7 @@ using Terraria.ModLoader.Core;
 using System.Collections.Generic;
 using TerRoguelike.Rooms;
 using TerRoguelike.Floors;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Managers
 {
@@ -170,7 +171,7 @@ namespace TerRoguelike.Managers
                     if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
                         var eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
-                        if (TerRoguelikeWorld.currentLoop > 0)
+                        if (TerRoguelikeWorld.currentLoop > 0 || TerRoguelikeMenu.RuinedMoonActive)
                         {
                             EliteCredits += 0.34f + 0.66f * TerRoguelikeWorld.currentLoop;
                             float eliteRoll = (float)Math.Pow(EliteCredits, 2) / (EliteCredits + 15);
