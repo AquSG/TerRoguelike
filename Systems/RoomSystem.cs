@@ -692,12 +692,51 @@ namespace TerRoguelike.Systems
                 Main.spriteBatch.End();
             }
 
-            if (TerRoguelikeWorld.escape && TerRoguelikeWorld.jstcPortalTime != 0)
+            if (escape && jstcPortalTime != 0)
             {
-                var thisTex = TexDict["Square"];
-                StartAlphaBlendSpritebatch(false);
-                Main.EntitySpriteDraw(thisTex, TerRoguelikeWorld.jstcPortalPos - Main.screenPosition, null, Color.White, 0, thisTex.Size() * 0.5f, new Vector2(1f / thisTex.Height) * TerRoguelikeWorld.jstcPortalScale, SpriteEffects.None);
-                Main.spriteBatch.End();
+                float portalScaleInterpolant = MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp(Math.Abs(jstcPortalTime) / 60f, 0, 1));
+                bool portalRot = jstcPortalScale.X > jstcPortalScale.Y;
+
+                Effect portalEffect = Filters.Scene["TerRoguelike:SpecialPortal"].GetShader().Shader;
+
+                var tex = TexDict["BlobbyNoiseSmall"];
+                Vector2 finalScale = new Vector2(1f / tex.Height) * jstcPortalScale * 1.5f;
+                if (portalRot)
+                    finalScale = new Vector2(finalScale.Y, finalScale.X);
+
+                for (int i = 0; i < 3; i++)
+                {
+                    float completion = i / 2f;
+                    float inVcompletion = 1 - completion;
+                    Vector2 loopOff = new Vector2(48 * completion, 0).RotatedBy(jstcPortalRot);
+                    float loopScale = 1 - (i / 6f);
+
+                    Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, portalEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                    float noiseScaleModif = MathHelper.Lerp(1, 0.5f, completion);
+                    portalEffect.Parameters["noiseScale"].SetValue(0.75f * noiseScaleModif);
+                    portalEffect.Parameters["uvOff"].SetValue(new Vector2((float)Math.Sin(Main.GlobalTimeWrappedHourly * MathHelper.PiOver4 * 0.25f) * 1f, Main.GlobalTimeWrappedHourly * 0.5f) * noiseScaleModif);
+                    portalEffect.Parameters["outerRing"].SetValue(MathHelper.Lerp(0.5f, MathHelper.Lerp(0.8f, 0.65f, completion), portalScaleInterpolant));
+                    portalEffect.Parameters["innerRing"].SetValue(0);
+                    portalEffect.Parameters["invisThreshold"].SetValue(0.35f);
+                    portalEffect.Parameters["edgeBlend"].SetValue(0.08f);
+                    portalEffect.Parameters["tint"].SetValue((Color.Lerp(Color.White, Color.Yellow, portalScaleInterpolant) * 0.8f * MathHelper.Lerp(1, 0.6f, completion)).ToVector4());
+                    portalEffect.Parameters["edgeTint"].SetValue((Color.White * MathHelper.Lerp(1, 0.7f, completion)).ToVector4());
+                    portalEffect.Parameters["finalFadeExponent"].SetValue(0.5f);
+                    portalEffect.Parameters["edgeThresholdMulti"].SetValue(0);
+                    portalEffect.Parameters["centerThresholdMulti"].SetValue(0.001f);
+                    portalEffect.Parameters["centerThresholdExponent"].SetValue(1.4f);
+
+                    loopOff *= finalScale.Y * 1.25f;
+                    if (i != 0)
+                    {
+                        loopOff += loopOff.SafeNormalize(Vector2.UnitY) * (float)Math.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi) * 1.4f * i;
+                    }
+                    Main.EntitySpriteDraw(tex, jstcPortalPos - Main.screenPosition + loopOff, null, Color.White, portalRot ? MathHelper.PiOver2 : 0, tex.Size() * 0.5f, finalScale * portalScaleInterpolant * loopScale, SpriteEffects.None);
+
+                    Main.spriteBatch.End();
+                }
+
             }
 
             DrawSpecialPendingItems();
@@ -1269,6 +1308,29 @@ namespace TerRoguelike.Systems
                         WorldGen.SaveAndQuit();
                     }
                     loopingDrama++;
+                }
+            }
+            if (escape && jstcPortalTime != 0)
+            {
+                float portalScaleInterpolant = MathHelper.SmoothStep(0f, 1f, MathHelper.Clamp(Math.Abs(jstcPortalTime) / 60f, 0, 1));
+                Vector2 finalScale = jstcPortalScale * 1.5f * portalScaleInterpolant;
+                float rot = finalScale.X > finalScale.Y ? MathHelper.PiOver2 : 0;
+
+                
+                for (int i = 0; i < 2; i++)
+                {
+                    float rate = Math.Max(jstcPortalScale.X, jstcPortalScale.Y) / 250f;
+                    if (Main.rand.NextFloat() < rate)
+                    {
+                        Vector2 randVect = Main.rand.NextVector2CircularEdge(finalScale.X * 0.4f, finalScale.Y * 0.4f);
+                        Vector2 ballVel = -randVect * 0.1f;
+                        ballVel = ballVel.ToRotation().AngleLerp(jstcPortalRot, Main.rand.NextFloat(0.5f, 0.9f)).ToRotationVector2() * Main.rand.NextFloat(2f, 6f);
+
+                        ParticleManager.AddParticle(new Ball(
+                            jstcPortalPos + randVect, ballVel,
+                            30, Color.Lerp(Color.Yellow, Color.White, Main.rand.NextFloat(0.999999f - portalScaleInterpolant, 1)),
+                            new Vector2(0.14f) * MathHelper.Lerp(portalScaleInterpolant, 1, 0.4f), 0, 0.96f, 30));
+                    }
                 }
             }
 

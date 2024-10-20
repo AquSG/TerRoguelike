@@ -18,6 +18,8 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.Utilities;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using TerRoguelike.Particles;
+using Terraria.Audio;
+using Steamworks;
 
 namespace TerRoguelike.Managers
 {
@@ -164,7 +166,9 @@ namespace TerRoguelike.Managers
                                                 Vector2 doorBottom = checkTile.ToWorldCoordinates(8, 0);
                                                 TerRoguelikeWorld.jstcPortalPos = Vector2.Lerp(doorTop, doorBottom, 0.5f);
                                                 float doorHeight = doorBottom.Y - doorTop.Y;
+                                                doorHeight = Math.Max(doorHeight, 96);
                                                 TerRoguelikeWorld.jstcPortalScale = new Vector2(doorHeight * 0.2f, doorHeight);
+                                                TerRoguelikeWorld.jstcPortalRot = 0;
                                                 allow = true;
                                                 break;
                                             }
@@ -195,7 +199,9 @@ namespace TerRoguelike.Managers
                                                 Vector2 doorRight = checkTile.ToWorldCoordinates(0, 8);
                                                 TerRoguelikeWorld.jstcPortalPos = Vector2.Lerp(doorLeft, doorRight, 0.5f);
                                                 float doorHeight = doorRight.X - doorLeft.X;
+                                                doorHeight = Math.Max(doorHeight, 96);
                                                 TerRoguelikeWorld.jstcPortalScale = new Vector2(doorHeight, doorHeight * 0.2f);
+                                                TerRoguelikeWorld.jstcPortalRot = doorDir == 1 ? MathHelper.PiOver2 : -MathHelper.PiOver2;
                                                 allow = true;
                                                 break;
                                             }
@@ -207,6 +213,7 @@ namespace TerRoguelike.Managers
                             {
                                 TerRoguelikeWorld.jstcPortalTime = 1;
                                 jstcProgress = JstcProgress.Enemies;
+                                SoundEngine.PlaySound(TerRoguelikeWorld.JstcSpawn with { Volume = 1f, Pitch = -0.2f }, TerRoguelikeWorld.jstcPortalPos);
                             }
                         }
                     }
@@ -318,6 +325,7 @@ namespace TerRoguelike.Managers
                         jstcProgress = JstcProgress.EnemyPortal;
                         TerRoguelikeWorld.jstcPortalTime = -60;
                         CutsceneSystem.SetCutscene(player.Center, 180, 60, 30, 1.5f);
+                        SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2], Pitch = -0.25f });
                         break;
                     }
                 }
@@ -397,7 +405,9 @@ namespace TerRoguelike.Managers
                                             Vector2 doorBottom = checkTile.ToWorldCoordinates(8, 0);
                                             TerRoguelikeWorld.jstcPortalPos = Vector2.Lerp(doorTop, doorBottom, 0.5f);
                                             float doorHeight = doorBottom.Y - doorTop.Y;
+                                            doorHeight = Math.Max(doorHeight, 96);
                                             TerRoguelikeWorld.jstcPortalScale = new Vector2(doorHeight * 0.2f, doorHeight);
+                                            TerRoguelikeWorld.jstcPortalRot = MathHelper.Pi;
                                             allow = true;
                                             break;
                                         }
@@ -425,7 +435,9 @@ namespace TerRoguelike.Managers
                                             Vector2 RightPos = checkTile.ToWorldCoordinates(0, 8);
                                             TerRoguelikeWorld.jstcPortalPos = Vector2.Lerp(leftPos, RightPos, 0.5f);
                                             float doorHeight = RightPos.X - leftPos.X;
+                                            doorHeight = Math.Max(doorHeight, 96);
                                             TerRoguelikeWorld.jstcPortalScale = new Vector2(doorHeight, doorHeight * 0.2f);
+                                            TerRoguelikeWorld.jstcPortalRot = doorDir == 2 ? MathHelper.PiOver2 : -MathHelper.PiOver2;
                                             allow = true;
                                             break;
                                         }
@@ -438,6 +450,8 @@ namespace TerRoguelike.Managers
                         {
                             TerRoguelikeWorld.jstcPortalTime = 1;
                             jstcProgress = JstcProgress.BossDeath;
+                            SoundEngine.PlaySound(TerRoguelikeWorld.JstcSpawn with { Volume = 1f, Pitch = -0.2f }, TerRoguelikeWorld.jstcPortalPos);
+                            SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/weird") with { Volume = 0.25f });
                             break;
                         }
                     }
@@ -473,6 +487,7 @@ namespace TerRoguelike.Managers
                         jstcProgress = JstcProgress.BossPortal;
                         TerRoguelikeWorld.jstcPortalTime = -60;
                         CutsceneSystem.SetCutscene(player.Center, 180, 60, 30, 1.5f);
+                        SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2], Pitch = -0.25f });
                         break;
                     }
                 }
@@ -529,9 +544,15 @@ namespace TerRoguelike.Managers
                     float inbetweenComp = i / (float)inbetweenCount;
                     Vector2 playerPos = Vector2.Lerp(player.position, player.oldPosition, inbetweenComp);
 
-                    ParticleManager.AddParticle(new Square(
-                    Main.rand.NextVector2FromRectangle(new Rectangle((int)playerPos.X, (int)playerPos.Y, player.width, player.height)), Main.rand.NextVector2Circular(0.5f, 0.5f),
-                    20, Color.Lerp(Color.Yellow, Color.White, Main.rand.NextFloat(0.5f)) * 0.9f, new Vector2(Main.rand.NextFloat(1f, 2f)), 0, 0.96f, 10, true), ParticleManager.ParticleLayer.AfterProjectiles);
+                    Vector2 particlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)playerPos.X, (int)playerPos.Y, player.width, player.height));
+                    Vector2 particleVel = Main.rand.NextVector2Circular(0.5f, 0.5f);
+                    Color particleCol = Color.Lerp(Color.Yellow, Color.White, Main.rand.NextFloat(0.5f));
+                    Vector2 particleScale = new Vector2(Main.rand.NextFloat(1f, 2f)) * 0.03f;
+                    for (int p = 0; p < 2; p++)
+                    {
+                        float particleRot = p * MathHelper.PiOver2;
+                        ParticleManager.AddParticle(new ThinSpark(particlePos, particleVel, 30, particleCol, particleScale, particleRot, true, false), ParticleManager.ParticleLayer.AfterProjectiles);
+                    }
                 }
             }
         }

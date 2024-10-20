@@ -3302,7 +3302,7 @@ namespace TerRoguelike.NPCs
             {
                 AdaptiveArmorEnabled = true;
                 AdaptiveArmorDecayRate = 280;
-                AdaptiveArmorCap = 50;
+                AdaptiveArmorCap = 200;
                 maxUpdates = 2;
                 npc.knockBackResist = 0;
             }

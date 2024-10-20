@@ -247,12 +247,7 @@ namespace TerRoguelike.ILEditing
 
 			NPC npc = passInNPC == -1 ? null : Main.npc[passInNPC];
 			Player player = passInPlayer == -1 ? null : Main.player[passInPlayer];
-			if (player != null)
-			{
-				var modPlayer = player.ModPlayer();
-				if (modPlayer != null && modPlayer.jstcTeleportTime > 0)
-					return new(Position, Velocity.X, Velocity.Y);
-			}
+
 			stair = false;
 			stairFall = false;
 			bool[] array = new bool[5];
