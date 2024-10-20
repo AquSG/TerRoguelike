@@ -51,6 +51,7 @@ namespace TerRoguelike.World
         public static Vector2 jstcPortalPos = Vector2.Zero;
         public static int jstcPortalTime = 0;
         public static Vector2 jstcPortalScale = Vector2.Zero;
+        public static float jstcPortalRot = 0;
         public static Vector2 lunarGambitSceneDisplayPos { get
             {
                 Vector2 drawPos = lunarGambitSceneStartPos;
@@ -91,6 +92,7 @@ namespace TerRoguelike.World
         public static readonly SoundStyle PortalSpawn = new SoundStyle("TerRoguelike/Sounds/PortalSpawn");
         public static readonly SoundStyle PortalLoop = new SoundStyle("TerRoguelike/Sounds/PortalLoop");
         public static readonly SoundStyle AahLoop = new SoundStyle("TerRoguelike/Sounds/AahLoop");
+        public static readonly SoundStyle JstcSpawn = new SoundStyle("TerRoguelike/Sounds/JstcSpawn");
         public static SlotId PortalSlot;
         public static bool TryWarpToSanctuary(TerRoguelikePlayer modPlayer)
         {

@@ -1707,6 +1707,10 @@ namespace TerRoguelike.TerPlayer
                 Player.gravControl = false;
                 Player.gravControl2 = false;
             }
+            if (jstcTeleportTime > 0)
+            {
+                Player.tongued = true;
+            }
 
             if (Player.pulley && TerRoguelikeWorld.IsTerRoguelikeWorld)
             {

@@ -40,7 +40,7 @@ namespace TerRoguelike.Rooms
         public override void PostDrawTilesRoom()
         {
             base.PostDrawTilesRoom();
-            if (initialized)
+            if (initialized || (TerRoguelikeWorld.escape && FloorID[AssociatedFloor].jstcProgress == Floor.JstcProgress.Start))
                 return;
 
             int npcType = ModContent.NPCType<Skeletron>();

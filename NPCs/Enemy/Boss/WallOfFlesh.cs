@@ -714,6 +714,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.dontTakeDamage = true;
             NPC.active = true;
 
+            if (NPC.localAI[0] < -30)
+                NPC.localAI[0] = -30;
 
             if (deadTime == 0)
             {
