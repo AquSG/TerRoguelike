@@ -3768,7 +3768,7 @@ namespace TerRoguelike.NPCs
             if (ignitedStacks != null && ignitedStacks.Count > 0)
             {
                 drawColor = Color.Lerp(Color.White, Color.OrangeRed, 0.4f);
-                for (int i = 0; i < ignitedStacks.Count; i++)
+                for (int i = 0; i < Math.Min(ignitedStacks.Count, 10); i++)
                 {
                     if (Main.rand.NextBool(5))
                     {
