@@ -1,5 +1,6 @@
 # tracks folder is not to be included
 [Tt]racks/
+NPCs/Enemy/Boss/Mallet
 
 # manually added cronscript
 cronpull.sh

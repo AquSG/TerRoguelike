@@ -43,11 +43,9 @@ namespace TerRoguelike.Projectiles
                 return;
 
             Rectangle projRect = Projectile.getRect();
-            for (int i = 0; i < Main.maxPlayers; i++)
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-
-                if (player == null || !player.active || player.dead) // herobrine touched my bungus
+                if (player.dead)
                     continue;
 
                 if (player.getRect().Intersects(projRect))

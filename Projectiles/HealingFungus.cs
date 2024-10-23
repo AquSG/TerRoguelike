@@ -40,24 +40,20 @@ namespace TerRoguelike.Projectiles
             if (Projectile.ai[0] < 25)
                 return;
 
-            for (int i = 0; i < Main.maxPlayers; i++)
+            var projRect = Projectile.getRect();
+            foreach (Player player in Main.ActivePlayers)
             {
-                Player player = Main.player[i];
-
-                if (player == null || !player.active || player.dead) // herobrine touched my bungus
+                if (player.dead)
                     continue;
 
-                Vector2 playerVector = player.Center - Projectile.Center;
-                float playerDist = playerVector.Length();
-                if (playerDist < 50f && Projectile.position.X < player.position.X + player.width && Projectile.position.X + Projectile.width > player.position.X && Projectile.position.Y < player.position.Y + player.height && Projectile.position.Y + Projectile.height > player.position.Y)
+                if (player.getRect().Intersects(projRect))
                 {
                     TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                     int healAmt = ownerModPlayer.benignFungus; // heal for how much bungus the original spawner player had
                     modPlayer.ScaleableHeal(healAmt); // however, scales based off of the touchee's healing effectiveness
                     Projectile.Kill();
                 }
-            }
-            
+            }   
         }
 
         public override bool? CanDamage() => false;

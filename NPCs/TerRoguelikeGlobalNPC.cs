@@ -3659,6 +3659,9 @@ namespace TerRoguelike.NPCs
         }
         public bool EliteEffectSpritebatch(NPC npc, EliteEffectHelperVars vars, bool end = true)
         {
+            if (npc.IsABestiaryIconDummy)
+                return false;
+
             var sb = Main.spriteBatch;
             if (end)
                 sb.End();

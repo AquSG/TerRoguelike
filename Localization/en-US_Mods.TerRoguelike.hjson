@@ -1087,6 +1087,7 @@ NPCs: {
 	MoonLordHead.DisplayName: Moon Lord's Eye
 	TrueServant.DisplayName: True Servant of Cthulhu
 	TrueBrain.DisplayName: True Brain of Cthulhu
+	Mallet.DisplayName: Mallet
 }
 
 ItemBasin.DisplayName: Item Basin

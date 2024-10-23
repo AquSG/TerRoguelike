@@ -1087,6 +1087,7 @@ NPCs: {
 	MoonLordHead.DisplayName: Occhio del Signore della Luna
 	TrueServant.DisplayName: Vero Servo di Cthulhu
 	TrueBrain.DisplayName: Vero Cervello di Cthulhu
+	// Mallet.DisplayName: Mallet
 }
 
 ItemBasin.DisplayName: Fontana degli Oggetti
