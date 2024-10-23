@@ -21,7 +21,9 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
+using TerRoguelike.NPCs.Enemy.Boss.Mallet;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Managers.RoomManager;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
@@ -1345,6 +1347,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            if (modNPC.isRoomNPC)
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    if (FloorID[FloorIDsInPlay[i]].jstcProgress != Floor.JstcProgress.Jstc)
+                        break;
+
+                    if (i == 4)
+                    {
+                        SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), RoomList[modNPC.sourceRoomListID].RoomPosition16 + RoomList[modNPC.sourceRoomListID].RoomCenter16, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
+                        break;
+                    }
+                }
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;

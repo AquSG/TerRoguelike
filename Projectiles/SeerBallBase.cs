@@ -35,6 +35,7 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.tileCollide = false;
+            Projectile.netImportant = true;
         }
         public override void OnSpawn(IEntitySource source)
         {

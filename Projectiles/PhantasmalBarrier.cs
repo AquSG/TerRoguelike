@@ -32,12 +32,12 @@ namespace TerRoguelike.Projectiles
             Projectile.localNPCHitCooldown = -1;
             Projectile.friendly = true;
             Projectile.hostile = false;
+            Projectile.netImportant = true;
             glowTex = TexDict["CircularGlow"];
         }
 
         public override void OnSpawn(IEntitySource source)
         {
-            //SpawnSmokeParticles();
             ParticleManager.AddParticle(new MoonExplosion(Projectile.Center, Main.rand.Next(14, 22), Color.White, new Vector2(1f), Main.rand.NextFloat(MathHelper.TwoPi)));
             for (int i = 0; i < 12; i++)
             {

@@ -1087,6 +1087,7 @@ NPCs: {
 	MoonLordHead.DisplayName: Глаз Лунного Лорда
 	TrueServant.DisplayName: Истинный Прислужник Ктулху
 	TrueBrain.DisplayName: Истинный Мозг Ктулху
+	// Mallet.DisplayName: Mallet
 }
 
 ItemBasin.DisplayName: Раковина для Предметов
