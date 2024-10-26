@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -64,7 +65,7 @@ namespace TerRoguelike.Projectiles
             }
             if (modPlayer.bouncyBall > 0)
             {
-                modifiers.SourceDamage *= 1 + (0.15f * bounceCount);
+                modifiers.SourceDamage *= 1 + (0.15f * Math.Min(bounceCount, modPlayer.bouncyBall));
             }
             
             //Crit inheritance and custom crit chance supported by proc luck

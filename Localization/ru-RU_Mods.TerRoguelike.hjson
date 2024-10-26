@@ -40,6 +40,7 @@ BloodMoonDescription2: Меньше кадров неуязвимости, бо�
 // EliteTainted: "Tainted "
 // EliteSlugged: "Slugged "
 // EliteBurdened: "Burdened "
+// TrashDescription: On Tuesdays from 10PM to 11PM, +1 bounce for main projectiles
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Цепкая Граната

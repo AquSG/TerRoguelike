@@ -77,8 +77,8 @@ namespace TerRoguelike.Projectiles
             if (Projectile.ai[1] == 0 && modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / (5600f));
 
-            if (modPlayer.bouncyBall > 0)
-                modProj.extraBounces += modPlayer.bouncyBall;
+            if (modPlayer.bouncyBall > 0 || modPlayer.trash > 0)
+                modProj.extraBounces += modPlayer.bouncyBall + modPlayer.trash;
 
             Projectile.rotation += 0.2f * Projectile.direction;
 

@@ -40,6 +40,7 @@ RuinedMoonDescription2: Do not play this, seriously
 EliteTainted: "Tainted "
 EliteSlugged: "Slugged "
 EliteBurdened: "Burdened "
+TrashDescription: On Tuesdays from 10PM to 11PM, +1 bounce for main projectiles
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Clingy Grenade
