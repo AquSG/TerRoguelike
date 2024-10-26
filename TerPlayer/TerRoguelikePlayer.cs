@@ -133,6 +133,8 @@ namespace TerRoguelike.TerPlayer
         public int primevalRattle;
         public int theFalseSun;
 
+        public int trash;
+
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
@@ -323,6 +325,8 @@ namespace TerRoguelike.TerPlayer
             heartyHoneycomb = 0;
             primevalRattle = 0;
             theFalseSun = 0;
+
+            trash = 0;
 
             lunarGambit = 0;
 

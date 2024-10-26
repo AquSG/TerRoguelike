@@ -70,8 +70,8 @@ namespace TerRoguelike.Projectiles
             if (modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / (833f * Projectile.MaxUpdates));
 
-            if (modPlayer.bouncyBall > 0)
-                modProj.extraBounces += modPlayer.bouncyBall;
+            if (modPlayer.bouncyBall > 0 || modPlayer.trash > 0)
+                modProj.extraBounces += modPlayer.bouncyBall + modPlayer.trash;
 
             if (Projectile.timeLeft <= 2 * Projectile.MaxUpdates)
             {

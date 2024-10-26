@@ -40,6 +40,7 @@ BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
 // EliteTainted: "Tainted "
 // EliteSlugged: "Slugged "
 // EliteBurdened: "Burdened "
+// TrashDescription: On Tuesdays from 10PM to 11PM, +1 bounce for main projectiles
 
 Projectiles: {
 	ClingyGrenade.DisplayName: 粘性手雷
