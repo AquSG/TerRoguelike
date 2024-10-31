@@ -26,7 +26,7 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = true;
-            Projectile.extraUpdates = 29;
+            Projectile.extraUpdates = 15;
             Projectile.timeLeft = 1800;
             Projectile.penetrate = 1;
             modProj = Projectile.ModProj();
@@ -37,6 +37,10 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         { 
+            if (Projectile.MaxUpdates < 30 && Projectile.timeLeft % 40 == 0)
+            {
+                Projectile.extraUpdates++;
+            }
             if (Main.rand.NextBool(3))
                 return;
 

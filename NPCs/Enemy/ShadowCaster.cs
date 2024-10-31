@@ -24,8 +24,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override int modNPCID => ModContent.NPCType<ShadowCaster>();
         public override List<int> associatedFloors => new List<int>() { FloorDict["Corrupt"] };
         public override int CombatStyle => 1;
-        public int attackTelegraph = 30;
-        public int attackCooldown = 160;
+        public int attackTelegraph = 40;
+        public int attackCooldown = 150;
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[modNPCID] = 2;

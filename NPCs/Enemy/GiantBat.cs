@@ -30,8 +30,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override void SetDefaults()
         {
             base.SetDefaults();
-            NPC.width = 20;
-            NPC.height = 18;
+            NPC.width = 26;
+            NPC.height = 24;
             NPC.aiStyle = -1;
             NPC.damage = 25;
             NPC.lifeMax = 600;
@@ -68,6 +68,10 @@ namespace TerRoguelike.NPCs.Enemy
         {
             int currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] / 3)) + (NPC.ai[0] > 0 ? 4 : (NPC.ai[0] < -19 ? 8 : 0));
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight - 1);
+        }
+        public override bool? CanFallThroughPlatforms()
+        {
+            return true;
         }
     }
 }
