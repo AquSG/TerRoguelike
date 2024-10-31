@@ -1150,6 +1150,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == 0)
             {
+
                 NPC.ai[3] = 1;
                 teleportTargetPos = spawnPos + new Vector2(0, -320);
                 enemyHealthBar.ForceEnd(0);
@@ -1347,22 +1348,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (modNPC.isRoomNPC)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    if (FloorID[FloorIDsInPlay[i]].jstcProgress != Floor.JstcProgress.Jstc)
-                        break;
-
-                    if (i == 4)
-                    {
-                        SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), RoomList[modNPC.sourceRoomListID].RoomPosition16 + RoomList[modNPC.sourceRoomListID].RoomCenter16, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
-                        break;
-                    }
-                }
-            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
+                if (modNPC.isRoomNPC)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (FloorID[FloorIDsInPlay[i]].jstcProgress != Floor.JstcProgress.Jstc)
+                            break;
+
+                        if (i == 4)
+                        {
+                            SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), RoomList[modNPC.sourceRoomListID].RoomPosition16 + RoomList[modNPC.sourceRoomListID].RoomCenter16, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
+                            break;
+                        }
+                    }
+                }
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();

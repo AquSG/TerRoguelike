@@ -451,7 +451,13 @@ namespace TerRoguelike.Managers
                             TerRoguelikeWorld.jstcPortalTime = 1;
                             jstcProgress = JstcProgress.BossDeath;
                             SoundEngine.PlaySound(TerRoguelikeWorld.JstcSpawn with { Volume = 1f, Pitch = -0.2f }, TerRoguelikeWorld.jstcPortalPos);
-                            SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/weird") with { Volume = 0.25f });
+                            for (int f = Stage; f < 5; f++)
+                            {
+                                if (SchematicManager.FloorID[RoomManager.FloorIDsInPlay[f]].jstcProgress < JstcProgress.BossDeath)
+                                    allow = false;
+                            }
+                            if (allow)
+                                SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/weird") with { Volume = 0.25f });
                             break;
                         }
                     }

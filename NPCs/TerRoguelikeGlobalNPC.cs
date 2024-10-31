@@ -1280,6 +1280,8 @@ namespace TerRoguelike.NPCs
 
             npc.stairFall = true;
 
+            npc.ai[1]++;
+
             if (npc.collideY)
             {
                 int fluff = 6;
@@ -1297,9 +1299,21 @@ namespace TerRoguelike.NPCs
                 }
             }
 
+            float magnitude = 0.5f;
+
             if (target != null)
             {
-                Vector2 targetPos = target.Center + new Vector2(0, -distanceAbove);
+                Vector2 targetPos = target.Center + new Vector2(0, -distanceAbove - 1);
+                targetPos = TileCollidePositionInLine(target.Center, targetPos);
+                targetPos += Vector2.UnitY;
+                bool canSeeTarget = CanHitInLine(target.Center, npc.Center);
+                bool canSeeTargetPos = CanHitInLine(npc.Top, targetPos);
+                if (!canSeeTargetPos || !canSeeTarget)
+                {
+                    magnitude = 1;
+                    npc.velocity += Vector2.UnitY * acceleration * 0.25f * (float)Math.Cos(npc.ai[1] / 600f * MathHelper.TwoPi);
+                }
+
                 if ((npc.Center - targetPos).Length() < attackDistance)
                 {
                     npc.velocity *= 0.95f;
@@ -1310,7 +1324,10 @@ namespace TerRoguelike.NPCs
                 }
                 else
                 {
-                    npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
+                    if (canSeeTarget && canSeeTargetPos)
+                        npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
+                    else
+                        npc.velocity += new Vector2(1 * acceleration * (npc.velocity.X == 0 ? 1 : Math.Sign(npc.velocity.X)), 0);
                 }
                 if (npc.velocity.Length() > maxVelocity)
                 {
@@ -1349,6 +1366,8 @@ namespace TerRoguelike.NPCs
                     npc.velocity = npc.velocity.SafeNormalize(Vector2.UnitX) * maxVelocity;
                 }
             }
+
+            npc.velocity += Vector2.UnitY * acceleration * magnitude * (float)Math.Cos(npc.ai[1] / 20f * MathHelper.TwoPi);
 
             if (npc.collideX)
             {
@@ -2144,15 +2163,56 @@ namespace TerRoguelike.NPCs
                 if (Math.Abs(npc.velocity.X) > speedCap)
                     npc.velocity.X = speedCap * npc.direction;
 
-                Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
+                Point targetBlock = (npc.Bottom + Vector2.UnitY).ToTileCoordinates();
 
                 if (npc.collideX && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
                 }
-                else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && npc.ai[2] >= 0)
+                else if (npc.velocity.Y == 0 && !ParanoidTileRetrieval(targetBlock).IsTileSolidGround() && !ParanoidTileRetrieval(targetBlock + new Point(0, 1)).IsTileSolidGround() && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
+                }
+                else if (npc.velocity.Y >= 0f)
+                {
+                    int dir = 0;
+                    if (npc.velocity.X < 0f)
+                        dir = -1;
+                    if (npc.velocity.X > 0f)
+                        dir = 1;
+
+                    Vector2 futurePos = npc.position;
+                    futurePos.X += npc.velocity.X;
+                    int tileX = (int)((futurePos.X + (float)(npc.width / 2) + (float)((npc.width / 2 + 1) * dir)) / 16f);
+                    int tileY = (int)((futurePos.Y + (float)npc.height - 1f) / 16f);
+                    if (WorldGen.InWorld(tileX, tileY, 4))
+                    {
+                        if ((float)(tileX * 16) < futurePos.X + (float)npc.width && (float)(tileX * 16 + 16) > futurePos.X && ((Main.tile[tileX, tileY].HasUnactuatedTile && !TopSlope(Main.tile[tileX, tileY]) && !TopSlope(Main.tile[tileX, tileY - 1]) && Main.tileSolid[Main.tile[tileX, tileY].TileType] && !Main.tileSolidTop[Main.tile[tileX, tileY].TileType]) || (Main.tile[tileX, tileY - 1].IsHalfBlock && Main.tile[tileX, tileY - 1].HasUnactuatedTile)) && (!Main.tile[tileX, tileY - 1].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 1].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 1].TileType] || (Main.tile[tileX, tileY - 1].IsHalfBlock && (!Main.tile[tileX, tileY - 4].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 4].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 4].TileType]))) && (!Main.tile[tileX, tileY - 2].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 2].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 2].TileType]) && (!Main.tile[tileX, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 3].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 3].TileType]) && (!Main.tile[tileX - dir, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX - dir, tileY - 3].TileType]))
+                        {
+                            float tilePosY = tileY * 16;
+                            if (Main.tile[tileX, tileY].IsHalfBlock)
+                                tilePosY += 8f;
+
+                            if (Main.tile[tileX, tileY - 1].IsHalfBlock)
+                                tilePosY -= 8f;
+
+                            if (tilePosY < futurePos.Y + (float)npc.height)
+                            {
+                                float difference = futurePos.Y + (float)npc.height - tilePosY;
+                                if (difference <= 16.1f)
+                                {
+                                    npc.gfxOffY += npc.position.Y + (float)npc.height - tilePosY;
+                                    npc.position.Y = tilePosY - (float)npc.height;
+                                }
+
+                                if (difference < 9f)
+                                    npc.stepSpeed = 1f;
+                                else
+                                    npc.stepSpeed = 2f;
+                            }
+
+                        }
+                    }
                 }
             }
             else
@@ -2190,15 +2250,56 @@ namespace TerRoguelike.NPCs
                 if (Math.Abs(npc.velocity.X) > speedCap * speedMulti)
                     npc.velocity.X = speedCap * npc.direction * speedMulti;
 
-                Point targetBlock = new Point((int)((npc.position.X + (npc.direction == 1 ? npc.width + 1 : -1)) / 16f), (int)((npc.Bottom.Y + 1) / 16f));
+                Point targetBlock = (npc.Bottom + Vector2.UnitY).ToTileCoordinates();
 
                 if (npc.collideX && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
                 }
-                else if (!Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && npc.ai[2] >= 0)
+                else if (npc.collideY && !Main.tile[targetBlock.X, targetBlock.Y].IsTileSolidGround() && !ParanoidTileRetrieval(targetBlock + new Point(0, 1)).IsTileSolidGround() && npc.ai[2] >= 0)
                 {
                     npc.ai[0]++;
+                }
+                else if (npc.velocity.Y >= 0f)
+                {
+                    int dir = 0;
+                    if (npc.velocity.X < 0f)
+                        dir = -1;
+                    if (npc.velocity.X > 0f)
+                        dir = 1;
+
+                    Vector2 futurePos = npc.position;
+                    futurePos.X += npc.velocity.X;
+                    int tileX = (int)((futurePos.X + (float)(npc.width / 2) + (float)((npc.width / 2 + 1) * dir)) / 16f);
+                    int tileY = (int)((futurePos.Y + (float)npc.height - 1f) / 16f);
+                    if (WorldGen.InWorld(tileX, tileY, 4))
+                    {
+                        if ((float)(tileX * 16) < futurePos.X + (float)npc.width && (float)(tileX * 16 + 16) > futurePos.X && ((Main.tile[tileX, tileY].HasUnactuatedTile && !TopSlope(Main.tile[tileX, tileY]) && !TopSlope(Main.tile[tileX, tileY - 1]) && Main.tileSolid[Main.tile[tileX, tileY].TileType] && !Main.tileSolidTop[Main.tile[tileX, tileY].TileType]) || (Main.tile[tileX, tileY - 1].IsHalfBlock && Main.tile[tileX, tileY - 1].HasUnactuatedTile)) && (!Main.tile[tileX, tileY - 1].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 1].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 1].TileType] || (Main.tile[tileX, tileY - 1].IsHalfBlock && (!Main.tile[tileX, tileY - 4].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 4].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 4].TileType]))) && (!Main.tile[tileX, tileY - 2].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 2].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 2].TileType]) && (!Main.tile[tileX, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX, tileY - 3].TileType] || Main.tileSolidTop[Main.tile[tileX, tileY - 3].TileType]) && (!Main.tile[tileX - dir, tileY - 3].HasUnactuatedTile || !Main.tileSolid[Main.tile[tileX - dir, tileY - 3].TileType]))
+                        {
+                            float tilePosY = tileY * 16;
+                            if (Main.tile[tileX, tileY].IsHalfBlock)
+                                tilePosY += 8f;
+
+                            if (Main.tile[tileX, tileY - 1].IsHalfBlock)
+                                tilePosY -= 8f;
+
+                            if (tilePosY < futurePos.Y + (float)npc.height)
+                            {
+                                float difference = futurePos.Y + (float)npc.height - tilePosY;
+                                if (difference <= 16.1f)
+                                {
+                                    npc.gfxOffY += npc.position.Y + (float)npc.height - tilePosY;
+                                    npc.position.Y = tilePosY - (float)npc.height;
+                                }
+
+                                if (difference < 9f)
+                                    npc.stepSpeed = 1f;
+                                else
+                                    npc.stepSpeed = 2f;
+                            }
+
+                        }
+                    }
                 }
             }
             else
