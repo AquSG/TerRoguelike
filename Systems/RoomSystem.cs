@@ -446,6 +446,8 @@ namespace TerRoguelike.Systems
         {
             ILEdits.dualContrastTileShader = false;
 
+            ParticleManager.DrawParticles_AfterEverything();
+
             Player player = Main.LocalPlayer;
             if (player != null)
             {

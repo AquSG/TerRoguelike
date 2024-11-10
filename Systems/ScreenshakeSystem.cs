@@ -14,6 +14,8 @@ namespace TerRoguelike.Systems
         public static int screenshakeDuration;
         public static float screenshakeMagnitude;
         private static Vector2 screenshakeVector;
+        public static int screenshakeRate = 6;
+        public static float screenshakePull = 0.8f;
 
         public override void PostUpdateEverything()
         {
@@ -36,7 +38,7 @@ namespace TerRoguelike.Systems
             if (screenshakeTimer > 0)
             {
                 int time = screenshakeDuration - screenshakeTimer;
-                if (time % 6 == 0)
+                if (time % screenshakeRate == 0)
                 {
                     float effectiveMagnitude = screenshakeMagnitude * (1 - (float)Math.Pow(1 - (screenshakeTimer / (float)screenshakeDuration), 2d));
                     screenshakeVector = Main.rand.NextVector2CircularEdge(effectiveMagnitude, effectiveMagnitude);
@@ -52,13 +54,15 @@ namespace TerRoguelike.Systems
         {
             if (screenshakeTimer > 0)
             {
-                screenshakeVector *= 0.8f;
+                screenshakeVector *= screenshakePull;
             }
         }
-        public static void SetScreenshake(int time, float magnitude)
+        public static void SetScreenshake(int time, float magnitude, int rate = 6, float pullMultiplier = 0.8f)
         {
             screenshakeTimer = screenshakeDuration = time;
             screenshakeMagnitude = magnitude;
+            screenshakeRate = rate;
+            screenshakePull = pullMultiplier;
         }
         public override void ClearWorld()
         {
@@ -66,6 +70,8 @@ namespace TerRoguelike.Systems
             screenshakeDuration = 0;
             screenshakeMagnitude = 0;
             screenshakeVector = Vector2.Zero;
+            screenshakeRate = 6;
+            screenshakePull = 0.8f;
         }
     }
 }

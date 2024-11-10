@@ -34,6 +34,7 @@ namespace TerRoguelike.Projectiles
             Projectile.DamageType = DamageClass.Ranged;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
+            Projectile.netImportant = true;
         }
 
         public override bool? CanDamage()
