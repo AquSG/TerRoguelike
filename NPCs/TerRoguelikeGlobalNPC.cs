@@ -1326,6 +1326,8 @@ namespace TerRoguelike.NPCs
                 {
                     if (canSeeTarget && canSeeTargetPos)
                         npc.velocity += (targetPos - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
+                    else if (canSeeTarget)
+                        npc.velocity += (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
                     else
                         npc.velocity += new Vector2(1 * acceleration * (npc.velocity.X == 0 ? 1 : Math.Sign(npc.velocity.X)), 0);
                 }

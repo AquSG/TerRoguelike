@@ -35,11 +35,13 @@ namespace TerRoguelike.Managers
         public static List<Particle> ActiveParticles = new List<Particle>();
         public static List<Particle> ActiveParticlesBehindTiles = new List<Particle>();
         public static List<Particle> ActiveParticlesAfterProjectiles = new List<Particle>();
+        public static List<Particle> ActiveParticlesAfterEverything = new List<Particle>();
         public enum ParticleLayer
         {
             Default = 0,
             BehindTiles = 1,
-            AfterProjectiles = 2
+            AfterProjectiles = 2,
+            AfterEverything = 3
         }
         public static void AddParticle(Particle particle, ParticleLayer layer = ParticleLayer.Default)
         {
@@ -49,12 +51,15 @@ namespace TerRoguelike.Managers
                 ActiveParticlesBehindTiles.Add(particle);
             else if (layer == ParticleLayer.AfterProjectiles)
                 ActiveParticlesAfterProjectiles.Add(particle);
+            else if (layer == ParticleLayer.AfterEverything)
+                ActiveParticlesAfterEverything.Add(particle);
         }
         public static void UpdateParticles()
         {
             UpdateParticles_Default();
             UpdateParticles_BehindTiles();
             UpdateParticles_AfterProjectiles();
+            UpdateParticles_AfterEverything();
         }
         public static void UpdateParticles_Default()
         {
@@ -106,6 +111,23 @@ namespace TerRoguelike.Managers
                 }
             });
             ActiveParticlesAfterProjectiles.RemoveAll(x => x.timeLeft <= 0);
+        }
+        public static void UpdateParticles_AfterEverything()
+        {
+            if (ActiveParticlesAfterEverything == null)
+                return;
+            if (ActiveParticlesAfterEverything.Count == 0)
+                return;
+
+            FastParallel.For(0, ActiveParticlesAfterEverything.Count, delegate (int start, int end, object context)
+            {
+                for (int i = start; i < end; i++)
+                {
+                    Particle particle = ActiveParticlesAfterEverything[i];
+                    particle.Update();
+                }
+            });
+            ActiveParticlesAfterEverything.RemoveAll(x => x.timeLeft <= 0);
         }
         public static void DrawParticles_Default()
         {
@@ -197,6 +219,39 @@ namespace TerRoguelike.Managers
             for (int i = 0; i < ActiveParticlesAfterProjectiles.Count; i++)
             {
                 Particle particle = ActiveParticlesAfterProjectiles[i];
+                if (!particle.additive)
+                    continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
+                particle.Draw();
+            }
+            Main.spriteBatch.End();
+        }
+        public static void DrawParticles_AfterEverything()
+        {
+            if (ActiveParticlesAfterEverything == null)
+                return;
+            if (ActiveParticlesAfterEverything.Count == 0)
+                return;
+            Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
+            Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+            Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
+            StartAlphaBlendSpritebatch(false);
+            for (int i = 0; i < ActiveParticlesAfterEverything.Count; i++)
+            {
+                Particle particle = ActiveParticlesAfterEverything[i];
+                if (particle.additive)
+                    continue;
+                if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
+                particle.Draw();
+            }
+            StartAdditiveSpritebatch();
+            for (int i = 0; i < ActiveParticlesAfterEverything.Count; i++)
+            {
+                Particle particle = ActiveParticlesAfterEverything[i];
                 if (!particle.additive)
                     continue;
                 if (!DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))

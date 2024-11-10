@@ -2394,14 +2394,6 @@ namespace TerRoguelike.TerPlayer
                     Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * SunnyDayIframeMultiplier);
                 }
             }
-            else if (RuinedMoonActive)
-            {
-                Player.immuneTime = (int)(Player.immuneTime * RuinedMoonIframeMultiplier);
-                for (int i = 0; i < Player.hurtCooldowns.Length; i++)
-                {
-                    Player.hurtCooldowns[i] = (int)(Player.hurtCooldowns[i] * RuinedMoonIframeMultiplier);
-                }
-            }
             if (info.Damage == 1 && barrierInHurt > 0)
             {
                 Player.immuneTime *= 2;
