@@ -95,7 +95,7 @@ namespace TerRoguelike.ILEditing
             Main.spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, tileEffect, Main.GameViewMatrix.TransformationMatrix);
 
             tileEffect.Parameters["lightTint"].SetValue(Color.Black.ToVector4());
-            tileEffect.Parameters["darkTint"].SetValue(Color.Cyan.ToVector4());
+            tileEffect.Parameters["darkTint"].SetValue(new Color(17, 80, 207).ToVector4());
             tileEffect.Parameters["contrastThreshold"].SetValue(0.3f);
 
             orig.Invoke(self);
@@ -108,6 +108,7 @@ namespace TerRoguelike.ILEditing
                 return;
             }
 
+            dualContrastTileShader = false;
             orig.Invoke(self);
 
             Main.spriteBatch.End();
@@ -126,7 +127,7 @@ namespace TerRoguelike.ILEditing
             Main.spriteBatch.Begin((SpriteSortMode)0, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, tileEffect, Main.GameViewMatrix.EffectMatrix);
 
             tileEffect.Parameters["lightTint"].SetValue(Color.Black.ToVector4());
-            tileEffect.Parameters["darkTint"].SetValue(Color.Cyan.ToVector4());
+            tileEffect.Parameters["darkTint"].SetValue(new Color(17, 80, 207).ToVector4());
             tileEffect.Parameters["contrastThreshold"].SetValue(0.25f);
             orig.Invoke(self, solidLayer, forRenderTargets, intoRenderTargets, waterStyleOverride);
 

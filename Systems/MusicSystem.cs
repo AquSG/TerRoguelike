@@ -527,9 +527,16 @@ namespace TerRoguelike.Systems
                         BossIntroProgress += difference;
                         if (BossIntroProgress + difference >= BossIntroDuration)
                         {
+                            bool enable = false;
+                            if (PauseWhenIngamePaused)
+                                enable = true;
+
                             SetCombat(ActiveBossTheme.BattleTrack, true, fadeRateMultiplier);
                             ActiveBossTheme.startFlag = false;
                             BossIntroStopwatch.Reset();
+
+                            if (enable)
+                                PauseWhenIngamePaused = true;
                         }
                     }
 
@@ -543,9 +550,16 @@ namespace TerRoguelike.Systems
 
                     if (ActiveBossTheme.endFlag)
                     {
+                        bool enable = false;
+                        if (PauseWhenIngamePaused)
+                            enable = true;
+
                         SetCombat(ActiveBossTheme.EndTrack, false, fadeRateMultiplier);
                         ActiveBossTheme.endFlag = false;
                         ActiveBossTheme.startFlag = false;
+
+                        if (enable)
+                            PauseWhenIngamePaused = true;
                     }
                 }
                 else

@@ -586,6 +586,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             if (deadTime == 0)
             {
+                modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 enemyHealthBar.ForceEnd(0);
                 SoundEngine.PlaySound(SoundID.DD2_OgreHurt with { Volume = 1f, Pitch = -0.5f }, NPC.Center);
                 NPC.HitSound = SoundID.Item1 with { Volume = 0f };

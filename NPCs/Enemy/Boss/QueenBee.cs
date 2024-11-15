@@ -821,6 +821,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity *= 0;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 if (modNPC.isRoomNPC)
                 {
                     if (ActiveBossTheme != null)

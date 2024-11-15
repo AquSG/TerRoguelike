@@ -821,6 +821,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 currentFrame = 0;
                 NPC.localAI[1] = 0;
                 NPC.localAI[2] = 0;

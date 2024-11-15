@@ -693,6 +693,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 SoundEngine.PlaySound(SoundID.NPCDeath14 with { Volume = 1f, Pitch = -0.1f }, NPC.Center);
 
                 if (modNPC.isRoomNPC)

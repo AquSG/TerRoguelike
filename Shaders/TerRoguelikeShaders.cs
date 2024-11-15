@@ -15,20 +15,21 @@ namespace TerRoguelike.Shaders
     {
         //Shader loading and registering lifted from the Calamity Mod
         private const string ShaderPath = "Shaders/";
-        internal const string CalamityShaderPrefix = "TerRoguelike:";
+        internal const string TerRoguelikeShaderPrefix = "TerRoguelike:";
 
-        internal static Effect BasicTintShader;
-        internal static Effect CircularGradientWithEdge;
-        internal static Effect CircularGradientOuter;
-        internal static Effect ProtectiveBubbleShield;
-        internal static Effect AncientTwigEffect;
-        internal static Effect MaskOverlay;
-        internal static Effect SideFade;
-        internal static Effect ConeFade;
-        internal static Effect ConeSnippet;
-        internal static Effect Pixelation;
-        internal static Effect DualContrast;
-        internal static Effect SpecialPortal;
+        internal static Asset<Effect> BasicTintShader;
+        internal static Asset<Effect> CircularGradientWithEdge;
+        internal static Asset<Effect> CircularGradientOuter;
+        internal static Asset<Effect> ProtectiveBubbleShield;
+        internal static Asset<Effect> AncientTwigEffect;
+        internal static Asset<Effect> MaskOverlay;
+        internal static Asset<Effect> SideFade;
+        internal static Asset<Effect> ConeFade;
+        internal static Asset<Effect> ConeSnippet;
+        internal static Asset<Effect> Pixelation;
+        internal static Asset<Effect> DualContrast;
+        internal static Asset<Effect> SpecialPortal;
+        internal static Asset<Effect> ColorMaskOverlay;
 
         public static void LoadShaders()
         {
@@ -36,7 +37,7 @@ namespace TerRoguelike.Shaders
 
             // Shorthand to load shaders immediately.
             // Strings provided to LoadShader are the .xnb file paths.
-            Effect LoadShader(string path) => terAss.Request<Effect>($"{ShaderPath}{path}", AssetRequestMode.ImmediateLoad).Value;
+            Asset<Effect> LoadShader(string path) => terAss.Request<Effect>($"{ShaderPath}{path}", AssetRequestMode.AsyncLoad);
 
 
             BasicTintShader = LoadShader("BasicTint"); //lifted from the Calamity Mod
@@ -74,47 +75,23 @@ namespace TerRoguelike.Shaders
 
             SpecialPortal = LoadShader("SpecialPortal");
             RegisterScreenShader(SpecialPortal, "SpecialPortalPass", "SpecialPortal");
-            //This was some code I wrote to get it working on the ice queen boss I made
-            /*
-            Texture2D tex = TextureAssets.Npc[Type].Value;
-            Texture2D starTex = TexDict["StarrySky"];
 
-            Main.spriteBatch.End();
-            Effect maskEffect = Filters.Scene["TerRoguelike:MaskOverlay"].GetShader().Shader;
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, maskEffect, Main.GameViewMatrix.TransformationMatrix);
-
-            Vector2 screenOff = (NPC.Center);
-            screenOff.X %= tex.Width;
-            screenOff.Y %= tex.Height;
-            screenOff.X /= tex.Width;
-            screenOff.Y /= tex.Height;
-            screenOff.Y -= currentFrame * (1f / Main.npcFrameCount[Type]);
-
-            maskEffect.Parameters["screenOffset"].SetValue(screenOff);
-            maskEffect.Parameters["stretch"].SetValue(new Vector2(1f, Main.npcFrameCount[Type]));
-            maskEffect.Parameters["replacementTexture"].SetValue(starTex);
-
-            Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, Color.White * NPC.Opacity, NPC.rotation, NPC.frame.Size() * 0.5f, NPC.scale, NPC.spriteDirection < 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
-
-            StartVanillaSpritebatch();
-            */
-
+            ColorMaskOverlay = LoadShader("ColorMaskOverlay");
+            RegisterScreenShader(ColorMaskOverlay, "ColorMaskOverlayPass", "ColorMaskOverlay");
         }
-        private static void RegisterMiscShader(Effect shader, string passName, string registrationName)
+        private static void RegisterMiscShader(Asset<Effect> shader, string passName, string registrationName)
         {
-            Ref<Effect> shaderPointer = new(shader);
-            MiscShaderData passParamRegistration = new(shaderPointer, passName);
-            GameShaders.Misc[$"{CalamityShaderPrefix}{registrationName}"] = passParamRegistration;
+            MiscShaderData passParamRegistration = new(shader, passName);
+            GameShaders.Misc[$"{TerRoguelikeShaderPrefix}{registrationName}"] = passParamRegistration;
         }
-        private static void RegisterScreenShader(Effect shader, string passName, string registrationName, EffectPriority priority = EffectPriority.High)
+        private static void RegisterScreenShader(Asset<Effect> shader, string passName, string registrationName, EffectPriority priority = EffectPriority.High)
         {
-            Ref<Effect> shaderPointer = new(shader);
-            ScreenShaderData passParamRegistration = new(shaderPointer, passName);
+            ScreenShaderData passParamRegistration = new(shader, passName);
             RegisterSceneFilter(passParamRegistration, registrationName, priority);
         }
         private static void RegisterSceneFilter(ScreenShaderData passReg, string registrationName, EffectPriority priority = EffectPriority.High)
         {
-            string prefixedRegistrationName = $"{CalamityShaderPrefix}{registrationName}";
+            string prefixedRegistrationName = $"{TerRoguelikeShaderPrefix}{registrationName}";
             Filters.Scene[prefixedRegistrationName] = new Filter(passReg, priority);
             Filters.Scene[prefixedRegistrationName].Load();
         }
