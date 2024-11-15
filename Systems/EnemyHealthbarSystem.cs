@@ -56,15 +56,15 @@ namespace TerRoguelike.Systems
             }
             public void ForceEnd(int displayedHealth)
             {
-                CurrentHealth = 0;
+                CurrentHealth = displayedHealth;
                 TrackedEnemies.Clear();
                 TrackedEnemyTypes.Clear();
             }
             public void Update()
             {
-                CurrentHealth = 0;
                 if (TrackedEnemies.Count > 0)
                 {
+                    CurrentHealth = 0;
                     int storedHealth = MaxHealth;
                     MaxHealth = 0;
                     Opacity += 0.016f;

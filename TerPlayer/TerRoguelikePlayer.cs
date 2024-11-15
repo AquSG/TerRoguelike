@@ -40,6 +40,7 @@ using System.CodeDom;
 using Terraria.GameContent.Animations;
 using System.Linq.Expressions;
 using System.Drawing.Drawing2D;
+using TerRoguelike.ILEditing;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -1279,7 +1280,8 @@ namespace TerRoguelike.TerPlayer
             {
                 Vector2 basePos = Player.Center + Vector2.UnitY * Player.gfxOffY;
                 Point lightpos = basePos.ToTileCoordinates();
-                Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * theFalseSunIntensity);
+                if (jstcTeleportTime <= 0)
+                    Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * theFalseSunIntensity);
 
                 Player.GetCritChance(DamageClass.Generic) += 5f;
                 if (theFalseSunIntensity < theFalseSunIntensityTarget)
@@ -1539,6 +1541,13 @@ namespace TerRoguelike.TerPlayer
                     theFalseSunTargetExtra[i] = -1;
                     theFalseSunTime[i] = 0;
                 }
+            }
+
+            if (ILEdits.dualContrastTileShader)
+            {
+                Point lightpos = Player.Center.ToTileCoordinates();
+                if (jstcTeleportTime <= 0)
+                    Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1f);
             }
         }
         public override void PostUpdateEquips()
@@ -2416,6 +2425,10 @@ namespace TerRoguelike.TerPlayer
                     soulOfLenaHurtVisual = true;
                     SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f }, Player.Center);
                 }
+                if (Player.immuneTime > 0 && soulOfLenaHurtVisual && jstcTeleportTime <= 0)
+                {
+                    Lighting.AddLight(Player.Center, 0f, 0.24f, 0.36f);
+                }
             }
         }
         public override bool PreKill(double damage, int hitDirection, bool pvp, ref bool playSound, ref bool genDust, ref PlayerDeathReason damageSource)
@@ -2754,6 +2767,7 @@ namespace TerRoguelike.TerPlayer
                 b = 0f;
                 a = 0f;
                 fullBright = false;
+                drawInfo.itemColor = Color.Transparent;
                 return;
             }
 
@@ -3126,7 +3140,6 @@ namespace TerRoguelike.TerPlayer
                     {
                         soulOfLenaHurtVisual = false;
                     }
-                    Lighting.AddLight(Player.Center, 0f, 0.24f, 0.36f);
                 }
                 if (soulOfLenaUses < soulOfLena || soulOfLenaHurtVisual)
                 {

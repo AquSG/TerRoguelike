@@ -149,6 +149,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             NPC.localAI[0] = -(cutsceneDuration + 30);
+            NPC.localAI[0] = -31;
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
@@ -1158,6 +1159,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.rotation = 0;
                 modNPC.ignitedStacks.Clear();
                 modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 phantomPositions.Clear();
                 cutsceneEyeVector = teleportTargetPos + innerEyePosition;
                 deathStarPosition = teleportTargetPos + innerEyePosition;
@@ -1348,9 +1350,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (deadTime >= deathCutsceneDuration - 30)
+            if (deadTime == deathCutsceneDuration - 31)
             {
-                if (modNPC.isRoomNPC)
+                if (modNPC.isRoomNPC || true)
                 {
                     for (int i = 0; i < 5; i++)
                     {
@@ -1359,11 +1361,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                         if (i == 4)
                         {
-                            SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), RoomList[modNPC.sourceRoomListID].RoomPosition16 + RoomList[modNPC.sourceRoomListID].RoomCenter16, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
+                            NPC n = SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
                             break;
                         }
                     }
                 }
+            }
+            if (deadTime >= deathCutsceneDuration - 30)
+            {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();

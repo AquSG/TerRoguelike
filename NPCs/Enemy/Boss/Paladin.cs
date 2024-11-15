@@ -101,7 +101,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SetBossTrack(PaladinTheme);
             }
 
-            ableToHit = !(NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise + slamFall) && deadTime == 0;
+            ableToHit = !(NPC.ai[0] == Slam.Id && NPC.ai[1] >= slamTelegraph && NPC.ai[1] <= slamTelegraph + slamRise + slamFall) && deadTime == 0 && NPC.localAI[0] > -30;
 
             if (NPC.collideY)
                 NPC.localAI[1] = 0;
@@ -795,6 +795,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             if (deadTime == 0)
             {
+                modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 enemyHealthBar.ForceEnd(0);
                 CutsceneSystem.SetCutscene(NPC.Center, 210, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 if (modNPC.isRoomNPC)

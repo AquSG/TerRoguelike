@@ -151,6 +151,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.ai[3] == 0)
             {
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
             }
             NPC.ai[3]++;
             NPC parent = Main.npc[(int)NPC.ai[0]];

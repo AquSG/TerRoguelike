@@ -59,6 +59,7 @@ namespace TerRoguelike.NPCs
         public float AdaptiveArmor = 0;
         public int currentUpdate = 1;
         public int maxUpdates = 1;
+        public bool drawAfterEverything = false;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;

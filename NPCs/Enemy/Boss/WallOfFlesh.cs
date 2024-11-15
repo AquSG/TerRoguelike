@@ -721,6 +721,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 enemyHealthBar.ForceEnd(0);
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 if (modNPC.isRoomNPC)
                 {
                     if (ActiveBossTheme != null)

@@ -62,8 +62,16 @@ namespace TerRoguelike.Systems
         {
             if (IsTerRoguelikeWorld)
             {
-                Main.time = 34920;
-                Main.dayTime = true;
+                if (ILEdits.dualContrastTileShader)
+                {
+                    Main.time = 16500;
+                    Main.dayTime = false;
+                }
+                else
+                {
+                    Main.time = 34920;
+                    Main.dayTime = true;
+                }
             }
 
             postDrawAllBlack = false;
@@ -444,7 +452,16 @@ namespace TerRoguelike.Systems
         }
         public static void PostDrawEverything(SpriteBatch spritebatch)
         {
-            ILEdits.dualContrastTileShader = false;
+            StartVanillaSpritebatch(false);
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                var modNPC = npc.ModNPC();
+                if (modNPC == null || !modNPC.drawAfterEverything)
+                    continue;
+
+                Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
+            }
+            Main.spriteBatch.End();
 
             ParticleManager.DrawParticles_AfterEverything();
 
@@ -1439,6 +1456,7 @@ namespace TerRoguelike.Systems
             loopingDrama = 0;
             jstcPortalPos = Vector2.Zero;
             jstcPortalTime = 0;
+            ILEdits.dualContrastTileShader = false;
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
 

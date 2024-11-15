@@ -397,6 +397,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.localAI[3] == 0)
             {
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 NPC.height = NPC.width;
             }
             NPC.localAI[3]++;

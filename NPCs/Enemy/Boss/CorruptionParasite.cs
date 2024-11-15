@@ -849,11 +849,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.dontTakeDamage = true;
             NPC.active = true;
 
-
             if (deadTime == 0)
             {
                 enemyHealthBar.ForceEnd(0);
                 modNPC.ignitedStacks.Clear();
+                modNPC.bleedingStacks.Clear();
+                modNPC.ballAndChainSlow = 0;
                 if (modNPC.isRoomNPC)
                 {
                     if (ActiveBossTheme != null)
