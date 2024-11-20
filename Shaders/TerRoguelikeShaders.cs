@@ -30,6 +30,7 @@ namespace TerRoguelike.Shaders
         internal static Asset<Effect> DualContrast;
         internal static Asset<Effect> SpecialPortal;
         internal static Asset<Effect> ColorMaskOverlay;
+        internal static Asset<Effect> CircularPulse;
 
         public static void LoadShaders()
         {
@@ -78,6 +79,9 @@ namespace TerRoguelike.Shaders
 
             ColorMaskOverlay = LoadShader("ColorMaskOverlay");
             RegisterScreenShader(ColorMaskOverlay, "ColorMaskOverlayPass", "ColorMaskOverlay");
+
+            CircularPulse = LoadShader("CircularPulse");
+            RegisterMiscShader(CircularPulse, "CircularPulsePass", "CircularPulse");
         }
         private static void RegisterMiscShader(Asset<Effect> shader, string passName, string registrationName)
         {

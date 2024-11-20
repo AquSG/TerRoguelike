@@ -149,7 +149,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             NPC.localAI[0] = -(cutsceneDuration + 30);
-            NPC.localAI[0] = -31;
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
