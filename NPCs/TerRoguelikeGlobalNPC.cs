@@ -3924,11 +3924,13 @@ namespace TerRoguelike.NPCs
             Color color = Color.Red * 1f;
             Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
 
-            for (int i = 0; i < bleedingStacks.Count; i++)
+            int count = Math.Min(bleedingStacks.Count, 100);
+            Main.NewText(count);
+            for (int i = 0; i < count; i++)
             {
                 Vector2 specificPosition = position;
                 float rotation = MathHelper.Lerp(0, MathHelper.TwoPi, Main.GlobalTimeWrappedHourly * 1.5f);
-                float rotationCompletionOffset = MathHelper.TwoPi / bleedingStacks.Count * i;
+                float rotationCompletionOffset = MathHelper.TwoPi / count * i;
                 rotation += rotationCompletionOffset;
                 specificPosition += new Vector2(0, 16).RotatedBy(rotation);
                 specificPosition += (specificPosition - position) * new Vector2(((npc.width + npc.frame.Width) * 0.5f * npc.scale) / 32f, -0.5f);
