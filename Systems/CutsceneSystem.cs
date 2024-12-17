@@ -58,7 +58,7 @@ namespace TerRoguelike.Systems
                 }
                 else if (cutsceneTimer <= easeOutTime)
                 {
-                    cutsceneDisableControl = false;
+                    cutsceneDisableControl = CreditsSystem.creditsActive;
                     if (!easeOutActivated)
                     {
                         if (Main.player[Main.myPlayer].dead)
@@ -89,7 +89,7 @@ namespace TerRoguelike.Systems
                     cutsceneActive = false;
                     Main.screenPosition = Main.Camera.UnscaledPosition;
                     overrideCameraCenter = Vector2.Zero;
-                    cutsceneDisableControl = false;
+                    cutsceneDisableControl = CreditsSystem.creditsActive;
                 }
             }
         }

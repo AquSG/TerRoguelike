@@ -107,6 +107,7 @@ namespace TerRoguelike.UI
                     TerRoguelikeWorld.escape = false;
                     Main.LocalPlayer.ModPlayer().escaped = false;
                     Main.LocalPlayer.ModPlayer().creditsViewTime = 0;
+                    Main.LocalPlayer.ModPlayer().escapeFail = false;
                     CreditsUI.creditsList = null;
                     CreditsSystem.StopCredits();
                     CutsceneSystem.cutsceneDisableControl = false;

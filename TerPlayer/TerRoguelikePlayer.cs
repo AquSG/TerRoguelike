@@ -2660,7 +2660,7 @@ namespace TerRoguelike.TerPlayer
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 Main.BlackFadeIn = 255;
-                Main.SetCameraLerp(1, 1);
+                Main.SetCameraLerp(0, 0);
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
                 if (RoomSystem.RoomList != null && ModContent.GetInstance<TerRoguelikeConfig>().LoadEntireWorldUponEnteringWorld)
@@ -2708,6 +2708,9 @@ namespace TerRoguelike.TerPlayer
         #region Edit Starting Items
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {
+            if (!prepareForRoguelikeGeneration)
+                return Enumerable.Empty<Item>();
+
             static Item createItem(int type)
             {
                 Item i = new Item();
@@ -2726,6 +2729,9 @@ namespace TerRoguelike.TerPlayer
 
         public override void ModifyStartingInventory(IReadOnlyDictionary<string, List<Item>> itemsByMod, bool mediumCoreDeath)
         {
+            if (!prepareForRoguelikeGeneration)
+                return;
+
             itemsByMod["Terraria"].Clear();
         }
         #endregion

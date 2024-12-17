@@ -34,6 +34,7 @@ using TerRoguelike.NPCs.Enemy.Boss;
 using System.Reflection;
 using Terraria.Graphics.Effects;
 using TerRoguelike.Managers;
+using Terraria.Graphics.Light;
 
 namespace TerRoguelike.ILEditing
 {
@@ -64,6 +65,40 @@ namespace TerRoguelike.ILEditing
             On_TileDrawing.DrawMultiTileVines += On_TileDrawing_DrawMultiTileVines;
             On_TileDrawing.DrawReverseVines += On_TileDrawing_DrawReverseVines;
             On_NPC.UpdateNPC_Inner += NPCExtraUpdate;
+            On_Main.DoDraw_WallsTilesNPCs += DrawBeforeWalls;
+            On_TileLightScanner.GetTileLight += ForceLight;
+            On_TileDrawing.DrawTiles_EmitParticles += DisableTileParticles;
+        }
+
+        private void DisableTileParticles(On_TileDrawing.orig_DrawTiles_EmitParticles orig, TileDrawing self, int j, int i, Tile tileCache, ushort typeCache, short tileFrameX, short tileFrameY, Color tileLight)
+        {
+			if (dualContrastTileShader)
+				return;
+
+			orig.Invoke(self, j, i, tileCache, typeCache, tileFrameX, tileFrameY, tileLight);
+        }
+
+        private void ForceLight(On_TileLightScanner.orig_GetTileLight orig, TileLightScanner self, int x, int y, out Vector3 outputColor)
+        {
+			orig.Invoke(self, x, y, out outputColor);
+
+			if (dualContrastTileShader)
+				outputColor += new Vector3(0.01f);
+        }
+
+        private void DrawBeforeWalls(On_Main.orig_DoDraw_WallsTilesNPCs orig, Main self)
+        {
+			foreach (NPC npc in Main.ActiveNPCs)
+			{
+				var modNPC = npc.ModNPC();
+				if (modNPC == null || !modNPC.drawBeforeWalls)
+					continue;
+
+				modNPC.drawingBeforeWallsCurrently = true;
+                Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
+                modNPC.drawingBeforeWallsCurrently = false;
+			}
+			orig.Invoke(self);
         }
 
         private void NPCExtraUpdate(On_NPC.orig_UpdateNPC_Inner orig, NPC self, int i)

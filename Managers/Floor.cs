@@ -334,6 +334,7 @@ namespace TerRoguelike.Managers
             {
                 CutsceneSystem.cameraTargetCenter = Vector2.Lerp(Main.LocalPlayer.Center, CutsceneSystem.cameraTargetCenter, 0.6f);
                 bool end = false;
+                Main.SetCameraLerp(0, 0);
                 foreach (Player player in Main.ActivePlayers)
                 {
                     var modPlayer = player.ModPlayer();
@@ -502,6 +503,7 @@ namespace TerRoguelike.Managers
             {
                 CutsceneSystem.cameraTargetCenter = Vector2.Lerp(Main.LocalPlayer.Center, CutsceneSystem.cameraTargetCenter, 0.6f);
                 bool end = false;
+                Main.SetCameraLerp(0, 0);
                 foreach (Player player in Main.ActivePlayers)
                 {
                     var modPlayer = player.ModPlayer();

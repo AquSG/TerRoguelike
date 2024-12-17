@@ -217,6 +217,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     
                     if (NPC.localAI[0] > -90)
                     {
+                        NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
                         NPC.Opacity = (NPC.localAI[0] + 90) / 60f;
                     }
                 }

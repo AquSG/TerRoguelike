@@ -811,7 +811,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
-                offset = MathHelper.SmoothStep(0, maxOffset, -(NPC.localAI[0] - cutsceneBurrowFinish) / (cutsceneDuration + 30 + cutsceneBurrowFinish));
+                offset = deadTime > 0 ? 0 : MathHelper.SmoothStep(0, maxOffset, -(NPC.localAI[0] - cutsceneBurrowFinish) / (cutsceneDuration + 30 + cutsceneBurrowFinish));
             }
             return offset;
         }
