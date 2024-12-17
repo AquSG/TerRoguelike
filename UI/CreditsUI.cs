@@ -119,6 +119,9 @@ namespace TerRoguelike.UI
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelikeWorld.IsDeletableOnExit)
                 {
+                    TerRoguelikeMenu.wipeTempWorld = true;
+                    TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+
                     IEnumerable<Item> vanillaItems = from item in player.inventory
                                                      where !item.IsAir
                                                      select item into x
@@ -127,8 +130,6 @@ namespace TerRoguelike.UI
                     PlayerLoader.SetStartInventory(player, startingItems);
                     player.trashItem = new(ItemID.None, 0);
                     TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
-                    TerRoguelikeMenu.wipeTempWorld = true;
-                    TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
                 }
                 modPlayer.killerNPC = -1;
                 modPlayer.killerProj = -1;
@@ -148,7 +149,8 @@ namespace TerRoguelike.UI
             var font = FontAssets.DeathText.Value;
 
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, itemsString, screenPos + new Vector2(-360, -250), Color.White * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, victoryString, screenPos + new Vector2(0, -340), Color.Lerp(Color.Yellow, Color.White, 0.5f) * opacity, 0f, font.MeasureString(victoryString) * 0.5f, new Vector2(1.4f));
+            if (!modPlayer.escapeFail)
+                ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, victoryString, screenPos + new Vector2(0, -340), Color.Lerp(Color.Yellow, Color.White, 0.5f) * opacity, 0f, font.MeasureString(victoryString) * 0.5f, new Vector2(1.4f));
             Vector2 creditsTextPos = screenPos + new Vector2(240, 80);
             float offsetPerCredit = 32;
             float maxOffset = (creditsList.Count) * offsetPerCredit;
@@ -337,6 +339,7 @@ namespace TerRoguelike.UI
                         "The Binding of Isaac",
                         "Armored Core VI",
                         "Minecraft",
+                        "Pizza Tower",
                         "Pixabay",
                         "Adobe Stock"
                         ];

@@ -395,7 +395,7 @@ namespace TerRoguelike.Systems
 
             // for some reason vanilla isn't certain about where the spawn position is and some crazy camera lerp happens so I'm just gonna make that.. not happen
             Main.BlackFadeIn = 255;
-            Main.SetCameraLerp(1, 1);
+            Main.SetCameraLerp(0, 0);
 
             if (promoteLoop)
             {

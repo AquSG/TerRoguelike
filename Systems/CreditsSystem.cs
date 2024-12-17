@@ -27,7 +27,21 @@ namespace TerRoguelike.Systems
         public static List<Vector2> creditsPath = [];
         public static int currentViewStage = -1;
         public static int currentViewStageDuration = 0;
-
+        public static bool weird
+        {
+            get {
+                Player player = Main.LocalPlayer;
+                if (player != null)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer != null && modPlayer.escapeFail)
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
         public override void PostUpdateEverything()
         {
             TickCredits();
@@ -131,6 +145,13 @@ namespace TerRoguelike.Systems
         public static void PlayCreditsTheme()
         {
             SetMusicMode(MusicStyle.AllCalm);
+            Player player = Main.LocalPlayer;
+            if (weird)
+            {
+                SetCalm(Darkness, true, 4);
+                CalmVolumeLevel = 0.6f;
+                return;
+            }
             SetCalm(Credits, false);
             CalmVolumeLevel = 0.5f;
             PauseWhenIngamePaused = true;
@@ -184,7 +205,8 @@ namespace TerRoguelike.Systems
             {
                 currentViewStageDuration = 1323;
                 creditsPath = [Main.LocalPlayer.Center];
-                PlayCreditsTheme();
+                if (!weird)
+                    PlayCreditsTheme();
             }
             else
             {

@@ -60,6 +60,8 @@ namespace TerRoguelike.NPCs
         public int currentUpdate = 1;
         public int maxUpdates = 1;
         public bool drawAfterEverything = false;
+        public bool drawBeforeWalls = false;
+        public bool drawingBeforeWallsCurrently = false;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -3925,7 +3927,6 @@ namespace TerRoguelike.NPCs
             Vector2 position = GetDrawCenter(npc) + (Vector2.UnitY * npc.gfxOffY);
 
             int count = Math.Min(bleedingStacks.Count, 100);
-            Main.NewText(count);
             for (int i = 0; i < count; i++)
             {
                 Vector2 specificPosition = position;

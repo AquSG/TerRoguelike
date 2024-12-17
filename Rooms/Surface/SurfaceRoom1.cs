@@ -39,11 +39,13 @@ namespace TerRoguelike.Rooms
         }
         public override void RoomClearReward()
         {
-            ClearSpecificProjectiles();
-            CreditsSystem.StartCredits();
             Player player = Main.LocalPlayer;
             if (player != null)
             {
+                if (player.dead)
+                    return;
+                ClearSpecificProjectiles();
+                CreditsSystem.StartCredits();
                 var modPlayer = player.ModPlayer();
                 if (modPlayer != null)
                 {

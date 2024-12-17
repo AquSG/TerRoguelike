@@ -119,6 +119,9 @@ namespace TerRoguelike.UI
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelikeWorld.IsDeletableOnExit)
                 {
+                    TerRoguelikeMenu.wipeTempWorld = true;
+                    TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+
                     IEnumerable<Item> vanillaItems = from item in player.inventory
                                                      where !item.IsAir
                                                      select item into x
@@ -127,8 +130,6 @@ namespace TerRoguelike.UI
                     PlayerLoader.SetStartInventory(player, startingItems);
                     player.trashItem = new(ItemID.None, 0);
                     TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
-                    TerRoguelikeMenu.wipeTempWorld = true;
-                    TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
                 }
                 modPlayer.killerNPC = -1;
                 modPlayer.killerProj = -1;

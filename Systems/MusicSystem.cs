@@ -64,6 +64,7 @@ namespace TerRoguelike.Systems
         public static string FinalStage = "TerRoguelike/Tracks/FinalStage";
         public static string Escape = "TerRoguelike/Tracks/Escape";
         public static string Credits = "TerRoguelike/Tracks/Credits";
+        public static string Darkness = "TerRoguelike/Tracks/Darkness";
 
         public static FloorSoundtrack SanctuaryTheme = new(
             "TerRoguelike/Tracks/SanctuaryTheme",
@@ -203,6 +204,7 @@ namespace TerRoguelike.Systems
                 FinalStage,
                 Escape,
                 Credits,
+                Darkness,
                 SanctuaryTheme.CalmTrack,
                 BaseTheme.CalmTrack,
                 BaseTheme.CombatTrack,
