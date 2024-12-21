@@ -1145,3 +1145,10 @@ Configs: {
 		}
 	}
 }
+
+Buffs: {
+	Retribution: {
+		// DisplayName: Retribution
+		// Description: No recovery
+	}
+}

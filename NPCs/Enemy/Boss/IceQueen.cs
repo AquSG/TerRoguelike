@@ -1050,16 +1050,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Point dimensions;
         public Vector2 offset;
         public bool active;
-        public ExtraHitbox(Point Dimensions, Vector2 Offset, bool Active = true)
+        public bool contactDamage;
+        public ExtraHitbox(Point Dimensions, Vector2 Offset, bool Active = true, bool ContactDamage = true)
         {
             dimensions = Dimensions;
             offset = Offset;
             active = Active;
+            contactDamage = ContactDamage;
         }
-        public Rectangle GetHitbox(Vector2 origin, float rotation)
+        public Rectangle GetHitbox(Vector2 origin, float rotation, float scale = 1f)
         {
-            Point hitboxPos = (offset.RotatedBy(rotation) + origin).ToPoint() - new Point(dimensions.X / 2, dimensions.Y / 2);
-            return new Rectangle(hitboxPos.X, hitboxPos.Y, dimensions.X, dimensions.Y);
+            Point hitboxPos = ((offset * scale).RotatedBy(rotation) + origin).ToPoint() - new Point((int)(dimensions.X * scale) / 2, (int)(dimensions.Y * scale) / 2);
+            return new Rectangle(hitboxPos.X, hitboxPos.Y, (int)(dimensions.X * scale), (int)(dimensions.Y * scale));
         }
     }
 }
