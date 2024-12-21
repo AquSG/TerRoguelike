@@ -240,6 +240,7 @@ namespace TerRoguelike.TerPlayer
         public Vector2 jstcTeleportEnd = Vector2.Zero;
         public int sluggedTime = 0;
         public bool sluggedAttempt = false;
+        public bool noRestore = false;
         public Stopwatch playthroughTime = new Stopwatch();
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
@@ -332,6 +333,7 @@ namespace TerRoguelike.TerPlayer
             lunarGambit = 0;
 
             sluggedAttempt = false;
+            noRestore = false;
             shotsToFire = 1;
             jumpSpeedMultiplier = 0f;
             extraDoubleJumps = 0;
@@ -378,7 +380,6 @@ namespace TerRoguelike.TerPlayer
             {
                 DashDir = 0;
             }
-
         }
         #endregion
 
@@ -529,7 +530,7 @@ namespace TerRoguelike.TerPlayer
             if (barrierFloor > Player.statLifeMax2)
                 barrierFloor = Player.statLifeMax2;
 
-            if (barrierHealth < barrierFloor && outOfDangerTime >= 420 && barrierFloor != 0)
+            if (barrierHealth < barrierFloor && outOfDangerTime >= 420 && barrierFloor != 0 && !noRestore)
             {
                 barrierHealth += barrierFloor * 0.0083334f;
             }
@@ -1547,7 +1548,14 @@ namespace TerRoguelike.TerPlayer
             {
                 Point lightpos = Player.Center.ToTileCoordinates();
                 if (jstcTeleportTime <= 0)
-                    Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1f);
+                    Lighting.AddLight(lightpos.X, lightpos.Y, noRestore ? TorchID.Mushroom : TorchID.Ichor, 1f);
+            }
+            if (noRestore && Main.rand.NextBool())
+            {
+                ParticleManager.AddParticle(new Square(
+                    Player.Center, Main.rand.NextVector2CircularEdge(4, 4) * Main.rand.NextFloat(0.5f, 1f) + Player.velocity,
+                    20, Main.rand.NextBool() ? new Color(65, 187, 255) : new Color(17, 80, 207),
+                    new Vector2(1), 0, 0.98f, 10, false), ParticleManager.ParticleLayer.AfterProjectiles);
             }
         }
         public override void PostUpdateEquips()
@@ -1592,6 +1600,10 @@ namespace TerRoguelike.TerPlayer
             if (cornucopia > 0 || RuinedMoonActive)
             {
                 Player.lifeRegen = (int)(healMultiplier * Player.lifeRegen);
+            }
+            if (noRestore && Player.lifeRegen > 0)
+            {
+                Player.lifeRegen = 0;
             }
 
             if (!Player.GetJumpState(ExtraJump.CloudInABottle).Available && timesDoubleJumped < extraDoubleJumps)
@@ -2501,6 +2513,11 @@ namespace TerRoguelike.TerPlayer
         #region Mechanical Functions
         public void ScaleableHeal(int healAmt)
         {
+            if (noRestore)
+            {
+                CombatText.NewText(Player.getRect(), Color.Lerp(Color.Blue, Color.White, 0.3f), 0);
+                return;
+            }
             healAmt = Math.Max((int)(healAmt * healMultiplier), 1);
             if (barrierSynthesizer > 0)
             {
@@ -2518,6 +2535,11 @@ namespace TerRoguelike.TerPlayer
         }
         public void AddBarrierHealth(int barrierGainAmt)
         {
+            if (noRestore)
+            {
+                CombatText.NewText(Player.getRect(), Color.Cyan, 0);
+                return;
+            }
             if (RuinedMoonActive)
             {
                 barrierGainAmt = Math.Max((int)(barrierGainAmt * 0.5f), 1);
