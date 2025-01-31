@@ -77,7 +77,7 @@ namespace TerRoguelike.Projectiles
         {
             for (int i = 0; i < 5; i++)
             {
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.YellowTorch, 0f, 0f, 0, default(Color), 1.5f);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.YellowTorch, 0f, 0f, 0, default(Color), 1.5f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.noLight = true;

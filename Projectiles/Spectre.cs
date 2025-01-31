@@ -35,6 +35,7 @@ namespace TerRoguelike.Projectiles
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
             Projectile.timeLeft = 320;
+            Projectile.penetrate = -1;
             glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
@@ -102,11 +103,12 @@ namespace TerRoguelike.Projectiles
             spectreTex = TextureAssets.Projectile[Type].Value;
             int frameHeight = spectreTex.Height / Main.projFrames[Type];
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Projectile.ModProj().EliteSpritebatch(true, BlendState.Additive);
+
             Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.White * 0.6f, 0f, glowTex.Size() * 0.5f, 0.085f, SpriteEffects.None, 0);
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Projectile.ModProj().EliteSpritebatch();
+
             Main.EntitySpriteDraw(spectreTex, Projectile.Center - Main.screenPosition + (Vector2.UnitY * -6).RotatedBy(Projectile.rotation - MathHelper.PiOver2), new Rectangle(0, frameHeight * Projectile.frame, spectreTex.Width, frameHeight), Color.White * 0.75f, Projectile.rotation - MathHelper.PiOver2, new Vector2(spectreTex.Size().X * 0.5f, spectreTex.Size().Y / (Main.projFrames[Type] * 2)), 1f, SpriteEffects.None, 0);
 
             return false;

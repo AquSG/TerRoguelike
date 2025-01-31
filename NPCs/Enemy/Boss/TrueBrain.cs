@@ -21,7 +21,6 @@ using TerRoguelike.Projectiles;
 using TerRoguelike.Systems;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
-using TerRoguelike.NPCs.Enemy.Boss.Mallet;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Managers.RoomManager;
 using static TerRoguelike.Schematics.SchematicManager;
@@ -32,6 +31,7 @@ using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using TerRoguelike.NPCs.Enemy.Boss.Mallet;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -1360,7 +1360,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                         if (i == 4)
                         {
-                            NPC n = SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
+                            NPC n = SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Being>(), modNPC.sourceRoomListID);
                             break;
                         }
                     }

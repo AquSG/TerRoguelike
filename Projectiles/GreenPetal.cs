@@ -43,10 +43,12 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.timeLeft % 4 == 0 && Main.rand.NextBool())
             {
-                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Grass, 0, 0, 0, default(Color), 0.9f);
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Grass, 0, 0, 0, default(Color), 0.9f);
                 Main.dust[d].velocity *= 0.4f;
             }
-                
+            if (Projectile.timeLeft == 300)
+                GetTarget();
+
             Projectile.frame = (Projectile.timeLeft / 4) % 2;
             Projectile.rotation = Projectile.rotation.AngleTowards(Projectile.velocity.ToRotation() + MathHelper.PiOver2, 0.3f);
             if (Projectile.timeLeft > 260)
@@ -57,7 +59,6 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.timeLeft == 260)
             {
-                GetTarget();
                 float direction = MathHelper.PiOver2;
                 if (Projectile.ai[0] != -1)
                 {
@@ -82,6 +83,31 @@ namespace TerRoguelike.Projectiles
         }
         public void GetTarget()
         {
+            var modProj = Projectile.ModProj();
+            if (modProj != null && modProj.npcOwner >= 0)
+            {
+                NPC owner = Main.npc[modProj.npcOwner];
+                if (owner.active)
+                {
+                    var modOwner = owner.ModNPC();
+                    if (modOwner != null)
+                    {
+                        if (modOwner.targetNPC >= 0 && Main.npc[modOwner.targetNPC].active)
+                        {
+                            Projectile.ai[1] = 1;
+                            Projectile.ai[0] = modOwner.targetNPC;
+                            return;
+                        }
+                        if (modOwner.targetPlayer >= 0 && Main.player[modOwner.targetPlayer].active && !Main.player[modOwner.targetPlayer].dead)
+                        {
+                            Projectile.ai[1] = 0;
+                            Projectile.ai[0] = modOwner.targetPlayer;
+                            return;
+                        }
+                    }
+                }
+            }
+
             float closestTarget = 3200f;
             if (Projectile.hostile)
             {

@@ -49,12 +49,14 @@ namespace TerRoguelike.Projectiles
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, Projectile.timeLeft / 60f), 0, 1f);
             float scale = 0.2f;
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null ,Color.Cyan * opacity * 0.8f, 0f, glowTex.Size() * 0.5f, 0.45f * scale, SpriteEffects.None, 0);
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.EntitySpriteDraw(flakeTex, Projectile.Center - Main.screenPosition, null ,Color.White * opacity, Projectile.rotation, flakeTex.Size() * 0.5f, scale, SpriteEffects.None, 0);
+            Projectile.ModProj().EliteSpritebatch(true, BlendState.Additive);
+
+            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.Cyan * opacity * 0.8f, 0f, glowTex.Size() * 0.5f, 0.45f * scale, SpriteEffects.None, 0);
+
+            TerRoguelikeUtils.StartVanillaSpritebatch();
+
+            Color color = Projectile.ModProj().hostileTurnedAlly ? Color.Cyan * 0.6f : Color.White;
+            Main.EntitySpriteDraw(flakeTex, Projectile.Center - Main.screenPosition, null, color * opacity, Projectile.rotation, flakeTex.Size() * 0.5f, scale, SpriteEffects.None, 0);
             
             return false;
         }

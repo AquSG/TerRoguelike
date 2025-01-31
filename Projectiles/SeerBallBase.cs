@@ -35,7 +35,7 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.tileCollide = false;
-            Projectile.netImportant = true;
+            Projectile.netImportant = true; //makes projectile not able to be replaced if at the projectile cap 
         }
         public override void OnSpawn(IEntitySource source)
         {

@@ -1382,6 +1382,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool CanHitNPC(NPC target)
         {
+            bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;
+            bool rightHandAlive = rightHandWho >= 0 && Main.npc[rightHandWho].life > 1;
             bool topEyeCanHit = headWho >= 0 && Main.npc[headWho].life > 1;
             float eyeHitRadius = 30;
             for (int i = topEyeCanHit ? 0 : 1; i < 3; i++)
@@ -1457,7 +1459,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
-            CollisionPass = false;
+            CollisionPass = (leftHandAlive || rightHandAlive || topEyeCanHit) ? false : NPC.getRect().Intersects(target.Hitbox);
             return false;
         }
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
@@ -1474,6 +1476,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            var baseTex = TextureAssets.Npc[Type];
+            NPC.frame = baseTex.Frame(sizeOffsetY: -180);
+
             bool hardMode = (int)difficulty >= (int)Difficulty.BloodMoon;
 
             bool leftHandAlive = leftHandWho >= 0 && Main.npc[leftHandWho].life > 1;

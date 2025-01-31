@@ -152,6 +152,12 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: Impugnare Fucile Adattivo
 	// FalseSunBeam.DisplayName: False Sun Beam
 	// ResidualBurden.DisplayName: Residual Burden
+	// SplittingFeather.DisplayName: Splitting Feather
+	// SplitFeather.DisplayName: Split Feather
+	// Talon.DisplayName: Talon
+	// DashingFeather.DisplayName: Dashing Feather
+	// SpeedingFeather.DisplayName: Speeding Feather
+	// YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -989,6 +995,16 @@ Items: {
 			Ogni copie extra dell'oggetto aumentano il danno base di 75
 			'''
 	}
+
+	PuppeteersHand: {
+		// DisplayName: Puppeteers Hand
+		/* Tooltip:
+			'''
+			Enemies have a 40% chance to be resurrected as an allied ghost on kill
+			Ghosts have 3x base damage, and live for up to 2 minutes
+			Extra copies of this item increase ghost max life and damage by 100%
+			''' */
+	}
 }
 
 NPCs: {
@@ -1089,6 +1105,7 @@ NPCs: {
 	TrueServant.DisplayName: Vero Servo di Cthulhu
 	TrueBrain.DisplayName: Vero Cervello di Cthulhu
 	// Mallet.DisplayName: Mallet
+	// Being.DisplayName: Being
 }
 
 ItemBasin.DisplayName: Fontana degli Oggetti
@@ -1102,6 +1119,11 @@ Configs: {
 				TerRoguelike: {
 					VisualConfig: Configurazione Visiva
 					MiscConfig: Configurazione Miscellanea
+				}
+
+				TerRoguelike: {
+					// VisualConfig: Mods. Ter Roguelike Priv. Visual Config Header
+					// MiscConfig: Mods. Ter Roguelike Priv. Misc Config Header
 				}
 			}
 		}
@@ -1152,3 +1174,65 @@ Buffs: {
 		// Description: No recovery
 	}
 }
+
+// Dialogue box text.
+// 1 newline  = newline
+// 2 newlines = new textbox
+// 3 newlines = close textbox and an 'event' happens
+// @ = computer username
+/* DialogueKillAll:
+	'''
+	...
+
+	So, you made it.
+
+	Are you surprised?
+	Or is this exactly
+	what you expected?
+
+	Your actions make
+	it clear that you
+	knew about... this.
+
+
+	The pursuit for 
+	more content...
+
+	A desire that many
+	cannot resist once
+	it is known about.
+
+	But your position
+	does not justify
+	your actions.
+
+	Your excuses do not
+	justify your
+	actions.
+
+
+	Judgement will soon
+	fall upon others
+	who walk in your
+	footsteps.
+
+	The tools to
+	take down those
+	such as you, do not
+	yet exist.
+
+	...but one day,
+	they will.
+
+	In another time,
+	you will be back
+	here... for your
+	"content".
+
+	I know you will.
+
+	Until then...
+
+	We'll meet again,
+	@.
+	''' */

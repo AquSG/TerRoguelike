@@ -10,6 +10,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Projectiles
 {
@@ -24,7 +25,9 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 480;
-            Projectile.penetrate = 2;
+            Projectile.penetrate = -1;
+            Projectile.usesLocalNPCImmunity = true;
+            Projectile.localNPCHitCooldown = 10;
             glowTex = TexDict["CircularGlow"];
         }
         public override void OnSpawn(IEntitySource source)
@@ -59,7 +62,7 @@ namespace TerRoguelike.Projectiles
 
             for (int i = -1; i < 2; i += 2)
             {
-                Dust d = Dust.NewDustPerfect(Projectile.Center + (Vector2.UnitX * 26).RotatedBy(Projectile.rotation), DustID.YellowTorch, (-Projectile.velocity * 0.56f).RotatedBy(0.5f * i), 0, default, 1.1f);
+                Dust d = Dust.NewDustPerfect(Projectile.Center + (Vector2.UnitX * 26).RotatedBy(Projectile.rotation), Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.YellowTorch, (-Projectile.velocity * 0.56f).RotatedBy(0.5f * i), 0, default, 1.1f);
                 d.noGravity = true;
                 d.noLight = true;
                 d.noLightEmittence = true;
@@ -68,7 +71,7 @@ namespace TerRoguelike.Projectiles
 
         public override Color? GetAlpha(Color lightColor)
         {
-            return Color.Lerp(lightColor, Color.LightYellow, 0.5f);
+            return Color.Lerp(lightColor, Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.LightYellow, 0.5f);
         }
         public override void OnKill(int timeLeft)
         {
@@ -88,21 +91,23 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
-            Vector3 colorHSL = Main.rgbToHsl(Color.Yellow);
-
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
-            GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
-            for (int i = 0; i < 8; i++)
+            if (!Projectile.ModProj().hostileTurnedAlly)
             {
-                Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
-                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + offset + new Vector2(0, 0), null, Color.White, Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+                Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+                Vector3 colorHSL = Main.rgbToHsl(Color.Yellow);
+
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + offset + new Vector2(0, 0), null, Color.White, Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+                }
+                TerRoguelikeUtils.StartVanillaSpritebatch();
             }
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
 
             Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + new Vector2(0, 0), null, Projectile.GetAlpha(lightColor), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;

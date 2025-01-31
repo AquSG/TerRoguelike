@@ -15,7 +15,6 @@ namespace TerRoguelike.Projectiles
 {
     public class PhantasmalResidue : ModProjectile, ILocalizedModType
     {
-        //almost everything in this is just visuals. the hitbox is active for 1/4 of a second after 30 frames pass, and is a big square
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public List<Vector2> rockPositions = new List<Vector2>();
         public List<float> rockRotations = new List<float>();

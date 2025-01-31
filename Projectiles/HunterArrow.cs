@@ -61,7 +61,7 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.ai[0] < RedirectTelegraph)
                 {
                     Vector2 offset = (Main.rand.Next(13, 19) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
-                    Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.GreenTorch, -offset.SafeNormalize(Vector2.UnitX) + Projectile.velocity, Projectile.alpha, default(Color), 1.5f);
+                    Dust d = Dust.NewDustPerfect(Projectile.Center + offset, Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.GreenTorch, -offset.SafeNormalize(Vector2.UnitX) + Projectile.velocity, Projectile.alpha, default(Color), 1.5f);
                     d.noGravity = true;
                     d.noLight = true;
                     d.noLightEmittence = true;
@@ -83,7 +83,7 @@ namespace TerRoguelike.Projectiles
 
             if (Main.rand.NextBool())
             {
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.GreenTorch, 0f, 0f, 0, default(Color), 1.5f);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.GreenTorch, 0f, 0f, 0, default(Color), 1.5f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.noLight = true;
@@ -93,14 +93,14 @@ namespace TerRoguelike.Projectiles
 
         public override Color? GetAlpha(Color lightColor)
         {
-            return Color.Lerp(lightColor, Color.LightGreen, MathHelper.Clamp(Projectile.ai[0] / RedirectTelegraph, 0.4f, 1f));
+            return Color.Lerp(lightColor, Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.LightGreen, MathHelper.Clamp(Projectile.ai[0] / RedirectTelegraph, 0.4f, 1f));
         }
         public override void OnKill(int timeLeft)
         {
             for (int i = 0; i < 15; i++)
             {
                 Vector2 offset = (Main.rand.Next(2, 6) * Vector2.UnitX.RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi)));
-                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, DustID.GreenTorch, offset.SafeNormalize(Vector2.UnitX) + Projectile.oldVelocity, Projectile.alpha, default(Color), 1.5f);
+                Dust d = Dust.NewDustPerfect(Projectile.Center + offset, Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.GreenTorch, offset.SafeNormalize(Vector2.UnitX) + Projectile.oldVelocity, Projectile.alpha, default(Color), 1.5f);
                 d.noGravity = true;
                 d.noLight = true;
                 d.noLightEmittence = true;
@@ -135,36 +135,61 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Projectile.ModProj().EliteSpritebatch(true, BlendState.Additive);
+            Color color = Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.Green;
 
-            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.Green * MathHelper.Clamp(Projectile.ai[0] / RedirectTelegraph * 0.8f, 0f, 0.8f), 0f, glowTex.Size() * 0.5f, 0.1f, SpriteEffects.None, 0);
+            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, color * MathHelper.Clamp(Projectile.ai[0] / RedirectTelegraph * 0.8f, 0f, 0.8f), 0f, glowTex.Size() * 0.5f, 0.1f, SpriteEffects.None, 0);
 
             if (Projectile.ai[0] < RedirectTelegraph && Projectile.ai[0] > 0)
-                Main.EntitySpriteDraw(lineTex, Projectile.Center - Main.screenPosition, null, Color.Green * MathHelper.Clamp(Projectile.ai[0] / RedirectTelegraph, 0f, 1f), Projectile.rotation, new Vector2(0, lineTex.Height * 0.5f), 1f, SpriteEffects.None, 0);
+                Main.EntitySpriteDraw(lineTex, Projectile.Center - Main.screenPosition, null, color * MathHelper.Clamp(Projectile.ai[0] / RedirectTelegraph, 0f, 1f), Projectile.rotation, new Vector2(0, lineTex.Height * 0.5f), 1f, SpriteEffects.None, 0);
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-
-            Vector3 colorHSL = Main.rgbToHsl(Color.LimeGreen);
-
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
-            GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
-            for (int i = 0; i < 8; i++)
+            if (!Projectile.ModProj().hostileTurnedAlly)
             {
-                Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
-                Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + offset + new Vector2(0, 0), null, Color.White, Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
-            }
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+                TerRoguelikeUtils.StartAlphaBlendSpritebatch();
 
+                Vector3 colorHSL = Main.rgbToHsl(Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.LimeGreen);
+
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
+                    Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition + offset + new Vector2(0, 0), null, Color.White, Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+                }
+            }
+            Projectile.ModProj().EliteSpritebatch();
             Main.EntitySpriteDraw(TextureAssets.Projectile[Type].Value, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, TextureAssets.Projectile[Type].Value.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
         }
 
         public void GetTarget()
         {
+            var modProj = Projectile.ModProj();
+            if (modProj != null && modProj.npcOwner >= 0)
+            {
+                NPC owner = Main.npc[modProj.npcOwner];
+                if (owner.active)
+                {
+                    var modOwner = owner.ModNPC();
+                    if (modOwner != null)
+                    {
+                        if (modOwner.targetNPC >= 0 && Main.npc[modOwner.targetNPC].active)
+                        {
+                            Projectile.ai[1] = 1;
+                            Projectile.ai[2] = modOwner.targetNPC;
+                            return;
+                        }
+                        if (modOwner.targetPlayer >= 0 && Main.player[modOwner.targetPlayer].active && !Main.player[modOwner.targetPlayer].dead)
+                        {
+                            Projectile.ai[1] = 0;
+                            Projectile.ai[2] = modOwner.targetPlayer;
+                            return;
+                        }
+                    }
+                }
+            }
+
             float closestTarget = 3200f;
             if (Projectile.hostile)
             {

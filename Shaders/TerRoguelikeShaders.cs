@@ -31,6 +31,7 @@ namespace TerRoguelike.Shaders
         internal static Asset<Effect> SpecialPortal;
         internal static Asset<Effect> ColorMaskOverlay;
         internal static Asset<Effect> CircularPulse;
+        internal static Asset<Effect> GrayscaleRecolor;
 
         public static void LoadShaders()
         {
@@ -82,6 +83,9 @@ namespace TerRoguelike.Shaders
 
             CircularPulse = LoadShader("CircularPulse");
             RegisterMiscShader(CircularPulse, "CircularPulsePass", "CircularPulse");
+
+            GrayscaleRecolor = LoadShader("GrayscaleRecolor");
+            RegisterScreenShader(GrayscaleRecolor, "GrayscaleRecolorPass", "GrayscaleRecolor");
         }
         private static void RegisterMiscShader(Asset<Effect> shader, string passName, string registrationName)
         {

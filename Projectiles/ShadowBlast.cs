@@ -44,7 +44,7 @@ namespace TerRoguelike.Projectiles
             if (Main.rand.NextBool(3))
                 return;
 
-            int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
+            int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, modProj.hostileTurnedAlly ? DustID.DungeonSpirit : DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
             Dust dust = Main.dust[d];
             dust.velocity *= 0f;
             dust.noGravity = true;

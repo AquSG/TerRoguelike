@@ -47,7 +47,7 @@ namespace TerRoguelike.Projectiles
         {
             if (modProj.npcOwner >= 0)
             {
-                if (!Main.npc[modProj.npcOwner].active || Main.npc[modProj.npcOwner].life <= 0)
+                if (!Main.npc[modProj.npcOwner].active || Main.npc[modProj.npcOwner].life <= 0 || (Main.npc[modProj.npcOwner].friendly && Projectile.hostile))
                 {
                     Projectile.Kill();
                 }

@@ -147,6 +147,20 @@ namespace TerRoguelike.UI
             string deathItems = Language.GetOrRegister("Mods.TerRoguelike.DeathItems").Value;
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathKilledBy, screenPos + new Vector2(130, -250), Color.MediumPurple * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, deathItems, screenPos + new Vector2(-360, -250), Color.White * opacity, 0f, Vector2.Zero, new Vector2(0.9f));
+
+            Vector2 rectanglePos = screenPos + new Vector2(238, 80);
+
+            // Enforce a cutoff on everything
+            Rectangle textCutoffRegion = new Rectangle((int)rectanglePos.X, (int)rectanglePos.Y, 1, 1);
+            textCutoffRegion.Inflate(111, 151);
+            textCutoffRegion.Y -= 124;
+            var rasterizer = Main.Rasterizer;
+            rasterizer.ScissorTestEnable = true;
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearClamp, DepthStencilState.None, rasterizer, null, Matrix.Identity);
+            Rectangle cachedOldScissor = Main.spriteBatch.GraphicsDevice.ScissorRectangle;
+            Main.spriteBatch.GraphicsDevice.ScissorRectangle = textCutoffRegion;
+
             if (modPlayer.killerNPC != -1)
             {
                 Texture2D enemyTex = TextureAssets.Npc[modPlayer.killerNPCType].Value;
@@ -167,6 +181,8 @@ namespace TerRoguelike.UI
                     scale = horizontalScale;
                 if (scale > 4f)
                     scale = 4f;
+                if (scale < 0.5f)
+                    scale = 0.5f;
                 spriteBatch.Draw(enemyTex, screenPos + new Vector2(240, -40), frame, Color.White * opacity, 0f, frame.Size() * 0.5f, scale, SpriteEffects.None, 0);
             }
             else if (modPlayer.killerProj != -1)
@@ -182,12 +198,19 @@ namespace TerRoguelike.UI
                     scale = horizontalScale;
                 if (scale > 4f)
                     scale = 4f;
+                if (scale < 0.5f)
+                    scale = 0.5f;
                 spriteBatch.Draw(projTex, screenPos + new Vector2(240, -40), new Rectangle(0, 0, projTex.Width, frameHeight), Color.White * opacity, 0f, new Vector2(projTex.Width * 0.5f, (frameHeight * 0.5f)), scale, SpriteEffects.None, 0);
             }
             else
             {
                 Main.EntitySpriteDraw(questionMarkTex, screenPos + new Vector2(240, -40), null, Color.White * opacity, 0, questionMarkTex.Size() * 0.5f, 1f, SpriteEffects.None);
             }
+
+            Main.spriteBatch.End();
+            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Matrix.Identity);
+            rasterizer.ScissorTestEnable = false;
+            Main.spriteBatch.GraphicsDevice.ScissorRectangle = cachedOldScissor;
 
             if (itemsToDraw.Count == 0)
             {

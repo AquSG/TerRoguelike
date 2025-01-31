@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using Terraria.GameContent;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using System.Security.Cryptography.X509Certificates;
 
 namespace TerRoguelike.Projectiles
 {
@@ -61,10 +62,6 @@ namespace TerRoguelike.Projectiles
                 originalDirection = Projectile.velocity.SafeNormalize(-Vector2.UnitY);
                 SoundEngine.PlaySound(SoundID.Item39 with { Volume = 1f }, Projectile.Center);
             }
-            if (Projectile.timeLeft == 59)
-            {
-                
-            }
             Projectile.localAI[1]++;
 
             if (modPlayer == null)
@@ -88,15 +85,41 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            Projectile.velocity = Vector2.Zero;
-            if (Projectile.timeLeft > 60)
-                Projectile.timeLeft = 60;
+            bool collideX = Math.Abs(Projectile.velocity.X - oldVelocity.X) > float.Epsilon;
+            bool collideY = Math.Abs(Projectile.velocity.Y - oldVelocity.Y) > float.Epsilon;
 
-            Projectile.penetrate = 1;
-            if (modPlayer.volatileRocket > 0)
-                modProj.SpawnExplosion(Projectile, modPlayer, originalHit: true);
-            Projectile.rotation = Projectile.oldRot[1];
-            SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.75f }, Projectile.Center);
+            void Stop()
+            {
+                Projectile.velocity = Vector2.Zero;
+                if (Projectile.timeLeft > 60)
+                    Projectile.timeLeft = 60;
+
+                Projectile.penetrate = 1;
+                if (modPlayer.volatileRocket > 0)
+                    modProj.SpawnExplosion(Projectile, modPlayer, originalHit: true);
+                Projectile.rotation = Projectile.oldRot[1];
+                SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.75f }, Projectile.Center);
+            }
+            if ((collideX && collideY) || Projectile.timeLeft <= 60 || Projectile.penetrate == 1)
+            {
+                Stop();
+                return false;
+            }
+
+            if (collideX)
+            {
+                Projectile.velocity = Vector2.UnitY * Math.Sign(oldVelocity.Y) * oldVelocity.Length();
+            }
+            else if (collideY)
+            {
+                Projectile.velocity = Vector2.UnitX * Math.Sign(oldVelocity.X) * oldVelocity.Length();
+            }
+            if (Projectile.velocity == Vector2.Zero)
+            {
+                Stop();
+                return false;
+            }
+            
             return false;
         }
         public override bool PreDraw(ref Color lightColor)
@@ -113,7 +136,7 @@ namespace TerRoguelike.Projectiles
                 if (i == 0)
                     color = Color.White * 0.8f;
                 else
-                    color = Color.Lerp(Color.Red, Color.DarkRed, (float)i / (Projectile.oldPos.Length / 2)) * 0.65f;
+                    color = Color.Lerp(Color.Red, Color.DarkRed, (float)i / (Projectile.oldPos.Length)) * 0.65f;
 
                 Vector2 drawPosition = Projectile.oldPos[i] + new Vector2(Projectile.width * 0.5f, Projectile.height * 0.5f) - Main.screenPosition;
                 

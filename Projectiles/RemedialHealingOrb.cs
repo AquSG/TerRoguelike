@@ -53,7 +53,8 @@ namespace TerRoguelike.Projectiles
                     TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
                     int healAmt = ownerModPlayer.remedialTapeworm * 1; // heal for how much tapeworm the original spawner player had
                     modPlayer.ScaleableHeal(healAmt); // however, scales based off of the touchee's healing effectiveness
-                    Projectile.Kill();
+                    Projectile.timeLeft = 0;
+                    Projectile.active = false;
                 }
             }
         }

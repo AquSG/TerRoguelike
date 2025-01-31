@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,18 @@ namespace TerRoguelike.Projectiles
         public int targetPlayer = -1;
         public int targetNPC = -1;
         public bool sluggedEffect = false;
+        public bool hostileTurnedAlly = false;
+        public override bool PreDraw(Projectile projectile, ref Color lightColor)
+        {
+            if (hostileTurnedAlly)
+                GhostSpritebatch();
+            return true;
+        }
+        public override void PostDraw(Projectile projectile, Color lightColor)
+        {
+            if (hostileTurnedAlly)
+                StartVanillaSpritebatch();
+        }
         public override bool PreAI(Projectile projectile)
         {
             extraBounces = 0; // set bounces in projectile ai.
@@ -66,6 +79,15 @@ namespace TerRoguelike.Projectiles
             if (modPlayer.bouncyBall > 0)
             {
                 modifiers.SourceDamage *= 1 + (0.15f * Math.Min(bounceCount, modPlayer.bouncyBall));
+            }
+            if (npcOwner >= 0)
+            {
+                NPC nOwner = Main.npc[npcOwner];
+                var modNOwner = nOwner.ModNPC();
+                if (modNOwner != null && !nOwner.friendly && !modNOwner.hostileTurnedAlly)
+                {
+                    modifiers.SourceDamage *= 2;
+                }
             }
             
             //Crit inheritance and custom crit chance supported by proc luck
@@ -114,6 +136,7 @@ namespace TerRoguelike.Projectiles
                     {
                         projectile.friendly = true;
                         projectile.hostile = false;
+                        hostileTurnedAlly = modNPC.hostileTurnedAlly;
                     }
                     else
                     {
@@ -130,6 +153,7 @@ namespace TerRoguelike.Projectiles
                     TerRoguelikeGlobalProjectile parentModProj = parentProj.ModProj();
                     npcOwner = parentModProj.npcOwner;
                     npcOwnerType = parentModProj.npcOwnerType;
+                    hostileTurnedAlly = parentModProj.hostileTurnedAlly;
                     if (npcOwnerType != -1)
                     {
                         if (AllNPCs.Exists(x => x.modNPCID == npcOwnerType))
@@ -276,6 +300,24 @@ namespace TerRoguelike.Projectiles
                 }
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
+        }
+
+        public void EliteSpritebatch(bool end = true, BlendState blendState = null)
+        {
+            if (blendState == null)
+                blendState = BlendState.AlphaBlend;
+
+            if (hostileTurnedAlly)
+            {
+                GhostSpritebatch(end, blendState);
+                return;
+            }
+            else
+            {
+                if (end)
+                    Main.spriteBatch.End();
+                Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            }
         }
     }
     public class ProcChainBools

@@ -453,6 +453,10 @@ namespace TerRoguelike.UI
                         "'The Proverbial Dust Biters'",
                         "Chris Christodoulou",
                         "Deadbolt",
+                        " ",
+                        "'Untouched Cache'",
+                        "AquaSG",
+                        "Hadalis",
                         ];
                         break;
                     case 7:

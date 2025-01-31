@@ -37,7 +37,7 @@ namespace TerRoguelike.Projectiles
             Projectile.DamageType = DamageClass.Melee;
             Projectile.ignoreWater = true;
             Projectile.tileCollide = false;
-            Projectile.netImportant = true;
+            Projectile.netImportant = true; //makes projectile not able to be replaced if at the projectile cap 
         }
 
         public override bool? CanDamage()

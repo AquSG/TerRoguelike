@@ -13,6 +13,7 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
+using Microsoft.Build.ObjectModelRemoting;
 
 namespace TerRoguelike.Projectiles
 {
@@ -49,13 +50,16 @@ namespace TerRoguelike.Projectiles
 
         public override void AI()
         {
+            if (Projectile.timeLeft == 60)
+                GetTarget();
+
             Projectile.velocity *= 0.965f;
             for (int j = 0; j < 3; j++)
             {
                 for (int i = 0; i < Main.rand.Next(1, 3); i++)
                 {
                     Vector2 position = Projectile.Center + (Vector2.UnitX * 8).RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi));
-                    Dust dust = Dust.NewDustPerfect(position, DustID.Crimson, (Projectile.Center - position) * 0.25f, 0, default, 1f);
+                    Dust dust = Dust.NewDustPerfect(position, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Crimson, (Projectile.Center - position) * 0.25f, 0, default, 1f);
 
                     dust.noGravity = true;
                     dust.noLightEmittence = true;
@@ -64,7 +68,7 @@ namespace TerRoguelike.Projectiles
                 if (Main.rand.NextBool())
                 {
                     Vector2 position = Projectile.Center + (Vector2.UnitX * 8).RotatedBy(Main.rand.NextFloat(MathHelper.TwoPi));
-                    Dust dust = Dust.NewDustPerfect(position, DustID.CrimsonTorch, (Projectile.Center - position) * 0.25f, 0, default, 1.5f);
+                    Dust dust = Dust.NewDustPerfect(position, Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.CrimsonTorch, (Projectile.Center - position) * 0.25f, 0, default, 1.5f);
 
                     dust.noGravity = true;
                     dust.noLightEmittence = true;
@@ -83,7 +87,6 @@ namespace TerRoguelike.Projectiles
             if (Projectile.localAI[0] == 1)
                 return;
 
-            GetTarget();
             float direction = MathHelper.PiOver2;
             if (Projectile.ai[0] != -1)
             {
@@ -102,7 +105,7 @@ namespace TerRoguelike.Projectiles
 
             for (int i = 0; i < 9; i++)
             {
-                int d2 = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Crimson, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, Color.LimeGreen, 0.75f);
+                int d2 = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Crimson, Main.rand.NextFloat(-2f, 2f), Main.rand.NextFloat(-2f, 2f), Projectile.alpha, Color.LimeGreen, 0.75f);
                 Dust dust2 = Main.dust[d2];
                 dust2.velocity *= 0.5f;
                 dust2.noLightEmittence = true;
@@ -111,6 +114,8 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreDraw(ref Color lightColor)
         {
+            if (Projectile.ModProj().hostileTurnedAlly)
+                return false;
             TerRoguelikeUtils.StartNonPremultipliedSpritebatch();
             Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.Black * 0.2f, Projectile.velocity.ToRotation(), glowTex.Size() * 0.5f, new Vector2(0.1f), SpriteEffects.None);
             TerRoguelikeUtils.StartVanillaSpritebatch();
@@ -118,6 +123,31 @@ namespace TerRoguelike.Projectiles
         }
         public void GetTarget()
         {
+            var modProj = Projectile.ModProj();
+            if (modProj != null && modProj.npcOwner >= 0)
+            {
+                NPC owner = Main.npc[modProj.npcOwner];
+                if (owner.active)
+                {
+                    var modOwner = owner.ModNPC();
+                    if (modOwner != null)
+                    {
+                        if (modOwner.targetNPC >= 0 && Main.npc[modOwner.targetNPC].active)
+                        {
+                            Projectile.ai[1] = 1;
+                            Projectile.ai[0] = modOwner.targetNPC;
+                            return;
+                        }
+                        if (modOwner.targetPlayer >= 0 && Main.player[modOwner.targetPlayer].active && !Main.player[modOwner.targetPlayer].dead)
+                        {
+                            Projectile.ai[1] = 0;
+                            Projectile.ai[0] = modOwner.targetPlayer;
+                            return;
+                        }
+                    }
+                }
+            }
+
             float closestTarget = 3200f;
             if (Projectile.hostile)
             {

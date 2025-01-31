@@ -51,6 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             NPC.ai[1] = -1;
             NPC.ai[2] = -1;
+            NPC.ai[0] = -1;
         }
         public override void AI()
         {
@@ -69,7 +70,7 @@ namespace TerRoguelike.NPCs.Enemy
             }
             else
             {
-                if (!NPC.friendly)
+                if (NPC.ai[0] == 0)
                 {
                     Player p = Main.player[(int)NPC.ai[1]];
                     if (p.dead)
@@ -83,7 +84,7 @@ namespace TerRoguelike.NPCs.Enemy
                         NPC.Center = p.Top + (Vector2.UnitY * p.gfxOffY);
                     }
                 }
-                else
+                else if (NPC.ai[0] == 1)
                 {
                     NPC n = Main.npc[(int)NPC.ai[1]];
                     if (n.life <= 0 || n.immortal || n.dontTakeDamage)
@@ -100,13 +101,13 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
         {
-            StickToTarget(target.whoAmI);
+            StickToTarget(target.whoAmI, true);
         }
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
         {
-            StickToTarget(target.whoAmI);
+            StickToTarget(target.whoAmI, false);
         }
-        public void StickToTarget(int target)
+        public void StickToTarget(int target, bool player)
         {
             NPC.velocity *= 0;
             if (NPC.ai[2] < -1)
@@ -120,7 +121,7 @@ namespace TerRoguelike.NPCs.Enemy
                 if (NPC.ai[2] < 0)
                     NPC.ai[2] = 0;
             }
-                
+            NPC.ai[0] = player ? 0 : 1;
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot) => NPC.ai[2] >= -1;
         public override bool CanHitNPC(NPC target) => NPC.ai[2] >= -1;
@@ -130,6 +131,7 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 NPC.ai[1] = -1;
                 NPC.ai[2] = -90;
+                NPC.ai[0] = -1;
             }
 
             if (NPC.life > 0)

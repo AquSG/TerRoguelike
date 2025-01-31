@@ -45,8 +45,8 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = maxTimeLeft = 1500;
             Projectile.tileCollide = true;
             Projectile.penetrate = -1;
-            Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = -1;
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 4;
             Projectile.tileCollide = false;
             Projectile.ignoreWater = true;
             Projectile.friendly = true;

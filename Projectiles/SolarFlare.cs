@@ -107,18 +107,47 @@ namespace TerRoguelike.Projectiles
             Vector2 offset = new Vector2(Projectile.width * 0.5f, Projectile.height * 0.5f);
             int frameHeight = tex.Height / Main.projFrames[Type];
             Rectangle frame = new Rectangle(0, frameHeight * Projectile.frame, tex.Width, frameHeight);
+            if (Projectile.ModProj().hostileTurnedAlly)
+                StartVanillaSpritebatch();
             for (int i = 1; i < Projectile.oldPos.Length; i++)
             {
                 Vector2 pos = Projectile.oldPos[i] + offset;
                 float opacity = (1f - ((float)i / Projectile.oldPos.Length)) * 0.6f;
                 Main.EntitySpriteDraw(tex, pos - Main.screenPosition, frame, Color.White * opacity, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             }
+            Projectile.ModProj().EliteSpritebatch();
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
         }
 
         public void GetTarget()
         {
+            var modProj = Projectile.ModProj();
+            if (modProj != null && modProj.npcOwner >= 0)
+            {
+                NPC owner = Main.npc[modProj.npcOwner];
+                if (owner.active && (owner.friendly == Projectile.friendly))
+                {
+                    var modOwner = owner.ModNPC();
+
+                    if (modOwner != null)
+                    {
+                        if (modOwner.targetNPC >= 0 && Main.npc[modOwner.targetNPC].active)
+                        {
+                            Projectile.ai[1] = 1;
+                            Projectile.ai[2] = modOwner.targetNPC;
+                            return;
+                        }
+                        if (modOwner.targetPlayer >= 0 && Main.player[modOwner.targetPlayer].active && !Main.player[modOwner.targetPlayer].dead)
+                        {
+                            Projectile.ai[1] = 0;
+                            Projectile.ai[2] = modOwner.targetPlayer;
+                            return;
+                        }
+                    }
+                }
+            }
+
             float closestTarget = 3200f;
             if (Projectile.hostile)
             {

@@ -172,41 +172,15 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot)
         {
-            for (int i = 0; i < modNPC.Segments.Count; i++)
-            {
-                WormSegment segment = modNPC.Segments[i];
-                float radius = i == 0 ? (NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2) : segment.Height / 2;
-                if (segment.Position.Distance(target.getRect().ClosestPointInRect(segment.Position)) <= radius)
-                {
-                    CollisionPass = true;
-                    return true;
-                }
-            }
-            CollisionPass = false;
-            return false;
+            return true;
         }
         public override bool CanHitNPC(NPC target)
         {
-            for (int i = 0; i < modNPC.Segments.Count; i++)
-            {
-                WormSegment segment = modNPC.Segments[i];
-                float radius = i == 0 ? (NPC.height < NPC.width ? NPC.height / 2 : NPC.width / 2) : segment.Height / 2;
-                if (segment.Position.Distance(target.getRect().ClosestPointInRect(segment.Position)) <= radius)
-                {
-                    CollisionPass = true;
-                    return true;
-                }
-            }
-            CollisionPass = false;
-            return false;
+            return true;
         }
         public override bool ModifyCollisionData(Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
-            if (CollisionPass)
-            {
-                npcHitbox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
-            }
-            return CollisionPass;
+            return true;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {

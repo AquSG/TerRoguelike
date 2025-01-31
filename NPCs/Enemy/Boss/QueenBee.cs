@@ -237,7 +237,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             bool hardMode = (int)difficulty >= (int)Difficulty.BloodMoon;
 
             target = modNPC.GetTarget(NPC);
-
             NPC.ai[1]++;
             NPC.velocity *= 0.98f;
 

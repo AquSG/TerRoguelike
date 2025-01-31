@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using System.Linq;
 using Terraria.DataStructures;
+using TerRoguelike.ILEditing;
 
 namespace TerRoguelike.Projectiles
 {
@@ -46,6 +47,11 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            if (ILEdits.dualContrastTileShader)
+            {
+                Projectile.light = 0.75f;
+            }
+
             float fallSpeedCap = 25f;
             float downwardsAccel = 0.3f;
             Projectile.gfxOffY = 0;
