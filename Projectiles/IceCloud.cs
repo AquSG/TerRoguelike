@@ -29,8 +29,8 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = maxTimeLeft;
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
-            Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = -1;
+            Projectile.usesIDStaticNPCImmunity = true;
+            Projectile.idStaticNPCHitCooldown = 10;
             Projectile.friendly = true;
             Projectile.hostile = false;
             smokeTex = TexDict["Smoke"];

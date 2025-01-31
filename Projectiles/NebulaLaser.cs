@@ -36,7 +36,7 @@ namespace TerRoguelike.Projectiles
             Projectile.velocity /= Projectile.MaxUpdates;
             for (int i = 0; i < 6; i++)
             {
-                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.DungeonSpirit : DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
                 Dust dust = Main.dust[d];
                 dust.velocity *= 2f;
                 dust.noLight = true;
@@ -48,7 +48,7 @@ namespace TerRoguelike.Projectiles
             if (Main.rand.NextBool(3))
                 return;
 
-            int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
+            int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.DungeonSpirit : DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
             Dust dust = Main.dust[d];
             dust.velocity *= 0f;
             dust.noGravity = true;
@@ -60,7 +60,7 @@ namespace TerRoguelike.Projectiles
         {
             for (int i = 0; i < 12; i++)
             {
-                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.DungeonSpirit : DustID.ShadowbeamStaff, 0f, 0f, 100, Color.Purple, 1.2f);
                 Dust dust = Main.dust[d];
                 dust.velocity *= 3f;
                 dust.noLight = true;

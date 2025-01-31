@@ -59,9 +59,9 @@ namespace TerRoguelike.Projectiles
         {
             Vector2 pos = Projectile.Center + Main.rand.NextVector2Circular(Projectile.width * 0.55f, Projectile.height * 0.55f);
             Vector2 vel = Main.rand.NextVector2Circular(0.5f, 0.5f);
-            ParticleManager.AddParticle(new Square(pos, vel, 20, Color.Lerp(Color.LimeGreen, Color.Yellow, Main.rand.NextFloat(0.75f)), new Vector2(Main.rand.NextFloat(0.9f, 1f)), vel.ToRotation(), 0.96f, 10, false));
+            ParticleManager.AddParticle(new Square(pos, vel, 20, Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.Lerp(Color.LimeGreen, Color.Yellow, Main.rand.NextFloat(0.75f)), new Vector2(Main.rand.NextFloat(0.9f, 1f)), vel.ToRotation(), 0.96f, 10, false));
             if (Main.rand.NextBool())
-                ParticleManager.AddParticle(new Square(Projectile.Center + Main.rand.NextVector2Circular(5, 5), Projectile.velocity * 0.5f, 8, Color.LimeGreen, new Vector2(0.75f), Projectile.velocity.ToRotation(), 0.96f, 4, false));
+                ParticleManager.AddParticle(new Square(Projectile.Center + Main.rand.NextVector2Circular(5, 5), Projectile.velocity * 0.5f, 8, Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.LimeGreen, new Vector2(0.75f), Projectile.velocity.ToRotation(), 0.96f, 4, false));
         }
         public override void OnKill(int timeLeft)
         {

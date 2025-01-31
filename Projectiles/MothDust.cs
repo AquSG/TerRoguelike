@@ -33,7 +33,7 @@ namespace TerRoguelike.Projectiles
             Projectile.tileCollide = false;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = -1;
+            Projectile.localNPCHitCooldown = 10;
             Projectile.friendly = true;
             Projectile.hostile = false;
             smokeTex = TexDict["Smoke"];
@@ -54,7 +54,8 @@ namespace TerRoguelike.Projectiles
                 starVelocities.Add(starVector);
                 starRotations.Add(Main.rand.NextFloat(-MathHelper.Pi, MathHelper.Pi + float.Epsilon));
                 starLifetimeOffsets.Add(Main.rand.Next(50));
-                starColors.Add(Color.Lerp(Color.HotPink, Color.Blue, Main.rand.NextFloat(1f + float.Epsilon)));
+                starColors.Add(Color.Lerp(Projectile.ModProj().hostileTurnedAlly ? Color.LightCyan : Color.HotPink, Color.Blue, Main.rand.NextFloat(1f + float.Epsilon)));
+
                 starScales.Add(Main.rand.NextFloat(0.8f, 1f + float.Epsilon));
             }
 
@@ -79,15 +80,15 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.timeLeft <= maxTimeLeft - 20 && Projectile.timeLeft >= 50 ? (bool?)null : false;
         public override bool PreDraw(ref Color lightColor)
         {
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            StartAdditiveSpritebatch();
+
             for (int i = 0; i < starPositions.Count; i++)
             {
                 float opacity = MathHelper.Lerp(0, 1f, MathHelper.Clamp((Projectile.timeLeft - starLifetimeOffsets[i] - 50) / 30f, 0f, 1f));
                 Main.EntitySpriteDraw(starTex, starPositions[i] + Projectile.Center - Main.screenPosition, null, starColors[i] * opacity, starRotations[i], starTex.Size() * 0.5f, 1f * starScales[i], SpriteEffects.None);
             }
             Vector2 smokeOffset = Vector2.UnitY * -16;
-            Color smokeColor = Color.HotPink;
+            Color smokeColor = Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.HotPink;
 
             float smokeOpacity = 1f;
             if (Projectile.timeLeft > maxTimeLeft - 30)
@@ -102,8 +103,8 @@ namespace TerRoguelike.Projectiles
             Main.EntitySpriteDraw(smokeTex, Projectile.Center - Main.screenPosition + smokeOffset, null, smokeColor * smokeOpacity * 0.6f, 0, smokeTex.Size() * 0.5f, MaxScale * 0.45f + (smokeOpacity * 0.5f), SpriteEffects.None);
             Main.EntitySpriteDraw(smokeTex, Projectile.Center - Main.screenPosition + smokeOffset + new Vector2(0, 16), null, smokeColor * smokeOpacity * 0.75f, randomSmokeRotation, smokeTex.Size() * 0.5f, (MaxScale * 0.5f) + (smokeOpacity * 0.5f), SpriteEffects.None);
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            StartVanillaSpritebatch();
+
             return false;
         }
     }

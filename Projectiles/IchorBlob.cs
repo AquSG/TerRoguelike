@@ -40,7 +40,7 @@ namespace TerRoguelike.Projectiles
             
             for (int i = 0; i < 2; i++)
             {
-                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Ichor, 0, 0, 0, default, 1.2f);
+                int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Ichor, 0, 0, 0, default, 1.2f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.velocity *= 0;
@@ -50,7 +50,7 @@ namespace TerRoguelike.Projectiles
         {
             for (int i = 0; i < 20; i++)
             {
-                Dust.NewDust(Projectile.Center, 1, 1, DustID.Ichor, 0, 0, 0, default, 0.8f);
+                int d = Dust.NewDust(Projectile.Center, 1, 1, DustID.Ichor, 0, 0, 0, default, 0.8f);
             } 
             //SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
             return true;

@@ -131,7 +131,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool CanHitNPC(NPC target)
         {
-            return ableToHit;
+            return canBeHit;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {

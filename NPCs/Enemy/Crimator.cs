@@ -51,7 +51,7 @@ namespace TerRoguelike.NPCs.Enemy
             if (NPC.ai[0] > 0 && NPC.ai[0] <= attackTelegraph && NPC.ai[1] % 2 == 0)
             {
                 Vector2 offset = Main.rand.NextVector2Circular(NPC.width * 0.4f, NPC.width * 0.4f);
-                Dust dust = Dust.NewDustPerfect(NPC.Center + offset + NPC.rotation.ToRotationVector2() * 10, DustID.RedTorch, -offset * 0.01f + NPC.velocity, 0, Color.Red, 1.4f);
+                Dust dust = Dust.NewDustPerfect(NPC.Center + offset + NPC.rotation.ToRotationVector2() * 10, modNPC.hostileTurnedAlly ? DustID.CoralTorch : DustID.RedTorch, -offset * 0.01f + NPC.velocity, 0, Color.Red, 1.4f);
                 dust.noGravity = true;
                 dust.noLightEmittence = true;
                 dust.noLight = true;

@@ -22,16 +22,34 @@ using Terraria.Graphics.Effects;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.Audio;
 
 namespace TerRoguelike.NPCs
 {
     public class TerRoguelikeGlobalNPC : GlobalNPC
     {
         #region Variables
+        public static bool anyPuppets
+        {
+            get
+            {
+                foreach (NPC npc in Main.ActiveNPCs)
+                {
+                    if (!npc.friendly)
+                        continue;
+                    var modNPC = npc.ModNPC();
+                    if (!modNPC.hostileTurnedAlly || !modNPC.activatedPuppeteersHand)
+                        continue;
+                    return true;
+                }
+                return false;
+            }
+        }
         public bool TerRoguelikeBoss = false;
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
         public bool hostileTurnedAlly = false;
+        public int puppetOwner = -1;
         public bool IgnoreRoomWallCollision = false;
         public Vector2 RoomWallCollisionShrink = Vector2.Zero;
         public bool SpecialProjectileCollisionRules = false; // Makes certain things happen on the attacking projectile rather than the closest point in the NPC rect to the projectile
@@ -62,6 +80,7 @@ namespace TerRoguelike.NPCs
         public bool drawAfterEverything = false;
         public bool drawBeforeWalls = false;
         public bool drawingBeforeWallsCurrently = false;
+        public int puppetLifetime = 0;
 
         //On kill bools to not let an npc somehow proc it more than once on death.
         public bool activatedHotPepper = false;
@@ -75,6 +94,7 @@ namespace TerRoguelike.NPCs
         public bool activatedSteamEngine = false;
         public bool activatedNutritiousSlime = false;
         public bool activatedItemPotentiometer = false;
+        public bool activatedPuppeteersHand = false;
 
         public bool activatedJstc = false;
 
@@ -89,13 +109,16 @@ namespace TerRoguelike.NPCs
         public int whoAmI;
         public int targetPlayer = -1;
         public int targetNPC = -1;
-        public int friendlyFireHitCooldown = 0;
+        public int targetCooldown = 0;
+        public int[] friendlyFireHitCooldown = new int[Main.maxNPCs];
         public bool OverrideIgniteVisual = false;
         public bool IgniteCentered = false;
+        public int sluggedTime = 0;
+        public bool sluggedSlowApplied;
 
         //elites
         public EliteVars eliteVars = new();
-        public bool sluggedSlowApplied = false;
+        public bool sluggedEliteSlowApplied = false;
         public class EliteVars
         {
             public EliteVars(EliteVars flags)
@@ -1742,6 +1765,11 @@ namespace TerRoguelike.NPCs
                 else
                 {
                     npc.ai[1]++;
+                    if (npc.ai[1] >= attackWindUpTime + attackCooldown && !Main.projectile[(int)npc.ai[3]].active)
+                    {
+                        npc.ai[1] = 0;
+                        npc.ai[2] = 0;
+                    }
                 }
             }
         }
@@ -3379,10 +3407,21 @@ namespace TerRoguelike.NPCs
                 {
                     NPC parent = Main.npc[parentSource.Entity.whoAmI];
                     var modparent = parent.ModNPC();
-                    if (modparent != null && modparent.isRoomNPC)
+                    if (modparent != null)
                     {
-                        isRoomNPC = true;
-                        sourceRoomListID = modparent.sourceRoomListID;
+                        if (modparent.isRoomNPC)
+                        {
+                            isRoomNPC = true;
+                            sourceRoomListID = modparent.sourceRoomListID;
+                        }
+                        if (modparent.hostileTurnedAlly && modparent.puppetOwner >= 0)
+                        {
+                            var parentowner = Main.player[modparent.puppetOwner];
+                            var modparentowner = parentowner.ModPlayer();
+                            modparentowner?.MakeNPCPuppet(npc, npc.ModNPC());
+                        }
+                        targetPlayer = modparent.targetPlayer;
+                        targetNPC = modparent.targetNPC;
                     }
                 }
             }
@@ -3417,10 +3456,10 @@ namespace TerRoguelike.NPCs
                 AdaptiveArmorEnabled = true;
                 AdaptiveArmorDecayRate = 280;
                 diminishingDR += 20;
-                if (sluggedSlowApplied)
+                if (sluggedEliteSlowApplied)
                 {
                     npc.velocity /= 0.85f;
-                    sluggedSlowApplied = false;
+                    sluggedEliteSlowApplied = false;
                 }
                 npc.knockBackResist = 0;
             }
@@ -3430,11 +3469,25 @@ namespace TerRoguelike.NPCs
                 AdaptiveArmorDecayRate = 280;
                 npc.knockBackResist = 0;
             }
+            
+            if (hostileTurnedAlly)
+            {
+                npc.friendlyRegen = -1000000;
+            }
+            if (targetCooldown > 0 && currentUpdate == 1)
+            {
+                targetCooldown--;
+            }
 
-            if (ballAndChainSlowApplied) // grant slowed velocity back as an attempt to make the ai run normall as if it was going full speed
+            if (ballAndChainSlowApplied) // grant slowed velocity back as an attempt to make the ai run normal as if it was going full speed
             {
                 npc.velocity /= 0.85f;
                 ballAndChainSlowApplied = false;
+            }
+            if (sluggedSlowApplied)
+            {
+                npc.velocity /= 0.7f;
+                sluggedSlowApplied = false;
             }
             return true;
         }
@@ -3443,12 +3496,21 @@ namespace TerRoguelike.NPCs
             if (ballAndChainSlow > 0) // slow down
             {
                 npc.velocity *= 0.85f;
-                ballAndChainSlow--;
                 ballAndChainSlowApplied = true;
+                if (currentUpdate == 1)
+                {
+                    ballAndChainSlow--;
+                }
             }
+
             if (eliteVars.slugged)
             {
                 npc.velocity *= 0.85f;
+                sluggedEliteSlowApplied = true;
+            }
+            else if (sluggedTime > 0)
+            {
+                npc.velocity *= 0.7f;
                 sluggedSlowApplied = true;
             }
             if (eliteVars.burdened)
@@ -3475,39 +3537,71 @@ namespace TerRoguelike.NPCs
 
             if (hostileTurnedAlly)
             {
-                if (friendlyFireHitCooldown == 0)
+                if (currentUpdate == 1)
                 {
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
-                        NPC target = Main.npc[i];
-                        if (!target.active)
-                            continue;
-                        if (!target.ModNPC().CanBeChased(false, false))
-                            continue;
-
-                        if (npc.getRect().Intersects(target.getRect()))
-                        {
-                            NPC.HitInfo info = new NPC.HitInfo();
-                            info.HideCombatText = true;
-                            info.Damage = npc.damage;
-                            info.InstantKill = false;
-                            info.HitDirection = 1;
-                            info.Knockback = 0f;
-                            info.Crit = false;
-
-                            target.StrikeNPC(info);
-                            NetMessage.SendStrikeNPC(target, info);
-                            CombatText.NewText(target.getRect(), Color.Orange, npc.damage);
-                            friendlyFireHitCooldown += 20;
-                        }
+                        if (friendlyFireHitCooldown[i] > 0)
+                            friendlyFireHitCooldown[i]--;
                     }
                 }
-                else if (friendlyFireHitCooldown > 0)
-                    friendlyFireHitCooldown--;
+                for (int i = 0; i < Main.maxNPCs; i++)
+                {
+                    NPC target = Main.npc[i];
+                    if (friendlyFireHitCooldown[i] > 0 || !target.active || !target.ModNPC().CanBeChased(false, false))
+                        continue;
+
+                    int cdslot = 0;
+                    float multi = 1;
+                    float multienemy = 1;
+                    Rectangle hitbox = npc.Hitbox;
+                    Rectangle enemyHitbox = target.Hitbox;
+                    if (NPCLoader.CanHitNPC(npc, target) && NPCLoader.ModifyCollisionData(npc, enemyHitbox, ref cdslot, ref multi, ref hitbox) &&
+                        (NPCLoader.CanHitNPC(target, npc) || true) && NPCLoader.ModifyCollisionData(target, hitbox, ref cdslot, ref multienemy, ref enemyHitbox) &&
+                        hitbox.Intersects(enemyHitbox))
+                    {
+                        int hitDamage = (int)(npc.damage * multi * effectiveDamageTakenMulti);
+                        var modifiers = new NPC.HitModifiers();
+                        NPCLoader.ModifyHitNPC(npc, target, ref modifiers);
+
+                        NPC.HitInfo info = new NPC.HitInfo();
+                        info.HideCombatText = true;
+                        info.Damage = npc.damage;
+                        info.InstantKill = false;
+                        info.HitDirection = 1;
+                        info.Knockback = 0f;
+                        info.Crit = false;
+
+                        target.StrikeNPC(info);
+                        NetMessage.SendStrikeNPC(target, info);
+                        NPCLoader.OnHitNPC(npc, target, info);
+                        CombatText.NewText(target.getRect(), Color.Orange, npc.damage);
+                        if (target.life <= 0)
+                        {
+                            if (puppetOwner >= 0)
+                            {
+                                var modOwner = Main.player[puppetOwner].ModPlayer();
+                                modOwner?.OnKillEffects(target);
+                            }
+                        }
+
+                        friendlyFireHitCooldown[i] += 30;
+                    }
+                }
             }
 
             if (currentUpdate == 1)
             {
+                if (hostileTurnedAlly)
+                {
+                    puppetLifetime--;
+                    if (puppetLifetime <= 0)
+                        npc.StrikeInstantKill();
+                }
+
+                if (sluggedTime > 0)
+                    sluggedTime--;
+
                 if (ignitedStacks != null && ignitedStacks.Count > 0) // ignite debuff logic
                 {
                     if (ignitedHitCooldown <= 0)
@@ -3605,6 +3699,13 @@ namespace TerRoguelike.NPCs
             }
             return true;
         }
+        public void CleanseDebuffs()
+        {
+            ignitedStacks.Clear();
+            bleedingStacks.Clear();
+            ballAndChainSlow = 0;
+            sluggedTime = 0;
+        }
         public void IgniteHit(int hitDamage, NPC npc, int owner)
         {
             if (npc.immortal || npc.dontTakeDamage)
@@ -3614,10 +3715,6 @@ namespace TerRoguelike.NPCs
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
 
-            if (npc.life - hitDamage <= 0)
-            {
-                modPlayer.OnKillEffects(npc);
-            }
             NPC.HitInfo info = new NPC.HitInfo();
             info.HideCombatText = true;
             info.Damage = hitDamage;
@@ -3631,6 +3728,11 @@ namespace TerRoguelike.NPCs
             if (npc.Center.Distance(Main.Camera.Center) < 1600)
                 CombatText.NewText(npc.getRect(), Color.DarkKhaki, hitDamage);
             ignitedHitCooldown += 10; // hits 6 times a second
+
+            if (npc.life <= 0)
+            {
+                modPlayer.OnKillEffects(npc);
+            }
         }
         public void BleedingHit(int hitDamage, NPC npc, int owner)
         {
@@ -3641,10 +3743,6 @@ namespace TerRoguelike.NPCs
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
 
-            if (npc.life - hitDamage <= 0)
-            {
-                modPlayer.OnKillEffects(npc);
-            }
             NPC.HitInfo info = new NPC.HitInfo();
             info.HideCombatText = true;
             info.Damage = hitDamage;
@@ -3657,6 +3755,11 @@ namespace TerRoguelike.NPCs
             NetMessage.SendStrikeNPC(npc, info);
             CombatText.NewText(npc.getRect(), Color.MediumVioletRed, hitDamage);
             bleedingHitCooldown = 20; // hits 3 times a second
+
+            if (npc.life <= 0)
+            {
+                modPlayer.OnKillEffects(npc);
+            }
         }
         public void AddBleedingStackWithRefresh(BleedingStack stack)
         {
@@ -3675,6 +3778,21 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreKill(NPC npc)
         {
+            if (hostileTurnedAlly)
+            {
+                SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.1f }, npc.Center);
+                SoundEngine.PlaySound(SoundID.NPCDeath6 with { Volume = 1f }, npc.Center);
+                for (int i = 0; i < 50; i++)
+                {
+                    int d = Dust.NewDust(npc.position, npc.width, npc.height, 180, npc.velocity.X * 0.5f, npc.velocity.Y * 0.5f);
+                    Dust dust = Main.dust[d];
+                    dust.velocity *= 2f;
+                    dust.noGravity = true;
+                    dust.scale = 1.4f;
+                }
+                return false;
+            }
+
             if (!isRoomNPC)
                 return true;
 
@@ -3732,6 +3850,38 @@ namespace TerRoguelike.NPCs
                 target.ModPlayer().sluggedAttempt = true;
             }
         }
+        public override void OnHitNPC(NPC npc, NPC target, NPC.HitInfo hit)
+        {
+            var modTarget = target.ModNPC();
+            if (modTarget != null)
+            {
+                if (target.friendly && modTarget.Segments.Count > 0)
+                {
+                    Vector2 position = modTarget.Segments[hitSegment].Position;
+                    int segHeight = (int)modTarget.Segments[hitSegment].Height;
+                    Rectangle segRect = new Rectangle((int)position.X - (segHeight / 2), (int)position.Y - (segHeight / 2), segHeight, segHeight);
+                    CombatText.NewText(segRect, hit.Crit ? CombatText.DamagedFriendlyCrit : CombatText.DamagedFriendly, hit.Damage, hit.Crit);
+                }
+            }
+        }
+        public override bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
+        {
+            if (Segments.Count > 0)
+            {
+                for (int i = 0; i < Segments.Count; i++)
+                {
+                    WormSegment segment = Segments[i];
+                    float radius = i == 0 ? (npc.height < npc.width ? npc.height / 2 : npc.width / 2) : segment.Height / 2;
+                    if (segment.Position.Distance(victimHitbox.ClosestPointInRect(segment.Position)) <= radius)
+                    {
+                        npcHitbox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+                        hitSegment = i;
+                        break;
+                    }
+                }
+            }
+            return true;
+        }
         public override void ModifyHoverBoundingBox(NPC npc, ref Rectangle boundingBox)
         {
             if (Segments.Count > 0)
@@ -3763,6 +3913,23 @@ namespace TerRoguelike.NPCs
                 frame = Frame;
             }
         }
+        public static bool EliteSpritebatch = false;
+        public static void GhostSpritebatch(bool end = true, BlendState blendState = null)
+        {
+            if (blendState == null)
+                blendState = BlendState.AlphaBlend;
+
+            if (end)
+                Main.spriteBatch.End();
+
+            Effect ghostEffect = Filters.Scene["TerRoguelike:GrayscaleRecolor"].GetShader().Shader;
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, blendState, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, ghostEffect, Main.GameViewMatrix.TransformationMatrix);
+
+            Color recolor = Color.Cyan;
+            recolor.A = 0;
+            ghostEffect.Parameters["recolor"].SetValue(recolor.ToVector4());
+            ghostEffect.Parameters["intensity"].SetValue(0.6f);
+        }
         public bool EliteEffectSpritebatch(NPC npc, EliteEffectHelperVars vars, bool end = true)
         {
             if (npc.IsABestiaryIconDummy)
@@ -3771,7 +3938,11 @@ namespace TerRoguelike.NPCs
             var sb = Main.spriteBatch;
             if (end)
                 sb.End();
-            if (eliteVars.tainted)
+            if (hostileTurnedAlly && npc.friendly)
+            {
+                GhostSpritebatch(false);
+            }
+            else if (eliteVars.tainted)
             {
                 Effect taintedEffect = Filters.Scene["TerRoguelike:DualContrast"].GetShader().Shader;
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, taintedEffect, Main.GameViewMatrix.TransformationMatrix);
@@ -3908,7 +4079,7 @@ namespace TerRoguelike.NPCs
                 {
                     overheadArrowTime++;
                 }
-                if (!Main.hideUI && overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
+                if (!Main.hideUI && !hostileTurnedAlly && overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
                 {
                     Texture2D arrowTex = TexDict["YellowArrow"];
                     float opacity = MathHelper.Clamp(overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
@@ -4018,35 +4189,45 @@ namespace TerRoguelike.NPCs
                 if (!Main.player[targetPlayer].active || Main.player[targetPlayer].dead || npc.friendly)
                 {
                     targetPlayer = -1;
+                    targetCooldown = 0;
                 }
             }
             if (targetNPC != -1)
             {
-                if (!Main.npc[targetNPC].ModNPC().CanBeChased(false, false) || !npc.friendly)
+                if (hostileTurnedAlly ? (!Main.npc[targetNPC].ModNPC().CanBeChased(false, false) || !npc.friendly) : (!Main.npc[targetNPC].ModNPC().CanBeChased(false, true)))
                 {
-
                     targetNPC = -1;
+                    targetCooldown = 0;
                 }
             }
 
             if (npc.friendly)
             {
-                if (targetNPC == -1 || targetPlayer != -1)
+                if (targetNPC == -1 || targetPlayer != -1 || targetCooldown <= 0)
                 {
                     targetNPC = ClosestNPC(npc.Center, 3200f, false);
                     targetPlayer = -1;
+                    targetCooldown = 300;
                 }
             }
-            else
+            else if (targetCooldown <= 0)
             {
-                if (targetPlayer == -1 || targetNPC != -1)
-                {
+                if (targetPlayer == -1)
                     targetPlayer = npc.FindClosestPlayer();
-                    if (Main.player[targetPlayer].dead)
+                if (targetNPC == -1 && !TerRoguelikeBoss)
+                    targetNPC = ClosestNPC(npc.Center, 3200f, true);
+                if (Main.player[targetPlayer].dead)
+                    targetPlayer = -1;
+                if (targetPlayer != -1 && targetNPC != -1)
+                {
+                    Player p = Main.player[targetPlayer];
+                    NPC n = Main.npc[targetNPC];
+                    if (npc.Center.DistanceSQ(n.Center) < npc.Center.DistanceSQ(p.Center))
                         targetPlayer = -1;
-
-                    targetNPC = -1;
+                    else
+                        targetNPC = -1;
                 }
+                targetCooldown = 300;
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
         }

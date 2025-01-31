@@ -46,7 +46,7 @@ namespace TerRoguelike.Projectiles
             Projectile.rotation = Projectile.velocity.ToRotation();
             if (Main.rand.NextBool())
             {
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, DustID.SolarFlare, Projectile.velocity.X * 0.5f,Projectile.velocity.Y * 0.5f, 0, default(Color), 1f);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.SolarFlare, Projectile.velocity.X * 0.5f,Projectile.velocity.Y * 0.5f, 0, default(Color), 1f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.noLight = true;

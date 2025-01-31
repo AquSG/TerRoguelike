@@ -13,6 +13,7 @@ using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
+using TerRoguelike.NPCs;
 
 namespace TerRoguelike.Projectiles
 {
@@ -61,20 +62,23 @@ namespace TerRoguelike.Projectiles
             var tex = TextureAssets.Projectile[Type].Value;
             Vector2 origin = tex.Size() * 0.5f;
 
-            TerRoguelikeUtils.StartAlphaBlendSpritebatch();
-
-            Vector3 colorHSL = Main.rgbToHsl(Color.SandyBrown);
-
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
-            GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
-            GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
-            for (int i = 0; i < 8; i++)
+            if (!Projectile.ModProj().hostileTurnedAlly)
             {
-                Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
-                Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + offset, null, Color.White, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
-            }
-            TerRoguelikeUtils.StartVanillaSpritebatch();
+                TerRoguelikeUtils.StartAlphaBlendSpritebatch();
 
+                Vector3 colorHSL = Main.rgbToHsl(Projectile.ModProj().hostileTurnedAlly ? Color.Cyan : Color.SandyBrown);
+
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector2 offset = (Vector2.UnitX * 1).RotatedBy(Projectile.rotation + (i * MathHelper.PiOver4));
+                    Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition + offset, null, Color.White, Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
+                }
+                TerRoguelikeUtils.StartVanillaSpritebatch();
+            }
+            
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, (Color)GetAlpha(Lighting.GetColor(Projectile.Center.ToTileCoordinates())), Projectile.rotation, origin, Projectile.scale, SpriteEffects.None);
             return false;
         }

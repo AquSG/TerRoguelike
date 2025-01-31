@@ -40,6 +40,15 @@ namespace TerRoguelike.Projectiles
             Projectile.rotation += MathHelper.Clamp(Projectile.velocity.X * 0.08f, -0.3f, 0.3f);
             if (Projectile.timeLeft < 230)
                 Projectile.velocity.Y += 0.24f;
+            if (Projectile.timeLeft == 60 && Projectile.ModProj().hostileTurnedAlly)
+            {
+                for (int i = 0; i < 11; i++)
+                {
+                    Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.DungeonSpirit);
+                }
+                Projectile.Kill();
+                SoundEngine.PlaySound(SoundID.Item51 with { Volume = 0.8f }, Projectile.Center);
+            }
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
@@ -70,7 +79,7 @@ namespace TerRoguelike.Projectiles
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             float opacity = MathHelper.Clamp((Projectile.timeLeft - 90) / 90f, 0, 1f);
 
-            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(lightColor), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
+            Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, Projectile.GetAlpha(Lighting.GetColor(Projectile.Center.ToTileCoordinates())), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(lightTex, Projectile.Center - Main.screenPosition, null, Color.White * opacity, Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
         }

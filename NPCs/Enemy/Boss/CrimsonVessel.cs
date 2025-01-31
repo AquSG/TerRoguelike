@@ -157,7 +157,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             ableToHit = NPC.ai[3] == 0 && !(NPC.ai[0] == Heal.Id) && NPC.localAI[0] >= 0 && !(NPC.ai[0] == BloodTrail.Id && NPC.ai[1] < BloodTrail.Duration - teleportTime) && deadTime == 0;
             canBeHit = true;
-            trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active);
+            trackedSeers.RemoveAll(x => !Main.npc[x.whoAmI].active || Main.npc[x.whoAmI].ModNPC().hostileTurnedAlly);
             seerOrbitCenter = NPC.Center + modNPC.drawCenter;
 
             NPC.frameCounter += 0.13d;

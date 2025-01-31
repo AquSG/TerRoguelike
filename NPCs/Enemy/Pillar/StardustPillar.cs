@@ -44,6 +44,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             NPC.behindTiles = true;
             modNPC.drawCenter = new Vector2(0, -18);
             NPC.immortal = true;
+            modNPC.activatedPuppeteersHand = true;
         }
         public override void AI()
         {

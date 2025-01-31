@@ -54,6 +54,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             segmentTex = TexDict["HungryTether"];
             NPC.spriteDirection = 1;
             NPC.gfxOffY = 2;
+            modNPC.activatedPuppeteersHand = true;
         }
         public override void DrawBehind(int index)
         {

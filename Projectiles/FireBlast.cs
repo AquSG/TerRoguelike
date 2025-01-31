@@ -25,7 +25,7 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 120;
-            Projectile.penetrate = 1;
+            Projectile.penetrate = -1;
         }
         public override void OnSpawn(IEntitySource source)
         {
@@ -33,13 +33,13 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            if (Projectile.ai[0] == 1)
+            if (Projectile.localAI[0] == 1)
             {
                 int newWidth = 64;
                 int newHeight = 64;
                 SoundEngine.PlaySound(SoundID.Item74 with { Volume = 1f }, Projectile.Center);
                 Projectile.velocity = Vector2.Zero;
-                Projectile.ai[0] = 2;
+                Projectile.localAI[0] = 2;
                 Projectile.position = Projectile.Center + new Vector2(-(newWidth * 0.5f), -(newHeight * 0.5f));
                 Projectile.width = newWidth;
                 Projectile.height = newHeight;
@@ -47,13 +47,15 @@ namespace TerRoguelike.Projectiles
                 Projectile.penetrate = -1;
             }
 
-            if (Projectile.ai[0] == 0)
+            if (Projectile.localAI[0] == 0)
             {
-                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, 174, 0f, 0f, 100, default(Color), 1.2f);
+                int d = Dust.NewDust(new Vector2(Projectile.position.X, Projectile.position.Y), Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.InfernoFork, 0f, 0f, 100, default(Color), 1.2f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.velocity *= 0.5f;
                 dust.velocity += Projectile.velocity * 0.3f;
+                if (Projectile.ModProj().hostileTurnedAlly)
+                    dust.color = Color.Cyan;
             }
             else
             {
@@ -61,7 +63,9 @@ namespace TerRoguelike.Projectiles
                 {
                     float rot = MathHelper.TwoPi / 20f * i;
                     Vector2 vel = (-Vector2.UnitY * 4f).RotatedBy(rot);
-                    Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-4), 0, 0, 174, vel.X, vel.Y, 0, default(Color), 0.8f);
+                    Dust dust = Dust.NewDustDirect(Projectile.Center + new Vector2(-4), 0, 0, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.InfernoFork, vel.X, vel.Y, 0, default(Color), 0.8f);
+                    if (Projectile.ModProj().hostileTurnedAlly)
+                        dust.color = Color.Cyan;
 
                     dust.noGravity = true;
                 }
@@ -70,24 +74,24 @@ namespace TerRoguelike.Projectiles
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
-            if (Projectile.ai[0] >= 1)
+            if (Projectile.localAI[0] >= 1)
                 return false;
-            Projectile.ai[0] = 1;
+            Projectile.localAI[0] = 1;
             return false;
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            if (Projectile.ai[0] >= 1)
+            if (Projectile.localAI[0] >= 1)
                 return;
 
-            Projectile.ai[0] = 1;
+            Projectile.localAI[0] = 1;
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
-            if (Projectile.ai[0] >= 1)
+            if (Projectile.localAI[0] >= 1)
                 return;
 
-            Projectile.ai[0] = 1;
+            Projectile.localAI[0] = 1;
         }
     }
 }

@@ -106,6 +106,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            if (modNPC.hostileTurnedAlly)
+            {
+                modNPC.IgnoreRoomWallCollision = false;
+                NPC.position += Main.rand.NextVector2CircularEdge(2, 2);
+                int attackTelegraph = 45;
+                int attackCooldown = 15;
+                modNPC.RogueFlyingShooterAI(NPC, 7f, 5.5f, 0.12f, 128f, 320f, attackTelegraph, attackCooldown, ModContent.ProjectileType<BloodClot>(), 8f, Vector2.Zero, NPC.damage, true);
+                if (NPC.ai[2] == -attackCooldown)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCHit13 with { Volume = 0.5f, Pitch = -0.6f }, NPC.Center);
+                }
+                return;
+            }
             NPC.localAI[1] += Main.rand.NextFloat(0.9f, 1f);
             NPC.localAI[2]++;
             if (NPC.localAI[3] == 0)
@@ -258,7 +271,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Color color = modNPC.ignitedStacks.Count > 0 ? Color.Lerp(Color.White, Color.OrangeRed, 0.4f) : Color.Lerp(Color.White, Lighting.GetColor(drawPos.ToTileCoordinates()), 0.6f);
             float rotation = 0;
             Vector2 scale = new Vector2(NPC.scale);
-            if (NPC.ai[3] > 0)
+            if (NPC.ai[3] > 0 && !modNPC.hostileTurnedAlly)
             {
                 float interpolant = NPC.ai[3] < teleportMoveTimestamp ? NPC.ai[3] / (teleportMoveTimestamp) : 1f - ((NPC.ai[3] - teleportMoveTimestamp) / (teleportTime - teleportMoveTimestamp));
                 float verticInterpolant = MathHelper.Lerp(1f, 2f, 0.5f + (0.5f * -(float)Math.Cos(interpolant * MathHelper.TwoPi)));
@@ -291,6 +304,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             
             Main.EntitySpriteDraw(tex, drawPos - Main.screenPosition, NPC.frame, color, rotation, NPC.frame.Size() * 0.5f, scale, NPC.spriteDirection > 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None);
+
+            if (modNPC.hostileTurnedAlly)
+                return false;
 
             NPC parent = Main.npc[(int)NPC.ai[0]];
             if (NPC.localAI[2] < 60 || (parent.ai[0] == 2 && parent.ai[1] > teleportTime))

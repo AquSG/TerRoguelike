@@ -49,13 +49,22 @@ namespace TerRoguelike.Projectiles
             Projectile.velocity *= 0.98f;
             if (Projectile.timeLeft > 60 && Main.rand.NextBool(5))
             {
-                int d = Dust.NewDust(Projectile.position - new Vector2(12), Projectile.width + 24, Projectile.height + 24, DustID.GreenTorch, 0, 0, 0, default, 2f);
+                int d = Dust.NewDust(Projectile.position - new Vector2(12), Projectile.width + 24, Projectile.height + 24, Projectile.ModProj().hostileTurnedAlly ? DustID.CoralTorch : DustID.GreenTorch, 0, 0, 0, default, 2f);
                 Dust dust = Main.dust[d];
                 dust.noGravity = true;
                 dust.noLight = true;
                 dust.noLightEmittence = true;
             }
-                
+
+            if (Projectile.timeLeft == 45 && Projectile.ModProj().hostileTurnedAlly)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    Dust d = Dust.NewDustDirect(Projectile.position, Projectile.width, Projectile.height, DustID.DungeonSpirit, Scale: 1.4f);
+                    d.noGravity = true;
+                }
+                Projectile.Kill();
+            }
         }
         public override bool? CanDamage() => Projectile.timeLeft > 45 ? null : false;
         public override bool PreDraw(ref Color lightColor)
@@ -66,11 +75,12 @@ namespace TerRoguelike.Projectiles
             float opacity = MathHelper.Clamp(MathHelper.Lerp(0, 1f, Projectile.timeLeft / 60f), 0, 1f);
             float scale = 0.2f;
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Projectile.ModProj().EliteSpritebatch(true, BlendState.Additive);
+
             Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null ,Color.Green * opacity * 0.8f, 0f, glowTex.Size() * 0.5f, 0.45f * scale * Projectile.scale, SpriteEffects.None, 0);
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+
+            Projectile.ModProj().EliteSpritebatch();
+
             Main.EntitySpriteDraw(sporeTex, Projectile.Center - Main.screenPosition, new Rectangle(0, frameHeight * Projectile.frame, sporeTex.Width, frameHeight), Color.White * opacity, Projectile.rotation, new Vector2(sporeTex.Width * 0.5f, frameHeight * 0.5f), Projectile.scale, SpriteEffects.None, 0);
             
             return false;

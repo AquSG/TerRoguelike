@@ -73,7 +73,7 @@ namespace TerRoguelike.NPCs.Enemy
             int attackCooldown = 120;
             NPC.frameCounter += NPC.velocity.Length() * 0.2d;
             bulletPos = new Vector2(-36, 2 * NPC.direction).RotatedBy(gunRot);
-            modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 720f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SniperBullet>(), 2f, bulletPos, NPC.damage * 2, true, false, gunRot + MathHelper.Pi);
+            modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 720f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SniperBullet>(), 2f, bulletPos, NPC.damage * 3, true, false, gunRot + MathHelper.Pi);
             if (NPC.ai[1] == -attackCooldown)
             {
                 SoundEngine.PlaySound(SoundID.Item40 with { Volume = 1f }, NPC.Center);
@@ -113,7 +113,7 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-                if (NPC.ai[1] < attackTelegraph - 30 || NPC.ai[1] % 6 < 3)
+                if ((NPC.ai[1] < attackTelegraph - 30 || NPC.ai[1] % 6 < 3) && !modNPC.hostileTurnedAlly)
                 {
                     Vector2 anchorPos = bulletPos + NPC.Center;
                     Color startColor = Color.Red * 0.9f;

@@ -97,12 +97,15 @@ namespace TerRoguelike.Projectiles
             Vector2 offset = new Vector2(Projectile.width * 0.5f, Projectile.height * 0.5f);
             int frameHeight = tex.Height / Main.projFrames[Type];
             Rectangle frame = new Rectangle(0, frameHeight * Projectile.frame, tex.Width, frameHeight);
+            if (Projectile.ModProj().hostileTurnedAlly)
+                StartVanillaSpritebatch();
             for (int i = 1; i < Projectile.oldPos.Length; i++)
             {
                 Vector2 pos = Projectile.oldPos[i] + offset;
                 float opacity = (1f - ((float)i / Projectile.oldPos.Length)) * 0.6f;
                 Main.EntitySpriteDraw(tex, pos - Main.screenPosition, frame, Color.White * opacity, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             }
+            Projectile.ModProj().EliteSpritebatch();
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
         }

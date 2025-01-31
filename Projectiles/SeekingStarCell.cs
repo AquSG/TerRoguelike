@@ -10,6 +10,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Managers.TextureManager;
+using Microsoft.Build.Construction;
 
 namespace TerRoguelike.Projectiles
 {
@@ -44,6 +45,9 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            if (Projectile.timeLeft == maxTimeLeft)
+                GetTarget();
+
             Projectile.frameCounter++;
             Projectile.frame = ((int)Projectile.frameCounter / 10) % Main.projFrames[Type];
             if (!Main.rand.NextBool(4))
@@ -60,9 +64,6 @@ namespace TerRoguelike.Projectiles
                 Projectile.velocity *= 0.972f;
                 return;
             }
-
-            if (Projectile.ai[2] == -1)
-                GetTarget();
 
             float newRot = Projectile.velocity.ToRotation();
             if (Projectile.ai[2] != -1)
@@ -128,12 +129,15 @@ namespace TerRoguelike.Projectiles
             Vector2 offset = new Vector2(Projectile.width * 0.5f, Projectile.height * 0.5f);
             int frameHeight = lightTex.Height / Main.projFrames[Type];
             Rectangle frame = new Rectangle(0, frameHeight * Projectile.frame, tex.Width, frameHeight);
+            if (Projectile.ModProj().hostileTurnedAlly)
+                StartVanillaSpritebatch();
             for (int i = 1; i < Projectile.oldPos.Length; i++)
             {
                 Vector2 pos = Projectile.oldPos[i] + offset;
                 float opacity = (1f - ((float)i / Projectile.oldPos.Length)) * 0.6f;
                 Main.EntitySpriteDraw(lightTex, pos - Main.screenPosition, frame, Color.White * opacity, Projectile.oldRot[i], frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             }
+            Projectile.ModProj().EliteSpritebatch();
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, frame, Projectile.GetAlpha(lightColor), Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             Main.EntitySpriteDraw(lightTex, Projectile.Center - Main.screenPosition, frame, Color.White, Projectile.rotation, frame.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
@@ -141,6 +145,32 @@ namespace TerRoguelike.Projectiles
 
         public void GetTarget()
         {
+            var modProj = Projectile.ModProj();
+            if (modProj != null && modProj.npcOwner >= 0)
+            {
+                NPC owner = Main.npc[modProj.npcOwner];
+                if (owner.active && (owner.friendly == Projectile.friendly))
+                {
+                    var modOwner = owner.ModNPC();
+                    
+                    if (modOwner != null)
+                    {
+                        if (modOwner.targetNPC >= 0 && Main.npc[modOwner.targetNPC].active)
+                        {
+                            Projectile.ai[1] = 1;
+                            Projectile.ai[2] = modOwner.targetNPC;
+                            return;
+                        }
+                        if (modOwner.targetPlayer >= 0 && Main.player[modOwner.targetPlayer].active && !Main.player[modOwner.targetPlayer].dead)
+                        {
+                            Projectile.ai[1] = 0;
+                            Projectile.ai[2] = modOwner.targetPlayer;
+                            return;
+                        }
+                    }
+                }
+            }
+
             float closestTarget = 3200f;
             if (Projectile.hostile)
             {

@@ -44,6 +44,7 @@ namespace TerRoguelike.Rooms
             {
                 if (player.dead)
                     return;
+                ClearGhosts();
                 ClearSpecificProjectiles();
                 CreditsSystem.StartCredits();
                 var modPlayer = player.ModPlayer();

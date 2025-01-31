@@ -49,6 +49,7 @@ namespace TerRoguelike.Systems
         public static List<Room> RoomList; //List of all rooms currently in play in the world
         public static List<HealingPulse> healingPulses = new List<HealingPulse>();
         public static List<AttackPlanRocketBundle> attackPlanRocketBundles = new List<AttackPlanRocketBundle>();
+        public static List<RemedialHealingOrb> remedialHealingOrbs = [];
         public static bool obtainedRoomListFromServer = false;
         public static bool debugDrawNotSpawnedEnemies = false;
         public static List<StoredDraw> postDrawEverythingCache = [];
@@ -66,6 +67,7 @@ namespace TerRoguelike.Systems
                 {
                     Main.time = 16500;
                     Main.dayTime = false;
+                    Star.starfallBoost = -1;
                 }
                 else
                 {
@@ -215,6 +217,13 @@ namespace TerRoguelike.Systems
                 }
 
                 room.Update();
+            }
+        }
+        public override void PostUpdateTime()
+        {
+            if (ILEdits.dualContrastTileShader)
+            {
+                Star.starfallBoost = -1;
             }
         }
         #region Initialize Lunar Floor
@@ -969,6 +978,174 @@ namespace TerRoguelike.Systems
         }
         #endregion
 
+        #region Remedial Healing Orbs
+        public static void UpdateRemedialHealingOrbs()
+        {
+            int cap = 2000;
+            if (remedialHealingOrbs.Count > cap)
+                remedialHealingOrbs.RemoveRange(0, remedialHealingOrbs.Count - cap);
+
+            bool updatesLeft = false;
+            for (int u = 0; u < 1000; u++)
+            {
+                updatesLeft = false;
+                for (int i = 0; i < remedialHealingOrbs.Count; i++)
+                {
+                    var orb = remedialHealingOrbs[i];
+                    if (!orb.active)
+                    {
+                        remedialHealingOrbs.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+
+                    if (orb.currentUpdate < orb.maxUpdates)
+                    {
+                        orb.Update();
+                        updatesLeft = true;
+                    }
+
+                    if (!orb.active)
+                    {
+                        remedialHealingOrbs.RemoveAt(i);
+                        i--;
+                        continue;
+                    }
+                }
+
+                if (!updatesLeft || u == 999)
+                {
+                    for (int i = 0; i < remedialHealingOrbs.Count; i++)
+                    {
+                        var orb = remedialHealingOrbs[i];
+                        orb.currentUpdate = 0;
+                    }
+                    break;
+                }
+            }
+        }
+        public static void DrawRemedialHealingOrbs()
+        {
+            if (remedialHealingOrbs == null)
+                return;
+            if (remedialHealingOrbs.Count == 0)
+                return;
+
+            StartVanillaSpritebatch(false);
+
+            for (int i = 0; i < remedialHealingOrbs.Count; i++)
+            {
+                var orb = remedialHealingOrbs[i];
+                if (!orb.active)
+                    continue;
+
+                orb.Draw();
+            }
+
+            Main.spriteBatch.End();
+        }
+        public class RemedialHealingOrb
+        {
+            public Texture2D texture => TextureAssets.Projectile[ModContent.ProjectileType<Projectiles.RemedialHealingOrb>()].Value;
+            public bool active = true;
+            public int timeLeft;
+            public int timeAlive = 0;
+            public Vector2 position;
+            public Vector2 velocity;
+            public int width = 10;
+            public int height = 10;
+            public int owner;
+            public int maxUpdates;
+            public int currentUpdate = 0;
+            public List<Vector2> oldPos = [];
+            public int oldPosCap = 5;
+            public Rectangle hitbox => new Rectangle((int)(position.X - (width * 0.5f)), (int)(position.Y - (height * 0.5f)), width, height);
+            public RemedialHealingOrb(Vector2 Position, Vector2 Velocity, int TimeLeft, int Owner, int MaxUpdates = 1)
+            {
+                position = Position;
+                velocity = Velocity;
+                maxUpdates = MaxUpdates;
+                timeLeft = TimeLeft * maxUpdates;
+                owner = Owner;
+            }
+            public void Update()
+            {
+                currentUpdate++;
+
+                AI();
+                
+                position += velocity;
+                oldPos.Insert(0, position);
+                if (oldPos.Count > oldPosCap)
+                    oldPos.RemoveAt(oldPosCap - 1);
+
+                timeAlive++;
+                timeLeft--;
+                if (timeLeft <= 0)
+                    active = false;
+                    
+            }
+            public void AI()
+            {
+                velocity *= 0.885f;
+
+                if (currentUpdate != maxUpdates)
+                    return;
+
+                var ownerModPlayer = Main.player[owner].ModPlayer();
+                if (ownerModPlayer == null)
+                    return;
+
+                Rectangle rect = hitbox;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    if (player.dead)
+                        continue;
+
+                    if (player.getRect().Intersects(rect))
+                    {
+                        TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                        int healAmt = ownerModPlayer.remedialTapeworm * 1; // heal for how much tapeworm the original spawner player had
+                        modPlayer.ScaleableHeal(healAmt); // however, scales based off of the touchee's healing effectiveness
+                        timeLeft = 0;
+                        active = false;
+                        return;
+                    }
+                }
+            }
+            public void Draw()
+            {
+                Texture2D tex = texture;
+                for (int i = 0; i < oldPos.Count; i++)
+                {
+                    float colorInterpolation = (float)Math.Cos(timeLeft / 32f + Main.GlobalTimeWrappedHourly / 20f + i / (float)oldPos.Count * MathHelper.Pi) * 0.5f + 0.5f;
+                    Color color = Color.Lerp(Color.LightSeaGreen, Color.LimeGreen, colorInterpolation) * (i <= 1 ? 1f - (i * 0.05f) : 0.7f);
+                    color.A = 0;
+                    Vector2 drawPosition = oldPos[i] - Main.screenPosition;
+                    Color outerColor = color;
+                    Color innerColor = color * 0.5f;
+                    float intensity = 0.8f + 0.15f * (float)Math.Cos(timeLeft * MathHelper.TwoPi / maxUpdates * 0.04f);
+                    intensity *= i <= 1 ? 1f : MathHelper.Lerp(0.15f, 0.6f, 1f - i / (float)oldPos.Count);
+                    if (timeLeft <= 60 * maxUpdates) //Shrinks to nothing when projectile is nearing death
+                    {
+                        intensity *= timeLeft / (60f * maxUpdates);
+                    }
+                    if (timeAlive < 30 * maxUpdates)
+                    {
+                        intensity *= MathHelper.Lerp(0.5f, 1f, timeAlive / (30f * maxUpdates));
+                    }
+
+                    Vector2 outerScale = new Vector2(1f) * intensity;
+                    Vector2 innerScale = new Vector2(1f) * intensity * 0.7f;
+                    outerColor *= intensity;
+                    innerColor *= intensity;
+                    Main.EntitySpriteDraw(tex, drawPosition, null, outerColor, 0f, tex.Size() * 0.5f, outerScale * 0.15f, SpriteEffects.None, 0);
+                    Main.EntitySpriteDraw(tex, drawPosition, null, innerColor, 0f, tex.Size() * 0.5f, innerScale * 0.15f, SpriteEffects.None, 0);
+                }
+            }
+        }
+        #endregion
+
         #region Chains
         public void UpdateChains()
         {
@@ -1153,6 +1330,7 @@ namespace TerRoguelike.Systems
         public override void PostUpdateEverything()
         {
             ParticleManager.UpdateParticles();
+            UpdateRemedialHealingOrbs();
             if (worldTeleportTime > 0)
             {
                 worldTeleportTime++;
@@ -1456,6 +1634,9 @@ namespace TerRoguelike.Systems
             loopingDrama = 0;
             jstcPortalPos = Vector2.Zero;
             jstcPortalTime = 0;
+            healingPulses.Clear();
+            attackPlanRocketBundles.Clear();
+            remedialHealingOrbs.Clear();
             ILEdits.dualContrastTileShader = false;
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;

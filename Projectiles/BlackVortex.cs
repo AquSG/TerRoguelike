@@ -38,7 +38,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 600;
             Projectile.penetrate = -1;
             Projectile.usesLocalNPCImmunity = true;
-            Projectile.localNPCHitCooldown = 20;
+            Projectile.localNPCHitCooldown = 10;
             modProj = Projectile.ModProj();
             maxTimeLeft = Projectile.timeLeft;
             maxScale = Projectile.scale;
@@ -113,6 +113,31 @@ namespace TerRoguelike.Projectiles
         }
         public void GetTarget()
         {
+            var modProj = Projectile.ModProj();
+            if (modProj != null && modProj.npcOwner >= 0)
+            {
+                NPC owner = Main.npc[modProj.npcOwner];
+                if (owner.active && (owner.friendly == Projectile.friendly))
+                {
+                    var modOwner = owner.ModNPC();
+                    if (modOwner != null)
+                    {
+                        if (modOwner.targetNPC >= 0 && Main.npc[modOwner.targetNPC].active)
+                        {
+                            Projectile.ai[0] = 1;
+                            Projectile.ai[2] = modOwner.targetNPC;
+                            return;
+                        }
+                        if (modOwner.targetPlayer >= 0 && Main.player[modOwner.targetPlayer].active && !Main.player[modOwner.targetPlayer].dead)
+                        {
+                            Projectile.ai[0] = 0;
+                            Projectile.ai[2] = modOwner.targetPlayer;
+                            return;
+                        }
+                    }
+                }
+            }
+
             float closestTarget = 3200f;
             if (Projectile.hostile)
             {
@@ -148,6 +173,11 @@ namespace TerRoguelike.Projectiles
                     if (npc.life <= 0)
                         continue;
                     if (npc.immortal)
+                        continue;
+                    var modnpc = npc.ModNPC();
+                    if (modnpc == null)
+                        continue;
+                    if (modnpc.hostileTurnedAlly)
                         continue;
 
                     float distance = (Projectile.Center - npc.Center).Length();

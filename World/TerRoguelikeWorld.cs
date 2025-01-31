@@ -93,6 +93,7 @@ namespace TerRoguelike.World
         public static readonly SoundStyle PortalLoop = new SoundStyle("TerRoguelike/Sounds/PortalLoop");
         public static readonly SoundStyle AahLoop = new SoundStyle("TerRoguelike/Sounds/AahLoop");
         public static readonly SoundStyle JstcSpawn = new SoundStyle("TerRoguelike/Sounds/JstcSpawn");
+        public static readonly SoundStyle LunarGambitSpawn = new SoundStyle("TerRoguelike/Sounds/LunarGambitSpawn");
         public static SlotId PortalSlot;
         public static bool TryWarpToSanctuary(TerRoguelikePlayer modPlayer)
         {

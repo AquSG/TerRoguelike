@@ -122,7 +122,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
-            TerRoguelikeUtils.StartVanillaSpritebatch();
+            if (!NPC.IsABestiaryIconDummy)
+                TerRoguelikeUtils.StartVanillaSpritebatch();
             Vector2 offset = new Vector2(NPC.width * 0.5f, NPC.height * 0.5f);
             Texture2D tex = TextureAssets.Npc[Type].Value;
             for (int i = 0; i < NPC.oldPos.Length; i++)

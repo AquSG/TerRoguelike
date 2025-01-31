@@ -34,6 +34,7 @@ namespace TerRoguelike
             RoomList = null;
             healingPulses = null;
             attackPlanRocketBundles = null;
+            remedialHealingOrbs = null;
             pendingEnemies = null;
             pendingItems = null;
             specialPendingItems = null;

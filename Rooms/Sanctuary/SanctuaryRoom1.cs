@@ -26,6 +26,7 @@ using Terraria.Utilities.Terraria.Utilities;
 using Terraria.ModLoader.IO;
 using Terraria.GameContent;
 using Microsoft.CodeAnalysis;
+using ReLogic.Utilities;
 
 namespace TerRoguelike.Rooms
 {
@@ -39,6 +40,7 @@ namespace TerRoguelike.Rooms
         public override bool ActivateNewFloorEffects => false;
         public override bool AllowSettingPlayerCurrentRoom => true;
         public bool lunarGambitGranted = false;
+        public SlotId lunarGambitSlot;
         public override void InitializeRoom()
         {
             if (!initialized && Main.LocalPlayer != null)
@@ -61,6 +63,7 @@ namespace TerRoguelike.Rooms
             base.Update();
             awake = false;
 
+            bool fadeSound = !lunarGambitGranted;
             if (!lunarGambitGranted)
             {
                 foreach(Player player in Main.ActivePlayers)
@@ -70,7 +73,11 @@ namespace TerRoguelike.Rooms
                     {
                         if (modPlayer.darkSanctuaryTime > 0)
                         {
+                            fadeSound = false;
+
                             Vector2 itemPosition = RoomPosition16 + RoomCenter16 + new Vector2(-328, -48);
+                            if (modPlayer.darkSanctuaryTime == 35)
+                                lunarGambitSlot = SoundEngine.PlaySound(TerRoguelikeWorld.LunarGambitSpawn with { Volume = 1f }, itemPosition);
 
                             if (modPlayer.darkSanctuaryTime >= 180)
                             {
@@ -109,6 +116,14 @@ namespace TerRoguelike.Rooms
                             break;
                         }
                     }
+                }
+            }
+            if (SoundEngine.TryGetActiveSound(lunarGambitSlot, out var sound) && sound.IsPlaying)
+            {
+                if (fadeSound)
+                {
+                    sound.Volume *= 0.8f;
+                    sound.Pitch -= 0.05f;
                 }
             }
         }

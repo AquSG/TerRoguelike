@@ -3,44 +3,36 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.GameContent;
+using Terraria.GameInput;
 using Terraria.Graphics.Effects;
 using Terraria.Graphics.Shaders;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
+using TerRoguelike.ILEditing;
 using TerRoguelike.Items.Rare;
 using TerRoguelike.Items.Weapons;
+using TerRoguelike.MainMenu;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs;
+using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
+using TerRoguelike.Schematics;
 using TerRoguelike.Systems;
 using TerRoguelike.UI;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
-using static TerRoguelike.Utilities.TerRoguelikeUtils;
-using static TerRoguelike.Managers.TextureManager;
-using TerRoguelike.Particles;
-using Terraria.Localization;
-using Terraria.ModLoader.IO;
-using TerRoguelike.MainMenu;
-using Terraria.GameInput;
-using TerRoguelike.Schematics;
-using System.Diagnostics;
-using TerRoguelike.NPCs.Enemy.Boss;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
-using Terraria.WorldBuilding;
-using TerRoguelike.Items.Common;
-using TerRoguelike.Items.Uncommon;
-using static Terraria.Player;
-using System.CodeDom;
-using Terraria.GameContent.Animations;
-using System.Linq.Expressions;
-using System.Drawing.Drawing2D;
-using TerRoguelike.ILEditing;
+using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.TerPlayer
 {
@@ -133,13 +125,17 @@ namespace TerRoguelike.TerPlayer
         public int heartyHoneycomb;
         public int primevalRattle;
         public int theFalseSun;
+        public int puppeteersHand;
 
         public int trash;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
         public int benignFungusCooldown = 0;
-        public int storedDaggers = 0;
+        public float storedDaggers = 0;
+        public float visualStoredDaggers = 0;
+        public bool visualRedThrow = false;
+        public float oldStoredDaggers = 0;
         public int soulOfLenaUses = 0;
         public bool soulOfLenaHurtVisual = false;
         public List<int> barbedLassoTargets = new List<int>();
@@ -171,6 +167,9 @@ namespace TerRoguelike.TerPlayer
         public int theFalseSunHitCooldown = 0;
         public float theFalseSunIntensity = 0;
         public float theFalseSunIntensityTarget = 0;
+        public int backupDaggerMaxStocks => 3 + backupDagger;
+        public float backupDaggerStockRate => backupDaggerMaxStocks / 360f;
+        public float backupDaggerReleaseRate => backupDaggerMaxStocks / 30f;
 
         #endregion
 
@@ -327,6 +326,7 @@ namespace TerRoguelike.TerPlayer
             heartyHoneycomb = 0;
             primevalRattle = 0;
             theFalseSun = 0;
+            puppeteersHand = 0;
 
             trash = 0;
 
@@ -674,42 +674,56 @@ namespace TerRoguelike.TerPlayer
             }
             if (backupDagger > 0)
             {
-                int maxStocks = 3 + backupDagger;
-                int stockRate = (int)(360f / (float)maxStocks);
+                int maxStocks = backupDaggerMaxStocks;
                 if (storedDaggers > maxStocks)
                 {
                     storedDaggers = maxStocks;
                     SoundEngine.PlaySound(SoundID.Item7, Player.Center);
                 }
-                    
-                int releaseCooldown = (int)(stockRate / 2f);
-                if (releaseCooldown > 8)
-                    releaseCooldown = 8;
-                if (releaseCooldown < 1)
-                    releaseCooldown = 1;
+
+                oldStoredDaggers = storedDaggers;
 
                 if (timeAttacking > 0)
                 {
-                    if (stockRate < 1)
-                        stockRate = 1;
+                    visualRedThrow = false;
+                    if (timeAttacking == 1)
+                        storedDaggers = visualStoredDaggers = (int)storedDaggers;
 
-                    if (timeAttacking % stockRate == 0 && storedDaggers < maxStocks)
+                    storedDaggers = visualStoredDaggers += backupDaggerStockRate; // stock multiple daggers per frame if possible
+                    if (storedDaggers >= maxStocks)
                     {
-                        storedDaggers++;
+                        storedDaggers = maxStocks;
+                        visualRedThrow = true;
+                    }
+                        
+                    if ((int)storedDaggers != (int)oldStoredDaggers)
+                    {
                         if (storedDaggers == maxStocks)
                             SoundEngine.PlaySound(SoundID.Item63 with { Volume = 1f }, Player.Center);
                         else
                             SoundEngine.PlaySound(SoundID.Item64 with { Volume = 0.5f }, Player.Center);
                     }
                 }
-                else if (Math.Abs(timeAttacking) % releaseCooldown == 0 && storedDaggers > 0)
+                else
                 {
-                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (AimWorld() - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
-                    storedDaggers--;
+                    if (timeAttacking == 0)
+                        storedDaggers = visualStoredDaggers = (int)storedDaggers;
+
+                    storedDaggers = visualStoredDaggers -= backupDaggerReleaseRate;
+                    if (storedDaggers < 0)
+                        storedDaggers = 0;
+
+                    int releaseCount = (int)oldStoredDaggers - (int)storedDaggers; // throw multiple daggers per frame if possible
+                    for (int i = 0; i < releaseCount; i++)
+                    {
+                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (AimWorld() - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
+                    }
                 }
             }
             else
-                storedDaggers = 0;
+            {
+                storedDaggers = oldStoredDaggers = 0;
+            }
 
             if (stimPack > 0)
             {
@@ -756,10 +770,6 @@ namespace TerRoguelike.TerPlayer
                         info.HideCombatText = true;
                         int actualHitDamage = hitDamage * 10;
                         info.Damage = actualHitDamage;
-                        if (target.life - actualHitDamage <= 0)
-                        {
-                            OnKillEffects(target);
-                        }
                         info.InstantKill = false;
                         info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                         info.Knockback = 0f;
@@ -768,6 +778,10 @@ namespace TerRoguelike.TerPlayer
                         target.StrikeNPC(info);
                         NetMessage.SendStrikeNPC(target, info);
                         CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
+                        if (target.life <= 0)
+                        {
+                            OnKillEffects(target);
+                        }
 
                         totalHealAmt += hitDamage;
                     }
@@ -1073,10 +1087,6 @@ namespace TerRoguelike.TerPlayer
                     info.HideCombatText = true;
                     int actualHitDamage = hitDamage * 10;
                     info.Damage = actualHitDamage;
-                    if (target.life - actualHitDamage <= 0)
-                    {
-                        OnKillEffects(target);
-                    }
                     info.InstantKill = false;
                     info.HitDirection = Main.rand.NextBool() ? -1 : 1;
                     info.Knockback = 0f;
@@ -1085,6 +1095,10 @@ namespace TerRoguelike.TerPlayer
                     target.StrikeNPC(info);
                     NetMessage.SendStrikeNPC(target, info);
                     CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
+                    if (target.life <= 0)
+                    {
+                        OnKillEffects(target);
+                    }
 
                     allSeeingEyeHitCooldown += 30;
                     ScaleableHeal(hitDamage);
@@ -1548,7 +1562,7 @@ namespace TerRoguelike.TerPlayer
             {
                 Point lightpos = Player.Center.ToTileCoordinates();
                 if (jstcTeleportTime <= 0)
-                    Lighting.AddLight(lightpos.X, lightpos.Y, noRestore ? TorchID.Mushroom : TorchID.Ichor, 1f);
+                    Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1f);
             }
             if (noRestore && Main.rand.NextBool())
             {
@@ -1882,12 +1896,16 @@ namespace TerRoguelike.TerPlayer
         {
             TerRoguelikeGlobalProjectile modProj = proj.ModProj();
             TerRoguelikeGlobalNPC modNPC = target.ModNPC();
+            if (modProj.npcOwner >= 0)
+            {
+                if (target.life <= 0 && modProj.hostileTurnedAlly)
+                    OnKillEffects(target);
+                return;
+            }
+                
 
             if (previousBonusDamageMulti != 1f)
                 hit.Damage = (int)(hit.Damage / previousBonusDamageMulti);
-
-            if (target.life <= 0)
-                OnKillEffects(target);
 
             if (clingyGrenade > 0 && !modProj.procChainBools.clinglyGrenadePreviously)
             {
@@ -1966,7 +1984,7 @@ namespace TerRoguelike.TerPlayer
             {
                 Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
                 Vector2 targetVect = targetPos - proj.getRect().ClosestPointInRect(Player.Center);
-                Projectile.NewProjectile(Player.GetSource_FromThis(), targetPos, targetVect.SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * Main.rand.NextFloat(8f, 10f), ModContent.ProjectileType<RemedialHealingOrb>(), 0, 0);
+                RoomSystem.remedialHealingOrbs.Add(new(targetPos, targetVect.SafeNormalize(Vector2.UnitY).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)) * Main.rand.NextFloat(8f, 10f), 300, Player.whoAmI, 1));
             }
 
             if (lockOnMissile > 0 && !modProj.procChainBools.lockOnMissilePreviously)
@@ -2051,6 +2069,9 @@ namespace TerRoguelike.TerPlayer
                 int bleedDamage = 120;
                 modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
             }
+
+            if (target.life <= 0)
+                OnKillEffects(target);
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {
@@ -2091,6 +2112,15 @@ namespace TerRoguelike.TerPlayer
         {
             TerRoguelikeGlobalNPC modTarget = target.ModNPC();
 
+            if (puppeteersHand > 0 && !modTarget.activatedPuppeteersHand && !modTarget.TerRoguelikeBoss)
+            {
+                float chance = 0.4f;
+                if (ChanceRollWithLuck(chance, procLuck))
+                {
+                    MakeNPCPuppet(target, modTarget);
+                }
+            }
+
             if (hotPepper > 0 && !modTarget.activatedHotPepper)
             {
                 float radius = 144f + (64f * (hotPepper - 1));
@@ -2105,6 +2135,8 @@ namespace TerRoguelike.TerPlayer
                         continue;
 
                     var modNPC = npc.ModNPC();
+                    if (modNPC.hostileTurnedAlly)
+                        continue;
                     Vector2 npcPos = modNPC.ClosestPosition(npc.Center, target.Center, npc);
                     if (npcPos.Distance(target.Center) <= radius)
                     {
@@ -2194,6 +2226,29 @@ namespace TerRoguelike.TerPlayer
                 modTarget.activatedItemPotentiometer = true;
             }
         }
+        public void MakeNPCPuppet(NPC target, TerRoguelikeGlobalNPC modTarget)
+        {
+            float lifeMulti = puppeteersHand;
+            float damageMulti = puppeteersHand * 3;
+
+            target.active = true;
+            target.friendly = true;
+            modTarget.hostileTurnedAlly = true;
+            target.life = target.lifeMax = (int)(target.lifeMax * lifeMulti);
+            target.damage = (int)(target.damage * damageMulti);
+            target.friendlyRegen = 0;
+            if (target.lifeMax < 1)
+                target.lifeMax = int.MaxValue;
+            if (target.damage < 0)
+                target.damage = int.MaxValue;
+
+            modTarget.activatedPuppeteersHand = true;
+            modTarget.puppetOwner = Player.whoAmI;
+            modTarget.CleanseDebuffs();
+            modTarget.targetCooldown = 0;
+            modTarget.puppetLifetime = 7200;
+            modTarget.eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
+        }
         #endregion
 
         #region Player Hurt
@@ -2208,6 +2263,7 @@ namespace TerRoguelike.TerPlayer
             if (barrierHealth > 1 && info.Damage <= (int)barrierHealth && !barrierFullAbsorbHit)
             {
                 BarrierHitEffect(info.Damage, info.Damage);
+                PlayerLoader.OnHurt(Player, info);
                 return true;
             }
 
@@ -3155,6 +3211,13 @@ namespace TerRoguelike.TerPlayer
                 b = color.B / 255f;
             }
 
+            if (noRestore)
+            {
+                r = 0.3f;
+                g = 0.78f;
+                b = 1.5f;
+            }
+
             if (soulOfLena > 0)
             {
                 bool hurtCheck = Player.immuneTime > 0 && soulOfLenaHurtVisual;
@@ -3281,6 +3344,95 @@ namespace TerRoguelike.TerPlayer
                 DrawPrimevalVisuals();
             }
 
+            if (ceremonialCrownStacks > 0)
+            {
+                var crownTex = TexDict["CeremonialCrownGems"];
+                int vertiFrameCount = 3;
+                int frameHeight = crownTex.Height / vertiFrameCount;
+                int fullCycle = 12;
+                float baseRot = Main.GlobalTimeWrappedHourly * MathHelper.Pi;
+                float baseOutDist = 40;
+                for (int i = 0; i < ceremonialCrownStacks; i++)
+                {
+                    int cycleCount = i / fullCycle;
+                    int dir = cycleCount % 2 == 0 ? 1 : -1;
+                    float outerRot = cycleCount * MathHelper.PiOver4;
+                    Rectangle gemFrame = new Rectangle(0, i % vertiFrameCount * frameHeight, crownTex.Width, frameHeight - 2);
+                    float extraRot = i / (float)fullCycle * MathHelper.TwoPi;
+                    float outDist = baseOutDist + 8 * cycleCount;
+                    float thisRot = extraRot + outerRot + baseRot * (1 - ((cycleCount + 1f) / (cycleCount + 2f))) * dir;
+                    Vector2 drawPos = Player.Center + Vector2.UnitY * Player.gfxOffY + thisRot.ToRotationVector2() * outDist;
+                    Main.EntitySpriteDraw(crownTex, drawPos - Main.screenPosition, gemFrame, Color.White * 0.75f, thisRot + MathHelper.PiOver2, gemFrame.Size() * 0.5f, 1f, SpriteEffects.None);
+                }
+            }
+            
+            if (backupDagger > 0 && (int)visualStoredDaggers > 0)
+            {
+                int daggerCount = (int)storedDaggers;
+                Vector2 basePos = Player.Center - Main.screenPosition + Player.gfxOffY * Vector2.UnitY;
+                Color outlineColor = visualRedThrow ? Color.Red * 0.9f : Color.White * 0.5f;
+                outlineColor.A = 70;
+                ;
+
+                int row = 0;
+                int rowCheck = 6;
+                int oldRowCheck = 0;
+                float rotPer = MathHelper.PiOver2 * 0.10f;
+                float stockRate = backupDaggerStockRate;
+                float animationTime = stockRate * 8;
+                float animationThreshold = visualStoredDaggers - animationTime;
+                var daggerTex = TextureAssets.Projectile[ModContent.ProjectileType<ThrownBackupDagger>()].Value;
+                var origin = daggerTex.Size() * 0.5f;
+                float currentRot = 0;
+                for (int i = 0; i < daggerCount; i++)
+                {
+                    if (i >= rowCheck)
+                    {
+                        currentRot = 0;
+                        row++;
+                        oldRowCheck = rowCheck;
+                        rowCheck += 6 + row;
+                    }
+
+                    bool evenRow = row % 2 == 0;
+                    bool firstInRow = i - oldRowCheck == 0;
+
+                    if (evenRow)
+                    {
+                        if (firstInRow)
+                        {
+                            currentRot += rotPer * 0.5f;
+                        }
+                    }
+                    if (!firstInRow)
+                    {
+                        currentRot *= -1;
+                        if ((i - oldRowCheck) % 2 == (evenRow ? 0 : 1))
+                            currentRot += rotPer * Math.Sign(currentRot == 0 ? 1 : currentRot);
+                    }
+ 
+                    float moveInterpolant = 1;
+                    if ((i + 1) > animationThreshold)
+                    {
+                        moveInterpolant *= 1 - ((i + 1 - animationThreshold) / animationTime);
+                    }
+
+                    Vector2 daggerPos = basePos + Vector2.UnitY * 60 + (currentRot - MathHelper.PiOver2).ToRotationVector2() * (100 + 16 * row + (float)Math.Cos(Main.GlobalTimeWrappedHourly * MathHelper.Pi + i) * 2);
+                    float daggerRot = currentRot + MathHelper.PiOver2;
+                    if (moveInterpolant < 1)
+                    {
+                        daggerPos = Vector2.Lerp(basePos, daggerPos, moveInterpolant);
+                    }
+
+                    
+                    for (int j = 0; j < 8; j++)
+                    {
+                        Main.EntitySpriteDraw(daggerTex, daggerPos + (MathHelper.TwoPi * (j / 8f)).ToRotationVector2() * 2, null, outlineColor, daggerRot, origin, 0.5f, SpriteEffects.None);
+                    }
+                    Main.EntitySpriteDraw(daggerTex, daggerPos, null, Color.White, daggerRot, origin, 0.5f, SpriteEffects.None);
+                }
+            }
+
             if (brainSucklerTime > 0)
             {
                 Main.spriteBatch.End();
@@ -3339,28 +3491,6 @@ namespace TerRoguelike.TerPlayer
                 Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowColor * opacity * 0.7f, arrowRot, origin, scale, SpriteEffects.None);
                 arrowFrame.Y += frameHeight;
                 Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowOutlineColor * opacity * 0.9f, arrowRot, origin, scale, SpriteEffects.None);
-            }
-
-            if (ceremonialCrownStacks > 0)
-            {
-                var crownTex = TexDict["CeremonialCrownGems"];
-                int vertiFrameCount = 3;
-                int frameHeight = crownTex.Height / vertiFrameCount;
-                int fullCycle = 12;
-                float baseRot = Main.GlobalTimeWrappedHourly * MathHelper.Pi;
-                float baseOutDist = 40;
-                for (int i = 0; i < ceremonialCrownStacks; i++)
-                {
-                    int cycleCount = i / fullCycle;
-                    int dir = cycleCount % 2 == 0 ? 1 : -1;
-                    float outerRot = cycleCount * MathHelper.PiOver4;
-                    Rectangle gemFrame = new Rectangle(0, i % vertiFrameCount * frameHeight, crownTex.Width, frameHeight - 2);
-                    float extraRot = i / (float)fullCycle * MathHelper.TwoPi;
-                    float outDist = baseOutDist + 15 * cycleCount;
-                    float thisRot = extraRot + outerRot + baseRot * (1 - ((cycleCount + 1f) / (cycleCount + 2f))) * dir;
-                    Vector2 drawPos = Player.Center + Vector2.UnitY * Player.gfxOffY + thisRot.ToRotationVector2() * outDist;
-                    Main.EntitySpriteDraw(crownTex, drawPos - Main.screenPosition, gemFrame, Color.White * 0.75f, thisRot + MathHelper.PiOver2, gemFrame.Size() * 0.5f, 1f, SpriteEffects.None);
-                }
             }
 
             return;

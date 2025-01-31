@@ -32,7 +32,7 @@ namespace TerRoguelike.Projectiles
             Projectile.localNPCHitCooldown = -1;
             Projectile.friendly = true;
             Projectile.hostile = false;
-            Projectile.netImportant = true;
+            Projectile.netImportant = true; //makes projectile not able to be replaced if at the projectile cap 
             glowTex = TexDict["CircularGlow"];
         }
 

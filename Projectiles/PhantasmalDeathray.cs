@@ -26,10 +26,10 @@ namespace TerRoguelike.Projectiles
             Projectile.friendly = true;
             Projectile.hostile = false;
             Projectile.timeLeft = 1;
-            Projectile.penetrate = 1;
+            Projectile.penetrate = -1;
             Projectile.hide = true;
             Projectile.usesIDStaticNPCImmunity = true;
-            Projectile.idStaticNPCHitCooldown = 10;
+            Projectile.idStaticNPCHitCooldown = 2;
         }
     }
 }

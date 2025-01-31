@@ -41,7 +41,7 @@ namespace TerRoguelike.Projectiles
             SoundEngine.PlaySound(SoundID.Item20 with { Volume = 1f }, Projectile.Center);
             for (int i = 0; i < 8; i++)
             {
-                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, 0, 0, 0, default, 1f);
+                Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Shadowflame, 0, 0, 0, default, 1f);
             }
         }
         public override void AI()
@@ -53,7 +53,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.velocity *= 1.01f;
             if (Main.rand.NextBool(3))
             {
-                int i = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, DustID.Shadowflame, 0, 0, 0, default, 1f);
+                int i = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Shadowflame, 0, 0, 0, default, 1f);
                 Main.dust[i].noGravity = true;
                 Main.dust[i].velocity *= 0;
             } 
@@ -74,11 +74,12 @@ namespace TerRoguelike.Projectiles
             fireTex = TextureAssets.Projectile[Type].Value;
             int frameHeight = fireTex.Height / Main.projFrames[Type];
 
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null ,Color.Purple * 0.8f, 0f, glowTex.Size() * 0.5f, 0.1f, SpriteEffects.None, 0);
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
+            Projectile.ModProj().EliteSpritebatch(true, BlendState.Additive);
+
+            Main.EntitySpriteDraw(glowTex, Projectile.Center - Main.screenPosition, null, Color.Purple * 0.8f, 0f, glowTex.Size() * 0.5f, 0.1f, SpriteEffects.None, 0);
+
+            Projectile.ModProj().EliteSpritebatch();
+
             Main.EntitySpriteDraw(fireTex, Projectile.Center - Main.screenPosition + (Vector2.UnitY * -6), new Rectangle(0, frameHeight * Projectile.frame, fireTex.Width, frameHeight), Color.White, 0f, new Vector2(fireTex.Size().X * 0.5f, fireTex.Size().Y / (Main.projFrames[Type] * 2)), 1f, SpriteEffects.None, 0);
 
             return false;

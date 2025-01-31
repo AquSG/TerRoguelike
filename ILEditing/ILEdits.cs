@@ -237,6 +237,7 @@ namespace TerRoguelike.ILEditing
 			}
 			cursor.EmitDelegate<Action>(() =>
 			{
+				RoomSystem.DrawRemedialHealingOrbs();
 				ParticleManager.DrawParticles_AfterProjectiles();
 			});
         }

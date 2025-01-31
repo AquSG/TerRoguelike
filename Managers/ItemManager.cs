@@ -330,6 +330,7 @@ namespace TerRoguelike.Managers
                 new HeartyHoneycomb(),
                 new PrimevalRattle(),
                 new TheFalseSun(),
+                new PuppeteersHand(),
             };
             CommonCombatItems = new List<BaseRoguelikeItem>();
             CommonHealingItems = new List<BaseRoguelikeItem>();

@@ -439,6 +439,7 @@ namespace TerRoguelike.Managers
             if (TerRoguelikeWorld.escape)
                 return;
 
+            ClearGhosts();
             ClearSpecificProjectiles();
 
             // reward. boss rooms give higher tiers.
@@ -759,6 +760,17 @@ namespace TerRoguelike.Managers
                 {
                     proj.timeLeft = 60;
                 }
+            }
+        }
+        public void ClearGhosts()
+        {
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                var modNPC = npc.ModNPC();
+                if (modNPC == null)
+                    continue;
+                if (modNPC.hostileTurnedAlly && modNPC.isRoomNPC && modNPC.sourceRoomListID == myRoom)
+                    npc.StrikeInstantKill();
             }
         }
         public virtual void PostDrawTilesRoom()
