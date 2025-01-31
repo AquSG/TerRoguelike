@@ -35,6 +35,8 @@ using System.Reflection;
 using Terraria.Graphics.Effects;
 using TerRoguelike.Managers;
 using Terraria.Graphics.Light;
+using Terraria.UI;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.ILEditing
 {
@@ -42,6 +44,7 @@ namespace TerRoguelike.ILEditing
     {
 		public int passInNPC = -1;
 		public int passInPlayer = -1;
+		public static int fakeHoverItem = 0;
         public override void OnModLoad()
         {
             On_Main.DamageVar_float_int_float += AdjustDamageVariance;
@@ -68,6 +71,19 @@ namespace TerRoguelike.ILEditing
             On_Main.DoDraw_WallsTilesNPCs += DrawBeforeWalls;
             On_TileLightScanner.GetTileLight += ForceLight;
             On_TileDrawing.DrawTiles_EmitParticles += DisableTileParticles;
+            On_Main.DrawPendingMouseText += FakeHoverItemTooltip;
+        }
+
+        private void FakeHoverItemTooltip(On_Main.orig_DrawPendingMouseText orig)
+        {
+			if (fakeHoverItem != 0)
+			{
+                Main.instance.MouseText(GetAllTooltipLines(new Item(fakeHoverItem).ToolTip));
+                
+                Main.HoverItem = new Item(fakeHoverItem).Clone();
+				Main.hoverItemName = Main.HoverItem.Name;
+			}
+			orig();
         }
 
         private void DisableTileParticles(On_TileDrawing.orig_DrawTiles_EmitParticles orig, TileDrawing self, int j, int i, Tile tileCache, ushort typeCache, short tileFrameX, short tileFrameY, Color tileLight)

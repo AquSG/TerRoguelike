@@ -14,6 +14,8 @@ using Terraria.GameInput;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Items;
 using Terraria.DataStructures;
+using Terraria.UI;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.Utilities
 {
@@ -624,5 +626,18 @@ namespace TerRoguelike.Utilities
                 Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
         }
+        public static string GetAllTooltipLines(ItemTooltip tooltip)
+        {
+            string final = "";
+            for (int i = 0; i < tooltip.Lines; i++)
+            {
+                final += tooltip.GetLine(i);
+                if (i != tooltip.Lines - 1)
+                    final += "\n";
+            }
+            return final;
+        }
+
+        public static Vector2 MouseWorldAfterZoom => ((Main.MouseWorld - Main.Camera.Center) / ZoomSystem.zoomOverride) + Main.Camera.Center;
     }
 }
