@@ -1120,11 +1120,6 @@ Configs: {
 					VisualConfig: 视觉配置
 					MiscConfig: 杂项配置
 				}
-
-				TerRoguelike: {
-					// VisualConfig: Mods. Ter Roguelike Priv. Visual Config Header
-					// MiscConfig: Mods. Ter Roguelike Priv. Misc Config Header
-				}
 			}
 		}
 

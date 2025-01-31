@@ -681,6 +681,7 @@ namespace TerRoguelike.Systems
             DrawDeathScene();
             DrawPendingEnemies();
 
+            ILEdits.fakeHoverItem = 0;
             if (itemBasins != null)
             {
                 StartVanillaSpritebatch(false);
@@ -692,11 +693,18 @@ namespace TerRoguelike.Systems
                         continue;
                     }
 
-                    Vector2 drawPos = (basin.position.ToVector2() + new Vector2(1, 0)).ToWorldCoordinates(8, 0) + new Vector2(0, -32) - new Vector2(Main.offScreenRange);
+                    Vector2 drawPos = (basin.position.ToVector2() + new Vector2(1, 0)).ToWorldCoordinates(8, 0) + new Vector2(0, -32);
+                    Vector2 itemDisplayDimensions = new Vector2(48, 48);
+                    var hoverRect = new Rectangle((int)(drawPos.X - (itemDisplayDimensions.X * 0.5f)), (int)(drawPos.Y - (itemDisplayDimensions.Y * 0.5f)), (int)itemDisplayDimensions.X, (int)(itemDisplayDimensions.Y * 1.83f));
+                    if (hoverRect.Contains(MouseWorldAfterZoom.ToPoint()))
+                    {
+                        ILEdits.fakeHoverItem = basin.itemDisplay;
+                    }
+
                     float period = (Main.GlobalTimeWrappedHourly + basin.position.X + basin.position.Y);
                     drawPos.Y += (float)Math.Cos(period * 0.5f) * 4;
+                    drawPos -= new Vector2(Main.offScreenRange);
 
-                    Vector2 itemDisplayDimensions = new Vector2(48, 48);
                     Item item = new Item(basin.itemDisplay);
                     Texture2D itemTex;
                     float scale;
