@@ -332,7 +332,7 @@ namespace TerRoguelike.Managers
             }
             if (jstcProgress == JstcProgress.EnemyPortal)
             {
-                CutsceneSystem.cameraTargetCenter = Vector2.Lerp(Main.LocalPlayer.Center, CutsceneSystem.cameraTargetCenter, 0.6f);
+                CutsceneSystem.cameraTargetCenter = Vector2.Lerp(Main.LocalPlayer.Center + Vector2.UnitY * Main.LocalPlayer.gfxOffY, Main.Camera.Center, 0.6f);
                 bool end = false;
                 Main.SetCameraLerp(0, 0);
                 foreach (Player player in Main.ActivePlayers)
@@ -501,7 +501,7 @@ namespace TerRoguelike.Managers
             }
             if (jstcProgress == JstcProgress.BossPortal)
             {
-                CutsceneSystem.cameraTargetCenter = Vector2.Lerp(Main.LocalPlayer.Center, CutsceneSystem.cameraTargetCenter, 0.6f);
+                CutsceneSystem.cameraTargetCenter = Vector2.Lerp(Main.LocalPlayer.Center + Vector2.UnitY * Main.LocalPlayer.gfxOffY, Main.Camera.Center, 0.6f);
                 bool end = false;
                 Main.SetCameraLerp(0, 0);
                 foreach (Player player in Main.ActivePlayers)

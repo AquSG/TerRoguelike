@@ -175,7 +175,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
-                
+
+                if (NPC.localAI[0] > -cutsceneDuration + 100 && NPC.localAI[0] < -40)
+                    NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
+
                 if (SoundEngine.TryGetActiveSound(rumbleSlot, out var sound) && sound.IsPlaying)
                 {
                     if (NPC.localAI[0] > -90)

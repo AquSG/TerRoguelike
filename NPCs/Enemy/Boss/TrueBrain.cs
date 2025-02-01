@@ -31,7 +31,6 @@ using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
-using TerRoguelike.NPCs.Enemy.Boss.Mallet;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
