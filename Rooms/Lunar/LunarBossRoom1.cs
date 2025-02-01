@@ -65,6 +65,16 @@ namespace TerRoguelike.Rooms
             }
             base.Update();
         }
+        public override void OnEnter()
+        {
+            if (!awake)
+            {
+                entered = false;
+                return;
+            }
+
+            base.OnEnter();
+        }
         public override bool ClearCondition()
         {
             if (!TerRoguelikeWorld.lunarBossSpawned)

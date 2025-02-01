@@ -154,7 +154,7 @@ namespace TerRoguelike.Systems
                     continue;
 
                 room.myRoom = loopCount; //updates the room's 'myRoom' to refer to it's index on RoomList
-
+                bool tryEnter = false;
                 for (int i = 0; i < Main.maxPlayers; i++) //Player collision with rooms
                 {
                     Player player;
@@ -168,6 +168,10 @@ namespace TerRoguelike.Systems
                     bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
                     if (roomXcheck && roomYcheck)
                     {
+                        if (!room.entered)
+                        {
+                            tryEnter = true;
+                        }
                         modPlayer.currentRoom = -1; //Current room is -1 unless the player is inside an active room in RoomList
                         if (room.AssociatedFloor != -1)
                             modPlayer.currentFloor = FloorID[room.AssociatedFloor]; //If player is inside a room with a valid value for an associated floor, set it to that.
@@ -217,6 +221,11 @@ namespace TerRoguelike.Systems
                 }
 
                 room.Update();
+                if (room.awake && tryEnter)
+                {
+                    room.entered = true;
+                    room.OnEnter();
+                }
             }
         }
         public override void PostUpdateTime()
@@ -445,6 +454,7 @@ namespace TerRoguelike.Systems
             room.haltSpawns = false;
             room.bossSpawnPos = Vector2.Zero;
             room.bossDead = false;
+            room.entered = false;
         }
         public static void PostDrawWalls_PreNPCsBehindTiles(SpriteBatch spritebatch)
         {
@@ -813,6 +823,10 @@ namespace TerRoguelike.Systems
         {
             worldTeleportTime = 1;
             SoundEngine.PlaySound(WorldTeleport with { Volume = 0.3f, Variants = [1] });
+
+            if (attackPlanRocketBundles != null)
+                attackPlanRocketBundles.Clear();
+            Room.ClearSpecificProjectiles();
 
             var modPlayer = Main.LocalPlayer.ModPlayer();
             if (modPlayer != null)
@@ -1255,6 +1269,11 @@ namespace TerRoguelike.Systems
                     bundle.Time = -1;
                     continue;
                 }
+                if (bundle.StartupTime < 30)
+                {
+                    bundle.StartupTime++;
+                    continue;
+                }
 
                 if (bundle.Time % 12 == 0 && bundle.Count > 0)
                 {
@@ -1688,5 +1707,6 @@ namespace TerRoguelike.Systems
         public int Time;
         public float Rotation = 0f;
         public int SourceRoom;
+        public int StartupTime = 0;
     }
 }

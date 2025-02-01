@@ -27,7 +27,20 @@ namespace TerRoguelike.Projectiles
         public bool autoRelease = false;
         public Player Owner => Main.player[Projectile.owner];
         public TerRoguelikePlayer modPlayer;
-        public float ChargeSpread => (float)Math.Pow(1 - (Charge / wantedCharge), 2) *  0.75f;
+        public float ChargeSpread
+        {
+            get
+            {
+                float spread = (float)Math.Pow(1 - (Charge / wantedCharge), 2) * 0.75f;
+                if (modPlayer != null)
+                {
+                    if (modPlayer.minigunComponent > 0)
+                        spread += MathHelper.Pi * 0.0125f;
+                    spread += (modPlayer.shotsToFire - 1) * (MathHelper.PiOver4 / 64f);
+                }
+                return Math.Min(spread, MathHelper.Pi);
+            }
+        }
 
         public override void SetDefaults()
         {
@@ -109,9 +122,18 @@ namespace TerRoguelike.Projectiles
             SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f });
 
             float chargeSpread = ChargeSpread;
+            for (int i = 0; i < shotsToFire; i++)
+            {
+                float baseAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() + Main.rand.NextFloat(-chargeSpread, chargeSpread);
+
+                Vector2 direction = baseAngle.ToRotationVector2();
+                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + ((Projectile.Center - Owner.MountedCenter).SafeNormalize(Vector2.UnitY) * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI, modPlayer.scaleMultiplier);
+            }
+            /*
             float baseAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() + Main.rand.NextFloat(-chargeSpread, chargeSpread);
             for (int i = 0; i < shotsToFire; i++)
             {
+                float baseAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() + Main.rand.NextFloat(-chargeSpread, chargeSpread);
                 float mainAngle;
                 float spread = 64f;
                 if (shotsToFire == 1)
@@ -138,6 +160,7 @@ namespace TerRoguelike.Projectiles
                 Vector2 direction = (mainAngle).ToRotationVector2();
                 int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + ((Projectile.Center - Owner.MountedCenter).SafeNormalize(Vector2.UnitY) * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI, modPlayer.scaleMultiplier);
             }
+            */
 
             Charge -= wantedCharge;
             if (Charge > wantedCharge) // support for swinging more than once a frame if one has that much attack speed
@@ -149,27 +172,33 @@ namespace TerRoguelike.Projectiles
         {
             float baseRot = Projectile.rotation;
             float opacity = MathHelper.Lerp(0.3f, 1, Charge / wantedCharge);
-            Main.spriteBatch.End();
-            Effect fadeEffect = Filters.Scene["TerRoguelike:ConeFade"].GetShader().Shader;
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.GameViewMatrix.TransformationMatrix);
 
-            fadeEffect.Parameters["tint"].SetValue((Color.White * 0.7f * opacity).ToVector4());
-            fadeEffect.Parameters["fadeTint"].SetValue(Color.Transparent.ToVector4());
-            fadeEffect.Parameters["fadeCutoff"].SetValue(0.6f);
-            fadeEffect.Parameters["halfCone"].SetValue(ChargeSpread);
-            fadeEffect.Parameters["coneFadeStrength"].SetValue(0.99990f);
-
-            Texture2D tex = TextureManager.TexDict["Square"];
-            Main.EntitySpriteDraw(tex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White, baseRot, tex.Size() * 0.5f, 300, SpriteEffects.None);
-
-            StartAdditiveSpritebatch();
-
-            var lineTex = TextureManager.TexDict["LerpLineGradient"];
-            float spread = ChargeSpread;
-            for (int i = -1; i <= 1; i += 2)
+            if (ChargeSpread < MathHelper.Pi)
             {
-                Main.EntitySpriteDraw(lineTex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White * 0.50f * opacity, baseRot + spread * i, lineTex.Size() * new Vector2(0, 0.5f), new Vector2(0.7f, 0.35f), SpriteEffects.None);
+                Main.spriteBatch.End();
+                Effect fadeEffect = Filters.Scene["TerRoguelike:ConeFade"].GetShader().Shader;
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, fadeEffect, Main.GameViewMatrix.TransformationMatrix);
+
+                fadeEffect.Parameters["tint"].SetValue((Color.White * 0.7f * opacity).ToVector4());
+                fadeEffect.Parameters["fadeTint"].SetValue(Color.Transparent.ToVector4());
+                fadeEffect.Parameters["fadeCutoff"].SetValue(0.6f);
+                fadeEffect.Parameters["halfCone"].SetValue(ChargeSpread);
+                fadeEffect.Parameters["coneFadeStrength"].SetValue(0.99990f);
+
+                Texture2D tex = TextureManager.TexDict["Square"];
+                Main.EntitySpriteDraw(tex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White, baseRot, tex.Size() * 0.5f, 300, SpriteEffects.None);
+
+                StartAdditiveSpritebatch();
+
+                var lineTex = TextureManager.TexDict["LerpLineGradient"];
+                float spread = ChargeSpread;
+                for (int i = -1; i <= 1; i += 2)
+                {
+                    Main.EntitySpriteDraw(lineTex, Projectile.Center + Owner.gfxOffY * Vector2.UnitY - Main.screenPosition, null, Color.White * 0.50f * opacity, baseRot + spread * i, lineTex.Size() * new Vector2(0, 0.5f), new Vector2(0.7f, 0.35f), SpriteEffects.None);
+                }
             }
+
+            
             
 
             StartAlphaBlendSpritebatch();

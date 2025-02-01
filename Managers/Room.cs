@@ -63,6 +63,7 @@ namespace TerRoguelike.Managers
         public Vector2 bossSpawnPos;
         public Vector2 RoomPosition; //position of the room
         public bool bossDead;
+        public bool entered = false;
         public virtual Point WallInflateModifier => new Point(0, 0);
         public virtual bool AllowWallDrawing => true;
         public Rectangle GetRect()
@@ -688,6 +689,43 @@ namespace TerRoguelike.Managers
         {
             return (RoomPosition + (RoomDimensions / 2f)) * 16f;
         }
+        public virtual void OnEnter()
+        {
+            if (IsStartRoom)
+                return;
+            if (IsSanctuary)
+                return;
+
+            if (IsBossRoom && TerRoguelikeWorld.escape && FloorID[AssociatedFloor].jstcProgress < Floor.JstcProgress.Boss)
+            {
+                entered = false;
+                return;
+            }
+
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+                if (player == null)
+                    continue;
+                if (!player.active)
+                    continue;
+
+                TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                if (modPlayer == null)
+                    continue;
+
+                if (modPlayer.attackPlan > 0)
+                {
+                    int rocketCount = 4 + (4 * modPlayer.attackPlan);
+                    RoomSystem.attackPlanRocketBundles.Add(new AttackPlanRocketBundle(RoomPosition16 + RoomCenter16, rocketCount, player.whoAmI, myRoom));
+                }
+                if (modPlayer.stimPack > 0)
+                {
+                    modPlayer.stimPackTime = 600;
+                }
+                
+            }
+        }
         public virtual void PreResetRoom()
         {
 
@@ -720,25 +758,6 @@ namespace TerRoguelike.Managers
                 if (roomTime % healTime == 0 && roomTime > 0)
                 {
                     RoomSystem.healingPulses.Add(new HealingPulse(roomCenter));
-                }
-            }
-
-            if (roomTime == 30)
-            {
-                for (int i = 0; i < Main.maxPlayers; i++)
-                {
-                    Player player = Main.player[i];
-                    if (player == null)
-                        continue;
-                    if (!player.active)
-                        continue;
-
-                    TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
-                    if (modPlayer.attackPlan <= 0)
-                        continue;
-
-                    int rocketCount = 4 + (4 * modPlayer.attackPlan);
-                    RoomSystem.attackPlanRocketBundles.Add(new AttackPlanRocketBundle(roomCenter, rocketCount, player.whoAmI, myRoom));
                 }
             }
         }

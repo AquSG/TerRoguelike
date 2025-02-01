@@ -170,6 +170,7 @@ namespace TerRoguelike.TerPlayer
         public int backupDaggerMaxStocks => 3 + backupDagger;
         public float backupDaggerStockRate => backupDaggerMaxStocks / 360f;
         public float backupDaggerReleaseRate => backupDaggerMaxStocks / 30f;
+        public int stimPackTime = 0;
 
         #endregion
 
@@ -727,15 +728,15 @@ namespace TerRoguelike.TerPlayer
 
             if (stimPack > 0)
             {
-                if (currentRoom != -1)
+                if (stimPackTime > 0)
                 {
-                    if (RoomSystem.RoomList[currentRoom].roomTime <= 600)
-                    {
-                        int lifeRegenIncrease = stimPack * 16;
-                        Player.lifeRegen += lifeRegenIncrease;
-                    }
+                    int lifeRegenIncrease = stimPack * 16;
+                    Player.lifeRegen += lifeRegenIncrease;
+                    stimPackTime--;
                 }
             }
+            else
+                stimPackTime = 0;
 
             if (barbedLasso > 0)
             {
@@ -1838,6 +1839,11 @@ namespace TerRoguelike.TerPlayer
             }
             enableCampfire = false;
         }
+        public override void UpdateDead()
+        {
+            moonLordSkyEffect = false;
+            moonLordVisualEffect = false;
+        }
         public override void PostUpdate()
         {
             moonLordVisualEffect = false;
@@ -2522,7 +2528,8 @@ namespace TerRoguelike.TerPlayer
                         reviveDeathEffect = true;
                         SoundEngine.PlaySound(SoundID.PlayerKilled);
                         SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/LossRevive"));
-                        ZoomSystem.SetZoomAnimation(2.5f, 60);
+                        if (!CutsceneSystem.cutsceneActive)
+                            ZoomSystem.SetZoomAnimation(2.5f, 60);
                         return false;
                     }
                 }
@@ -2560,7 +2567,8 @@ namespace TerRoguelike.TerPlayer
                 killerNPCType = ModContent.NPCType<TrueBrain>();
             }
             SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
-            ZoomSystem.SetZoomAnimation(2.5f, 60);
+            if (!CutsceneSystem.cutsceneActive)
+                ZoomSystem.SetZoomAnimation(2.5f, 60);
             deathEffectTimer += 120;
             return true;
         }
