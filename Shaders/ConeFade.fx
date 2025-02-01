@@ -28,9 +28,14 @@ float4 main(float2 uv : TEXCOORD) : COLOR
 
     float fadeStrength = (DOT - coneFadeStrength) / (1 - coneFadeStrength);
 
-    if (uv.x > fadeCutoff)
+    float distance = length(uv - origin) + 0.5f;
+    if (distance >= 1)
     {
-        fadeStrength *= 1 - ((uv.x - fadeCutoff) / (1 - fadeCutoff));
+        return float4(0, 0, 0, 0);
+    }
+    if (distance > fadeCutoff)
+    {
+        fadeStrength *= 1 - ((distance - fadeCutoff) / (1 - fadeCutoff));
     }
 
     pixelColor = lerp(fadeTint, pixelColor, fadeStrength);

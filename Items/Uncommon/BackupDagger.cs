@@ -9,6 +9,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.TerPlayer;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Items.Uncommon
 {
@@ -26,6 +27,18 @@ namespace TerRoguelike.Items.Uncommon
         public override void ItemEffects(Player player)
         {
             player.GetModPlayer<TerRoguelikePlayer>().backupDagger += Item.stack;
+        }
+        public override bool OnPickup(Player player)
+        {
+            var modPlayer = player.ModPlayer();
+            if (modPlayer == null)
+                return true;
+
+            if (modPlayer.backupDagger == 0)
+            {
+                modPlayer.storedDaggers = modPlayer.visualStoredDaggers = 0;
+            }
+            return true;
         }
     }
 }
