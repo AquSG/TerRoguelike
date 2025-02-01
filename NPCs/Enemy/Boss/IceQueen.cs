@@ -182,7 +182,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             ableToHit = NPC.localAI[0] >= 0 && deadTime == 0;
-            canBeHit = true;
+            canBeHit = !NPC.immortal;
 
             if (NPC.localAI[0] < 0)
             {
@@ -217,8 +217,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     
                     if (NPC.localAI[0] > -90)
                     {
-                        NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
                         NPC.Opacity = (NPC.localAI[0] + 90) / 60f;
+                        if (NPC.localAI[0] > -75)
+                        {
+                            NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
+                        }
                     }
                 }
                 

@@ -772,11 +772,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool? CanBeHitByItem(Player player, Item item)
         {
-            return ableToHit ? null : false;
+            return !NPC.immortal ? null : false;
         }
         public override bool? CanBeHitByProjectile(Projectile projectile)
         {
-            return ableToHit ? null : false;
+            return !NPC.immortal ? null : false;
         }
         public override bool CheckDead()
         {
