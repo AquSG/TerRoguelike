@@ -198,9 +198,6 @@ namespace TerRoguelike.Projectiles
                 }
             }
 
-            
-            
-
             StartAlphaBlendSpritebatch();
             return false;
         }

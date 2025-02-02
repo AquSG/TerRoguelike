@@ -1767,10 +1767,10 @@ namespace TerRoguelike.TerPlayer
                     {
                         Player.AddImmuneTime(i, 7);
                     }
-                    DashTime += 15;
-                    int dashDelayAdd = (int)(600 * 4 / (float)(jetLeg + 3));
-                    if (dashDelayAdd < 30)
-                        dashDelayAdd = 30;
+                    DashTime += 20;
+                    int dashDelayAdd = (int)(300 * 4 / (float)(jetLeg + 3));
+                    if (dashDelayAdd < 20)
+                        dashDelayAdd = 20;
 
                     DashDelay += dashDelayAdd;
                 }
@@ -3705,7 +3705,7 @@ namespace TerRoguelike.TerPlayer
         #region Jet Leg Dash
         public void JetLegDashMovement()
         {
-            Player.velocity.X = Player.maxRunSpeed * DashDirCache * 1.5f;
+            Player.velocity.X = Player.maxRunSpeed * DashDirCache * 2;
             for (int i = -1; i < 5; i++)
             {
                 Player.AddImmuneTime(i, 1);
