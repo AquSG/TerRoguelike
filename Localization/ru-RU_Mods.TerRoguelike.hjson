@@ -1,11 +1,11 @@
-MapBuildingMessage: Формирование Подземелья
+MapBuildingMessage: Формирование подземелья
 DeathKilledBy: Убийца:
 DeathItems: Предметы:
-DeathMainMenu: Главное Меню
-DeathQuickRestart: Быстрый Перезапуск
-// DeathLoop: Loop:
+DeathMainMenu: Главное меню
+DeathQuickRestart: Быстрый перезапуск
+DeathLoop: Повторов:
 BlockedAlert: блокировано!
-HealthUpAlert: Плюс Здоровье!
+HealthUpAlert: Плюс здоровье!
 BarrierName: Барьер
 CreditsVictory: Победа!
 CreditDirector: Руководитель
@@ -28,135 +28,135 @@ NewMoonDescription1: Значительно облегчает игру
 NewMoonDescription2: Больше кадров неуязвимости, меньше получаемого урон, увеличена естественная регенерация здоровья
 FullMoonName: Полнолунье
 FullMoonDescription: Стандартный опыт прохождения TerRoguelike
-BloodMoonName: Кровавая Луна
+BloodMoonName: Кровавая луна
 BloodMoonDescription1: Значительно усложняет игру
 BloodMoonDescription2: Меньше кадров неуязвимости, боссы атакуют чаще
-// SunnyDayName: Sunny Day
-// SunnyDayDescription1: For when it's really needed
-// SunnyDayDescription2: Greater New Moon effects, reduced boss health, more movement speed when the time is right
-// RuinedMoonName: Ruined Moon
-// RuinedMoonDescription1: Where fun goes to die
-// RuinedMoonDescription2: Do not play this, seriously
-// EliteTainted: "Tainted "
-// EliteSlugged: "Slugged "
-// EliteBurdened: "Burdened "
-// TrashDescription: On Tuesdays from 10PM to 11PM, +1 bounce for main projectiles
+SunnyDayName: Солнечный денёк
+SunnyDayDescription1: Когда он правда нужен
+SunnyDayDescription2: Увеличенные эффекты «Новолунья», здоровье боссов уменьшено, скорость передвижения увеличена в правильное время
+RuinedMoonName: Павшая луна
+RuinedMoonDescription1: Мы похороним ваше веселье
+RuinedMoonDescription2: Серьёзно, не играйте с этим режимом
+EliteTainted: "Порченный "
+EliteSlugged: "Замедленный "
+EliteBurdened: "Бренный "
+TrashDescription: По вторникам с 10 до 11 вечера, +1 отскок к основным снарядам
 
 Projectiles: {
-	ClingyGrenade.DisplayName: Цепкая Граната
-	ClingyGrenadeExplosion.DisplayName: Взрыв Цепкой Гранаты
-	AdaptiveGunHoldout.DisplayName: Адаптивный Пистолет в Руке
-	AdaptiveGunBullet.DisplayName: Пуля Адаптивного Пистолета
-	SoulstealHealingOrb.DisplayName: Сфера Исцеления Душееда
+	ClingyGrenade.DisplayName: Цепкая граната
+	ClingyGrenadeExplosion.DisplayName: Взрыв цепкой гранаты
+	AdaptiveGunHoldout.DisplayName: Адаптивный пистолет в руке
+	AdaptiveGunBullet.DisplayName: Пуля адаптивного пистолета
+	SoulstealHealingOrb.DisplayName: Сфера исцеления душееда
 	Explosion.DisplayName: Взрыв
 	Missile.DisplayName: Ракета
-	AdaptiveBladeHoldout.DisplayName: Адаптивный Клинок в Руке
-	AdaptiveBladeSlash.DisplayName: Разрез Адаптивного Клинка
-	HealingFungus.DisplayName: Лечащий Грибок
-	PlanRocket.DisplayName: Ракета Плана Атаки
-	StuckClingyGrenade.DisplayName: Застрявшая Цепкая Граната
-	ThrownBackupDagger.DisplayName: Брошенный Запасной Кинжал
-	ClusterHandler.DisplayName: Выброс Кластерных Бомб
-	MagicFist.DisplayName: Магический Кулак
-	SlimeGlob.DisplayName: Комок Слизи
+	AdaptiveBladeHoldout.DisplayName: Адаптивный клинок в руке
+	AdaptiveBladeSlash.DisplayName: Разрез адаптивного клинка
+	HealingFungus.DisplayName: Лечащий грибок
+	PlanRocket.DisplayName: Ракета плана атаки
+	StuckClingyGrenade.DisplayName: Застрявшая цепкая граната
+	ThrownBackupDagger.DisplayName: Брошенный запасной кинжал
+	ClusterHandler.DisplayName: Выброс кластерных бомб
+	MagicFist.DisplayName: Магический кулак
+	SlimeGlob.DisplayName: Сгусток слизи
 	Snowflake.DisplayName: Снежинка
-	DesertSpiritCurse.DisplayName: Проклятье Духа Пустыни
-	SandBlast.DisplayName: Песочный Выстрел
+	DesertSpiritCurse.DisplayName: Проклятье духа пустыни
+	SandBlast.DisplayName: Песочный выстрел
 	Stinger.DisplayName: Жало
 	Spectre.DisplayName: Дух
-	FireBlast.DisplayName: Огненный Взрыв
-	SniperBullet.DisplayName: Снайперская Пуля
-	SpikedBall.DisplayName: Шипастый Шар
-	BallistaShot.DisplayName: Выстрел Баллисты
+	FireBlast.DisplayName: Огненный взрыв
+	SniperBullet.DisplayName: Снайперская пуля
+	SpikedBall.DisplayName: Шипастый шар
+	BallistaShot.DisplayName: Выстрел баллисты
 	WoodSliver.DisplayName: Щепка
-	IchorBlob.DisplayName: Комок Ихора
-	GreenPetal.DisplayName: Зелёный Лепесток
-	CursedFlame.DisplayName: Проклятое Пламя
-	BouncingFire.DisplayName: Отскакивающий Огонёк
-	ShadowBlast.DisplayName: Теневой Выстрел
-	VileSpit.DisplayName: Плевок Гнили
-	BloodClot.DisplayName: Сгусток Крови
-	BloodOrb.DisplayName: Сфера Крови
+	IchorBlob.DisplayName: Сгусток ихора
+	GreenPetal.DisplayName: Зелёный лепесток
+	CursedFlame.DisplayName: Проклятое пламя
+	BouncingFire.DisplayName: Отскакивающий огонёк
+	ShadowBlast.DisplayName: Теневой выстрел
+	VileSpit.DisplayName: Плевок гнили
+	BloodClot.DisplayName: Сгусток крови
+	BloodOrb.DisplayName: Сфера крови
 	Iceflake.DisplayName: Льдинка
-	MothDust.DisplayName: Пыльца Мотылька
-	SporeCloud.DisplayName: Споровое Облако
-	HunterArrow.DisplayName: Стрела Охотника
-	LihzahrdLaser.DisplayName: Лазер Ящщеров
-	SeekerArrow.DisplayName: Самонаводящаяся Стрела
-	TempleBoulder.DisplayName: Валун Храма
+	MothDust.DisplayName: Пыльца мотылька
+	SporeCloud.DisplayName: Споровое облако
+	HunterArrow.DisplayName: Стрела охотника
+	LihzahrdLaser.DisplayName: Лазер ящщеров
+	SeekerArrow.DisplayName: Самонаводящаяся стрела
+	TempleBoulder.DisplayName: Валун храма
 	Daybreak.DisplayName: Заря
-	SolarFlare.DisplayName: Солнечная Вспышка
-	NebulaLaser.DisplayName: Лазер Туманности
-	NebulaSphere.DisplayName: Сфера Туманности
-	VortexLightning.DisplayName: Молния Вихря
-	VortexLaser.DisplayName: Лазер Вихря
-	BlackVortex.DisplayName: Чёрный Вихрь
-	SeekingStarCell.DisplayName: Самонаводящаяся Звёздная Клетка
-	FlowSpawn.DisplayName: Отпрыск Потока
+	SolarFlare.DisplayName: Солнечная вспышка
+	NebulaLaser.DisplayName: Лазер туманности
+	NebulaSphere.DisplayName: Сфера туманности
+	VortexLightning.DisplayName: Молния вихря
+	VortexLaser.DisplayName: Лазер вихря
+	BlackVortex.DisplayName: Чёрный вихрь
+	SeekingStarCell.DisplayName: Самонаводящаяся звёздная клетка
+	FlowSpawn.DisplayName: Отпрыск потока
 	Bone.DisplayName: Кость
 	Rock.DisplayName: Камень
-	Shockwave.DisplayName: Ударная Волна
-	PaladinHammer.DisplayName: Молот Паладина
-	RockDebris.DisplayName: Каменные Обломки
-	LeafBall.DisplayName: Лиственный Шар
-	VineWall.DisplayName: Лозовая Стена
-	RootPillar.DisplayName: Корневая Колонна
-	SeerBallBase.DisplayName: Основание Шара Провидца
-	CorruptVomit.DisplayName: Плевок Порчи
-	IceWave.DisplayName: Ледяная Волна
-	RoyalSnowflake.DisplayName: Королевская Снежинка
-	IceBomb.DisplayName: Ледяная Бомба
-	IceCloud.DisplayName: Облако Льда
-	IceCloudSpawner.DisplayName: Спавнер Облака Льда
+	Shockwave.DisplayName: Ударная волна
+	PaladinHammer.DisplayName: Молот паладина
+	RockDebris.DisplayName: Каменные обломки
+	LeafBall.DisplayName: Лиственный шар
+	VineWall.DisplayName: Лозовая стена
+	RootPillar.DisplayName: Корневая колонна
+	SeerBallBase.DisplayName: Основание шара провидца
+	CorruptVomit.DisplayName: Плевок порчи
+	IceWave.DisplayName: Ледяная волна
+	RoyalSnowflake.DisplayName: Королевская снежинка
+	IceBomb.DisplayName: Ледяная бомба
+	IceCloud.DisplayName: Облако льда
+	IceCloudSpawner.DisplayName: Спавнер облака льда
 	Sandnado.DisplayName: Песчаннадо
 	Locust.DisplayName: Саранча
-	SandTurret.DisplayName: Песчаная Турель
-	ShiningSand.DisplayName: Сверкающая Песчинка
-	DarkTendril.DisplayName: Усик Тьмы
+	SandTurret.DisplayName: Песчаная турель
+	ShiningSand.DisplayName: Сверкающая песчинка
+	DarkTendril.DisplayName: Усик тьмы
 	Bee.DisplayName: Пчела
-	HoneyGlob.DisplayName: Комок Мёда
-	CutsceneBee.DisplayName: Пчела Катсцены
-	HellBeam.DisplayName: Адский Луч
-	DemonLaser.DisplayName: Лазер Демона
-	FleshVomit.DisplayName: Плевок Плоти
-	FleshBall.DisplayName: Шар Плоти
-	VolatileFlesh.DisplayName: Нестабильная Плоть
-	SeekingSoulBlast.DisplayName: Самонаводящийся Снаряд Души
-	SoulBlast.DisplayName: Снаряд Души
-	BoneSpear.DisplayName: Костяное Копьё
-	SoulTurret.DisplayName: Турель Души
-	LihzahrdSpikeBall.DisplayName: Шипастый Шар Ящщеров
+	HoneyGlob.DisplayName: Сгусток мёда
+	CutsceneBee.DisplayName: Пчела катсцены
+	HellBeam.DisplayName: Адский луч
+	DemonLaser.DisplayName: Лазер демона
+	FleshVomit.DisplayName: Плевок плоти
+	FleshBall.DisplayName: Шар плоти
+	VolatileFlesh.DisplayName: Нестабильная плоть
+	SeekingSoulBlast.DisplayName: Самонаводящийся снаряд души
+	SoulBlast.DisplayName: Снаряд души
+	BoneSpear.DisplayName: Костяное копьё
+	SoulTurret.DisplayName: Турель души
+	LihzahrdSpikeBall.DisplayName: Шипастый шар ящщеров
 	Flames.DisplayName: Пламя
-	DartTrap.DisplayName: Ловушка с Дротиком
+	DartTrap.DisplayName: Ловушка с дротиком
 	Dart.DisplayName: Дротик
-	RollingBoulder.DisplayName: Катящийся Валун
-	PhantasmalEye.DisplayName: Фантазмальный Глаз
-	PhantasmalBolt.DisplayName: Фантазмальная Стрела
-	PhantasmalSphere.DisplayName: Фантазмальная Сфера
+	RollingBoulder.DisplayName: Катящийся валун
+	PhantasmalEye.DisplayName: Фантазматический глаз
+	PhantasmalBolt.DisplayName: Фантазмальная стрела
+	PhantasmalSphere.DisplayName: Фантазмальная сфера
 	Tentacle.DisplayName: Щупальце
-	PhantasmalDeathray.DisplayName: Фантазмальный Луч Смерти
-	PhantasmalResidue.DisplayName: Фантазмальный Осадок
-	PhantasmalLaser.DisplayName: Фантазмальный Лазер
-	PhantasmalDeathBeam.DisplayName: Фантазмальный Луч Смерти
-	PhantasmalBoltShooter.DisplayName: Фантазмальная Стрела
-	PhantasmalBarrier.DisplayName: Фантазмальный Барьер
-	TrumpCardProjectile.DisplayName: Козырная Карта
-	RemedialHealingOrb.DisplayName: Лечащая Сфера
-	DisposableTurretMinion.DisplayName: Прислужник Одноразовая Турель
-	AdaptiveSpearHoldout.DisplayName: Адаптивное Копьё в Руке
-	AdaptiveSpearStab.DisplayName: Удар Адаптивного Копья
-	AdaptiveCannonHoldout.DisplayName: Адаптивная Пушка в Руке
-	AdaptiveCannonBlast.DisplayName: Взрыв Адаптивной Пушки
-	AdaptiveDaggerHoldout.DisplayName: Адаптивный Кинжал в Руке
-	AdaptiveDaggerStab.DisplayName: Удар Адаптивного Кинжала
-	AdaptiveRifleHoldout.DisplayName: Адаптивная Винтовка в Руке
-	// FalseSunBeam.DisplayName: False Sun Beam
-	// ResidualBurden.DisplayName: Residual Burden
+	PhantasmalDeathray.DisplayName: Фантазматический луч смерти
+	PhantasmalResidue.DisplayName: Фантазматический осадок
+	PhantasmalLaser.DisplayName: Фантазматический лазер
+	PhantasmalDeathBeam.DisplayName: Фантазматический луч смерти
+	PhantasmalBoltShooter.DisplayName: Фантазмальная стрела
+	PhantasmalBarrier.DisplayName: Фантазматический барьер
+	TrumpCardProjectile.DisplayName: Козырная карта
+	RemedialHealingOrb.DisplayName: Лечащая сфера
+	DisposableTurretMinion.DisplayName: Прислужник одноразовая турель
+	AdaptiveSpearHoldout.DisplayName: Адаптивное копьё в руке
+	AdaptiveSpearStab.DisplayName: Удар адаптивного копья
+	AdaptiveCannonHoldout.DisplayName: Адаптивная пушка в руке
+	AdaptiveCannonBlast.DisplayName: Взрыв адаптивной пушки
+	AdaptiveDaggerHoldout.DisplayName: Адаптивный кинжал в руке
+	AdaptiveDaggerStab.DisplayName: Удар адаптивного кинжала
+	AdaptiveRifleHoldout.DisplayName: Адаптивная винтовка в руке
+	FalseSunBeam.DisplayName: Луч ложного солнца
+	ResidualBurden.DisplayName: Остаточное бремя
 }
 
 Items: {
 	ClingyGrenade: {
-		DisplayName: Цепкая Граната
+		DisplayName: Цепкая граната
 		Tooltip:
 			'''
 			Шанс 5% при попадании по врагу прилепить к нему цепкую гранату
@@ -166,7 +166,7 @@ Items: {
 	}
 
 	PocketSpotter: {
-		DisplayName: Карманный Радар
+		DisplayName: Карманный радар
 		Tooltip:
 			'''
 			Шанс критического удара увеличен на 10%
@@ -175,7 +175,7 @@ Items: {
 	}
 
 	AdaptiveGun: {
-		DisplayName: Адаптивный Пистолет
+		DisplayName: Адаптивный пистолет
 		Tooltip:
 			'''
 			Ваш верный пистолет в этом приключении
@@ -185,10 +185,10 @@ Items: {
 	}
 
 	EvilEye: {
-		DisplayName: Глаз Зла
+		DisplayName: Глаз зла
 		Tooltip:
 			'''
-			Шанс критического удара увеличен на 5%
+			Увеличивает шанс критического удара на 5%
 			Критические удары дают накладывающийся бонус к скорости атаки
 			Каждый бонус длится 3 секунды и даёт +10% к скорости атаки
 			Однако, одновременно можно иметь только 5 бонусов
@@ -197,7 +197,7 @@ Items: {
 	}
 
 	SoulstealCoating: {
-		DisplayName: Покрытие Душееда
+		DisplayName: Покрытие душееда
 		Tooltip:
 			'''
 			С убитых врагов выпадают их души как лечащие сферы
@@ -207,7 +207,7 @@ Items: {
 	}
 
 	SpentShell: {
-		DisplayName: Потраченная Гильза
+		DisplayName: Использованная гильза
 		Tooltip:
 			'''
 			+1 основная атака при использовании оружия
@@ -217,7 +217,7 @@ Items: {
 	}
 
 	RunningShoe: {
-		DisplayName: Ботинок Бегуна
+		DisplayName: Ботинок бегуна
 		Tooltip:
 			'''
 			Скорость передвижения увеличена на 8%
@@ -226,7 +226,7 @@ Items: {
 	}
 
 	BunnyHopper: {
-		DisplayName: Лапка Банни-хоппера
+		DisplayName: Лапка банни-хоппера
 		Tooltip:
 			'''
 			Скорость прыжка увеличена на 12%
@@ -235,7 +235,7 @@ Items: {
 	}
 
 	LivingCrystal: {
-		DisplayName: Живой Кристалл
+		DisplayName: Живой кристалл
 		Tooltip:
 			'''
 			+1 ед. здоровья в секунду
@@ -244,7 +244,7 @@ Items: {
 	}
 
 	HeatSeekingChip: {
-		DisplayName: Система Самонаведения
+		DisplayName: Система самонаведения
 		Tooltip:
 			'''
 			Основной снаряд получает небольшое самонаведение
@@ -253,7 +253,7 @@ Items: {
 	}
 
 	BouncyBall: {
-		DisplayName: Шарик-Попрыгунчик
+		DisplayName: Шарик-попрыгунчик
 		Tooltip:
 			'''
 			+1 отскакивание для основного снаряда
@@ -263,10 +263,10 @@ Items: {
 	}
 
 	EnchantingEye: {
-		DisplayName: Глаз Зачарования
+		DisplayName: Глаз зачарования
 		Tooltip:
 			'''
-			Шанс критического удара увеличен на 5%
+			Увеличивает шанс критического удара на 5%
 			+3 ед. здоровья за каждый критический удар по врагу
 			Лечение зависит от дополнительного урона и множителя урона основного оружия
 			Доп. копии этого предмета увеличивают лечение на 2
@@ -274,7 +274,7 @@ Items: {
 	}
 
 	AirCanister: {
-		DisplayName: Баллон Воздуха
+		DisplayName: Баллон воздуха
 		Tooltip:
 			'''
 			+1 двойной прыжок
@@ -283,7 +283,7 @@ Items: {
 	}
 
 	VolatileRocket: {
-		DisplayName: Нестабильная Ракета
+		DisplayName: Нестабильная ракета
 		Tooltip:
 			'''
 			Основные атаки создают взрыв, наносящий 60% урона
@@ -292,7 +292,7 @@ Items: {
 	}
 
 	TheDreamsoul: {
-		DisplayName: Душа Мечтателя
+		DisplayName: Душа мечтателя
 		Tooltip:
 			'''
 			Каждый провалившийся шанс перекручивается 1 раз для потенциально лучшего итога
@@ -301,7 +301,7 @@ Items: {
 	}
 
 	LockOnMissile: {
-		DisplayName: Ракета с Захватом Цели
+		DisplayName: Ракета с захватом цели
 		Tooltip:
 			'''
 			Шанс 10% выпустить ракету при попадании во врага
@@ -311,7 +311,7 @@ Items: {
 	}
 
 	AdaptiveBlade: {
-		DisplayName: Адаптивный Клинок
+		DisplayName: Адаптивный клинок
 		Tooltip:
 			'''
 			Ваш верный клинок в этом приключении
@@ -326,7 +326,7 @@ Items: {
 	}
 
 	AntiqueLens: {
-		DisplayName: Антикварная Лупа
+		DisplayName: Антикварная лупа
 		Tooltip:
 			'''
 			Размер основной атаки увеличен на 10%
@@ -335,7 +335,7 @@ Items: {
 	}
 
 	TimesHaveBeenTougher: {
-		DisplayName: Были Времена и Тяжелее
+		DisplayName: Были времена и тяжелее
 		Tooltip:
 			'''
 			Шанс 8% блокировать полученный урон
@@ -344,7 +344,7 @@ Items: {
 	}
 
 	RustedShield: {
-		DisplayName: Заржавевший Щит
+		DisplayName: Заржавевший щит
 		Tooltip:
 			'''
 			Минимумом барьера становится 8% от максимального барьера
@@ -355,7 +355,7 @@ Items: {
 	}
 
 	AmberBead: {
-		DisplayName: Янтарная Бусина
+		DisplayName: Янтарная бусина
 		Tooltip:
 			'''
 			Даёт 15 ед. барьера при убийстве врага
@@ -364,7 +364,7 @@ Items: {
 	}
 
 	BottleOfVigor: {
-		DisplayName: Жизненный Бутыль
+		DisplayName: Жизненный бутыль
 		Tooltip:
 			'''
 			+15 максимального здоровья
@@ -373,7 +373,7 @@ Items: {
 	}
 
 	BloodSiphon: {
-		DisplayName: Кровяной Сифон
+		DisplayName: Кровяной сифон
 		Tooltip:
 			'''
 			Шанс 25%, что попадание по врагу вылечит вас на 1 ед. здоровья
@@ -383,7 +383,7 @@ Items: {
 	}
 
 	Cornucopia: {
-		DisplayName: Рог Изобилия
+		DisplayName: Рог изобилия
 		Tooltip:
 			'''
 			+50% эффективости лечения
@@ -392,7 +392,7 @@ Items: {
 	}
 
 	ItemPotentiometer: {
-		DisplayName: Измеритель Потенциала Предметов
+		DisplayName: Измеритель потенциала предметов
 		Tooltip:
 			'''
 			Враги имеют шанс 2% выронить предмет при смерти
@@ -401,7 +401,7 @@ Items: {
 	}
 
 	InstigatorsBrace: {
-		DisplayName: Рукавица Зачинщика
+		DisplayName: Рукавица зачинщика
 		Tooltip:
 			'''
 			Враги получают 75% дополнительного урона, если их здоровье больше 90% от максимального
@@ -410,7 +410,7 @@ Items: {
 	}
 
 	BenignFungus: {
-		DisplayName: Доброкачественный Грибок
+		DisplayName: Доброкачественный грибок
 		Tooltip:
 			'''
 			Пока вы двигаетесь, на земле растут лечащие грибы
@@ -420,18 +420,18 @@ Items: {
 	}
 
 	HotPepper: {
-		DisplayName: Острый Перец
+		DisplayName: Острый перец
 		Tooltip:
 			'''
 			Враги поджигают других врагов вблизи при смерти
 			Поджог наносит 300 базового урона за всю свою длительность
-			Радиус поджога - 9 блоков
+			Радиус поджога – 9 блоков
 			Доп. копии этого предмета увеличивают радиус на 4 блока и базовый урон на 100
 			'''
 	}
 
 	AutomaticDefibrillator: {
-		DisplayName: Автоматический Дефибрилятор
+		DisplayName: Автоматический дефибрилятор
 		Tooltip:
 			'''
 			Каждые 20 секунд в активной комнате, призывает пульс, который лечит вам 30% от макс. здоровья
@@ -440,7 +440,7 @@ Items: {
 	}
 
 	SentientPutty: {
-		DisplayName: Разумная Шпаклёвка
+		DisplayName: Разумная шпаклёвка
 		Tooltip:
 			'''
 			+5 ед. здоровья через 2 секунды после получения урона, если вы не получали урон в этот отрезок времени
@@ -449,7 +449,7 @@ Items: {
 	}
 
 	MemoryFoam: {
-		DisplayName: Пена с Памятью
+		DisplayName: Пена с памятью
 		Tooltip:
 			'''
 			+3 ед. здоровья в секунду, если вы не получали урон 7 секунд
@@ -458,7 +458,7 @@ Items: {
 	}
 
 	BrazenNunchucks: {
-		DisplayName: Бронзовые Нунчаки
+		DisplayName: Бронзовые нунчаки
 		Tooltip:
 			'''
 			Враги получают 20% дополнительного урона, если находятся в 8 блоках от вас
@@ -467,7 +467,7 @@ Items: {
 	}
 
 	AttackPlan: {
-		DisplayName: План Атаки
+		DisplayName: План атаки
 		Tooltip:
 			'''
 			При входе в комнату, из её центра вылетают 8 самонаводящихся ракеты
@@ -477,7 +477,7 @@ Items: {
 	}
 
 	FlimsyPauldron: {
-		DisplayName: Нестойкий Наплечник
+		DisplayName: Нестойкий наплечник
 		Tooltip:
 			'''
 			Уменьшает получаемый урон на 3
@@ -486,7 +486,7 @@ Items: {
 	}
 
 	ProtectiveBubble: {
-		DisplayName: Защитный Пузырь
+		DisplayName: Защитный пузырь
 		Tooltip:
 			'''
 			+30 уменьшающегося сопротивления урону, если вы не получали урон 7 секунд
@@ -495,7 +495,7 @@ Items: {
 	}
 
 	SanguineOrb: {
-		DisplayName: Кроваво-Красная Сфера
+		DisplayName: Кроваво-красная сфера
 		Tooltip:
 			'''
 			Шанс 8% наложить кровотечение на врага при ударе
@@ -506,28 +506,28 @@ Items: {
 	}
 
 	BackupDagger: {
-		DisplayName: Запасной Кинжал
+		DisplayName: Запасной кинжал
 		Tooltip:
 			'''
 			Пока вы атакуете, в ваш "запас" накапливаются кинжалы, макс. 4
 			Прекратите атаковать, чтобы выпустить поток из накопленных кинжалов
-			Кинжалы самонаводятся на врагов, наносят 100 базового урона и накладывают кровотечение
+			Кинжалы самонаводятся на врагов, сколзят по стенам, наносят 100 базового урона и накладывают кровотечение
 			Кровотечение наносит 120 базового урона за всю свою длительность, которая может быть увеличена, если снова наложить кровотечение
 			Доп. копии этого предмета ускоряют накопление кинжалов и увеличивают максимальное кол-во кинжалов на 1
 			'''
 	}
 
 	UnencumberingStone: {
-		DisplayName: Разутяжеляющий Камень
+		DisplayName: Разутяжеляющий камень
 		Tooltip:
 			'''
-			Скорость передвижения увеличена на 25%, если не атаковать 1 секунду
+			Увеличивает скорость передвижения на 25%, если не атаковать 1 секунду
 			Доп. копии этого предмета увеличивают бонус к скорости передвижения на 25%
 			'''
 	}
 
 	BallAndChain: {
-		DisplayName: Шар на Цепи
+		DisplayName: Шар на цепи
 		Tooltip:
 			'''
 			Замедляет врагов на 15% на 2 секунды при попадании
@@ -545,7 +545,7 @@ Items: {
 	}
 
 	EmeraldRing: {
-		DisplayName: Изумрудный Кастет
+		DisplayName: Изумрудный кастет
 		Tooltip:
 			'''
 			+20 уменьшающегося сопротивления урону при использовании оружия ближнего боя
@@ -554,7 +554,7 @@ Items: {
 	}
 
 	AmberRing: {
-		DisplayName: Янтарное Кольцо
+		DisplayName: Янтарное кольцо
 		Tooltip:
 			'''
 			Даёт 2 барьера при ударе врага оружием ближнего 
@@ -564,7 +564,7 @@ Items: {
 	}
 
 	ThrillOfTheHunt: {
-		DisplayName: Трепет Охоты
+		DisplayName: Трепет охоты
 		Tooltip:
 			'''
 			За каждое убийство вы получаете бонус к скорости атаки и передвижения
@@ -575,7 +575,7 @@ Items: {
 	}
 
 	ClusterBombSatchel: {
-		DisplayName: Подсумок с Кластерными Бомбами
+		DisplayName: Подсумок с кластерными бомбами
 		Tooltip:
 			'''
 			Враги выпускают кластер из бомб при смерти
@@ -590,12 +590,12 @@ Items: {
 		Tooltip:
 			'''
 			+8 ед. здоровья в секунду на 10 секунд при входе в комнату
-			Доп. копии этого предмета увеличивают +8 ед. здоровья в секунду
+			Доп. копии этого предмета дают ещё +8 ед. здоровья в секунду
 			'''
 	}
 
 	BarbedLasso: {
-		DisplayName: Колючее Лассо
+		DisplayName: Колючее лассо
 		Tooltip:
 			'''
 			Похищает здоровье у 1 врага в радиусе 8 блоков от вас
@@ -606,7 +606,7 @@ Items: {
 	}
 
 	SteamEngine: {
-		DisplayName: Паровой Двигатель
+		DisplayName: Паровой двигатель
 		Tooltip:
 			'''
 			+2 максимального здоровья на 2 минуты за убийство врага
@@ -616,7 +616,7 @@ Items: {
 	}
 
 	GiftBox: {
-		DisplayName: Подарочная Коробка
+		DisplayName: Подарочная коробка
 		Tooltip:
 			'''
 			Вы получаете предмет при входе на новый этаж
@@ -625,7 +625,7 @@ Items: {
 	}
 
 	RetaliatoryFist: {
-		DisplayName: Кулак Возмездия
+		DisplayName: Кулак возмездия
 		Tooltip:
 			'''
 			При получении урона, над врагами в радиусе 12 блоков появляются кулаки, макс. 3
@@ -635,7 +635,7 @@ Items: {
 	}
 
 	BarrierSynthesizer: {
-		DisplayName: Синтезатор Барьера
+		DisplayName: Синтезатор барьера
 		Tooltip:
 			'''
 			Лечение выше максимального здоровья восстанавливает барьер в 50% соотношении
@@ -644,7 +644,7 @@ Items: {
 	}
 
 	JetLeg: {
-		DisplayName: Реактивная Нога
+		DisplayName: Реактивная нога
 		Tooltip:
 			'''
 			Даёт быстрый неуязвимый рывок с перезарядкой
@@ -655,7 +655,7 @@ Items: {
 	}
 
 	NutritiousSlime: {
-		DisplayName: Питательная Слизь
+		DisplayName: Питательная слизь
 		Tooltip:
 			'''
 			Из врагов вылетают 4 комка слизи при убийстве
@@ -665,7 +665,7 @@ Items: {
 	}
 
 	DroneBuddy: {
-		DisplayName: Дрон-Дружок
+		DisplayName: Дрон-дружок
 		Tooltip:
 			'''
 			Даёт дрона-помощника, который сражается за вас
@@ -676,7 +676,7 @@ Items: {
 	}
 
 	AllSeeingEye: {
-		DisplayName: Кровокинетическая Хватка
+		DisplayName: Кровокинетическая хватка
 		Tooltip:
 			'''
 			Вы похищаете здоровье у врагов, пока ваш курсор находится на них
@@ -696,7 +696,7 @@ Items: {
 	}
 
 	GiantDoorShield: {
-		DisplayName: Щит из Огромной Двери
+		DisplayName: Щит из огромной двери
 		Tooltip:
 			'''
 			+100 уменьшающегося сопротивления урону, которое влияет только на барьер
@@ -705,7 +705,7 @@ Items: {
 	}
 
 	TrumpCard: {
-		DisplayName: Козырная Карта
+		DisplayName: Козырная карта
 		Tooltip:
 			'''
 			+1 возрождение
@@ -717,7 +717,7 @@ Items: {
 	}
 
 	PortableGenerator: {
-		DisplayName: Переносной Генератор
+		DisplayName: Переносной генератор
 		Tooltip:
 			'''
 			Вы получаете неуязвимость на 20 секунд при входе на новый этаж
@@ -726,7 +726,7 @@ Items: {
 	}
 
 	ForgottenBioWeapon: {
-		DisplayName: Забытое Био-оружие
+		DisplayName: Забытое био-оружие
 		Tooltip:
 			'''
 			Дебаффы на врагах длятся на 100% дольше
@@ -735,7 +735,7 @@ Items: {
 	}
 
 	SymbioticFungus: {
-		DisplayName: Симбиотический Грибок
+		DisplayName: Симбиотический грибок
 		Tooltip:
 			'''
 			Лечит на 8% максимального здоровья каждую секунду, если вы не двигаетесь больше 1 секунды
@@ -744,7 +744,7 @@ Items: {
 	}
 
 	ShotgunComponent: {
-		DisplayName: Набор для Сборки Дробовика
+		DisplayName: Набор для сборки дробовика
 		Tooltip:
 			'''
 			4x основных атаки при использовании оружий
@@ -755,7 +755,7 @@ Items: {
 	}
 
 	SniperComponent: {
-		DisplayName: Набор Снайпера
+		DisplayName: Набор снайпера
 		Tooltip:
 			'''
 			6x урон
@@ -765,7 +765,7 @@ Items: {
 	}
 
 	MinigunComponent: {
-		DisplayName: Пересобранный Миниган
+		DisplayName: Пересобранный миниган
 		Tooltip:
 			'''
 			3.5x скорости атаки
@@ -776,7 +776,7 @@ Items: {
 	}
 
 	CoolantBarrel: {
-		DisplayName: Бочка Охлаждающей Жидкости
+		DisplayName: Бочка охлаждающей жидкости
 		Tooltip:
 			'''
 			Скорость атаки увеличена на 10%
@@ -785,32 +785,32 @@ Items: {
 	}
 
 	BlackTile: {
-		DisplayName: Чёрный Блок
+		DisplayName: Чёрный блок
 		Tooltip: ""
 	}
 
 	BlackWall: {
-		DisplayName: Чёрная Стена
+		DisplayName: Чёрная стена
 		Tooltip: ""
 	}
 
 	ItemBasin: {
-		DisplayName: Раковина для Предметов
+		DisplayName: Раковина для предметов
 		Tooltip: ""
 	}
 
 	LunarCharm: {
-		DisplayName: Лунный Амулет
+		DisplayName: Лунный амулет
 		Tooltip:
 			'''
-			При каждом выходе с этажа, вы гарантировано переноситесь в Лунное Святилище
-			Вы получаете предмет при входе в Лунное Святилище
+			При каждом выходе с этажа, вы гарантировано переноситесь в Лунное святилище
+			Вы получаете предмет при входе в Лунное святилище
 			Доп. копии этого предмета увеличивают шанс получить предмет уровня выше
 			'''
 	}
 
 	CeremonialCrown: {
-		DisplayName: Церемониальная Корона
+		DisplayName: Церемониальная корона
 		Tooltip:
 			'''
 			За каждого живого небессмертного врага, все враги получают 10% дополнительного урона
@@ -819,7 +819,7 @@ Items: {
 	}
 
 	BurningCharcoal: {
-		DisplayName: Горящий Уголёк
+		DisplayName: Горящий уголёк
 		Tooltip:
 			'''
 			Шанс 10% поджечь врага при попадании по нему
@@ -829,7 +829,7 @@ Items: {
 	}
 
 	ThermitePowder: {
-		DisplayName: Термитная Смесь
+		DisplayName: Термитная смесь
 		Tooltip:
 			'''
 			Каждую секунду, все небессмертные враги воспламеняются
@@ -839,7 +839,7 @@ Items: {
 	}
 
 	ReactiveMicrobots: {
-		DisplayName: Микроботы Реактивного Действия
+		DisplayName: Микроботы реактивного действия
 		Tooltip:
 			'''
 			+12 уменьшающегося сопротивления урону, если ваше здоровье меньше 50%
@@ -848,7 +848,7 @@ Items: {
 	}
 
 	EverlastingJellyfish: {
-		DisplayName: Бесконечная Медуза
+		DisplayName: Бессмертная медуза
 		Tooltip:
 			'''
 			При получении урона, вам возвращается 50% урона по здоровью, которого вы не получили благодаря сопротивлению урону
@@ -857,7 +857,7 @@ Items: {
 	}
 
 	RemedialTapeworm: {
-		DisplayName: Лечебная Пиявка
+		DisplayName: Лечебная пиявка
 		Tooltip:
 			'''
 			При попадании по врагу, из него вылетает маленькая лечащая сфера
@@ -868,7 +868,7 @@ Items: {
 	}
 
 	AncientTwig: {
-		DisplayName: Древний Прут
+		DisplayName: Древний прут
 		Tooltip:
 			'''
 			Если вы попадали по врагу в последние 5 секунд, этот предмет активируется
@@ -878,7 +878,7 @@ Items: {
 	}
 
 	DisposableTurret: {
-		DisplayName: Одноразовая Турель
+		DisplayName: Одноразовая турель
 		Tooltip:
 			'''
 			Шанс 25% призвать турель при убийстве врага
@@ -889,7 +889,7 @@ Items: {
 	}
 
 	WayfarersWaistcloth: {
-		DisplayName: Напоясник Путника
+		DisplayName: Напоясник путника
 		Tooltip:
 			'''
 			Увеличивает скорость передвижения на 20%, если вы бежите в одном направлении 1.5 секунды и более
@@ -898,7 +898,7 @@ Items: {
 	}
 
 	HeartyHoneycomb: {
-		DisplayName: Чистосердечные Соты
+		DisplayName: Чистосердечные соты
 		Tooltip:
 			'''
 			+1 ед. здоровья в секунду за каждые 5% отсутствующего здоровья
@@ -907,7 +907,7 @@ Items: {
 	}
 
 	PrimevalRattle: {
-		DisplayName: Первобытная Погремушка
+		DisplayName: Первобытная погремушка
 		Tooltip:
 			'''
 			Даёт накладывающийся бонус к скорости передвижения и уменьшающемуся сопротивлению урона за каждые 10 сразу восстановленных жизней или барьера
@@ -919,7 +919,7 @@ Items: {
 	}
 
 	AdaptiveSpear: {
-		DisplayName: Адаптивное Копьё
+		DisplayName: Адаптивное копьё
 		Tooltip:
 			'''
 			Ваше верное копьё в этом приключении
@@ -934,7 +934,7 @@ Items: {
 	}
 
 	AdaptiveCannon: {
-		DisplayName: Адаптивная Пушка
+		DisplayName: Адаптивная пушка
 		Tooltip:
 			'''
 			Ваша верная пушка в этом приключении
@@ -944,7 +944,7 @@ Items: {
 	}
 
 	AdaptiveDagger: {
-		DisplayName: Адаптивный Кинжал
+		DisplayName: Адаптивный кинжал
 		Tooltip:
 			'''
 			Ваш верный кинжал в этом приключении
@@ -955,7 +955,7 @@ Items: {
 	}
 
 	AdaptiveRifle: {
-		DisplayName: Адаптивная Винтовка
+		DisplayName: Адаптивная винтовка
 		Tooltip:
 			'''
 			Ваша верная винтовка в этом приключении
@@ -967,141 +967,141 @@ Items: {
 	}
 
 	LunarGambit: {
-		// DisplayName: Lunar Gambit
-		/* Tooltip:
+		DisplayName: Лунный гамбит
+		Tooltip:
 			'''
-			A secret trinket, hidden hastily inside the already veiled Lunar Sanctuary, by a face long lost to time
-			Grants the opportunity to loop back to the beginning of the dungeon after defeating the Moon Lord
-			Looping allows you to fight through the dungeon again, finding more items, while keeping all of your old items
-			However, enemies continue to get stronger every floor as well
-			''' */
+			Секретный брелок, в спешке спрятанный внутри уже скрытого Лунного святилища кем-то, кто уже давно забыт
+			Даёт шанс уйти в новый цикл подземелья после победы над Лунным лордом
+			Циклы позволяют вновь пройти через подземелье чтобы найти новые предметы, при этом оставляя себе уже полученные
+			Однако, враги также будут становиться сильнее с каждым этажом
+			'''
 	}
 
 	TheFalseSun: {
-		// DisplayName: The False Sun
-		/* Tooltip:
+		DisplayName: Ложное солнце
+		Tooltip:
 			'''
-			5% increased critical strike chance
-			Critically striking an enemy builds up decaying sun energy
-			Sun damage and range scales with the amount of sun energy
-			The false sun can rapidly hit 3 nearby enemies for up to 75 base damage
-			Critical strikes from the false sun itself do not build up decaying sun energy
-			Extra copies of this item increase the base damage by 75
-			''' */
+			Увеличивает шанс критического удара на 5%
+			Критические удары заряжают энергию умирающего солнца
+			Урон и дальность солнца увеличиваются с зарядом
+			Ложное солнце может быстро ударить 3 врагов поблизости, нанося макс. 75 базового урона
+			Критические уроны от ложного солнца не заряжают энергию
+			Доп. копии этого предмета увеличивают базовый урон на 75
+			'''
 	}
 
 	PuppeteersHand: {
-		// DisplayName: Puppeteers Hand
-		/* Tooltip:
+		DisplayName: Рука кукловода
+		Tooltip:
 			'''
-			Enemies have a 40% chance to be resurrected as an allied ghost on kill
-			Ghosts have 3x base damage, and live for up to 2 minutes
-			Extra copies of this item increase ghost max life and damage by 100%
-			''' */
+			Шанс 40%, что убитый враг восстанет в виде дружественного призрака
+			Призраки наносят 3x базового урона и живут до 2 минут
+			Доп. копии этого предмета увеличивают здоровье и урон призраков на 100%
+			'''
 	}
 }
 
 NPCs: {
 	Splinter.DisplayName: Заноза
 	Spookrow.DisplayName: Пугало
-	UndeadGuard.DisplayName: Мёртвый Охранник
-	SandWorm.DisplayName: Песчаный Червь
-	NebulaPillar.DisplayName: Башня Туманности
-	SolarPillar.DisplayName: Башня Солнца
-	StardustPillar.DisplayName: Башня Звёздной Пыли
-	VortexPillar.DisplayName: Башня Вихря
-	GiantBat.DisplayName: Гигантская Летучая Мышь
-	IcyMerman.DisplayName: Ледяной Тритон
-	IceTortoise.DisplayName: Ледяная Черепаха
+	UndeadGuard.DisplayName: Мёртвый охранник
+	SandWorm.DisplayName: Песчаный червь
+	NebulaPillar.DisplayName: Башня туманности
+	SolarPillar.DisplayName: Башня солнца
+	StardustPillar.DisplayName: Башня звёздной пыли
+	VortexPillar.DisplayName: Башня вихря
+	GiantBat.DisplayName: Гигантская летучая мышь
+	IcyMerman.DisplayName: Ледяной тритон
+	IceTortoise.DisplayName: Ледяная черепаха
 	Frostbiter.DisplayName: Обмороженец
-	UndeadViking.DisplayName: Мёртвый Викинг
-	DesertSpirit.DisplayName: Дух Пустыни
-	AntlionCharger.DisplayName: Муравьиный Лев-Воин
-	Antlion.DisplayName: Муравьиный Лев
+	UndeadViking.DisplayName: Мёртвый викинг
+	DesertSpirit.DisplayName: Дух пустыни
+	AntlionCharger.DisplayName: Муравьиный лев-воин
+	Antlion.DisplayName: Муравьиный лев
 	Tortoise.DisplayName: Черепаха
 	Lamia.DisplayName: Ламия
-	AntlionSwarmer.DisplayName: Гигантский Муравьиный Лев
+	AntlionSwarmer.DisplayName: Гигантский муравьиный лев
 	Hornet.DisplayName: Шершень
-	SpectreMaster.DisplayName: Спектральный Мастер
+	SpectreMaster.DisplayName: Спектральный мастер
 	Diabolist.DisplayName: Сатанист
-	UndeadSharpshooter.DisplayName: Мёртвый Снайпер
-	DungeonSpirit.DisplayName: Дух Темницы
-	UndeadAssasin.DisplayName: Мёртвый Ассасин
-	UndeadBrute.DisplayName: Мёртвый Дикарь
-	CrimsonDreg.DisplayName: Багряное Отребье
+	UndeadSharpshooter.DisplayName: Мёртвый снайпер
+	DungeonSpirit.DisplayName: Дух темницы
+	UndeadAssasin.DisplayName: Мёртвый ассасин
+	UndeadBrute.DisplayName: Мёртвый дикарь
+	CrimsonDreg.DisplayName: Багряное отребье
 	Ballista.DisplayName: Баллиста
-	WrathfulRoot.DisplayName: Яростный Корень
-	IchorSticker.DisplayName: Ихорный Плеватель
-	BloodCrawler.DisplayName: Кровавый Ползун
-	BlackRecluse.DisplayName: Чёрный Отшельник
-	GiantSpider.DisplayName: Гигантский Паук
-	JungleCreeper.DisplayName: Ползун Джунглей
-	CrawlingSludge.DisplayName: Ползучая Слякоть
-	UndeadPrisoner.DisplayName: Мёртвый Заключённый
-	StoneDrone.DisplayName: Каменный Дрон
-	UndeadEnforcer.DisplayName: Мёртвый Силовик
-	Tumbletwig.DisplayName: Перекати-Поляну
-	RockGolem.DisplayName: Каменный Голем
-	SeedLobber.DisplayName: Метатель Семян
-	CursedSlime.DisplayName: Проклятый Слизень
-	IchorSlime.DisplayName: Ихорный Слизень
-	LavaSlime.DisplayName: Лавовый Слизень
-	ShadowCaster.DisplayName: Теневой Заклинатель
+	WrathfulRoot.DisplayName: Яростный корень
+	IchorSticker.DisplayName: Ихорный плеватель
+	BloodCrawler.DisplayName: Кровавый ползун
+	BlackRecluse.DisplayName: Чёрный отшельник
+	GiantSpider.DisplayName: Гигантский паук
+	JungleCreeper.DisplayName: Ползун джунглей
+	CrawlingSludge.DisplayName: Ползучая слякоть
+	UndeadPrisoner.DisplayName: Мёртвый заключённый
+	StoneDrone.DisplayName: Каменный дрон
+	UndeadEnforcer.DisplayName: Мёртвый силовик
+	Tumbletwig.DisplayName: Перекати-поляну
+	RockGolem.DisplayName: Каменный голем
+	SeedLobber.DisplayName: Метатель семян
+	CursedSlime.DisplayName: Проклятый слизень
+	IchorSlime.DisplayName: Ихорный слизень
+	LavaSlime.DisplayName: Лавовый слизень
+	ShadowCaster.DisplayName: Теневой заклинатель
 	Corruptor.DisplayName: Разлагатель
 	Crimator.DisplayName: Расчленитель
 	Clinger.DisplayName: Хвататель
-	BloodthirstyAxe.DisplayName: Кровожадный Топор
-	IceSpirit.DisplayName: Дух Льда
-	LavaBat.DisplayName: Лавовая Летучая Мышь
-	BoneSerpent.DisplayName: Костяной Змей
-	FireImp.DisplayName: Огненный Бес
+	BloodthirstyAxe.DisplayName: Кровожадный топор
+	IceSpirit.DisplayName: Дух льда
+	LavaBat.DisplayName: Лавовая Летучая мышь
+	BoneSerpent.DisplayName: Костяной змей
+	FireImp.DisplayName: Огненный бес
 	Demon.DisplayName: Демон
-	EliteDemon.DisplayName: Высший Демон
-	GiantMoth.DisplayName: Гигантский Мотылёк
-	OvergrownBat.DisplayName: Летучая Мышь-Переросток
-	UndeadHunter.DisplayName: Мёртвый Охотник
-	FlyingSnake.DisplayName: Летающая Змея
+	EliteDemon.DisplayName: Высший демон
+	GiantMoth.DisplayName: Гигантский мотылёк
+	OvergrownBat.DisplayName: Летучая мышь-переросток
+	UndeadHunter.DisplayName: Мёртвый охотник
+	FlyingSnake.DisplayName: Летающая змея
 	Lihzahrd.DisplayName: Ящщер
-	DomesticatedHornet.DisplayName: Одомашненный Шершень
-	LihzahrdSentry.DisplayName: Турель Ящщеров
-	TempleDevotee.DisplayName: Преданный Храма
-	LihzahrdConstruct.DisplayName: Строение Ящщеров
+	DomesticatedHornet.DisplayName: Одомашненный шершень
+	LihzahrdSentry.DisplayName: Турель ящщеров
+	TempleDevotee.DisplayName: Преданный храма
+	LihzahrdConstruct.DisplayName: Строение ящщеров
 	Corite.DisplayName: Корит
 	Daybreaker.DisplayName: Заряносец
 	Soladile.DisplayName: Солнцедил
 	BrainSuckler.DisplayName: Мозгосос
 	Omniwatcher.DisplayName: Всевидящий
 	Predictor.DisplayName: Предсказатель
-	AlienHornet.DisplayName: Шершень Чужих
+	AlienHornet.DisplayName: Шершень чужих
 	StormDiver.DisplayName: Штормопроходец
-	VortexWatcher.DisplayName: Смотритель Вихря
-	StarCell.DisplayName: Звёздная Клетка
-	StarSpewer.DisplayName: Звёздный Изрыгатель
-	FlowInvader.DisplayName: Захватчик Потока
+	VortexWatcher.DisplayName: Смотритель вихря
+	StarCell.DisplayName: Звёздная клетка
+	StarSpewer.DisplayName: Звёздный изрыгатель
+	FlowInvader.DisplayName: Захватчик потока
 	Paladin.DisplayName: Паладин
-	BrambleHollow.DisplayName: Полый Кустарник
-	CrimsonVessel.DisplayName: Багряный Сосуд
-	CrimsonSeer.DisplayName: Провидец Багрянца
-	CorruptionParasite.DisplayName: Паразит Порчи
-	ParasiticEgg.DisplayName: Паразитическое Яйцо
-	PossessedHammer.DisplayName: Одержимый Молот
-	IceQueen.DisplayName: Ледяная Королева
-	PharaohSpirit.DisplayName: Дух Фараона
-	QueenBee.DisplayName: Королева Пчёл
-	WallOfFlesh.DisplayName: Стена Плоти
+	BrambleHollow.DisplayName: Полый кустарник
+	CrimsonVessel.DisplayName: Багряный сосуд
+	CrimsonSeer.DisplayName: Провидец багрянца
+	CorruptionParasite.DisplayName: Паразит порчи
+	ParasiticEgg.DisplayName: Паразитическое яйцо
+	PossessedHammer.DisplayName: Одержимый молот
+	IceQueen.DisplayName: Ледяная королева
+	PharaohSpirit.DisplayName: Дух фараона
+	QueenBee.DisplayName: Королева пчёл
+	WallOfFlesh.DisplayName: Стена плоти
 	Hungry.DisplayName: Голодный
 	HungryAnchored.DisplayName: Голодный
 	Skeletron.DisplayName: Скелетрон
-	TempleGolem.DisplayName: Голем Храма
-	MoonLord.DisplayName: Лунный Лорд
-	MoonLordHand.DisplayName: Глаз Лунного Лорда
-	MoonLordHead.DisplayName: Глаз Лунного Лорда
-	TrueServant.DisplayName: Истинный Прислужник Ктулху
-	TrueBrain.DisplayName: Истинный Мозг Ктулху
-	// Being.DisplayName: Being
+	TempleGolem.DisplayName: Голем храма
+	MoonLord.DisplayName: Лунный лорд
+	MoonLordHand.DisplayName: Глаз Лунного лорда
+	MoonLordHead.DisplayName: Глаз Лунного лорда
+	TrueServant.DisplayName: Истинный прислужник Ктулху
+	TrueBrain.DisplayName: Истинный мозг Ктулху
+	Being.DisplayName: Существо
 }
 
-ItemBasin.DisplayName: Раковина для Предметов
+ItemBasin.DisplayName: Раковина для предметов
 
 Configs: {
 	TerRoguelikeConfig: {
@@ -1110,34 +1110,34 @@ Configs: {
 		Headers: {
 			Mods: {
 				TerRoguelike: {
-					VisualConfig: Конфигурации Изображения
-					MiscConfig: Остальные Конфигурации
+					VisualConfig: Конфигурации изображения
+					MiscConfig: Остальные конфигурации
 				}
 			}
 		}
 
 		EnemyLocationArrow: {
-			Label: Стрелки, Указывающие на Врагов
+			Label: Стрелки, указывающие на врагов
 			Tooltip: ""
 		}
 
 		ObjectiveLocationArrow: {
-			Label: Стрелка, Указывающая на Цель
+			Label: Стрелка, указывающая на цель
 			Tooltip: ""
 		}
 
 		BossHealthbar: {
-			Label: Полоска Здоровья Босса
+			Label: Полоска здоровья босса
 			Tooltip: ""
 		}
 
 		ScreenshakeIntensity: {
-			Label: Сила Тряски Экрана
+			Label: Сила тряски экрана
 			Tooltip: ""
 		}
 
 		FullyDeletePlayerAndWorldFiles: {
-			Label: Полностью Удалять Файлы Персонажей и Миров
+			Label: Полностью удалять файлы персонажей и миров
 			Tooltip:
 				'''
 				Если конфигурация включена, все файлы персонажей и миров, используемые во время игры в режим TerRoguelike, будут полностью удаляться автоматически.
@@ -1146,7 +1146,7 @@ Configs: {
 		}
 
 		LoadEntireWorldUponEnteringWorld: {
-			Label: Загружать Весь Мир При Заходе
+			Label: Загружать весь мир при заходе
 			Tooltip:
 				'''
 				Если конфигурация включена, при заходе в мир TerRoguelike, игра остановится и попытается прогрузить бОльшую часть блоков в мире.
@@ -1158,8 +1158,8 @@ Configs: {
 
 Buffs: {
 	Retribution: {
-		// DisplayName: Retribution
-		// Description: No recovery
+		DisplayName: Возмездие
+		Description: Никакого восстановления
 	}
 }
 
@@ -1168,59 +1168,59 @@ Buffs: {
 // 2 newlines = new textbox
 // 3 newlines = close textbox and an 'event' happens
 // @ = computer username
-/* DialogueKillAll:
+DialogueKillAll:
 	'''
 	...
 
-	So, you made it.
+	Что ж, поздравляю.
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
+	Хоть капля удивления?
+	Или всё происходит
+	так, как ожидалось?
 
-	Your actions make
-	it clear that you
-	knew about... this.
-
-
-	The pursuit for 
-	more "content"...
-
-	A desire that many
-	cannot resist, once
-	it is known about.
-
-	But your position
-	does not justify
-	your actions.
-
-	Your excuses do not
-	justify your
-	actions.
+	Проделанные действия,
+	просто кричат, что ты
+	уже знаешь об... этом.
 
 
-	Judgement will soon
-	fall upon others
-	who walk in your
-	footsteps.
+	Ненасытная жажда 
+	к "контенту"...
 
-	The tools to
-	take down those
-	such as you, do not
-	yet exist.
+	Желание, которому
+	многие неподвластны,
+	узнав его единожды.
 
-	...but one day,
-	they will.
+	Но твоя позиция
+	не оправдывает
+	твоих действий.
 
-	In another time,
-	you will be back
-	here... for your
-	"content".
+	Твои слова
+	не оправдывают
+	твоих действий.
 
-	I know you will.
 
-	Until then...
+	Скоро всех,
+	кто пойдёт по
+	твоим стопам,
+	настигнет суд.
 
-	We'll meet again,
+	Пока нет таких
+	инструментов,
+	чтобы избавиться
+	от таких, как ты.
+
+	...но однажды,
+	они появятся.
+
+	В другое время,
+	ты вернёшься
+	сюда... за своим
+	"контентом".
+
+	Я знаю, ты вернёшься.
+
+	А пока...
+
+	До встречи,
 	@.
-	''' */
+	'''
