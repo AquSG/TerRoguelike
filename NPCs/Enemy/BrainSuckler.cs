@@ -109,6 +109,9 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public void StickToTarget(int target, bool player)
         {
+            if (!player && Main.npc[target].type == ModContent.NPCType<BrainSuckler>())
+                return;
+
             NPC.velocity *= 0;
             if (NPC.ai[2] < -1)
                 return;

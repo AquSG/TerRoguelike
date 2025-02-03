@@ -691,7 +691,7 @@ namespace TerRoguelike.Managers
         }
         public virtual void OnEnter()
         {
-            if (IsStartRoom)
+            if (IsStartRoom && !IsBossRoom)
                 return;
             if (IsSanctuary)
                 return;

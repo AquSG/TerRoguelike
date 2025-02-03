@@ -152,12 +152,6 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: Impugnare Fucile Adattivo
 	// FalseSunBeam.DisplayName: False Sun Beam
 	// ResidualBurden.DisplayName: Residual Burden
-	// SplittingFeather.DisplayName: Splitting Feather
-	// SplitFeather.DisplayName: Split Feather
-	// Talon.DisplayName: Talon
-	// DashingFeather.DisplayName: Dashing Feather
-	// SpeedingFeather.DisplayName: Speeding Feather
-	// YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -654,7 +648,7 @@ Items: {
 		Tooltip:
 			'''
 			Ottieni uno rapido scatto con invincibilità limitato da un tempo di recupero
-			Lo scatto ti da 1/3 di secondo di invincibilità ed ha un tempo di recupero di 10 secondi
+			Lo scatto ti da 1/3 di secondo di invincibilità ed ha un tempo di recupero di 5 secondi
 			Clicca due volte destra o sinistra per attivare lo scatto
 			Ogni copie extra dell'oggetto diminuiscono il tempo di recupero dello scatto
 			'''
@@ -1104,7 +1098,6 @@ NPCs: {
 	MoonLordHead.DisplayName: Occhio del Signore della Luna
 	TrueServant.DisplayName: Vero Servo di Cthulhu
 	TrueBrain.DisplayName: Vero Cervello di Cthulhu
-	// Mallet.DisplayName: Mallet
 	// Being.DisplayName: Being
 }
 

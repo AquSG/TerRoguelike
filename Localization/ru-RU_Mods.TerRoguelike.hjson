@@ -152,12 +152,6 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: Адаптивная Винтовка в Руке
 	// FalseSunBeam.DisplayName: False Sun Beam
 	// ResidualBurden.DisplayName: Residual Burden
-	// SplittingFeather.DisplayName: Splitting Feather
-	// SplitFeather.DisplayName: Split Feather
-	// Talon.DisplayName: Talon
-	// DashingFeather.DisplayName: Dashing Feather
-	// SpeedingFeather.DisplayName: Speeding Feather
-	// YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -654,7 +648,7 @@ Items: {
 		Tooltip:
 			'''
 			Даёт быстрый неуязвимый рывок с перезарядкой
-			Рывок даёт 1/3 секунды неуязвимости и перезаряжается 10 секунд
+			Рывок даёт 1/3 секунды неуязвимости и перезаряжается 5 секунд
 			Нажмите ВЛЕВО или ВПРАВО дважды, чтобы активировать рывок
 			Доп. копии этого предмета уменьшают перезарядку рывка
 			'''
@@ -1104,7 +1098,6 @@ NPCs: {
 	MoonLordHead.DisplayName: Глаз Лунного Лорда
 	TrueServant.DisplayName: Истинный Прислужник Ктулху
 	TrueBrain.DisplayName: Истинный Мозг Ктулху
-	// Mallet.DisplayName: Mallet
 	// Being.DisplayName: Being
 }
 

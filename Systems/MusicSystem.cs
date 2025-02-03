@@ -179,17 +179,6 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/FinalBoss2Start",
             "TerRoguelike/Tracks/FinalBoss2End",
             0.45f);
-        public static BossTheme JstcTheme = new(
-            "TerRoguelike/Tracks/JstcTheme",
-            "TerRoguelike/Tracks/JstcThemeStart",
-            Silence,
-            0.52f);
-        public static BossTheme Jstc2Theme = new(
-            "TerRoguelike/Tracks/Jstc2Theme",
-            "TerRoguelike/Tracks/Jstc2ThemeStart",
-            Silence,
-            0.52f);
-
 
         public static void FillMusicDictionary()
         {
@@ -264,10 +253,6 @@ namespace TerRoguelike.Systems
                 FinalBoss2Theme.BattleTrack,
                 FinalBoss2Theme.StartTrack,
                 FinalBoss2Theme.EndTrack,
-                JstcTheme.BattleTrack,
-                JstcTheme.StartTrack,
-                Jstc2Theme.BattleTrack,
-                Jstc2Theme.StartTrack
             };
             foreach (string path in pathList)
             {
