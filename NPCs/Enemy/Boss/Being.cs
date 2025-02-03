@@ -265,8 +265,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (!allow)
             {
-                NPC.active = false;
-                return;
+                //TODO: re-enable this before release
+                //NPC.active = false;
+                //return;
             }
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
@@ -532,10 +533,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         return;
 
                     var strings = list[(int)NPC.ai[3]].StringDisplay(textProgress < 0 ? -1 : (int)textProgress);
-                    Vector2 textScale = TalkFont ? new Vector2(0.081f) : new Vector2(0.43f, 0.38f);
                     int verticalStep = TalkFont ? 15 : 18;
                     for (int i = 0; i < strings.Count; i++)
                     {
+                        Vector2 textScale = TalkFont ? new Vector2(0.081f) : new Vector2(0.38f);
+                        float stringSize = (font.MeasureString(list[(int)NPC.ai[3]].strings[i]) * textScale).X;
+                        float shrinkThreshold = 195;
+                        if (stringSize > shrinkThreshold)
+                        {
+                            textScale.X *= shrinkThreshold / stringSize;
+                        }
                         ChatManager.DrawColorCodedString(Main.spriteBatch, font, strings[i], drawPos + new Vector2(77, -82) + Vector2.UnitY * verticalStep * i + vector - Main.screenPosition, Color.Black, 0, Vector2.Zero, textScale);
                     }
                 }
