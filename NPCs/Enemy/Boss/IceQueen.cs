@@ -117,7 +117,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void OnSpawn(IEntitySource source)
         {
             NPC.Opacity = 0;
-            NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
+            NPC.immortal = NPC.dontTakeDamage = true;
             currentFrame = 0;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
