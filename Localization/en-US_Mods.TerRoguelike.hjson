@@ -152,12 +152,6 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: Adaptive Rifle Holdout
 	FalseSunBeam.DisplayName: False Sun Beam
 	ResidualBurden.DisplayName: Residual Burden
-	SplittingFeather.DisplayName: Splitting Feather
-	SplitFeather.DisplayName: Split Feather
-	Talon.DisplayName: Talon
-	DashingFeather.DisplayName: Dashing Feather
-	SpeedingFeather.DisplayName: Speeding Feather
-	YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -654,7 +648,7 @@ Items: {
 		Tooltip:
 			'''
 			Gain a quick invincibility dash that has a cooldown
-			The dash gives 1/3 of a second of invincibility and has a 10 second cooldown
+			The dash gives 1/3 of a second of invincibility and has a 5 second cooldown
 			Double tap left or right to activate the dash
 			Extra copies of this item decrease the cooldown of the dash
 			'''
@@ -1104,7 +1098,6 @@ NPCs: {
 	MoonLordHead.DisplayName: Moon Lord's Eye
 	TrueServant.DisplayName: True Servant of Cthulhu
 	TrueBrain.DisplayName: True Brain of Cthulhu
-	Mallet.DisplayName: Mallet
 	Being.DisplayName: Being
 }
 

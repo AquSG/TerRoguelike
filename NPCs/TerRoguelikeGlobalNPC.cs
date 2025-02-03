@@ -1277,7 +1277,7 @@ namespace TerRoguelike.NPCs
         {
             Entity target = GetTarget(npc);
 
-            Vector2 targetPos = npc.Center + Vector2.UnitX.RotatedBy(-npc.rotation);
+            Vector2 targetPos = npc.Center + Vector2.UnitX.RotatedBy(-npc.rotation) * 240;
             if (target != null)
             {
                 targetPos = target.Center;
@@ -1299,6 +1299,7 @@ namespace TerRoguelike.NPCs
             npc.velocity = Vector2.UnitX.RotatedBy(npc.rotation) * npc.velocity.Length();
             Vector2 wantedVelocity = slowTurn ? npc.rotation.ToRotationVector2() * (maxVelocity * ((((1f - velMultiplier * 0.85f)) + 0.15f))) : npc.rotation.ToRotationVector2() * maxVelocity;
             npc.velocity = Vector2.Lerp(npc.velocity, wantedVelocity, 0.07f);
+            npc.direction = npc.velocity.X > 0 ? 1 : -1;
         }
         public void RogueGiantBatAI(NPC npc, float distanceAbove, float acceleration, float maxVelocity, int attackTelegraph, int attackCooldown, float attackDistance, int projType, Vector2 projVelocity, int projDamage)
         {
@@ -3742,6 +3743,8 @@ namespace TerRoguelike.NPCs
             TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
+            if (hitDamage < 1)
+                hitDamage = 1;
 
             NPC.HitInfo info = new NPC.HitInfo();
             info.HideCombatText = true;
@@ -4205,7 +4208,7 @@ namespace TerRoguelike.NPCs
             {
                 if (targetNPC == -1 || targetPlayer != -1 || targetCooldown <= 0)
                 {
-                    targetNPC = ClosestNPC(npc.Center, 3200f, false);
+                    targetNPC = ClosestNPC(npc.Center, 50000f, false);
                     targetPlayer = -1;
                     targetCooldown = 300;
                 }
@@ -4215,7 +4218,7 @@ namespace TerRoguelike.NPCs
                 if (targetPlayer == -1)
                     targetPlayer = npc.FindClosestPlayer();
                 if (targetNPC == -1 && !TerRoguelikeBoss)
-                    targetNPC = ClosestNPC(npc.Center, 3200f, true);
+                    targetNPC = ClosestNPC(npc.Center, 50000f, true);
                 if (Main.player[targetPlayer].dead)
                     targetPlayer = -1;
                 if (targetPlayer != -1 && targetNPC != -1)

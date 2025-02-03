@@ -91,7 +91,7 @@ namespace TerRoguelike.Managers
                 foreach (NPC npc in Main.ActiveNPCs)
                 {
                     var modNPC = npc.ModNPC();
-                    if (modNPC == null || !modNPC.isRoomNPC || modNPC.sourceRoomListID < 0) continue;
+                    if (modNPC == null || !modNPC.isRoomNPC || modNPC.sourceRoomListID < 0 || modNPC.hostileTurnedAlly) continue;
                     if (RoomSystem.RoomList[modNPC.sourceRoomListID].AssociatedFloor == ID)
                     {
                         count++;

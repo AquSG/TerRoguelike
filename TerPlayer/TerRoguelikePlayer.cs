@@ -2237,6 +2237,16 @@ namespace TerRoguelike.TerPlayer
             float lifeMulti = puppeteersHand;
             float damageMulti = puppeteersHand * 3;
 
+            if (TerRoguelikeWorld.escape)
+            {
+                if (!modTarget.activatedJstc && modTarget.isRoomNPC && modTarget.sourceRoomListID >= 0)
+                {
+                    Floor targetFloor = SchematicManager.FloorID[RoomSystem.RoomList[modTarget.sourceRoomListID].AssociatedFloor];
+                    if (targetFloor.jstcProgress == Floor.JstcProgress.Start)
+                        targetFloor.jstc++;
+                    modTarget.activatedJstc = true;
+                }
+            }
             target.active = true;
             target.friendly = true;
             modTarget.hostileTurnedAlly = true;

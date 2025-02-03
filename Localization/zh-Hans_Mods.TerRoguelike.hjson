@@ -152,12 +152,6 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: 来福枪握持
 	// FalseSunBeam.DisplayName: False Sun Beam
 	// ResidualBurden.DisplayName: Residual Burden
-	// SplittingFeather.DisplayName: Splitting Feather
-	// SplitFeather.DisplayName: Split Feather
-	// Talon.DisplayName: Talon
-	// DashingFeather.DisplayName: Dashing Feather
-	// SpeedingFeather.DisplayName: Speeding Feather
-	// YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -654,7 +648,7 @@ Items: {
 		Tooltip:
 			'''
 			获得一次快速且无敌的冲刺，但需要冷却
-			冲刺会给予1/3秒无敌并有10秒冷却
+			冲刺会给予1/3秒无敌并有5秒冷却
 			双击左键或右键以进行冲刺
 			每额外拥有一件会降低冲刺冷却
 			'''
@@ -1104,7 +1098,6 @@ NPCs: {
 	MoonLordHead.DisplayName: 月亮领主眼
 	TrueServant.DisplayName: 真·克苏鲁之仆
 	TrueBrain.DisplayName: 真·克苏鲁之脑
-	// Mallet.DisplayName: Mallet
 	// Being.DisplayName: Being
 }
 
