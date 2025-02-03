@@ -107,7 +107,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             rumbleSlot = SoundEngine.PlaySound(SoundID.DD2_EtherianPortalIdleLoop with { Volume = 0.03f, PitchVariance = 0f, Pitch = 0.8f }, NPC.Center);
 
             NPC.Opacity = 0;
-            NPC.immortal = NPC.dontTakeDamage = !TerRoguelikeWorld.escape;
+            NPC.immortal = NPC.dontTakeDamage = true;
             currentFrame = 0;
             NPC.localAI[0] = -(cutsceneDuration + 30);
             NPC.direction = -1;
