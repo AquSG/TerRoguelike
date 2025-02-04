@@ -3,7 +3,7 @@ DeathKilledBy: Ucciso da:
 DeathItems: Oggetti:
 DeathMainMenu: Menu Principale
 DeathQuickRestart: Riavvio Rapido
-// DeathLoop: Loop:
+DeathLoop: Ciclo:
 BlockedAlert: bloccato!
 HealthUpAlert: Incremento Salute!
 BarrierName: Barriera
@@ -12,7 +12,7 @@ CreditDirector: Direttore
 CreditProgramming: Programmatori
 CreditExternalCode: Codice Esterno
 CreditRoomBuilding: Creatori delle Stanze
-CreditSpriting: Accelerare
+CreditSpriting: Artisti
 CreditExternalAssets: Risorse Esterne
 CreditMusic: Musica
 CreditTesting: Tester
@@ -31,16 +31,16 @@ FullMoonDescription: L'esperienza prevista di TerRoguelike
 BloodMoonName: Luna di Sangue
 BloodMoonDescription1: Aumenta un pò la difficoltà
 BloodMoonDescription2: Diminuisce il tempo di invincibilità, i boss attaccano più spesso
-// SunnyDayName: Sunny Day
-// SunnyDayDescription1: For when it's really needed
-// SunnyDayDescription2: Greater New Moon effects, reduced boss health, more movement speed when the time is right
-// RuinedMoonName: Ruined Moon
-// RuinedMoonDescription1: Where fun goes to die
-// RuinedMoonDescription2: Do not play this, seriously
-// EliteTainted: "Tainted "
-// EliteSlugged: "Slugged "
-// EliteBurdened: "Burdened "
-// TrashDescription: On Tuesdays from 10PM to 11PM, +1 bounce for main projectiles
+SunnyDayName: Giornata di Sole
+SunnyDayDescription1: Per quando ce n'è davvero bisogno
+SunnyDayDescription2: Effetti potenziati della Luna Nuova, vita dei boss ridottta, maggiore velocità di moviemento quando è il momento giusto
+RuinedMoonName: Luna Rovinata
+RuinedMoonDescription1: Dove il divertimento va a morire
+RuinedMoonDescription2: Non giocare questa, seriamente
+EliteTainted: "Corrotto "
+EliteSlugged: "Violento "
+EliteBurdened: "Gravato "
+TrashDescription: Nei martedì, tra le 10 e le 11 di sera, +1 rimbalzo ad i proiettili principali
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Granata Appiccicosa
@@ -150,8 +150,8 @@ Projectiles: {
 	AdaptiveDaggerHoldout.DisplayName: Impugnare Pugnale Adattivo
 	AdaptiveDaggerStab.DisplayName: Pugnalare Pugnale Adattivo
 	AdaptiveRifleHoldout.DisplayName: Impugnare Fucile Adattivo
-	// FalseSunBeam.DisplayName: False Sun Beam
-	// ResidualBurden.DisplayName: Residual Burden
+	FalseSunBeam.DisplayName: Fascio del Falso Sole
+	ResidualBurden.DisplayName: Fardello Residuo
 }
 
 Items: {
@@ -521,7 +521,7 @@ Items: {
 		DisplayName: Pietra Sgombrante
 		Tooltip:
 			'''
-			Aumento del 25% della velocità di movimento dopo non attaccato per 1 secondo
+			Aumento del 25% della velocità di movimento dopo non aver attaccato per 1 secondo
 			Ogni copie extra dell'oggetto aumentano il bonus di velocità del 25%
 			'''
 	}
@@ -699,7 +699,7 @@ Items: {
 		DisplayName: Scudo Porta Gigante
 		Tooltip:
 			'''
-			+100 RD alla salute della barriera
+			+100 RD che hanno effetto solo sulla salute della barriera
 			Ogni copie extra dell'oggetto aumentano la RD di +100
 			'''
 	}
@@ -978,26 +978,26 @@ Items: {
 	}
 
 	TheFalseSun: {
-		DisplayName: Il Sole Falso
+		DisplayName: Il Falso Sole
 		Tooltip:
 			'''
 			Aumenta la probabilità di colpi critici del 5%
 			Infliggere un colpo critico su un nemico fa accumulare energia solare che decade nel tempo
 			Il danno e gittata del sole sono in rapporto con la quantità di energia solare presente
-			Il sole falso può colpire 3 nemici vicini ad esso infliggendo fino a 75 danni base
-			I colpi critici dal sole falso stesso non creano energia solare
+			Il falso sole può colpire 3 nemici vicini ad esso infliggendo fino a 75 danni base
+			I colpi critici dal falso sole stesso non creano energia solare
 			Ogni copie extra dell'oggetto aumentano il danno base di 75
 			'''
 	}
 
 	PuppeteersHand: {
-		// DisplayName: Puppeteers Hand
-		/* Tooltip:
+		DisplayName: Mano del Burattinaio
+		Tooltip:
 			'''
-			Enemies have a 40% chance to be resurrected as an allied ghost on kill
-			Ghosts have 3x base damage, and live for up to 2 minutes
-			Extra copies of this item increase ghost max life and damage by 100%
-			''' */
+			I nemici hanno una probabilità del 40% di essere risorti come fantasmi alleati quando vengono uccisi
+			I fantasmi hanno il 3x dei danni base e vivono fino a 2 minuti
+			Copie extra di questo oggetto aumentono del 100% la vita massima ed il danno del fantasma 
+			'''
 	}
 }
 
@@ -1098,7 +1098,7 @@ NPCs: {
 	MoonLordHead.DisplayName: Occhio del Signore della Luna
 	TrueServant.DisplayName: Vero Servo di Cthulhu
 	TrueBrain.DisplayName: Vero Cervello di Cthulhu
-	// Being.DisplayName: Being
+	Being.DisplayName: Essere
 }
 
 ItemBasin.DisplayName: Fontana degli Oggetti
@@ -1140,8 +1140,8 @@ Configs: {
 			Label: Cancella Permanentemente File dei Personaggi e Mondi
 			Tooltip:
 				'''
-				Se abilitatà, tutti i personaggi ed i mondo usati mentre si gioca con TerRogueLike sono cancellati permanentemente.
-				Se disabilitatà, tutti i personaggi ed i mondo usati mentre si gioca con TerRogueLike sono mandati nel cestino.
+				Se abilitatà, tutti i personaggi ed i mondi usati mentre si gioca con TerRogueLike sono cancellati permanentemente.
+				Se disabilitatà, tutti i personaggi ed i mondi usati mentre si gioca con TerRogueLike sono mandati nel cestino.
 				'''
 		}
 
@@ -1158,8 +1158,8 @@ Configs: {
 
 Buffs: {
 	Retribution: {
-		// DisplayName: Retribution
-		// Description: No recovery
+		DisplayName: Retribuzione
+		Description: Niente recupero
 	}
 }
 
@@ -1168,59 +1168,59 @@ Buffs: {
 // 2 newlines = new textbox
 // 3 newlines = close textbox and an 'event' happens
 // @ = computer username
-/* DialogueKillAll:
+DialogueKillAll:
 	'''
 	...
 
-	So, you made it.
+	Quindi ce l'hai fatta.
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
+	Sei sorpreso?
+	O questo è esattamente
+	quello che ti aspettavi?
 
-	Your actions make
-	it clear that you
-	knew about... this.
-
-
-	The pursuit for 
-	more "content"...
-
-	A desire that many
-	cannot resist, once
-	it is known about.
-
-	But your position
-	does not justify
-	your actions.
-
-	Your excuses do not
-	justify your
-	actions.
+	Le tue azioni rendono
+	chiaro che tu
+	sapessi di... questo.
 
 
-	Judgement will soon
-	fall upon others
-	who walk in your
-	footsteps.
+	La ricerca di 
+	più "contenuto"...
 
-	The tools to
-	take down those
-	such as you, do not
-	yet exist.
+	Un desiderio a cui molti
+	non possono resistere, una volta
+	che diventa conosciuto.
 
-	...but one day,
-	they will.
+	Ma la tua posizione
+	non giustifica
+	le tue azioni.
 
-	In another time,
-	you will be back
-	here... for your
-	"content".
+	Le tue scuse non
+	giustificano le tue
+	azioni.
 
-	I know you will.
 
-	Until then...
+	Giudizio ricadrà
+	presto su coloro
+	che seguiranno il tuo
+	stesso cammino.
 
-	We'll meet again,
+	Gli strumenti per
+	abbattere quelli
+	come te, ancora
+	non esistono.
+
+	...ma un giorno,
+	ci saranno.
+
+	Un'altra volta,
+	tu tornerai
+	qui... per il tuo
+	"contenuto".
+
+	So che lo farai.
+
+	Fino ad allora...
+
+	Ci rincontreremo,
 	@.
-	''' */
+	''' 
