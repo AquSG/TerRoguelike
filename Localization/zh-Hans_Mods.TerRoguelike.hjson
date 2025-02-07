@@ -970,7 +970,7 @@ Items: {
 		DisplayName: 月之赌约
 		Tooltip:
 			'''
-			一件秘宝，被一张早已被时间遗忘的面孔草草藏匿在本就神秘的月亮圣殿中
+			一件秘宝，被一张早已被时间遗忘的面孔草草藏匿在本就隐秘的月亮圣殿中
 			给予你在击败月亮领主后，回溯到地牢入口的机会
 			回溯允许你重新征战地牢，在保留你已有的物品的情况下，找到更多物品
 			然而，敌人也会随着你的深入逐层变得更加强大
@@ -987,17 +987,17 @@ Items: {
 			虚伪之阳能够迅速攻击附近的3名敌怪，造成至多75基础伤害
 			来自虚伪之阳自身的暴击不会积攒不断流失的太阳能量
 			每额外拥有一件会将基础伤害提升75
-			''' 
+			'''
 	}
 
 	PuppeteersHand: {
 		DisplayName: 提线之手
-		/Tooltip:
+		Tooltip:
 			'''
 			在击倒敌怪时，有40%的几率将其复生为鬼魂，并为你而战
 			鬼魂造成3倍基础伤害，至多存在2分钟
 			每额外拥有一件会翻倍鬼魂的最大生命值和伤害
-			''' 
+			'''
 	}
 }
 
@@ -1168,59 +1168,59 @@ Buffs: {
 // 2 newlines = new textbox
 // 3 newlines = close textbox and an 'event' happens
 // @ = computer username
-/* DialogueKillAll:
+DialogueKillAll:
 	'''
-	...
+	……
 
-	So, you made it.
+	所以，你成功了
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
+	你对此很惊讶吗？
+	还是说，这就是
+	你所期望之物？
 
-	Your actions make
-	it clear that you
-	knew about... this.
-
-
-	The pursuit for 
-	more "content"...
-
-	A desire that many
-	cannot resist, once
-	it is known about.
-
-	But your position
-	does not justify
-	your actions.
-
-	Your excuses do not
-	justify your
-	actions.
+	显然，你的行为已经
+	证明你知道……
+	所有这些
 
 
-	Judgement will soon
-	fall upon others
-	who walk in your
-	footsteps.
+	对更多“内容”
+	无止境的追求
 
-	The tools to
-	take down those
-	such as you, do not
-	yet exist.
+	一种无尽的渴望
+	一旦为人所知晓
+	无数人难以抵抗
 
-	...but one day,
-	they will.
+	但你的地位
+	并不能
+	正当化你的行为
 
-	In another time,
-	you will be back
-	here... for your
-	"content".
+	你的借口
+	亦无法
+	正当化你的行为
 
-	I know you will.
 
-	Until then...
+	很快，
+	审判就会降临在
+	哪些妄图追随
+	你的步伐之人身上
 
-	We'll meet again,
+	能够将你这种
+	贪得无厌之人
+	斩于马下的工具
+	还不存在
+
+	……但总有一天
+	会出现的
+
+	在另一个时间，
+	你会回到这里……
+	为了你的
+	“内容”
+
+	我知道你会的
+
+	到了那时……
+
+	我们再相会吧
 	@.
-	''' */
+	'''
