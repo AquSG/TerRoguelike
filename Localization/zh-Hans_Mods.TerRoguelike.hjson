@@ -31,13 +31,13 @@ FullMoonDescription: 预期的TerRoguelike之旅
 BloodMoonName: 血月
 BloodMoonDescription1: 火力全开
 BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
-SunnyDayName: Sunny Day
-SunnyDayDescription1: For when it's really needed
+SunnyDayName: 暖阳
+SunnyDayDescription1: 如果真有这个必要
 SunnyDayDescription2: 更强的新月效果，Boss生命值降低，时机合适时提升移动速度
-RuinedMoonName: Ruined Moon
-RuinedMoonDescription1: Where fun goes to die
-RuinedMoonDescription2: 别玩这个，求你了
 EliteTainted: "Tainted "
+RuinedMoonName: 裂月
+RuinedMoonDescription1: 当好玩变成好似
+RuinedMoonDescription2: 别玩这个，真别玩
 EliteSlugged: "Slugged "
 EliteBurdened: "Burdened "
 TrashDescription: 在周二的晚上10到11点，主射弹获得一次额外的弹跳次数
@@ -987,17 +987,17 @@ Items: {
 			虚伪之阳能够迅速攻击附近的3名敌怪，造成至多75基础伤害
 			来自虚伪之阳自身的暴击不会积攒不断流失的太阳能量
 			每额外拥有一件会将基础伤害提升75
-			''' 
+			'''
 	}
 
 	PuppeteersHand: {
 		DisplayName: 提线之手
-		/Tooltip:
+		/* Tooltip:
 			'''
-			在击倒敌怪时，有40%的几率将其复生为鬼魂，并为你而战
-			鬼魂造成3倍基础伤害，至多存在2分钟
-			每额外拥有一件会翻倍鬼魂的最大生命值和伤害
-			''' 
+			Enemies have a 40% chance to be resurrected as an allied ghost on kill
+			Ghosts have 3x base damage, and live for up to 2 minutes
+			Extra copies of this item increase ghost max life and damage by 100%
+			''' */
 	}
 }
 
