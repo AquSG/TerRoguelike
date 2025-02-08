@@ -1356,7 +1356,7 @@ namespace TerRoguelike.NPCs
                     else if (canSeeTarget)
                         npc.velocity += (target.Center - npc.Center).SafeNormalize(Vector2.UnitY) * acceleration;
                     else
-                        npc.velocity += new Vector2(1 * acceleration * (npc.velocity.X == 0 ? 1 : Math.Sign(npc.velocity.X)), 0);
+                        npc.velocity += new Vector2(1 * acceleration * (npc.velocity.X == 0 ? (Main.rand.NextBool() ? -1 : 1) : Math.Sign(npc.velocity.X)), 0);
                 }
                 if (npc.velocity.Length() > maxVelocity)
                 {
@@ -1387,7 +1387,7 @@ namespace TerRoguelike.NPCs
                     int proj = Projectile.NewProjectile(npc.GetSource_FromThis(), npc.Center, projVelocity, projType, projDamage, 0f);
                 }
 
-                npc.velocity.X += (npc.velocity.X == 0 ? 1 : Math.Sign(npc.velocity.X)) * acceleration;
+                npc.velocity.X += (npc.velocity.X == 0 ? (Main.rand.NextBool() ? 1 : -1) : Math.Sign(npc.velocity.X)) * acceleration;
                 npc.velocity.Y += Main.rand.NextFloat(-acceleration / 2f, acceleration / 2f);
 
                 if (npc.velocity.Length() > maxVelocity)
