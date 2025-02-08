@@ -3,7 +3,7 @@ DeathKilledBy: 凶手：
 DeathItems: 物品：
 DeathMainMenu: 主菜单
 DeathQuickRestart: 重新开始
-// DeathLoop: Loop:
+DeathLoop: 回溯：
 BlockedAlert: 格挡！
 HealthUpAlert: 生命值提升！
 BarrierName: 屏障
@@ -31,16 +31,16 @@ FullMoonDescription: 预期的TerRoguelike之旅
 BloodMoonName: 血月
 BloodMoonDescription1: 火力全开
 BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
-// SunnyDayName: Sunny Day
-// SunnyDayDescription1: For when it's really needed
-// SunnyDayDescription2: Greater New Moon effects, reduced boss health, more movement speed when the time is right
-// RuinedMoonName: Ruined Moon
-// RuinedMoonDescription1: Where fun goes to die
-// RuinedMoonDescription2: Do not play this, seriously
-// EliteTainted: "Tainted "
-// EliteSlugged: "Slugged "
-// EliteBurdened: "Burdened "
-// TrashDescription: On Tuesdays from 10PM to 11PM, +1 bounce for main projectiles
+SunnyDayName: 暖阳
+SunnyDayDescription1: 如果真有这个必要
+SunnyDayDescription2: 更强的新月效果，Boss生命值降低，时机合适时提升移动速度
+RuinedMoonName: 裂月
+RuinedMoonDescription1: 当好玩变成好似
+RuinedMoonDescription2: 别玩这个，真别玩
+EliteTainted: "染魔 "
+EliteSlugged: "滞钝 "
+EliteBurdened: "障蔽 "
+TrashDescription: 在周二的晚上10到11点，主射弹获得一次额外的弹跳次数
 
 Projectiles: {
 	ClingyGrenade.DisplayName: 粘性手雷
@@ -150,8 +150,8 @@ Projectiles: {
 	AdaptiveDaggerHoldout.DisplayName: 匕首握持
 	AdaptiveDaggerStab.DisplayName: 匕首刺击
 	AdaptiveRifleHoldout.DisplayName: 来福枪握持
-	// FalseSunBeam.DisplayName: False Sun Beam
-	// ResidualBurden.DisplayName: Residual Burden
+	FalseSunBeam.DisplayName: 虚伪之阳射线
+	ResidualBurden.DisplayName: 障蔽毒雾
 }
 
 Items: {
@@ -511,7 +511,7 @@ Items: {
 			'''
 			攻击时最多储存4把匕首
 			停止攻击会释放所有储存的匕首
-			匕首会追踪敌怪，击中时造成100点基础伤害并施加流血
+			匕首会追踪敌怪，在墙壁上滑行，击中时造成100点基础伤害并施加流血
 			流血在一段时间内造成120点基础伤害，并可以通过再次施加流血提升
 			每额外拥有一件会使匕首储存更快并使储存的最大匕首数增加1
 			'''
@@ -967,37 +967,37 @@ Items: {
 	}
 
 	LunarGambit: {
-		// DisplayName: Lunar Gambit
-		/* Tooltip:
+		DisplayName: 月之赌约
+		Tooltip:
 			'''
-			A secret trinket, hidden hastily inside the already veiled Lunar Sanctuary, by a face long lost to time
-			Grants the opportunity to loop back to the beginning of the dungeon after defeating the Moon Lord
-			Looping allows you to fight through the dungeon again, finding more items, while keeping all of your old items
-			However, enemies continue to get stronger every floor as well
-			''' */
+			一件秘宝，被一张早已被时间遗忘的面孔草草藏匿在本就隐秘的月亮圣殿中
+			给予你在击败月亮领主后，回溯到地牢入口的机会
+			回溯允许你重新征战地牢，在保留你已有的物品的情况下，找到更多物品
+			然而，敌人也会随着你的深入逐层变得更加强大
+			'''
 	}
 
 	TheFalseSun: {
-		// DisplayName: The False Sun
-		/* Tooltip:
+		DisplayName: 虚伪之阳
+		Tooltip:
 			'''
-			5% increased critical strike chance
-			Critically striking an enemy builds up decaying sun energy
-			Sun damage and range scales with the amount of sun energy
-			The false sun can rapidly hit 3 nearby enemies for up to 75 base damage
-			Critical strikes from the false sun itself do not build up decaying sun energy
-			Extra copies of this item increase the base damage by 75
-			''' */
+			增加5%暴击率
+			暴击会积攒不断流失的太阳能量
+			太阳的伤害和射程随着能量的积攒而提升
+			虚伪之阳能够迅速攻击附近的3名敌怪，造成至多75基础伤害
+			来自虚伪之阳自身的暴击不会积攒不断流失的太阳能量
+			每额外拥有一件会将基础伤害提升75
+			'''
 	}
 
 	PuppeteersHand: {
-		// DisplayName: Puppeteers Hand
-		/* Tooltip:
+		DisplayName: 提线之手
+		Tooltip:
 			'''
-			Enemies have a 40% chance to be resurrected as an allied ghost on kill
-			Ghosts have 3x base damage, and live for up to 2 minutes
-			Extra copies of this item increase ghost max life and damage by 100%
-			''' */
+			在击倒敌怪时，有40%的几率将其复生为鬼魂，并为你而战
+			鬼魂造成3倍基础伤害，至多存在2分钟
+			每额外拥有一件会翻倍鬼魂的最大生命值和伤害
+			'''
 	}
 }
 
@@ -1098,7 +1098,7 @@ NPCs: {
 	MoonLordHead.DisplayName: 月亮领主眼
 	TrueServant.DisplayName: 真·克苏鲁之仆
 	TrueBrain.DisplayName: 真·克苏鲁之脑
-	// Being.DisplayName: Being
+	Being.DisplayName: 存在
 }
 
 ItemBasin.DisplayName: 物品火盆
@@ -1158,8 +1158,8 @@ Configs: {
 
 Buffs: {
 	Retribution: {
-		// DisplayName: Retribution
-		// Description: No recovery
+		DisplayName: 报应
+		Description: 万劫不复
 	}
 }
 
@@ -1168,59 +1168,59 @@ Buffs: {
 // 2 newlines = new textbox
 // 3 newlines = close textbox and an 'event' happens
 // @ = computer username
-/* DialogueKillAll:
+DialogueKillAll:
 	'''
-	...
+	……
 
-	So, you made it.
+	所以，你成功了
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
+	你对此很惊讶吗？
+	还是说，这就是
+	你所期望之物？
 
-	Your actions make
-	it clear that you
-	knew about... this.
-
-
-	The pursuit for 
-	more "content"...
-
-	A desire that many
-	cannot resist, once
-	it is known about.
-
-	But your position
-	does not justify
-	your actions.
-
-	Your excuses do not
-	justify your
-	actions.
+	显然，你的行为已经
+	证明你知道……
+	所有这些
 
 
-	Judgement will soon
-	fall upon others
-	who walk in your
-	footsteps.
+	对更多“内容”
+	无止境的追求
 
-	The tools to
-	take down those
-	such as you, do not
-	yet exist.
+	一种无尽的渴望
+	一旦为人所知晓
+	无数人难以抵抗
 
-	...but one day,
-	they will.
+	但你的地位
+	并不能
+	正当化你的行为
 
-	In another time,
-	you will be back
-	here... for your
-	"content".
+	你的借口
+	亦无法
+	正当化你的行为
 
-	I know you will.
 
-	Until then...
+	很快，
+	审判就会降临在
+	哪些妄图追随
+	你的步伐之人身上
 
-	We'll meet again,
+	能够将你这种
+	贪得无厌之人
+	斩于马下的工具
+	还不存在
+
+	……但总有一天
+	会出现的
+
+	在另一个时间，
+	你会回到这里……
+	为了你的
+	“内容”
+
+	我知道你会的
+
+	到了那时……
+
+	我们再相会吧
 	@.
-	''' */
+	'''
