@@ -34,12 +34,12 @@ BloodMoonDescription2: 减少受伤后的无敌时间，Boss攻击更频繁
 SunnyDayName: 暖阳
 SunnyDayDescription1: 如果真有这个必要
 SunnyDayDescription2: 更强的新月效果，Boss生命值降低，时机合适时提升移动速度
-EliteTainted: "Tainted "
 RuinedMoonName: 裂月
 RuinedMoonDescription1: 当好玩变成好似
 RuinedMoonDescription2: 别玩这个，真别玩
-EliteSlugged: "Slugged "
-EliteBurdened: "Burdened "
+EliteTainted: "染魔 "
+EliteSlugged: "滞钝 "
+EliteBurdened: "障蔽 "
 TrashDescription: 在周二的晚上10到11点，主射弹获得一次额外的弹跳次数
 
 Projectiles: {
@@ -151,7 +151,7 @@ Projectiles: {
 	AdaptiveDaggerStab.DisplayName: 匕首刺击
 	AdaptiveRifleHoldout.DisplayName: 来福枪握持
 	FalseSunBeam.DisplayName: 虚伪之阳射线
-	ResidualBurden.DisplayName: Residual Burden
+	ResidualBurden.DisplayName: 障蔽毒雾
 }
 
 Items: {
