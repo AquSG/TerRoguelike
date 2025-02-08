@@ -348,7 +348,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             }
                             if (speechChar != ' ' && speechChar != '\n')
                             {
-                                if (speechChar == '.' || speechChar == '?' || speechChar == ',' || speechChar == '!')
+                                if (speechChar == '.' || speechChar == '?' || speechChar == ',' || speechChar == '!' || speechChar == '？' || speechChar == '…' || speechChar == '，')
                                     textProgressPause += 9;
 
                                 PlayTalkSound();
