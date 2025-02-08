@@ -265,9 +265,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (!allow)
             {
-                //TODO: re-enable this before release
-                //NPC.active = false;
-                //return;
+                NPC.active = false;
+                return;
             }
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
