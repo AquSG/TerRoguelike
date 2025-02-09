@@ -695,6 +695,8 @@ namespace TerRoguelike.Managers
                 return;
             if (IsSanctuary)
                 return;
+            if (IsPillarRoom && TerRoguelikeWorld.escape)
+                return;
 
             if (IsBossRoom && TerRoguelikeWorld.escape && FloorID[AssociatedFloor].jstcProgress < Floor.JstcProgress.Boss)
             {
