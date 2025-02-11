@@ -3,7 +3,7 @@ DeathKilledBy: Убийца:
 DeathItems: Предметы:
 DeathMainMenu: Главное меню
 DeathQuickRestart: Быстрый перезапуск
-DeathLoop: Повторов:
+DeathLoop: Циклов:
 BlockedAlert: блокировано!
 HealthUpAlert: Плюс здоровье!
 BarrierName: Барьер
@@ -38,7 +38,7 @@ RuinedMoonName: Павшая луна
 RuinedMoonDescription1: Мы похороним ваше веселье
 RuinedMoonDescription2: Серьёзно, не играйте с этим режимом
 EliteTainted: "Порченный "
-EliteSlugged: "Замедленный "
+EliteSlugged: "Замедляющий "
 EliteBurdened: "Бренный "
 TrashDescription: По вторникам с 10 до 11 вечера, +1 отскок к основным снарядам
 
@@ -185,7 +185,7 @@ Items: {
 	}
 
 	EvilEye: {
-		DisplayName: Глаз зла
+		DisplayName: Злой глаз
 		Tooltip:
 			'''
 			Увеличивает шанс критического удара на 5%
@@ -263,7 +263,7 @@ Items: {
 	}
 
 	EnchantingEye: {
-		DisplayName: Глаз зачарования
+		DisplayName: Зачарованный глаз
 		Tooltip:
 			'''
 			Увеличивает шанс критического удара на 5%
