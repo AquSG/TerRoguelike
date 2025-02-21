@@ -1750,6 +1750,8 @@ namespace TerRoguelike.TerPlayer
             if (jstcTeleportTime > 0)
             {
                 Player.tongued = true;
+                Player.GetJumpState(ExtraJump.CloudInABottle).Available = false;
+                timesDoubleJumped = int.MaxValue;
             }
 
             if (Player.pulley && TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -1931,9 +1933,7 @@ namespace TerRoguelike.TerPlayer
                     Vector2 targetPos = modtarget.Segments.Count > 0 ? modtarget.Segments[modtarget.hitSegment].Position : target.Center;
                     Vector2 direction = (proj.Center - targetPos).SafeNormalize(Vector2.UnitY);
                     Vector2 spawnPosition = (direction * radius) + (targetPos);
-                    int damage = (int)(hit.Damage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
-                    if (hit.Crit)
-                        damage /= 2;
+                    int damage = (int)(proj.damage * 1.5f);
 
                     int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, Vector2.Zero, ModContent.ProjectileType<StuckClingyGrenade>(), damage, 0f, proj.owner, target.whoAmI);
                     TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].ModProj();
@@ -1959,10 +1959,8 @@ namespace TerRoguelike.TerPlayer
                 float chance = 0.1f * burningCharcoal;
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
-                    int internalHitDamage = hit.Damage;
-                    if (hit.Crit)
-                        internalHitDamage /= 2;
-                    int igniteDamage = (int)(internalHitDamage * 1.5f / target.ModNPC().effectiveDamageTakenMulti);
+                    int internalHitDamage = proj.damage;
+                    int igniteDamage = (int)(internalHitDamage * 1.5f);
                     int burnCap = Math.Max(Math.Min(igniteDamage / 6, 50), 1);
                     modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
                     Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
@@ -2000,9 +1998,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     Vector2 spawnPosition = Main.player[proj.owner].Top;
                     Vector2 direction = -Vector2.UnitY;
-                    int damage = (int)(hit.Damage * 3f * lockOnMissile / target.ModNPC().effectiveDamageTakenMulti);
-                    if (hit.Crit)
-                        damage /= 2;
+                    int damage = (int)(proj.damage * 3f * lockOnMissile);
 
                     int spawnedProjectile = Projectile.NewProjectile(proj.GetSource_FromThis(), spawnPosition, direction * 2.2f, ModContent.ProjectileType<Missile>(), damage, 0f, proj.owner, target.whoAmI);
                     TerRoguelikeGlobalProjectile spawnedModProj = Main.projectile[spawnedProjectile].ModProj();

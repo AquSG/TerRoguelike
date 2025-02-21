@@ -1069,6 +1069,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.active = true;
             ableToHit = false;
             canBeHit = false;
+            modNPC.CleanseDebuffs();
 
             if (deadTime == 0)
             {
@@ -1081,9 +1082,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
-                modNPC.ignitedStacks.Clear();
-                modNPC.bleedingStacks.Clear();
-                modNPC.ballAndChainSlow = 0;
 
                 if (modNPC.isRoomNPC)
                 {
