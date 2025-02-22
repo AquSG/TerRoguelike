@@ -124,7 +124,7 @@ namespace TerRoguelike.Projectiles
                             60, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.97f, 50));
                     }
                 }
-                if (i % 2 == 0 && Projectile.timeLeft % 1 == 0 && !specialOldDead[i] && i > 0)
+                if (!TerRoguelike.lowDetail && i % 2 == 0 && Projectile.timeLeft % 1 == 0 && !specialOldDead[i] && i > 0)
                 {
                     Vector2 particlePos = specialOldPos[i];
                     float rot = (specialOldPos[i - 1] - specialOldPos[i]).ToRotation();

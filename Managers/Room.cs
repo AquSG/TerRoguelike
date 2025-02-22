@@ -691,6 +691,8 @@ namespace TerRoguelike.Managers
         }
         public virtual void OnEnter()
         {
+            if (!active)
+                return;
             if (IsStartRoom && !IsBossRoom)
                 return;
             if (IsSanctuary)
@@ -757,7 +759,7 @@ namespace TerRoguelike.Managers
                 int healTime = (int)(1500 * (4 / (float)(totalAutomaticDefibrillator + 4)));
                 if (healTime <= 0)
                     healTime = 1;
-                if (roomTime % healTime == 0 && roomTime > 0)
+                if (roomTime % healTime == 0 && roomTime > 0 && !(IsStartRoom && IsBossRoom && CutsceneSystem.cutsceneActive))
                 {
                     RoomSystem.healingPulses.Add(new HealingPulse(roomCenter));
                 }

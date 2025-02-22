@@ -47,9 +47,10 @@ namespace TerRoguelike.Projectiles
             float rot = Projectile.velocity.ToRotation();
             Vector2 step = -Projectile.velocity / 5;
             Vector2 off = Projectile.velocity;
-            for (int i = 0; i < 5; i++)
+            int count = TerRoguelike.lowDetail ? Main.rand.Next(1, 3) : 5;
+            for (int i = 0; i < count; i++)
             {
-                if (Main.rand.NextBool(3))
+                if (!TerRoguelike.lowDetail && Main.rand.NextBool(3))
                     continue;
 
                 Vector2 position = Main.rand.NextVector2FromRectangle(Projectile.getRect());

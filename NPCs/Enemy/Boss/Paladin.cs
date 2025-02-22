@@ -199,7 +199,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Charge.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (NPC.ai[1] == 0 || (RuinedMoonActive && NPC.ai[1] < chargeTelegraph))
                 {
                     if (target != null)
                     {
@@ -256,19 +256,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             Gore g = Gore.NewGorePerfect(NPC.GetSource_FromThis(), NPC.Center + new Vector2(16 * Math.Sign(NPC.oldVelocity.X), -16 - 16 * i), new Vector2(Main.rand.NextFloat(-1.2f, -0.7f) * Math.Sign(NPC.oldVelocity.X), Main.rand.NextFloat(-0.08f, 0.08f)), goreid);
                         }
 
-                        NPC.ai[1] += 2;
-                        NPC.velocity.X = -chargeSpeed * NPC.direction * 0.55f;
-                        NPC.velocity.Y = -chargeSpeed * 0.4f;
-
                         bool ruin = RuinedMoonActive;
                         int spawnCount = ruin ? 48 : 12;
+                        Vector2 basePos = NPC.Center;
+                        var room = modNPC.GetParentRoom();
+                        if (room != null)
+                        {
+                            basePos.X = room.RoomPosition16.X + (room.RoomDimensions16.X * 0.5f) + (room.RoomDimensions16.X * 0.5f * NPC.direction);
+                            basePos.Y = room.RoomPosition16.Y + room.RoomDimensions16.Y;
+                        }
                         for (int i = 0; i < spawnCount; i++)
                         {
                             Point tilePos = Point.Zero;
                             int valid = -1;
                             for (int j = 0; j < 5; j++)
                             {
-                                tilePos = (NPC.Center + new Vector2(Main.rand.NextFloat(ruin ? -1800 : -800, 60) * NPC.direction, -480)).ToTileCoordinates();
+                                tilePos = (basePos + new Vector2(Main.rand.NextFloat(ruin ? -1800 : -800, 60) * NPC.direction, -480)).ToTileCoordinates();
                                 Tile tile = ParanoidTileRetrieval(tilePos.X, tilePos.Y);
                                 if (!tile.IsTileSolidGround(true))
                                     continue;
@@ -290,11 +293,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
                             }
                         }
+
+                        if (ruin && NPC.ai[3] < 2)
+                        {
+                            NPC.velocity.X = -NPC.oldVelocity.X;
+                            NPC.spriteDirection = NPC.direction *= -1;
+                            NPC.ai[3]++;
+                        }
+                        else
+                        {
+                            NPC.ai[1] += 2;
+                            NPC.velocity.X = -chargeSpeed * NPC.direction * 0.55f;
+                            NPC.velocity.Y = -chargeSpeed * 0.4f;
+                            NPC.ai[3] = 0;
+                        }
                     }
                     else
                     {
-                        NPC.velocity.X = chargeSpeed * NPC.direction;
-                        if ((int)NPC.localAI[0] % 9 == 0)
+                        NPC.velocity.X = (chargeSpeed * (1 + (0.2f * NPC.ai[3]))) * NPC.direction;
+                        if ((int)NPC.localAI[0] % 9 == 0 && NPC.localAI[1] < 10)
                         {
                             SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.7f, Pitch = -0.1f, MaxInstances = 8 }, NPC.Center);
                             SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.10f, Pitch = -0.9f, PitchVariance = 0.08f, MaxInstances = 8 }, NPC.Center);
@@ -561,9 +578,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (target != null)
             {
-                if (NPC.ai[0] == None.Id && NPC.ai[1] < None.Duration - 60)
+                if ((NPC.ai[0] == None.Id && NPC.ai[1] < None.Duration - 60) || (RuinedMoonActive && NPC.ai[1] >= chargeTelegraph && NPC.ai[1] <= chargeTelegraph + 1 && Math.Sign(target.Center.X - NPC.Center.X) == NPC.direction))
                 {
-                    if (NPC.velocity.Y == 0f && target.Bottom.Y < NPC.Top.Y && Math.Abs(NPC.Center.X - target.Center.X) < (float)(target.width * 3) && Collision.CanHit(NPC, target))
+                    float width = 3;
+                    if (RuinedMoonActive && NPC.ai[0] != None.Id)
+                    {
+                        width = 6;
+                        if (target.Top.Y > NPC.Bottom.Y)
+                        {
+                            NPC.GravityMultiplier *= 4;
+                        }
+                    }
+                    if (NPC.velocity.Y == 0f && target.Bottom.Y < NPC.Top.Y && Math.Abs(NPC.Center.X - target.Center.X) < (float)(target.width * width) && Collision.CanHit(NPC, target))
                     {
                         if (NPC.velocity.Y == 0f)
                         {
@@ -678,6 +704,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     break;
                 }
             }
+
             NPC.ai[0] = chosenAttack;
         }
         public override bool? CanFallThroughPlatforms()
@@ -913,6 +940,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     else if (NPC.ai[1] >= chargeTelegraph && NPC.ai[1] <= chargeTelegraph + 1)
                     {
                         currentFrame = ((int)NPC.frameCounter % (frameCount - 9)) + 2;
+                        if (NPC.localAI[1] >= 10)
+                            currentFrame = 1;
                     }
                     else
                     {

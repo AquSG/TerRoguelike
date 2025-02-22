@@ -192,7 +192,7 @@ Items: {
 			Critically striking an enemy grants a stackable attack speed buff
 			Each stack lasts 3 seconds and grants 10% increased attack speed
 			However, the amount of stacks is capped at 5
-			Extra copies of this item increase the stack cap by 2, and increase the attack speed bonus by 10%
+			Extra copies of this item increase the stack cap by 1, and increase the attack speed bonus by 5%
 			'''
 	}
 
@@ -329,8 +329,8 @@ Items: {
 		DisplayName: Antique Lens
 		Tooltip:
 			'''
-			10% increased main attack size
-			Extra copies of this item also grant 10% increased main attack size
+			15% increased main attack size
+			Extra copies of this item also grant 15% increased main attack size
 			'''
 	}
 
