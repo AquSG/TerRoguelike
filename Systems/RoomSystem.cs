@@ -484,6 +484,34 @@ namespace TerRoguelike.Systems
 
             ParticleManager.DrawParticles_AfterEverything();
 
+            Rectangle cameraRect = new Rectangle((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
+            cameraRect.Inflate((int)(cameraRect.Height * -0.1f), (int)(cameraRect.Height * -0.1f));
+            StartVanillaSpritebatch(false);
+            foreach (NPC npc in Main.ActiveNPCs)
+            {
+                var modNPC = npc.ModNPC();
+                if (modNPC == null)
+                    continue;
+
+                if (modNPC.isRoomNPC && modNPC.sourceRoomListID >= 0)
+                {
+                    if (!Main.hideUI && !modNPC.hostileTurnedAlly && modNPC.overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
+                    {
+                        Texture2D arrowTex = TexDict["YellowArrow"];
+                        float opacity = MathHelper.Clamp(modNPC.overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
+                        Vector2 pos = npc.Top + modNPC.drawCenter + (npc.gfxOffY - 32) * Vector2.UnitY;
+                        if (!cameraRect.Contains(pos.ToPoint()))
+                        {
+                            pos = cameraRect.ClosestPointInRect(pos);
+                        }
+                        float rot = (npc.Center - pos).ToRotation();
+                        pos += 14 * opacity * rot.ToRotationVector2();
+                        Main.EntitySpriteDraw(arrowTex, pos - Main.screenPosition, null, Color.White * opacity * 0.9f, rot, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
+                    }
+                }
+            }
+            Main.spriteBatch.End();
+
             Player player = Main.LocalPlayer;
             if (player != null)
             {

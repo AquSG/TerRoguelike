@@ -3684,6 +3684,15 @@ namespace TerRoguelike.NPCs
                     if (AdaptiveArmor < 0)
                         AdaptiveArmor = 0;
                 }
+
+                if (isRoomNPC && sourceRoomListID >= 0)
+                {
+                    Room room = RoomList[sourceRoomListID];
+                    if (!room.IsBossRoom && !TerRoguelikeWorld.escape && (room.roomTime - room.waveClearGraceTime >= 480 || overheadArrowTime != 0))
+                    {
+                        overheadArrowTime++;
+                    }
+                }
             }
         }
         public override bool CheckDead(NPC npc)
@@ -4074,21 +4083,6 @@ namespace TerRoguelike.NPCs
             if (bleedingStacks != null && bleedingStacks.Count > 0)
             {
                 DrawRotatlingBloodParticles(true, npc);
-            }
-            if (isRoomNPC && sourceRoomListID >= 0)
-            {
-                Room room = RoomList[sourceRoomListID];
-                if (!room.IsBossRoom && !TerRoguelikeWorld.escape && (room.roomTime - room.waveClearGraceTime >= 480 || overheadArrowTime != 0))
-                {
-                    overheadArrowTime++;
-                }
-                if (!Main.hideUI && !hostileTurnedAlly && overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
-                {
-                    Texture2D arrowTex = TexDict["YellowArrow"];
-                    float opacity = MathHelper.Clamp(overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
-                    Vector2 pos = npc.Top + drawCenter + ((npc.gfxOffY - 32 + (14 * opacity)) * Vector2.UnitY) - Main.screenPosition;
-                    Main.EntitySpriteDraw(arrowTex, pos, null, Color.White * opacity * 0.9f, MathHelper.PiOver2, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
-                }
             }
         }
         /// <summary>
