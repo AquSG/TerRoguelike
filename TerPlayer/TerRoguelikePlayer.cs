@@ -659,7 +659,7 @@ namespace TerRoguelike.TerPlayer
 
                     evilEyeStacks.RemoveAll(time => time <= 0);
 
-                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count, 1, 4 + evilEye) * 0.1f * (float)evilEye;
+                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count, 1, 4 + evilEye) * (0.5f + (0.5f * evilEye));
                 }
             }
             else if (evilEyeStacks.Count > 0)
@@ -732,6 +732,33 @@ namespace TerRoguelike.TerPlayer
                 {
                     int lifeRegenIncrease = stimPack * 16;
                     Player.lifeRegen += lifeRegenIncrease;
+
+                    if (stimPackTime == 600)
+                    {
+                        for (int i = 0; i < 25; i++)
+                        {
+                            StimPackParticle(2);
+                        }
+                    }
+                    else if (stimPackTime % 7 == 0)
+                    {
+                        StimPackParticle(1);
+                    }
+
+                    void StimPackParticle(float distance = 1)
+                    {
+                        Vector2 offset = Main.rand.NextVector2CircularEdge(1, 1) * Main.rand.NextFloat(0.5f, 1f);
+                        Vector2 position = Main.rand.NextVector2FromRectangle(Player.getRect());
+                        int timeleft = Main.rand.Next(20, 35);
+                        if (Main.rand.NextBool(4))
+                            timeleft *= 2;
+
+                        for (int j = 0; j < 2; j++)
+                        {
+                            ParticleManager.AddParticle(new ThinSpark(
+                                position + offset * 4 * distance, offset * distance, timeleft, Color.Lime, new Vector2(0.02f * Main.rand.NextFloat(1, 1.4f)), MathHelper.PiOver2 * j, true, false), ParticleManager.ParticleLayer.AfterEverything);
+                        }
+                    }
                     stimPackTime--;
                 }
             }
@@ -2881,7 +2908,7 @@ namespace TerRoguelike.TerPlayer
                 Effect coneEffect = Filters.Scene["TerRoguelike:ConeSnippet"].GetShader().Shader;
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, coneEffect, Main.GameViewMatrix.TransformationMatrix);
 
-                int rayCount = 400;
+                int rayCount = TerRoguelike.lowDetail ? 1 : 400;
 
                 coneEffect.Parameters["tint"].SetValue((Color.Lerp(Color.Orange, Color.Yellow, 0.3f) * 0.75f).ToVector4());
                 coneEffect.Parameters["minDOT"].SetValue(Vector2.Dot(Vector2.UnitX, Vector2.UnitX.RotatedBy(1f / rayCount * MathHelper.Pi)));
@@ -2894,6 +2921,10 @@ namespace TerRoguelike.TerPlayer
                     float completion = (float)i / rayCount;
                     float thisRot = completion * MathHelper.TwoPi;
                     rayLengths.Add(FalseSunLightCollisionCheck(basePos, thisRot, maxRayLength, 3));
+                }
+                if (TerRoguelike.lowDetail)
+                {
+                    rayLengths[0] = maxRayLength;
                 }
                 var glowTex = TexDict["CircularGlow"];
 

@@ -466,6 +466,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.localAI[0] >= 0)
                     NPC.active = false;
             }
+
+            Main.StopRain();
         }
         
         public override bool? CanBeHitByProjectile(Projectile projectile)

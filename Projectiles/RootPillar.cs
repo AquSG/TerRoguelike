@@ -210,11 +210,11 @@ namespace TerRoguelike.Projectiles
             List<StoredRootDraw> drawList = new List<StoredRootDraw>();
 
             bool changeup = Projectile.ai[1] > 0;
-            
-            for (int i = 0; i < length; i++)
+            int quality = TerRoguelike.lowDetail ? 2 : 1;
+            for (int i = 0; i < length; i += quality)
             {
-                int rectY = ((length - 1 - i) % tex.Height);
-                Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
+                int rectY = ((length - quality - i) % tex.Height);
+                Rectangle rect = new Rectangle(0, rectY, tex.Width, quality);
                 List<StoredRootDraw> miniDrawList = new List<StoredRootDraw>();
                 for (int r = 0; r < 4; r++)
                 {

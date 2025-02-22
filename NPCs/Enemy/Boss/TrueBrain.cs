@@ -1348,7 +1348,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (deadTime == deathCutsceneDuration - 31)
             {
-                if (modNPC.isRoomNPC || true)
+                if (modNPC.isRoomNPC)
                 {
                     for (int i = 0; i < 5; i++)
                     {
@@ -1358,6 +1358,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (i == 4)
                         {
                             NPC n = SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Being>(), modNPC.sourceRoomListID);
+                            foreach (Projectile proj in Main.ActiveProjectiles)
+                            {
+                                proj.Kill();
+                                proj.active = false;
+                            }
+                            attackPlanRocketBundles.Clear();
                             break;
                         }
                     }

@@ -15,6 +15,8 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.MainMenu;
+using System.Diagnostics;
+using Microsoft.Extensions.Options;
 
 namespace TerRoguelike.Projectiles
 {
@@ -125,17 +127,19 @@ namespace TerRoguelike.Projectiles
             return false;
         }
         public override bool PreDraw(ref Color lightColor)
-{
+        {
+            TerRoguelikeUtils.StartVanillaSpritebatch();
             Texture2D tex = TextureAssets.Projectile[Type].Value;
             int length = (int)Projectile.ai[0] % 2 == 0 ? (int)Math.Abs(Projectile.Center.Y - spawnPos.Y) : (int)Math.Abs(Projectile.Center.X - spawnPos.X);
             Vector2 pos = spawnPos;
             float rot = Projectile.ai[0] * MathHelper.PiOver2;
             int endEase = length - 8;
-            for (int i = 0; i < length; i++)
+            int quality = TerRoguelike.lowDetail ? 2 : 1;
+            for (int i = 0; i < length; i += quality)
             {
                 Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
                 int rectY = i % tex.Height;
-                Rectangle rect = new Rectangle(0, rectY, tex.Width, 1);
+                Rectangle rect = new Rectangle(0, rectY, tex.Width, quality);
                 Vector2 scale = new Vector2(1f);
                 float interpolant = ((float)Math.Sin((float)i / tex.Height) + 0.5f);
                 float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
@@ -150,6 +154,7 @@ namespace TerRoguelike.Projectiles
                 }
                 Main.EntitySpriteDraw(tex, pos + posOffset - Main.screenPosition, rect, color, rot, tex.Size() * 0.5f, scale, SpriteEffects.None);
             }
+            TerRoguelikeUtils.StartVanillaSpritebatch();
 
             /* draws where collision is happening for debugging
             Texture2D tempTex = TexDict["CircularGlow"];

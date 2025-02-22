@@ -15,6 +15,7 @@ namespace TerRoguelike
 	public class TerRoguelike : Mod
 	{
 		internal static TerRoguelike Instance;
+        public static bool lowDetail => Main.qaStyle > 1;
         public override void Load()
         {
             Instance = this;

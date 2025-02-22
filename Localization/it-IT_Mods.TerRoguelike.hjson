@@ -192,7 +192,7 @@ Items: {
 			Colpire un nemico con un colpo critico fornisce una miglioria accumulabile alla velocità di attacco
 			Ogni carica dura 3 secondi e fornisce un incremento del 10% alla velocità di attacco
 			La quantità di cariche è limitato a 5
-			Ogni copie extra di questo oggetto aumentano il limite di cariche di 2, e aumentano la miglioria alla velocità di attacco del 10%
+			Ogni copie extra di questo oggetto aumentano il limite di cariche di 1, e aumentano la miglioria alla velocità di attacco del 5%
 			'''
 	}
 
@@ -329,8 +329,8 @@ Items: {
 		DisplayName: Lente Antica
 		Tooltip:
 			'''
-			Aumenta del 10% la dimensione dell'attacco principale
-			Ogni copie extra dell'oggetto forniscono un ulteriore aumento del 10%
+			Aumenta del 15% la dimensione dell'attacco principale
+			Ogni copie extra dell'oggetto forniscono un ulteriore aumento del 15%
 			'''
 	}
 

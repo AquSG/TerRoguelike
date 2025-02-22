@@ -20,6 +20,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.Graphics.Effects;
 using System.Diagnostics;
 using System.IO.Pipes;
+using TerRoguelike.MainMenu;
 
 
 namespace TerRoguelike.Projectiles
@@ -138,15 +139,15 @@ namespace TerRoguelike.Projectiles
                             ParticleManager.ParticleLayer.AfterProjectiles);
                     }
                 }
-                if (i % 2 == 0 && Projectile.timeLeft % 1 == 0 && !specialOldDead[i] && i > 0)
+                if (i % (TerRoguelike.lowDetail ? 8 : 2) == 0 && Projectile.timeLeft % 1 == 0 && !specialOldDead[i] && i > 0)
                 {
                     Vector2 particlePos = specialOldPos[i];
                     float rot = (specialOldPos[i - 1] - specialOldPos[i]).ToRotation();
                     for (int j = -1; j <= 1; j += 2)
                     {
                         ParticleManager.AddParticle(new ThinSpark(
-                            particlePos + (rot + MathHelper.PiOver2 * j).ToRotationVector2() * 24 - specialOldVel[i], specialOldVel[i],
-                            10, Color.Cyan, new Vector2(0.1f, 0.4f) * 5, rot + (MathHelper.PiOver4 * 0.1f * j), true, false),
+                            particlePos + (rot + MathHelper.PiOver2 * j).ToRotationVector2() * (TerRoguelike.lowDetail ? 12 : 24) - specialOldVel[i], specialOldVel[i],
+                            10, Color.Cyan, new Vector2(TerRoguelike.lowDetail ? 0.4f : 0.1f, 0.4f) * 5, rot + (TerRoguelike.lowDetail ? 0 : (MathHelper.PiOver4 * 0.1f * j)), true, false),
                             ParticleManager.ParticleLayer.AfterProjectiles);
                     }
 
