@@ -659,7 +659,7 @@ namespace TerRoguelike.TerPlayer
 
                     evilEyeStacks.RemoveAll(time => time <= 0);
 
-                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count, 1, 4 + evilEye) * (0.5f + (0.5f * evilEye));
+                    Player.GetAttackSpeed(DamageClass.Generic) += MathHelper.Clamp(evilEyeStacks.Count, 1, 4 + evilEye) * (0.05f + (0.05f * evilEye));
                 }
             }
             else if (evilEyeStacks.Count > 0)
