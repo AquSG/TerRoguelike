@@ -485,7 +485,7 @@ namespace TerRoguelike.Systems
             ParticleManager.DrawParticles_AfterEverything();
 
             Rectangle cameraRect = new Rectangle((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
-            cameraRect.Inflate((int)(cameraRect.Height * -0.1f), (int)(cameraRect.Height * -0.1f));
+            cameraRect.Inflate((int)(cameraRect.Height * -0.06f), (int)(cameraRect.Height * -0.06f));
             StartVanillaSpritebatch(false);
             foreach (NPC npc in Main.ActiveNPCs)
             {
@@ -499,13 +499,15 @@ namespace TerRoguelike.Systems
                     {
                         Texture2D arrowTex = TexDict["YellowArrow"];
                         float opacity = MathHelper.Clamp(modNPC.overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
-                        Vector2 pos = npc.Top + modNPC.drawCenter + (npc.gfxOffY - 32) * Vector2.UnitY;
+                        Vector2 pos = npc.Top + modNPC.drawCenter + (npc.gfxOffY) * Vector2.UnitY;
                         if (!cameraRect.Contains(pos.ToPoint()))
                         {
                             pos = cameraRect.ClosestPointInRect(pos);
                         }
                         float rot = (npc.Center - pos).ToRotation();
-                        pos += 14 * opacity * rot.ToRotationVector2();
+                        if (npc.Center == pos)
+                            rot = MathHelper.PiOver2;
+                        pos += (-32 + (14 * opacity)) * rot.ToRotationVector2();
                         Main.EntitySpriteDraw(arrowTex, pos - Main.screenPosition, null, Color.White * opacity * 0.9f, rot, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                     }
                 }
