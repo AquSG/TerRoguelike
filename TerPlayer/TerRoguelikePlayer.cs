@@ -2299,10 +2299,13 @@ namespace TerRoguelike.TerPlayer
                 return true;
             }
 
-            if (barrierHealth > 1 && info.Damage <= (int)barrierHealth && !barrierFullAbsorbHit)
+            if (((barrierHealth > 1 && info.Damage <= (int)barrierHealth) || barrierInHurt != 0) && !barrierFullAbsorbHit)
             {
-                BarrierHitEffect(info.Damage, info.Damage);
-                PlayerLoader.OnHurt(Player, info);
+                if (barrierInHurt == 0)
+                {
+                    BarrierHitEffect(info.Damage, info.Damage);
+                    PlayerLoader.OnHurt(Player, info);
+                }
                 return true;
             }
 
@@ -2365,49 +2368,73 @@ namespace TerRoguelike.TerPlayer
                     damageMultiplierFromDR *= 2 - (100f / (100f - diminishingDR));
             }
             int newDamage = (int)(info.Damage * damageMultiplierFromDR);
-            int damageDifference = info.Damage - newDamage;
             info.Damage = newDamage;
 
-            if (everlastingJellyfish > 0 && damageDifference > barrierHealth)
+            if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)
             {
-                int damageDifferenceAfterBarrierReduction = damageDifference - (int)barrierHealth;
-                if (damageDifferenceAfterBarrierReduction > 0)
+                float totalLifePercentage = ((int)barrierHealth + Player.statLife) / (Player.statLifeMax2 * 2f);
+                bool oneShotProtection = totalLifePercentage >= 0.95f;
+                int oneShotRemainingTarget = Math.Max((int)((totalLifePercentage - 0.95f) * Player.statLifeMax2 * 2), 1);
+                int preBarrierDamage = info.Damage;
+                info.Damage -= (int)barrierHealth;
+                barrierFullAbsorbHit = true;
+                int extraDamageSubtraction = BarrierHitEffect((int)barrierHealth, preBarrierDamage);
+                info.Damage -= extraDamageSubtraction;
+                if (oneShotProtection && Player.statLifeMax2 - info.Damage < oneShotRemainingTarget)
                 {
+                    info.Damage = Player.statLifeMax2 - oneShotRemainingTarget;
+                }
+            }
+
+            if (everlastingJellyfish > 0)
+            {
+                int difference = (int)(info.Damage / damageMultiplierFromDR) - info.Damage;
+                if (difference > 0)
+                {
+                    if (difference > Player.statLifeMax2)
+                        difference = Player.statLifeMax2;
+
                     float targetedHealingPercentage = ((everlastingJellyfish + 1f) / (everlastingJellyfish + 3f));
-                    int finalHealingAmount = (int)(damageDifferenceAfterBarrierReduction * targetedHealingPercentage);
+                    int finalHealingAmount = (int)(difference * targetedHealingPercentage);
                     if (finalHealingAmount < 1)
                         finalHealingAmount = 1;
                     ScaleableHeal(finalHealingAmount);
                 }
             }
-            if (barrierHealth >= 1 && info.Damage > (int)barrierHealth)
-            {
-                int preBarrierDamage = info.Damage;
-                info.Damage -= (int)barrierHealth;
-                barrierFullAbsorbHit = true;
-                BarrierHitEffect((int)barrierHealth, preBarrierDamage);
-            }
         }
-        public void BarrierHitEffect(int damageToBarrier, int fullHitDamage)
+        public int BarrierHitEffect(int damageToBarrier, int fullHitDamage)
         {
+            int extraDamageNegated = 0;
             if (barrierDiminishingDR != 0)
             {
-                int damageChange = 0;
+                float multiplier = 1;
                 if (barrierDiminishingDR > 0)
-                    damageChange = (int)(damageToBarrier * ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR))));
+                    multiplier = 1 + (100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR));
                 else
-                    damageChange = (int)(damageToBarrier * (2 - ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR))))) - damageToBarrier;
+                    multiplier = 2 - ((100f / (100f + diminishingDR + barrierDiminishingDR)) - (100f / (100f + diminishingDR)));
 
-                damageToBarrier += damageChange;
-                fullHitDamage += damageChange;
+                extraDamageNegated = (int)(damageToBarrier / multiplier) - damageToBarrier;
+                if (extraDamageNegated + damageToBarrier > fullHitDamage)
+                {
+                    extraDamageNegated = fullHitDamage - damageToBarrier;
+                }
+                int oldDamageToBarrier = damageToBarrier;
+                damageToBarrier = (int)((damageToBarrier + extraDamageNegated) * multiplier);
+                fullHitDamage -= extraDamageNegated + (oldDamageToBarrier - damageToBarrier);
             }
             if (damageToBarrier < 1)
                 damageToBarrier = 1;
+            if (fullHitDamage < 1)
+                fullHitDamage = 1;
             barrierInHurt = damageToBarrier;
             CombatText.NewText(Player.getRect(), Color.Gold, damageToBarrier > (int)barrierHealth ? -(int)barrierHealth : -damageToBarrier);
             SoundStyle soundStyle = damageToBarrier < (int)barrierHealth ? SoundID.NPCHit53 with { Volume = 0.5f } : SoundID.NPCDeath56 with { Volume = 0.3f };
             SoundEngine.PlaySound(soundStyle, Player.Center);
             barrierHealth -= damageToBarrier;
+            if (barrierFullAbsorbHit && damageToBarrier == fullHitDamage)
+            {
+                barrierFullAbsorbHit = false;
+            }
             int addImmuneTime = fullHitDamage == 1 ? 20 : 40;
             if (BloodMoonActive)
             {
@@ -2431,7 +2458,8 @@ namespace TerRoguelike.TerPlayer
             }
             Player.immune = true;
             HurtEffects(fullHitDamage);
-            
+
+            return extraDamageNegated;
         }
         public void HurtEffects(int damage)
         {
