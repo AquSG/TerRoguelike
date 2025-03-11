@@ -366,7 +366,7 @@ namespace TerRoguelike.Schematics
                     Tile t = Main.tile[x + cornerX, y + cornerY];
                     originalTiles[x, y] = new SchematicMetaTile(t);
                 }
-
+            
             for (int x = 0; x < width; ++x)
                 for (int y = 0; y < height; ++y)
                     if (originalTiles[x, y].TileType != TileID.Containers)
