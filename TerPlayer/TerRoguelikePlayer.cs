@@ -1752,7 +1752,7 @@ namespace TerRoguelike.TerPlayer
                 Player.itemTime = 1;
                 Player.itemAnimation = 1;
             }
-            else if (CutsceneSystem.cutsceneDisableControl)
+            else if (CutsceneSystem.cutsceneDisableControl || RoomSystem.regeneratingWorld)
             {
                 Player.immuneTime = 60;
                 Player.SetImmuneTimeForAllTypes(60);
@@ -1848,6 +1848,9 @@ namespace TerRoguelike.TerPlayer
                 Player.velocity = new Vector2(0, -0.0000000001f);
                 Player.Center = Vector2.Lerp(Player.Center, TerRoguelikeWorld.lunarGambitSceneDisplayPos, 0.05f);
             }
+
+            if (RoomSystem.regeneratingWorld)
+                Player.velocity = Vector2.Zero;
         }
         public override void PreUpdateBuffs()
         {

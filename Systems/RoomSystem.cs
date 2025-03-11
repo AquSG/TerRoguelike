@@ -41,6 +41,8 @@ using TerRoguelike.ILEditing;
 using TerRoguelike.Items;
 using TerRoguelike.Schematics;
 using Terraria.Utilities.Terraria.Utilities;
+using Terraria.UI.Chat;
+using TerRoguelike.Utilities;
 
 namespace TerRoguelike.Systems
 {
@@ -55,6 +57,8 @@ namespace TerRoguelike.Systems
         public static List<StoredDraw> postDrawEverythingCache = [];
         public static bool postDrawAllBlack = false;
         public static int loopingDrama = 0;
+        public static bool regeneratingWorld = false;
+        public static int regeneratingWorldTime = 0;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -615,33 +619,48 @@ namespace TerRoguelike.Systems
                 }
             }
 
-            if (postDrawEverythingCache == null || postDrawEverythingCache.Count == 0)
-                return;
-
-            Vector2 offset = -Main.screenPosition;
-            if (postDrawAllBlack)
+            if (!(postDrawEverythingCache == null || postDrawEverythingCache.Count == 0))
             {
-                for (int i = 0; i < Main.combatText.Length; i++)
+                Vector2 offset = -Main.screenPosition;
+                if (postDrawAllBlack)
                 {
-                    Main.combatText[i].active = false;
-                }
-                StartAlphaBlendSpritebatch(false);
-                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Lerp(Color.LightGray, Color.White, 0.8f), 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
-                StartAlphaBlendSpritebatch();
+                    for (int i = 0; i < Main.combatText.Length; i++)
+                    {
+                        Main.combatText[i].active = false;
+                    }
+                    StartAlphaBlendSpritebatch(false);
+                    Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Lerp(Color.LightGray, Color.White, 0.8f), 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
+                    StartAlphaBlendSpritebatch();
 
-                Vector3 colorHSL = Main.rgbToHsl(Color.Black);
-                GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
-                GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
-                GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                    Vector3 colorHSL = Main.rgbToHsl(Color.Black);
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseOpacity(1f);
+                    GameShaders.Misc["TerRoguelike:BasicTint"].UseColor(Main.hslToRgb(1 - colorHSL.X, colorHSL.Y, colorHSL.Z));
+                    GameShaders.Misc["TerRoguelike:BasicTint"].Apply();
+                }
+                else
+                    StartAlphaBlendSpritebatch(false);
+                foreach (var draw in postDrawEverythingCache)
+                {
+                    draw.Draw(offset);
+                }
+                postDrawEverythingCache.Clear();
+                Main.spriteBatch.End();
             }
-            else
-                StartAlphaBlendSpritebatch(false);
-            foreach (var draw in postDrawEverythingCache)
+
+            if (regeneratingWorld)
             {
-                draw.Draw(offset);
+                StartAlphaBlendSpritebatch(false);
+
+                Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Black, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
+
+                var font = FontAssets.DeathText.Value;
+                string text = "Loading...";
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, Main.Camera.Center - Main.screenPosition, Color.White, RoomSystem.regeneratingWorldTime * 0.05f, font.MeasureString(text) * 0.5f, new Vector2(1));
+
+                Main.spriteBatch.End();
             }
-            postDrawEverythingCache.Clear();
-            Main.spriteBatch.End();
+            
+
         }
         public static void DrawRoomWalls(SpriteBatch spriteBatch)
         {
@@ -1386,6 +1405,37 @@ namespace TerRoguelike.Systems
         #region Post Update Everything
         public override void PostUpdateEverything()
         {
+            if (regeneratingWorld)
+            {
+                regeneratingWorldTime++;
+                Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                Main.LocalPlayer.dead = false;
+            }
+            else if (regeneratingWorldTime > 0)
+            {
+                Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                Main.LocalPlayer.dead = false;
+                Main.LocalPlayer.gfxOffY = 0;
+                regeneratingWorldTime = 0;
+                Main.LocalPlayer.ModPlayer().OnEnterWorld();
+                Main.LocalPlayer.ModPlayer().OnRespawn();
+                WorldGen.gen = false;
+                MusicSystem.Initialized = false;
+                Main.BlackFadeIn = 255;
+                TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
+
+                for (int i = 0; i < 10; i++)
+                {
+                    Point position = Main.LocalPlayer.Bottom.ToTileCoordinates();
+                    position.Y += i;
+                    if (TerRoguelikeUtils.IsTileSolidGround(Main.tile[position]))
+                    {
+                        Main.LocalPlayer.Bottom = position.ToVector2() * 16 + Vector2.UnitY * -1;
+                        break;
+                    }
+                }
+            }
+
             ParticleManager.UpdateParticles();
             UpdateRemedialHealingOrbs();
             if (worldTeleportTime > 0)
@@ -1657,7 +1707,7 @@ namespace TerRoguelike.Systems
             obtainedRoomListFromServer = true;
         }
         #endregion
-        public override void ClearWorld()
+        public static void ClearWorldTerRoguelike()
         {
             if (Main.netMode == NetmodeID.MultiplayerClient)
                 obtainedRoomListFromServer = false;
@@ -1674,8 +1724,8 @@ namespace TerRoguelike.Systems
             CutsceneSystem.cutsceneActive = false;
             Main.screenPosition = Main.Camera.UnscaledPosition;
             TerRoguelikeWorld.IsDebugWorld = false;
-            TerRoguelikeWorld.IsDeletableOnExit = false;
-            TerRoguelikeWorld.IsTerRoguelikeWorld = false;
+            TerRoguelikeWorld.IsDeletableOnExit = IsDeletableOnExit && regeneratingWorld;
+            TerRoguelikeWorld.IsTerRoguelikeWorld = regeneratingWorld;
             TerRoguelikeWorld.lunarFloorInitialized = false;
             TerRoguelikeWorld.lunarBossSpawned = false;
             TerRoguelikeWorld.escape = false;
@@ -1695,6 +1745,12 @@ namespace TerRoguelike.Systems
             attackPlanRocketBundles.Clear();
             remedialHealingOrbs.Clear();
             ILEdits.dualContrastTileShader = false;
+            SpawnManager.pendingEnemies.Clear();
+            SpawnManager.pendingItems.Clear();
+            ParticleManager.ActiveParticles.Clear();
+            ParticleManager.ActiveParticlesAfterEverything.Clear();
+            ParticleManager.ActiveParticlesAfterProjectiles.Clear();
+            ParticleManager.ActiveParticlesBehindTiles.Clear();
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
 
@@ -1702,6 +1758,10 @@ namespace TerRoguelike.Systems
             {
                 portalSound.Stop();
             }
+        }
+        public override void ClearWorld()
+        {
+            ClearWorldTerRoguelike();
         }
         public override void SetStaticDefaults()
         {

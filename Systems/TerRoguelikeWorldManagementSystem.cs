@@ -18,7 +18,6 @@ using TerRoguelike.World;
 using TerRoguelike.MainMenu;
 using Microsoft.Xna.Framework;
 using ReLogic.Threading;
-using System.Reflection.PortableExecutable;
 
 namespace TerRoguelike.Systems
 {
@@ -93,6 +92,56 @@ namespace TerRoguelike.Systems
                     }
                 }
             });   
+        }
+        public static void RegenerateWorld()
+        {
+            TerRoguelikeWorld.currentStage = 0;
+            Main.worldSurface = 200;
+            if (TerRoguelikeWorld.promoteLoop)
+                TerRoguelikeWorld.currentLoop++;
+            else
+                TerRoguelikeWorld.currentLoop = 0;
+
+            WorldGen.PlaceTile(1, (int)Main.worldSurface, ModContent.TileType<Tiles.BlackTile>(), true);
+            foreach (Room room in RoomSystem.RoomList)
+            {
+                int width = (int)room.RoomDimensions.X;
+                int height = (int)room.RoomDimensions.Y;
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        int x = i + (int)room.RoomPosition.X;
+                        int y = j + (int)room.RoomPosition.Y;
+
+                        Main.tile[x, y].CopyFrom(Main.tile[1, (int)Main.worldSurface]);
+                        if (y == (int)Main.worldSurface)
+                            continue;
+
+                        WorldGen.PlaceWall(x, y, ModContent.WallType<Tiles.BlackWall>(), true);
+                    }
+                }
+            }
+            RoomManager.GenerateRoomStructure();
+            foreach (Room room in RoomSystem.RoomList)
+            {
+                int width = (int)room.RoomDimensions.X;
+                int height = (int)room.RoomDimensions.Y;
+                
+                for (int i = 0; i < width; i++)
+                {
+                    for (int j = 0; j < height; j++)
+                    {
+                        int x = i + (int)room.RoomPosition.X;
+                        int y = j + (int)room.RoomPosition.Y;
+
+                        WorldGen.TileFrame(x, y, true, true);
+                        WorldGen.SquareWallFrame(x, y);
+                    }
+                }
+            }
+
+            RoomSystem.regeneratingWorld = false;
         }
     }
 }
