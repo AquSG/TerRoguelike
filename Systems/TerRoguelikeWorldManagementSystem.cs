@@ -98,7 +98,10 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.currentStage = 0;
             Main.worldSurface = 200;
             if (TerRoguelikeWorld.promoteLoop)
+            {
+                TerRoguelikeWorld.promoteLoop = false;
                 TerRoguelikeWorld.currentLoop++;
+            }   
             else
                 TerRoguelikeWorld.currentLoop = 0;
 

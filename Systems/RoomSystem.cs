@@ -43,6 +43,7 @@ using TerRoguelike.Schematics;
 using Terraria.Utilities.Terraria.Utilities;
 using Terraria.UI.Chat;
 using TerRoguelike.Utilities;
+using System.Threading;
 
 namespace TerRoguelike.Systems
 {
@@ -1408,15 +1409,23 @@ namespace TerRoguelike.Systems
             if (regeneratingWorld)
             {
                 regeneratingWorldTime++;
+                loopingDrama = 0;
                 Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-                Main.LocalPlayer.dead = false;
+                if (Main.LocalPlayer.dead)
+                    Main.LocalPlayer.Spawn(PlayerSpawnContext.ReviveFromDeath);
+                else
+                    Main.LocalPlayer.Spawn(PlayerSpawnContext.RecallFromItem);
             }
             else if (regeneratingWorldTime > 0)
             {
                 Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-                Main.LocalPlayer.dead = false;
+                if (Main.LocalPlayer.dead)
+                    Main.LocalPlayer.Spawn(PlayerSpawnContext.ReviveFromDeath);
+                else
+                    Main.LocalPlayer.Spawn(PlayerSpawnContext.RecallFromItem);
                 Main.LocalPlayer.gfxOffY = 0;
                 regeneratingWorldTime = 0;
+                loopingDrama = 0;
                 Main.LocalPlayer.ModPlayer().OnEnterWorld();
                 Main.LocalPlayer.ModPlayer().OnRespawn();
                 WorldGen.gen = false;
@@ -1599,17 +1608,27 @@ namespace TerRoguelike.Systems
                     {
                         loopingDrama = 0;
                         ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                        if (TerRoguelikeWorld.IsDeletableOnExit)
+                        ZoomSystem.zoomOverride = Main.GameZoomTarget;
+                        bool stayinworld = true;
+                        if (stayinworld)
                         {
-                            TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
-                            TerRoguelikeMenu.wipeTempWorld = true;
-                            TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
                             TerRoguelikeWorld.promoteLoop = true;
+                            RegenerateWorld(true);
                         }
-                        SetCalm(Silence);
-                        SetCombat(Silence);
-                        SetMusicMode(MusicStyle.Silent);
-                        WorldGen.SaveAndQuit();
+                        else
+                        {
+                            if (TerRoguelikeWorld.IsDeletableOnExit)
+                            {
+                                TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                                TerRoguelikeMenu.wipeTempWorld = true;
+                                TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+                                TerRoguelikeWorld.promoteLoop = true;
+                            }
+                            SetCalm(Silence);
+                            SetCombat(Silence);
+                            SetMusicMode(MusicStyle.Silent);
+                            WorldGen.SaveAndQuit();
+                        }   
                     }
                     loopingDrama++;
                 }
@@ -1715,6 +1734,7 @@ namespace TerRoguelike.Systems
                 obtainedRoomListFromServer = true;
 
             ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+            ZoomSystem.zoomOverride = Main.GameZoomTarget;
 
             chainList.Clear();
             ParticleManager.ActiveParticles.Clear();
@@ -1762,6 +1782,52 @@ namespace TerRoguelike.Systems
         public override void ClearWorld()
         {
             ClearWorldTerRoguelike();
+        }
+        public static void RegenerateWorld(bool loop = false)
+        {
+            if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
+                return;
+
+            TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+            for (int i = 0; i < Main.maxNPCs; i++)
+                Main.npc[i].active = false;
+            for (int i = 0; i < Main.maxProjectiles; i++)
+                Main.projectile[i].active = false;
+            for (int i = 0; i < Main.maxDust; i++)
+                Main.dust[i].active = false;
+            for (int i = 0; i < Main.maxGore; i++)
+                Main.gore[i].active = false;
+            for (int i = 0; i < Main.maxCombatText; i++)
+                Main.combatText[i].active = false;
+
+            SetCalm(Silence);
+            SetCombat(Silence);
+            SetMusicMode(MusicStyle.Silent);
+            regeneratingWorld = true;
+            WorldGen.gen = true;
+            ClearWorldTerRoguelike();
+            Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+
+            if (!loop)
+            {
+                IEnumerable<Item> vanillaItems = [];
+                for (int i = 0; i < 58; i++)
+                    Main.LocalPlayer.inventory[i].type = Main.LocalPlayer.inventory[i].stack = 0;
+                List<Item> startingItems = PlayerLoader.GetStartingItems(Main.LocalPlayer, vanillaItems);
+                PlayerLoader.SetStartInventory(Main.LocalPlayer, startingItems);
+                Main.LocalPlayer.trashItem = new(ItemID.None, 0);
+                TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+            }
+
+
+            for (int i = 0; i < RoomList.Count; i++)
+                ResetRoomID(RoomList[i].ID);
+            foreach (var floor in FloorID)
+            {
+                floor.Reset();
+            }
+
+            ThreadPool.QueueUserWorkItem(_ => TerRoguelikeWorldManagementSystem.RegenerateWorld());
         }
         public override void SetStaticDefaults()
         {

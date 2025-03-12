@@ -184,50 +184,7 @@ namespace TerRoguelike.UI
         public override string Command => "RegenWorld";
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
-                return;
-
-            TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
-            for (int i = 0; i < Main.maxNPCs; i++)
-                Main.npc[i].active = false;
-            for (int i = 0; i < Main.maxProjectiles; i++)
-                Main.projectile[i].active = false;
-            for (int i = 0; i < Main.maxDust; i++)
-                Main.dust[i].active = false;
-            for (int i = 0; i < Main.maxGore; i++)
-                Main.gore[i].active = false;
-            for (int i = 0; i < Main.maxCombatText; i++)
-                Main.combatText[i].active = false;
-
-            SetCalm(Silence);
-            SetCombat(Silence);
-            SetMusicMode(MusicStyle.Silent);
-            RoomSystem.regeneratingWorld = true;
-            WorldGen.gen = true;
-            RoomSystem.ClearWorldTerRoguelike();
-            Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-
-            bool loop = false;
-            if (!loop)
-            {
-                IEnumerable<Item> vanillaItems = [];
-                for (int i = 0; i < 58; i++)
-                    Main.LocalPlayer.inventory[i].type = Main.LocalPlayer.inventory[i].stack = 0;
-                List<Item> startingItems = PlayerLoader.GetStartingItems(Main.LocalPlayer, vanillaItems);
-                PlayerLoader.SetStartInventory(Main.LocalPlayer, startingItems);
-                Main.LocalPlayer.trashItem = new(ItemID.None, 0);
-                TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
-            }
-
-
-            for (int i = 0; i < RoomSystem.RoomList.Count; i++)
-                RoomSystem.ResetRoomID(RoomSystem.RoomList[i].ID);
-            foreach (var floor in SchematicManager.FloorID)
-            {
-                floor.Reset();
-            }
-
-            ThreadPool.QueueUserWorkItem(_ => TerRoguelikeWorldManagementSystem.RegenerateWorld());
+            RoomSystem.RegenerateWorld();
         }
     }
 }

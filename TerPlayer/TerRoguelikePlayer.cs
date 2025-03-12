@@ -1850,7 +1850,7 @@ namespace TerRoguelike.TerPlayer
             }
 
             if (RoomSystem.regeneratingWorld)
-                Player.velocity = Vector2.Zero;
+                Player.velocity = new Vector2(0, -0.0000000001f);
         }
         public override void PreUpdateBuffs()
         {

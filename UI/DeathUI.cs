@@ -117,24 +117,35 @@ namespace TerRoguelike.UI
             else if (pressed && restartHover && modPlayer.deadTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                if (TerRoguelikeWorld.IsDeletableOnExit)
+                bool stayinworld = true;
+                if (stayinworld)
                 {
-                    TerRoguelikeMenu.wipeTempWorld = true;
-                    TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
-
-                    IEnumerable<Item> vanillaItems = from item in player.inventory
-                                                     where !item.IsAir
-                                                     select item into x
-                                                     select x.Clone();
-                    List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
-                    PlayerLoader.SetStartInventory(player, startingItems);
-                    player.trashItem = new(ItemID.None, 0);
-                    TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                    RoomSystem.RegenerateWorld();
+                    modPlayer.killerNPC = -1;
+                    modPlayer.killerProj = -1;
+                    modPlayer.deadTime = 0;
                 }
-                modPlayer.killerNPC = -1;
-                modPlayer.killerProj = -1;
-                WorldGen.SaveAndQuit();
-                modPlayer.deadTime = 0;
+                else
+                {
+                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                    {
+                        TerRoguelikeMenu.wipeTempWorld = true;
+                        TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+
+                        IEnumerable<Item> vanillaItems = from item in player.inventory
+                                                         where !item.IsAir
+                                                         select item into x
+                                                         select x.Clone();
+                        List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
+                        PlayerLoader.SetStartInventory(player, startingItems);
+                        player.trashItem = new(ItemID.None, 0);
+                        TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                    }
+                    modPlayer.killerNPC = -1;
+                    modPlayer.killerProj = -1;
+                    WorldGen.SaveAndQuit();
+                    modPlayer.deadTime = 0;
+                }
             }
         }
 

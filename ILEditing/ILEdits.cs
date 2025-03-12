@@ -72,6 +72,24 @@ namespace TerRoguelike.ILEditing
             On_TileLightScanner.GetTileLight += ForceLight;
             On_TileDrawing.DrawTiles_EmitParticles += DisableTileParticles;
             On_Main.DrawPendingMouseText += FakeHoverItemTooltip;
+            On_Player.GetHurtTile += MysteryBugfix1; //for some reason, when regenerating the world and ONLY BY LOOPING, these cause errors and freeze the player in place.
+            On_NPC.SpawnNPC += MysteryBugfix2;
+        }
+
+        private void MysteryBugfix2(On_NPC.orig_SpawnNPC orig)
+        {
+			if (RoomSystem.regeneratingWorld)
+				return;
+
+			orig.Invoke();
+        }
+
+        private HurtTile MysteryBugfix1(On_Player.orig_GetHurtTile orig, Player self)
+        {
+			if (RoomSystem.regeneratingWorld)
+				return new();
+
+			return orig.Invoke(self);
         }
 
         private void FakeHoverItemTooltip(On_Main.orig_DrawPendingMouseText orig)
