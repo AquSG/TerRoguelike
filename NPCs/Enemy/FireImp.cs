@@ -16,6 +16,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using TerRoguelike.Projectiles;
 using Terraria.Audio;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -28,7 +29,7 @@ namespace TerRoguelike.NPCs.Enemy
         int attackCooldown = 90;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 10;
+            Main.npcFrameCount[Type] = 10;
         }
         public override void SetDefaults()
         {
@@ -96,8 +97,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override void FindFrame(int frameHeight)
         {
             int attackAnimTimer = (int)NPC.ai[0] % (attackTelegraph + attackCooldown);
-            int currentFrame = attackAnimTimer >= attackTelegraph ? (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 6)) : ((attackAnimTimer * 6 / attackTelegraph) % (Main.npcFrameCount[modNPCID] - 4)) + 4;
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            int currentFrame = attackAnimTimer >= attackTelegraph ? (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 6)) : ((attackAnimTimer * 6 / attackTelegraph) % (Main.npcFrameCount[Type] - 4)) + 4;
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override Color? GetAlpha(Color drawColor)
         {

@@ -67,6 +67,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            modPlayer ??= Main.player[Projectile.owner].ModPlayer();
             if (modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / (833f * Projectile.MaxUpdates));
 

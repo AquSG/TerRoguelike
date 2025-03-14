@@ -19,6 +19,7 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using TerRoguelike.Utilities;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Rooms
 {
@@ -31,21 +32,23 @@ namespace TerRoguelike.Rooms
         public override bool IsBossRoom => true;
         public override Point WallInflateModifier => new Point(-48, 0);
         public override bool AllowWallDrawing => false;
+        public override Vector2 bossSpawnPos => new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f);
         public override void Update()
         {
-            if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 8f);
             base.Update();
         }
         public override void RoomClearReward()
         {
             Player player = Main.LocalPlayer;
-            if (player != null)
+            if (Main.netMode == NetmodeID.SinglePlayer && (!player.active || player.dead))
+                return;
+            ClearGhosts();
+            ClearSpecificProjectiles();
+            if (Main.dedServ)
+                StartCreditsPacket.Send();
+            
+            if (Main.netMode == NetmodeID.SinglePlayer)
             {
-                if (player.dead)
-                    return;
-                ClearGhosts();
-                ClearSpecificProjectiles();
                 CreditsSystem.StartCredits();
                 var modPlayer = player.ModPlayer();
                 if (modPlayer != null)
@@ -53,6 +56,7 @@ namespace TerRoguelike.Rooms
                     modPlayer.playthroughTime.Stop();
                 }
             }
+            
         }
         public override bool CanAscend(Player player, TerRoguelikePlayer modPlayer)
         {

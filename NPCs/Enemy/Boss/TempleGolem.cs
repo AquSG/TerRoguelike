@@ -616,6 +616,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
@@ -761,35 +765,38 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, DustID.t_Lihzahrd, hit.HitDirection, -1f);
                 }
             }
-        }
-        public override void OnKill()
-        {
-            SoundEngine.PlaySound(SoundID.NPCDeath14 with { Volume = 1f }, NPC.Center);
-            SoundEngine.PlaySound(SoundID.DD2_OgreGroundPound with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 368, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 370, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 368, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 370, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 365, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 363, NPC.scale);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 362, NPC.scale);
-
-            for (int i = 0; i < 8; i++)
+            else if (deadTime > 0)
             {
-                float rot = i * MathHelper.TwoPi * 0.125f + Main.rand.NextFloat(-0.5f, 0.5f);
-                ParticleManager.AddParticle(new ThinSpark(
-                    NPC.Center + rot.ToRotationVector2() * 15, rot.ToRotationVector2() * 3, 43, Color.Goldenrod, new Vector2(0.075f, 0.075f), rot, true, false));
-            }
-            for (int i = 0; i < 25; i++)
-            {
-                Vector2 offset = Main.rand.NextVector2Circular(30, 30);
-                ParticleManager.AddParticle(new Square(
-                    NPC.Center, offset * 0.2f, 40, Color.Goldenrod, new Vector2(Main.rand.NextFloat(0.7f, 1f)), offset.ToRotation(), 0.96f, 30, true));
+                SoundEngine.PlaySound(SoundID.NPCDeath14 with { Volume = 1f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_OgreGroundPound with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 368, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 370, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 368, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), new Vector2(NPC.position.X + Main.rand.Next(NPC.width), NPC.position.Y + Main.rand.Next(NPC.height)), NPC.velocity, 370, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 365, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 363, NPC.scale);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 362, NPC.scale);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    float rot = i * MathHelper.TwoPi * 0.125f + Main.rand.NextFloat(-0.5f, 0.5f);
+                    ParticleManager.AddParticle(new ThinSpark(
+                        NPC.Center + rot.ToRotationVector2() * 15, rot.ToRotationVector2() * 3, 43, Color.Goldenrod, new Vector2(0.075f, 0.075f), rot, true, false));
+                }
+                for (int i = 0; i < 25; i++)
+                {
+                    Vector2 offset = Main.rand.NextVector2Circular(30, 30);
+                    ParticleManager.AddParticle(new Square(
+                        NPC.Center, offset * 0.2f, 40, Color.Goldenrod, new Vector2(Main.rand.NextFloat(0.7f, 1f)), offset.ToRotation(), 0.96f, 30, true));
+                }
             }
         }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             Texture2D tex = TextureAssets.Npc[Type].Value;
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight - 2);

@@ -92,10 +92,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 1;
-            NPCID.Sets.MustAlwaysDraw[modNPCID] = true;
-            NPCID.Sets.TrailCacheLength[modNPCID] = 2;
-            NPCID.Sets.TrailingMode[modNPCID] = 1;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+            Main.npcFrameCount[Type] = 1;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
+            NPCID.Sets.TrailCacheLength[Type] = 2;
+            NPCID.Sets.TrailingMode[Type] = 1;
         }
         public override void SetDefaults()
         {
@@ -132,10 +133,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.ai[1] = -48;
             ableToHit = false;
 
-            int segCount = 50;
-            int segmentHeight = 38;
             NPC.position.Y += 320;
             NPC.velocity.Y = -5f;
+            AddSegments();
+        }
+        public void AddSegments()
+        {
+            int segCount = 50;
+            int segmentHeight = 38;
             for (int i = 0; i < segCount; i++)
             {
                 modNPC.Segments.Add(new WormSegment(NPC.Center + (Vector2.UnitY * segmentHeight * i), MathHelper.PiOver2 * 3f, i == 0 ? NPC.height : segmentHeight));
@@ -148,7 +153,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(NPC, segmentRotationInterpolant);
 
-            if (NPC.localAI[0] >= 0 && deadTime <= 0)
+            if (!Main.dedServ && NPC.localAI[0] >= 0 && deadTime <= 0)
             {
                 if (diggingEffect > 0)
                     diggingEffect--;
@@ -180,6 +185,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            if (modNPC.Segments.Count == 0)
+                AddSegments();
+
             if (deadTime > 0)
             {
                 CheckDead();
@@ -705,6 +713,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
@@ -925,6 +937,46 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();
+
+                if (!Main.dedServ)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                    for (int s = 0; s < modNPC.Segments.Count; s++)
+                    {
+                        WormSegment segment = modNPC.Segments[s];
+                        for (int i = 0; i < 10; i++)
+                        {
+                            Vector2 pos = segment.Position + new Vector2(0, 16);
+                            int width = (int)(NPC.width * 0.25f);
+                            pos.X += Main.rand.Next(-width, width);
+                            Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                            velocity *= Main.rand.NextFloat(0.3f, 1f);
+                            if (Main.rand.NextBool(5))
+                                velocity *= 1.5f;
+                            Vector2 scale = new Vector2(0.25f, 0.4f) * 0.86f;
+                            int time = 110 + Main.rand.Next(70);
+                            Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
+                            ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                            ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
+                        }
+                        if (s == 0)
+                        {
+                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 24);
+                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 25);
+                        }
+                        else if (s == modNPC.Segments.Count - 1)
+                        {
+                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 28);
+                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 29);
+                        }
+                        else
+                        {
+                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 26);
+                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 27);
+                        }
+                    }
+                }
             }
 
             return deadTime >= cutsceneDuration - 30;
@@ -945,47 +997,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 
             }
         }
-        public override void OnKill()
-        {
-            SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
-            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-            for (int s = 0; s < modNPC.Segments.Count; s++)
-            {
-                WormSegment segment = modNPC.Segments[s];
-                for (int i = 0; i < 10; i++)
-                {
-                    Vector2 pos = segment.Position + new Vector2(0, 16);
-                    int width = (int)(NPC.width * 0.25f);
-                    pos.X += Main.rand.Next(-width, width);
-                    Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
-                    velocity *= Main.rand.NextFloat(0.3f, 1f);
-                    if (Main.rand.NextBool(5))
-                        velocity *= 1.5f;
-                    Vector2 scale = new Vector2(0.25f, 0.4f) * 0.86f;
-                    int time = 110 + Main.rand.Next(70);
-                    Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
-                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                    ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
-                }
-                if (s == 0)
-                {
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 24);
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 25);
-                }
-                else if (s == modNPC.Segments.Count - 1)
-                {
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 28);
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 29);
-                }
-                else
-                {
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 26);
-                    Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 27);
-                }
-            }
-        }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             Texture2D tex = TextureAssets.Npc[Type].Value;
             currentFrame = 0;
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);

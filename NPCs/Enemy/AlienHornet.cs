@@ -18,6 +18,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -32,7 +33,7 @@ namespace TerRoguelike.NPCs.Enemy
         int currentFrame;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 3;
+            Main.npcFrameCount[Type] = 3;
         }
         public override void SetDefaults()
         {
@@ -105,10 +106,10 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            currentFrame = ((int)NPC.frameCounter % (1 + Main.npcFrameCount[modNPCID]));
+            currentFrame = ((int)NPC.frameCounter % (1 + Main.npcFrameCount[Type]));
             if (currentFrame == 3)
                 currentFrame = 1;
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

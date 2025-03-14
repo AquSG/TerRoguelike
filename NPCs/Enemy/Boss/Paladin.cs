@@ -60,7 +60,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 16;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+            Main.npcFrameCount[Type] = 16;
         }
         public override void SetDefaults()
         {
@@ -678,6 +679,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             List<Attack> potentialAttacks = new List<Attack>() { Charge, Throw, Slam, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
@@ -867,33 +872,35 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();
+                
+                if (!Main.dedServ)
+                {
+                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                    SoundEngine.PlaySound(HammerLand with { Volume = 0.5f, MaxInstances = 10 }, NPC.Center);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(14 * NPC.direction, 0), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin1").Type);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(0, -14), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin2").Type);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-14 * NPC.direction, 14), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin3").Type);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(10 * NPC.direction, 14), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin4").Type);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, -8), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin5").Type);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(1 * NPC.direction, 0), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin6").Type);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, 0), (-Vector2.UnitX * NPC.direction * 3) + (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin7").Type);
+                    for (int i = 0; i < 60; i++)
+                    {
+                        Vector2 pos = NPC.Center + new Vector2(0, 16);
+                        Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                        velocity *= Main.rand.NextFloat(0.3f, 1f);
+                        if (Main.rand.NextBool(5))
+                            velocity *= 1.5f;
+                        Vector2 scale = new Vector2(0.25f, 0.4f);
+                        int time = 110 + Main.rand.Next(70);
+                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
+                    }
+                }
+                
             }
                 
             return deadTime >= 150;
-        }
-        public override void OnKill()
-        {
-            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-            SoundEngine.PlaySound(HammerLand with { Volume = 0.5f, MaxInstances = 10 }, NPC.Center);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(14 * NPC.direction, 0), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin1").Type);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(0, -14), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin2").Type);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-14 * NPC.direction, 14), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin3").Type);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(10 * NPC.direction, 14), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin4").Type);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, -8), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin5").Type);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(1 * NPC.direction, 0), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin6").Type);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, 0), (-Vector2.UnitX * NPC.direction * 3) + (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin7").Type);
-            for (int i = 0; i < 60; i++)
-            {
-                Vector2 pos = NPC.Center + new Vector2(0, 16);
-                Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
-                velocity *= Main.rand.NextFloat(0.3f, 1f);
-                if (Main.rand.NextBool(5))
-                    velocity *= 1.5f;
-                Vector2 scale = new Vector2(0.25f, 0.4f);
-                int time = 110 + Main.rand.Next(70);
-                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red* 0.65f, scale, velocity.ToRotation(), true));
-            }
         }
         public override void FindFrame(int frameHeight)
         {
@@ -998,7 +1005,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[Type].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

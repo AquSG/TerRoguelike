@@ -92,7 +92,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 8;
+            Main.npcFrameCount[Type] = 8;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
             SoundEngine.PlaySound(HellRumble with { Volume = 0 });
         }
         public override void SetDefaults()
@@ -693,7 +694,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 else if (teleportLocation == -Vector2.One)
                     teleportLocation = spawnPos + Main.rand.NextVector2CircularEdge(240, 240);
 
-                NPC.Center = teleportLocation;
+                if (!TerRoguelike.mpClient)
+                {
+                    NPC.Center = teleportLocation;
+                    NPC.netUpdate = true;
+                }
+                   
                 if (SoundEngine.TryGetActiveSound(TeleportSlot, out var teleportSound) && teleportSound.IsPlaying)
                 {
                     teleportSound.Position = NPC.Center;
@@ -707,7 +713,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void SeerHeal()
         {
-            int healAmt = (int)(900 * healthScalingMultiplier);
+            int healAmt = (int)(900 * healthScalingMultiplier(modNPC.TerRoguelikeBoss));
             NPC.life += healAmt;
             if (NPC.life > NPC.lifeMax)
                 NPC.life = NPC.lifeMax;
@@ -736,6 +742,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             NPC.ai[3] = 0;
             int chosenAttack = 0;
@@ -896,6 +906,37 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 NPC.StrikeInstantKill();
+
+                if (!Main.dedServ)
+                {
+                    if (SoundEngine.TryGetActiveSound(TeleportSlot, out var sound) && sound.IsPlaying)
+                    {
+                        sound.Stop();
+                    }
+
+                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                    SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 396);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 397);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 398);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 399);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 400);
+                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 401);
+                    for (int i = 0; i < 90; i++)
+                    {
+                        Vector2 pos = NPC.Center + new Vector2(0, 16);
+                        int width = (int)(NPC.width * 0.25f);
+                        pos.X += Main.rand.Next(-width, width);
+                        Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                        velocity *= Main.rand.NextFloat(0.3f, 1f);
+                        if (Main.rand.NextBool(5))
+                            velocity *= 1.5f;
+                        Vector2 scale = new Vector2(0.25f, 0.4f);
+                        int time = 110 + Main.rand.Next(70);
+                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
+                    }
+                }
             }
 
             return deadTime >= cutsceneDuration - 30;
@@ -910,40 +951,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
         }
-        public override void OnKill()
-        {
-            if (SoundEngine.TryGetActiveSound(TeleportSlot, out var sound) && sound.IsPlaying)
-            {
-                sound.Stop();
-            }
-
-            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-            SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 396);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 397);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 398);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 399);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 400);
-            Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 401);
-            for (int i = 0; i < 90; i++)
-            {
-                Vector2 pos = NPC.Center + new Vector2(0, 16);
-                int width = (int)(NPC.width * 0.25f);
-                pos.X += Main.rand.Next(-width, width);
-                Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
-                velocity *= Main.rand.NextFloat(0.3f, 1f);
-                if (Main.rand.NextBool(5))
-                    velocity *= 1.5f;
-                Vector2 scale = new Vector2(0.25f, 0.4f);
-                int time = 110 + Main.rand.Next(70);
-                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
-            }
-        }
         public override void FindFrame(int frameHeight)
         {
-            Texture2D tex = TextureAssets.Npc[Type].Value;
-
             int frameCount = Main.npcFrameCount[Type];
             
             currentFrame = (int)NPC.frameCounter % (frameCount - 4);
@@ -952,7 +961,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (deadTime > 0)
                 currentFrame = 5;
 
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

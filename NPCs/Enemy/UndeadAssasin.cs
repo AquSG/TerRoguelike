@@ -33,7 +33,7 @@ namespace TerRoguelike.NPCs.Enemy
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 18;
+            Main.npcFrameCount[Type] = 18;
         }
         public override void SetDefaults()
         {
@@ -93,8 +93,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            int currentFrame = NPC.ai[1] > attackCooldown ? (NPC.ai[1] > attackTelegraph + attackCooldown ? 16 : 17) : (NPC.velocity.Y != 0 ? 1 : (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 4)) + 2);
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            int currentFrame = NPC.ai[1] > attackCooldown ? (NPC.ai[1] > attackTelegraph + attackCooldown ? 16 : 17) : (NPC.velocity.Y != 0 ? 1 : (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 4)) + 2);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool CanHitNPC(NPC target) => ableToHit;
         public override bool CanHitPlayer(Player target, ref int cooldownSlot) => ableToHit;

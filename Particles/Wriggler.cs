@@ -49,6 +49,9 @@ namespace TerRoguelike.Particles
 
         public Wriggler(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame = 0, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 15, SpriteEffects SpriteEffects = SpriteEffects.None)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["Wriggler"];
             frameWidth = texture.Width;
             frameHeight = texture.Height / verticalFrameCount;

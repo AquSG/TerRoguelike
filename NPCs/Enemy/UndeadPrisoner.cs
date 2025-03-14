@@ -16,6 +16,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.Audio;
 using TerRoguelike.Projectiles;
 using Terraria.DataStructures;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -29,7 +30,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int extendedAttackSlowdown = 18;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 19;
+            Main.npcFrameCount[Type] = 19;
         }
         public override void SetDefaults()
         {
@@ -82,8 +83,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            int currentFrame = NPC.ai[1] > 0 ? (int)((NPC.ai[1] - 1) / ((attackTelegraph + extendedAttackSlowdown) / 4)) + Main.npcFrameCount[modNPCID] - 5 : (NPC.velocity.Y == 0 ? (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 5)) + 1 : 0);
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            int currentFrame = NPC.ai[1] > 0 ? (int)((NPC.ai[1] - 1) / ((attackTelegraph + extendedAttackSlowdown) / 4)) + Main.npcFrameCount[Type] - 5 : (NPC.velocity.Y == 0 ? (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 5)) + 1 : 0);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
     }
 }

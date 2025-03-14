@@ -23,6 +23,9 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Audio;
+using Terraria.ModLoader.IO;
+using System.IO;
+using Terraria.GameContent.UI.States;
 
 namespace TerRoguelike.NPCs
 {
@@ -45,6 +48,7 @@ namespace TerRoguelike.NPCs
                 return false;
             }
         }
+
         public bool TerRoguelikeBoss = false;
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
@@ -61,6 +65,7 @@ namespace TerRoguelike.NPCs
         public List<WormSegment> Segments = [];
         public List<Vector2> ExtraIgniteTargetPoints = [];
         public int hitSegment = 0;
+        public bool scalingApplied = false;
         public float effectiveDamageTakenMulti 
         { 
             get 
@@ -2373,6 +2378,7 @@ namespace TerRoguelike.NPCs
         public void RogueTumbletwigAI(NPC npc, float speedCap, float acceleration, float attackDist, int projType, float projSpeed, int projDamage, int attackTelegraph, int attackDuration, int attackShootCooldown, int attackCooldown, float attackSpread)
         {
             // I FUCKING HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAATE SLOOOOOOOOOOOOOOOOOOOOOOOOOOOPES FUCK YOU RED FUUUUUUUUCK YOUUUUUUUUU I SWEAR TO FUCK WHY ARE SLOPES SO FUCKING JANK. I'LL JUST NEVER FUCKING USE THEM IN MY BUILDS. (edit- slopes should work now :] )
+            npc.netSpam = 0;
 
             Entity target = GetTarget(npc);
             //npc ai 3: 0 = right, 1 = down, 2 = left, 3 = up
@@ -2415,7 +2421,10 @@ namespace TerRoguelike.NPCs
                     attacking = true;
 
                 if (npc.ai[0] == attackTelegraph + attackDuration)
+                {
                     npc.direction = Main.rand.NextBool() ? -1 : 1;
+                    npc.netUpdate = true;
+                }
                 else if (npc.ai[0] >= attackTelegraph + attackDuration + attackCooldown)
                     npc.ai[0] = 0;
             }
@@ -2435,6 +2444,7 @@ namespace TerRoguelike.NPCs
                     npc.ai[3] = npc.direction == 1 ? 0 : 2;
                     npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
                 else if (!npc.collideY && npc.ai[2] == 0)
                 {
@@ -2442,6 +2452,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.Y = Math.Abs(npc.oldVelocity.X);
                     npc.velocity.X *= -1;
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
             }
             else if (npc.ai[3] == 0) // right collide
@@ -2455,6 +2466,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = -Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y = npc.direction == 1 ? -16 : 16;
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
                 else if (!npc.collideX && npc.ai[2] == 0)
                 {
@@ -2462,6 +2474,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y *= -1;
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
             }
             else if (npc.ai[3] == 3) // up collide
@@ -2475,6 +2488,7 @@ namespace TerRoguelike.NPCs
                     npc.ai[3] = npc.direction == 1 ? 2 : 0;
                     npc.velocity.Y = Math.Abs(npc.oldVelocity.X);
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
                 else if (!npc.collideY && npc.ai[2] == 0)
                 {
@@ -2482,6 +2496,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.Y = -Math.Abs(npc.oldVelocity.X);
                     npc.velocity.X *= -1;
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
             }
             else if (npc.ai[3] == 2)// left collide
@@ -2495,6 +2510,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y = npc.direction == 1 ? 16 : -16;
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
                 else if (!npc.collideX && npc.ai[2] == 0)
                 {
@@ -2502,6 +2518,7 @@ namespace TerRoguelike.NPCs
                     npc.velocity.X = -Math.Abs(npc.oldVelocity.Y);
                     npc.velocity.Y *= -1;
                     npc.ai[2] = 6;
+                    npc.netUpdate = true;
                 }
             }
 
@@ -3378,6 +3395,47 @@ namespace TerRoguelike.NPCs
         #endregion
 
         public override bool InstancePerEntity => true;
+        public override void SendExtraAI(NPC npc, BitWriter bitWriter, BinaryWriter writer)
+        {
+            writer.Write(eliteVars.tainted);
+            writer.Write(eliteVars.slugged);
+            writer.Write(eliteVars.burdened);
+            writer.Write(hostileTurnedAlly);
+            writer.Write(isRoomNPC);
+            writer.Write(sourceRoomListID);
+            writer.Write(targetNPC);
+            writer.Write(targetPlayer);
+            writer.Write(npc.friendly);
+            bool sendZero = npc.ai[0] == 0 || npc.ai[1] == 0 || npc.ai[2] == 0 || npc.ai[3] == 0;
+            writer.Write(sendZero);
+            if (sendZero)
+            {
+                writer.Write(npc.ai[0]);
+                writer.Write(npc.ai[1]);
+                writer.Write(npc.ai[2]);
+                writer.Write(npc.ai[3]);
+            }
+        }
+        public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
+        {
+            eliteVars.tainted = reader.ReadBoolean();
+            eliteVars.slugged = reader.ReadBoolean();
+            eliteVars.burdened = reader.ReadBoolean();
+            hostileTurnedAlly = reader.ReadBoolean();
+            isRoomNPC = reader.ReadBoolean();
+            sourceRoomListID = reader.ReadInt32();
+            targetNPC = reader.ReadInt32();
+            targetPlayer = reader.ReadInt32();
+            npc.friendly = reader.ReadBoolean();
+            bool recieveZero = reader.ReadBoolean();
+            if (recieveZero)
+            {
+                npc.ai[0] = reader.ReadSingle();
+                npc.ai[1] = reader.ReadSingle();
+                npc.ai[2] = reader.ReadSingle();
+                npc.ai[3] = reader.ReadSingle();
+            }
+        }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -3395,6 +3453,8 @@ namespace TerRoguelike.NPCs
 
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
+
+            npc.netUpdate = true;
 
             if (npc.type == NPCID.OldMan || npc.type == NPCID.Guide)
                 npc.active = false;
@@ -3441,6 +3501,13 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreAI(NPC npc)
         {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld && !scalingApplied)
+            {
+                baseMaxHP = npc.lifeMax;
+                baseDamage = npc.damage;
+                SpawnManager.ApplyNPCDifficultyScaling(npc, this);
+            }
+
             diminishingDR = 0;
 
             maxUpdates = 1;
@@ -3878,8 +3945,14 @@ namespace TerRoguelike.NPCs
         }
         public override bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
+            
             if (Segments.Count > 0)
             {
+                if (Main.netMode != NetmodeID.SinglePlayer)
+                {
+                    npcHitbox = new Rectangle(0, 0, 1, 1);
+                    return true;
+                }
                 for (int i = 0; i < Segments.Count; i++)
                 {
                     WormSegment segment = Segments[i];
@@ -4187,6 +4260,7 @@ namespace TerRoguelike.NPCs
                 {
                     targetPlayer = -1;
                     targetCooldown = 0;
+                    npc.netUpdate = true;
                 }
             }
             if (targetNPC != -1)
@@ -4195,6 +4269,7 @@ namespace TerRoguelike.NPCs
                 {
                     targetNPC = -1;
                     targetCooldown = 0;
+                    npc.netUpdate = true;
                 }
             }
 
@@ -4205,6 +4280,7 @@ namespace TerRoguelike.NPCs
                     targetNPC = ClosestNPC(npc.Center, 50000f, false);
                     targetPlayer = -1;
                     targetCooldown = 300;
+                    npc.netUpdate = true;
                 }
             }
             else if (targetCooldown <= 0)
@@ -4225,6 +4301,7 @@ namespace TerRoguelike.NPCs
                         targetNPC = -1;
                 }
                 targetCooldown = 300;
+                npc.netUpdate = true;
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
         }

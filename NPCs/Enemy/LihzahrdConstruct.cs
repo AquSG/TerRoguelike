@@ -17,6 +17,7 @@ using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -34,7 +35,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int meleeHitboxExtension = 20;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 21;
+            Main.npcFrameCount[Type] = 21;
         }
         public override void SetDefaults()
         {
@@ -94,7 +95,7 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            int frameTotal = Main.npcFrameCount[modNPCID];
+            int frameTotal = Main.npcFrameCount[Type];
             int currentFrame;
             if (NPC.ai[1] > 0)
             {
@@ -114,7 +115,7 @@ namespace TerRoguelike.NPCs.Enemy
             {
                 currentFrame = (int)(NPC.frameCounter % (frameTotal - 13)) + 1;
             }
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

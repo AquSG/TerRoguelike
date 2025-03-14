@@ -33,8 +33,8 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackTelegraph = 40;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 20;
-            NPCID.Sets.MustAlwaysDraw[modNPCID] = true;
+            Main.npcFrameCount[Type] = 20;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -117,27 +117,27 @@ namespace TerRoguelike.NPCs.Enemy
                     }
                 }
                 if (Math.Abs(visualGunRot) < MathHelper.PiOver4 * 0.333f)
-                    currentFrame = Main.npcFrameCount[modNPCID] - 3;
+                    currentFrame = Main.npcFrameCount[Type] - 3;
                 else if (visualGunRot > 0)
                 {
                     if (visualGunRot < MathHelper.PiOver4 + 0.4f)
-                        currentFrame = Main.npcFrameCount[modNPCID] - 4;
+                        currentFrame = Main.npcFrameCount[Type] - 4;
                     else
-                        currentFrame = Main.npcFrameCount[modNPCID] - 5;
+                        currentFrame = Main.npcFrameCount[Type] - 5;
                 }
                 else
                 {
                     if (visualGunRot > -MathHelper.PiOver4 - 0.4f)
-                        currentFrame = Main.npcFrameCount[modNPCID] - 2;
+                        currentFrame = Main.npcFrameCount[Type] - 2;
                     else
-                        currentFrame = Main.npcFrameCount[modNPCID] - 1;
+                        currentFrame = Main.npcFrameCount[Type] - 1;
                 }
             }
             else if (NPC.velocity.Y == 0)
             {
-                currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 7)) + 2;
+                currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 7)) + 2;
             }
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
     }
 }

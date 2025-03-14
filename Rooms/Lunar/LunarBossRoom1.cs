@@ -23,6 +23,8 @@ using TerRoguelike.TerPlayer;
 using TerRoguelike.Utilities;
 using TerRoguelike.Items.Rare;
 using TerRoguelike.Items;
+using TerRoguelike.Packets;
+using static TerRoguelike.Packets.EscapePacket;
 
 namespace TerRoguelike.Rooms
 {
@@ -34,6 +36,7 @@ namespace TerRoguelike.Rooms
         public override bool IsBossRoom => true;
         public bool musicPlayed = false;
         public static Texture2D moonLordTex;
+        public override Vector2 bossSpawnPos => new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 11f);
         public override void InitializeRoom()
         {
             if (!TerRoguelikeWorld.lunarBossSpawned)
@@ -43,8 +46,6 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
-            if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 11f);
             if (TerRoguelikeWorld.lunarFloorInitialized && active)
             {
                 if (RoomID[RoomDict["LunarPillarRoomTopLeft"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomTopRight"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomBottomLeft"]].closedTime > 0 && RoomID[RoomDict["LunarPillarRoomBottomRight"]].closedTime > 0)
@@ -93,6 +94,7 @@ namespace TerRoguelike.Rooms
         {
             base.RoomClearReward();
             TerRoguelikeWorld.StartEscapeSequence();
+            EscapePacket.Send(EscapeContext.Start);
 
             bool allowLunarGambitSequence = false;
             Vector2 lunarGambitStartPos = Vector2.Zero;

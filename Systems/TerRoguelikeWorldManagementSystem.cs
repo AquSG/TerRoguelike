@@ -18,6 +18,7 @@ using TerRoguelike.World;
 using TerRoguelike.MainMenu;
 using Microsoft.Xna.Framework;
 using ReLogic.Threading;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Systems
 {
@@ -96,6 +97,7 @@ namespace TerRoguelike.Systems
         public static void RegenerateWorld()
         {
             TerRoguelikeWorld.currentStage = 0;
+            StageCountPacket.Send();
             Main.worldSurface = 200;
             if (TerRoguelikeWorld.promoteLoop)
             {

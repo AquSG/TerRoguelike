@@ -134,6 +134,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             Texture2D tex = TextureAssets.Npc[Type].Value;
             currentFrame = (int)NPC.frameCounter % Main.npcFrameCount[Type];
 

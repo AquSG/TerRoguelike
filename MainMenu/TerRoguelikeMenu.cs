@@ -46,7 +46,7 @@ namespace TerRoguelike.MainMenu
         public static Difficulty difficulty = Difficulty.FullMoon;
         public static ButtonState oldGamepadXState = ButtonState.Released;
         public static ButtonState oldGamepadLeftStickState = ButtonState.Released;
-        public static GamePadState oldGamepadState = GamePad.GetState(PlayerIndex.One);
+        public static GamePadState oldGamepadState;
         public static List<Keys> oldPressedKeys = [];
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
@@ -442,7 +442,7 @@ namespace TerRoguelike.MainMenu
                 }
             }
 
-            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6)
+            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889)
                 prepareForRoguelikeGeneration = false;
             if (Main.menuMode != 888 && Main.menuMode != 0)
             {
@@ -461,8 +461,15 @@ namespace TerRoguelike.MainMenu
             }
             if (Main.menuMode == 6 && prepareForRoguelikeGeneration)
             {
-                Main.menuMode = 10;
-                WorldGen.playWorld();
+                if (Main.menuMultiplayer)
+                {
+                    Main.menuMode = 889;
+                }
+                else
+                {
+                    Main.menuMode = 10;
+                    WorldGen.playWorld();
+                }
             }
             if (PlayerInput.UsingGamepad)
             {
@@ -497,6 +504,8 @@ namespace TerRoguelike.MainMenu
             }
             if (prepareForRoguelikeGeneration && Main.menuMode == 888 && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
             {
+                Main.menuMultiplayer = true;
+                Main.menuServer = true;
                 var font = FontAssets.DeathText.Value;
 
                 DifficultyDrawing();

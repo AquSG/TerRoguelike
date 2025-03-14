@@ -45,6 +45,9 @@ namespace TerRoguelike.Managers
         }
         public static void AddParticle(Particle particle, ParticleLayer layer = ParticleLayer.Default)
         {
+            if (Main.dedServ)
+                return;
+
             if (layer == ParticleLayer.Default)
                 ActiveParticles.Add(particle);
             else if (layer == ParticleLayer.BehindTiles)

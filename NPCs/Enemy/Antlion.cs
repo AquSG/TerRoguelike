@@ -35,7 +35,7 @@ namespace TerRoguelike.NPCs.Enemy
         public bool ableToHit = true;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 2;
+            Main.npcFrameCount[Type] = 2;
         }
         public override void SetDefaults()
         {
@@ -95,7 +95,6 @@ namespace TerRoguelike.NPCs.Enemy
                 Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 97);
                 Gore.NewGore(NPC.GetSource_Death(), NPC.position, NPC.velocity, 98);
             }
-            
         }
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

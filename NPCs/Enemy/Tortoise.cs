@@ -14,6 +14,7 @@ using TerRoguelike.NPCs;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -28,7 +29,7 @@ namespace TerRoguelike.NPCs.Enemy
         public float dashVelocity = 9f;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 8;
+            Main.npcFrameCount[Type] = 8;
         }
         public override void SetDefaults()
         {
@@ -109,7 +110,7 @@ namespace TerRoguelike.NPCs.Enemy
             int currentFrame = 0;
             if (NPC.ai[1] >= 0 && NPC.ai[1] <= attackCooldown - attackTelegraph + 1)
             {
-                currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 3));
+                currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 3));
             }
             else if (NPC.ai[1] > attackCooldown - attackTelegraph)
             {
@@ -121,9 +122,9 @@ namespace TerRoguelike.NPCs.Enemy
             }
             else
             {
-                currentFrame = Main.npcFrameCount[modNPCID] - 1;
+                currentFrame = Main.npcFrameCount[Type] - 1;
             }
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
     }
 }

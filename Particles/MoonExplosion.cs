@@ -44,6 +44,9 @@ namespace TerRoguelike.Particles
 
         public MoonExplosion(Vector2 Position, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["MoonDeadExplosion"];
             frameWidth = texture.Width;
             frameHeight = texture.Height / verticalFrameCount;

@@ -17,6 +17,7 @@ using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.DataStructures;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -27,7 +28,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int CombatStyle => 2;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 5;
+            Main.npcFrameCount[Type] = 5;
         }
         public override void SetDefaults()
         {
@@ -106,8 +107,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override void FindFrame(int frameHeight)
         {
             NPC.gfxOffY = 16;
-            int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[modNPCID]);
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight - 1);
+            int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[Type]);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight - 1);
         }
         public override Color? GetAlpha(Color drawColor)
         {

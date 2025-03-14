@@ -22,6 +22,7 @@ namespace TerRoguelike.Rooms
         public override string Key => "ForestBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/ForestBossRoom1.csch";
         public override bool IsBossRoom => true;
+        public override Vector2 bossSpawnPos => new Vector2(RoomDimensions16.X * 0.5f, RoomDimensions16.Y - 64f);
         public override void InitializeRoom()
         {
             base.InitializeRoom();
@@ -29,8 +30,6 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
-            if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions16.X * 0.5f, RoomDimensions16.Y - 64f);
             base.Update();
         }
     }

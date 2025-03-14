@@ -41,6 +41,9 @@ namespace TerRoguelike.Particles
         public int maxTimeLeft;
         public FadingThinSpark(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["ThinSpark"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = true;

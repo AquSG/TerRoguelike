@@ -15,6 +15,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using TerRoguelike.Projectiles;
 using static TerRoguelike.Schematics.SchematicManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -25,7 +26,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override int CombatStyle => 2;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 6;
+            Main.npcFrameCount[Type] = 6;
         }
         public override void SetDefaults()
         {
@@ -92,8 +93,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[modNPCID]);
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            int currentFrame = (int)(NPC.frameCounter % Main.npcFrameCount[Type]);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
     }
 }
