@@ -27,6 +27,8 @@ using Terraria.ModLoader.IO;
 using Terraria.GameContent;
 using Microsoft.CodeAnalysis;
 using ReLogic.Utilities;
+using TerRoguelike.Packets;
+using static TerRoguelike.Packets.TeleportToPositionPacket;
 
 namespace TerRoguelike.Rooms
 {
@@ -43,14 +45,16 @@ namespace TerRoguelike.Rooms
         public SlotId lunarGambitSlot;
         public override void InitializeRoom()
         {
-            if (!initialized && Main.LocalPlayer != null)
+            if (!initialized)
             {
                 for (int i = 0; i < TerRoguelikeWorld.itemBasins.Count; i++)
                 {
                     var basin = TerRoguelikeWorld.itemBasins[i];
                     basin.itemDisplay = ItemManager.ChooseItemUnbiased((int)basin.tier);
-                    basin.GenerateItemOptions(Main.LocalPlayer);
+                    if (Main.netMode == NetmodeID.SinglePlayer)
+                        basin.GenerateItemOptions(Main.LocalPlayer);
                 }
+                BasinPacket.Send();
             }
             initialized = true;
         }
@@ -143,16 +147,21 @@ namespace TerRoguelike.Rooms
         }
         public override void Ascend(Player player)
         {
-            var modPlayer = player.ModPlayer();
-            var finalRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
-            player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
-            SetBossTrack(FinalBoss2Theme);
-            Vector2 storedBossSpawnPos = finalRoom.bossSpawnPos;
-            ResetRoomID(finalRoom.ID);
-            finalRoom.bossSpawnPos = storedBossSpawnPos;
-            finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
+            if (!TerRoguelike.mpClient)
+            {
+                var modPlayer = player.ModPlayer();
+                var finalRoom = RoomID[FloorID[FloorDict["Surface"]].StartRoomID];
+                player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
+                TeleportToPositionPacket.Send(player.Center, TeleportContext.TrueBrain, ID);
+                finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
 
-            NewFloorEffects(finalRoom, modPlayer);
+                SetBossTrack(FinalBoss2Theme);
+                ResetRoomID(finalRoom.ID);
+                RoomPacket.Send(finalRoom.ID);
+
+
+                NewFloorEffects(finalRoom, modPlayer);
+            }
         }
 
         public override void PreResetRoom()

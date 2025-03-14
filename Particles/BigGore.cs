@@ -47,6 +47,9 @@ namespace TerRoguelike.Particles
 
         public BigGore(Texture2D tex, Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Acceleration, float yCap, float Rotation, int RotDirection, SpriteEffects SpriteEffects, float RotAmount = 0.075f)
         {
+            if (Main.dedServ)
+                return;
+
             texture = tex;
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = false;

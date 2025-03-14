@@ -92,7 +92,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 6;
+            Main.npcFrameCount[Type] = 6;
         }
         public override void SetDefaults()
         {
@@ -766,6 +766,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
@@ -1006,9 +1010,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             
         public override void FindFrame(int frameHeight)
         {
-            Texture2D tex = TextureAssets.Npc[Type].Value;
-
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

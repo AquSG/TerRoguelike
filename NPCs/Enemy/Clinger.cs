@@ -35,7 +35,7 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D segment2Tex;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 5;
+            Main.npcFrameCount[Type] = 5;
         }
         public override void SetDefaults()
         {
@@ -134,7 +134,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void FindFrame(int frameHeight)
         {
             int currentFrame = (int)NPC.frameCounter % 2 == 1 ? 2 : 0;
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

@@ -50,6 +50,9 @@ namespace TerRoguelike.Particles
 
         public Debris(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame, float Rotation, SpriteEffects SpriteEffects, float Acceleration, float yCap, int fadeOutTimeLeftThreshold = 60, bool UseLighting = false)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["RockDebris"];
             frameWidth = texture.Width;
             frameHeight = texture.Height / verticalFrameCount;

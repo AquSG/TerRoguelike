@@ -18,6 +18,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.Graphics.Shaders;
 using TerRoguelike.Utilities;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -31,9 +32,9 @@ namespace TerRoguelike.NPCs.Enemy
         public int dashTime = 40;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 8;
-            NPCID.Sets.TrailCacheLength[modNPCID] = 10;
-            NPCID.Sets.TrailingMode[modNPCID] = 3;
+            Main.npcFrameCount[Type] = 8;
+            NPCID.Sets.TrailCacheLength[Type] = 10;
+            NPCID.Sets.TrailingMode[Type] = 3;
         }
         public override void SetDefaults()
         {
@@ -112,13 +113,13 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            int frameCount = Main.npcFrameCount[modNPCID];
+            int frameCount = Main.npcFrameCount[Type];
             int currentFrame = (int)(NPC.frameCounter % (frameCount - 3));
             if (NPC.ai[1] == 0 && NPC.ai[0] >= attackTelegraph)
             {
                 currentFrame = (int)MathHelper.Clamp(NPC.ai[0] < attackTelegraph + 20 ? ((NPC.ai[0] - attackTelegraph) * 6 / dashTime) + 4 : -((NPC.ai[0] - attackTelegraph - 20) * 6 / dashTime) + frameCount, frameCount - 4, frameCount - 1);
             }
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

@@ -279,6 +279,8 @@ namespace TerRoguelike.Systems
         }
         public static void SetBossTrack(BossTheme bossTheme, float fadeRateMulti = 1)
         {
+            if (Main.dedServ)
+                return;
             if (TerRoguelikeWorld.escape)
                 return;
 
@@ -299,6 +301,8 @@ namespace TerRoguelike.Systems
         }
         public static void SetMusicMode(MusicStyle newMode)
         {
+            if (Main.dedServ)
+                return;
             MusicMode = newMode;
             if (newMode != MusicStyle.Boss)
                 ActiveBossTheme = null;
@@ -326,6 +330,8 @@ namespace TerRoguelike.Systems
         }
         public static void SetCalm(SoundEffect track, bool loop = true, float fadeRateMulti = 1)
         {
+            if (Main.dedServ)
+                return;
             if (!BufferCalmSilence)
             {
                 PauseWhenIngamePaused = false;
@@ -345,6 +351,8 @@ namespace TerRoguelike.Systems
         }
         public static void SetCombat(SoundEffect track, bool loop = true, float fadeRateMulti = 1)
         {
+            if (Main.dedServ)
+                return;
             if (!BufferCombatSilence)
             {
                 PauseWhenIngamePaused = false;
@@ -360,6 +368,8 @@ namespace TerRoguelike.Systems
         }
         public void MusicUpdate()
         {
+            if (Main.dedServ)
+                return;
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
 

@@ -48,6 +48,9 @@ namespace TerRoguelike.Particles
 
         public Shard(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, int StartFrame = 0, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 15, float Gravity = 0.1f, SpriteEffects SpriteEffects = SpriteEffects.None, bool Additive = true)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["Shard"];
             frameWidth = texture.Width;
             frameHeight = texture.Height / verticalFrameCount;

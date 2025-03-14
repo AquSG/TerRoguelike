@@ -9,6 +9,9 @@ using TerRoguelike.Shaders;
 using Terraria.Graphics.Effects;
 using TerRoguelike.Skies;
 using Terraria.GameContent.Shaders;
+using System.IO;
+using TerRoguelike.Systems;
+using Terraria.ID;
 
 namespace TerRoguelike
 {
@@ -16,6 +19,7 @@ namespace TerRoguelike
 	{
 		internal static TerRoguelike Instance;
         public static bool lowDetail => Main.qaStyle > 1;
+        public static bool mpClient => Main.netMode == NetmodeID.MultiplayerClient;
         public override void Load()
         {
             Instance = this;
@@ -66,5 +70,7 @@ namespace TerRoguelike
             ItemBasinUI.Load();
             EnemyHealthbarUI.Load();
         }
+
+        public override void HandlePacket(BinaryReader reader, int whoAmI) => NetcodeSystem.HandlePacket(this, reader, whoAmI);
     }
 }

@@ -24,6 +24,7 @@ using Terraria.GameContent;
 using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.TerPlayer;
 using ReLogic.Utilities;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.World
 {
@@ -129,6 +130,7 @@ namespace TerRoguelike.World
             escape = true;
             escapeTime = escapeTimeSet;
             currentStage++;
+            StageCountPacket.Send();
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
                 Room room = RoomSystem.RoomList[i];

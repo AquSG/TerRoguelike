@@ -23,6 +23,9 @@ using System.Collections.Generic;
 using TerRoguelike.Rooms;
 using TerRoguelike.Floors;
 using TerRoguelike.MainMenu;
+using TerRoguelike.Packets;
+using static TerRoguelike.Packets.TeleportToPositionPacket;
+using static TerRoguelike.Packets.EscapePacket;
 
 namespace TerRoguelike.Managers
 {
@@ -60,7 +63,7 @@ namespace TerRoguelike.Managers
         public int currentWave;
         public int waveClearGraceTime;
         public const int RoomSpawnCap = 200;
-        public Vector2 bossSpawnPos;
+        public virtual Vector2 bossSpawnPos => Vector2.Zero;
         public Vector2 RoomPosition; //position of the room
         public bool bossDead;
         public bool entered = false;
@@ -266,8 +269,9 @@ namespace TerRoguelike.Managers
                 currentWave++;
                 waveStartTime = roomTime;
                 waveClearGraceTime = roomTime;
+                RoomPacket.Send(ID);
             }
-            if (cancontinue)
+            if (cancontinue && !TerRoguelike.mpClient)
             {
                 // start checking if any npcs in the world are active and associated with this room
                 if (roomClearGraceTime == -1)
@@ -302,6 +306,7 @@ namespace TerRoguelike.Managers
             {
                 active = false;
                 RoomClearReward();
+                RoomPacket.Send(ID);
             }
         }
         public virtual void InitializeRoom()
@@ -318,10 +323,27 @@ namespace TerRoguelike.Managers
             if (!wallActive)
                 return;
 
+            if (roomTime == 0 && Main.netMode != NetmodeID.SinglePlayer)
+            {
+                Rectangle roomRect = GetRect();
+                roomRect.Inflate(WallInflateModifier.X * 16, WallInflateModifier.Y * 16);
+                int teleportTarget = -1;
+                for (int i = 0; i < Main.maxPlayers; i++)
+                {
+                    if (roomRect.Contains(Main.player[i].getRect()))
+                    {
+                        teleportTarget = i;
+                        break;
+                    }
+                }
+                if (teleportTarget >= 0)
+                    TeleportToPositionPacket.Send(Main.player[teleportTarget].Center, TeleportContext.Room, ID, -1, -1);
+            }
             Vector2 playerCollisionShrink = WallInflateModifier.ToVector2() * 16;
             for (int playerID = 0; playerID < Main.maxPlayers; playerID++) // keep players in the fucking room
             {
                 var player = Main.player[playerID];
+                
                 bool boundLeft = !player.pulley && (player.position.X + player.velocity.X + playerCollisionShrink.X) < (RoomPosition.X + 1f) * 16f;
                 bool boundRight = !player.pulley && (player.position.X + (float)player.width + player.velocity.X - playerCollisionShrink.X) > (RoomPosition.X - 1f + RoomDimensions.X) * 16f;
                 bool boundTop = (player.position.Y + player.velocity.Y + playerCollisionShrink.Y) < (RoomPosition.Y + 1f) * 16f;
@@ -443,49 +465,52 @@ namespace TerRoguelike.Managers
             ClearGhosts();
             ClearSpecificProjectiles();
 
-            // reward. boss rooms give higher tiers.
-            int chance = Main.rand.Next(1, 101);
-            int itemType;
-            int itemTier;
-
-            if (IsBossRoom)
+            foreach (Player player in Main.ActivePlayers)
             {
+                // reward. boss rooms give higher tiers.
+                int chance = Main.rand.Next(1, 101);
+                int itemType;
+                int itemTier;
+
+                if (IsBossRoom)
+                {
+                    if (chance <= 80)
+                    {
+                        itemType = ItemManager.GiveUncommon(false);
+                        itemTier = 1;
+                    }
+                    else
+                    {
+                        itemType = ItemManager.GiveRare(false);
+                        itemTier = 2;
+                    }
+                    SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, player.whoAmI);
+                    return;
+                }
+
+                if (ItemManager.RoomRewardCooldown > 0)
+                {
+                    ItemManager.RoomRewardCooldown--;
+                    return;
+                }
+
                 if (chance <= 80)
                 {
-                    itemType = ItemManager.GiveUncommon(false);
+                    itemType = ItemManager.GiveCommon();
+                    itemTier = 0;
+                }
+                else if (chance <= 98)
+                {
+                    itemType = ItemManager.GiveUncommon();
                     itemTier = 1;
                 }
                 else
                 {
-                    itemType = ItemManager.GiveRare(false);
+                    itemType = ItemManager.GiveRare();
                     itemTier = 2;
                 }
-                SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f);
-                return;
+                SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, player.whoAmI);
             }
-
-            if (ItemManager.RoomRewardCooldown > 0)
-            {
-                ItemManager.RoomRewardCooldown--;
-                return;
-            }
-                
-            if (chance <= 80)
-            {
-                itemType = ItemManager.GiveCommon();
-                itemTier = 0;
-            }
-            else if (chance <= 98)
-            {
-                itemType = ItemManager.GiveUncommon();
-                itemTier = 1;
-            }
-            else
-            {
-                itemType = ItemManager.GiveRare();
-                itemTier = 2;
-            }
-            SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f);
         }
         public virtual bool CanDescend(Player player, TerRoguelikePlayer modPlayer)
         {
@@ -506,9 +531,10 @@ namespace TerRoguelike.Managers
             }
             else
             {
-                if (nextStage > TerRoguelikeWorld.currentStage)
+                if (nextStage > TerRoguelikeWorld.currentStage && !Main.dedServ)
                 {
                     TerRoguelikeWorld.currentStage = nextStage;
+                    StageCountPacket.Send();
                 }
             }
 
@@ -544,7 +570,14 @@ namespace TerRoguelike.Managers
             player.Center = targetRoom.DescendTeleportPosition();
             if (!IsSanctuary)
             {
+                if (Main.dedServ)
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, ID);
                 TerRoguelikePlayer.HealthUpIndicator(player);
+            }
+            else
+            {
+                if (Main.dedServ)
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.Sanctuary, ID);
             }
             if (nextFloor.Name != "Lunar")
             {
@@ -593,6 +626,9 @@ namespace TerRoguelike.Managers
                 player.Center = (targetRoom.RoomPosition + (targetRoom.RoomDimensions / 2f)) * 16f;
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                 modPlayer.currentFloor = nextFloor;
+
+                if (Main.dedServ)
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, ID);
 
                 modPlayer.escapeArrowTime = 300;
                 var newFloorStartRoom = RoomSystem.RoomList.Find(x => x.ID == nextFloor.StartRoomID);
@@ -649,6 +685,9 @@ namespace TerRoguelike.Managers
                 player.Center = targetRoom.RoomPosition16 + targetRoom.RoomDimensions16 * new Vector2(0.9f, 0.5f);
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                 modPlayer.escaped = true;
+                EscapePacket.Send(EscapeContext.Complete);
+                if (Main.dedServ)
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.Sanctuary);
                 modPlayer.escapeArrowTime = 0;
                 for (int L = 0; L < RoomSystem.RoomList.Count; L++)
                 {

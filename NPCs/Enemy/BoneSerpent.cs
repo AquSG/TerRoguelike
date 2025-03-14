@@ -19,6 +19,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Utilities;
 using Terraria.Audio;
+using Terraria.GameContent.Animations;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -33,8 +34,8 @@ namespace TerRoguelike.NPCs.Enemy
         public bool CollisionPass = false;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 1;
-            NPCID.Sets.MustAlwaysDraw[modNPCID] = true;
+            Main.npcFrameCount[Type] = 1;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -59,9 +60,13 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void OnSpawn(IEntitySource source)
         {
-            NPC.position.Y -= -NPC.height + TextureAssets.Npc[modNPCID].Value.Size().Y * 0.5f;
+            NPC.position.Y -= -NPC.height + 540 * 0.5f;
             NPC.velocity = Vector2.UnitY * -1f;
             NPC.rotation = -MathHelper.PiOver2;
+            AddSegments();
+        }
+        public void AddSegments()
+        {
             int segCount = 25;
             int segmentHeight = 20;
             for (int i = 0; i < segCount; i++)
@@ -71,13 +76,17 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void AI()
         {
+            if (modNPC.Segments.Count == 0)
+            {
+                AddSegments();
+            }
             if (NPC.ai[3] > 0)
                 NPC.ai[3]--;
             modNPC.RogueWormAI(NPC, 12f, MathHelper.Pi / 60f, 480);
             NPC.rotation = NPC.velocity.ToRotation();
             modNPC.UpdateWormSegments(NPC);
             Point tile = new Point((int)(NPC.Center.X / 16f), (int)(NPC.Center.Y / 16f));
-            if (TerRoguelikeUtils.ParanoidTileRetrieval(tile.X, tile.Y).IsTileSolidGround(true))
+            if (!Main.dedServ && TerRoguelikeUtils.ParanoidTileRetrieval(tile.X, tile.Y).IsTileSolidGround(true))
             {
                 if (NPC.ai[3] <= 0)
                 {

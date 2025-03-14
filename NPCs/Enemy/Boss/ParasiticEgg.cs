@@ -53,6 +53,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool? CanFallThroughPlatforms() => true;
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (Main.dedServ)
+                return;
+
             if (NPC.life > 0)
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 50.0; i++)

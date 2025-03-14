@@ -39,8 +39,8 @@ namespace TerRoguelike.NPCs.Enemy
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 16;
-            NPCID.Sets.MustAlwaysDraw[modNPCID] = true;
+            Main.npcFrameCount[Type] = 16;
+            NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -96,8 +96,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void FindFrame(int frameHeight)
         {
-            int currentFrame = NPC.ai[1] > attackCooldown ? 15 : (NPC.velocity.Y != 0 ? 0 : (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 2) + 1));
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            int currentFrame = NPC.ai[1] > attackCooldown ? 15 : (NPC.velocity.Y != 0 ? 0 : (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 2) + 1));
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
 
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)

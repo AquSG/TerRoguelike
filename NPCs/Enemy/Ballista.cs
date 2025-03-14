@@ -32,7 +32,7 @@ namespace TerRoguelike.NPCs.Enemy
         public Texture2D baseTex;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 7;
+            Main.npcFrameCount[Type] = 7;
         }
         public override void SetDefaults()
         {
@@ -101,7 +101,7 @@ namespace TerRoguelike.NPCs.Enemy
         {
             texture = TextureAssets.Npc[Type].Value;
             int currentFrame = NPC.ai[0] >= -150 ? 1 : (NPC.ai[0] > 0 ? (int)(NPC.ai[0] / 5) + 2 : (int)((NPC.ai[0] + attackCooldown) / 5) + 3);
-            int frameHeight = texture.Height / Main.npcFrameCount[modNPCID];
+            int frameHeight = texture.Height / Main.npcFrameCount[Type];
             SpriteEffects effects = Math.Abs(NPC.rotation) < MathHelper.PiOver2 ? SpriteEffects.None : SpriteEffects.FlipVertically;
             if (modNPC.ignitedStacks.Count > 0)
             {

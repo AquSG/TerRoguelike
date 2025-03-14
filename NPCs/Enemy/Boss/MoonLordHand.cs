@@ -464,6 +464,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             currentFrame = (int)NPC.frameCounter % 4;
             frameHeight = trueEyeTex.Height / 4;
             NPC.frame = new Rectangle(0, frameHeight * currentFrame, trueEyeTex.Width, frameHeight - 2);

@@ -21,6 +21,7 @@ namespace TerRoguelike.Rooms
         public override string Key => "CorruptBossRoom1";
         public override string Filename => "Schematics/RoomSchematics/CorruptBossRoom1.csch";
         public override bool IsBossRoom => true;
+        public override Vector2 bossSpawnPos => new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 10f);
         public override void InitializeRoom()
         {
             base.InitializeRoom();
@@ -28,8 +29,6 @@ namespace TerRoguelike.Rooms
         }
         public override void Update()
         {
-            if (bossSpawnPos == Vector2.Zero)
-                bossSpawnPos = new Vector2(RoomDimensions.X * 8f, RoomDimensions.Y * 10f);
             base.Update();
         }
     }

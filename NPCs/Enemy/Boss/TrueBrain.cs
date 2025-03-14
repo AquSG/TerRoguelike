@@ -31,6 +31,7 @@ using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -110,6 +111,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
             Main.npcFrameCount[Type] = 5;
             NPCID.Sets.MustAlwaysDraw[Type] = true;
             SoundEngine.PlaySound(QuakeCooking with { Volume = 0 }); // Play sounds in mod load to force the sound to be ready when first played ingame. otherwise long sounds hitch to load on the fly
@@ -212,7 +214,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         }
                     }
 
-                    NPC.Center = teleportTargetPos;
+                    if (!TerRoguelike.mpClient)
+                        NPC.Center = teleportTargetPos;
+                    NPC.netUpdate = true;
                     if (SoundEngine.TryGetActiveSound(TeleportSlot, out var teleportSound) && teleportSound.IsPlaying)
                     {
                         teleportSound.Position = NPC.Center;
@@ -1097,6 +1101,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
@@ -1244,7 +1252,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         20, Color.Lerp(Color.Teal, Color.White, 0.5f), new Vector2(0.25f), 0, 0.96f, 10));
                 }
             }
-            else if (deadTime == deathExplodeTime)
+            else if (deadTime == deathExplodeTime && !Main.dedServ)
             {
                 SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
                 SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 1f, Pitch = -0.4f }, NPC.Center);
@@ -1417,6 +1425,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             bool dead = deadTime > 0;
             var tex = dead ? deathTex : TextureAssets.Npc[Type].Value;
 
@@ -1588,6 +1599,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(spawnPos);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            spawnPos = reader.ReadVector2();
         }
     }
 }

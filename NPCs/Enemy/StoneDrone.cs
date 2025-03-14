@@ -17,6 +17,7 @@ using Terraria.Audio;
 using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -30,7 +31,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackCooldown = 60;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 22;
+            Main.npcFrameCount[Type] = 22;
         }
         public override void SetDefaults()
         {
@@ -80,18 +81,18 @@ namespace TerRoguelike.NPCs.Enemy
             int currentFrame;
             if (NPC.ai[2] > 0)
             {
-                currentFrame = NPC.ai[2] < attackTelegraph - 11 ? (Main.npcFrameCount[modNPCID] - 9) + (((int)(NPC.ai[2]) * 9) / (attackTelegraph - 11)) : (Main.npcFrameCount[modNPCID] - 8) - ((int)(NPC.ai[2] - (attackTelegraph - 11)) / 6);
+                currentFrame = NPC.ai[2] < attackTelegraph - 11 ? (Main.npcFrameCount[Type] - 9) + (((int)(NPC.ai[2]) * 9) / (attackTelegraph - 11)) : (Main.npcFrameCount[Type] - 8) - ((int)(NPC.ai[2] - (attackTelegraph - 11)) / 6);
             }
             else if (NPC.ai[2] < -attackCooldown + 6)
             {
                 NPC.frameCounter = 1;
-                currentFrame = (Main.npcFrameCount[modNPCID] - 10);
+                currentFrame = (Main.npcFrameCount[Type] - 10);
             }
             else
             {
-                currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[modNPCID] - 10));
+                currentFrame = (int)(NPC.frameCounter % (Main.npcFrameCount[Type] - 10));
             }
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override void PostDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

@@ -600,6 +600,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
@@ -834,80 +838,80 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 SoundEngine.PlaySound(SoundID.NPCHit8 with { Volume = 0.4f, MaxInstances = 4 }, NPC.Center + hitboxes[1].offset);
             }
-        }
-        public override void OnKill()
-        {
-            if (SoundEngine.TryGetActiveSound(DeathraySlot, out var sound) && sound.IsPlaying)
+            else if (deadTime > 0)
             {
-                sound.Stop();
-            }
-            SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.5f }, NPC.Center + hitboxes[1].offset);
-            SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-            SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.8f, Pitch = -0.4f }, NPC.Center);
-
-
-            //the following was copied from the vanilla WoF gore code, and I tried cleaning it up a lot. still shows a bit
-            for (int e = 1; e <= 3; e++)
-            {
-                Rectangle rect = hitboxes[e].GetHitbox(NPC.Center, 0);
-                Vector2 pos = new Vector2(rect.X, rect.Y);
-                Dust.NewDust(pos, rect.Width, rect.Height, 5, -2, -1f);
-                if (e > 1)
+                if (SoundEngine.TryGetActiveSound(DeathraySlot, out var sound) && sound.IsPlaying)
                 {
-                    Gore.NewGore(NPC.GetSource_Death(), pos, NPC.velocity, 137, NPC.scale);
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X, pos.Y + (rect.Height / 2)), NPC.velocity, 139, NPC.scale);
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y), NPC.velocity, 139, NPC.scale);
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y + (rect.Height / 2)), NPC.velocity, 137, NPC.scale);
+                    sound.Stop();
                 }
-                else
+                SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.5f }, NPC.Center + hitboxes[1].offset);
+                SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.8f, Pitch = -0.4f }, NPC.Center);
+
+
+                //the following was copied from the vanilla WoF gore code, and I tried cleaning it up a lot. still shows a bit
+                for (int e = 1; e <= 3; e++)
                 {
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X, pos.Y), NPC.velocity, 137, NPC.scale);
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X, pos.Y + (rect.Height / 2)), NPC.velocity, 138, NPC.scale);
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y), NPC.velocity, 138, NPC.scale);
-                    Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y + (rect.Height / 2)), NPC.velocity, 137, NPC.scale);
-                }
-            }
-
-            Rectangle bodyRect = hitboxes[0].GetHitbox(NPC.Center, 0);
-            Vector2 topLeft = new Vector2(bodyRect.X, bodyRect.Y);
-            for (int x = 0; x < bodyRect.Width - 32; x += 46)
-            {
-                for (int y = 0; y < bodyRect.Height; y += 52)
-                {
-                    Vector2 pos = topLeft + new Vector2(x, y);
-                    if (ParanoidTileRetrieval(pos.ToTileCoordinates()).IsTileSolidGround(true))
-                        continue;
-
-                    if (Main.rand.NextBool(3))
-                        DeathBloodParticles(true);
-
-                    for (int i = 0; i < 5; i++)
+                    Rectangle rect = hitboxes[e].GetHitbox(NPC.Center, 0);
+                    Vector2 pos = new Vector2(rect.X, rect.Y);
+                    Dust.NewDust(pos, rect.Width, rect.Height, 5, -2, -1f);
+                    if (e > 1)
                     {
-                        Dust.NewDust(pos, 32, 32, 5, Main.rand.NextFloat(-0.6f, 0.6f), Main.rand.NextFloat(-0.6f, 0.6f));
+                        Gore.NewGore(NPC.GetSource_Death(), pos, NPC.velocity, 137, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X, pos.Y + (rect.Height / 2)), NPC.velocity, 139, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y), NPC.velocity, 139, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y + (rect.Height / 2)), NPC.velocity, 137, NPC.scale);
+                    }
+                    else
+                    {
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X, pos.Y), NPC.velocity, 137, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X, pos.Y + (rect.Height / 2)), NPC.velocity, 138, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y), NPC.velocity, 138, NPC.scale);
+                        Gore.NewGore(NPC.GetSource_Death(), new Vector2(pos.X + (rect.Width / 2), pos.Y + (rect.Height / 2)), NPC.velocity, 137, NPC.scale);
+                    }
+                }
 
-                        if (Main.rand.NextBool())
+                Rectangle bodyRect = hitboxes[0].GetHitbox(NPC.Center, 0);
+                Vector2 topLeft = new Vector2(bodyRect.X, bodyRect.Y);
+                for (int x = 0; x < bodyRect.Width - 32; x += 46)
+                {
+                    for (int y = 0; y < bodyRect.Height; y += 52)
+                    {
+                        Vector2 pos = topLeft + new Vector2(x, y);
+                        if (ParanoidTileRetrieval(pos.ToTileCoordinates()).IsTileSolidGround(true))
                             continue;
 
-                        Vector2 velocity = new Vector2(-1f, -1f) * Main.rand.NextFloat(1f, 1.7f);
-                        velocity.X *= Main.rand.NextFloat(0.5f, 3f);
-
                         if (Main.rand.NextBool(3))
-                            velocity *= 1.5f;
-                        Vector2 scale = new Vector2(0.25f, 0.4f) * 0.65f;
-                        int time = 110 + Main.rand.Next(70);
-                        Color color = Color.Lerp(Color.Red * 0.65f, Color.Purple, Main.rand.NextFloat(0.75f));
-                        Vector2 randParticlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)pos.X, (int)pos.Y, 32, 32));
-                        ParticleManager.AddParticle(new Blood(randParticlePos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                        ParticleManager.AddParticle(new Blood(randParticlePos, velocity, time, color, scale, velocity.ToRotation(), true));
+                            DeathBloodParticles(true);
+
+                        for (int i = 0; i < 5; i++)
+                        {
+                            Dust.NewDust(pos, 32, 32, 5, Main.rand.NextFloat(-0.6f, 0.6f), Main.rand.NextFloat(-0.6f, 0.6f));
+
+                            if (Main.rand.NextBool())
+                                continue;
+
+                            Vector2 velocity = new Vector2(-1f, -1f) * Main.rand.NextFloat(1f, 1.7f);
+                            velocity.X *= Main.rand.NextFloat(0.5f, 3f);
+
+                            if (Main.rand.NextBool(3))
+                                velocity *= 1.5f;
+                            Vector2 scale = new Vector2(0.25f, 0.4f) * 0.65f;
+                            int time = 110 + Main.rand.Next(70);
+                            Color color = Color.Lerp(Color.Red * 0.65f, Color.Purple, Main.rand.NextFloat(0.75f));
+                            Vector2 randParticlePos = Main.rand.NextVector2FromRectangle(new Rectangle((int)pos.X, (int)pos.Y, 32, 32));
+                            ParticleManager.AddParticle(new Blood(randParticlePos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                            ParticleManager.AddParticle(new Blood(randParticlePos, velocity, time, color, scale, velocity.ToRotation(), true));
+                        }
+                        Vector2 goreVel = new Vector2(Main.rand.NextFloat(-0.8f, 0.8f), Main.rand.NextFloat(-0.6f, 0.2f));
+                        goreVel += Vector2.UnitX * -1.5f;
+                        if (goreVel.X < 0)
+                            goreVel.X *= 3.5f;
+                        Gore.NewGore(NPC.GetSource_Death(), pos, goreVel, Main.rand.Next(140, 143));
                     }
-                    Vector2 goreVel = new Vector2(Main.rand.NextFloat(-0.8f, 0.8f), Main.rand.NextFloat(-0.6f, 0.2f));
-                    goreVel += Vector2.UnitX * -1.5f;
-                    if (goreVel.X < 0)
-                        goreVel.X *= 3.5f;
-                    Gore.NewGore(NPC.GetSource_Death(), pos, goreVel, Main.rand.Next(140, 143));
                 }
             }
-        }
+        }  
         public override void ModifyIncomingHit(ref NPC.HitModifiers modifiers)
         {
             modifiers.HideCombatText();
@@ -937,6 +941,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             Texture2D tex = TextureAssets.Npc[Type].Value;
 
             NPC.frame = new Rectangle(0, currentFrame * frameHeight, tex.Width, frameHeight);

@@ -138,6 +138,8 @@ namespace TerRoguelike.ILEditing
         private void NPCExtraUpdate(On_NPC.orig_UpdateNPC_Inner orig, NPC self, int i)
         {
             orig.Invoke(self, i);
+			if (!self.active)
+				return;
             var modNPC = self.ModNPC();
             if (modNPC != null)
             {

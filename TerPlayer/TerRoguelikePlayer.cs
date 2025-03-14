@@ -23,6 +23,7 @@ using TerRoguelike.MainMenu;
 using TerRoguelike.Managers;
 using TerRoguelike.NPCs;
 using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.Packets;
 using TerRoguelike.Particles;
 using TerRoguelike.Projectiles;
 using TerRoguelike.Schematics;
@@ -2807,6 +2808,8 @@ namespace TerRoguelike.TerPlayer
         }
         public override void OnEnterWorld()
         {
+            RequestRoomUmovingDataPacket.Send();
+
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 Main.BlackFadeIn = 255;

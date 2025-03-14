@@ -48,6 +48,9 @@ namespace TerRoguelike.Particles
 
         public OrbitingGore(Texture2D tex, Vector2 Position, Vector2 Velocity, float Decelertation, float OrbitRate, Vector2 OrbitAnchor, Rectangle Frame, int TimeLeft, Color Color, Vector2 Scale, float Rotation, int RotDirection, int FadeOutTime = 180, float RotAmount = 0.075f)
         {
+            if (Main.dedServ)
+                return;
+
             texture = tex;
             frame = Frame;
             additive = false;

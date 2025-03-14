@@ -16,6 +16,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Audio;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.DataStructures;
+using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -28,7 +29,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackCooldown = 150;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 2;
+            Main.npcFrameCount[Type] = 2;
         }
         public override void SetDefaults()
         {
@@ -99,7 +100,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void FindFrame(int frameHeight)
         {
             int currentFrame = NPC.ai[0] % (attackCooldown + attackTelegraph) <= attackTelegraph && NPC.localAI[0] >= 0 ? 1 : 0;
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
         public override bool CanHitNPC(NPC target) => false;
         public override bool CanHitPlayer(Player target, ref int cooldownSlot) => false;

@@ -16,6 +16,9 @@ using TerRoguelike.Items;
 using Terraria.DataStructures;
 using Terraria.UI;
 using TerRoguelike.Systems;
+using Terraria.ModLoader.Core;
+using System.IO;
+using Terraria.GameContent;
 
 namespace TerRoguelike.Utilities
 {
@@ -637,7 +640,28 @@ namespace TerRoguelike.Utilities
             }
             return final;
         }
+        public static void IterateEveryModsTypes<T>(bool includeBaseType = false, Action<Type> action = null)
+        {
+            if (action is null)
+                return;
 
+            Type baseType = typeof(T);
+            var types = ModLoader.Mods.SelectMany(mod => AssemblyManager.GetLoadableTypes(mod.Code));
+            foreach (var type in types)
+            {
+                if (type.IsSubclassOf(baseType) && !type.IsAbstract && (!includeBaseType && type != baseType))
+                {
+                    action.Invoke(type);
+                }
+            }
+        }
+        public static int NpcTexWidth(int Type)
+        {
+            if (Main.dedServ)
+                return 1;
+
+            return TextureAssets.Npc[Type].Width();
+        }
         public static Vector2 MouseWorldAfterZoom => ((Main.MouseWorld - Main.Camera.Center) / ZoomSystem.zoomOverride) + Main.Camera.Center;
     }
 }

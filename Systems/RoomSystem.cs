@@ -44,6 +44,7 @@ using Terraria.Utilities.Terraria.Utilities;
 using Terraria.UI.Chat;
 using TerRoguelike.Utilities;
 using System.Threading;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Systems
 {
@@ -103,7 +104,9 @@ namespace TerRoguelike.Systems
                         if (!Main.player[i].active)
                             continue;
 
-                        var modPlayer = Main.player[i].ModPlayer();
+                        var modPlayer = Main.player[i]?.ModPlayer();
+                        if (modPlayer == null)
+                            continue;
                         if (modPlayer.escaped)
                             continue;
 
@@ -167,8 +170,10 @@ namespace TerRoguelike.Systems
                         player = Main.player[Main.myPlayer];
                     else
                         player = Main.player[i];
+                    if (!player.active || player.dead)
+                        continue;
 
-                    TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+                    TerRoguelikePlayer modPlayer = player.ModPlayer();
                     bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f - 1f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f + 1f;
                     bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
                     if (roomXcheck && roomYcheck)
@@ -230,6 +235,7 @@ namespace TerRoguelike.Systems
                 {
                     room.entered = true;
                     room.OnEnter();
+                    RoomPacket.Send(room.ID);
                 }
             }
         }
@@ -457,7 +463,6 @@ namespace TerRoguelike.Systems
             room.roomClearGraceTime = -1;
             room.wallActive = false;
             room.haltSpawns = false;
-            room.bossSpawnPos = Vector2.Zero;
             room.bossDead = false;
             room.entered = false;
         }
@@ -1406,6 +1411,11 @@ namespace TerRoguelike.Systems
         #region Post Update Everything
         public override void PostUpdateEverything()
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+                PostUpdateWorld();
+            }
+
             if (regeneratingWorld)
             {
                 regeneratingWorldTime++;
@@ -1695,35 +1705,11 @@ namespace TerRoguelike.Systems
         #region Networking
         public override void NetSend(BinaryWriter writer)
         {
-            //Sorrowful attempt at any semblance of multiplayer compat
-            writer.Write(TerRoguelikeWorld.IsTerRoguelikeWorld);
-            List<byte> packageRoomLisIDs = new List<byte>();
-            for (int i = 0; i < RoomList.Count; i++)
-            {
-                packageRoomLisIDs.Add((byte)RoomList[i].ID);
-            }
-            ReadOnlySpan<byte> sentRoomList = packageRoomLisIDs.ToArray();
-            writer.Write(sentRoomList.Length);
-            writer.Write(sentRoomList);
+            RoomUnmovingDataPacket.Send();
         }
         public override void NetReceive(BinaryReader reader)
         {
-            if (obtainedRoomListFromServer)
-                return;
-
-            if (RoomList == null)
-                RoomList = new List<Room>();
-
-            TerRoguelikeWorld.IsTerRoguelikeWorld = reader.ReadBoolean();
-            int roomListLength = reader.ReadInt32();
-            byte[] recievedRoomIDs = reader.ReadBytes(roomListLength);
-            for (int i = 0; i < recievedRoomIDs.Length; i++)
-            {
-                int roomID = (int)recievedRoomIDs[i];
-                RoomList.Add(RoomID[roomID]);
-                ResetRoomID(roomID);
-            }
-            obtainedRoomListFromServer = true;
+            
         }
         #endregion
         public static void ClearWorldTerRoguelike()
@@ -1771,8 +1757,15 @@ namespace TerRoguelike.Systems
             ParticleManager.ActiveParticlesAfterEverything.Clear();
             ParticleManager.ActiveParticlesAfterProjectiles.Clear();
             ParticleManager.ActiveParticlesBehindTiles.Clear();
+            if (RoomList != null)
+            {
+                for (int i = 0; i < RoomList.Count; i++)
+                    ResetRoomID(RoomList[i].ID);
+            }
 
             TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
+            if (!regeneratingWorld)
+                WorldGen.gen = false;
 
             if (SoundEngine.TryGetActiveSound(PortalSlot, out var portalSound))
             {

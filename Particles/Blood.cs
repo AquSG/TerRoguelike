@@ -40,6 +40,9 @@ namespace TerRoguelike.Particles
         public Vector2 startScale;
         public Blood(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, bool Additive = true)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["Spark"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = Additive;

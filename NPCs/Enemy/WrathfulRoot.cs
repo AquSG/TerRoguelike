@@ -28,7 +28,7 @@ namespace TerRoguelike.NPCs.Enemy
         public int attackCooldown = 80;
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 1;
+            Main.npcFrameCount[Type] = 1;
         }
         public override void SetDefaults()
         {
@@ -97,7 +97,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void FindFrame(int frameHeight)
         {
             int currentFrame = 0;
-            NPC.frame = new Rectangle(0, currentFrame * frameHeight, TextureAssets.Npc[modNPCID].Value.Width, frameHeight);
+            NPC.frame = new Rectangle(0, currentFrame * frameHeight, NpcTexWidth(Type), frameHeight);
         }
     }
 }

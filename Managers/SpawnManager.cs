@@ -23,6 +23,9 @@ using System.Threading;
 using TerRoguelike.Items.Rare;
 using TerRoguelike.MainMenu;
 using Terraria.Localization;
+using TerRoguelike.Packets;
+using log4net.Repository.Hierarchy;
+using Terraria.GameContent.Personalities;
 
 namespace TerRoguelike.Managers
 {
@@ -43,11 +46,18 @@ namespace TerRoguelike.Managers
 
         public static void SpawnEnemy(int npcType, Vector2 position, int roomListID, int telegraphDuration, float telegraphSize = 0.45f, EliteVars eliteVariables = null)
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                return;
+
             eliteVariables ??= new EliteVars();
-            pendingEnemies.Add(new PendingEnemy(npcType, position, roomListID, telegraphDuration, telegraphSize, eliteVariables));
+            var enemy = new PendingEnemy(npcType, position, roomListID, telegraphDuration, telegraphSize, eliteVariables);
+            pendingEnemies.Add(enemy);
+            PendingEnemyPacket.Send(enemy);
         }
         public static void UpdatePendingEnemies()
         {
+            if (pendingEnemies == null)
+                pendingEnemies = [];
             if (pendingEnemies.Count == 0)
                 return;
 
@@ -57,20 +67,23 @@ namespace TerRoguelike.Managers
             {
                 loopcount++;
 
-                Texture2D dummyTex = enemy.dummyTex;
-                int width = dummyTex.Width;
-                int height = dummyTex.Height / Main.npcFrameCount[enemy.NPCType];
-                float completion = enemy.TelegraphDuration / (float)enemy.MaxTelegraphDuration;
-                int y = (int)(completion * height);
-                Vector2 topLeftPos = enemy.Position + new Vector2(-width * 0.5f, -height * 0.5f);
-                int time = enemy.TelegraphDuration < 15 ? 13 : 20;
-                for (int i = 0; i < width; i += 100)
+                if (Main.netMode != NetmodeID.Server)
                 {
-                    int x = Main.rand.Next(width);
-                    Vector2 pos = topLeftPos + new Vector2(x, y);
-                    ParticleManager.AddParticle(new Square(pos, Vector2.Zero, time, GetEliteColor(enemy.eliteVars), new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * enemy.TelegraphSize), 0, 0.96f, time, true));
+                    Texture2D dummyTex = enemy.dummyTex;
+                    int width = dummyTex.Width;
+                    int height = dummyTex.Height / Main.npcFrameCount[enemy.NPCType];
+                    float completion = enemy.TelegraphDuration / (float)enemy.MaxTelegraphDuration;
+                    int y = (int)(completion * height);
+                    Vector2 topLeftPos = enemy.Position + new Vector2(-width * 0.5f, -height * 0.5f);
+                    int time = enemy.TelegraphDuration < 15 ? 13 : 20;
+                    for (int i = 0; i < width; i += 100)
+                    {
+                        int x = Main.rand.Next(width);
+                        Vector2 pos = topLeftPos + new Vector2(x, y);
+                        ParticleManager.AddParticle(new Square(pos, Vector2.Zero, time, GetEliteColor(enemy.eliteVars), new Vector2((4f + Main.rand.NextFloat(-0.5f, 0.5f)) * enemy.TelegraphSize), 0, 0.96f, time, true));
+                    }
                 }
-
+                
                 enemy.TelegraphDuration--;
                 if (enemy.RoomListID != -1)
                 {
@@ -85,7 +98,11 @@ namespace TerRoguelike.Managers
                     NPC dummyNpc = new NPC();
                     dummyNpc.type = enemy.NPCType;
                     dummyNpc.SetDefaults(dummyNpc.type);
-                    NPC spawnedNPC = SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), new Vector2(enemy.Position.X, enemy.Position.Y + (dummyNpc.height / 2f)), enemy.NPCType, enemy.RoomListID, enemy.eliteVars);
+
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
+                    {
+                        NPC spawnedNPC = SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), new Vector2(enemy.Position.X, enemy.Position.Y + (dummyNpc.height / 2f)), enemy.NPCType, enemy.RoomListID, enemy.eliteVars);
+                    }
 
                     enemy.spent = true;
                 }
@@ -142,11 +159,12 @@ namespace TerRoguelike.Managers
             }
             return npc;
         }
-        public static double healthScalingMultiplier => Math.Pow(1.2d, TerRoguelikeWorld.currentStageForScaling);
+        public static double healthScalingMultiplier(bool boss) => Math.Pow(1.2d, TerRoguelikeWorld.currentStageForScaling) * (1 + ((NPC.GetActivePlayerCount() - 1) * (boss ? 1 : 0.5d)));
         public static double damageScalingMultiplier => Math.Pow(1.10d, TerRoguelikeWorld.currentStageForScaling);
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {
-            double healthMultiplier = healthScalingMultiplier;
+            modNpc.scalingApplied = true;
+            double healthMultiplier = healthScalingMultiplier(modNpc.TerRoguelikeBoss);
             if (modNpc.TerRoguelikeBoss && TerRoguelikeMenu.SunnyDayActive)
                 healthMultiplier *= 0.8d;
             double damageMultiplier = damageScalingMultiplier;
@@ -160,16 +178,25 @@ namespace TerRoguelike.Managers
 
             npc.life = npc.lifeMax;
         }
-        public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
+        public static void SpawnItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f, int toPlayer = -1)
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+                return;
             if (TerRoguelikeMenu.RuinedMoonActive && Main.rand.NextFloat() < 0.15f)
                 itemType = trashList[Main.rand.Next(trashList.Count)];
 
-            pendingItems.Add(new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize));
+            var item = new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize, toPlayer >= 0);
+            if (!Main.dedServ || toPlayer == -1)
+                pendingItems.Add(item);
             SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [itemTier], MaxInstances = 10 }, position);
+
+            PendingItemPacket.Send(item, toPlayer);
         }
         public static void UpdatePendingItems()
         {
+            if (pendingItems == null)
+                pendingItems = [];
+
             UpdateSpecialPendingItems();
 
             if (pendingItems.Count == 0)
@@ -201,7 +228,10 @@ namespace TerRoguelike.Managers
                 if (item.TelegraphDuration == 0)
                 {
                     item.TelegraphSize *= 2f;
-                    int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
+                    if (Main.netMode != NetmodeID.MultiplayerClient || item.Personal)
+                    {
+                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType, noBroadcast: item.Personal);
+                    }
                     SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
                     for (int i = 0; i < 15; i++)
                     {
@@ -282,10 +312,13 @@ namespace TerRoguelike.Managers
                             SpawnParticle(item.Position + offset, offset.ToRotation(), offset.Length() * 0.5f, color, Main.rand.Next(20, 61), new Vector2(Main.rand.NextFloat(0.7f, 0.9f) * 0.2f));
                         }
                         item.Position.Y -= 10;
-                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                        {
+                            int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
+                            Main.item[spawnedItem].noGrabDelay = 24;
+                        }
                         if (item.Sound)
                             SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
-                        Main.item[spawnedItem].noGrabDelay = 24;
                         item.spent = true;
                     }
                 }
@@ -340,7 +373,8 @@ namespace TerRoguelike.Managers
         public int setTelegraphDuration;
         public Vector2 displayInterpolationStartPos;
         public int itemSacrificeType;
-        public PendingItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f)
+        public bool Personal;
+        public PendingItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f, bool personal = false)
         {
             ItemType = itemType;
             Position = position;
@@ -352,6 +386,7 @@ namespace TerRoguelike.Managers
             Sound = false;
             displayInterpolationStartPos = Vector2.Zero;
             itemSacrificeType = 0;
+            Personal = personal;
         }
         public PendingItem(int itemType, Vector2 position, ItemTier itemTier, int telegraphDuration, Vector2 velocity, float gravity, Vector2 start, int ItemSacrificeType, bool sound = true)
         {
@@ -363,7 +398,7 @@ namespace TerRoguelike.Managers
             Gravity = gravity;
             TelegraphSize = 1;
             Sound = sound;
-            displayInterpolationStartPos = Main.LocalPlayer.Top;
+            displayInterpolationStartPos = start;
             if (Sound)
             {
                 SoundEngine.PlaySound(SoundID.Item1 with { Volume = 1f, Pitch = -0.24f }, displayInterpolationStartPos);

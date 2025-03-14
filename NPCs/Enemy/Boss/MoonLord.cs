@@ -128,6 +128,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.noTileCollide = true;
             NPC.noGravity = true;
             NPC.behindTiles = true;
+
             coreTex = TexDict["MoonLordCore"];
             coreCrackTex = TexDict["MoonLordCoreCracks"];
             emptyEyeTex = TexDict["MoonLordEmptyEye"];
@@ -1022,6 +1023,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             int chosenAttack = 0;
 
@@ -1474,6 +1479,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void FindFrame(int frameHeight)
         {
+            if (Main.dedServ)
+                return;
+
             var baseTex = TextureAssets.Npc[Type];
             NPC.frame = baseTex.Frame(sizeOffsetY: -180);
 

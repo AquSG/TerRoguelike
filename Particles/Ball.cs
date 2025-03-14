@@ -42,6 +42,9 @@ namespace TerRoguelike.Particles
         Color startColor;
         public Ball(Vector2 Position, Vector2 Velocity, int TimeLeft, Color Color, Vector2 Scale, float Rotation = 0, float Deceleration = 0.96f, int fadeOutTimeLeftThreshold = 30, bool Additive = false, bool UseLighting = false)
         {
+            if (Main.dedServ)
+                return;
+
             texture = TexDict["Circle"];
             frame = new Rectangle(0, 0, texture.Width, texture.Height);
             additive = Additive;

@@ -68,7 +68,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
         public override void SetStaticDefaults()
         {
-            Main.npcFrameCount[modNPCID] = 10;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+            Main.npcFrameCount[Type] = 10;
         }
         public override void SetDefaults()
         {
@@ -200,8 +201,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     BurrowEffect();
                 }
-                if (NPC.ai[1] == (int)(Burrow.Duration * 0.5f))
+                if (NPC.ai[1] == (int)(Burrow.Duration * 0.5f) && !TerRoguelike.mpClient)
                 {
+                    NPC.netUpdate = true;
+
                     NPC.velocity = Vector2.Zero;
                     List<int> directions = new List<int>() { -1, 0, 1, 2 };
                     directions.RemoveAll(x => x == (int)NPC.ai[3]);
@@ -287,11 +290,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else if (NPC.ai[1] == ballAttack1)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), ballAttack1Pos, new Vector2(attackHorizSpeedMulti, -6).RotatedBy(NPC.rotation), ModContent.ProjectileType<LeafBall>(), NPC.damage, 0f, -1, NPC.ai[3]);
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), ballAttack1Pos, new Vector2(attackHorizSpeedMulti, -6).RotatedBy(NPC.rotation), ModContent.ProjectileType<LeafBall>(), NPC.damage, 0f, -1, NPC.ai[3]);
                 }
                 else if (NPC.ai[1] == ballAttack2)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), ballAttack2Pos, new Vector2(-attackHorizSpeedMulti, -6).RotatedBy(NPC.rotation), ModContent.ProjectileType<LeafBall>(), NPC.damage, 0f, -1, NPC.ai[3]);
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), ballAttack2Pos, new Vector2(-attackHorizSpeedMulti, -6).RotatedBy(NPC.rotation), ModContent.ProjectileType<LeafBall>(), NPC.damage, 0f, -1, NPC.ai[3]);
                 }
                 else if (NPC.ai[1] >= VineWall.Duration)
                 {
@@ -333,7 +338,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (ParanoidTileRetrieval(targetTilePos.X, targetTilePos.Y).IsTileSolidGround(true))
                         {
                             float ai0 = (int)NPC.ai[3] % 2 != 0 ? -NPC.ai[3] : (NPC.ai[3] == 2 ? 0 : 2);
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), targetTilePos.ToWorldCoordinates() + new Vector2(0, -32).RotatedBy(rotateBy), new Vector2(0, 12).RotatedBy(rotateBy), ModContent.ProjectileType<RootPillar>(), NPC.damage, 0f, -1, ai0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), targetTilePos.ToWorldCoordinates() + new Vector2(0, -32).RotatedBy(rotateBy), new Vector2(0, 12).RotatedBy(rotateBy), ModContent.ProjectileType<RootPillar>(), NPC.damage, 0f, -1, ai0);
                             break;
                         }
                     }
@@ -377,7 +383,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 pos = new Vector2(0, -72).RotatedBy(((-rotOff + (progress * rotOff * 2)) * direction) + NPC.rotation);
                     Vector2 velocity = pos.SafeNormalize(Vector2.UnitY) * 7f;
                     pos += NPC.Center;
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, velocity, ModContent.ProjectileType<GreenPetal>(), NPC.damage, 0);
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, velocity, ModContent.ProjectileType<GreenPetal>(), NPC.damage, 0);
                 }
                 if (NPC.ai[1] >= SeedBarrage.Duration)
                 {
@@ -475,6 +482,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void ChooseAttack()
         {
+            if (TerRoguelike.mpClient)
+                return;
+            NPC.netUpdate = true;
+
             NPC.ai[1] = 0;
             List<Attack> potentialAttacks = new List<Attack>() { Burrow, VineWall, RootLift, SeedBarrage, Summon };
             potentialAttacks.RemoveAll(x => x.Id == (int)NPC.ai[2]);
@@ -689,7 +700,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             modNPC.drawCenter = (NPC.Bottom - NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + 2)).RotatedBy(NPC.rotation);
 
             int frameCount = Main.npcFrameCount[Type];
-            int frameWidth = TextureAssets.Npc[Type].Value.Width / 3;
+            int frameWidth = NpcTexWidth(Type) / 3;
             currentFrame = (int)NPC.frameCounter % (frameCount - 5);
             horizontalFrame = 0;
 

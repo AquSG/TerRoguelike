@@ -36,6 +36,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         bool ableToHit = true;
         bool canBeHit = true;
 
+        public override void SetStaticDefaults()
+        {
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+        }
         public override void SetDefaults()
         {
             base.SetDefaults();
