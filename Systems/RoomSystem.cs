@@ -95,7 +95,7 @@ namespace TerRoguelike.Systems
                     quakeCooldown--;
 
                 escapeTime--;
-                if (escapeTime == 0)
+                if (escapeTime == 0 && !escaped)
                 {
                     for (int i = 0; i < Main.maxPlayers; i++)
                     {
@@ -1735,6 +1735,7 @@ namespace TerRoguelike.Systems
             TerRoguelikeWorld.lunarFloorInitialized = false;
             TerRoguelikeWorld.lunarBossSpawned = false;
             TerRoguelikeWorld.escape = false;
+            TerRoguelikeWorld.escaped = false;
             itemBasins.Clear();
             worldTeleportTime = 0;
             sanctuaryTries = 0;

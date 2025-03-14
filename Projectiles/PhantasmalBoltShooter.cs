@@ -107,7 +107,8 @@ namespace TerRoguelike.Projectiles
                     vectToTarget = vectToTarget.SafeNormalize(Vector2.UnitY) * maxLength;
                 Vector2 projSpawnPos = Projectile.Center + vectToTarget;
 
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), projSpawnPos, vectToTarget.SafeNormalize(Vector2.UnitY) * Projectile.ai[0], ModContent.ProjectileType<PhantasmalBolt>(), Projectile.damage, 0);
+                if (!TerRoguelike.mpClient)
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), projSpawnPos, vectToTarget.SafeNormalize(Vector2.UnitY) * Projectile.ai[0], ModContent.ProjectileType<PhantasmalBolt>(), Projectile.damage, 0);
             }
         }
         public override bool? CanDamage() => maxTimeLeft - Projectile.timeLeft > 20 && Projectile.timeLeft > 20 ? null : false;

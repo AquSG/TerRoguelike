@@ -281,7 +281,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         for (float i = -3; i <= 3; i += 2)
                         {
                             Vector2 projVelDir = (fireDirection + 0.5f * i).ToRotationVector2();
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projVelDir * 28, projVelDir * 12, ModContent.ProjectileType<SeekingSoulBlast>(), NPC.damage, 0, -1, targetPos.X, targetPos.Y, NPC.velocity.ToRotation());
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projVelDir * 28, projVelDir * 12, ModContent.ProjectileType<SeekingSoulBlast>(), NPC.damage, 0, -1, targetPos.X, targetPos.Y, NPC.velocity.ToRotation());
                         }
                     }
                 }
@@ -380,7 +381,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         NPC.direction = Math.Sign(NPC.rotation);
                     }
 
-                    if (NPC.ai[1] % 2 == 0)
+                    if (NPC.ai[1] % 2 == 0 && !TerRoguelike.mpClient)
                     {
                         int count = RuinedMoonActive ? 4 : 1;
                         for (int i = 0; i < count; i++)
@@ -495,7 +496,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             continue;
 
                         projSpawnPos -= rotVect;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, -rotVect, ModContent.ProjectileType<BoneSpear>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, -rotVect, ModContent.ProjectileType<BoneSpear>(), NPC.damage, 0);
                         break;
                     }
                 }
@@ -550,7 +552,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 float yOff = (spawningDimensions.Y * amplitude * 0.4f + spawningDimensions.Y * 0.1f) * d;
                                 Vector2 spawnPos = start + new Vector2(xOff, yOff);
                                 Vector2 off = (NPC.Center + new Vector2(0, 32).RotatedBy(NPC.rotation)) - spawnPos;
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), spawnPos, Vector2.Zero, ModContent.ProjectileType<SoulTurret>(), NPC.damage, 0, -1, off.X, off.Y);
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), spawnPos, Vector2.Zero, ModContent.ProjectileType<SoulTurret>(), NPC.damage, 0, -1, off.X, off.Y);
                             }
                         }
 

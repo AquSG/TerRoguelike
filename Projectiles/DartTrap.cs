@@ -65,7 +65,8 @@ namespace TerRoguelike.Projectiles
                 if (time == shootTime)
                 {
                     Projectile.rotation = Projectile.ai[0];
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.ai[0].ToRotationVector2() * 16, Projectile.rotation.ToRotationVector2() * Projectile.ai[1], ModContent.ProjectileType<Dart>(), Projectile.damage, 0);
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + Projectile.ai[0].ToRotationVector2() * 16, Projectile.rotation.ToRotationVector2() * Projectile.ai[1], ModContent.ProjectileType<Dart>(), Projectile.damage, 0);
 
                     SoundEngine.PlaySound(SoundID.Item108 with { Volume = 0.5f, Pitch = 0.1f, PitchVariance = 0, MaxInstances = 100, SoundLimitBehavior = SoundLimitBehavior.IgnoreNew }, Projectile.Center + Projectile.ai[0].ToRotationVector2() * -390);
 

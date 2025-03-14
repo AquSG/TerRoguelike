@@ -155,6 +155,9 @@ namespace TerRoguelike.Managers
             if (closedTime <= 60 && (TerRoguelikeWorld.escapeTime > TerRoguelikeWorld.escapeTimeSet - 180 || !TerRoguelikeWorld.escape || (TerRoguelikeWorld.escape && IsBossRoom && FloorID[AssociatedFloor].jstcProgress >= Floor.JstcProgress.Boss))) //wall is visually active up to 1 second after room clear
                 wallActive = true;
 
+            if (TerRoguelikeWorld.escaped && FloorID[AssociatedFloor].Stage != -1)
+                wallActive = false;
+
             if (!active) // room done, closed time increments
             {
                 closedTime++;
@@ -685,6 +688,7 @@ namespace TerRoguelike.Managers
                 player.Center = targetRoom.RoomPosition16 + targetRoom.RoomDimensions16 * new Vector2(0.9f, 0.5f);
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
                 modPlayer.escaped = true;
+                TerRoguelikeWorld.escaped = true;
                 EscapePacket.Send(EscapeContext.Complete);
                 if (Main.dedServ)
                     TeleportToPositionPacket.Send(player.Center, TeleportContext.Sanctuary);

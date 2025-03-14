@@ -110,7 +110,8 @@ namespace TerRoguelike.Projectiles
             for (int i = 0; i < spikes.Count; i++)
             {
                 Vector2 rot = spikes[i].ToRotationVector2();
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + rot * 8, rot * 7, ModContent.ProjectileType<BloodClot>(), Projectile.damage, 0);
+                if (!TerRoguelike.mpClient)
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + rot * 8, rot * 7, ModContent.ProjectileType<BloodClot>(), Projectile.damage, 0);
             }
         }
         public override bool PreDraw(ref Color lightColor)

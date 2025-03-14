@@ -291,7 +291,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             }
                             if (valid != -1)
                             {
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
                             }
                         }
 
@@ -385,7 +386,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         SoundEngine.PlaySound(SoundID.Item1 with { Volume = 1f, MaxInstances = 3 }, NPC.Center);
                         Vector2 projPos = NPC.Center + new Vector2(0 * NPC.direction, -16);
                         Vector2 velocityDirection = target == null ? Vector2.UnitX * NPC.direction : (target.Center - projPos).SafeNormalize(Vector2.UnitX * NPC.direction);
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, velocityDirection * 8f, ModContent.ProjectileType<PaladinHammer>(), NPC.damage, 0f);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, velocityDirection * 8f, ModContent.ProjectileType<PaladinHammer>(), NPC.damage, 0f);
                     }
                 }
 
@@ -760,7 +762,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             for (int i = -1; i <= 1; i += 2)
             {
-                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 10), new Vector2(i * 6, 16), ModContent.ProjectileType<Shockwave>(), NPC.damage, 0f);
+                if (!TerRoguelike.mpClient)
+                    Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 10), new Vector2(i * 6, 16), ModContent.ProjectileType<Shockwave>(), NPC.damage, 0f);
             }
             bool ruin = RuinedMoonActive;
             int spawnCount = ruin ? 40 : 8;
@@ -790,7 +793,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (valid != -1)
                 {
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), new Vector2(tilePos.X * 16f, (tilePos.Y + valid - 2) * 16f) + new Vector2(8f), new Vector2(0, 7), ModContent.ProjectileType<RockDebris>(), NPC.damage, 0f, -1, Main.rand.Next(-25, 1));
                 }
             }
         }

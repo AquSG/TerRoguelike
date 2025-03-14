@@ -209,7 +209,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             float rot = npc.rotation + (i * MathHelper.PiOver4 * 0.33f);
                             Vector2 offset = rot.ToRotationVector2() * (npc.width * 0.5f);
                             Vector2 velocity = rot.ToRotationVector2() * 8f;
-                            Projectile.NewProjectile(parent.GetSource_FromThis(), npc.Center + offset, velocity, ModContent.ProjectileType<BloodClot>(), npc.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(parent.GetSource_FromThis(), npc.Center + offset, velocity, ModContent.ProjectileType<BloodClot>(), npc.damage, 0);
                         }
                     }
                 }

@@ -86,10 +86,14 @@ namespace TerRoguelike.NPCs.Enemy
             else
             {
                 SoundEngine.PlaySound(SoundID.NPCDeath7 with { Volume = 0.5f }, NPC.Center);
-                for (int p = 0; p < 4; p++)
+                if (!TerRoguelike.mpClient)
                 {
-                    int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Main.rand.NextVector2CircularEdge(5f, 5f) * Main.rand.NextFloat(0.5f, 1f), ModContent.ProjectileType<SeekingStarCell>(), NPC.damage, 0);
+                    for (int p = 0; p < 4; p++)
+                    {
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Main.rand.NextVector2CircularEdge(5f, 5f) * Main.rand.NextFloat(0.5f, 1f), ModContent.ProjectileType<SeekingStarCell>(), NPC.damage, 0);
+                    }
                 }
+
                 for (int i = 0; i < 60; i++)
                 {
                     int width = NPC.width / 4;

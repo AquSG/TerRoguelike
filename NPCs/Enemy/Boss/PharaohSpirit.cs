@@ -310,7 +310,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         float completion = (i + 1f) / (nadoCount + 1f);
                         Vector2 projPos = room != null ? room.RoomPosition16 + new Vector2(room.RoomDimensions16.X * completion, room.RoomDimensions16.Y * 0.5f) : spawnPos + new Vector2(-1000 + (2000 * completion), 0);
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, Vector2.Zero, ModContent.ProjectileType<Sandnado>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, Vector2.Zero, ModContent.ProjectileType<Sandnado>(), NPC.damage, 0);
                     }
                 }
                 if (NPC.ai[1] >= Sandnado.Duration)
@@ -348,7 +349,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         for (int i = 0; i < locustCount; i++)
                         {
                             Vector2 projPos = anchor + new Vector2(0, Main.rand.NextFloat(-height, height));
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, projVel, ModContent.ProjectileType<Locust>(), NPC.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projPos, projVel, ModContent.ProjectileType<Locust>(), NPC.damage, 0);
                         }
                     }
                 }
@@ -381,7 +383,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (NPC.ai[1] == fireTime)
                     {
                         SoundEngine.PlaySound(SoundID.DD2_EtherianPortalSpawnEnemy with { Volume = 1f, Variants =  new ReadOnlySpan<int>(0) }, NPC.Top);
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<SandTurret>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, Vector2.Zero, ModContent.ProjectileType<SandTurret>(), NPC.damage, 0);
                     }
                 }
                 if (NPC.ai[1] >= SandTurret.Duration)
@@ -402,7 +405,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         Vector2 offset = new Vector2(30 * NPC.direction, 0);
                         offset = offset.RotatedBy(MathHelper.Pi * 0.15f * i);
                         offset.X *= 0.5f;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), anchor + offset, offset.SafeNormalize(Vector2.UnitX * NPC.direction) * 3, ModContent.ProjectileType<DarkTendril>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), anchor + offset, offset.SafeNormalize(Vector2.UnitX * NPC.direction) * 3, ModContent.ProjectileType<DarkTendril>(), NPC.damage, 0);
                     }
                 }
                 if (NPC.ai[1] >= Tendril.Duration)

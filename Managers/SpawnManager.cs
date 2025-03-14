@@ -26,6 +26,7 @@ using Terraria.Localization;
 using TerRoguelike.Packets;
 using log4net.Repository.Hierarchy;
 using Terraria.GameContent.Personalities;
+using rail;
 
 namespace TerRoguelike.Managers
 {
@@ -185,12 +186,11 @@ namespace TerRoguelike.Managers
             if (TerRoguelikeMenu.RuinedMoonActive && Main.rand.NextFloat() < 0.15f)
                 itemType = trashList[Main.rand.Next(trashList.Count)];
 
-            var item = new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize, toPlayer >= 0);
-            if (!Main.dedServ || toPlayer == -1)
-                pendingItems.Add(item);
+            var item = new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize, toPlayer);
+            pendingItems.Add(item);
             SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [itemTier], MaxInstances = 10 }, position);
 
-            PendingItemPacket.Send(item, toPlayer);
+            PendingItemPacket.Send(item);
         }
         public static void UpdatePendingItems()
         {
@@ -223,19 +223,23 @@ namespace TerRoguelike.Managers
                     }
                 }
                 
+                if (Main.netMode != NetmodeID.SinglePlayer && item.Owner >= 0)
+                {
+                    Player targetPlayer = Main.player[item.Owner];
+                    if (!(!targetPlayer.active || targetPlayer.dead))
+                    {
+                        item.Position = targetPlayer.Center;
+                    }
+                }
+
                 Dust.NewDustDirect(item.Position - new Vector2(15f * item.TelegraphSize, 15f * item.TelegraphSize), (int)(30 * item.TelegraphSize), (int)(30 * item.TelegraphSize), item.particleTier, Scale: 0.5f);
                 item.TelegraphDuration--;
                 if (item.TelegraphDuration == 0)
                 {
                     item.TelegraphSize *= 2f;
-                    if (Main.netMode != NetmodeID.MultiplayerClient || item.Personal)
+                    if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        bool wasMultiplayer = Main.netMode == NetmodeID.MultiplayerClient;
-                        if (wasMultiplayer)
-                            Main.netMode = NetmodeID.SinglePlayer;
-                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType, noBroadcast: item.Personal, prefixGiven: item.Personal ? -1 : 0);
-                        if (wasMultiplayer)
-                            Main.netMode = NetmodeID.MultiplayerClient;
+                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType);
                     }
                     SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
                     for (int i = 0; i < 15; i++)
@@ -378,8 +382,8 @@ namespace TerRoguelike.Managers
         public int setTelegraphDuration;
         public Vector2 displayInterpolationStartPos;
         public int itemSacrificeType;
-        public bool Personal;
-        public PendingItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f, bool personal = false)
+        public int Owner;
+        public PendingItem(int itemType, Vector2 position, int itemTier, int telegraphDuration, float telegraphSize = 0.5f, int owner = -1)
         {
             ItemType = itemType;
             Position = position;
@@ -391,7 +395,7 @@ namespace TerRoguelike.Managers
             Sound = false;
             displayInterpolationStartPos = Vector2.Zero;
             itemSacrificeType = 0;
-            Personal = personal;
+            Owner = owner;
         }
         public PendingItem(int itemType, Vector2 position, ItemTier itemTier, int telegraphDuration, Vector2 velocity, float gravity, Vector2 start, int ItemSacrificeType, bool sound = true)
         {

@@ -80,7 +80,7 @@ namespace TerRoguelike.NPCs.Enemy
                 d.noLight = true;
                 d.noLightEmittence = true;
             }
-            else if (NPC.ai[1] == -65)
+            else if (NPC.ai[1] == -65 && !Main.dedServ)
             {
                 Vector2 pos = (weaponPos) + ((Vector2.UnitX * wepTex.Width * 0.5f) + (spriteEffects == SpriteEffects.FlipHorizontally ? Vector2.Zero : -Vector2.UnitX * wepTex.Width * 0.1f)).RotatedBy(weaponRot + MathHelper.Pi);
                 for (int i = 0; i < wepTex.Width; i += 3)

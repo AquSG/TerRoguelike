@@ -85,11 +85,14 @@ namespace TerRoguelike.Projectiles
         {
             SoundEngine.PlaySound(SoundID.DD2_ExplosiveTrapExplode with { Volume = 0.9f, Pitch = 1f }, Projectile.Center);
             SoundEngine.PlaySound(SoundID.Item48 with { Volume = 0.9f, Pitch = 0 }, Projectile.Center);
-
-            for (int i = 0; i < 8; i++)
+            if (!TerRoguelike.mpClient)
             {
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.UnitX.RotatedBy(i * MathHelper.PiOver4) * 2f, ModContent.ProjectileType<Iceflake>(), Projectile.damage, 0);
+                for (int i = 0; i < 8; i++)
+                {
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Vector2.UnitX.RotatedBy(i * MathHelper.PiOver4) * 2f, ModContent.ProjectileType<Iceflake>(), Projectile.damage, 0);
+                }
             }
+            
             if (!TerRoguelikeUtils.ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
             {
                 for (int i = 0; i < 8; i++)

@@ -38,7 +38,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
-            if ((int)Projectile.velocity.Length() > 0 && Projectile.timeLeft > 90 && Projectile.timeLeft % (int)(Projectile.velocity.Length() * 0.5f) == 0 && !ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
+            if (!TerRoguelike.mpClient && (int)Projectile.velocity.Length() > 0 && Projectile.timeLeft > 90 && Projectile.timeLeft % (int)(Projectile.velocity.Length() * 0.5f) == 0 && !ParanoidTileRetrieval(Projectile.Center.ToTileCoordinates()).IsTileSolidGround(true))
             {
                 Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, Projectile.velocity * 0.04f, ModContent.ProjectileType<IceCloud>(), Projectile.damage, 0, -1, Projectile.timeLeft + ((maxTimeLeft - Projectile.timeLeft) * 0.75f));
             }

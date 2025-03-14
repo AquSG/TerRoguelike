@@ -563,7 +563,7 @@ namespace TerRoguelike.TerPlayer
             if (deathEffectTimer > 0)
             {
                 deathEffectTimer--;
-                if (!reviveDeathEffect && deathEffectTimer <= 1)
+                if (!reviveDeathEffect && deathEffectTimer <= 1 && Player.whoAmI == Main.myPlayer)
                     ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 60);
             }
                 
@@ -2593,7 +2593,7 @@ namespace TerRoguelike.TerPlayer
                         reviveDeathEffect = true;
                         SoundEngine.PlaySound(SoundID.PlayerKilled);
                         SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/LossRevive"));
-                        if (!CutsceneSystem.cutsceneActive)
+                        if (!CutsceneSystem.cutsceneActive && Player.whoAmI == Main.myPlayer)
                             ZoomSystem.SetZoomAnimation(2.5f, 60);
                         return false;
                     }
@@ -2632,7 +2632,7 @@ namespace TerRoguelike.TerPlayer
                 killerNPCType = ModContent.NPCType<TrueBrain>();
             }
             SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
-            if (!CutsceneSystem.cutsceneActive)
+            if (!CutsceneSystem.cutsceneActive && Player.whoAmI == Main.myPlayer)
                 ZoomSystem.SetZoomAnimation(2.5f, 60);
             deathEffectTimer += 120;
             return true;
@@ -3911,7 +3911,7 @@ namespace TerRoguelike.TerPlayer
                 if (deathEffectTimer <= 30)
                     opacityInterpolant = 1f - ((deathEffectTimer + 30) / 90f);
                 opacity = MathHelper.Clamp(MathHelper.Lerp(0.3f, 1f, opacityInterpolant), 0f, 1f);
-                if (deathEffectTimer == 20)
+                if (deathEffectTimer == 20 && Player.whoAmI == Main.myPlayer)
                     ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
             }
             else
@@ -3931,7 +3931,7 @@ namespace TerRoguelike.TerPlayer
             {
                 if (reviveDeathEffect)
                     SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f });
-                else if (!Player.dead)
+                else if (!Player.dead && Player.whoAmI == Main.myPlayer)
                     ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
 
                 reviveDeathEffect = false;
@@ -3940,7 +3940,8 @@ namespace TerRoguelike.TerPlayer
         }
         public override void OnRespawn()
         {
-            ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
+            if (Player.whoAmI == Main.myPlayer)
+                ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
             killerNPC = -1;
             killerProj = -1;
             DeathUI.itemsToDraw.Clear();

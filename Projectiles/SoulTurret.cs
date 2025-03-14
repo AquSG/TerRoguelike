@@ -119,8 +119,11 @@ namespace TerRoguelike.Projectiles
                 SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.2f, Pitch = 0.5f, PitchVariance = 0.08f }, Projectile.Center);
                 Projectile.localAI[0] = 5;
 
-                int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + aimingDirection * 10, aimingDirection * 5, ModContent.ProjectileType<SoulBlast>(), Projectile.damage, 0, -1, 0.65f);
-                Main.projectile[proj].tileCollide = true;
+                if (!TerRoguelike.mpClient)
+                {
+                    int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + aimingDirection * 10, aimingDirection * 5, ModContent.ProjectileType<SoulBlast>(), Projectile.damage, 0, -1, 0.65f);
+                    Main.projectile[proj].tileCollide = true;
+                }
             }
         }
         public override bool? CanDamage() => (maxTimeLeft - Projectile.timeLeft) >= startup + 20 ? null : false;
