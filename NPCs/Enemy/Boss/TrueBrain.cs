@@ -1620,10 +1620,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.WriteVector2(spawnPos);
+            writer.Write(NPC.localAI[0]);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             spawnPos = reader.ReadVector2();
+            NPC.localAI[0] = reader.ReadSingle();
         }
     }
 }

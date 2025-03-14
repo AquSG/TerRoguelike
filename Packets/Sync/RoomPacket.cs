@@ -61,6 +61,7 @@ namespace TerRoguelike.Packets
             packet.Write(room.anyAlive);
             packet.Write(room.lastTelegraphDuration);
             packet.Write(room.wallActive);
+            packet.Write(TerRoguelikeWorld.currentStage);
 
             packet.Send(toClient, ignoreClient);
         }
@@ -84,6 +85,7 @@ namespace TerRoguelike.Packets
             room.anyAlive = packet.ReadBoolean();
             room.lastTelegraphDuration = packet.ReadInt32();
             room.wallActive = packet.ReadBoolean();
+            TerRoguelikeWorld.currentStage = packet.ReadInt32();
         }
     }
 }

@@ -2,12 +2,14 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 using TerRoguelike.NPCs;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
@@ -35,6 +37,8 @@ namespace TerRoguelike.Projectiles
         public int targetNPC = -1;
         public bool sluggedEffect = false;
         public bool hostileTurnedAlly = false;
+        public int multiplayerIdentifier = -1;
+        public int multiplayerClientIdentifier = -1;
         public override bool PreDraw(Projectile projectile, ref Color lightColor)
         {
             if (hostileTurnedAlly)
@@ -48,6 +52,8 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreAI(Projectile projectile)
         {
+            Main.NewText(projectile.friendly);
+            Main.NewText(projectile.hostile);
             extraBounces = 0; // set bounces in projectile ai.
             return true;
         }
@@ -165,6 +171,9 @@ namespace TerRoguelike.Projectiles
                     sluggedEffect = parentModProj.sluggedEffect;
                 }
             }
+            multiplayerIdentifier = projectile.whoAmI;
+            multiplayerClientIdentifier = Main.myPlayer;
+            projectile.netUpdate = true;
         }
         public override void OnKill(Projectile projectile, int timeLeft)
         {
@@ -318,6 +327,48 @@ namespace TerRoguelike.Projectiles
                     Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, blendState, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             }
+        }
+
+        public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter writer)
+        {
+            bool sendZero = projectile.ai[0] == 0 || projectile.ai[1] == 0 || projectile.ai[2] == 0;
+            writer.Write(sendZero);
+            if (sendZero)
+            {
+                writer.Write(projectile.ai[0]);
+                writer.Write(projectile.ai[1]);
+                writer.Write(projectile.ai[2]);
+            }
+
+            writer.Write(sluggedEffect);
+            writer.Write(projectile.rotation);
+            writer.Write(multiplayerIdentifier);
+            writer.Write(multiplayerClientIdentifier);
+            writer.Write(projectile.friendly);
+            writer.Write(projectile.hostile);
+            writer.Write(npcOwner);
+            writer.Write(npcOwnerType);
+        }
+
+        public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader reader)
+        {
+            bool receiveZero = reader.ReadBoolean();
+            if (receiveZero)
+            {
+                projectile.ai[0] = reader.ReadSingle();
+                projectile.ai[1] = reader.ReadSingle();
+                projectile.ai[2] = reader.ReadSingle();
+            }
+
+            sluggedEffect = reader.ReadBoolean();
+            projectile.rotation = reader.ReadSingle();
+            multiplayerIdentifier = reader.ReadInt32();
+            multiplayerClientIdentifier = reader.ReadInt32();
+            projectile.friendly = reader.ReadBoolean();
+            projectile.hostile = reader.ReadBoolean();
+            npcOwner = reader.ReadInt32();
+            npcOwnerType = reader.ReadInt32();
+            
         }
     }
     public class ProcChainBools

@@ -142,6 +142,9 @@ namespace TerRoguelike.Managers
         }
         public virtual void AddBoss(Vector2 npcSpawnPosition, int npcToSpawn)
         {
+            if (TerRoguelike.mpClient)
+                return;
+
             SpawnNPCTerRoguelike(NPC.GetSource_NaturalSpawn(), npcSpawnPosition + RoomPosition16, npcToSpawn, myRoom);
         }
         public virtual void Update()

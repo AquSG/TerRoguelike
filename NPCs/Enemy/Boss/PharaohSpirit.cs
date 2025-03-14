@@ -26,6 +26,7 @@ using Terraria.Graphics.Effects;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using TerRoguelike.World;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -886,6 +887,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.localAI[0]);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.localAI[0] = reader.ReadSingle();
         }
     }
 }
