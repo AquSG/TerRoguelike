@@ -369,7 +369,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             pos += rot.ToRotationVector2() * 44;
                             SoundEngine.PlaySound(SoundID.Item33 with { Volume = 0.3f, Pitch = 0.5f, PitchVariance = 0.04f, MaxInstances = 2 }, pos);
 
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 12, ModContent.ProjectileType<DemonLaser>(), NPC.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 12, ModContent.ProjectileType<DemonLaser>(), NPC.damage, 0);
                         }
 
                     }
@@ -399,7 +400,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             float randRot = Main.rand.NextFloat(-0.15f, 0.15f) + rot;
                             randRot += 0.075f * i;
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) - Vector2.UnitY + (extraSpeed.ToRotation().AngleLerp(-MathHelper.PiOver2, 0.2f).ToRotationVector2() * extraSpeed.Length()), ModContent.ProjectileType<FleshVomit>(), NPC.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) - Vector2.UnitY + (extraSpeed.ToRotation().AngleLerp(-MathHelper.PiOver2, 0.2f).ToRotationVector2() * extraSpeed.Length()), ModContent.ProjectileType<FleshVomit>(), NPC.damage, 0);
                         }
                     }
 
@@ -443,10 +445,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] == 90)
                 {
                     DeathraySlot = SoundEngine.PlaySound(HellBeamSound with { Volume = 1f }, NPC.Center + hitboxes[1].offset);
-                    deathrayTrackedProjId1 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
-                    Main.projectile[deathrayTrackedProjId1].rotation = topEyeRotation;
-                    deathrayTrackedProjId2 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
-                    Main.projectile[deathrayTrackedProjId2].rotation = bottomEyeRotation;
+                    if (!TerRoguelike.mpClient)
+                    {
+                        deathrayTrackedProjId1 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
+                        Main.projectile[deathrayTrackedProjId1].rotation = topEyeRotation;
+                        deathrayTrackedProjId2 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
+                        Main.projectile[deathrayTrackedProjId2].rotation = bottomEyeRotation;
+                    }
                 }
                 if (deathrayTrackedProjId1 >= 0)
                 {

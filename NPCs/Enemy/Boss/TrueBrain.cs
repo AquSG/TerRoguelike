@@ -517,7 +517,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         if (!ParanoidTileRetrieval(pos.ToTileCoordinates()).IsTileSolidGround(true))
                         {
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<PhantasmalBarrier>(), NPC.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<PhantasmalBarrier>(), NPC.damage, 0);
                             soundPos = pos;
                         }
                         cutsceneEyeVector = pos;
@@ -648,7 +649,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             projSpawnPos = anchorPos + vectToTarget * new Vector2(0.35f, 1f);
                         }
 
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, vectToTarget.SafeNormalize(Vector2.UnitY) * 15, ModContent.ProjectileType<PhantasmalBolt>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, vectToTarget.SafeNormalize(Vector2.UnitY) * 15, ModContent.ProjectileType<PhantasmalBolt>(), NPC.damage, 0);
                     }
                 }
                 else if (time == TeleportBoltCycleTime - 20)
@@ -714,7 +716,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             for (int i = -1; i <= 1; i += 2)
                             {
                                 float specificDirection = direction + i * MathHelper.PiOver2;
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + innerEyePosition, specificDirection.ToRotationVector2() * 8, ModContent.ProjectileType<PhantasmalEye>(), NPC.damage, 0);
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + innerEyePosition, specificDirection.ToRotationVector2() * 8, ModContent.ProjectileType<PhantasmalEye>(), NPC.damage, 0);
                             }
                         }
                     }
@@ -840,8 +843,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (time % FakeChargeFireRate == 0)
                     {
                         Vector2 projSpawnPos = NPC.Center + NPC.velocity + innerEyePosition;
-                        int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1, 10, 120);
-                        Main.projectile[proj].ai[2] -= 10;
+                        if (!TerRoguelike.mpClient)
+                        {
+                            int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1, 10, 120);
+                            Main.projectile[proj].ai[2] -= 10;
+                        }
+                            
 
                         SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 0.85f, MaxInstances = 100, Pitch = 1f }, projSpawnPos);
                     }
@@ -875,7 +882,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 Vector2 projSpawnPos = phantomPositions[i] + new Vector2(0, -20);
                                 if (projSpawnPos.Distance(targetPos) > 1000)
                                     continue;
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (-Vector2.UnitY * 10).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)), ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1);
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (-Vector2.UnitY * 10).RotatedBy(Main.rand.NextFloat(-0.5f, 0.5f)), ModContent.ProjectileType<PhantasmalSphere>(), NPC.damage, 0, -1, -1);
                             }
                         }
                     }
@@ -902,7 +910,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 DefaultMovement();
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
                 int cycleTime = RuinedMoonActive ? CrossBeamCycleTime / 2 : CrossBeamCycleTime;
-                if (NPC.ai[1] % cycleTime == 0)
+                if (NPC.ai[1] % cycleTime == 0 && !TerRoguelike.mpClient)
                 {
                     float radius = 370;
                     float rot = Main.rand.NextFloat(MathHelper.TwoPi);
@@ -967,8 +975,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             float rot = startRot + i * rotPerCycle;
                             Vector2 projSpawnPos = NPC.Center + innerEyePosition + rot.ToRotationVector2() * 4;
-                            int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y);
-                            Main.projectile[proj].rotation = rot;
+                            if (!TerRoguelike.mpClient)
+                            {
+                                int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y);
+                                Main.projectile[proj].rotation = rot;
+                            }
                         }
                         if (RuinedMoonActive)
                         {
@@ -976,8 +987,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             {
                                 float rot = startRot + i * rotPerCycle;
                                 Vector2 projSpawnPos = NPC.Center + innerEyePosition + rot.ToRotationVector2() * 4;
-                                int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y, 1);
-                                Main.projectile[proj].rotation = rot;
+                                if (!TerRoguelike.mpClient)
+                                {
+                                    int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y, 1);
+                                    Main.projectile[proj].rotation = rot;
+                                }
                             }
                         }
                     }
@@ -990,7 +1004,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             float rot = (targetPos - NPC.Center - innerEyePosition).ToRotation();
                             rot += -NPC.direction * (Main.rand.NextFloat(-1.2f, 1.2f) + MathHelper.PiOver2);
                             Vector2 rotVect = rot.ToRotationVector2();
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0);
 
                             if (hardMode)
                             {
@@ -998,7 +1013,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 rot = (targetPos - NPC.Center - innerEyePosition).ToRotation();
                                 rot += -NPC.direction * (Main.rand.NextFloat(-0.8f, 0.8f) - MathHelper.PiOver2 * 1.12f);
                                 rotVect = rot.ToRotationVector2();
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0, -1, 1);
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), targetPos + rotVect * radius, -rotVect * 15, ModContent.ProjectileType<PhantasmalBoltShooter>(), NPC.damage, 0, -1, 1);
                             }
                         }
                     }

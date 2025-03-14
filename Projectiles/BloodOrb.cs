@@ -100,8 +100,9 @@ namespace TerRoguelike.Projectiles
                 }
             }
             Vector2 velocity = (Vector2.UnitX * Projectile.ai[2]).RotatedBy(direction);
-            
-            int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<BloodClot>(), Projectile.damage, 0);
+
+            if (!TerRoguelike.mpClient)
+                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center, velocity, ModContent.ProjectileType<BloodClot>(), Projectile.damage, 0);
 
             for (int i = 0; i < 9; i++)
             {

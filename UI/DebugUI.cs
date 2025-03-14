@@ -107,6 +107,7 @@ namespace TerRoguelike.UI
                     TerRoguelikeWorld.lunarFloorInitialized = false;
                     TerRoguelikeWorld.lunarBossSpawned = false;
                     TerRoguelikeWorld.escape = false;
+                    TerRoguelikeWorld.escaped = false;
                     Main.LocalPlayer.ModPlayer().escaped = false;
                     Main.LocalPlayer.ModPlayer().creditsViewTime = 0;
                     Main.LocalPlayer.ModPlayer().escapeFail = false;

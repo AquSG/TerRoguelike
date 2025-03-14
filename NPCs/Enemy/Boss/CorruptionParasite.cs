@@ -553,7 +553,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         float randRot = Main.rand.NextFloat(-0.15f, 0.15f) + NPC.rotation;
                         randRot += 0.075f * i;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (NPC.rotation.ToRotationVector2() * 36), (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) + (NPC.velocity * 0.25f) - Vector2.UnitY, ModContent.ProjectileType<CorruptVomit>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (NPC.rotation.ToRotationVector2() * 36), (randRot.ToRotationVector2() * Main.rand.NextFloat(4.8f, 6f)) + (NPC.velocity * 0.25f) - Vector2.UnitY, ModContent.ProjectileType<CorruptVomit>(), NPC.damage, 0);
                     }
                 } 
                 if (NPC.ai[1] >= Vomit.Duration)
@@ -774,7 +775,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Vector2 randomVect = Main.rand.NextVector2CircularEdge(16f, 16f);
                     ParticleManager.AddParticle(new Square(segment.Position + randomVect, -randomVect * 0.07f, 10, color * ((0.25f * opacity) + 0.75f), new Vector2(0.65f), 0, 0.96f, 10, false));
                 }
-                if (shoot)
+                if (shoot && !TerRoguelike.mpClient)
                     Projectile.NewProjectile(NPC.GetSource_FromThis(), segment.Position, (target == null ? Vector2.UnitY : (target.Center - segment.Position)).SafeNormalize(Vector2.UnitY) * 8, ModContent.ProjectileType<CursedFlame>(), NPC.damage, 0);
             }
         }

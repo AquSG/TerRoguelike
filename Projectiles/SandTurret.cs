@@ -103,8 +103,9 @@ namespace TerRoguelike.Projectiles
                             SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.2f, Pitch = 0.5f, PitchVariance = 0.08f }, Projectile.Center);
                             SoundEngine.PlaySound(SoundID.Dig with { Volume = 0.4f }, Projectile.Center);
                             Projectile.localAI[0] = 5;
-                            
-                            Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + aimingDirection * 36, aimingDirection * 6, ModContent.ProjectileType<ShiningSand>(), Projectile.damage, 0);
+
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + aimingDirection * 36, aimingDirection * 6, ModContent.ProjectileType<ShiningSand>(), Projectile.damage, 0);
                         }
                     }
 

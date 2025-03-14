@@ -327,10 +327,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             Vector2 projSpawnPos = baseOffset + ((Vector2.UnitX * 16).RotatedBy(i * MathHelper.TwoPi / 12f) * new Vector2(1f, 0.6f));
                             projSpawnPos = projSpawnPos.RotatedBy(NPC.rotation);
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<Stinger>(), NPC.damage, 0, -1, 1);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<Stinger>(), NPC.damage, 0, -1, 1);
                             if (ruin && Main.rand.NextBool(4))
                             {
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + projSpawnPos, (fireDirection.ToRotationVector2() * Main.rand.NextFloat(7, 7.5f)).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f)), ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);
                             }
                         }
                     }
@@ -429,7 +431,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 NPC.localAI[1] = 1;
                             }
                             NPC.velocity += rotToAnchor.ToRotationVector2() * 0.051f;
-                            if (NPC.ai[1] % 4 == 0)
+                            if (NPC.ai[1] % 4 == 0 && !TerRoguelike.mpClient)
                             {
                                 Vector2 projSpawnPos = -rotToAnchor.ToRotationVector2() * 460 + NPC.Center + new Vector2(0, Main.rand.NextFloat(-380, -60) * beeSwarmRotateDirection).RotatedBy(rotToAnchor);
                                 Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rotToAnchor.ToRotationVector2() * 9, ModContent.ProjectileType<Bee>(), NPC.damage, 0);
@@ -555,7 +557,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     for (int i = 0; i < spawnCount; i++)
                     {
                         Vector2 projVel = (Vector2.UnitY * Main.rand.NextFloat(2f, 3.5f)).RotatedBy(MathHelper.PiOver2 * 1.3f * -NPC.direction + Main.rand.NextFloat(-0.3f, 0.3f));
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, projVel, ModContent.ProjectileType<HoneyGlob>(), NPC.damage, 0, -1, i / 4);
 
                         Vector2 particleVel = (Vector2.UnitY * Main.rand.NextFloat(1f, 1.7f)).RotatedBy(MathHelper.PiOver2 * 1.3f * -NPC.direction + Main.rand.NextFloat(-0.6f, 0.6f));
                         ParticleManager.AddParticle(new BallOutlined(
@@ -857,7 +860,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
-            if (deadTime < 60)
+            if (deadTime < 60 && !TerRoguelike.mpClient)
             {
                 Vector2 anchor = NPC.Center + modNPC.drawCenter + new Vector2(7 * NPC.direction, 10);
                 for (int i = 0; i < 2; i++)

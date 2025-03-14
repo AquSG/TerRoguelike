@@ -329,7 +329,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (progress == iceWaveShotTelegraph)
                     {
                         Vector2 projSpawnPos = NPC.Center + new Vector2(Math.Sign(NPC.ai[3]) * 60, 0).RotatedBy(NPC.rotation);
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (targetPos - projSpawnPos).SafeNormalize(Vector2.UnitY) * 9, ModContent.ProjectileType<IceWave>(), NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, (targetPos - projSpawnPos).SafeNormalize(Vector2.UnitY) * 9, ModContent.ProjectileType<IceWave>(), NPC.damage, 0);
                         if (NPC.ai[1] == IceWave.Duration - 1 && Math.Abs(NPC.ai[3]) > 1 && Math.Abs(NPC.ai[3]) <= iceWaveShotTelegraph * 2)
                             NPC.ai[1]++;
                     }
@@ -422,7 +423,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 for (int j = skip; j < snowflakeCount; j++)
                                 {
                                     Vector2 projVel = new Vector2((snowflakeMaxHorizontalVelocity * d * (j / (float)snowflakeCount)) + extraVelocity, Main.rand.NextFloat(-0.14f, 0));
-                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 0), projVel, ModContent.ProjectileType<RoyalSnowflake>(), NPC.damage, 0);
+                                    if (!TerRoguelike.mpClient)
+                                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(0, 0), projVel, ModContent.ProjectileType<RoyalSnowflake>(), NPC.damage, 0);
 
                                     if (j % 5 == 0)
                                     {
@@ -501,7 +503,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             speed = 8f;
                         }
 
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(NPC.rotation) * speed, projType, NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(NPC.rotation) * speed, projType, NPC.damage, 0);
                     }
 
                 }
@@ -537,7 +540,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             projType = ModContent.ProjectileType<IceBomb>();
                             speed = 8;
                         }
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.1f, 0.1f)) * speed, projType, NPC.damage, 0);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + (Vector2.UnitY * 90).RotatedBy(NPC.rotation), Vector2.UnitY.RotatedBy(Main.rand.NextFloat(-0.1f, 0.1f)) * speed, projType, NPC.damage, 0);
                     }
                 }
                 
@@ -605,7 +609,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         currentFrame = 0;
                         for (int d = -1; d <= 1; d += 2)
                         {
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(4 * d, -16), (MathHelper.PiOver2 + (-d * MathHelper.PiOver2)).AngleTowards(MathHelper.PiOver2, MathHelper.PiOver2 * 0.25f).ToRotationVector2() * 10, ModContent.ProjectileType<IceCloudSpawner>(), NPC.damage, 0);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + new Vector2(4 * d, -16), (MathHelper.PiOver2 + (-d * MathHelper.PiOver2)).AngleTowards(MathHelper.PiOver2, MathHelper.PiOver2 * 0.25f).ToRotationVector2() * 10, ModContent.ProjectileType<IceCloudSpawner>(), NPC.damage, 0);
                         }
                     }
                 }

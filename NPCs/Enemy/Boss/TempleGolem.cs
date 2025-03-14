@@ -265,7 +265,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             Vector2 pos = eyePositions[i];
                             float rotToTarget = (targetPos - pos).ToRotation();
-                            Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rotToTarget.ToRotationVector2() * 10, ModContent.ProjectileType<LihzahrdLaser>(), NPC.damage, 0, -1, RuinedMoonActive ? 2 : 1);
+                            if (!TerRoguelike.mpClient)
+                                Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rotToTarget.ToRotationVector2() * 10, ModContent.ProjectileType<LihzahrdLaser>(), NPC.damage, 0, -1, RuinedMoonActive ? 2 : 1);
 
                             for (int j = 0; j < 5; j++)
                             {
@@ -306,7 +307,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         Vector2 projSpawnPos = new Vector2(leftBound.X + (thirdWidth * NPC.localAI[2]) + Main.rand.NextFloat(thirdWidth), NPC.Center.Y);
                         projSpawnPos = TileCollidePositionInLine(projSpawnPos, projSpawnPos + new Vector2(0, -240)) - Vector2.UnitY * 16;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, new Vector2(0, -1), ModContent.ProjectileType<LihzahrdSpikeBall>(), NPC.damage, 0, -1, 7);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, new Vector2(0, -1), ModContent.ProjectileType<LihzahrdSpikeBall>(), NPC.damage, 0, -1, 7);
                     }
                     
                 }
@@ -374,7 +376,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (target != null)
                             NPC.ai[3] = NPC.ai[3].AngleTowards(rotToTarget, 0.075f * (angleBetween / slowdownCone));
                         float speed = RuinedMoonActive ? 11 : 7;
-                        Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * speed, ModContent.ProjectileType<Flames>(), NPC.damage, 0, -1, 0, 0.24f);
+                        if (!TerRoguelike.mpClient)
+                            Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, NPC.ai[3].ToRotationVector2() * speed, ModContent.ProjectileType<Flames>(), NPC.damage, 0, -1, 0, 0.24f);
                     }
                     if (time % 10 == 0)
                     {
@@ -460,7 +463,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                     }
                                 }
                                 projSpawnPos += dir.ToRotationVector2() * -4;
-                                Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, dir.ToRotationVector2() * 8, ModContent.ProjectileType<DartTrap>(), NPC.damage, 0);
+                                if (!TerRoguelike.mpClient)
+                                    Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, dir.ToRotationVector2() * 8, ModContent.ProjectileType<DartTrap>(), NPC.damage, 0);
                             }
                         }
                     }
@@ -513,7 +517,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (tile.HasTile && TileID.Sets.Platforms[tile.TileType] && tile.IsTileSolidGround() && tile.BlockType == BlockType.Solid)
                         {
                             Vector2 spawnPos = checkPos.ToTileCoordinates().ToWorldCoordinates(8 + 8 * dir, 0);
-                            if (spawnProj)
+                            if (spawnProj && !TerRoguelike.mpClient)
                             {
                                 Projectile.NewProjectile(NPC.GetSource_FromThis(), spawnPos + new Vector2(20 * dir, -24), new Vector2(-dir * Main.rand.NextFloat(1.9f, 2f), 0), ModContent.ProjectileType<RollingBoulder>(), NPC.damage, 0);
                             }

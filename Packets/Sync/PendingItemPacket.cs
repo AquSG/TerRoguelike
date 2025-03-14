@@ -53,7 +53,7 @@ namespace TerRoguelike.Packets
             packet.Write(item.ItemTier);
             packet.Write(item.setTelegraphDuration);
             packet.Write(item.TelegraphSize);
-            packet.Write(item.Personal);
+            packet.Write(item.Owner);
 
             packet.Send(toClient, ignoreClient);
         }
@@ -64,9 +64,9 @@ namespace TerRoguelike.Packets
             int tier = packet.ReadInt32();
             int duration = packet.ReadInt32();
             float size = packet.ReadSingle();
-            bool personal = packet.ReadBoolean();
+            int owner = packet.ReadInt32();
 
-            SpawnManager.pendingItems.Add(new(type, pos, tier, duration, size, personal));
+            SpawnManager.pendingItems.Add(new(type, pos, tier, duration, size, owner));
             SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [tier], MaxInstances = 10 }, pos);
         }
     }

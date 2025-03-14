@@ -413,7 +413,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             //float scale = trackedSeers.Count / 4f;
                             float scale = 2f;
-                            NPC.localAI[1] = Projectile.NewProjectile(NPC.GetSource_FromThis(), ballPos, ballRot.ToRotationVector2() * 8f, SeerBallType, NPC.damage, 0, -1, 0, scale, ballLaunchTime - (teleportTime + 1));
+                            if (!TerRoguelike.mpClient)
+                            {
+                                NPC.localAI[1] = Projectile.NewProjectile(NPC.GetSource_FromThis(), ballPos, ballRot.ToRotationVector2() * 8f, SeerBallType, NPC.damage, 0, -1, 0, scale, ballLaunchTime - (teleportTime + 1));
+                            }
                         }
 
                         if (NPC.localAI[1] >= 0)
