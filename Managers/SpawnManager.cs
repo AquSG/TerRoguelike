@@ -230,7 +230,12 @@ namespace TerRoguelike.Managers
                     item.TelegraphSize *= 2f;
                     if (Main.netMode != NetmodeID.MultiplayerClient || item.Personal)
                     {
-                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType, noBroadcast: item.Personal);
+                        bool wasMultiplayer = Main.netMode == NetmodeID.MultiplayerClient;
+                        if (wasMultiplayer)
+                            Main.netMode = NetmodeID.SinglePlayer;
+                        int spawnedItem = Item.NewItem(Item.GetSource_NaturalSpawn(), new Rectangle((int)item.Position.X, (int)item.Position.Y, 1, 1), item.ItemType, noBroadcast: item.Personal, prefixGiven: item.Personal ? -1 : 0);
+                        if (wasMultiplayer)
+                            Main.netMode = NetmodeID.MultiplayerClient;
                     }
                     SoundEngine.PlaySound(ItemLand with { Volume = 0.2f, Variants = [item.ItemTier], MaxInstances = 10 }, item.Position);
                     for (int i = 0; i < 15; i++)
