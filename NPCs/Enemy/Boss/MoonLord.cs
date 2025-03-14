@@ -31,6 +31,7 @@ using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using Terraria.GameContent.Shaders;
 using Terraria.Graphics.Effects;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -1380,7 +1381,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (checkPos.Distance(closestPoint) < deathrayRadius)
                         {
                             CollisionPass = false;
-                            if (ableToHit && !TerRoguelike.mpClient)
+                            if (ableToHit)
                                 Projectile.NewProjectile(NPC.GetSource_FromThis(), closestPoint, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathray>(), NPC.damage, 0);
                             return false;
                         }
@@ -1462,7 +1463,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (checkPos.Distance(closestPoint) < deathrayRadius)
                         {
                             CollisionPass = false;
-                            if (ableToHit && !TerRoguelike.mpClient)
+                            if (ableToHit)
                                 Projectile.NewProjectile(NPC.GetSource_FromThis(), closestPoint, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathray>(), NPC.damage, 0);
                             return false;
                         }
@@ -1834,6 +1835,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             GameShaders.Misc["ForceField"].Apply(drawdata);
             drawdata.Draw(Main.spriteBatch);
             StartVanillaSpritebatch();
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.localAI[0]);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.localAI[0] = reader.ReadSingle();
         }
     }
 }

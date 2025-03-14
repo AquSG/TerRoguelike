@@ -47,7 +47,10 @@ namespace TerRoguelike.Projectiles
                 Main.dust[d].velocity *= 0.4f;
             }
             if (Projectile.timeLeft == 300)
+            {
                 GetTarget();
+                Projectile.netUpdate = true;
+            }
 
             Projectile.frame = (Projectile.timeLeft / 4) % 2;
             Projectile.rotation = Projectile.rotation.AngleTowards(Projectile.velocity.ToRotation() + MathHelper.PiOver2, 0.3f);
@@ -72,6 +75,7 @@ namespace TerRoguelike.Projectiles
                     }
                 }
                 Projectile.velocity = Vector2.UnitX.RotatedBy(direction) * startingSpeed;
+                Projectile.netUpdate = true;
             }
         }
         public override void OnKill(int timeLeft)

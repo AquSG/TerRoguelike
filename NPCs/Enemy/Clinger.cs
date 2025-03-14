@@ -22,6 +22,7 @@ using Terraria.Graphics.Shaders;
 using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Managers;
 using TerRoguelike.Particles;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -188,6 +189,14 @@ namespace TerRoguelike.NPCs.Enemy
                 modNPC.EliteEffectSpritebatch(NPC, new());
             }
             return true;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(AnchorPos);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            AnchorPos = reader.ReadVector2();
         }
     }
 }

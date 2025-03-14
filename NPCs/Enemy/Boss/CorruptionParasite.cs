@@ -26,6 +26,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using TerRoguelike.World;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -1113,6 +1114,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 spriteBatch.Draw(texture, segment.Position - screenPos, i == 0 ? headFrame : null, color, segment.Rotation + MathHelper.PiOver2, texture.Size() * new Vector2(0.5f, i == 0 ? 0.25f : 0.5f), 1f, SpriteEffects.None, 0);
             }
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.localAI[0]);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.localAI[0] = reader.ReadSingle();
         }
     }
 }

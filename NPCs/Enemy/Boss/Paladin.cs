@@ -21,6 +21,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using TerRoguelike.World;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -1082,6 +1083,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 return MathHelper.Lerp(-1000, 0, (NPC.ai[1] - slamTelegraph - slamRise) / 60f);
             }
             return 0;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.localAI[0]);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.localAI[0] = reader.ReadSingle();
         }
     }
     public class GodRay
