@@ -119,7 +119,7 @@ namespace TerRoguelike.Projectiles
             float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 35f : 5f;
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
 
-            SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f });
+            SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f }, Owner.Center);
 
             float chargeSpread = ChargeSpread;
             for (int i = 0; i < shotsToFire; i++)

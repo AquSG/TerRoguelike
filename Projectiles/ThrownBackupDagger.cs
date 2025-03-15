@@ -152,6 +152,8 @@ namespace TerRoguelike.Projectiles
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;
             SoundEngine.PlaySound(SoundID.NPCHit18 with { Volume = 0.6f }, Projectile.Center);
+            Projectile.penetrate = 1;
+            Projectile.netUpdate = true;
         }
     }
 }

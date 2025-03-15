@@ -126,6 +126,7 @@ namespace TerRoguelike.NPCs.Enemy
                     NPC.ai[2] = 0;
             }
             NPC.ai[0] = player ? 0 : 1;
+            NPC.netUpdate = true;
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot) => NPC.ai[2] >= -1;
         public override bool CanHitNPC(NPC target) => NPC.ai[2] >= -1;

@@ -15,6 +15,8 @@ using ReLogic.Utilities;
 using TerRoguelike.Particles;
 using TerRoguelike.Utilities;
 using TerRoguelike.NPCs.Enemy.Boss;
+using System.IO;
+using Terraria.ModLoader.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -69,6 +71,7 @@ namespace TerRoguelike.Projectiles
                     SoundEngine.PlaySound(SoundID.DD2_BookStaffCast with { Volume = 1f }, Projectile.Center);
                     Projectile.tileCollide = true;
                     Projectile.velocity = Projectile.rotation.ToRotationVector2() * startVelocity;
+                    Projectile.netUpdate = true;
                 }
             }
             if (Projectile.localAI[0] > 0)
@@ -136,6 +139,25 @@ namespace TerRoguelike.Projectiles
             }
 
             Projectile.localAI[0] = 12;
+            Projectile.netUpdate = true;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(Projectile.localAI[0]);
+            writer.Write(Projectile.width);
+            writer.Write(Projectile.height);
+            writer.Write(Projectile.tileCollide);
+            writer.Write(startVelocity);
+            writer.WriteVector2(Projectile.Center);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            Projectile.localAI[0] = reader.ReadSingle();
+            Projectile.width = reader.ReadInt32();
+            Projectile.height = reader.ReadInt32();
+            Projectile.tileCollide = reader.ReadBoolean();
+            startVelocity = reader.ReadSingle();
+            Projectile.Center = reader.ReadVector2();
         }
     }
 }

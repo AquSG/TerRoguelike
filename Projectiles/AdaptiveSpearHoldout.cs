@@ -108,7 +108,7 @@ namespace TerRoguelike.Projectiles
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             float damageBoost = Charge >= 80f ? 5f : (1 + (Charge / 80f * 3f));
             int damage = (int)(Projectile.damage * damageBoost);
-            SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
+            SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f }, Owner.Center);
 
             float armPointingDirection = modPlayer.playerToCursor.ToRotation() + (MathHelper.PiOver2 * Owner.direction);
             Vector2 projSpawnPos = Owner.MountedCenter + armPointingDirection.ToRotationVector2() * 8 + modPlayer.playerToCursor * 22;

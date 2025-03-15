@@ -19,6 +19,7 @@ using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Systems.RoomSystem;
 using System.Threading;
 using TerRoguelike.Particles;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -84,6 +85,7 @@ namespace TerRoguelike.Projectiles
                     Projectile.velocity *= target == null ? 16f : (target.Center - Projectile.Center).Length() * 0.025f;
                     aimingDirection = Projectile.velocity.SafeNormalize(Vector2.UnitY);
                     SoundEngine.PlaySound(SoundID.Item76 with { Volume = 1f, Pitch = -0.5f }, Projectile.Center + Projectile.velocity * 10);
+                    Projectile.netUpdate = true;
                 }
             }
             else
@@ -162,6 +164,14 @@ namespace TerRoguelike.Projectiles
 
             TerRoguelikeUtils.StartVanillaSpritebatch();
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(aimingDirection);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            aimingDirection = reader.ReadVector2();
         }
     }
 }

@@ -89,19 +89,19 @@ namespace TerRoguelike.Projectiles
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             if (modPlayer.shotgunComponent > 0)
             {
-                SoundEngine.PlaySound(SoundID.Item36 with { Volume = SoundID.Item36.Volume * 0.6f });
+                SoundEngine.PlaySound(SoundID.Item36 with { Volume = SoundID.Item36.Volume * 0.6f }, Owner.Center);
             }
             else if (modPlayer.sniperComponent > 0)
             {
-                SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f });
+                SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f }, Owner.Center);
             }
             else if (modPlayer.minigunComponent > 0)
             {
-                SoundEngine.PlaySound(SoundID.Item11 with { Volume = SoundID.Item11.Volume * 0.6f });
+                SoundEngine.PlaySound(SoundID.Item11 with { Volume = SoundID.Item11.Volume * 0.6f }, Owner.Center);
             }
             else
             {
-                SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f });
+                SoundEngine.PlaySound(SoundID.Item41 with { Volume = SoundID.Item41.Volume * 0.6f }, Owner.Center);
             }
             
             for (int i = 0; i < shotsToFire; i++)

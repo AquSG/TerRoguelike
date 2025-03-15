@@ -103,6 +103,8 @@ namespace TerRoguelike.NPCs.Enemy
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (modNPC.Segments == null || modNPC.Segments.Count == 0)
+                return;
             if (NPC.life <= 0)
             {
                 SoundEngine.PlaySound(SoundID.NPCHit1, modNPC.Segments[modNPC.hitSegment].Position);

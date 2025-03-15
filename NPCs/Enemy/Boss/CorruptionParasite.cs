@@ -985,6 +985,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (modNPC.Segments == null || modNPC.Segments.Count == 0)
+                return;
             WormSegment segment = modNPC.Segments[modNPC.hitSegment];
             SoundEngine.PlaySound(SoundID.NPCHit1, segment.Position);
             if (NPC.life > 0)
@@ -1118,10 +1120,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.WriteVector2(spawnPos);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            spawnPos = reader.ReadVector2();
         }
     }
 }

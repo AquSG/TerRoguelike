@@ -31,6 +31,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 16;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {

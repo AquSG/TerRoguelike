@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.Graphics;
 using Terraria.ModLoader;
+using TerRoguelike.Packets;
 using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Systems
@@ -48,9 +49,12 @@ namespace TerRoguelike.Systems
                 CurrentHealth = 0;
                 MaxHealth = 0;
                 Update();
+                EnemyHealthbarPacket.Send(trackedEnemies);
             }
             public void AddEnemy(int npc)
             {
+                if (npc < 0)
+                    return;
                 TrackedEnemies.Add(npc);
                 TrackedEnemyTypes.Add(Main.npc[npc].type);
             }

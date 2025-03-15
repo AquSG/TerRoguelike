@@ -623,7 +623,11 @@ namespace TerRoguelike.NPCs
                         }
                     }
                 }
-                npc.Bottom = teleportPos;
+                if (!TerRoguelike.mpClient)
+                {
+                    npc.Bottom = teleportPos;
+                    npc.netUpdate = true;
+                }
             }
         }
         public void RogueTurretAI(NPC npc, int attackTelegraph, int attackCooldown, float attackDist, int projType, int projDamage, float projVelocity, Vector2 projOffset, bool LoSRequired, float? directionOverride = null, float? attackCone = null, int attackDuration = 0, int attackTimeBetween = 0)
@@ -806,8 +810,12 @@ namespace TerRoguelike.NPCs
                             burrowPos = npc.Center;
                     }
                 }
-                npc.ai[2] = burrowPos.X;
-                npc.ai[3] = burrowPos.Y;
+                if (!TerRoguelike.mpClient)
+                {
+                    npc.ai[2] = burrowPos.X;
+                    npc.ai[3] = burrowPos.Y;
+                    npc.netUpdate = true;
+                }
             }
         }
         public void RogueFlyingShooterAI(NPC npc, float xCap, float yCap, float acceleration, float minAttackDist, float maxAttackDist, int attackTelegraph, int attackCooldown, int projType, float projSpeed, Vector2 projOffset, int projDamage, bool LoSRequired, float deceleration = 0.93f, int attackSuperCooldown = 0, int attacksToSuperCooldown = 0, bool ignorePlatforms = false)
@@ -1463,6 +1471,7 @@ namespace TerRoguelike.NPCs
                         nextTarget += target == null ? npc.Center : target.Center;
                         npc.ai[2] = nextTarget.X;
                         npc.ai[3] = nextTarget.Y;
+                        npc.netUpdate = true;
                     }
                     if (target != null)
                         npc.direction = 0;
@@ -1895,7 +1904,11 @@ namespace TerRoguelike.NPCs
                                     teleportPos = npc.Bottom;
                             }
                         }
-                        npc.Bottom = teleportPos;
+                        if (!TerRoguelike.mpClient)
+                        {
+                            npc.Bottom = teleportPos;
+                            npc.netUpdate = true;
+                        }
                     }
 
                     npc.ai[1]++;
@@ -3430,6 +3443,7 @@ namespace TerRoguelike.NPCs
                 writer.Write(npc.ai[2]);
                 writer.Write(npc.ai[3]);
             }
+            writer.Write(npc.direction);
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3450,6 +3464,7 @@ namespace TerRoguelike.NPCs
                 npc.ai[2] = reader.ReadSingle();
                 npc.ai[3] = reader.ReadSingle();
             }
+            npc.direction = reader.ReadInt32();
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {

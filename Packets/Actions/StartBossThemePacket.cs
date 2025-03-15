@@ -32,42 +32,32 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
+using static TerRoguelike.Systems.MusicSystem;
+using TerRoguelike.Floors;
 using Terraria.ModLoader.IO;
-using static TerRoguelike.Managers.ItemManager;
-using Terraria.Audio;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class PendingItemPacket : TerRoguelikePacket
+    public sealed class StartBossThemePacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.PendingItemSync;
-        public static void Send(PendingItem item, int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.StartBossThemeSync;
+        public static void Send(BossTheme bossTheme, float fadeRate = 1, int toClient = -1, int ignoreClient = -1)
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!Main.dedServ)
                 return;
 
-            var packet = NewPacket(PacketType.PendingItemSync);
+            var packet = NewPacket(PacketType.StartBossThemeSync);
 
-            packet.Write(item.ItemType);
-            packet.WriteVector2(item.Position);
-            packet.Write(item.ItemTier);
-            packet.Write(item.setTelegraphDuration);
-            packet.Write(item.TelegraphSize);
-            packet.Write(item.Owner);
+            packet.Write((int)bossTheme.Type);
+            packet.Write(fadeRate);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            int type = packet.ReadInt32();
-            Vector2 pos = packet.ReadVector2();
-            int tier = packet.ReadInt32();
-            int duration = packet.ReadInt32();
-            float size = packet.ReadSingle();
-            int owner = packet.ReadInt32();
-
-            SpawnManager.pendingItems.Add(new(type, pos, tier, duration, size, owner));
-            SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [tier], MaxInstances = 10 }, Main.LocalPlayer.Center);
+            BossThemeSyncType type = (BossThemeSyncType)packet.ReadInt32();
+            float fade = packet.ReadSingle();
+            SetBossTrack(BossThemeFromEnum(type), fade);
         }
     }
 }

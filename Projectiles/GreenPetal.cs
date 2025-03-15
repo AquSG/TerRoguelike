@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -157,6 +158,14 @@ namespace TerRoguelike.Projectiles
                     }
                 }
             }
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(startingSpeed);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            startingSpeed = reader.ReadSingle();
         }
     }
 }

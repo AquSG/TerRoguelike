@@ -45,7 +45,7 @@ namespace TerRoguelike.Rooms
         public SlotId lunarGambitSlot;
         public override void InitializeRoom()
         {
-            if (!initialized)
+            if (!initialized && !TerRoguelike.mpClient)
             {
                 for (int i = 0; i < TerRoguelikeWorld.itemBasins.Count; i++)
                 {

@@ -15,6 +15,7 @@ using static TerRoguelike.Managers.TextureManager;
 using Terraria.GameContent;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -162,6 +163,14 @@ namespace TerRoguelike.Projectiles
                     }
                 }
             }
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(direction);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            direction = reader.ReadInt32();
         }
     }
 }

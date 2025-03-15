@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -86,5 +87,14 @@ namespace TerRoguelike.Projectiles
             return false;
         }
         public override Color? GetAlpha(Color lightColor) => Color.Lerp(Color.White, lightColor, 0.15f);
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(startVelocity);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            startVelocity = reader.ReadVector2();
+        }
     }
 }

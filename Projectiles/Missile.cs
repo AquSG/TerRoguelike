@@ -129,6 +129,8 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 60;
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;
+            Projectile.penetrate = 1;
+            Projectile.netUpdate = true;
         }
     }
 }

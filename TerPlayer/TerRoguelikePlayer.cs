@@ -604,7 +604,8 @@ namespace TerRoguelike.TerPlayer
                 benignFungusCooldown--;
             if (benignFungus > 0 && benignFungusCooldown == 0 && Math.Abs(Player.velocity.X) > 2.5f && onGround)
             {
-                Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Bottom + new Vector2(0, -5f), Vector2.Zero, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
+                if (Player.whoAmI == Main.myPlayer)
+                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Bottom + new Vector2(0, -5f), Vector2.Zero, ModContent.ProjectileType<HealingFungus>(), 0, 0f, Player.whoAmI);
                 benignFungusCooldown += Main.rand.Next(13, 16);
             }
             if (sentientPutty > 0 && outOfDangerTime == 120)
@@ -804,8 +805,11 @@ namespace TerRoguelike.TerPlayer
                         info.Knockback = 0f;
                         info.Crit = false;
 
-                        target.StrikeNPC(info);
-                        NetMessage.SendStrikeNPC(target, info);
+                        if (Player.whoAmI == Main.myPlayer)
+                        {
+                            target.StrikeNPC(info);
+                            NetMessage.SendStrikeNPC(target, info);
+                        }
                         CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
                         if (target.life <= 0)
                         {
@@ -1121,8 +1125,11 @@ namespace TerRoguelike.TerPlayer
                     info.Knockback = 0f;
                     info.Crit = false;
 
-                    target.StrikeNPC(info);
-                    NetMessage.SendStrikeNPC(target, info);
+                    if (Player.whoAmI == Main.myPlayer)
+                    {
+                        target.StrikeNPC(info);
+                        NetMessage.SendStrikeNPC(target, info);
+                    }
                     CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
                     if (target.life <= 0)
                     {
@@ -1324,7 +1331,7 @@ namespace TerRoguelike.TerPlayer
             {
                 Vector2 basePos = Player.Center + Vector2.UnitY * Player.gfxOffY;
                 Point lightpos = basePos.ToTileCoordinates();
-                if (jstcTeleportTime <= 0)
+                if (jstcTeleportTime <= 0 && !Main.dedServ)
                     Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1.2f * theFalseSunIntensity);
 
                 Player.GetCritChance(DamageClass.Generic) += 5f;
@@ -1534,7 +1541,8 @@ namespace TerRoguelike.TerPlayer
                                     theFalseSunHitCooldown = 8;
                                     int falseSunDamage = Math.Max((int)(75 * theFalseSunIntensity * theFalseSun), 1);
 
-                                    Projectile.NewProjectile(Player.GetSource_FromThis(), laserPos, Vector2.Zero, ModContent.ProjectileType<FalseSunBeam>(), falseSunDamage, 0.5f, Player.whoAmI, target, Main.npc[target].type);
+                                    if (Player.whoAmI == Main.myPlayer)
+                                        Projectile.NewProjectile(Player.GetSource_FromThis(), laserPos, Vector2.Zero, ModContent.ProjectileType<FalseSunBeam>(), falseSunDamage, 0.5f, Player.whoAmI, target, Main.npc[target].type);
                                 }
                             }
                             else
@@ -1590,7 +1598,7 @@ namespace TerRoguelike.TerPlayer
             if (ILEdits.dualContrastTileShader)
             {
                 Point lightpos = Player.Center.ToTileCoordinates();
-                if (jstcTeleportTime <= 0)
+                if (jstcTeleportTime <= 0 && !Main.dedServ)
                     Lighting.AddLight(lightpos.X, lightpos.Y, TorchID.Ichor, 1f);
             }
             if (noRestore && Main.rand.NextBool())
@@ -1876,6 +1884,19 @@ namespace TerRoguelike.TerPlayer
         {
             moonLordSkyEffect = false;
             moonLordVisualEffect = false;
+            if (Main.myPlayer == Player.whoAmI && deadTime > 240)
+            {
+                for (int i = 0; i < Main.maxPlayers; i++)
+                {
+                    Player spectatee = Main.player[i];
+                    if (!spectatee.active || spectatee.dead)
+                        continue;
+
+                    Player.Center = spectatee.Center;
+                    Main.SetCameraLerp(0.1f, 10);
+                    break;
+                }
+            }
         }
         public override void PostUpdate()
         {
@@ -2564,7 +2585,7 @@ namespace TerRoguelike.TerPlayer
                     soulOfLenaHurtVisual = true;
                     SoundEngine.PlaySound(SoundID.NPCHit36 with { Volume = 0.4f }, Player.Center);
                 }
-                if (Player.immuneTime > 0 && soulOfLenaHurtVisual && jstcTeleportTime <= 0)
+                if (Player.immuneTime > 0 && soulOfLenaHurtVisual && jstcTeleportTime <= 0 && !Main.dedServ)
                 {
                     Lighting.AddLight(Player.Center, 0f, 0.24f, 0.36f);
                 }
