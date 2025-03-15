@@ -602,7 +602,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     if (chargeTime >= BloodTrailChargeTelegraph)
                     {
                         int projSpawnTime = BloodTrailChargeDuration / BloodTrailProjCount;
-                        if ((chargeTime - BloodTrailChargeTelegraph) % projSpawnTime == 0)
+                        if ((chargeTime - BloodTrailChargeTelegraph) % projSpawnTime == 0 && !TerRoguelike.mpClient)
                         {
                             Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center, targetVect.SafeNormalize(Vector2.UnitY) * 6f, ModContent.ProjectileType<BloodOrb>(), NPC.damage, 0);
                         }

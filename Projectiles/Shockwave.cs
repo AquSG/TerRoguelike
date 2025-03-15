@@ -15,6 +15,7 @@ using ReLogic.Utilities;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -108,6 +109,14 @@ namespace TerRoguelike.Projectiles
                 crumbleSound.Stop();
             }
             return true;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(spawnVelocity);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            spawnVelocity = reader.ReadVector2();
         }
     }
 }

@@ -15,6 +15,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -176,6 +177,14 @@ namespace TerRoguelike.Projectiles
 
             Main.EntitySpriteDraw(tex, Projectile.Center + offset - Main.screenPosition, frame, Color.White * spawnCompletion, 0, frame.Size() * 0.5f, Projectile.scale * spawnCompletion, SpriteEffects.None);
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(Projectile.timeLeft);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            Projectile.timeLeft = reader.ReadInt32();
         }
     }
 }
