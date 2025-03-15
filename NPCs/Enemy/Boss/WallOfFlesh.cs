@@ -448,16 +448,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     DeathraySlot = SoundEngine.PlaySound(HellBeamSound with { Volume = 1f }, NPC.Center + hitboxes[1].offset);
                     if (!TerRoguelike.mpClient)
                     {
-                        deathrayTrackedProjId1 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
-                        Main.projectile[deathrayTrackedProjId1].rotation = topEyeRotation;
-                        deathrayTrackedProjId2 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42, Vector2.Zero, ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
-                        Main.projectile[deathrayTrackedProjId2].rotation = bottomEyeRotation;
+                        deathrayTrackedProjId1 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[2].offset + topEyeRotation.ToRotationVector2() * 42, topEyeRotation.ToRotationVector2(), ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
+                        deathrayTrackedProjId2 = Projectile.NewProjectile(NPC.GetSource_FromThis(), NPC.Center + hitboxes[3].offset + bottomEyeRotation.ToRotationVector2() * 42, bottomEyeRotation.ToRotationVector2(), ModContent.ProjectileType<HellBeam>(), NPC.damage, 0);
+                        NPC.netUpdate = true;
                     }
                 }
                 if (deathrayTrackedProjId1 >= 0)
                 {
                     var proj = Main.projectile[deathrayTrackedProjId1];
-                    if (proj.type != ModContent.ProjectileType<HellBeam>())
+                    if (proj.type != ModContent.ProjectileType<HellBeam>() || !proj.active)
                     {
                         deathrayTrackedProjId1 = -1;
                     }
@@ -470,7 +469,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (deathrayTrackedProjId2 >= 0)
                 {
                     var proj = Main.projectile[deathrayTrackedProjId2];
-                    if (proj.type != ModContent.ProjectileType<HellBeam>())
+                    if (proj.type != ModContent.ProjectileType<HellBeam>() || !proj.active)
                     {
                         deathrayTrackedProjId2 = -1;
                     }
@@ -1080,10 +1079,47 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.WriteVector2(spawnPos);
+            writer.Write(topEyeRotation);
+            writer.Write(bottomEyeRotation);
+            writer.Write(mouthRotation);
+            writer.Write(deathrayTrackedProjId1);
+            writer.Write(deathrayTrackedProjId2);
+            writer.Write(Main.myPlayer);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            spawnPos = reader.ReadVector2();
+            topEyeRotation = reader.ReadSingle();
+            bottomEyeRotation = reader.ReadSingle();
+            mouthRotation = reader.ReadSingle();
+            int id1Check = reader.ReadInt32();
+            int id2Check = reader.ReadInt32();
+            int playerCheck = reader.ReadInt32();
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                var proj = Main.projectile[i];
+                if (!proj.active)
+                    continue;
+                var modProj = proj.ModProj();
+                if (modProj == null)
+                    continue;
+
+                if (modProj.multiplayerClientIdentifier == 255)
+                {
+                    if (modProj.multiplayerIdentifier == id1Check)
+                    {
+                        deathrayTrackedProjId1 = i;
+                        continue;
+                    }
+                    if (modProj.multiplayerIdentifier == id2Check)
+                    {
+                        deathrayTrackedProjId2 = i;
+                        continue;
+                    }
+                }
+            }
         }
     }
     public class StoredDraw

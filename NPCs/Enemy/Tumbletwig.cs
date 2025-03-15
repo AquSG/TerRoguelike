@@ -17,6 +17,7 @@ using TerRoguelike.Projectiles;
 using Terraria.DataStructures;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Audio;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -107,6 +108,13 @@ namespace TerRoguelike.NPCs.Enemy
         {
             return true;
         }
-
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.noGravity);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.noGravity = reader.ReadBoolean();
+        }
     }
 }

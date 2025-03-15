@@ -138,6 +138,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
             TeleportAIRunThisUpdate = false;
             if (NPC.localAI[1] >= 0 && trackedSeers.Count <= 1)
             {
@@ -725,6 +726,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void SpawnSeers()
         {
+            if (TerRoguelike.mpClient)
+                return;
+
             int seerCount = RuinedMoonActive ? 16 : 8;
             int seerRate = seerSpawnTime / (seerCount - 1);
             if ((NPC.ai[1] - (Heal.Duration - seerSpawnTime)) % seerRate == 0)
@@ -742,6 +746,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 seer.ModNPC().isRoomNPC = modNPC.isRoomNPC;
                 seer.ModNPC().sourceRoomListID = modNPC.sourceRoomListID;
                 trackedSeers.Add(new TrackedSeer(currentSeer, whoAmI));
+                NPC.netUpdate = true;
             }
         }
         public void ChooseAttack()
@@ -1058,10 +1063,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.WriteVector2(spawnPos);
+            int count = trackedSeers.Count;
+            writer.Write(count);
+            for (int i = 0; i < count; i++)
+            {
+                var seer = trackedSeers[i];
+                writer.Write(seer.seerId);
+                writer.Write(seer.whoAmI);
+            }
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            spawnPos = reader.ReadVector2();
+            trackedSeers.Clear();
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                int id = reader.ReadInt32();
+                int whoami = reader.ReadInt32();
+                trackedSeers.Add(new(id, whoami));
+            }
         }
     }
     public class TrackedSeer

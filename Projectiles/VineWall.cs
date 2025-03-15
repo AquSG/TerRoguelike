@@ -17,6 +17,7 @@ using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.MainMenu;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -101,7 +102,7 @@ namespace TerRoguelike.Projectiles
         }
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-            Texture2D tex = TextureAssets.Projectile[Type].Value;
+            int height = Main.dedServ ? 18 : TextureAssets.Projectile[Type].Height();
             int length = (int)Projectile.ai[0] % 2 == 0 ? (int)Math.Abs(Projectile.Center.Y - spawnPos.Y) : (int)Math.Abs(Projectile.Center.X - spawnPos.X);
             Vector2 pos = spawnPos;
             float rot = Projectile.ai[0] * MathHelper.PiOver2;
@@ -110,8 +111,8 @@ namespace TerRoguelike.Projectiles
             {
                 Vector2 posOffset = (Vector2.UnitY * (i)).RotatedBy(rot);
                 Vector2 scale = new Vector2(1f);
-                float interpolant = ((float)Math.Sin((float)i / tex.Height) + 0.5f);
-                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / tex.Height * 0.5f));
+                float interpolant = ((float)Math.Sin((float)i / height) + 0.5f);
+                float depthInterpolant = Math.Abs((float)Math.Sin((float)i / height * 0.5f));
                 float depth = MathHelper.Lerp(0.7f, 1f, depthInterpolant);
                 scale.X *= depth;
                 posOffset += (Vector2.UnitX * MathHelper.Lerp(-8.5f, 8.5f, interpolant)).RotatedBy(rot);
@@ -120,7 +121,7 @@ namespace TerRoguelike.Projectiles
                     //scale.X *= 1f - ((i - endEase) / (length - (float)endEase));
                 //}
                 Vector2 realPos = pos + posOffset;
-                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < tex.Height * 0.45f * scale.X)
+                if ((realPos - (targetHitbox.ClosestPointInRect(realPos))).Length() < height * 0.45f * scale.X)
                     return true;
             }
 
@@ -176,6 +177,16 @@ namespace TerRoguelike.Projectiles
             }
             */
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(spawnPos);
+            writer.WriteVector2(startVel);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            spawnPos = reader.ReadVector2();
+            startVel = reader.ReadVector2();
         }
     }
 }

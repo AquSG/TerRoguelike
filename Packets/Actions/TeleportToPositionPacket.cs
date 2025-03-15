@@ -34,6 +34,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
 using static TerRoguelike.Systems.MusicSystem;
 using TerRoguelike.Floors;
+using TerRoguelike.TerPlayer;
 
 namespace TerRoguelike.Packets
 {
@@ -106,6 +107,19 @@ namespace TerRoguelike.Packets
                 if (Main.LocalPlayer.ModPlayer() != null)
                     RoomSystem.NewFloorEffects(room, Main.LocalPlayer.ModPlayer());
                 RoomSystem.FloorTransitionEffects();
+
+                Floor nextFloor = FloorID[room.AssociatedFloor];
+                TerRoguelikePlayer.HealthUpIndicator(Main.LocalPlayer);
+                if (nextFloor.Name != "Lunar")
+                {
+                    SetCalm(nextFloor.Soundtrack.CalmTrack);
+                    SetCombat(nextFloor.Soundtrack.CombatTrack);
+                    SetMusicMode(nextFloor.Name == "Sanctuary" ? MusicStyle.AllCalm : MusicStyle.Dynamic);
+                    CombatVolumeInterpolant = 0;
+                    CalmVolumeInterpolant = 0;
+                    CalmVolumeLevel = nextFloor.Soundtrack.Volume;
+                    CombatVolumeLevel = nextFloor.Soundtrack.Volume;
+                }
             }
             if (context == TeleportContext.TrueBrain)
             {

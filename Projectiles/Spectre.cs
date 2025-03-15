@@ -61,6 +61,21 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            if (target == null)
+            {
+                if (Projectile.ai[0] != -1)
+                {
+                    if (Projectile.ai[1] == 1)
+                    {
+                        target = Main.player[(int)Projectile.ai[0]];
+                    }
+                    else if (Projectile.ai[1] == 2)
+                    {
+                        target = Main.npc[(int)Projectile.ai[0]];
+                    }
+                }
+            }
+
             Projectile.frame = (Projectile.frameCounter / 6) % Main.projFrames[Type];
             Projectile.frameCounter++;
 

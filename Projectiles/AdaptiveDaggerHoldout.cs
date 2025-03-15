@@ -114,7 +114,7 @@ namespace TerRoguelike.Projectiles
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             float damageBoost = 1;
             int damage = (int)(Projectile.damage * damageBoost);
-            SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f });
+            SoundEngine.PlaySound(SoundID.Item1 with { Volume = SoundID.Item41.Volume * 1f }, Owner.Center);
             for (int i = 0; i < shotsToFire; i++)
             {
                 float baseRot = Owner.compositeFrontArm.rotation + MathHelper.PiOver2;

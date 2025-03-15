@@ -272,6 +272,14 @@ namespace TerRoguelike.Projectiles
         }
         public Entity GetTarget(Projectile proj)
         {
+            if (TerRoguelike.mpClient && proj.owner != Main.LocalPlayer.whoAmI)
+            {
+                if (targetPlayer >= 0)
+                    return Main.player[targetPlayer];
+                if (targetNPC >= 0)
+                    return Main.npc[targetNPC];
+                return null;
+            }
             if (targetPlayer != -1)
             {
                 if (!Main.player[targetPlayer].active || Main.player[targetPlayer].dead || proj.friendly)
@@ -346,6 +354,8 @@ namespace TerRoguelike.Projectiles
             writer.Write(projectile.hostile);
             writer.Write(npcOwner);
             writer.Write(npcOwnerType);
+            writer.Write(targetPlayer);
+            writer.Write(targetNPC);
         }
 
         public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader reader)
@@ -366,7 +376,8 @@ namespace TerRoguelike.Projectiles
             projectile.hostile = reader.ReadBoolean();
             npcOwner = reader.ReadInt32();
             npcOwnerType = reader.ReadInt32();
-            
+            targetPlayer = reader.ReadInt32();
+            targetNPC = reader.ReadInt32();
         }
     }
     public class ProcChainBools

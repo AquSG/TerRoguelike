@@ -29,6 +29,7 @@ using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.NPCs.Enemy.Boss.MoonLord;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -210,6 +211,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (NPC.life > 1)
                 DrawDeathrayForNPC(NPC, Main.npc[(int)NPC.ai[0]]);
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(spawnPos);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            spawnPos = reader.ReadVector2();
         }
     }
 }

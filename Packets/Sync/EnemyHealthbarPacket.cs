@@ -35,39 +35,43 @@ using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
 using Terraria.ModLoader.IO;
 using static TerRoguelike.Managers.ItemManager;
 using Terraria.Audio;
+using static TerRoguelike.Systems.EnemyHealthBarSystem;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class PendingItemPacket : TerRoguelikePacket
+    public sealed class EnemyHealthbarPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.PendingItemSync;
-        public static void Send(PendingItem item, int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.EnemyHealthbarSync;
+        public static void Send(List<int> trackedEnemies, int toClient = -1, int ignoreClient = -1)
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!Main.dedServ)
                 return;
 
-            var packet = NewPacket(PacketType.PendingItemSync);
+            var packet = NewPacket(PacketType.EnemyHealthbarSync);
 
-            packet.Write(item.ItemType);
-            packet.WriteVector2(item.Position);
-            packet.Write(item.ItemTier);
-            packet.Write(item.setTelegraphDuration);
-            packet.Write(item.TelegraphSize);
-            packet.Write(item.Owner);
+            int count = trackedEnemies.Count;
+            packet.Write(count);
+            for (int i = 0; i < count; i++)
+            {
+                packet.Write(trackedEnemies[i]);
+            }
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            int type = packet.ReadInt32();
-            Vector2 pos = packet.ReadVector2();
-            int tier = packet.ReadInt32();
-            int duration = packet.ReadInt32();
-            float size = packet.ReadSingle();
-            int owner = packet.ReadInt32();
-
-            SpawnManager.pendingItems.Add(new(type, pos, tier, duration, size, owner));
-            SoundEngine.PlaySound(ItemSpawn with { Volume = 0.12f, Variants = [tier], MaxInstances = 10 }, Main.LocalPlayer.Center);
+            int count = packet.ReadInt32();
+            List<int> trackedEnemies = [];
+            for (int i = 0; i < count; i++)
+            {
+                int who = packet.ReadInt32();
+                if (who < 0)
+                    continue;
+                trackedEnemies.Add(who);
+            }
+            NPC first = Main.npc[trackedEnemies[0]];
+            string name = first.active ? first.GivenOrTypeName : " ";
+            enemyHealthBar = new(trackedEnemies, name);
         }
     }
 }

@@ -26,6 +26,8 @@ using ReLogic.Content;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
+using static TerRoguelike.Systems.MusicSystem;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Systems
 {
@@ -116,69 +118,142 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/PaladinTheme",
             "TerRoguelike/Tracks/PaladinThemeStart",
             "TerRoguelike/Tracks/PaladinThemeEnd",
-            0.33f);
+            0.33f,
+            BossThemeSyncType.Paladin);
 
         public static BossTheme BrambleHollowTheme = new(
             "TerRoguelike/Tracks/BrambleHollowTheme",
             "TerRoguelike/Tracks/BrambleHollowThemeStart",
             "TerRoguelike/Tracks/BrambleHollowThemeEnd",
-            0.4f);
+            0.4f,
+            BossThemeSyncType.BrambleHollow);
 
         public static BossTheme CrimsonVesselTheme = new(
             "TerRoguelike/Tracks/CrimsonVesselTheme",
             "TerRoguelike/Tracks/CrimsonVesselThemeStart",
             "TerRoguelike/Tracks/CrimsonVesselThemeEnd",
-            0.8f);
+            0.8f,
+            BossThemeSyncType.CrimsonVessel);
+
         public static BossTheme CorruptionParasiteTheme = new(
             "TerRoguelike/Tracks/CorruptionParasiteTheme",
             "TerRoguelike/Tracks/CorruptionParasiteThemeStart",
             "TerRoguelike/Tracks/CorruptionParasiteThemeEnd",
-            0.36f);
+            0.36f,
+            BossThemeSyncType.CorruptionParasite);
+
         public static BossTheme IceQueenTheme = new(
             "TerRoguelike/Tracks/IceQueenTheme",
             "TerRoguelike/Tracks/IceQueenThemeStart",
             "TerRoguelike/Tracks/IceQueenThemeEnd",
-            0.6f);
+            0.6f,
+            BossThemeSyncType.IceQueen);
+
         public static BossTheme PharaohSpiritTheme = new(
             "TerRoguelike/Tracks/PharaohSpiritTheme",
             "TerRoguelike/Tracks/PharaohSpiritThemeStart",
             "TerRoguelike/Tracks/PharaohSpiritThemeEnd",
-            0.67f);
+            0.67f,
+            BossThemeSyncType.PharaohSpirit);
+
         public static BossTheme QueenBeeTheme = new(
             "TerRoguelike/Tracks/QueenBeeTheme",
             "TerRoguelike/Tracks/QueenBeeThemeStart",
             "TerRoguelike/Tracks/QueenBeeThemeEnd",
-            0.4f);
+            0.4f,
+            BossThemeSyncType.QueenBee);
+
         public static BossTheme WallOfFleshTheme = new(
             "TerRoguelike/Tracks/WallOfFleshTheme",
             "TerRoguelike/Tracks/WallOfFleshThemeStart",
             "TerRoguelike/Tracks/WallOfFleshThemeEnd",
-            0.44f);
+            0.44f,
+            BossThemeSyncType.WallOfFlesh);
+
         public static BossTheme SkeletronTheme = new(
             "TerRoguelike/Tracks/SkeletronTheme",
             "TerRoguelike/Tracks/SkeletronThemeStart",
             "TerRoguelike/Tracks/SkeletronThemeEnd",
-            0.42f);
+            0.42f,
+            BossThemeSyncType.Skeletron);
+
         public static BossTheme TempleGolemTheme = new(
             "TerRoguelike/Tracks/TempleGolemTheme",
             "TerRoguelike/Tracks/TempleGolemThemeStart",
             "TerRoguelike/Tracks/TempleGolemThemeEnd",
-            0.55f);
+            0.55f,
+            BossThemeSyncType.TempleGolem);
+
         public static BossTheme FinalBoss1Theme = new(
             "TerRoguelike/Tracks/FinalBoss1",
             "TerRoguelike/Tracks/FinalBoss1Start",
             "TerRoguelike/Tracks/FinalBoss1End",
-            0.65f);
+            0.65f,
+            BossThemeSyncType.FinalBoss1);
+
         public static BossTheme FinalBoss2PreludeTheme = new(
             "TerRoguelike/Tracks/FinalBoss2Prelude",
             "TerRoguelike/Tracks/FinalBoss2PreludeStart",
             Silence,
-            0.45f);
+            0.45f,
+            BossThemeSyncType.FinalBoss2Prelude);
+
         public static BossTheme FinalBoss2Theme = new(
             "TerRoguelike/Tracks/FinalBoss2",
             "TerRoguelike/Tracks/FinalBoss2Start",
             "TerRoguelike/Tracks/FinalBoss2End",
-            0.45f);
+            0.45f,
+            BossThemeSyncType.FinalBoss2);
+
+        public enum BossThemeSyncType
+        {
+            Paladin,
+            BrambleHollow,
+            CrimsonVessel,
+            CorruptionParasite,
+            IceQueen,
+            PharaohSpirit,
+            QueenBee,
+            WallOfFlesh,
+            Skeletron,
+            TempleGolem,
+            FinalBoss1,
+            FinalBoss2Prelude,
+            FinalBoss2
+        }
+        public static BossTheme BossThemeFromEnum(BossThemeSyncType type)
+        {
+            switch (type)
+            {
+                default:
+                case BossThemeSyncType.Paladin:
+                    return PaladinTheme;
+                case BossThemeSyncType.BrambleHollow:
+                    return BrambleHollowTheme;
+                case BossThemeSyncType.CrimsonVessel:
+                    return CrimsonVesselTheme;
+                case BossThemeSyncType.CorruptionParasite:
+                    return CorruptionParasiteTheme;
+                case BossThemeSyncType.IceQueen:
+                    return IceQueenTheme;
+                case BossThemeSyncType.PharaohSpirit:
+                    return PharaohSpiritTheme;
+                case BossThemeSyncType.QueenBee:
+                    return QueenBeeTheme;
+                case BossThemeSyncType.WallOfFlesh:
+                    return WallOfFleshTheme;
+                case BossThemeSyncType.Skeletron:
+                    return SkeletronTheme;
+                case BossThemeSyncType.TempleGolem:
+                    return TempleGolemTheme;
+                case BossThemeSyncType.FinalBoss1:
+                    return FinalBoss1Theme;
+                case BossThemeSyncType.FinalBoss2Prelude:
+                    return FinalBoss2PreludeTheme;
+                case BossThemeSyncType.FinalBoss2:
+                    return FinalBoss2Theme;
+            }
+        }
 
         public static void FillMusicDictionary()
         {
@@ -280,7 +355,10 @@ namespace TerRoguelike.Systems
         public static void SetBossTrack(BossTheme bossTheme, float fadeRateMulti = 1)
         {
             if (Main.dedServ)
+            {
+                StartBossThemePacket.Send(bossTheme, fadeRateMulti);
                 return;
+            }
             if (TerRoguelikeWorld.escape)
                 return;
 
@@ -611,12 +689,14 @@ namespace TerRoguelike.Systems
         public bool endFlag = false;
         public bool startFlag = true;
         public float Volume;
-        public BossTheme(string battleTrack, string startTrack, string endTrack, float volume)
+        public BossThemeSyncType Type;
+        public BossTheme(string battleTrack, string startTrack, string endTrack, float volume, BossThemeSyncType type)
         {
             BattleTrack = battleTrack;
             StartTrack = startTrack;
             EndTrack = endTrack;
             Volume = volume;
+            Type = type;
         }
         public BossTheme(BossTheme bossTheme)
         {

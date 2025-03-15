@@ -18,6 +18,7 @@ using ReLogic.Utilities;
 using Microsoft.Xna.Framework.Audio;
 using static TerRoguelike.Managers.TextureManager;
 using System.Diagnostics;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -156,6 +157,7 @@ namespace TerRoguelike.Projectiles
                 {
                     Projectile.velocity = Vector2.Zero;
                     Projectile.tileCollide = false;
+                    Projectile.netUpdate = true;
                     return false;
                 }
             }
@@ -165,7 +167,7 @@ namespace TerRoguelike.Projectiles
         public override bool? CanDamage() => Projectile.timeLeft < maxTimeLeft - 30;
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)
         {
-            Texture2D tex = TextureAssets.Projectile[Type].Value;
+            int height = Main.dedServ ? 40 : TextureAssets.Projectile[Type].Height();
 
             int length = (int)Projectile.ai[0] % 2 == 0 ? (int)Math.Abs(Projectile.Center.Y - spawnPos.Y) : (int)Math.Abs(Projectile.Center.X - spawnPos.X);
             Vector2 pos = spawnPos;
@@ -174,7 +176,7 @@ namespace TerRoguelike.Projectiles
 
             for (int i = 0; i < length; i += 15)
             {
-                Vector2 posOffset = (Vector2.UnitY * (i + (tex.Height * 0.5f))).RotatedBy(rot);
+                Vector2 posOffset = (Vector2.UnitY * (i + (height * 0.5f))).RotatedBy(rot);
                 Vector2 scale = new Vector2(1f);
 
                 if (i > endEase)
@@ -286,6 +288,16 @@ namespace TerRoguelike.Projectiles
             }
             */
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(spawnPos);
+            writer.WriteVector2(startVel);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            spawnPos = reader.ReadVector2();
+            startVel = reader.ReadVector2();
         }
     }
     public class StoredRootDraw

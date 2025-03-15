@@ -78,6 +78,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 2;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -892,10 +893,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.WriteVector2(spawnPos);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            spawnPos = reader.ReadVector2();
         }
     }
 }

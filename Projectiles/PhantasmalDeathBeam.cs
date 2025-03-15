@@ -161,8 +161,8 @@ namespace TerRoguelike.Projectiles
                 Projectile.Kill();
             }
 
-
-            int frameWidth = Main.dedServ ? 48 : TextureAssets.Projectile[Type].Width();
+            Texture2D tex = Main.dedServ ? TexDict["Square"] : TextureAssets.Projectile[Type].Value;
+            int frameWidth = Main.dedServ ? 48 : tex.Width;
             float frameProgress = 0;
             if (specialOldPos.Count >= maxSpecialPos)
             {

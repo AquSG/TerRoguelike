@@ -273,6 +273,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
             if (NPC.ai[3] != 0)
             {
                 NPC.ai[3]++;
@@ -658,9 +659,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     teleportTargetPos = new Vector2(-1);
                     NPC.ai[3] = 1;
                 }
-                else if (time == TeleportBoltCycleTime - 1)
+                else if (time == TeleportBoltCycleTime - 1 && !TerRoguelike.mpClient)
                 {
                     phantomPositions.Add(NPC.Center + modNPC.drawCenter);
+                    NPC.netUpdate = true;
                 }
 
                 if (NPC.ai[1] == TeleportBolt.Duration)
@@ -762,7 +764,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 targetVect = targetPos - NPC.Center;
                 if (NPC.ai[1] < FakeChargeWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (NPC.ai[1] == 0 && !TerRoguelike.mpClient)
                     {
                         Vector2 anchor = spawnPos;
                         Vector2 oldSelectedPos = Vector2.Zero;
@@ -820,6 +822,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         }
                         phantomPositions.Remove(chosenPos);
                         teleportTargetPos = chosenPos;
+                        NPC.netUpdate = true;
                     }
                     NPC.velocity = Vector2.Zero;
                 }
@@ -1620,11 +1623,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             writer.WriteVector2(spawnPos);
             writer.Write(NPC.localAI[0]);
+            int count = phantomPositions.Count;
+            writer.Write(count);
+            for (int i = 0; i < count; i++)
+            {
+                writer.WriteVector2(phantomPositions[i]);
+            }
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             spawnPos = reader.ReadVector2();
             NPC.localAI[0] = reader.ReadSingle();
+            phantomPositions.Clear();
+            int count = reader.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                phantomPositions.Add(reader.ReadVector2());
+            }
         }
     }
 }

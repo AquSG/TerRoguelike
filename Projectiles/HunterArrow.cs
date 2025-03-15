@@ -15,6 +15,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -235,6 +236,14 @@ namespace TerRoguelike.Projectiles
                     }
                 }
             }
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(origVelocity);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            origVelocity = reader.ReadVector2();
         }
     }
 }

@@ -1839,10 +1839,32 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.WriteVector2(spawnPos);
+            writer.Write(leftHandWho);
+            writer.Write(rightHandWho);
+            writer.Write(headWho);
+            writer.WriteVector2(leftHandPos);
+            writer.WriteVector2(rightHandPos);
+            writer.WriteVector2(headPos);
+            writer.WriteVector2(leftHandAnchor);
+            writer.WriteVector2(rightHandAnchor);
+            writer.WriteVector2(leftHandTargetPos);
+            writer.WriteVector2(rightHandTargetPos);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            spawnPos = reader.ReadVector2();
+            leftHandWho = reader.ReadInt32();
+            rightHandWho = reader.ReadInt32();
+            headWho = reader.ReadInt32();
+            leftHandPos = reader.ReadVector2();
+            rightHandPos = reader.ReadVector2();
+            headPos = reader.ReadVector2();
+            leftHandAnchor = reader.ReadVector2();
+            rightHandAnchor = reader.ReadVector2();
+            leftHandTargetPos = reader.ReadVector2();
+            rightHandTargetPos = reader.ReadVector2();
         }
     }
 }

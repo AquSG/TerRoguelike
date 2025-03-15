@@ -207,13 +207,13 @@ namespace TerRoguelike.Systems
                         }
 
                         room.awake = true;
-                        if (room.CanDescend(player, modPlayer)) //New Floor Blue Wall Portal Teleport
+                        if (room.CanDescend(player, modPlayer) && !TerRoguelike.mpClient) //New Floor Blue Wall Portal Teleport
                         {
                             room.Descend(player);
                             player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
                         }
-                        if (room.CanAscend(player, modPlayer))
+                        if (room.CanAscend(player, modPlayer) && !TerRoguelike.mpClient)
                         {
                             room.Ascend(player);
                             player.fallStart = (int)(player.position.Y / 16f);

@@ -537,7 +537,7 @@ namespace TerRoguelike.Managers
             }
             else
             {
-                if (nextStage > TerRoguelikeWorld.currentStage && !Main.dedServ)
+                if (nextStage > TerRoguelikeWorld.currentStage)
                 {
                     TerRoguelikeWorld.currentStage = nextStage;
                     StageCountPacket.Send();
@@ -576,14 +576,17 @@ namespace TerRoguelike.Managers
             player.Center = targetRoom.DescendTeleportPosition();
             if (!IsSanctuary)
             {
-                if (Main.dedServ)
-                    TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, ID);
                 TerRoguelikePlayer.HealthUpIndicator(player);
+            }
+            if (targetRoom.IsSanctuary)
+            {
+                if (Main.dedServ)
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.Sanctuary, targetRoom.ID);
             }
             else
             {
                 if (Main.dedServ)
-                    TeleportToPositionPacket.Send(player.Center, TeleportContext.Sanctuary, ID);
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, targetRoom.ID);
             }
             if (nextFloor.Name != "Lunar")
             {
@@ -764,7 +767,7 @@ namespace TerRoguelike.Managers
                 if (modPlayer == null)
                     continue;
 
-                if (modPlayer.attackPlan > 0)
+                if (modPlayer.attackPlan > 0 && !TerRoguelike.mpClient)
                 {
                     int rocketCount = 4 + (4 * modPlayer.attackPlan);
                     RoomSystem.attackPlanRocketBundles.Add(new AttackPlanRocketBundle(RoomPosition16 + RoomCenter16, rocketCount, player.whoAmI, myRoom));

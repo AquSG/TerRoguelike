@@ -16,12 +16,13 @@ using TerRoguelike.Particles;
 using ReLogic.Utilities;
 using static TerRoguelike.Systems.RoomSystem;
 using System.Diagnostics;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
     public class DarkTendril : ModProjectile, ILocalizedModType
     {
-        public float turnMultiplier = 1f;
+        public float turnMultiplier = 4f;
         public Entity target = null;
         public List<Vector2> specialOldPos = new List<Vector2>();
         public int maxTendrilLength = 360;
@@ -189,6 +190,15 @@ namespace TerRoguelike.Projectiles
                 Main.EntitySpriteDraw(circleTex, basePos, null, fillColor, 0, origin, scale, SpriteEffects.None);
             }
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(startRot);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            startRot = reader.ReadSingle();
         }
     }
 }

@@ -61,7 +61,8 @@ namespace TerRoguelike.Rooms
             }
             if (TerRoguelikeWorld.lunarFloorInitialized && !TerRoguelikeWorld.lunarBossSpawned)
             {
-                AddBoss(bossSpawnPos, ModContent.NPCType<MoonLord>());
+                if (!TerRoguelike.mpClient)
+                    AddBoss(bossSpawnPos, ModContent.NPCType<MoonLord>());
                 TerRoguelikeWorld.lunarBossSpawned = true;
             }
             base.Update();

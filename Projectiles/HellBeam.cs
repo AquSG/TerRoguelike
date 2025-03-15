@@ -59,6 +59,11 @@ namespace TerRoguelike.Projectiles
         {
             behindNPCs.Add(index);
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            Projectile.velocity = Vector2.Zero;
+        }
         public override void AI()
         {
             bool allow = true;
@@ -141,7 +146,8 @@ namespace TerRoguelike.Projectiles
             {
                 float completion = time < 60 ? MathHelper.Clamp(time / 4f, 0, 1) : (1f - MathHelper.Clamp((time - 240) / 60f, 0, 1));
                 Point lPos = (Projectile.Center + Projectile.rotation.ToRotationVector2() * -20).ToTileCoordinates();
-                Lighting.AddLight(lPos.X, lPos.Y, TorchID.Orange, completion);
+                if (!Main.dedServ)
+                    Lighting.AddLight(lPos.X, lPos.Y, TorchID.Orange, completion);
             }
 
             if (deadCount >= specialOldPos.Count)

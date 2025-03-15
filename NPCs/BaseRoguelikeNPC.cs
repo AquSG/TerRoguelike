@@ -18,6 +18,7 @@ namespace TerRoguelike.NPCs
         public override void SetDefaults()
         {
             NPC.value = 0f;
+            NPC.netAlways = true;
         }
         public override bool CheckActive()
         {
