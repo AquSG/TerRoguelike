@@ -74,6 +74,8 @@ namespace TerRoguelike.NPCs.Enemy
         public override void HitEffect(NPC.HitInfo hit)
         {
             NPC.ai[0] = 0;
+            if (Main.dedServ)
+                return;
             if (NPC.life > 0)
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 40.0; i++)

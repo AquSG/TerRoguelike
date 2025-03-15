@@ -977,8 +977,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             Vector2 projSpawnPos = NPC.Center + innerEyePosition + rot.ToRotationVector2() * 4;
                             if (!TerRoguelike.mpClient)
                             {
-                                int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y);
-                                Main.projectile[proj].rotation = rot;
+                                int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rot.ToRotationVector2(), ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y);
                             }
                         }
                         if (RuinedMoonActive)
@@ -989,7 +988,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 Vector2 projSpawnPos = NPC.Center + innerEyePosition + rot.ToRotationVector2() * 4;
                                 if (!TerRoguelike.mpClient)
                                 {
-                                    int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, Vector2.Zero, ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y, 1);
+                                    int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rot.ToRotationVector2(), ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y, 1);
                                     Main.projectile[proj].rotation = rot;
                                 }
                             }

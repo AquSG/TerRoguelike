@@ -52,8 +52,6 @@ namespace TerRoguelike.Projectiles
         }
         public override bool PreAI(Projectile projectile)
         {
-            Main.NewText(projectile.friendly);
-            Main.NewText(projectile.hostile);
             extraBounces = 0; // set bounces in projectile ai.
             return true;
         }

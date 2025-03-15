@@ -131,7 +131,8 @@ namespace TerRoguelike.Projectiles
                 float rot = (float)i / projCount * MathHelper.TwoPi;
                 Vector2 offset = rot.ToRotationVector2() * Projectile.width * 0.5f;
                 Vector2 velocity = rot.ToRotationVector2() * 8f;
-                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + offset, velocity, ModContent.ProjectileType<BloodOrb>(), Projectile.damage, 0f, -1, 1);
+                if (!TerRoguelike.mpClient)
+                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + offset, velocity, ModContent.ProjectileType<BloodOrb>(), Projectile.damage, 0f, -1, 1);
             }
 
             Projectile.localAI[0] = 12;

@@ -62,6 +62,8 @@ namespace TerRoguelike.Projectiles
             ParentRotCenterOffset = new Vector2(Projectile.ai[0], Projectile.ai[1]);
             if (Projectile.ai[2] == 1)
                 fuckYou = -1;
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            Projectile.velocity = Vector2.Zero;
         }
         public override void AI()
         {
@@ -160,8 +162,7 @@ namespace TerRoguelike.Projectiles
             }
 
 
-            Texture2D tex = TextureAssets.Projectile[Type].Value;
-            int frameWidth = tex.Width;
+            int frameWidth = Main.dedServ ? 48 : TextureAssets.Projectile[Type].Width();
             float frameProgress = 0;
             if (specialOldPos.Count >= maxSpecialPos)
             {
