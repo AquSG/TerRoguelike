@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.Graphics;
 using Terraria.Graphics.CameraModifiers;
 using Terraria.ModLoader;
+using TerRoguelike.Packets;
 using TerRoguelike.TerPlayer;
 using TerRoguelike.World;
 
@@ -97,6 +98,8 @@ namespace TerRoguelike.Systems
         {
             if (TerRoguelikeWorld.escape && source == CutsceneSource.Boss)
                 return;
+            if (source == CutsceneSource.Boss && TerRoguelike.mpClient)
+                return;
 
             cutsceneTimer = time;
             cutsceneDuration = time;
@@ -108,6 +111,8 @@ namespace TerRoguelike.Systems
             easeOutActivated = false;
             cutsceneZoom = targetZoom;
             cutsceneDisableControl = true;
+
+            StartCutscenePacket.Send(cameraTarget, time, easeIn, easeOut, targetZoom);
         }
 
         public enum CutsceneSource

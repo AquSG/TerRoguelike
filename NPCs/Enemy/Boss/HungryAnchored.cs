@@ -20,6 +20,7 @@ using static TerRoguelike.Systems.MusicSystem;
 using static TerRoguelike.Systems.RoomSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.NPCs.Enemy.Boss.CrimsonVessel;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -189,6 +190,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
             return true;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.WriteVector2(AnchorPos);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            AnchorPos = reader.ReadVector2();
         }
     }
 }

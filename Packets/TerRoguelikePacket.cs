@@ -52,6 +52,8 @@ namespace TerRoguelike.Packets
             RequestUnmovingDataSync,
             StartCreditsSync,
             StartBossThemeSync,
+            StartCutsceneSync,
+            RequestBasinSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

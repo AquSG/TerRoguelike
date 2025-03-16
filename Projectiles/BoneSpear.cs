@@ -14,6 +14,7 @@ using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using Terraria.GameContent;
 using static TerRoguelike.Managers.TextureManager;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -167,6 +168,16 @@ namespace TerRoguelike.Projectiles
             Main.EntitySpriteDraw(tipTex, currentEndPos - Main.screenPosition, null, Lighting.GetColor(currentEndPos.ToTileCoordinates()), Projectile.rotation, new Vector2(0, tipTex.Height * 0.5f), 1f, SpriteEffects.None);
 
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(maxLength);
+            writer.WriteVector2(endPosition);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            maxLength = reader.ReadSingle();
+            endPosition = reader.ReadVector2();
         }
     }
 }

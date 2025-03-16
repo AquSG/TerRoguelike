@@ -64,6 +64,7 @@ namespace TerRoguelike.Packets
             else if (context == EscapeContext.Complete)
             {
                 TerRoguelikeWorld.escaped = true;
+                TerRoguelikeWorld.escape = false;
                 foreach (Player player in Main.ActivePlayers)
                 {
                     var modPlayer = player.ModPlayer();

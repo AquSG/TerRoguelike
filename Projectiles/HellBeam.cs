@@ -156,8 +156,8 @@ namespace TerRoguelike.Projectiles
             }
 
 
-            Texture2D tex = TextureAssets.Projectile[Type].Value;
-            int frameWidth = tex.Width;
+            Texture2D tex = Main.dedServ ? TexDict["Square"] : TextureAssets.Projectile[Type].Value;
+            int frameWidth = Main.dedServ ? 48 : tex.Width;
             float frameProgress = 0;
             if (specialOldPos.Count >= maxSpecialPos)
             {
@@ -212,10 +212,10 @@ namespace TerRoguelike.Projectiles
 
 
 
-                    frame = new Rectangle((int)frameProgress % frameWidth, 0, progress + 1, tex.Height);
+                    frame = new Rectangle((int)frameProgress % frameWidth, 0, progress + 1, frameWidth);
 
 
-                    draws.Add(new StoredDraw(tex, pos, frame, Color.White, rot, new Vector2(0, tex.Size().Y * 0.5f), scale, SpriteEffects.None));
+                    draws.Add(new StoredDraw(Main.dedServ ? null : tex, pos, frame, Color.White, rot, Main.dedServ ? Vector2.Zero : new Vector2(0, tex.Size().Y * 0.5f), scale, SpriteEffects.None));
                     frameProgress += progress;
                     Vector2 step = rot.ToRotationVector2() * progress;
                     if (distance <= 1f)

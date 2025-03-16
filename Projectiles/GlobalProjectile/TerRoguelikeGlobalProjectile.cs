@@ -285,6 +285,7 @@ namespace TerRoguelike.Projectiles
                 if (!Main.player[targetPlayer].active || Main.player[targetPlayer].dead || proj.friendly)
                 {
                     targetPlayer = -1;
+                    proj.netUpdate = true;
                 }
             }
             if (targetNPC != -1)
@@ -292,6 +293,7 @@ namespace TerRoguelike.Projectiles
                 if (!Main.npc[targetNPC].ModNPC().CanBeChased(false, false) || !proj.friendly)
                 {
                     targetNPC = -1;
+                    proj.netUpdate = true;
                 }
             }
 
@@ -301,6 +303,8 @@ namespace TerRoguelike.Projectiles
                 {
                     targetNPC = ClosestNPC(proj.Center, 3200f, false);
                     targetPlayer = -1;
+                    if (targetNPC != -1)
+                        proj.netUpdate = true;
                 }
             }
             else
@@ -312,6 +316,8 @@ namespace TerRoguelike.Projectiles
                         targetPlayer = -1;
 
                     targetNPC = -1;
+                    if (targetPlayer != -1)
+                        proj.netUpdate = true;
                 }
             }
             return targetPlayer != -1 ? Main.player[targetPlayer] : (targetNPC != -1 ? Main.npc[targetNPC] : null);
@@ -356,6 +362,7 @@ namespace TerRoguelike.Projectiles
             writer.Write(npcOwnerType);
             writer.Write(targetPlayer);
             writer.Write(targetNPC);
+            writer.Write(projectile.scale);
         }
 
         public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader reader)
@@ -378,6 +385,7 @@ namespace TerRoguelike.Projectiles
             npcOwnerType = reader.ReadInt32();
             targetPlayer = reader.ReadInt32();
             targetNPC = reader.ReadInt32();
+            projectile.scale = reader.ReadSingle();
         }
     }
     public class ProcChainBools

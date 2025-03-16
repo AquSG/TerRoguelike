@@ -393,7 +393,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         int thisTime = time - (cutsceneLookLeaveTime + cutsceneSideSweepTime * 2 + cutsceneTopSweepTime);
                         if (thisTime == 0)
                         {
-                            ZoomSystem.SetZoomAnimation(2f, 60);
+                            if (CutsceneSystem.cutsceneActive)
+                                ZoomSystem.SetZoomAnimation(2f, 60);
                             SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.5f, Pitch = 0.3f, PitchVariance = 0, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                         }
                         if (thisTime < 60)
@@ -1213,7 +1214,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                     if (modChildNPC == null)
                         continue;
-                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                     {
                         childNPC.StrikeInstantKill();
                         childNPC.active = false;

@@ -17,6 +17,7 @@ using Terraria.GameContent;
 using TerRoguelike.Particles;
 using ReLogic.Utilities;
 using Steamworks;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -113,6 +114,16 @@ namespace TerRoguelike.Projectiles
             TerRoguelikeUtils.StartVanillaSpritebatch();
 
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(startSpeed);
+            writer.Write(Projectile.tileCollide);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            startSpeed = reader.ReadSingle();
+            Projectile.tileCollide = reader.ReadBoolean();
         }
     }
 }

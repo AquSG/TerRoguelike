@@ -16,6 +16,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
 using Terraria.Graphics.Shaders;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {

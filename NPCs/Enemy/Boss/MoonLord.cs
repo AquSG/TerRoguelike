@@ -1137,7 +1137,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                     if (modChildNPC == null)
                         continue;
-                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                     {
                         childNPC.StrikeInstantKill();
                         childNPC.active = false;
@@ -1839,6 +1839,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.Write(NPC.localAI[1]);
+            writer.Write(NPC.localAI[2]);
             writer.WriteVector2(spawnPos);
             writer.Write(leftHandWho);
             writer.Write(rightHandWho);
@@ -1850,10 +1852,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.WriteVector2(rightHandAnchor);
             writer.WriteVector2(leftHandTargetPos);
             writer.WriteVector2(rightHandTargetPos);
+            writer.Write(idleCounter);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            NPC.localAI[1] = reader.ReadSingle();
+            NPC.localAI[2] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
             leftHandWho = reader.ReadInt32();
             rightHandWho = reader.ReadInt32();
@@ -1865,6 +1870,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             rightHandAnchor = reader.ReadVector2();
             leftHandTargetPos = reader.ReadVector2();
             rightHandTargetPos = reader.ReadVector2();
+            idleCounter = reader.ReadInt32();
         }
     }
 }

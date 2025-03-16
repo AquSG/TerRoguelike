@@ -1414,6 +1414,8 @@ namespace TerRoguelike.Systems
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 PostUpdateWorld();
+                if (RequestBasinPacket.cooldown > 0)
+                    RequestBasinPacket.cooldown--;
             }
 
             if (regeneratingWorld)

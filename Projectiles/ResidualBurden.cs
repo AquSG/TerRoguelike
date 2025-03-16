@@ -46,9 +46,17 @@ namespace TerRoguelike.Projectiles
             Projectile.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
             Projectile.frame = Main.rand.Next(3);
             Projectile.direction = Main.rand.NextBool() ? -1 : 1;
+            Projectile.localAI[1] = 1;
         }
         public override void AI()
         {
+            if (Projectile.localAI[1] == 0)
+            {
+                Projectile.rotation = Main.rand.NextFloat(MathHelper.TwoPi);
+                Projectile.frame = Main.rand.Next(3);
+                Projectile.direction = Main.rand.NextBool() ? -1 : 1;
+                Projectile.localAI[1] = 1;
+            }
             Projectile.localAI[0]++;
             if (Projectile.timeLeft % 3 == 0)
             {

@@ -58,9 +58,30 @@ namespace TerRoguelike.Projectiles
                 rockFrames.Add(Main.rand.Next(3));
                 rockDirections.Add(Main.rand.NextBool() ? -1 : 1);
             }
+            Projectile.localAI[0] = 1;
         }
         public override void AI()
         {
+            if (Projectile.localAI[0] == 0)
+            {
+                float rotOff = Main.rand.NextFloat(MathHelper.TwoPi);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    Vector2 center = Vector2.Zero;
+                    if (i != 0)
+                        center += (i / 7f * MathHelper.TwoPi + rotOff).ToRotationVector2() * Projectile.width * 0.25f;
+
+                    center += Main.rand.NextVector2Circular(Projectile.width * 0.1f, Projectile.width * 0.1f);
+
+                    rockPositions.Add(center);
+                    rockRotations.Add(Main.rand.NextFloat(MathHelper.TwoPi));
+                    rockFrames.Add(Main.rand.Next(3));
+                    rockDirections.Add(Main.rand.NextBool() ? -1 : 1);
+                }
+
+                Projectile.localAI[0] = 1;
+            }
             if (Projectile.timeLeft > 45)
             {
                 if (Projectile.timeLeft % 3 == 0)

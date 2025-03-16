@@ -70,6 +70,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.localAI[0] = Main.rand.NextFloat(-1, 1 + float.Epsilon);
             SoundEngine.PlaySound(SeerSpawn with { Volume = 0.25f, MaxInstances = 3 }, NPC.Center);
 
+            NPC.rotation = NPC.ai[0];
+
             NPC.ai[0] = -1;
             NPC.localAI[1] += Main.rand.Next(50);
             if (source is EntitySource_Parent parentSource)
@@ -79,7 +81,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.ai[0] = parentSource.Entity.whoAmI;
                     NPC npc = Main.npc[(int)NPC.ai[0]];
                     GenerateLightningPath();
-                    if (!npc.active)
+                    if (!npc.active && !TerRoguelike.mpClient)
                     {
                         NPC.StrikeInstantKill();
                         return;

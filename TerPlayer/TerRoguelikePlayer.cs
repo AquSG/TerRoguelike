@@ -570,10 +570,13 @@ namespace TerRoguelike.TerPlayer
             if (deathEffectTimer == 1 && reviveDeathEffect)
             {
                 ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_DarkMageHealImpact with { Volume = 1f }, Player.Center), 2));
-                for (int i = 0; i < 20; i++)
+                if (Player.whoAmI == Main.myPlayer)
                 {
-                    Vector2 projVel = Main.rand.NextVector2CircularEdge(4, 4) * Main.rand.NextFloat(0.5f, 1f);
-                    Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, projVel, ModContent.ProjectileType<TrumpCardProjectile>(), 300, 0.25f);
+                    for (int i = 0; i < 20; i++)
+                    {
+                        Vector2 projVel = Main.rand.NextVector2CircularEdge(4, 4) * Main.rand.NextFloat(0.5f, 1f);
+                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, projVel, ModContent.ProjectileType<TrumpCardProjectile>(), 300, 0.25f);
+                    }
                 }
             }
             if (deathEffectTimer > 0)
@@ -717,9 +720,12 @@ namespace TerRoguelike.TerPlayer
                         storedDaggers = 0;
 
                     int releaseCount = (int)oldStoredDaggers - (int)storedDaggers; // throw multiple daggers per frame if possible
-                    for (int i = 0; i < releaseCount; i++)
+                    if (Player.whoAmI == Main.myPlayer)
                     {
-                        Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (AimWorld() - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
+                        for (int i = 0; i < releaseCount; i++)
+                        {
+                            Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (AimWorld() - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
+                        }
                     }
                 }
             }
@@ -967,8 +973,11 @@ namespace TerRoguelike.TerPlayer
                     {
                         Vector2 projSpawnPos = droneBuddyVisualPosition + (Vector2.UnitY.RotatedBy(droneSeenRot) * 11f * new Vector2(1.2f, 1));
                         droneBuddyAttackCooldown = 0;
-                        int spawnedProjectile = Projectile.NewProjectile(Player.GetSource_FromThis(), projSpawnPos, (Main.npc[droneTarget].Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), 100, 1f, Player.whoAmI);
-                        Main.projectile[spawnedProjectile].scale = scaleMultiplier;
+                        if (Player.whoAmI == Main.myPlayer)
+                        {
+                            int spawnedProjectile = Projectile.NewProjectile(Player.GetSource_FromThis(), projSpawnPos, (Main.npc[droneTarget].Center - projSpawnPos).SafeNormalize(Vector2.UnitY) * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), 100, 1f, Player.whoAmI);
+                            Main.projectile[spawnedProjectile].scale = scaleMultiplier;
+                        }
                         SoundEngine.PlaySound(SoundID.Item108 with { Volume = 0.3f }, droneBuddyVisualPosition);
                         Dust dust = Dust.NewDustDirect(projSpawnPos - new Vector2(2), 4, 4, DustID.YellowTorch);
                         dust.noLight = true;
