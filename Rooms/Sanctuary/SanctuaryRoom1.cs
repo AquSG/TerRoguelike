@@ -67,6 +67,15 @@ namespace TerRoguelike.Rooms
             base.Update();
             awake = false;
 
+            if (TerRoguelike.mpClient)
+            {
+                var modPlayer = Main.LocalPlayer.ModPlayer();
+                if (modPlayer != null && modPlayer.currentRoom == myRoom && TerRoguelikeWorld.itemBasins.Count == 0)
+                {
+                    RequestBasinPacket.Send(255);
+                }
+            }
+
             bool fadeSound = !lunarGambitGranted;
             if (!lunarGambitGranted)
             {

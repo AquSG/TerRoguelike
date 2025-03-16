@@ -56,6 +56,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.netSpam = 0;
             Projectile.frameCounter++;
             Projectile.frame = Projectile.frameCounter / 10 % Main.projFrames[Type];
             var modProj = Projectile.ModProj();
@@ -69,6 +70,8 @@ namespace TerRoguelike.Projectiles
                 Projectile.Center + Main.rand.NextVector2CircularEdge(circleEdge, circleEdge), Main.rand.NextVector2Circular(1.5f, 1.5f) + Projectile.velocity,
                 15, Color.Lerp(Color.Teal, Color.LightCyan, Main.rand.NextFloat()), new Vector2(0.15f), 0, 0.96f, 15, false));
 
+            if (time % 10 == 0)
+                Projectile.netUpdate = true;
             if (time < 30)
             {
                 if (Projectile.ai[0] >= 0)
@@ -144,6 +147,7 @@ namespace TerRoguelike.Projectiles
                         float velLength = Projectile.velocity.Length();
                         Projectile.rotation = Projectile.rotation.AngleTowards(targetRot, 0.0002f * velLength);
                         Projectile.velocity = Projectile.rotation.ToRotationVector2() * velLength;
+                        Projectile.netUpdate = true;
                     }
                 }
             }
@@ -181,10 +185,12 @@ namespace TerRoguelike.Projectiles
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(Projectile.timeLeft);
+            writer.Write(timeOffset);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             Projectile.timeLeft = reader.ReadInt32();
+            timeOffset = reader.ReadSingle();
         }
     }
 }

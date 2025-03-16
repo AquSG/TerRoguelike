@@ -60,9 +60,27 @@ namespace TerRoguelike.Projectiles
             }
 
             randomSmokeRotation = Main.rand.NextFloatDirection();
+            Projectile.localAI[0] = 1;
         }
         public override void AI()
         {
+            if (Projectile.localAI[0] == 0)
+            {
+                for (int i = 0; i < (int)(10 * MaxScale); i++)
+                {
+                    Vector2 starVector = Main.rand.NextVector2Circular(2f, 2f) * MaxScale;
+                    starPositions.Add(starVector);
+                    starVelocities.Add(starVector);
+                    starRotations.Add(Main.rand.NextFloat(-MathHelper.Pi, MathHelper.Pi + float.Epsilon));
+                    starLifetimeOffsets.Add(Main.rand.Next(50));
+                    starColors.Add(Color.Lerp(Projectile.ModProj().hostileTurnedAlly ? Color.LightCyan : Color.HotPink, Color.Blue, Main.rand.NextFloat(1f + float.Epsilon)));
+
+                    starScales.Add(Main.rand.NextFloat(0.8f, 1f + float.Epsilon));
+                }
+
+                randomSmokeRotation = Main.rand.NextFloatDirection();
+                Projectile.localAI[0] = 1;
+            }
             Projectile.velocity *= 0.992f;
 
             for (int i = 0; i < starPositions.Count; i++)

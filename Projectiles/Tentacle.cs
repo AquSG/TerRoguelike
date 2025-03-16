@@ -62,6 +62,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.netSpam = 0;
             var modProj = Projectile.ModProj();
             if (modProj.npcOwner >= 0)
             {
@@ -216,10 +217,12 @@ namespace TerRoguelike.Projectiles
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(startRot);
+            writer.Write(Projectile.localAI[0]);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             startRot = reader.ReadSingle();
+            Projectile.localAI[0] = reader.ReadSingle();
         }
     }
 }

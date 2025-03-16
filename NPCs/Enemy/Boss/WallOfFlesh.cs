@@ -761,7 +761,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                     if (modChildNPC == null)
                         continue;
-                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                     {
                         childNPC.StrikeInstantKill();
                         childNPC.active = false;
@@ -1100,7 +1100,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             for (int i = 0; i < Main.maxProjectiles; i++)
             {
                 var proj = Main.projectile[i];
-                if (!proj.active)
+                if (!proj.active || proj.type != ModContent.ProjectileType<HellBeam>())
                     continue;
                 var modProj = proj.ModProj();
                 if (modProj == null)

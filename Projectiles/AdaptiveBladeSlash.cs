@@ -14,6 +14,7 @@ using TerRoguelike.Utilities;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.ResourceSets;
 using Terraria.DataStructures;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -130,6 +131,16 @@ namespace TerRoguelike.Projectiles
                 }
             }
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(modProj.swingDirection);
+            writer.WriteVector2(stuckPosition);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            modProj.swingDirection = reader.ReadInt32();
+            stuckPosition = reader.ReadVector2();
         }
     }
 }

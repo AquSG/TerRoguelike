@@ -633,7 +633,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                         if (modChildNPC == null)
                             continue;
-                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                         {
                             childNPC.StrikeInstantKill();
                             childNPC.active = false;

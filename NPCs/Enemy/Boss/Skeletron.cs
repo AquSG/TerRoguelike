@@ -606,7 +606,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         randRot += Math.Sign(randRot) * MathHelper.PiOver2 * 0.25f;
                         Vector2 teleportPos = ((wantedPos - targetPos).ToRotation() + randRot).ToRotationVector2() * chargeStartDist + targetPos;
                         Vector2 teleportVect = NPC.Center - teleportPos;
-                        NPC.Center = teleportPos;
+                        if (TerRoguelike.mpClient)
+                            NPC.Center = teleportPos;
+                        NPC.netUpdate = true;
                         if (target != null)
                             NPC.velocity = target.velocity * 0.4f;
                         UpdateDirection();
@@ -903,7 +905,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                     if (modChildNPC == null)
                         continue;
-                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                    if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                     {
                         childNPC.StrikeInstantKill();
                         childNPC.active = false;
@@ -963,6 +965,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (Main.dedServ)
+                return;
+
             if (NPC.life > 0)
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)

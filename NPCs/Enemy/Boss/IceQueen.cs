@@ -918,7 +918,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                         if (modChildNPC == null)
                             continue;
-                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                         {
                             childNPC.StrikeInstantKill();
                             childNPC.active = false;
@@ -1059,11 +1059,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
+            writer.Write(NPC.Opacity);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            NPC.Opacity = reader.ReadSingle();
         }
     }
     public class ExtraHitbox

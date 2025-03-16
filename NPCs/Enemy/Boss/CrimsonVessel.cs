@@ -418,6 +418,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             if (!TerRoguelike.mpClient)
                             {
                                 NPC.localAI[1] = Projectile.NewProjectile(NPC.GetSource_FromThis(), ballPos, ballRot.ToRotationVector2() * 8f, SeerBallType, NPC.damage, 0, -1, 0, scale, ballLaunchTime - (teleportTime + 1));
+                                NPC.netUpdate = true;
                             }
                         }
 
@@ -736,9 +737,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 int currentSeer = (int)((NPC.ai[1] - (Heal.Duration - seerSpawnTime)) / seerRate);
                 float rotation = ((float)currentSeer / seerCount * MathHelper.TwoPi) - MathHelper.PiOver2;
                 Vector2 pos = NPC.Center + (rotation.ToRotationVector2() * 50);
-                int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)pos.X, (int)pos.Y, ModContent.NPCType<CrimsonSeer>());
+                int whoAmI = NPC.NewNPC(NPC.GetSource_FromThis(), (int)pos.X, (int)pos.Y, ModContent.NPCType<CrimsonSeer>(), 0, rotation);
                 NPC seer = Main.npc[whoAmI];
-                seer.rotation = rotation;
                 seer.ai[3] = NPC.ai[3];
                 seer.localAI[2] = -(Heal.Duration - NPC.ai[1]);
                 if (NPC.localAI[0] < 0)
@@ -1072,6 +1072,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 writer.Write(seer.seerId);
                 writer.Write(seer.whoAmI);
             }
+            writer.Write((int)NPC.localAI[1]);
+            writer.Write(Main.myPlayer);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1084,6 +1086,26 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 int id = reader.ReadInt32();
                 int whoami = reader.ReadInt32();
                 trackedSeers.Add(new(id, whoami));
+            }
+            int idCheck = reader.ReadInt32();
+            int playerCheck = reader.ReadInt32();
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                var proj = Main.projectile[i];
+                if (!proj.active || proj.type != ModContent.ProjectileType<SeerBallBase>())
+                    continue;
+                var modProj = proj.ModProj();
+                if (modProj == null)
+                    continue;
+
+                if (modProj.multiplayerClientIdentifier == 255)
+                {
+                    if (modProj.multiplayerIdentifier == idCheck)
+                    {
+                        NPC.localAI[1] = i;
+                        break;
+                    }
+                }
             }
         }
     }

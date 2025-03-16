@@ -625,7 +625,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                         if (modChildNPC == null)
                             continue;
-                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                         {
                             childNPC.StrikeInstantKill();
                             childNPC.active = false;
@@ -654,7 +654,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/FireExtinguish") with { Volume = 0.25f, Pitch = 0 }, NPC.Center);
                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/FireCrackle") with { Volume = 0.4f, Pitch = -0.6f }, NPC.Center);
             }
-            else if (deadTime > deathDisintegrateStartTime)
+            else if (deadTime > deathDisintegrateStartTime && !Main.dedServ)
             {
                 int frameHeight = TextureAssets.Npc[Type].Value.Height / Main.npcFrameCount[Type];
                 float interpolant = (deadTime - deathDisintegrateStartTime) / (deathCutsceneDuration - (float)deathDisintegrateStartTime);
