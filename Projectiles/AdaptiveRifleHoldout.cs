@@ -173,7 +173,7 @@ namespace TerRoguelike.Projectiles
             float baseRot = Projectile.rotation;
             float opacity = MathHelper.Lerp(0.3f, 1, Charge / wantedCharge);
 
-            if (ChargeSpread < MathHelper.Pi)
+            if (ChargeSpread < MathHelper.Pi && Projectile.owner == Main.myPlayer)
             {
                 Main.spriteBatch.End();
                 Effect fadeEffect = Filters.Scene["TerRoguelike:ConeFade"].GetShader().Shader;

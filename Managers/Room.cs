@@ -342,8 +342,16 @@ namespace TerRoguelike.Managers
                         break;
                     }
                 }
-                if (teleportTarget >= 0)
+                if (teleportTarget >= 0 && !RoomSystem.activatedTeleport)
+                {
+                    RoomSystem.activatedTeleport = true;
                     TeleportToPositionPacket.Send(Main.player[teleportTarget].Center, TeleportContext.Room, ID, -1, -1);
+                    foreach (Player player in Main.ActivePlayers)
+                    {
+                        player.Center = Main.player[teleportTarget].Center;
+                    }
+                }
+                    
             }
             Vector2 playerCollisionShrink = WallInflateModifier.ToVector2() * 16;
             for (int playerID = 0; playerID < Main.maxPlayers; playerID++) // keep players in the fucking room
@@ -491,7 +499,7 @@ namespace TerRoguelike.Managers
                         itemTier = 2;
                     }
                     SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, player.whoAmI);
-                    return;
+                    continue;
                 }
 
                 if (ItemManager.RoomRewardCooldown > 0)
@@ -693,7 +701,13 @@ namespace TerRoguelike.Managers
                 }
                 player.Center = targetRoom.RoomPosition16 + targetRoom.RoomDimensions16 * new Vector2(0.9f, 0.5f);
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);
-                modPlayer.escaped = true;
+                foreach (Player p in Main.ActivePlayers)
+                {
+                    var modp = p.ModPlayer();
+                    if (modp == null)
+                        continue;
+                    modp.escaped = true;
+                }
                 TerRoguelikeWorld.escaped = true;
                 EscapePacket.Send(EscapeContext.Complete);
                 if (Main.dedServ)
@@ -767,7 +781,7 @@ namespace TerRoguelike.Managers
                 if (modPlayer == null)
                     continue;
 
-                if (modPlayer.attackPlan > 0 && !TerRoguelike.mpClient)
+                if (modPlayer.attackPlan > 0 && i == Main.myPlayer)
                 {
                     int rocketCount = 4 + (4 * modPlayer.attackPlan);
                     RoomSystem.attackPlanRocketBundles.Add(new AttackPlanRocketBundle(RoomPosition16 + RoomCenter16, rocketCount, player.whoAmI, myRoom));

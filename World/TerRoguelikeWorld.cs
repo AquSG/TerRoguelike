@@ -54,6 +54,7 @@ namespace TerRoguelike.World
         public static int jstcPortalTime = 0;
         public static Vector2 jstcPortalScale = Vector2.Zero;
         public static float jstcPortalRot = 0;
+        public static bool difficultyReceivedByServer = false;
         public static Vector2 lunarGambitSceneDisplayPos { get
             {
                 Vector2 drawPos = lunarGambitSceneStartPos;

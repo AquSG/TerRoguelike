@@ -78,26 +78,32 @@ namespace TerRoguelike.UI
             MouseState ms = Mouse.GetState();
             GamePadState gs = GamePad.GetState(PlayerIndex.One);
 
-            if (PlayerInput.UsingGamepad)
+            if (!TerRoguelike.mpClient)
             {
-                if (gs.ThumbSticks.Left.X < -0.4f || gs.DPad.Left == ButtonState.Pressed)
+                if (PlayerInput.UsingGamepad)
                 {
-                    mainMenuHover = true;
-                    restartHover = false;
+                    if (gs.ThumbSticks.Left.X < -0.4f || gs.DPad.Left == ButtonState.Pressed)
+                    {
+                        mainMenuHover = true;
+                        restartHover = false;
+                    }
+                    else if (gs.ThumbSticks.Left.X > 0.4f || gs.DPad.Right == ButtonState.Pressed)
+                    {
+                        mainMenuHover = false;
+                        restartHover = true;
+                    }
                 }
-                else if (gs.ThumbSticks.Left.X > 0.4f || gs.DPad.Right == ButtonState.Pressed)
+                else
                 {
-                    mainMenuHover = false;
-                    restartHover = true;
+                    mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
+                    restartHover = mouseHitbox.Intersects(restartBar);
                 }
-            }
-            else
-            {
-                 mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
-                 restartHover = mouseHitbox.Intersects(restartBar);
             }
 
             DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);
+
+            if (TerRoguelike.mpClient)
+                return;
 
             bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) || gs.IsButtonDown(Buttons.B) : ms.LeftButton == ButtonState.Pressed;
             if (pressed && mainMenuHover && modPlayer.deadTime > 150)

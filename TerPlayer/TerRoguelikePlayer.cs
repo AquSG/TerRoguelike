@@ -209,6 +209,7 @@ namespace TerRoguelike.TerPlayer
         public List<VisualFungus> visualFungi = new List<VisualFungus>();
         public List<VisualFungus> primevalStreaks = [];
         public int currentRoom = -1;
+        public int lastKnownRoom = -1;
         public int DashDir = 0;
         public int DashDelay = 0;
         public int DashTime = -6;
@@ -249,6 +250,8 @@ namespace TerRoguelike.TerPlayer
         #region Reset Variables
         public override void PreUpdate()
         {
+            if (timeAttacking < -300)
+                Main.NewText(TerRoguelikeMenu.difficulty);
             startDirection = Player.direction;
 
             coolantBarrel = 0;
@@ -2838,6 +2841,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void OnEnterWorld()
         {
+            DifficultySetPacket.Send(TerRoguelikeMenu.difficulty);
             RequestRoomUmovingDataPacket.Send();
 
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -3970,6 +3974,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void OnRespawn()
         {
+            Main.SetCameraLerp(1, 1);
             if (Player.whoAmI == Main.myPlayer)
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 20);
             killerNPC = -1;
