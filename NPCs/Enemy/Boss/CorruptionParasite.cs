@@ -1121,11 +1121,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
+            writer.WriteVector2(waveTunnelDesiredPos);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            waveTunnelDesiredPos = reader.ReadVector2();
         }
     }
 }

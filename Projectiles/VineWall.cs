@@ -73,6 +73,9 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnKill(int timeLeft)
         {
+            if (Main.dedServ)
+                return;
+
             bool soundPlayed = false;
 
             Texture2D tex = TextureAssets.Projectile[Type].Value;

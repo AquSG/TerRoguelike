@@ -124,13 +124,21 @@ namespace TerRoguelike.ILEditing
         {
 			foreach (NPC npc in Main.ActiveNPCs)
 			{
-				var modNPC = npc.ModNPC();
-				if (modNPC == null || !modNPC.drawBeforeWalls)
-					continue;
+				try
+				{
+                    var modNPC = npc.ModNPC();
+                    if (modNPC == null || !modNPC.drawBeforeWalls)
+                        continue;
 
-				modNPC.drawingBeforeWallsCurrently = true;
-                Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
-                modNPC.drawingBeforeWallsCurrently = false;
+                    modNPC.drawingBeforeWallsCurrently = true;
+                    Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
+                    modNPC.drawingBeforeWallsCurrently = false;
+                }
+				catch (Exception ex)
+				{
+					TerRoguelike.Instance.Logger.Error(ex);
+				}
+				
 			}
 			orig.Invoke(self);
         }

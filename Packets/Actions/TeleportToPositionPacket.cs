@@ -110,7 +110,7 @@ namespace TerRoguelike.Packets
 
                 Floor nextFloor = FloorID[room.AssociatedFloor];
                 TerRoguelikePlayer.HealthUpIndicator(Main.LocalPlayer);
-                if (nextFloor.Name != "Lunar")
+                if (nextFloor.Name != "Lunar" && !TerRoguelikeWorld.escape)
                 {
                     SetCalm(nextFloor.Soundtrack.CalmTrack);
                     SetCombat(nextFloor.Soundtrack.CombatTrack);

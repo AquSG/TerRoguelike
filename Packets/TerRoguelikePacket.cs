@@ -54,6 +54,7 @@ namespace TerRoguelike.Packets
             StartBossThemeSync,
             StartCutsceneSync,
             RequestBasinSync,
+            DifficultySetSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

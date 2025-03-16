@@ -66,6 +66,7 @@ namespace TerRoguelike.NPCs
         public List<Vector2> ExtraIgniteTargetPoints = [];
         public int hitSegment = 0;
         public bool scalingApplied = false;
+        public int packetCooldown = 0;
         public float effectiveDamageTakenMulti 
         { 
             get 
@@ -3434,6 +3435,7 @@ namespace TerRoguelike.NPCs
             writer.Write(targetNPC);
             writer.Write(targetPlayer);
             writer.Write(npc.friendly);
+
             bool sendZero = npc.ai[0] == 0 || npc.ai[1] == 0 || npc.ai[2] == 0 || npc.ai[3] == 0;
             writer.Write(sendZero);
             if (sendZero)
@@ -3444,6 +3446,18 @@ namespace TerRoguelike.NPCs
                 writer.Write(npc.ai[3]);
             }
             writer.Write(npc.direction);
+
+            int segCount = Segments.Count;
+            writer.Write(segCount);
+            for (int i = 0; i < segCount; i++)
+            {
+                var seg = Segments[i];
+                writer.WriteVector2(seg.Position);
+                writer.WriteVector2(seg.OldPosition);
+                writer.Write(seg.Rotation);
+                writer.Write(seg.OldRotation);
+                writer.Write(seg.Height);
+            }
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3456,6 +3470,7 @@ namespace TerRoguelike.NPCs
             targetNPC = reader.ReadInt32();
             targetPlayer = reader.ReadInt32();
             npc.friendly = reader.ReadBoolean();
+
             bool recieveZero = reader.ReadBoolean();
             if (recieveZero)
             {
@@ -3465,6 +3480,21 @@ namespace TerRoguelike.NPCs
                 npc.ai[3] = reader.ReadSingle();
             }
             npc.direction = reader.ReadInt32();
+
+            Segments.Clear();
+            int segCount = reader.ReadInt32();
+            for (int i = 0; i < segCount; i++)
+            {
+                Vector2 pos = reader.ReadVector2();
+                Vector2 oldpos = reader.ReadVector2();
+                float rot = reader.ReadSingle();
+                float oldrot = reader.ReadSingle();
+                float height = reader.ReadSingle();
+
+                Segments.Add(new(pos, rot, height));
+                Segments[i].OldPosition = oldpos;
+                Segments[i].OldRotation = oldrot;
+            }
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
@@ -3531,6 +3561,13 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreAI(NPC npc)
         {
+            if (packetCooldown > 0)
+                packetCooldown--;
+            if (currentUpdate == 1 && Segments != null && Segments.Count > 0 && packetCooldown <= 0)
+            {
+                npc.netUpdate = true;
+                packetCooldown = 5;
+            }
             if (TerRoguelikeWorld.IsTerRoguelikeWorld && !scalingApplied)
             {
                 baseMaxHP = npc.lifeMax;
@@ -3975,21 +4012,16 @@ namespace TerRoguelike.NPCs
         }
         public override bool ModifyCollisionData(NPC npc, Rectangle victimHitbox, ref int immunityCooldownSlot, ref MultipliableFloat damageMultiplier, ref Rectangle npcHitbox)
         {
-            
             if (Segments.Count > 0)
             {
-                if (Main.netMode != NetmodeID.SinglePlayer)
-                {
-                    npcHitbox = new Rectangle(0, 0, 1, 1);
-                    return true;
-                }
                 for (int i = 0; i < Segments.Count; i++)
                 {
                     WormSegment segment = Segments[i];
                     float radius = i == 0 ? (npc.height < npc.width ? npc.height / 2 : npc.width / 2) : segment.Height / 2;
                     if (segment.Position.Distance(victimHitbox.ClosestPointInRect(segment.Position)) <= radius)
                     {
-                        npcHitbox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
+                        Point closestPoint = victimHitbox.ClosestPointInRect(segment.Position).ToPoint();
+                        npcHitbox = new Rectangle(closestPoint.X - 1, closestPoint.Y - 1, 3, 3);
                         hitSegment = i;
                         break;
                     }

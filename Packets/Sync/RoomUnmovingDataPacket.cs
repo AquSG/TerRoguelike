@@ -80,6 +80,13 @@ namespace TerRoguelike.Packets
                 packet.Write(roomDimensionsList[index + 1]);
             }
 
+            int floorLength = RoomManager.FloorIDsInPlay.Count;
+            packet.Write(length);
+            for (int i = 0; i < floorLength; i++)
+            {
+                packet.Write(RoomManager.FloorIDsInPlay[i]);
+            }
+
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
@@ -102,6 +109,13 @@ namespace TerRoguelike.Packets
                 room.RoomPosition.Y = packet.ReadInt32();
                 room.RoomDimensions.X = packet.ReadInt32();
                 room.RoomDimensions.Y = packet.ReadInt32();
+            }
+
+            int floorLength = packet.ReadInt32();
+            RoomManager.FloorIDsInPlay.Clear();
+            for (int i = 0; i < floorLength; i++)
+            {
+                RoomManager.FloorIDsInPlay.Add(packet.ReadInt32());
             }
         }
     }

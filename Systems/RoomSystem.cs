@@ -61,6 +61,7 @@ namespace TerRoguelike.Systems
         public static int loopingDrama = 0;
         public static bool regeneratingWorld = false;
         public static int regeneratingWorldTime = 0;
+        public static bool activatedTeleport = false;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -172,8 +173,34 @@ namespace TerRoguelike.Systems
                         player = Main.player[i];
                     if (!player.active || player.dead)
                         continue;
-
                     TerRoguelikePlayer modPlayer = player.ModPlayer();
+
+                    if (Main.netMode != NetmodeID.SinglePlayer && modPlayer.lastKnownRoom != -1)
+                    {
+                        bool stop = false;
+                        Point playerpoint = player.position.ToTileCoordinates();
+                        for (int x = playerpoint.X; x < playerpoint.X + 2; x++)
+                        {
+                            for (int y = playerpoint.Y; y < playerpoint.Y + 3; y++)
+                            {
+                                Tile tile = ParanoidTileRetrieval(x, y);
+                                if (!tile.IsTileSolidGround(true))
+                                {
+                                    stop = true;
+                                    break;
+                                }
+                                player.Center = room.FindAirNearRoomCenter();
+                                if (Main.dedServ)
+                                {
+                                    TeleportToPositionPacket.Send(player.Center, TeleportToPositionPacket.TeleportContext.Misc, room.ID, player.whoAmI);
+                                }
+                            }
+                            if (stop)
+                                break;
+                        }
+                    }
+
+                    
                     bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f - 1f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f + 1f;
                     bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
                     if (roomXcheck && roomYcheck)
@@ -186,7 +213,10 @@ namespace TerRoguelike.Systems
                         if (room.AssociatedFloor != -1)
                             modPlayer.currentFloor = FloorID[room.AssociatedFloor]; //If player is inside a room with a valid value for an associated floor, set it to that.
                         if (room.AllowSettingPlayerCurrentRoom)
+                        {
                             modPlayer.currentRoom = room.myRoom;
+                            modPlayer.lastKnownRoom = room.myRoom;
+                        }
 
                         if (modPlayer.currentFloor.ID == 10 && !lunarFloorInitialized)
                         {
@@ -202,19 +232,22 @@ namespace TerRoguelike.Systems
                                 {
                                     jumpstartRoom.awake = true;
                                     jumpstartRoom.InitializeRoom();
+                                    RoomPacket.Send(jumpstartRoom.ID);
                                 }
                             }
                         }
 
                         room.awake = true;
-                        if (room.CanDescend(player, modPlayer) && !TerRoguelike.mpClient) //New Floor Blue Wall Portal Teleport
+                        if (room.CanDescend(player, modPlayer) && !TerRoguelike.mpClient && !activatedTeleport) //New Floor Blue Wall Portal Teleport
                         {
+                            activatedTeleport = true;
                             room.Descend(player);
                             player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
                         }
-                        if (room.CanAscend(player, modPlayer) && !TerRoguelike.mpClient)
+                        if (room.CanAscend(player, modPlayer) && !TerRoguelike.mpClient && !activatedTeleport)
                         {
+                            activatedTeleport = true;
                             room.Ascend(player);
                             player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
@@ -484,11 +517,18 @@ namespace TerRoguelike.Systems
             StartVanillaSpritebatch(false);
             foreach (NPC npc in Main.ActiveNPCs)
             {
-                var modNPC = npc.ModNPC();
-                if (modNPC == null || !modNPC.drawAfterEverything)
-                    continue;
+                try
+                {
+                    var modNPC = npc.ModNPC();
+                    if (modNPC == null || !modNPC.drawAfterEverything)
+                        continue;
 
-                Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
+                    Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
+                }
+                catch (Exception ex)
+                {
+                    TerRoguelike.Instance.Logger.Error(ex);
+                }
             }
             Main.spriteBatch.End();
 
@@ -896,7 +936,7 @@ namespace TerRoguelike.Systems
         #region Death Scene
         public void DrawDeathScene()
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!Main.dedServ)
             {
                 Player player = Main.player[Main.myPlayer];
                 TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
@@ -1418,6 +1458,8 @@ namespace TerRoguelike.Systems
                     RequestBasinPacket.cooldown--;
             }
 
+            activatedTeleport = false;
+
             if (regeneratingWorld)
             {
                 regeneratingWorldTime++;
@@ -1716,6 +1758,7 @@ namespace TerRoguelike.Systems
         #endregion
         public static void ClearWorldTerRoguelike()
         {
+            difficultyReceivedByServer = false;
             if (Main.netMode == NetmodeID.MultiplayerClient)
                 obtainedRoomListFromServer = false;
             else

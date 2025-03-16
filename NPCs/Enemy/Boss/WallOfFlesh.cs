@@ -499,7 +499,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     pos += rot.ToRotationVector2() * 12;
 
                     SoundEngine.PlaySound(SoundID.NPCDeath13 with { Volume = 0.8f, Pitch = -0.1f }, NPC.Center);
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 6, ModContent.ProjectileType<FleshBall>(), NPC.damage, 0, -1, RuinedMoonActive ? -18 : 0);
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, rot.ToRotationVector2() * 6, ModContent.ProjectileType<FleshBall>(), NPC.damage, 0, -1, RuinedMoonActive ? -18 : 0);
                 }
                 if (time >= 30)
                 {
@@ -548,7 +549,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     pos += offset;
                     SoundEngine.PlaySound(SoundID.Item73 with { Volume = 0.5f, Pitch = -0.5f, PitchVariance = 0.05f, MaxInstances = 6 }, pos);
                     SoundEngine.PlaySound(SoundID.NPCHit13 with { Volume = 0.3f, Pitch = -0.95f, PitchVariance = 0.05f, MaxInstances = 6 }, pos);
-                    Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<VolatileFlesh>(), NPC.damage, 0, -1, startPos.X - pos.X, startPos.Y - pos.Y);
+                    if (!TerRoguelike.mpClient)
+                        Projectile.NewProjectile(NPC.GetSource_FromThis(), pos, Vector2.Zero, ModContent.ProjectileType<VolatileFlesh>(), NPC.damage, 0, -1, startPos.X - pos.X, startPos.Y - pos.Y);
                 }
                 if (NPC.ai[1] >= Bloodball.Duration)
                 {
