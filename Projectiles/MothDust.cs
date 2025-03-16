@@ -66,6 +66,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.localAI[0] == 0)
             {
+                MaxScale = Projectile.scale * 1f;
                 for (int i = 0; i < (int)(10 * MaxScale); i++)
                 {
                     Vector2 starVector = Main.rand.NextVector2Circular(2f, 2f) * MaxScale;

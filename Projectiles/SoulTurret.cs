@@ -57,8 +57,6 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             int time = maxTimeLeft - Projectile.timeLeft;
-            var modProj = Projectile.ModProj();
-            target = modProj.GetTarget(Projectile);
 
             if (Projectile.ai[2] >= -20)
                 Projectile.ai[2]++;
@@ -86,7 +84,18 @@ namespace TerRoguelike.Projectiles
                 
 
             Projectile.velocity *= 0.98f;
-            
+
+            if (time >= 130)
+            {
+                var modProj = Projectile.ModProj();
+                target = modProj.GetTarget(Projectile);
+            }
+            else
+            {
+                var modProj = Projectile.ModProj();
+                modProj.targetNPC = -1;
+                modProj.targetPlayer = -1;
+            }
             int count = 6;
             if (time < 160)
             {

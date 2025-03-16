@@ -59,6 +59,10 @@ namespace TerRoguelike.UI
 
         public static void Draw(SpriteBatch spriteBatch, Player player)
         {
+            if (TerRoguelike.mpClient)
+            {
+                return;
+            }
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
 
             Vector2 deathUIScreenPosRatio = new Vector2(Main.screenWidth * 0.5f, Main.screenHeight * 0.5f);
@@ -101,9 +105,6 @@ namespace TerRoguelike.UI
             }
 
             DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);
-
-            if (TerRoguelike.mpClient)
-                return;
 
             bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) || gs.IsButtonDown(Buttons.B) : ms.LeftButton == ButtonState.Pressed;
             if (pressed && mainMenuHover && modPlayer.deadTime > 150)

@@ -859,6 +859,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Deathray.Id)
             {
+                modNPC.DiscourageTargetting();
+
                 int timeToEnd = Deathray.Duration - (int)NPC.ai[1];
                 Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(0, -80);
                 Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);

@@ -88,6 +88,24 @@ namespace TerRoguelike.Packets
             }
 
             packet.Send(toClient, ignoreClient);
+
+            for (int i = 0; i < RoomSystem.RoomList.Count; i++)
+            {
+                Room room = RoomSystem.RoomList[i];
+                if ((room.IsStartRoom || room.IsSanctuary) && !room.IsBossRoom)
+                {
+                    Rectangle sendRect = new Rectangle((int)room.RoomPosition.X, (int)room.RoomPosition.Y, (int)room.RoomDimensions.X, (int)room.RoomDimensions.Y);
+                    for (int x = sendRect.X; x < sendRect.X + sendRect.Width; x += 145)
+                    {
+                        for (int y = sendRect.Y; y < sendRect.Y + sendRect.Height; y += 145)
+                        {
+                            int width = Math.Min(145, sendRect.Width - (x - sendRect.X));
+                            int height = Math.Min(145, sendRect.Height - (y - sendRect.Y));
+                            NetMessage.SendTileSquare(-1, sendRect.X, sendRect.Y, width, height);
+                        }
+                    }
+                }
+            }
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {

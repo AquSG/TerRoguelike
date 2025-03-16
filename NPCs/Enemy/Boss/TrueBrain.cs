@@ -993,7 +993,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 if (!TerRoguelike.mpClient)
                                 {
                                     int proj = Projectile.NewProjectile(NPC.GetSource_FromThis(), projSpawnPos, rot.ToRotationVector2(), ModContent.ProjectileType<PhantasmalDeathBeam>(), NPC.damage, 0, -1, projReferencePos.X, projReferencePos.Y, 1);
-                                    Main.projectile[proj].rotation = rot;
                                 }
                             }
                         }

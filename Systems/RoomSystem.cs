@@ -174,32 +174,6 @@ namespace TerRoguelike.Systems
                     if (!player.active || player.dead)
                         continue;
                     TerRoguelikePlayer modPlayer = player.ModPlayer();
-
-                    if (Main.netMode != NetmodeID.SinglePlayer && modPlayer.lastKnownRoom != -1)
-                    {
-                        bool stop = false;
-                        Point playerpoint = player.position.ToTileCoordinates();
-                        for (int x = playerpoint.X; x < playerpoint.X + 2; x++)
-                        {
-                            for (int y = playerpoint.Y; y < playerpoint.Y + 3; y++)
-                            {
-                                Tile tile = ParanoidTileRetrieval(x, y);
-                                if (!tile.IsTileSolidGround(true))
-                                {
-                                    stop = true;
-                                    break;
-                                }
-                                player.Center = room.FindAirNearRoomCenter();
-                                if (Main.dedServ)
-                                {
-                                    TeleportToPositionPacket.Send(player.Center, TeleportToPositionPacket.TeleportContext.Misc, room.ID, player.whoAmI);
-                                }
-                            }
-                            if (stop)
-                                break;
-                        }
-                    }
-
                     
                     bool roomXcheck = player.Center.X - (player.width / 2f) > (room.RoomPosition.X + 1f) * 16f - 1f && player.Center.X + (player.width / 2f) < (room.RoomPosition.X - 1f + room.RoomDimensions.X) * 16f + 1f;
                     bool roomYcheck = player.Center.Y - (player.height / 2f) > (room.RoomPosition.Y + 1f) * 16f && player.Center.Y + (player.height / 2f) < (room.RoomPosition.Y - (15f / 16f) + room.RoomDimensions.Y) * 16f;
