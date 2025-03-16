@@ -250,8 +250,6 @@ namespace TerRoguelike.TerPlayer
         #region Reset Variables
         public override void PreUpdate()
         {
-            if (timeAttacking < -300)
-                Main.NewText(TerRoguelikeMenu.difficulty);
             startDirection = Player.direction;
 
             coolantBarrel = 0;
@@ -1258,7 +1256,8 @@ namespace TerRoguelike.TerPlayer
                         if (modNPC == null)
                             continue;
                         procced = true;
-                        modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
+                        if (Player.whoAmI == Main.myPlayer)
+                            modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
                     }
                     if (procced)
                     {
@@ -2665,7 +2664,7 @@ namespace TerRoguelike.TerPlayer
                 killerNPCType = ModContent.NPCType<TrueBrain>();
             }
             SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
-            if (!CutsceneSystem.cutsceneActive && Player.whoAmI == Main.myPlayer)
+            if (!CutsceneSystem.cutsceneActive && Player.whoAmI == Main.myPlayer && !TerRoguelike.mpClient)
                 ZoomSystem.SetZoomAnimation(2.5f, 60);
             deathEffectTimer += 120;
             return true;

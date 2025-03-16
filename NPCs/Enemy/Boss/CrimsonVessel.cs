@@ -727,9 +727,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void SpawnSeers()
         {
-            if (TerRoguelike.mpClient)
-                return;
-
+            
             int seerCount = RuinedMoonActive ? 16 : 8;
             int seerRate = seerSpawnTime / (seerCount - 1);
             if ((NPC.ai[1] - (Heal.Duration - seerSpawnTime)) % seerRate == 0)

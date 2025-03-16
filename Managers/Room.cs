@@ -558,6 +558,13 @@ namespace TerRoguelike.Managers
             {
                 nextFloor = FloorID[RoomManager.FloorIDsInPlay[nextStage]];
                 targetRoom = RoomID[nextFloor.StartRoomID];
+                foreach (Player p in Main.ActivePlayers)
+                {
+                    var modp = p.ModPlayer();
+                    if (modp == null)
+                        continue;
+                    modp.cacheRoomListWarp = targetRoom.myRoom;
+                }
                 modPlayer.cacheRoomListWarp = targetRoom.myRoom;
             }
             else

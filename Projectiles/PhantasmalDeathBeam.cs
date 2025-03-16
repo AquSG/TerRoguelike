@@ -21,6 +21,7 @@ using Terraria.Graphics.Effects;
 using System.Diagnostics;
 using System.IO.Pipes;
 using TerRoguelike.MainMenu;
+using System.IO;
 
 
 namespace TerRoguelike.Projectiles
@@ -309,6 +310,14 @@ namespace TerRoguelike.Projectiles
             }
 
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(fuckYou);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            fuckYou = reader.ReadInt32();
         }
     }
 }

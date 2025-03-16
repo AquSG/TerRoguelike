@@ -48,6 +48,7 @@ namespace TerRoguelike.Packets
 
             // WHY DOES ENUM NOT FUCKING WORK
             // 5
+            // read underflow 2 of 1 bytes
             packet.Write(diff == Difficulty.SunnyDay);
             packet.Write(diff == Difficulty.NewMoon);
             packet.Write(diff == Difficulty.FullMoon);

@@ -3566,7 +3566,7 @@ namespace TerRoguelike.NPCs
             if (currentUpdate == 1 && Segments != null && Segments.Count > 0 && packetCooldown <= 0)
             {
                 npc.netUpdate = true;
-                packetCooldown = 5;
+                packetCooldown = 15;
             }
             if (TerRoguelikeWorld.IsTerRoguelikeWorld && !scalingApplied)
             {
@@ -4347,8 +4347,7 @@ namespace TerRoguelike.NPCs
             }
             else if (targetCooldown <= 0)
             {
-                if (targetPlayer == -1)
-                    targetPlayer = npc.FindClosestPlayer();
+                targetPlayer = npc.FindClosestPlayer();
                 if (targetNPC == -1 && !TerRoguelikeBoss)
                     targetNPC = ClosestNPC(npc.Center, 50000f, true);
                 if (Main.player[targetPlayer].dead)
@@ -4450,6 +4449,14 @@ namespace TerRoguelike.NPCs
             if (!isRoomNPC || sourceRoomListID < 0)
                 return null;
             return RoomList[sourceRoomListID];
+        }
+
+        public void DiscourageTargetting()
+        {
+            if (currentUpdate == 1)
+            {
+                targetCooldown++;
+            }
         }
     }
 
