@@ -152,7 +152,7 @@ namespace TerRoguelike.Managers
             if (!StartCondition()) // not been touched yet? return
                 return;
 
-            if (!initialized) // initialize the room
+            if (!initialized && !(TerRoguelikeWorld.escaped && FloorID[AssociatedFloor].Stage != -1)) // initialize the room
                 InitializeRoom();
 
             if (closedTime <= 60 && (TerRoguelikeWorld.escapeTime > TerRoguelikeWorld.escapeTimeSet - 180 || !TerRoguelikeWorld.escape || (TerRoguelikeWorld.escape && IsBossRoom && FloorID[AssociatedFloor].jstcProgress >= Floor.JstcProgress.Boss))) //wall is visually active up to 1 second after room clear
@@ -473,7 +473,7 @@ namespace TerRoguelike.Managers
         }
         public virtual void RoomClearReward()
         {
-            if (TerRoguelikeWorld.escape)
+            if (TerRoguelikeWorld.escape || TerRoguelikeWorld.escaped)
                 return;
 
             ClearGhosts();
@@ -574,14 +574,20 @@ namespace TerRoguelike.Managers
             }
             
 
-            if (!IsSanctuary && TerRoguelikeWorld.TryWarpToSanctuary(modPlayer))
+            if (!IsSanctuary && TerRoguelikeWorld.TryWarpToSanctuary())
             {
                 modPlayer.currentFloor = FloorID[FloorDict["Sanctuary"]];
                 targetRoom = RoomID[modPlayer.currentFloor.StartRoomID];
                 nextFloor = modPlayer.currentFloor;
-                if (modPlayer.lunarCharm > 0)
+                if (TerRoguelikeWorld.totalLunarCharm > 0)
                 {
-                    modPlayer.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                    foreach (Player p in Main.ActivePlayers)
+                    {
+                        var modp = p.ModPlayer();
+                        if (modp == null) continue;
+                        if (modp.lunarCharm > 0)
+                            modPlayer.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                    }
                 }
             }
             else
@@ -652,7 +658,7 @@ namespace TerRoguelike.Managers
                 modPlayer.currentFloor = nextFloor;
 
                 if (Main.dedServ)
-                    TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, ID);
+                    TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, targetRoom.ID);
 
                 modPlayer.escapeArrowTime = 300;
                 var newFloorStartRoom = RoomSystem.RoomList.Find(x => x.ID == nextFloor.StartRoomID);
@@ -806,7 +812,9 @@ namespace TerRoguelike.Managers
         }
         public void PlayerItemsUpdate()
         {
-            if (TerRoguelikeWorld.escape || bossDead)
+            if (TerRoguelikeWorld.escape || bossDead || IsSanctuary || IsStartRoom || TransitionDirection >= 0)
+                return;
+            if (TerRoguelikeWorld.escaped && FloorID[AssociatedFloor].Stage != -1)
                 return;
 
             int totalAutomaticDefibrillator = 0;

@@ -112,6 +112,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Main.npcFrameCount[Type] = 1;
             NPCID.Sets.MustAlwaysDraw[Type] = true;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {

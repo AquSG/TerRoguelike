@@ -163,7 +163,7 @@ namespace TerRoguelike.MainMenu
                     prepareForRoguelikeGeneration = true;
                 }
             }
-            if (prepareForRoguelikeGeneration && Main.menuMode == 888 && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
+            if (prepareForRoguelikeGeneration && (Main.menuMode == 888 || (Main.menuMultiplayer && Main.menuMode == 31)) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
             {
                 if (PlayerInput.UsingGamepad && GamePad.GetState(PlayerIndex.One).Buttons.LeftStick == ButtonState.Pressed && oldGamepadLeftStickState == ButtonState.Released)
                 {
@@ -172,7 +172,15 @@ namespace TerRoguelike.MainMenu
                     if (uiControllerCycle > 2)
                         uiControllerCycle = 0;
                 }
-                DifficultyInteraction();
+                if (!(Main.menuMultiplayer && !Main.menuServer))
+                {
+                    DifficultyInteraction();
+                }
+                else
+                {
+                    if (uiControllerCycle == 0)
+                        uiControllerCycle = 1;
+                }
                 WeaponInteraction();
                 SecretCodeInteraction();
 
@@ -502,13 +510,14 @@ namespace TerRoguelike.MainMenu
                 }
                     
             }
-            if (prepareForRoguelikeGeneration && Main.menuMode == 888 && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
+            if (prepareForRoguelikeGeneration && (Main.menuMode == 888 || (Main.menuMultiplayer && Main.menuMode == 31)) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
             {
                 Main.menuMultiplayer = true;
                 Main.menuServer = true;
                 var font = FontAssets.DeathText.Value;
 
-                DifficultyDrawing();
+                if (!(Main.menuMultiplayer && !Main.menuServer))
+                    DifficultyDrawing();
                 StarterWeaponDrawing();
 
                 void DifficultyDrawing()

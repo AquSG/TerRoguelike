@@ -152,7 +152,7 @@ namespace TerRoguelike.Systems
             if (RoomList == null)
                 return;
 
-            if (RoomList.Count == 0)
+            if (RoomList.Count == 0 || regeneratingWorld)
                 return;
 
             int loopCount = -1;
@@ -513,27 +513,34 @@ namespace TerRoguelike.Systems
             StartVanillaSpritebatch(false);
             foreach (NPC npc in Main.ActiveNPCs)
             {
-                var modNPC = npc.ModNPC();
-                if (modNPC == null)
-                    continue;
-
-                if (modNPC.isRoomNPC && modNPC.sourceRoomListID >= 0)
+                try
                 {
-                    if (!Main.hideUI && !modNPC.hostileTurnedAlly && modNPC.overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
+                    var modNPC = npc.ModNPC();
+                    if (modNPC == null)
+                        continue;
+
+                    if (modNPC.isRoomNPC && modNPC.sourceRoomListID >= 0)
                     {
-                        Texture2D arrowTex = TexDict["YellowArrow"];
-                        float opacity = MathHelper.Clamp(modNPC.overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
-                        Vector2 pos = npc.Top + modNPC.drawCenter + (npc.gfxOffY) * Vector2.UnitY;
-                        if (!cameraRect.Contains(pos.ToPoint()))
+                        if (!Main.hideUI && !modNPC.hostileTurnedAlly && modNPC.overheadArrowTime > 0 && ModContent.GetInstance<TerRoguelikeConfig>().EnemyLocationArrow)
                         {
-                            pos = cameraRect.ClosestPointInRect(pos);
+                            Texture2D arrowTex = TexDict["YellowArrow"];
+                            float opacity = MathHelper.Clamp(modNPC.overheadArrowTime / 60f, 0, 1) * 0.7f + (0.3f * (float)Math.Cos(Main.GlobalTimeWrappedHourly * 3));
+                            Vector2 pos = npc.Top + modNPC.drawCenter + (npc.gfxOffY) * Vector2.UnitY;
+                            if (!cameraRect.Contains(pos.ToPoint()))
+                            {
+                                pos = cameraRect.ClosestPointInRect(pos);
+                            }
+                            float rot = (npc.Center - pos).ToRotation();
+                            if (npc.Center == pos)
+                                rot = MathHelper.PiOver2;
+                            pos += (-32 + (14 * opacity)) * rot.ToRotationVector2();
+                            Main.EntitySpriteDraw(arrowTex, pos - Main.screenPosition, null, Color.White * opacity * 0.9f, rot, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                         }
-                        float rot = (npc.Center - pos).ToRotation();
-                        if (npc.Center == pos)
-                            rot = MathHelper.PiOver2;
-                        pos += (-32 + (14 * opacity)) * rot.ToRotationVector2();
-                        Main.EntitySpriteDraw(arrowTex, pos - Main.screenPosition, null, Color.White * opacity * 0.9f, rot, arrowTex.Size() * 0.5f, 0.5f, SpriteEffects.None);
                     }
+                }
+                catch (Exception e)
+                {
+                    TerRoguelike.Instance.Logger.Error(e);
                 }
             }
             Main.spriteBatch.End();
@@ -1013,7 +1020,7 @@ namespace TerRoguelike.Systems
                         Player player = Main.player[i];
                         if (player == null)
                             continue;
-                        if (!player.active)
+                        if (!player.active || player.dead)
                             continue;
 
                         TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
@@ -1443,6 +1450,7 @@ namespace TerRoguelike.Systems
                     Main.LocalPlayer.Spawn(PlayerSpawnContext.ReviveFromDeath);
                 else
                     Main.LocalPlayer.Spawn(PlayerSpawnContext.RecallFromItem);
+                RegenerateWorldPacket.Send();
             }
             else if (regeneratingWorldTime > 0)
             {
@@ -1470,6 +1478,30 @@ namespace TerRoguelike.Systems
                         Main.LocalPlayer.Bottom = position.ToVector2() * 16 + Vector2.UnitY * -1;
                         break;
                     }
+                }
+                if (Main.dedServ)
+                {
+                    foreach (Player player in Main.ActivePlayers)
+                    {
+                        Netplay.Clients[player.whoAmI].TileSections = new bool[Main.maxTilesX / 200 + 1, Main.maxTilesY / 150 + 1];
+                        RemoteClient.CheckSection(player.whoAmI, player.Center);
+                    }
+                    for (int i = 0; i < RoomSystem.RoomList.Count; i++)
+                    {
+                        Room room = RoomSystem.RoomList[i];
+                        Rectangle sendRect = new Rectangle((int)room.RoomPosition.X, (int)room.RoomPosition.Y, (int)room.RoomDimensions.X, (int)room.RoomDimensions.Y);
+                        for (int x = sendRect.X; x < sendRect.X + sendRect.Width; x += 145)
+                        {
+                            for (int y = sendRect.Y; y < sendRect.Y + sendRect.Height; y += 145)
+                            {
+                                int width = Math.Min(145, sendRect.Width - (x - sendRect.X));
+                                int height = Math.Min(145, sendRect.Height - (y - sendRect.Y));
+                                NetMessage.SendTileSquare(-1, sendRect.X, sendRect.Y, width, height);
+                            }
+                        }
+                    }
+                    RegenerateWorldPacket.Send();
+                    RoomUnmovingDataPacket.Send();
                 }
             }
 
@@ -1697,23 +1729,31 @@ namespace TerRoguelike.Systems
                 if (Main.mapFullscreen)
                     modPlayer.selectedBasin = null;
 
-                for (int i = 0; i < itemBasins.Count; i++)
+                try
                 {
-                    var basin = itemBasins[i];
-                    
-                    if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
+                    for (int i = 0; i < itemBasins.Count; i++)
                     {
-                        itemBasins.RemoveAt(i);
-                        i--;
-                        continue;
-                    }
-                    if (basin.nearby > 0)
-                    {
-                        basin.nearby--;
-                        if (spawnParticles)
-                            basin.SpawnParticles();
+                        var basin = itemBasins[i];
+
+                        if (Main.tile[basin.position.X, basin.position.Y].TileType != basinTileType)
+                        {
+                            itemBasins.RemoveAt(i);
+                            i--;
+                            continue;
+                        }
+                        if (basin.nearby > 0)
+                        {
+                            basin.nearby--;
+                            if (spawnParticles)
+                                basin.SpawnParticles();
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    TerRoguelike.Instance.Logger.Error(ex);
+                }
+                
             }
             if (ItemBasinUI.stickMoveCooldown > 0)
                 ItemBasinUI.stickMoveCooldown--;
@@ -1732,6 +1772,7 @@ namespace TerRoguelike.Systems
         #endregion
         public static void ClearWorldTerRoguelike()
         {
+            TerRoguelikePlayer.allDeadTime = 0;
             difficultyReceivedByServer = false;
             if (Main.netMode == NetmodeID.MultiplayerClient)
                 obtainedRoomListFromServer = false;
@@ -1817,7 +1858,7 @@ namespace TerRoguelike.Systems
             SetCombat(Silence);
             SetMusicMode(MusicStyle.Silent);
             regeneratingWorld = true;
-            WorldGen.gen = true;
+            WorldGen.gen = !Main.dedServ;
             ClearWorldTerRoguelike();
             Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
 
@@ -1840,7 +1881,12 @@ namespace TerRoguelike.Systems
                 floor.Reset();
             }
 
-            ThreadPool.QueueUserWorkItem(_ => TerRoguelikeWorldManagementSystem.RegenerateWorld());
+            if (Main.dedServ)
+            {
+                TerRoguelikeWorldManagementSystem.RegenerateWorld();
+            }
+            else
+                ThreadPool.QueueUserWorkItem(_ => TerRoguelikeWorldManagementSystem.RegenerateWorld());
         }
         public override void SetStaticDefaults()
         {

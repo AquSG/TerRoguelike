@@ -62,7 +62,7 @@ namespace TerRoguelike.Systems
                     cutsceneDisableControl = CreditsSystem.creditsActive;
                     if (!easeOutActivated)
                     {
-                        if (Main.player[Main.myPlayer].dead)
+                        if (Main.player[Main.myPlayer].dead && !TerRoguelike.mpClient)
                         {
                             ZoomSystem.SetZoomAnimation(2.5f, easeOutTime);
                         }

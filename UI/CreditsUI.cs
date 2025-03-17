@@ -25,6 +25,7 @@ using Terraria.GameInput;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.Localization;
 using static TerRoguelike.UI.CreditsUI;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.UI
 {
@@ -104,15 +105,23 @@ namespace TerRoguelike.UI
             if (pressed && mainMenuHover && modPlayer.creditsViewTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                if (TerRoguelikeWorld.IsDeletableOnExit)
+                if (TerRoguelike.mpClient)
                 {
-                    TerRoguelikeMenu.wipeTempPlayer = true;
-                    TerRoguelikeMenu.wipeTempWorld = true;
+                    StartRoomGenerationPacket.Send();
                 }
-                modPlayer.killerNPC = -1;
-                modPlayer.killerProj = -1;
-                SystemLoader.PreSaveAndQuit();
-                WorldGen.SaveAndQuit();
+                else
+                {
+                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                    {
+                        TerRoguelikeMenu.wipeTempPlayer = true;
+                        TerRoguelikeMenu.wipeTempWorld = true;
+                    }
+                    modPlayer.killerNPC = -1;
+                    modPlayer.killerProj = -1;
+                    SystemLoader.PreSaveAndQuit();
+                    WorldGen.SaveAndQuit();
+                }
+                
             }
             else if (pressed && restartHover && modPlayer.creditsViewTime > 150)
             {

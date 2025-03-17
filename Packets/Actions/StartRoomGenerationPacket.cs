@@ -32,27 +32,33 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
+using static TerRoguelike.Systems.MusicSystem;
+using TerRoguelike.Floors;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class RequestRoomUmovingDataPacket : TerRoguelikePacket
+    public sealed class StartRoomGenerationPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.RequestUnmovingDataSync;
+        public override PacketType MessageType => PacketType.StartRoomGenerationSync;
         public static void Send(int toClient = -1, int ignoreClient = -1)
         {
-            if (!TerRoguelike.mpClient)
+            if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            var packet = NewPacket(PacketType.RequestUnmovingDataSync);
+            var packet = NewPacket(PacketType.StartRoomGenerationSync);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            if (Main.dedServ)
-            {
-                RoomUnmovingDataPacket.Send(sender);
-            }
+            if (!Main.dedServ)
+                return;
+
+            if (RoomSystem.regeneratingWorld)
+                return;
+
+            RoomSystem.RegenerateWorld();
+            RegenerateWorldPacket.Send();
         }
     }
 }

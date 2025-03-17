@@ -46,12 +46,12 @@ namespace TerRoguelike.Packets
             if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            var packet = NewPacket(PacketType.PendingItemSync);
+            var packet = NewPacket(PacketType.SpecialPendingItemSync);
 
             packet.Write(item.ItemType);
             packet.WriteVector2(item.Position);
             packet.Write(item.ItemTier);
-            packet.Write(item.setTelegraphDuration);
+            packet.Write(item.setTelegraphDuration - 120);
             packet.WriteVector2(item.Velocity);
             packet.Write(item.Gravity);
             packet.WriteVector2(item.displayInterpolationStartPos);
@@ -72,7 +72,13 @@ namespace TerRoguelike.Packets
             int sacrificetype = packet.ReadInt32();
             bool sound = packet.ReadBoolean();
 
-            SpawnManager.pendingItems.Add(new(type, pos, (ItemTier)tier, duration, velocity, gravity, start, sacrificetype, sound));
+            PendingItem item = new(type, pos, (ItemTier)tier, duration, velocity, gravity, start, sacrificetype, sound);
+            SpawnManager.specialPendingItems.Add(item);
+
+            if (Main.dedServ)
+            {
+                Send(item);
+            }
         }
     }
 }

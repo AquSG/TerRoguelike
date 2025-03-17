@@ -44,7 +44,7 @@ namespace TerRoguelike.Packets
         }
         public static void Send(EscapeContext context, int toClient = -1, int ignoreClient = -1)
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!Main.dedServ)
                 return;
 
             var packet = NewPacket(PacketType.EscapeSync);

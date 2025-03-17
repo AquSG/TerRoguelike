@@ -84,6 +84,7 @@ namespace TerRoguelike.Packets
             }
             if (context == TeleportContext.Sanctuary)
             {
+                ExtraSoundSystem.ForceStopAllExtraSounds();
                 RoomSystem.FloorTransitionEffects();
                 var modPlayer = Main.LocalPlayer.ModPlayer();
                 if (modPlayer != null)
@@ -103,13 +104,64 @@ namespace TerRoguelike.Packets
             }
             if (context == TeleportContext.NewFloor)
             {
+                ExtraSoundSystem.ForceStopAllExtraSounds();
                 Room room = RoomID[roomID];
                 if (Main.LocalPlayer.ModPlayer() != null)
                     RoomSystem.NewFloorEffects(room, Main.LocalPlayer.ModPlayer());
                 RoomSystem.FloorTransitionEffects();
 
                 Floor nextFloor = FloorID[room.AssociatedFloor];
-                TerRoguelikePlayer.HealthUpIndicator(Main.LocalPlayer);
+                if (!TerRoguelikeWorld.escape)
+                    TerRoguelikePlayer.HealthUpIndicator(Main.LocalPlayer);
+                else
+                {
+                    var modPlayer = Main.LocalPlayer.ModPlayer();
+                    if (modPlayer != null)
+                    {
+                        modPlayer.escapeArrowTime = 300;
+                        var newFloorStartRoom = RoomSystem.RoomList.Find(x => x.ID == nextFloor.StartRoomID);
+                        modPlayer.escapeArrowTarget = newFloorStartRoom.RoomPosition16 + Vector2.UnitY * newFloorStartRoom.RoomDimensions.Y * 8f;
+                    }
+
+                    for (int n = 0; n < Main.maxNPCs; n++)
+                    {
+                        NPC npc = Main.npc[n];
+                        if (npc == null)
+                            continue;
+                        if (!npc.active)
+                            continue;
+                        if (npc.life <= 0)
+                            continue;
+
+                        TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
+                        if (!modNPC.isRoomNPC)
+                            continue;
+                        if (modNPC.sourceRoomListID < 0)
+                            continue;
+
+                        if (modNPC.sourceRoomListID > room.myRoom)
+                            npc.active = false;
+                    }
+                    for (int t = room.myRoom + 1; t < RoomSystem.RoomList.Count; t++)
+                    {
+                        Room roomToClear = RoomSystem.RoomList[t];
+                        if (!roomToClear.active)
+                            continue;
+
+                        for (int p = 0; p < roomToClear.NotSpawned.Length; p++)
+                        {
+                            roomToClear.NotSpawned[p] = false;
+                        }
+                    }
+                    for (int s = 0; s < SpawnManager.pendingEnemies.Count; s++)
+                    {
+                        var pendingEnemy = SpawnManager.pendingEnemies[s];
+                        if (pendingEnemy.RoomListID > room.myRoom)
+                        {
+                            pendingEnemy.spent = true;
+                        }
+                    }
+                }
                 if (nextFloor.Name != "Lunar" && !TerRoguelikeWorld.escape)
                 {
                     SetCalm(nextFloor.Soundtrack.CalmTrack);

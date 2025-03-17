@@ -88,6 +88,22 @@ namespace TerRoguelike.World
         public static bool promoteLoop = false;
         public static int currentStageForScaling => currentStage + currentLoop * 6;
         public static float sanctuaryChance => 1 / MathHelper.Clamp(sanctuaryMaxTries - sanctuaryTries, 1, sanctuaryMaxTries);
+        public static int totalLunarCharm
+        {
+            get
+            {
+                int total = 0;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer != null)
+                    {
+                        total += modPlayer.lunarCharm;
+                    }
+                }
+                return total;
+            }
+        }
 
         public static readonly SoundStyle EarthTremor = new SoundStyle("TerRoguelike/Sounds/EarthTremor", 5);
         public static readonly SoundStyle EarthPound = new SoundStyle("TerRoguelike/Sounds/EarthPound", 4);
@@ -98,9 +114,9 @@ namespace TerRoguelike.World
         public static readonly SoundStyle JstcSpawn = new SoundStyle("TerRoguelike/Sounds/JstcSpawn");
         public static readonly SoundStyle LunarGambitSpawn = new SoundStyle("TerRoguelike/Sounds/LunarGambitSpawn");
         public static SlotId PortalSlot;
-        public static bool TryWarpToSanctuary(TerRoguelikePlayer modPlayer)
+        public static bool TryWarpToSanctuary()
         {
-            if (modPlayer.lunarCharm > 0)
+            if (totalLunarCharm > 0)
             {
                 sanctuaryTries = 0;
                 sanctuaryCount++;

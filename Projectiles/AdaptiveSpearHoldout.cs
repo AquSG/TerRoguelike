@@ -58,7 +58,7 @@ namespace TerRoguelike.Projectiles
                 
             }
 
-            float pointingRotation = (AimWorld() - Owner.MountedCenter).ToRotation();
+            float pointingRotation = (modPlayer.mouseWorld - Owner.MountedCenter).ToRotation();
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 16f;
 
             if (Owner.channel) //Keep the player's hands full relative to attack speed

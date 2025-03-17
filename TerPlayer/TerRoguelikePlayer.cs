@@ -43,6 +43,7 @@ namespace TerRoguelike.TerPlayer
         public static float NewMoonIframeMultiplier = 1.5f;
         public static float SunnyDayIframeMultiplier = 2f;
         public static float RuinedMoonIframeMultiplier = 0.5f;
+        public static int allDeadTime = 0;
         public static readonly SoundStyle JetLegCooldown = new SoundStyle("TerRoguelike/Sounds/JetLegUp");
         public static readonly SoundStyle WayfarerProc = new SoundStyle("TerRoguelike/Sounds/WayfarerProc");
         public static readonly SoundStyle PrimevalRattleProc = new SoundStyle("TerRoguelike/Sounds/PrimevalRattleProc", 3);
@@ -244,12 +245,25 @@ namespace TerRoguelike.TerPlayer
         public bool sluggedAttempt = false;
         public bool noRestore = false;
         public Stopwatch playthroughTime = new Stopwatch();
+        public Vector2 mouseWorld = Vector2.Zero;
+        public Vector2 oldMouseWorld = Vector2.Zero;
+        public bool syncMouseWorld = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
         #region Reset Variables
         public override void PreUpdate()
         {
+            if (Player.whoAmI == Main.myPlayer)
+            {
+                mouseWorld = AimWorld();
+
+                if (Vector2.Distance(mouseWorld, oldMouseWorld) > 5f)
+                {
+                    oldMouseWorld = mouseWorld;
+                    syncMouseWorld = true;
+                }
+            }
             startDirection = Player.direction;
 
             coolantBarrel = 0;
@@ -725,7 +739,7 @@ namespace TerRoguelike.TerPlayer
                     {
                         for (int i = 0; i < releaseCount; i++)
                         {
-                            Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (AimWorld() - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
+                            Projectile.NewProjectile(Player.GetSource_FromThis(), Player.Center, (mouseWorld - Player.Center).SafeNormalize(Vector2.UnitX) * 2.2f, ModContent.ProjectileType<ThrownBackupDagger>(), 100, 1f, Player.whoAmI, -1f);
                         }
                     }
                 }
@@ -1091,7 +1105,7 @@ namespace TerRoguelike.TerPlayer
                     wantedScreenRect.Inflate(200, 200);
 
                     NPC npc = Main.npc[allSeeingEyeTarget];
-                    if (npc.life <= 0 || !npc.CanBeChasedBy() || !wantedScreenRect.Contains(AimWorld().ToPoint()))
+                    if (npc.life <= 0 || !npc.CanBeChasedBy() || !wantedScreenRect.Contains(mouseWorld.ToPoint()))
                         allSeeingEyeTarget = -1;
                 }
 
@@ -1099,7 +1113,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     Rectangle wantedScreenRect = new Rectangle((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
                     wantedScreenRect.Inflate(200, 200);
-                    Point checkPoint = AimWorld().ToPoint();
+                    Point checkPoint = mouseWorld.ToPoint();
                     allSeeingEyeTarget = -1;
                     if (wantedScreenRect.Contains(checkPoint))
                     {
@@ -1895,7 +1909,7 @@ namespace TerRoguelike.TerPlayer
         {
             moonLordSkyEffect = false;
             moonLordVisualEffect = false;
-            if (Main.myPlayer == Player.whoAmI && deadTime > 240)
+            if (Main.myPlayer == Player.whoAmI && deadTime > 120)
             {
                 for (int i = 0; i < Main.maxPlayers; i++)
                 {
@@ -1906,6 +1920,25 @@ namespace TerRoguelike.TerPlayer
                     Player.Center = spectatee.Center;
                     Main.SetCameraLerp(0.1f, 10);
                     break;
+                }
+            }
+            if (TerRoguelike.mpClient)
+            {
+                bool allow = true;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    if (!player.dead)
+                    {
+                        allow = false;
+                        allDeadTime = 0;
+                        break;
+                    }
+                }
+                if (allow)
+                    allDeadTime++;
+                if (allDeadTime == 1)
+                {
+                    ZoomSystem.SetZoomAnimation(2.5f, 60);
                 }
             }
         }
@@ -1921,6 +1954,11 @@ namespace TerRoguelike.TerPlayer
                     if (Player.buffType[i] == BuffID.MonsterBanner)
                         Player.buffType[i] = 0;
                 }
+            }
+            if (Player.whoAmI == Main.myPlayer && TerRoguelike.mpClient && syncMouseWorld)
+            {
+                syncMouseWorld = false;
+                MouseWorldPacket.Send(mouseWorld, Player.whoAmI);
             }
         }
         public override void PostUpdateMiscEffects()
@@ -2014,7 +2052,8 @@ namespace TerRoguelike.TerPlayer
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
                     int bleedDamage = 240;
-                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
+                    if (Player.whoAmI == Main.myPlayer)
+                        modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI), target.whoAmI);
                 }
             }
             if (burningCharcoal > 0)
@@ -2132,7 +2171,8 @@ namespace TerRoguelike.TerPlayer
             if (proj.type == ModContent.ProjectileType<ThrownBackupDagger>())
             {
                 int bleedDamage = 120;
-                modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI));
+                if (Player.whoAmI == Main.myPlayer)
+                    modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI), target.whoAmI);
             }
 
             if (target.life <= 0)
@@ -2674,6 +2714,8 @@ namespace TerRoguelike.TerPlayer
         #region Mechanical Functions
         public void ScaleableHeal(int healAmt)
         {
+            if (Player.dead)
+                return;
             if (noRestore)
             {
                 CombatText.NewText(Player.getRect(), Color.Lerp(Color.Blue, Color.White, 0.3f), 0);
@@ -3434,7 +3476,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     NPC npc = Main.npc[allSeeingEyeTarget];
 
-                    Vector2 distanceVector = AimWorld() - Player.Center;
+                    Vector2 distanceVector = mouseWorld - Player.Center;
                     for (int d = 0; d < 2; d++)
                     {
                         Vector2 placement = distanceVector.SafeNormalize(Vector2.UnitY) * Main.rand.NextFloat(1f, distanceVector.Length());

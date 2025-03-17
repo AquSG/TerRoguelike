@@ -26,6 +26,7 @@ using Terraria.Audio;
 using Terraria.ModLoader.IO;
 using System.IO;
 using Terraria.GameContent.UI.States;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.NPCs
 {
@@ -3458,6 +3459,8 @@ namespace TerRoguelike.NPCs
                 writer.Write(seg.OldRotation);
                 writer.Write(seg.Height);
             }
+            writer.Write(npc.immortal);
+            writer.Write(npc.dontTakeDamage);
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3495,6 +3498,8 @@ namespace TerRoguelike.NPCs
                 Segments[i].OldPosition = oldpos;
                 Segments[i].OldRotation = oldrot;
             }
+            npc.immortal = reader.ReadBoolean();
+            npc.dontTakeDamage = reader.ReadBoolean();
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
@@ -3880,6 +3885,8 @@ namespace TerRoguelike.NPCs
         }
         public void BleedingHit(int hitDamage, NPC npc, int owner)
         {
+            bleedingHitCooldown = 20; // hits 3 times a second
+
             if (npc.immortal || npc.dontTakeDamage)
                 return;
 
@@ -3897,17 +3904,19 @@ namespace TerRoguelike.NPCs
             info.Knockback = 0f;
             info.Crit = false;
 
-            npc.StrikeNPC(info);
-            NetMessage.SendStrikeNPC(npc, info);
-            CombatText.NewText(npc.getRect(), Color.MediumVioletRed, hitDamage);
-            bleedingHitCooldown = 20; // hits 3 times a second
-
-            if (npc.life <= 0)
+            if (owner == Main.myPlayer)
             {
-                modPlayer.OnKillEffects(npc);
+                npc.StrikeNPC(info);
+                NetMessage.SendStrikeNPC(npc, info);
+                if (npc.life <= 0)
+                {
+                    modPlayer.OnKillEffects(npc);
+                }
             }
+            
+            CombatText.NewText(npc.getRect(), Color.MediumVioletRed, hitDamage);
         }
-        public void AddBleedingStackWithRefresh(BleedingStack stack)
+        public void AddBleedingStackWithRefresh(BleedingStack stack, int target, bool noSend = false)
         {
             if (bleedingStacks.Count > 0)
             {
@@ -3921,6 +3930,8 @@ namespace TerRoguelike.NPCs
                 bleedingHitCooldown += 20;
 
             bleedingStacks.Add(stack);
+            if (!noSend)
+                ApplyBleedPacket.Send(stack, target, -1, Main.myPlayer);
         }
         public override bool PreKill(NPC npc)
         {
