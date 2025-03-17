@@ -32,27 +32,45 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class RequestRoomUmovingDataPacket : TerRoguelikePacket
+    public sealed class ApplyBleedPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.RequestUnmovingDataSync;
-        public static void Send(int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.ApplyBleedSync;
+        public static void Send(BleedingStack bleed, int npc, int toClient = -1, int ignoreClient = -1)
         {
-            if (!TerRoguelike.mpClient)
+            if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            var packet = NewPacket(PacketType.RequestUnmovingDataSync);
+            var packet = NewPacket(PacketType.ApplyBleedSync);
+
+            packet.Write(npc);
+            packet.Write(bleed.DamageToDeal);
+            packet.Write(bleed.Owner);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            if (Main.dedServ)
+            int who = packet.ReadInt32();
+            int damage = packet.ReadInt32();
+            int owner = packet.ReadInt32();
+
+            if (who >= 0)
             {
-                RoomUnmovingDataPacket.Send(sender);
+                NPC npc = Main.npc[who];
+                if (!npc.active)
+                    return;
+                var modNPC = npc.ModNPC();
+                if (modNPC == null)
+                    return;
+                modNPC.AddBleedingStackWithRefresh(new(damage, sender), who, true);
             }
+
+            if (Main.dedServ)
+                Send(new(damage, owner), who, -1, sender);
         }
     }
 }

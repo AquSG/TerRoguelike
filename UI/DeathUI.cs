@@ -24,6 +24,7 @@ using TerRoguelike.Systems;
 using Terraria.GameInput;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.Localization;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.UI
 {
@@ -59,11 +60,12 @@ namespace TerRoguelike.UI
 
         public static void Draw(SpriteBatch spriteBatch, Player player)
         {
-            if (TerRoguelike.mpClient)
+            if (TerRoguelike.mpClient && TerRoguelikePlayer.allDeadTime == 0)
             {
                 return;
             }
             TerRoguelikePlayer modPlayer = player.GetModPlayer<TerRoguelikePlayer>();
+            int deadTime = TerRoguelike.mpClient ? TerRoguelikePlayer.allDeadTime : modPlayer.deadTime;
 
             Vector2 deathUIScreenPosRatio = new Vector2(Main.screenWidth * 0.5f, Main.screenHeight * 0.5f);
             // Convert the screen ratio position to an absolute position in pixels
@@ -82,46 +84,50 @@ namespace TerRoguelike.UI
             MouseState ms = Mouse.GetState();
             GamePadState gs = GamePad.GetState(PlayerIndex.One);
 
-            if (!TerRoguelike.mpClient)
+            if (PlayerInput.UsingGamepad)
             {
-                if (PlayerInput.UsingGamepad)
+                if (gs.ThumbSticks.Left.X < -0.4f || gs.DPad.Left == ButtonState.Pressed)
                 {
-                    if (gs.ThumbSticks.Left.X < -0.4f || gs.DPad.Left == ButtonState.Pressed)
-                    {
-                        mainMenuHover = true;
-                        restartHover = false;
-                    }
-                    else if (gs.ThumbSticks.Left.X > 0.4f || gs.DPad.Right == ButtonState.Pressed)
-                    {
-                        mainMenuHover = false;
-                        restartHover = true;
-                    }
+                    mainMenuHover = true;
+                    restartHover = false;
                 }
-                else
+                else if (gs.ThumbSticks.Left.X > 0.4f || gs.DPad.Right == ButtonState.Pressed)
                 {
-                    mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
-                    restartHover = mouseHitbox.Intersects(restartBar);
+                    mainMenuHover = false;
+                    restartHover = true;
                 }
+            }
+            else
+            {
+                mainMenuHover = mouseHitbox.Intersects(mainMenuBar);
+                restartHover = mouseHitbox.Intersects(restartBar);
             }
 
             DrawDeathUI(spriteBatch, modPlayer, DeathUIScreenPos, player, mainMenuHover, restartHover);
 
             bool pressed = PlayerInput.UsingGamepad ? gs.IsButtonDown(Buttons.A) || gs.IsButtonDown(Buttons.B) : ms.LeftButton == ButtonState.Pressed;
-            if (pressed && mainMenuHover && modPlayer.deadTime > 150)
+            if (pressed && mainMenuHover && deadTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                if (TerRoguelikeWorld.IsDeletableOnExit)
+                if (TerRoguelike.mpClient)
                 {
-                    TerRoguelikeMenu.wipeTempPlayer = true;
-                    TerRoguelikeMenu.wipeTempWorld = true;
+                    StartRoomGenerationPacket.Send();
                 }
-                modPlayer.killerNPC = -1;
-                modPlayer.killerProj = -1;
-                SystemLoader.PreSaveAndQuit();
-                WorldGen.SaveAndQuit();
-                modPlayer.deadTime = 0;
+                else
+                {
+                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                    {
+                        TerRoguelikeMenu.wipeTempPlayer = true;
+                        TerRoguelikeMenu.wipeTempWorld = true;
+                    }
+                    modPlayer.killerNPC = -1;
+                    modPlayer.killerProj = -1;
+                    SystemLoader.PreSaveAndQuit();
+                    WorldGen.SaveAndQuit();
+                    modPlayer.deadTime = 0;
+                }
             }
-            else if (pressed && restartHover && modPlayer.deadTime > 150)
+            else if (pressed && restartHover && deadTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 bool stayinworld = true;

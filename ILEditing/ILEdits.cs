@@ -37,6 +37,7 @@ using TerRoguelike.Managers;
 using Terraria.Graphics.Light;
 using Terraria.UI;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using Terraria.Social;
 
 namespace TerRoguelike.ILEditing
 {
@@ -74,6 +75,30 @@ namespace TerRoguelike.ILEditing
             On_Main.DrawPendingMouseText += FakeHoverItemTooltip;
             On_Player.GetHurtTile += MysteryBugfix1; //for some reason, when regenerating the world and ONLY BY LOOPING, these cause errors and freeze the player in place.
             On_NPC.SpawnNPC += MysteryBugfix2;
+            On_Player.SavePlayer += On_Player_SavePlayer;
+            On_Main.ExitServerPasswordMenu += On_Main_ExitServerPasswordMenu;
+        }
+
+        private void On_Main_ExitServerPasswordMenu(On_Main.orig_ExitServerPasswordMenu orig)
+        {
+            if (SocialAPI.Network != null)
+            {
+                Main.menuMode = 889;
+            }
+            else
+            {
+                Main.menuMode = TerRoguelikeMenu.prepareForRoguelikeGeneration ? 0 : 6;
+            }
+            Netplay.ServerPassword = "";
+        }
+
+        private void On_Player_SavePlayer(On_Player.orig_SavePlayer orig, PlayerFileData playerFile, bool skipMapSave)
+        {
+            if (TerRoguelikeWorld.IsTerRoguelikeWorld && TerRoguelike.mpClient)
+            {
+				return;
+            }
+            orig.Invoke(playerFile, skipMapSave);
         }
 
         private void MysteryBugfix2(On_NPC.orig_SpawnNPC orig)
@@ -288,17 +313,40 @@ namespace TerRoguelike.ILEditing
 
         private void PostDrawBasicallyEverything(On_ScreenObstruction.orig_Draw orig, SpriteBatch spriteBatch)
         {
-			orig.Invoke(spriteBatch);
-			spriteBatch.End();
-			RoomSystem.PostDrawEverything(spriteBatch);
-			TerRoguelikeUtils.StartVanillaSpritebatch(false);
+            orig.Invoke(spriteBatch);
+            spriteBatch.End();
+            try
+            {
+                RoomSystem.PostDrawEverything(spriteBatch);
+            }
+            catch (Exception ex)
+            {
+                TerRoguelike.Instance.Logger.Error(ex);
+            }
+            TerRoguelikeUtils.StartVanillaSpritebatch(false);
         }
 
         private void PreDrawTilesInjection(On_Main.orig_DoDraw_DrawNPCsBehindTiles orig, Main self)
         {
-            RoomSystem.PostDrawWalls_PreNPCsBehindTiles(Main.spriteBatch);
+            try
+            {
+                RoomSystem.PostDrawWalls_PreNPCsBehindTiles(Main.spriteBatch);
+            }
+            catch (Exception ex)
+            {
+                TerRoguelike.Instance.Logger.Error(ex);
+            }
+            
             orig.Invoke(self);
-            RoomSystem.PostDrawWalls(Main.spriteBatch);
+            
+            try
+            {
+                RoomSystem.PostDrawWalls(Main.spriteBatch);
+            }
+            catch (Exception ex)
+            {
+                TerRoguelike.Instance.Logger.Error(ex);
+            }
         }
 
         private void StopOnKillHeartsAndMana(On_NPC.orig_NPCLoot_DropCommonLifeAndMana orig, NPC self, Player closestPlayer)
@@ -631,41 +679,58 @@ namespace TerRoguelike.ILEditing
 
         private void EditElectrifiedDisplayCondition1(On_PlayerDrawLayers.orig_DrawPlayer_04_ElectrifiedDebuffBack orig, ref PlayerDrawSet drawinfo)
 		{
-			if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
+			try
 			{
-				return;
-			}
-			Texture2D value = TextureAssets.GlowMask[25].Value;
-			int num = drawinfo.drawPlayer.miscCounter / 5;
-			for (int i = 0; i < 2; i++)
+                if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
+                {
+                    return;
+                }
+                Texture2D value = TextureAssets.GlowMask[25].Value;
+                int num = drawinfo.drawPlayer.miscCounter / 5;
+                for (int i = 0; i < 2; i++)
+                {
+                    num %= 7;
+                    if (num <= 1 || num >= 5)
+                    {
+                        DrawData item = new DrawData(value, new Vector2((float)(int)(drawinfo.Position.X - Main.screenPosition.X - (float)(drawinfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawinfo.drawPlayer.width / 2)), (float)(int)(drawinfo.Position.Y - Main.screenPosition.Y + (float)drawinfo.drawPlayer.height - (float)drawinfo.drawPlayer.bodyFrame.Height + 4f)) + drawinfo.drawPlayer.bodyPosition + new Vector2((float)(drawinfo.drawPlayer.bodyFrame.Width / 2), (float)(drawinfo.drawPlayer.bodyFrame.Height / 2)), (Rectangle?)new Rectangle(0, num * value.Height / 7, value.Width, value.Height / 7), drawinfo.colorElectricity, drawinfo.drawPlayer.bodyRotation, new Vector2((float)(value.Width / 2), (float)(value.Height / 14)), 1f, drawinfo.playerEffect, 0f);
+                        drawinfo.DrawDataCache.Add(item);
+                    }
+                    num += 3;
+                }
+            }
+			catch (Exception ex)
 			{
-				num %= 7;
-				if (num <= 1 || num >= 5)
-				{
-					DrawData item = new DrawData(value, new Vector2((float)(int)(drawinfo.Position.X - Main.screenPosition.X - (float)(drawinfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawinfo.drawPlayer.width / 2)), (float)(int)(drawinfo.Position.Y - Main.screenPosition.Y + (float)drawinfo.drawPlayer.height - (float)drawinfo.drawPlayer.bodyFrame.Height + 4f)) + drawinfo.drawPlayer.bodyPosition + new Vector2((float)(drawinfo.drawPlayer.bodyFrame.Width / 2), (float)(drawinfo.drawPlayer.bodyFrame.Height / 2)), (Rectangle?)new Rectangle(0, num * value.Height / 7, value.Width, value.Height / 7), drawinfo.colorElectricity, drawinfo.drawPlayer.bodyRotation, new Vector2((float)(value.Width / 2), (float)(value.Height / 14)), 1f, drawinfo.playerEffect, 0f);
-					drawinfo.DrawDataCache.Add(item);
-				}
-				num += 3;
+				TerRoguelike.Instance.Logger.Error(ex);
+				orig.Invoke(ref drawinfo);
 			}
 		}
 		private void EditElectrifiedDisplayCondition2(On_PlayerDrawLayers.orig_DrawPlayer_34_ElectrifiedDebuffFront orig, ref PlayerDrawSet drawinfo)
         {
-			if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
-			{
-				return;
-			}
-			Texture2D value = TextureAssets.GlowMask[25].Value;
-			int num = drawinfo.drawPlayer.miscCounter / 5;
-			for (int i = 0; i < 2; i++)
-			{
-				num %= 7;
-				if (num > 1 && num < 5)
-				{
-					DrawData item = new DrawData(value, new Vector2((float)(int)(drawinfo.Position.X - Main.screenPosition.X - (float)(drawinfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawinfo.drawPlayer.width / 2)), (float)(int)(drawinfo.Position.Y - Main.screenPosition.Y + (float)drawinfo.drawPlayer.height - (float)drawinfo.drawPlayer.bodyFrame.Height + 4f)) + drawinfo.drawPlayer.bodyPosition + new Vector2((float)(drawinfo.drawPlayer.bodyFrame.Width / 2), (float)(drawinfo.drawPlayer.bodyFrame.Height / 2)), (Rectangle?)new Rectangle(0, num * value.Height / 7, value.Width, value.Height / 7), drawinfo.colorElectricity, drawinfo.drawPlayer.bodyRotation, new Vector2((float)(value.Width / 2), (float)(value.Height / 14)), 1f, drawinfo.playerEffect, 0f);
-					drawinfo.DrawDataCache.Add(item);
-				}
-				num += 3;
-			}
+            try
+            {
+                if ((!drawinfo.drawPlayer.electrified && drawinfo.drawPlayer.GetModPlayer<TerRoguelikePlayer>().portableGeneratorImmuneTime <= 0) || drawinfo.shadow != 0f)
+                {
+                    return;
+                }
+                Texture2D value = TextureAssets.GlowMask[25].Value;
+                int num = drawinfo.drawPlayer.miscCounter / 5;
+                for (int i = 0; i < 2; i++)
+                {
+                    num %= 7;
+                    if (num > 1 && num < 5)
+                    {
+                        DrawData item = new DrawData(value, new Vector2((float)(int)(drawinfo.Position.X - Main.screenPosition.X - (float)(drawinfo.drawPlayer.bodyFrame.Width / 2) + (float)(drawinfo.drawPlayer.width / 2)), (float)(int)(drawinfo.Position.Y - Main.screenPosition.Y + (float)drawinfo.drawPlayer.height - (float)drawinfo.drawPlayer.bodyFrame.Height + 4f)) + drawinfo.drawPlayer.bodyPosition + new Vector2((float)(drawinfo.drawPlayer.bodyFrame.Width / 2), (float)(drawinfo.drawPlayer.bodyFrame.Height / 2)), (Rectangle?)new Rectangle(0, num * value.Height / 7, value.Width, value.Height / 7), drawinfo.colorElectricity, drawinfo.drawPlayer.bodyRotation, new Vector2((float)(value.Width / 2), (float)(value.Height / 14)), 1f, drawinfo.playerEffect, 0f);
+                        drawinfo.DrawDataCache.Add(item);
+                    }
+                    num += 3;
+                }
+            }
+            catch (Exception ex)
+            {
+                TerRoguelike.Instance.Logger.Error(ex);
+				orig.Invoke(ref drawinfo);
+            }
+            
 		}
 
         private void On_WorldGen_SaveAndQuit(On_WorldGen.orig_SaveAndQuit orig, Action callback)

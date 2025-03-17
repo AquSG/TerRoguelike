@@ -19,6 +19,7 @@ using TerRoguelike.MainMenu;
 using Microsoft.Xna.Framework;
 using ReLogic.Threading;
 using TerRoguelike.Packets;
+using Terraria.IO;
 
 namespace TerRoguelike.Systems
 {
@@ -145,6 +146,9 @@ namespace TerRoguelike.Systems
                     }
                 }
             }
+
+            if (Main.dedServ)
+                WorldFile.SaveWorld();
 
             RoomSystem.regeneratingWorld = false;
         }

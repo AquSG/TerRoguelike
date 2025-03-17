@@ -301,6 +301,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         potentialThirds.RemoveAll(x => x == (int)NPC.localAI[2]);
                         NPC.localAI[2] = potentialThirds[Main.rand.Next(potentialThirds.Count)];
                         RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthTremor with { Volume = 1f }, new Vector2(leftBound.X + (thirdWidth * NPC.localAI[2]) + thirdWidth * 0.5f, NPC.position.Y));
+                        NPC.netUpdate = true;
                     }
                 }
                 else
@@ -893,11 +894,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(NPC.localAI[0]);
+            writer.Write(NPC.localAI[2]);
             writer.WriteVector2(spawnPos);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
+            NPC.localAI[2] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
         }
     }

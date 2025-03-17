@@ -32,27 +32,45 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
+using Terraria.ModLoader.IO;
+using static TerRoguelike.Managers.ItemManager;
+using Terraria.Audio;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class RequestRoomUmovingDataPacket : TerRoguelikePacket
+    public sealed class MouseWorldPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.RequestUnmovingDataSync;
-        public static void Send(int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.MouseWorldSync;
+        public static void Send(Vector2 pos, int who, int toClient = -1, int ignoreClient = -1)
         {
-            if (!TerRoguelike.mpClient)
+            if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            var packet = NewPacket(PacketType.RequestUnmovingDataSync);
+            var packet = NewPacket(PacketType.MouseWorldSync);
+
+            packet.WriteVector2(pos);
+            packet.Write(who);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            if (Main.dedServ)
+            Vector2 pos = packet.ReadVector2();
+            int who = packet.ReadInt32();
+
+            if (who >= 0)
             {
-                RoomUnmovingDataPacket.Send(sender);
+                Player player = Main.player[who];
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null)
+                {
+                    modPlayer.mouseWorld = pos;
+                }
             }
+            
+
+            if (Main.dedServ)
+                Send(pos, who, -1, sender);
         }
     }
 }

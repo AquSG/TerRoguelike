@@ -47,6 +47,8 @@ namespace TerRoguelike.Packets
             BasinSync,
             StageCountSync,
             EnemyHealthbarSync,
+            MouseWorldSync,
+            RegenerateWorldSync,
 
             TeleportToPosition,
             RequestUnmovingDataSync,
@@ -55,6 +57,8 @@ namespace TerRoguelike.Packets
             StartCutsceneSync,
             RequestBasinSync,
             DifficultySetSync,
+            ApplyBleedSync,
+            StartRoomGenerationSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

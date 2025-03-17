@@ -51,7 +51,7 @@ namespace TerRoguelike.Projectiles
             if (modPlayer == null)
                 modPlayer = Owner.ModPlayer();
 
-            float pointingRotation = (AimWorld() - Owner.MountedCenter).ToRotation();
+            float pointingRotation = (modPlayer.mouseWorld - Owner.MountedCenter).ToRotation();
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 1f;
 
             if (Owner.channel) //Keep the player's hands full relative to attack speed
@@ -80,17 +80,17 @@ namespace TerRoguelike.Projectiles
 
         public void ReleaseSword()
         {
-            if (AimWorld().X > Owner.Center.X)
+            if (modPlayer.mouseWorld.X > Owner.Center.X)
             {
                 Owner.ChangeDir(1);
             }
-            else if (AimWorld().X <= Owner.Center.X)
+            else if (modPlayer.mouseWorld.X <= Owner.Center.X)
             {
                 Owner.ChangeDir(-1);
             }
 
             if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
-                modPlayer.playerToCursor = (AimWorld() - Owner.Center).SafeNormalize(Vector2.UnitX).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f));
+                modPlayer.playerToCursor = (modPlayer.mouseWorld - Owner.Center).SafeNormalize(Vector2.UnitX).RotatedBy(Main.rand.NextFloat(-0.2f, 0.2f));
             float armPointingDirection = modPlayer.playerToCursor.ToRotation();
             Owner.SetCompositeArmFront(true, Owner.compositeFrontArm.stretch, armPointingDirection - MathHelper.PiOver2);
 

@@ -45,11 +45,11 @@ namespace TerRoguelike.Items.Weapons
         {
             TerRoguelikePlayer modPlayer = player.ModPlayer();
 
-            if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            if (modPlayer.mouseWorld.X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
                 player.ChangeDir(1);
             }
-            else if (AimWorld().X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            else if (modPlayer.mouseWorld.X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
                 player.ChangeDir(-1);
             }
@@ -57,7 +57,7 @@ namespace TerRoguelike.Items.Weapons
 
             //Calculate the dirction in which the players arms should be pointing at.
             if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
-                modPlayer.playerToCursor = (AimWorld() - player.Center).SafeNormalize(Vector2.UnitX);
+                modPlayer.playerToCursor = (modPlayer.mouseWorld - player.Center).SafeNormalize(Vector2.UnitX);
             float armPointingDirection = modPlayer.playerToCursor.ToRotation() + (MathHelper.PiOver2 * player.direction);
             float itemPotentialRot = modPlayer.playerToCursor.ToRotation();
             Vector2 itemPotentialPos = player.MountedCenter + armPointingDirection.ToRotationVector2() * 8;
@@ -108,11 +108,11 @@ namespace TerRoguelike.Items.Weapons
         {
             TerRoguelikePlayer modPlayer = player.ModPlayer();
 
-            if (AimWorld().X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            if (modPlayer.mouseWorld.X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
                 player.ChangeDir(1);
             }
-            else if (AimWorld().X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            else if (modPlayer.mouseWorld.X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {
                 player.ChangeDir(-1);
             }

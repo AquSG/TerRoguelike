@@ -73,7 +73,7 @@ namespace TerRoguelike.Projectiles
                 Charge = wantedCharge;
             }
 
-            float pointingRotation = (AimWorld() - Owner.MountedCenter).ToRotation();
+            float pointingRotation = (modPlayer.mouseWorld - Owner.MountedCenter).ToRotation();
             Projectile.rotation = pointingRotation;
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 35f;
 
