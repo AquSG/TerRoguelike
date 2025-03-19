@@ -19,15 +19,27 @@ using TerRoguelike.Systems;
 using Terraria.ModLoader.Core;
 using System.IO;
 using Terraria.GameContent;
+using System.Runtime.CompilerServices;
 
 namespace TerRoguelike.Utilities
 {
     public static partial class TerRoguelikeUtils
     {
-        public static TerRoguelikePlayer ModPlayer(this Player player) => player.GetModPlayer<TerRoguelikePlayer>();
-        public static TerRoguelikeGlobalProjectile ModProj(this Projectile projectile) => projectile.GetGlobalProjectile<TerRoguelikeGlobalProjectile>();
-        public static TerRoguelikeGlobalNPC ModNPC(this NPC npc) => npc.GetGlobalNPC<TerRoguelikeGlobalNPC>();
-        public static TerRoguelikeGlobalItem ModItem(this Item item) => item.GetGlobalItem<TerRoguelikeGlobalItem>();
+        public static TerRoguelikePlayer ModPlayer(this Player player)
+        {
+            try
+            {
+                return (TerRoguelikePlayer)player.ModPlayers[ModContent.GetInstance<TerRoguelikePlayer>().Index] ?? null;
+            }
+            catch (Exception e)
+            {
+                TerRoguelike.Instance.Logger.Error(e);
+                return null;
+            }
+        }
+        public static TerRoguelikeGlobalProjectile ModProj(this Projectile projectile) => TerRoguelikeGlobalProjectile.TryGetGlobal(projectile.type, projectile.EntityGlobals, out TerRoguelikeGlobalProjectile result) ? result : null;
+        public static TerRoguelikeGlobalNPC ModNPC(this NPC npc) => TerRoguelikeGlobalNPC.TryGetGlobal(npc.type, npc.EntityGlobals, out TerRoguelikeGlobalNPC result) ? result : null;
+        public static TerRoguelikeGlobalItem ModItem(this Item item) => TerRoguelikeGlobalItem.TryGetGlobal(item.type, item.EntityGlobals, out TerRoguelikeGlobalItem result) ? result : null;
 
         /// <summary>
         /// Properly sets the player's held item rotation and position by doing the annoying math for you, since vanilla decided to be wholly inconsistent about it!

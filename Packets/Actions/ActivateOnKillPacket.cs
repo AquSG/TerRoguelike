@@ -32,36 +32,49 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
-using static TerRoguelike.Systems.MusicSystem;
-using TerRoguelike.Floors;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class StartRoomGenerationPacket : TerRoguelikePacket
+    public sealed class ActivateOnKillPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.StartRoomGenerationSync;
-        public static void Send(bool loop = false, int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.ActivateOnKillSync;
+        public static void Send(int npc, int npcType, Vector2 pos, int toClient = -1, int ignoreClient = -1)
         {
             if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            var packet = NewPacket(PacketType.StartRoomGenerationSync);
+            var packet = NewPacket(PacketType.ActivateOnKillSync);
 
-            packet.Write(loop);
+            packet.Write(npc);
+            packet.Write(npcType);
+            packet.WriteVector2(pos);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            bool loop = packet.ReadBoolean();
-            if (!Main.dedServ)
-                return;
+            int who = packet.ReadInt32();
+            int whoType = packet.ReadInt32();
+            Vector2 pos = packet.ReadVector2();
 
-            if (RoomSystem.regeneratingWorld)
-                return;
+            if (who < 0) return;
 
-            RoomSystem.RegenerateWorld(loop);
-            RegenerateWorldPacket.Send();
+            var modPlayer = Main.LocalPlayer.ModPlayer();
+            if (modPlayer == null) return;
+
+            NPC npc = Main.npc[who];
+            bool jank = false;
+            if (!npc.active || npc.type != whoType)
+            {
+                jank = true;
+                npc = NPC.NewNPCDirect(NPC.GetSource_None(), pos, whoType);
+            }
+
+            modPlayer.OnKillEffects(npc);
+
+            if (jank)
+                npc.active = false;
         }
     }
 }

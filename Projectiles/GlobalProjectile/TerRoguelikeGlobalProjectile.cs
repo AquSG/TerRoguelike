@@ -37,6 +37,7 @@ namespace TerRoguelike.Projectiles
         public int targetNPC = -1;
         public bool sluggedEffect = false;
         public bool hostileTurnedAlly = false;
+        public int npcOwnerPuppetOwner = -1;
         public int multiplayerIdentifier = -1;
         public int multiplayerClientIdentifier = -1;
         public override bool PreDraw(Projectile projectile, ref Color lightColor)
@@ -141,6 +142,10 @@ namespace TerRoguelike.Projectiles
                         projectile.friendly = true;
                         projectile.hostile = false;
                         hostileTurnedAlly = modNPC.hostileTurnedAlly;
+                        if (hostileTurnedAlly)
+                        {
+                            npcOwnerPuppetOwner = modNPC.puppetOwner;
+                        }
                     }
                     else
                     {
@@ -158,6 +163,7 @@ namespace TerRoguelike.Projectiles
                     npcOwner = parentModProj.npcOwner;
                     npcOwnerType = parentModProj.npcOwnerType;
                     hostileTurnedAlly = parentModProj.hostileTurnedAlly;
+                    npcOwnerPuppetOwner = parentModProj.npcOwnerPuppetOwner;
                     if (npcOwnerType != -1)
                     {
                         if (AllNPCs.Exists(x => x.modNPCID == npcOwnerType))
@@ -363,6 +369,7 @@ namespace TerRoguelike.Projectiles
             writer.Write(targetPlayer);
             writer.Write(targetNPC);
             writer.Write(projectile.scale);
+            writer.Write(hostileTurnedAlly);
         }
 
         public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader reader)
@@ -386,6 +393,7 @@ namespace TerRoguelike.Projectiles
             targetPlayer = reader.ReadInt32();
             targetNPC = reader.ReadInt32();
             projectile.scale = reader.ReadSingle();
+            hostileTurnedAlly = reader.ReadBoolean();
         }
     }
     public class ProcChainBools

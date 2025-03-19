@@ -37,31 +37,36 @@ using TerRoguelike.Floors;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class StartRoomGenerationPacket : TerRoguelikePacket
+    public sealed class StartLunarFloorPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.StartRoomGenerationSync;
-        public static void Send(bool loop = false, int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.StartLunarFloorSync;
+        public static void Send(int toClient = -1, int ignoreClient = -1)
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!Main.dedServ)
                 return;
 
-            var packet = NewPacket(PacketType.StartRoomGenerationSync);
-
-            packet.Write(loop);
+            var packet = NewPacket(PacketType.StartLunarFloorSync);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            bool loop = packet.ReadBoolean();
-            if (!Main.dedServ)
-                return;
+            int vortex = ModContent.NPCType<VortexPillar>();
+            int stardust = ModContent.NPCType<StardustPillar>();
+            int nebula = ModContent.NPCType<NebulaPillar>();
+            int solar = ModContent.NPCType<SolarPillar>();
+            for (int i = 0; i < Main.maxNPCs; i++)
+            {
+                var npc = Main.npc[i];
+                if (!npc.active) continue;
 
-            if (RoomSystem.regeneratingWorld)
-                return;
+                Vector2 chainStart = (RoomID[RoomDict["LunarBossRoom1"]].RoomPosition + (RoomID[RoomDict["LunarBossRoom1"]].RoomDimensions * 0.5f)) * 16f;
 
-            RoomSystem.RegenerateWorld(loop);
-            RegenerateWorldPacket.Send();
+                if (npc.type == vortex || npc.type == stardust || npc.type == nebula || npc.type == solar)
+                {
+                    TerRoguelikeWorld.chainList.Add(new Chain(chainStart, npc.Center, 24, 120, i));
+                }
+            }
         }
     }
 }

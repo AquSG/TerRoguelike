@@ -98,26 +98,21 @@ namespace TerRoguelike.Rooms
             EscapePacket.Send(EscapeContext.Start);
 
             bool allowLunarGambitSequence = false;
+            int playerSubtract = -1;
             Vector2 lunarGambitStartPos = Vector2.Zero;
+            int checkType = ModContent.ItemType<LunarGambit>();
             foreach (Player player in Main.ActivePlayers)
             {
-                var modPlayer = player.ModPlayer();
-                if (modPlayer != null)
+                for (int i = 0; i < 50; i++)
                 {
-                    if (modPlayer.lunarGambit > 0)
+                    Item item = player.inventory[i];
+                    if (item.type == checkType)
                     {
-                        int checkType = ModContent.ItemType<LunarGambit>();
-                        for (int i = 0; i < 50; i++)
-                        {
-                            Item item = player.inventory[i];
-                            if (item.type == checkType)
-                            {
-                                item.stack--;
-                                allowLunarGambitSequence = true;
-                                lunarGambitStartPos = player.Center;
-                                break;
-                            }
-                        }
+                        item.stack--;
+                        allowLunarGambitSequence = true;
+                        lunarGambitStartPos = player.Center;
+                        playerSubtract = player.whoAmI;
+                        break;
                     }
                 }
                 if (allowLunarGambitSequence)
@@ -128,6 +123,7 @@ namespace TerRoguelike.Rooms
             {
                 TerRoguelikeWorld.lunarGambitSceneTime = 1;
                 TerRoguelikeWorld.lunarGambitSceneStartPos = lunarGambitStartPos;
+                StartLoopPortalPacket.Send(playerSubtract);
             }
         }
         public override void PostDrawTilesRoom()

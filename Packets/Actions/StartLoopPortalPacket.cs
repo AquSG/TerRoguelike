@@ -37,31 +37,39 @@ using TerRoguelike.Floors;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class StartRoomGenerationPacket : TerRoguelikePacket
+    public sealed class StartLoopPortalPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.StartRoomGenerationSync;
-        public static void Send(bool loop = false, int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.StartLoopPortalSync;
+        public static void Send(int playerSubtract, int toClient = -1, int ignoreClient = -1)
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (!Main.dedServ)
                 return;
 
-            var packet = NewPacket(PacketType.StartRoomGenerationSync);
+            var packet = NewPacket(PacketType.StartLoopPortalSync);
 
-            packet.Write(loop);
+            packet.WriteVector2(TerRoguelikeWorld.lunarGambitSceneStartPos);
+            packet.Write(playerSubtract);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            bool loop = packet.ReadBoolean();
-            if (!Main.dedServ)
-                return;
-
-            if (RoomSystem.regeneratingWorld)
-                return;
-
-            RoomSystem.RegenerateWorld(loop);
-            RegenerateWorldPacket.Send();
+            TerRoguelikeWorld.lunarGambitSceneStartPos = packet.ReadVector2();
+            int plr = packet.ReadInt32();
+            if (plr == Main.myPlayer)
+            {
+                int checkType = ModContent.ItemType<LunarGambit>();
+                for (int i = 0; i < 50; i++)
+                {
+                    Item item = Main.player[plr].inventory[i];
+                    if (item.type == checkType)
+                    {
+                        item.stack--;
+                        break;
+                    }
+                }
+            }
+            TerRoguelikeWorld.lunarGambitSceneTime = 1;
         }
     }
 }

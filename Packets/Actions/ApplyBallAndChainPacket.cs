@@ -32,36 +32,41 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
-using static TerRoguelike.Systems.MusicSystem;
-using TerRoguelike.Floors;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class StartRoomGenerationPacket : TerRoguelikePacket
+    public sealed class ApplyBallAndChainPacket : TerRoguelikePacket
     {
-        public override PacketType MessageType => PacketType.StartRoomGenerationSync;
-        public static void Send(bool loop = false, int toClient = -1, int ignoreClient = -1)
+        public override PacketType MessageType => PacketType.ApplyBallAndChainSync;
+        public static void Send(int npc, int time, int toClient = -1, int ignoreClient = -1)
         {
             if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            var packet = NewPacket(PacketType.StartRoomGenerationSync);
+            var packet = NewPacket(PacketType.ApplyBallAndChainSync);
 
-            packet.Write(loop);
+            packet.Write(npc);
+            packet.Write(time);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            bool loop = packet.ReadBoolean();
-            if (!Main.dedServ)
-                return;
+            int who = packet.ReadInt32();
+            int time = packet.ReadInt32();
 
-            if (RoomSystem.regeneratingWorld)
-                return;
+            if (Main.dedServ)
+                Send(who, time, -1, sender);
 
-            RoomSystem.RegenerateWorld(loop);
-            RegenerateWorldPacket.Send();
+            if (who == -1) return;
+
+            NPC npc = Main.npc[who];
+            if (!npc.active) return;
+            var modNPC = npc.ModNPC();
+            if (modNPC == null) return;
+
+            modNPC.ballAndChainSlow = time;
         }
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.Graphics.Renderers;
 using System.Reflection;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Projectiles
 {
@@ -103,7 +104,10 @@ namespace TerRoguelike.Projectiles
         public void ReleaseSword()
         {
             if ((Charge <= 60f || (Owner.channel && autoRelease)) && modPlayer.swingAnimCompletion == 0)
+            {
                 modPlayer.swingAnimCompletion += 0.00001f; // start the swing anim
+                TerPlayerPacket.cooldown -= 8;
+            }
 
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support
             float damageBoost = Charge >= 60f ? 4f : (1 + (Charge / 60f * 2f));

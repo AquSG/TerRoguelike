@@ -263,6 +263,8 @@ namespace TerRoguelike.Systems
             if (lunarFloorInitialized)
                 return;
             lunarFloorInitialized = true;
+            if (TerRoguelike.mpClient)
+                return;
 
             Vector2 chainStart = (RoomID[RoomDict["LunarBossRoom1"]].RoomPosition + (RoomID[RoomDict["LunarBossRoom1"]].RoomDimensions * 0.5f)) * 16f;
             int pillarCount = 0;
@@ -312,6 +314,8 @@ namespace TerRoguelike.Systems
                     continue;
                 }
             }
+
+            StartLunarFloorPacket.Send();
         }
         #endregion
 
@@ -1485,25 +1489,19 @@ namespace TerRoguelike.Systems
                 }
                 if (Main.dedServ)
                 {
-                    for (int i = 0; i < RoomSystem.RoomList.Count; i++)
-                    {
-                        Room room = RoomSystem.RoomList[i];
-                        if (FloorID[room.AssociatedFloor].Stage != 0)
-                            break;
-                        Rectangle sendRect = new Rectangle((int)room.RoomPosition.X, (int)room.RoomPosition.Y, (int)room.RoomDimensions.X, (int)room.RoomDimensions.Y);
-                        for (int x = sendRect.X; x < sendRect.X + sendRect.Width; x += 145)
-                        {
-                            for (int y = sendRect.Y; y < sendRect.Y + sendRect.Height; y += 145)
-                            {
-                                int width = Math.Min(145, sendRect.Width - (x - sendRect.X));
-                                int height = Math.Min(145, sendRect.Height - (y - sendRect.Y));
-                                NetMessage.SendTileSquare(-1, sendRect.X, sendRect.Y, width, height);
-                            }
-                        }
-                    }
                     RegenerateWorldPacket.Send();
                     RoomUnmovingDataPacket.Send();
+                    for (int i = 0; i < Netplay.Clients.Length; i++)
+                    {
+                        var client = Netplay.Clients[i];
+                        if (client.IsConnected() && client.IsActive)
+                        {
+                            client.ResetSections();
+                            RemoteClient.CheckSection(i, Main.player[i].position);
+                        }
+                    }
                 }
+                Main.Map.Clear();
             }
 
             ParticleManager.UpdateParticles();
@@ -1674,17 +1672,21 @@ namespace TerRoguelike.Systems
                 {
                     if (loopingDrama == 120)
                     {
-                        loopingDrama = 0;
-                        ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                        ZoomSystem.zoomOverride = Main.GameZoomTarget;
                         bool stayinworld = true;
-                        if (stayinworld)
+                        if (stayinworld && !Main.dedServ)
                         {
-                            TerRoguelikeWorld.promoteLoop = true;
-                            RegenerateWorld(true);
+                            if (!TerRoguelike.mpClient)
+                            {
+                                TerRoguelikeWorld.promoteLoop = true;
+                                RegenerateWorld(true);
+                            }
+                            StartRoomGenerationPacket.Send(true);
                         }
+                        /*
                         else
                         {
+                            ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+                            ZoomSystem.zoomOverride = Main.GameZoomTarget;
                             if (TerRoguelikeWorld.IsDeletableOnExit)
                             {
                                 TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
@@ -1696,7 +1698,8 @@ namespace TerRoguelike.Systems
                             SetCombat(Silence);
                             SetMusicMode(MusicStyle.Silent);
                             WorldGen.SaveAndQuit();
-                        }   
+                        }
+                        */
                     }
                     loopingDrama++;
                 }
@@ -1850,6 +1853,17 @@ namespace TerRoguelike.Systems
         {
             if (!TerRoguelikeWorld.IsTerRoguelikeWorld)
                 return;
+
+            TerRoguelikeWorld.promoteLoop = loop;
+            TerRoguelikeWorld.currentStage = 0;
+            if (TerRoguelikeWorld.promoteLoop)
+            {
+                TerRoguelikeWorld.promoteLoop = false;
+                TerRoguelikeWorld.currentLoop++;
+            }
+            else
+                TerRoguelikeWorld.currentLoop = 0;
+            StageCountPacket.Send();
 
             TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
             for (int i = 0; i < Main.maxNPCs; i++)
