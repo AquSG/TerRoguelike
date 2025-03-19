@@ -37,7 +37,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
     {
         public Entity target;
         public Vector2 spawnPos;
-        public bool ableToHit = true;
+        public bool ableToHit = false;
         public bool canBeHit = true;
         public override int modNPCID => ModContent.NPCType<MoonLordHead>();
         public override string Texture => "TerRoguelike/NPCs/Enemy/Boss/MoonLordSideEye";

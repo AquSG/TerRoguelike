@@ -46,38 +46,37 @@ namespace TerRoguelike.Packets
             packet.Write(TerRoguelikeWorld.IsTerRoguelikeWorld);
             packet.Write(TerRoguelikeWorld.IsDeletableOnExit);
 
-            if (RoomSystem.RoomList == null)
+            bool returnEarly = RoomSystem.RoomList == null;
+            packet.Write(returnEarly);
+            if (returnEarly)
             {
                 packet.Send(toClient, ignoreClient);
                 return;
             }
 
             List<byte> packageRoomLisIDs = [];
-            List<int> roomPositionsList = [];
-            List<int> roomDimensionsList = [];
+            List<Vector2> roomPositionsList = [];
+            List<Vector2> roomDimensionsList = [];
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
                 Room room = RoomSystem.RoomList[i];
                 packageRoomLisIDs.Add((byte)room.ID);
 
-                roomPositionsList.Add((int)room.RoomPosition.X);
-                roomPositionsList.Add((int)room.RoomPosition.Y);
-
-                roomDimensionsList.Add((int)room.RoomDimensions.X);
-                roomDimensionsList.Add((int)room.RoomDimensions.Y);
+                roomPositionsList.Add(room.RoomPosition);
+                roomDimensionsList.Add(room.RoomDimensions);
             }
-            ReadOnlySpan<byte> sentRoomList = packageRoomLisIDs.ToArray();
-            int length = sentRoomList.Length;
+
+            int length = packageRoomLisIDs.Count;
             packet.Write(length);
-            packet.Write(sentRoomList);
+            for (int i = 0; i < length; i++)
+            {
+                packet.Write(packageRoomLisIDs[i]);
+            }
             
             for (int i = 0; i < length; i++)
             {
-                int index = i * 2;
-                packet.Write(roomPositionsList[index]);
-                packet.Write(roomPositionsList[index + 1]);
-                packet.Write(roomDimensionsList[index]);
-                packet.Write(roomDimensionsList[index + 1]);
+                packet.WriteVector2(roomPositionsList[i]);
+                packet.WriteVector2(roomDimensionsList[i]);
             }
 
             int floorLength = RoomManager.FloorIDsInPlay.Count;
@@ -89,6 +88,7 @@ namespace TerRoguelike.Packets
 
             packet.Send(toClient, ignoreClient);
 
+            return;
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
                 Room room = RoomSystem.RoomList[i];
@@ -109,24 +109,36 @@ namespace TerRoguelike.Packets
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
+            Main.NewText(packet.BaseStream.Length);
+            Main.NewText(packet.BaseStream.Position);
             TerRoguelikeWorld.IsTerRoguelikeWorld = packet.ReadBoolean();
             TerRoguelikeWorld.IsDeletableOnExit = packet.ReadBoolean();
+
+            bool returnEarly = packet.ReadBoolean();
+            if (returnEarly)
+            {
+                Main.NewText("return early");
+                RoomSystem.RoomList = [];
+                return;
+            }
 
             RoomSystem.RoomList = [];
 
             int length = packet.ReadInt32();
-            byte[] recievedRoomIDs = packet.ReadBytes(length);
-
-            for (int i = 0; i < recievedRoomIDs.Length; i++)
+            List<int> recievedRoomIDs = [];
+            for (int i = 0; i < length; i++)
             {
-                int roomID = (int)recievedRoomIDs[i];
+                recievedRoomIDs.Add(packet.ReadByte());
+            }
+
+            for (int i = 0; i < recievedRoomIDs.Count; i++)
+            {
+                int roomID = recievedRoomIDs[i];
                 RoomSystem.RoomList.Add(RoomID[roomID]);
 
                 Room room = RoomSystem.RoomList[i];
-                room.RoomPosition.X = packet.ReadInt32();
-                room.RoomPosition.Y = packet.ReadInt32();
-                room.RoomDimensions.X = packet.ReadInt32();
-                room.RoomDimensions.Y = packet.ReadInt32();
+                room.RoomPosition = packet.ReadVector2();
+                room.RoomDimensions = packet.ReadVector2();
             }
 
             int floorLength = packet.ReadInt32();
@@ -135,6 +147,7 @@ namespace TerRoguelike.Packets
             {
                 RoomManager.FloorIDsInPlay.Add(packet.ReadInt32());
             }
+            Main.NewText(packet.BaseStream.Position);
         }
     }
 }

@@ -48,6 +48,7 @@ namespace TerRoguelike.MainMenu
         public static ButtonState oldGamepadLeftStickState = ButtonState.Released;
         public static GamePadState oldGamepadState;
         public static List<Keys> oldPressedKeys = [];
+        public static bool weaponSelectInPlayerMenu = false;
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
         public static bool BloodMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.BloodMoon;
@@ -68,6 +69,7 @@ namespace TerRoguelike.MainMenu
         {
             if (Main.menuMode == 0)
             {
+                weaponSelectInPlayerMenu = false;
                 if (wipeTempWorld)
                 {
                     bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
@@ -163,7 +165,7 @@ namespace TerRoguelike.MainMenu
                     prepareForRoguelikeGeneration = true;
                 }
             }
-            if (prepareForRoguelikeGeneration && (Main.menuMode == 888 || (Main.menuMultiplayer && Main.menuMode == 31)) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
+            if ((prepareForRoguelikeGeneration || weaponSelectInPlayerMenu) && (Main.menuMode == 888 || Main.menuMode == 31) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
             {
                 if (PlayerInput.UsingGamepad && GamePad.GetState(PlayerIndex.One).Buttons.LeftStick == ButtonState.Pressed && oldGamepadLeftStickState == ButtonState.Released)
                 {
@@ -172,7 +174,7 @@ namespace TerRoguelike.MainMenu
                     if (uiControllerCycle > 2)
                         uiControllerCycle = 0;
                 }
-                if (!(Main.menuMultiplayer && !Main.menuServer))
+                if (!weaponSelectInPlayerMenu)
                 {
                     DifficultyInteraction();
                 }
@@ -450,7 +452,7 @@ namespace TerRoguelike.MainMenu
                 }
             }
 
-            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889)
+            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889 && Main.menuMode != 31)
                 prepareForRoguelikeGeneration = false;
             if (Main.menuMode != 888 && Main.menuMode != 0)
             {
@@ -510,13 +512,16 @@ namespace TerRoguelike.MainMenu
                 }
                     
             }
-            if (prepareForRoguelikeGeneration && (Main.menuMode == 888 || (Main.menuMultiplayer && Main.menuMode == 31)) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
+            if ((prepareForRoguelikeGeneration || weaponSelectInPlayerMenu) && (Main.menuMode == 888 || Main.menuMode == 31) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
             {
-                Main.menuMultiplayer = true;
-                Main.menuServer = true;
+                if (!weaponSelectInPlayerMenu)
+                {
+                    Main.menuMultiplayer = true;
+                    Main.menuServer = true;
+                }
                 var font = FontAssets.DeathText.Value;
 
-                if (!(Main.menuMultiplayer && !Main.menuServer))
+                if (!weaponSelectInPlayerMenu)
                     DifficultyDrawing();
                 StarterWeaponDrawing();
 

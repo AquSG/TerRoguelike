@@ -83,6 +83,14 @@ namespace TerRoguelike.Packets
                     difficulty = Difficulty.RuinedMoon;
                 }
             }
+            else
+            {
+                packet.ReadBoolean();
+                packet.ReadBoolean();
+                packet.ReadBoolean();
+                packet.ReadBoolean();
+                packet.ReadBoolean();
+            }
         }
     }
 }
