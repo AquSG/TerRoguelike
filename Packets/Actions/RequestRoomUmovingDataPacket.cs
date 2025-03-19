@@ -37,11 +37,13 @@ namespace TerRoguelike.Packets
 {
     public sealed class RequestRoomUmovingDataPacket : TerRoguelikePacket
     {
+        public static int cooldown = 0;
         public override PacketType MessageType => PacketType.RequestUnmovingDataSync;
         public static void Send(int toClient = -1, int ignoreClient = -1)
         {
-            if (!TerRoguelike.mpClient)
+            if (!TerRoguelike.mpClient || cooldown > 0)
                 return;
+            cooldown = 10;
 
             var packet = NewPacket(PacketType.RequestUnmovingDataSync);
 

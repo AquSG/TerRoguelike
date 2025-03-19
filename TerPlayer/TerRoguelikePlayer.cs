@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -1955,10 +1956,14 @@ namespace TerRoguelike.TerPlayer
                         Player.buffType[i] = 0;
                 }
             }
-            if (Player.whoAmI == Main.myPlayer && TerRoguelike.mpClient && syncMouseWorld)
+            if (Player.whoAmI == Main.myPlayer && TerRoguelike.mpClient)
             {
-                syncMouseWorld = false;
-                MouseWorldPacket.Send(mouseWorld, Player.whoAmI);
+                if (syncMouseWorld)
+                {
+                    syncMouseWorld = false;
+                    MouseWorldPacket.Send(mouseWorld, Player.whoAmI);
+                }
+                TerPlayerPacket.Send(this);
             }
         }
         public override void PostUpdateMiscEffects()
@@ -2883,6 +2888,7 @@ namespace TerRoguelike.TerPlayer
         public override void OnEnterWorld()
         {
             DifficultySetPacket.Send(TerRoguelikeMenu.difficulty);
+            RequestRoomUmovingDataPacket.cooldown = 0;
             RequestRoomUmovingDataPacket.Send();
 
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -2907,6 +2913,24 @@ namespace TerRoguelike.TerPlayer
                 {
                     TerRoguelikeWorld.worldTeleportTime = 1;
                     SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2] });
+                }
+                else if (TerRoguelike.mpClient)
+                {
+                    for (int i = 0; i < 59; i++)
+                        Player.inventory[i].TurnToAir();
+                    for (int i = 0; i < Player.armor.Length; i++)
+                        Player.armor[i].TurnToAir();
+                    for (int i = 0; i < Player.dye.Length; i++)
+                        Player.dye[i].TurnToAir();
+                    for (int i = 0; i < Player.miscEquips.Length; i++)
+                        Player.miscEquips[i].TurnToAir();
+                    for (int i = 0; i < Player.miscDyes.Length; i++)
+                        Player.miscDyes[i].TurnToAir();
+                    Player.trashItem.TurnToAir();
+
+                    IEnumerable<Item> vanillaItems = [];
+                    List<Item> startingItems = PlayerLoader.GetStartingItems(Main.LocalPlayer, vanillaItems);
+                    PlayerLoader.SetStartInventory(Main.LocalPlayer, startingItems);
                 }
             }
             soulOfLenaUses = 0;
@@ -3017,7 +3041,8 @@ namespace TerRoguelike.TerPlayer
                 Effect coneEffect = Filters.Scene["TerRoguelike:ConeSnippet"].GetShader().Shader;
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.Additive, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, coneEffect, Main.GameViewMatrix.TransformationMatrix);
 
-                int rayCount = TerRoguelike.lowDetail ? 1 : 400;
+                bool lowDetail = TerRoguelike.lowDetail || Player.whoAmI != Main.myPlayer;
+                int rayCount = lowDetail ? 1 : 400;
 
                 coneEffect.Parameters["tint"].SetValue((Color.Lerp(Color.Orange, Color.Yellow, 0.3f) * 0.75f).ToVector4());
                 coneEffect.Parameters["minDOT"].SetValue(Vector2.Dot(Vector2.UnitX, Vector2.UnitX.RotatedBy(1f / rayCount * MathHelper.Pi)));
@@ -3031,7 +3056,7 @@ namespace TerRoguelike.TerPlayer
                     float thisRot = completion * MathHelper.TwoPi;
                     rayLengths.Add(FalseSunLightCollisionCheck(basePos, thisRot, maxRayLength, 3));
                 }
-                if (TerRoguelike.lowDetail)
+                if (lowDetail)
                 {
                     rayLengths[0] = maxRayLength;
                 }

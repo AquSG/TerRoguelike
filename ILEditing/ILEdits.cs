@@ -38,6 +38,7 @@ using Terraria.Graphics.Light;
 using Terraria.UI;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Social;
+using Terraria.Social.Steam;
 
 namespace TerRoguelike.ILEditing
 {
@@ -77,6 +78,12 @@ namespace TerRoguelike.ILEditing
             On_NPC.SpawnNPC += MysteryBugfix2;
             On_Player.SavePlayer += On_Player_SavePlayer;
             On_Main.ExitServerPasswordMenu += On_Main_ExitServerPasswordMenu;
+            On_NetClientSocialModule.ConnectToLobby += WeaponSelectInjection;
+        }
+
+        private void WeaponSelectInjection(On_NetClientSocialModule.orig_ConnectToLobby orig, NetClientSocialModule self, ulong lobbyId)
+        {
+			TerRoguelikeMenu.weaponSelectInPlayerMenu = true;
         }
 
         private void On_Main_ExitServerPasswordMenu(On_Main.orig_ExitServerPasswordMenu orig)

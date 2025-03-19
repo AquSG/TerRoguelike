@@ -1437,6 +1437,10 @@ namespace TerRoguelike.Systems
                 PostUpdateWorld();
                 if (RequestBasinPacket.cooldown > 0)
                     RequestBasinPacket.cooldown--;
+                if (TerPlayerPacket.cooldown > 0)
+                    TerPlayerPacket.cooldown--;
+                if (RequestRoomUmovingDataPacket.cooldown > 0)
+                    RequestRoomUmovingDataPacket.cooldown--;
             }
 
             activatedTeleport = false;
@@ -1481,6 +1485,7 @@ namespace TerRoguelike.Systems
                 }
                 if (Main.dedServ)
                 {
+                    WorldGen.RefreshSections(0, 0, Main.maxTilesX, Main.maxTilesY);
                     foreach (Player player in Main.ActivePlayers)
                     {
                         Netplay.Clients[player.whoAmI].TileSections = new bool[Main.maxTilesX / 200 + 1, Main.maxTilesY / 150 + 1];

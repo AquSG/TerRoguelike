@@ -168,8 +168,12 @@ namespace TerRoguelike.Rooms
                 ResetRoomID(finalRoom.ID);
                 RoomPacket.Send(finalRoom.ID);
 
-
-                NewFloorEffects(finalRoom, modPlayer);
+                foreach (Player p in Main.ActivePlayers)
+                {
+                    var modp = p.ModPlayer();
+                    if (modp == null) continue;
+                    NewFloorEffects(finalRoom, modp);
+                }
             }
         }
 

@@ -49,6 +49,7 @@ namespace TerRoguelike.Packets
             EnemyHealthbarSync,
             MouseWorldSync,
             RegenerateWorldSync,
+            TerPlayerSync,
 
             TeleportToPosition,
             RequestUnmovingDataSync,
