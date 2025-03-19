@@ -129,8 +129,11 @@ namespace TerRoguelike.Projectiles
                     mainAngle += Main.rand.NextFloat(-MathHelper.Pi * 0.025f, MathHelper.Pi * 0.025f + float.Epsilon);
                 }
                 
-                Vector2 direction = (mainAngle).ToRotationVector2();
-                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI, modPlayer.scaleMultiplier);
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    Vector2 direction = (mainAngle).ToRotationVector2();
+                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI, modPlayer.scaleMultiplier);
+                }
             }
             Charge -= 20f;
             if (Charge > 0f) // if the player has enough attack speed to shoot more than once a frame, allow it.

@@ -27,6 +27,7 @@ using Terraria.ModLoader.IO;
 using System.IO;
 using Terraria.GameContent.UI.States;
 using TerRoguelike.Packets;
+using Steamworks;
 
 namespace TerRoguelike.NPCs
 {
@@ -3461,6 +3462,9 @@ namespace TerRoguelike.NPCs
             }
             writer.Write(npc.immortal);
             writer.Write(npc.dontTakeDamage);
+            writer.Write(puppetOwner);
+            writer.Write(puppetLifetime);
+            writer.Write(ballAndChainSlow);
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3500,6 +3504,9 @@ namespace TerRoguelike.NPCs
             }
             npc.immortal = reader.ReadBoolean();
             npc.dontTakeDamage = reader.ReadBoolean();
+            puppetOwner = reader.ReadInt32();
+            puppetLifetime = reader.ReadInt32();
+            ballAndChainSlow = reader.ReadInt32();
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
@@ -3747,11 +3754,13 @@ namespace TerRoguelike.NPCs
                     if (ignitedHitCooldown <= 0)
                     {
                         int hitDamage = 0;
+                        int displayedDamage = 0;
                         int targetDamage = (int)(npc.lifeMax * 0.01f);
-                        int owner = -1;
 
                         for (int i = 0; i < ignitedStacks.Count; i++)
                         {
+                            int thisOwner = ignitedStacks[i].Owner;
+
                             var igniteStack = ignitedStacks[i];
                             int myDamageCap = igniteStack.DamageCapPerTick;
                             int myTargetDamage = targetDamage;
@@ -3762,20 +3771,20 @@ namespace TerRoguelike.NPCs
 
                             if (ignitedStacks[i].DamageToDeal < myTargetDamage)
                             {
-                                hitDamage += ignitedStacks[i].DamageToDeal;
+                                if (thisOwner == Main.myPlayer)
+                                    hitDamage += ignitedStacks[i].DamageToDeal;
+                                displayedDamage += ignitedStacks[i].DamageToDeal;
                                 ignitedStacks[i].DamageToDeal = 0;
                             }
                             else
                             {
-                                hitDamage += myTargetDamage;
+                                if (thisOwner == Main.myPlayer)
+                                    hitDamage += myTargetDamage;
+                                displayedDamage += myTargetDamage;
                                 ignitedStacks[i].DamageToDeal -= myTargetDamage;
                             }
-                            if (i == ignitedStacks.Count - 1)
-                            {
-                                owner = ignitedStacks[i].Owner;
-                            }
                         }
-                        IgniteHit(hitDamage, npc, owner);
+                        IgniteHit(hitDamage, displayedDamage, npc, Main.myPlayer);
                         ignitedStacks.RemoveAll(x => x.DamageToDeal <= 0);
                     }
                 }
@@ -3787,27 +3796,31 @@ namespace TerRoguelike.NPCs
                     if (bleedingHitCooldown <= 0)
                     {
                         int hitDamage = 0;
+                        int displayedDamage = 0;
                         int targetDamage = 40;
                         int owner = -1;
 
                         for (int i = 0; i < bleedingStacks.Count; i++)
                         {
+                            int thisOwner = bleedingStacks[i].Owner;
                             if (bleedingStacks[i].DamageToDeal < targetDamage)
                             {
-                                hitDamage += ignitedStacks[i].DamageToDeal;
+                                if (thisOwner == Main.myPlayer)
+                                    hitDamage += bleedingStacks[i].DamageToDeal;
+                                displayedDamage += bleedingStacks[i].DamageToDeal;
                                 bleedingStacks[i].DamageToDeal = 0;
                             }
                             else
                             {
-                                hitDamage += targetDamage;
+                                if (thisOwner == Main.myPlayer)
+                                    hitDamage += targetDamage;
+                                displayedDamage += targetDamage;
                                 bleedingStacks[i].DamageToDeal -= targetDamage;
                             }
                             if (i == bleedingStacks.Count - 1)
-                            {
-                                owner = bleedingStacks[i].Owner;
-                            }
+                                owner = thisOwner;
                         }
-                        BleedingHit(hitDamage, npc, owner);
+                        BleedingHit(hitDamage, displayedDamage, npc, owner);
                         bleedingStacks.RemoveAll(x => x.DamageToDeal <= 0);
                     }
                 }
@@ -3855,14 +3868,22 @@ namespace TerRoguelike.NPCs
             ballAndChainSlow = 0;
             sluggedTime = 0;
         }
-        public void IgniteHit(int hitDamage, NPC npc, int owner)
+        public void IgniteHit(int hitDamage, int displayDamage, NPC npc, int owner)
         {
+            ignitedHitCooldown += 10; // hits 6 times a second
+
             if (npc.immortal || npc.dontTakeDamage)
                 return;
 
+            int origDamage = hitDamage;
             TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
+            displayDamage = (int)(displayDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
+            if (hitDamage < 1)
+                hitDamage = 1;
+            if (displayDamage < 1)
+                displayDamage = 1;
 
             NPC.HitInfo info = new NPC.HitInfo();
             info.HideCombatText = true;
@@ -3872,29 +3893,36 @@ namespace TerRoguelike.NPCs
             info.Knockback = 0f;
             info.Crit = false;
 
-            npc.StrikeNPC(info);
-            NetMessage.SendStrikeNPC(npc, info);
-            if (npc.Center.Distance(Main.Camera.Center) < 1600)
-                CombatText.NewText(npc.getRect(), Color.DarkKhaki, hitDamage);
-            ignitedHitCooldown += 10; // hits 6 times a second
-
-            if (npc.life <= 0)
+            if (origDamage > 0)
             {
-                modPlayer.OnKillEffects(npc);
+                int preHitHP = npc.life;
+                npc.StrikeNPC(info);
+                NetMessage.SendStrikeNPC(npc, info);
+
+                if (preHitHP - displayDamage <= 0)
+                {
+                    modPlayer.OnKillEffects(npc);
+                }
             }
+            if (npc.Center.Distance(Main.Camera.Center) < 1600)
+                CombatText.NewText(npc.getRect(), Color.DarkKhaki, displayDamage);
         }
-        public void BleedingHit(int hitDamage, NPC npc, int owner)
+        public void BleedingHit(int hitDamage, int displayDamage, NPC npc, int owner)
         {
             bleedingHitCooldown = 20; // hits 3 times a second
 
             if (npc.immortal || npc.dontTakeDamage)
                 return;
 
+            int origDamage = hitDamage;
             TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
+            displayDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
             if (hitDamage < 1)
                 hitDamage = 1;
+            if (displayDamage < 1)
+                displayDamage = 1;
 
             NPC.HitInfo info = new NPC.HitInfo();
             info.HideCombatText = true;
@@ -3904,17 +3932,18 @@ namespace TerRoguelike.NPCs
             info.Knockback = 0f;
             info.Crit = false;
 
-            if (owner == Main.myPlayer)
+            if (origDamage > 0)
             {
+                int prehitHP = npc.life;
                 npc.StrikeNPC(info);
                 NetMessage.SendStrikeNPC(npc, info);
-                if (npc.life <= 0)
+                if (prehitHP - displayDamage <= 0)
                 {
                     modPlayer.OnKillEffects(npc);
                 }
             }
             
-            CombatText.NewText(npc.getRect(), Color.MediumVioletRed, hitDamage);
+            CombatText.NewText(npc.getRect(), Color.MediumVioletRed, displayDamage);
         }
         public void AddBleedingStackWithRefresh(BleedingStack stack, int target, bool noSend = false)
         {
@@ -3932,6 +3961,12 @@ namespace TerRoguelike.NPCs
             bleedingStacks.Add(stack);
             if (!noSend)
                 ApplyBleedPacket.Send(stack, target, -1, Main.myPlayer);
+        }
+        public void AddIgniteStack(IgnitedStack stack, int target, bool noSend = false)
+        {
+            ignitedStacks.Add(stack);
+            if (!noSend)
+                ApplyIgnitePacket.Send(stack, target);
         }
         public override bool PreKill(NPC npc)
         {
@@ -4346,6 +4381,15 @@ namespace TerRoguelike.NPCs
                 }
             }
 
+            if (TerRoguelike.mpClient)
+            {
+                if (targetPlayer >= 0)
+                    return Main.player[targetPlayer];
+                if (targetNPC >= 0)
+                    return Main.npc[targetNPC];
+                return null;
+            }
+
             if (npc.friendly)
             {
                 if (targetNPC == -1 || targetPlayer != -1 || targetCooldown <= 0)
@@ -4509,7 +4553,8 @@ namespace TerRoguelike.NPCs
         public IgnitedStack(int damageToDeal, int owner, int damageCapPerTick = 50)
         {
             Owner = owner;
-            damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
+            if (owner == Main.myPlayer)
+                damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
             DamageToDeal = damageToDeal;
             DamageCapPerTick = damageCapPerTick;
         }
@@ -4522,7 +4567,8 @@ namespace TerRoguelike.NPCs
         public BleedingStack(int damageToDeal, int owner)
         {
             Owner = owner;
-            damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
+            if (owner == Main.myPlayer)
+                damageToDeal *= Main.player[owner].ModPlayer().forgottenBioWeapon + 1;
             DamageToDeal = damageToDeal;
         }
         public int DamageToDeal = 0;

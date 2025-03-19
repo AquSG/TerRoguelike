@@ -127,13 +127,15 @@ namespace TerRoguelike.Projectiles
                 }
 
                 
-                Vector2 direction = (mainAngle).ToRotationVector2();
-                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), Vector2.Zero, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
-                Projectile spawnedProj = Main.projectile[spawnedProjectile];
-                spawnedProj.rotation = direction.ToRotation();
-                spawnedProj.scale = modPlayer.scaleMultiplier;
-                spawnedProj.ModProj().swingDirection = Owner.direction;
-                spawnedProj.ModProj().notedBoostedDamage = damageBoost;
+                if (Projectile.owner == Main.myPlayer)
+                {
+                    Vector2 direction = (mainAngle).ToRotationVector2();
+                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), direction, ModContent.ProjectileType<AdaptiveBladeSlash>(), damage, 1f, Owner.whoAmI);
+                    Projectile spawnedProj = Main.projectile[spawnedProjectile];
+                    spawnedProj.scale = modPlayer.scaleMultiplier;
+                    spawnedProj.ModProj().swingDirection = Owner.direction;
+                    spawnedProj.ModProj().notedBoostedDamage = damageBoost;
+                }
             }
             Charge -= 60f;
             if (Charge > 60f) // support for swinging more than once a frame if one has that much attack speed

@@ -105,53 +105,52 @@ namespace TerRoguelike.UI
             if (pressed && mainMenuHover && modPlayer.creditsViewTime > 150)
             {
                 ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
+                if (TerRoguelikeWorld.IsDeletableOnExit)
+                {
+                    TerRoguelikeMenu.wipeTempPlayer = true;
+                    TerRoguelikeMenu.wipeTempWorld = true;
+                }
+                modPlayer.killerNPC = -1;
+                modPlayer.killerProj = -1;
+                SystemLoader.PreSaveAndQuit();
+                WorldGen.SaveAndQuit();
+            }
+            else if (pressed && restartHover && modPlayer.creditsViewTime > 150)
+            {
+                ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
                 if (TerRoguelike.mpClient)
                 {
                     StartRoomGenerationPacket.Send();
                 }
                 else
                 {
-                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                    bool stayinworld = true;
+                    if (stayinworld)
                     {
-                        TerRoguelikeMenu.wipeTempPlayer = true;
-                        TerRoguelikeMenu.wipeTempWorld = true;
+                        RoomSystem.RegenerateWorld();
+                        modPlayer.killerNPC = -1;
+                        modPlayer.killerProj = -1;
                     }
-                    modPlayer.killerNPC = -1;
-                    modPlayer.killerProj = -1;
-                    SystemLoader.PreSaveAndQuit();
-                    WorldGen.SaveAndQuit();
-                }
-                
-            }
-            else if (pressed && restartHover && modPlayer.creditsViewTime > 150)
-            {
-                ZoomSystem.SetZoomAnimation(Main.GameZoomTarget, 2);
-                bool stayinworld = true;
-                if (stayinworld)
-                {
-                    RoomSystem.RegenerateWorld();
-                    modPlayer.killerNPC = -1;
-                    modPlayer.killerProj = -1;
-                }
-                else
-                {
-                    if (TerRoguelikeWorld.IsDeletableOnExit)
+                    else
                     {
-                        TerRoguelikeMenu.wipeTempWorld = true;
-                        TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
+                        if (TerRoguelikeWorld.IsDeletableOnExit)
+                        {
+                            TerRoguelikeMenu.wipeTempWorld = true;
+                            TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
 
-                        IEnumerable<Item> vanillaItems = from item in player.inventory
-                                                         where !item.IsAir
-                                                         select item into x
-                                                         select x.Clone();
-                        List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
-                        PlayerLoader.SetStartInventory(player, startingItems);
-                        player.trashItem = new(ItemID.None, 0);
-                        TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                            IEnumerable<Item> vanillaItems = from item in player.inventory
+                                                             where !item.IsAir
+                                                             select item into x
+                                                             select x.Clone();
+                            List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
+                            PlayerLoader.SetStartInventory(player, startingItems);
+                            player.trashItem = new(ItemID.None, 0);
+                            TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
+                        }
+                        modPlayer.killerNPC = -1;
+                        modPlayer.killerProj = -1;
+                        WorldGen.SaveAndQuit();
                     }
-                    modPlayer.killerNPC = -1;
-                    modPlayer.killerProj = -1;
-                    WorldGen.SaveAndQuit();
                 }
             }
 

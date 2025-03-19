@@ -88,7 +88,6 @@ namespace TerRoguelike.Packets
 
             packet.Send(toClient, ignoreClient);
 
-            return;
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
                 Room room = RoomSystem.RoomList[i];
@@ -109,15 +108,12 @@ namespace TerRoguelike.Packets
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
-            Main.NewText(packet.BaseStream.Length);
-            Main.NewText(packet.BaseStream.Position);
             TerRoguelikeWorld.IsTerRoguelikeWorld = packet.ReadBoolean();
             TerRoguelikeWorld.IsDeletableOnExit = packet.ReadBoolean();
 
             bool returnEarly = packet.ReadBoolean();
             if (returnEarly)
             {
-                Main.NewText("return early");
                 RoomSystem.RoomList = [];
                 return;
             }
@@ -147,7 +143,6 @@ namespace TerRoguelike.Packets
             {
                 RoomManager.FloorIDsInPlay.Add(packet.ReadInt32());
             }
-            Main.NewText(packet.BaseStream.Position);
         }
     }
 }
