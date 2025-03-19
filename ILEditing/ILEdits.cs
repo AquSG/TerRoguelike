@@ -39,6 +39,7 @@ using Terraria.UI;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Social;
 using Terraria.Social.Steam;
+using TerRoguelike.NPCs;
 
 namespace TerRoguelike.ILEditing
 {

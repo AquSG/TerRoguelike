@@ -63,6 +63,7 @@ namespace TerRoguelike.Packets
             packet.Write(room.lastTelegraphDuration);
             packet.Write(room.wallActive);
             packet.Write(TerRoguelikeWorld.currentStage);
+            packet.Write(TerRoguelikeWorld.currentLoop);
             packet.Write((byte)TerRoguelikeMenu.difficulty);
 
             packet.Send(toClient, ignoreClient);
@@ -88,6 +89,7 @@ namespace TerRoguelike.Packets
             room.lastTelegraphDuration = packet.ReadInt32();
             room.wallActive = packet.ReadBoolean();
             TerRoguelikeWorld.currentStage = packet.ReadInt32();
+            TerRoguelikeWorld.currentLoop = packet.ReadInt32();
             TerRoguelikeMenu.difficulty = (TerRoguelikeMenu.Difficulty)packet.ReadByte();
         }
     }

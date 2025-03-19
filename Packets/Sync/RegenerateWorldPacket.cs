@@ -49,7 +49,7 @@ namespace TerRoguelike.Packets
             var packet = NewPacket(PacketType.RegenerateWorldSync);
 
             packet.Write(RoomSystem.regeneratingWorld);
-            packet.Write(TerRoguelikeWorld.currentLoop > 0);
+            packet.Write(TerRoguelikeWorld.currentLoop > 0 || TerRoguelikeWorld.promoteLoop);
 
             packet.Send(toClient, ignoreClient);
         }
@@ -97,6 +97,10 @@ namespace TerRoguelike.Packets
                 {
                     floor.Reset();
                 }
+            }
+            if (!regenworld && RoomSystem.regeneratingWorld)
+            {
+                Main.sectionManager = new WorldSections((Main.maxTilesX - 1) / 200 + 1, (Main.maxTilesY - 1) / 150 + 1);
             }
             RoomSystem.regeneratingWorld = regenworld;
         }

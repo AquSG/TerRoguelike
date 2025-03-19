@@ -586,7 +586,7 @@ namespace TerRoguelike.Managers
                         var modp = p.ModPlayer();
                         if (modp == null) continue;
                         if (modp.lunarCharm > 0)
-                            modPlayer.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                            modp.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
                     }
                 }
             }
@@ -607,7 +607,16 @@ namespace TerRoguelike.Managers
             else
             {
                 if (Main.dedServ)
+                {
                     TeleportToPositionPacket.Send(player.Center, TeleportContext.NewFloor, targetRoom.ID);
+                    foreach (Player p in Main.ActivePlayers)
+                    {
+                        var modp = p.ModPlayer();
+                        if (modp == null) continue;
+                        RoomSystem.NewFloorEffects(targetRoom, modp);
+                    }
+                }
+                    
             }
             if (nextFloor.Name != "Lunar")
             {
@@ -620,7 +629,8 @@ namespace TerRoguelike.Managers
                 CombatVolumeLevel = nextFloor.Soundtrack.Volume;
             }
 
-            RoomSystem.NewFloorEffects(targetRoom, modPlayer);
+            if (!Main.dedServ)
+                RoomSystem.NewFloorEffects(targetRoom, modPlayer);
         }
         public virtual void Ascend(Player player)
         {
@@ -703,14 +713,25 @@ namespace TerRoguelike.Managers
                     }
                 }
 
-                RoomSystem.NewFloorEffects(targetRoom, modPlayer);
+                foreach (Player p in Main.ActivePlayers)
+                {
+                    var modp = p.ModPlayer();
+                    if (modp == null) continue;
+                    RoomSystem.NewFloorEffects(targetRoom, modp);
+                }
             }
             else
             {
                 targetRoom = RoomID[FloorID[FloorDict["Sanctuary"]].StartRoomID];
-                if (modPlayer.lunarCharm > 0)
+                if (TerRoguelikeWorld.totalLunarCharm > 0)
                 {
-                    modPlayer.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                    foreach (Player p in Main.ActivePlayers)
+                    {
+                        var modp = p.ModPlayer();
+                        if (modp == null) continue;
+                        if (modp.lunarCharm > 0)
+                            modp.LunarCharmLogic(targetRoom.RoomPosition16 + targetRoom.RoomCenter16);
+                    }
                 }
                 player.Center = targetRoom.RoomPosition16 + targetRoom.RoomDimensions16 * new Vector2(0.9f, 0.5f);
                 player.BottomRight = modPlayer.FindAirToPlayer((targetRoom.RoomPosition + targetRoom.RoomDimensions) * 16f);

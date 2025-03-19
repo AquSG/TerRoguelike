@@ -28,6 +28,7 @@ using System.IO;
 using Terraria.GameContent.UI.States;
 using TerRoguelike.Packets;
 using Steamworks;
+using Terraria.Localization;
 
 namespace TerRoguelike.NPCs
 {
@@ -54,6 +55,7 @@ namespace TerRoguelike.NPCs
         public bool TerRoguelikeBoss = false;
         public bool isRoomNPC = false;
         public int sourceRoomListID = -1;
+        public bool eliteNamed = false;
         public bool hostileTurnedAlly = false;
         public int puppetOwner = -1;
         public bool IgnoreRoomWallCollision = false;
@@ -3465,6 +3467,7 @@ namespace TerRoguelike.NPCs
             writer.Write(puppetOwner);
             writer.Write(puppetLifetime);
             writer.Write(ballAndChainSlow);
+            writer.Write(sluggedTime);
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3507,6 +3510,7 @@ namespace TerRoguelike.NPCs
             puppetOwner = reader.ReadInt32();
             puppetLifetime = reader.ReadInt32();
             ballAndChainSlow = reader.ReadInt32();
+            sluggedTime = reader.ReadInt32();
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {
@@ -3695,7 +3699,7 @@ namespace TerRoguelike.NPCs
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC target = Main.npc[i];
-                    if (friendlyFireHitCooldown[i] > 0 || !target.active || !target.ModNPC().CanBeChased(false, false))
+                    if (friendlyFireHitCooldown[i] > 0 || !target.active || !target.ModNPC().CanBeChased(false, false) || i == npc.whoAmI)
                         continue;
 
                     int cdslot = 0;
@@ -3727,8 +3731,16 @@ namespace TerRoguelike.NPCs
                         {
                             if (puppetOwner >= 0)
                             {
-                                var modOwner = Main.player[puppetOwner].ModPlayer();
-                                modOwner?.OnKillEffects(target);
+                                if (puppetOwner == Main.myPlayer)
+                                {
+                                    var modOwner = Main.player[puppetOwner].ModPlayer();
+                                    modOwner?.OnKillEffects(target);
+                                }
+                                else if (Main.dedServ)
+                                {
+                                    ActivateOnKillPacket.Send(npc.whoAmI, npc.type, npc.Center, puppetOwner);
+                                }
+                                
                             }
                         }
 
@@ -3739,6 +3751,9 @@ namespace TerRoguelike.NPCs
 
             if (currentUpdate == 1)
             {
+                if (!eliteNamed)
+                    GiveEliteName(npc.whoAmI);
+
                 if (hostileTurnedAlly)
                 {
                     puppetLifetime--;
@@ -4195,6 +4210,9 @@ namespace TerRoguelike.NPCs
         }
         public override bool PreDraw(NPC npc, SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {
+            if (!eliteNamed)
+                GiveEliteName(npc.whoAmI);
+
             if (ignitedStacks != null && ignitedStacks.Count > 0 && !OverrideIgniteVisual)
             {
                 spriteBatch.End();
@@ -4512,6 +4530,29 @@ namespace TerRoguelike.NPCs
             {
                 targetCooldown++;
             }
+        }
+
+        public void GiveEliteName(int who)
+        {
+            NPC npc = Main.npc[who];
+            string giveName = "";
+            if (eliteVars.tainted)
+            {
+                giveName += Language.GetOrRegister("Mods.TerRoguelike.EliteTainted").Value;
+            }
+            if (eliteVars.slugged)
+            {
+                giveName += Language.GetOrRegister("Mods.TerRoguelike.EliteSlugged").Value; ;
+            }
+            if (eliteVars.burdened)
+            {
+                giveName += Language.GetOrRegister("Mods.TerRoguelike.EliteBurdened").Value; ;
+            }
+            if (giveName.Length > 0)
+            {
+                npc.GivenName = giveName + npc.GivenName + npc.TypeName;
+            }
+            eliteNamed = true;
         }
     }
 

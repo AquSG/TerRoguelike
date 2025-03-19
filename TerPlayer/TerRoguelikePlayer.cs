@@ -1932,7 +1932,7 @@ namespace TerRoguelike.TerPlayer
                 bool allow = true;
                 foreach (Player player in Main.ActivePlayers)
                 {
-                    if (!player.dead)
+                    if (!player.dead || RoomSystem.regeneratingWorld)
                     {
                         allow = false;
                         allDeadTime = 0;
@@ -2017,7 +2017,12 @@ namespace TerRoguelike.TerPlayer
             if (modProj.npcOwner >= 0)
             {
                 if (target.life <= 0 && modProj.hostileTurnedAlly)
-                    OnKillEffects(target);
+                {
+                    if (modProj.npcOwnerPuppetOwner == Main.myPlayer)
+                        OnKillEffects(target);
+                    else
+                        ActivateOnKillPacket.Send(target.whoAmI, target.type, target.Center, modProj.npcOwnerPuppetOwner);
+                }
                 return;
             }
                 
@@ -2155,6 +2160,7 @@ namespace TerRoguelike.TerPlayer
 
                 if (modNPC.ballAndChainSlow < slowTime)
                     modNPC.ballAndChainSlow = slowTime;
+                ApplyBallAndChainPacket.Send(target.whoAmI, slowTime);
             }
             if (amberRing > 0 && proj.DamageType == DamageClass.Melee)
             {

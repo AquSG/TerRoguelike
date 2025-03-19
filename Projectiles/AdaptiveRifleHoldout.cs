@@ -13,6 +13,7 @@ using Terraria.Graphics.Renderers;
 using System.Reflection;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Graphics.Effects;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Projectiles
 {
@@ -114,7 +115,10 @@ namespace TerRoguelike.Projectiles
         public void ShootBullet()
         {
             if ((Charge <= wantedCharge || (Owner.channel && autoRelease)) && modPlayer.swingAnimCompletion == 0)
-                modPlayer.swingAnimCompletion += 0.00001f; // start the shoot anim
+            {
+                modPlayer.swingAnimCompletion += 0.00001f; // start the swing anim
+                TerPlayerPacket.cooldown -= 8;
+            }
 
             float distance = Collision.CanHit(Owner.MountedCenter, 1, 1, Projectile.Center, 1, 1) ? 35f : 5f;
             int shotsToFire = Owner.ModPlayer().shotsToFire; //multishot support

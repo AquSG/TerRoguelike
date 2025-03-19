@@ -54,6 +54,10 @@ namespace TerRoguelike.Packets
             var packet = NewPacket(PacketType.TerPlayerSync);
 
             packet.Write((byte)modPlayer.Player.whoAmI);
+
+            packet.Write(modPlayer.swingAnimCompletion);
+            packet.Write(modPlayer.sluggedTime);
+
             bool falseSun = modPlayer.theFalseSun > 0;
             packet.Write(falseSun);
             if (falseSun)
@@ -66,12 +70,43 @@ namespace TerRoguelike.Packets
                     packet.Write(modPlayer.theFalseSunTargetExtra[i]);
                 }
             }
+
+            bool thrill = modPlayer.thrillOfTheHunt > 0;
+            packet.Write(thrill);
+            if (thrill)
+            {
+                packet.Write(modPlayer.thrillOfTheHuntStacks.Count);
+            }
+
+            bool evilEye = modPlayer.evilEye > 0;
+            packet.Write(evilEye);
+            if (evilEye)
+            {
+                packet.Write(modPlayer.evilEyeStacks.Count);
+            }
+
+            bool rattle = modPlayer.primevalRattle > 0;
+            packet.Write(rattle);
+            if (rattle)
+            {
+                packet.Write(modPlayer.primevalRattleStacks.Count);
+            }
+
+            bool steamEngine = modPlayer.steamEngine > 0;
+            packet.Write(steamEngine);
+            if (steamEngine)
+            {
+                packet.Write(modPlayer.steamEngineStacks.Count);
+            }
             
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
             int who = (int)packet.ReadByte();
+            float swingAnim = packet.ReadSingle();
+            int sluggedTime = packet.ReadInt32();
+
             bool falseSun = packet.ReadBoolean();
             int[] target = [-1, -1, -1];
             int[] targetExtra = [-1, -1, -1];
@@ -88,12 +123,43 @@ namespace TerRoguelike.Packets
                 }
             }
 
+            bool thrill = packet.ReadBoolean();
+            int thrillStackCount = 0;
+            if (thrill)
+            {
+                thrillStackCount = packet.ReadInt32();
+            }
+
+            bool evilEye = packet.ReadBoolean();
+            int evilEyeStackCount = 0;
+            if (evilEye)
+            {
+                evilEyeStackCount = packet.ReadInt32();
+            }
+
+            bool rattle = packet.ReadBoolean();
+            int rattleStackCount = 0;
+            if (rattle)
+            {
+                rattleStackCount = packet.ReadInt32();
+            }
+
+            bool steamEngine = packet.ReadBoolean();
+            int steamEngineStackCount = 0;
+            if (steamEngine)
+            {
+                steamEngineStackCount = packet.ReadInt32();
+            }
+
             Player player = Main.player[who];
             if (!player.active)
                 return;
             var modPlayer = player.ModPlayer();
             if (modPlayer == null)
                 return;
+
+            modPlayer.swingAnimCompletion = swingAnim;
+            modPlayer.sluggedTime = sluggedTime;
 
             if (falseSun)
             {
@@ -114,6 +180,34 @@ namespace TerRoguelike.Packets
                 modPlayer.theFalseSunTargetExtra = targetExtra;
                 modPlayer.theFalseSunIntensity = intensity;
                 modPlayer.theFalseSunIntensityTarget = intensityTarget;
+            }
+
+            if (thrill)
+            {
+                modPlayer.thrillOfTheHuntStacks.Clear();
+                for (int i = 0; i < thrillStackCount; i++)
+                    modPlayer.thrillOfTheHuntStacks.Add(480);
+            }
+
+            if (evilEye)
+            {
+                modPlayer.evilEyeStacks.Clear();
+                for (int i = 0; i < evilEyeStackCount; i++)
+                    modPlayer.evilEyeStacks.Add(180);
+            }
+
+            if (rattle)
+            {
+                modPlayer.primevalRattleStacks.Clear();
+                for (int i = 0; i < rattleStackCount; i++)
+                    modPlayer.primevalRattleStacks.Add(540);
+            }
+
+            if (steamEngine)
+            {
+                modPlayer.steamEngineStacks.Clear();
+                for (int i = 0; i < steamEngineStackCount; i++)
+                    modPlayer.steamEngineStacks.Add(7200);
             }
 
             if (Main.dedServ)

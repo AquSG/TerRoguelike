@@ -150,6 +150,7 @@ namespace TerRoguelike.Managers
             {
                 npc.GivenName = giveName + npc.GivenName + npc.TypeName;
             }
+            modNpc.eliteNamed = true;
             if (npc.damage < 0)
                 npc.damage = int.MaxValue;
 

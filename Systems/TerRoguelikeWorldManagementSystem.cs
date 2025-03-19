@@ -97,16 +97,7 @@ namespace TerRoguelike.Systems
         }
         public static void RegenerateWorld()
         {
-            TerRoguelikeWorld.currentStage = 0;
-            StageCountPacket.Send();
             Main.worldSurface = 200;
-            if (TerRoguelikeWorld.promoteLoop)
-            {
-                TerRoguelikeWorld.promoteLoop = false;
-                TerRoguelikeWorld.currentLoop++;
-            }   
-            else
-                TerRoguelikeWorld.currentLoop = 0;
 
             WorldGen.PlaceTile(1, (int)Main.worldSurface, ModContent.TileType<Tiles.BlackTile>(), true);
             foreach (Room room in RoomSystem.RoomList)
@@ -140,9 +131,12 @@ namespace TerRoguelike.Systems
                     {
                         int x = i + (int)room.RoomPosition.X;
                         int y = j + (int)room.RoomPosition.Y;
+                        var tile = Main.tile[x, y];
 
-                        WorldGen.TileFrame(x, y, true, true);
-                        WorldGen.SquareWallFrame(x, y);
+                        if (tile.HasTile)
+                            WorldGen.TileFrame(x, y, true, true);
+                        if (tile.WallType > 0)
+                            Framing.WallFrame(i, j, true);
                     }
                 }
             }
