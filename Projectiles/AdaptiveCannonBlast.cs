@@ -75,6 +75,9 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.scale = Projectile.ai[0];
+            modPlayer = Main.player[Projectile.owner].ModPlayer();
+
             if (Projectile.ai[1] == 0 && modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / (5600f));
 
@@ -185,6 +188,7 @@ namespace TerRoguelike.Projectiles
                 Projectile.ai[1] = 1;
                 Projectile.velocity = Vector2.Zero;
                 Projectile.tileCollide = false;
+                Projectile.netUpdate = true;
             }
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
@@ -217,6 +221,16 @@ namespace TerRoguelike.Projectiles
                 }
             }
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(Projectile.penetrate);
+            writer.Write(Projectile.tileCollide);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            Projectile.penetrate = reader.ReadInt32();
+            Projectile.tileCollide = reader.ReadBoolean();
         }
     }
 }

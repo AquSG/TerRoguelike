@@ -121,13 +121,16 @@ namespace TerRoguelike.Projectiles
 
             SoundEngine.PlaySound(SoundID.Item40 with { Volume = SoundID.Item40.Volume * 0.6f }, Owner.Center);
 
-            float chargeSpread = ChargeSpread;
-            for (int i = 0; i < shotsToFire; i++)
+            if (Projectile.owner == Main.myPlayer)
             {
-                float baseAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() + Main.rand.NextFloat(-chargeSpread, chargeSpread);
+                float chargeSpread = ChargeSpread;
+                for (int i = 0; i < shotsToFire; i++)
+                {
+                    float baseAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() + Main.rand.NextFloat(-chargeSpread, chargeSpread);
 
-                Vector2 direction = baseAngle.ToRotationVector2();
-                int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + ((Projectile.Center - Owner.MountedCenter).SafeNormalize(Vector2.UnitY) * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI, modPlayer.scaleMultiplier);
+                    Vector2 direction = baseAngle.ToRotationVector2();
+                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + ((Projectile.Center - Owner.MountedCenter).SafeNormalize(Vector2.UnitY) * distance) + (Vector2.UnitY * Owner.gfxOffY), direction * 11.25f, ModContent.ProjectileType<AdaptiveGunBullet>(), Projectile.damage, 1f, Owner.whoAmI, modPlayer.scaleMultiplier);
+                }
             }
             /*
             float baseAngle = (Projectile.Center - Owner.MountedCenter).ToRotation() + Main.rand.NextFloat(-chargeSpread, chargeSpread);

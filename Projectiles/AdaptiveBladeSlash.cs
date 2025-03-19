@@ -56,6 +56,8 @@ namespace TerRoguelike.Projectiles
             modPlayer ??= player.ModPlayer();
 
             stuckPosition = player.position - Projectile.position;
+            Projectile.rotation = Projectile.velocity.ToRotation();
+            Projectile.velocity = Vector2.Zero;
         }
         public override void AI()
         {

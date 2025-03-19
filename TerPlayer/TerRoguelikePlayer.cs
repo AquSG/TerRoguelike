@@ -32,6 +32,7 @@ using TerRoguelike.Systems;
 using TerRoguelike.UI;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
+using static System.Net.Mime.MediaTypeNames;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
@@ -1272,7 +1273,10 @@ namespace TerRoguelike.TerPlayer
                             continue;
                         procced = true;
                         if (Player.whoAmI == Main.myPlayer)
-                            modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
+                        {
+                            modNPC.AddIgniteStack(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap), i);
+                        }
+                            
                     }
                     if (procced)
                     {
@@ -2069,7 +2073,7 @@ namespace TerRoguelike.TerPlayer
                     int internalHitDamage = proj.damage;
                     int igniteDamage = (int)(internalHitDamage * 1.5f);
                     int burnCap = Math.Max(Math.Min(igniteDamage / 6, 50), 1);
-                    modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap));
+                    modNPC.AddIgniteStack(new IgnitedStack(igniteDamage, Player.whoAmI, burnCap), target.whoAmI);
                     Vector2 targetPos = modNPC.Segments.Count > 0 ? modNPC.Segments[modNPC.hitSegment].Position : target.Center;
                     int particleDir = -1;
                     if (proj.owner >= 0)
@@ -2250,7 +2254,7 @@ namespace TerRoguelike.TerPlayer
                     Vector2 npcPos = modNPC.ClosestPosition(npc.Center, target.Center, npc);
                     if (npcPos.Distance(target.Center) <= radius)
                     {
-                        modNPC.ignitedStacks.Add(new IgnitedStack(igniteDamage, Player.whoAmI));
+                        modNPC.AddIgniteStack(new IgnitedStack(igniteDamage, Player.whoAmI, 50), i);
                     }
                 }
                 modTarget.activatedHotPepper = true;
@@ -2336,8 +2340,10 @@ namespace TerRoguelike.TerPlayer
                 modTarget.activatedItemPotentiometer = true;
             }
         }
-        public void MakeNPCPuppet(NPC target, TerRoguelikeGlobalNPC modTarget)
+        public void MakeNPCPuppet(NPC target, TerRoguelikeGlobalNPC modTarget, bool noSend = false)
         {
+            target.netSpam = 0;
+            target.netUpdate = true;
             float lifeMulti = puppeteersHand;
             float damageMulti = puppeteersHand * 3;
 
@@ -2368,6 +2374,9 @@ namespace TerRoguelike.TerPlayer
             modTarget.targetCooldown = 0;
             modTarget.puppetLifetime = 7200;
             modTarget.eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
+
+            if (!noSend && TerRoguelike.mpClient)
+                MakeNPCPuppetPacket.Send(target.whoAmI, target.type, target.Center, Player.whoAmI);
         }
         #endregion
 

@@ -97,10 +97,23 @@ namespace TerRoguelike.Packets
 
             if (falseSun)
             {
-                modPlayer.theFalseSunIntensity = intensity;
-                modPlayer.theFalseSunIntensityTarget = intensityTarget;
+                for (int i = 0; i < target.Length; i++)
+                {
+                    if (target[i] == -1 && modPlayer.theFalseSunTarget[i] != -1)
+                    {
+                        modPlayer.theFalseSunTime[i] = -10;
+                        continue;
+                    }
+                    if (targetExtra[i] == -1 && modPlayer.theFalseSunTargetExtra[i] != -1)
+                    {
+                        modPlayer.theFalseSunTime[i] = -10;
+                        continue;
+                    }
+                }
                 modPlayer.theFalseSunTarget = target;
                 modPlayer.theFalseSunTargetExtra = targetExtra;
+                modPlayer.theFalseSunIntensity = intensity;
+                modPlayer.theFalseSunIntensityTarget = intensityTarget;
             }
 
             if (Main.dedServ)

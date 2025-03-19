@@ -57,8 +57,10 @@ namespace TerRoguelike.Packets
         {
             bool regenworld = packet.ReadBoolean();
             bool loop = packet.ReadBoolean();
+
             if (regenworld && !RoomSystem.regeneratingWorld)
             {
+                RoomSystem.regeneratingWorld = regenworld;
                 TerRoguelikeMenu.prepareForRoguelikeGeneration = true;
                 for (int i = 0; i < Main.maxNPCs; i++)
                     Main.npc[i].active = false;

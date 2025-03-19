@@ -230,8 +230,7 @@ namespace TerRoguelike.Systems
         }
         public override void ClearWorld()
         {
-            CutsceneSystem.cutsceneDisableControl = false;
-            StopCredits();
+            
         }
     }
 }

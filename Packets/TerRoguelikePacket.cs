@@ -59,7 +59,9 @@ namespace TerRoguelike.Packets
             RequestBasinSync,
             DifficultySetSync,
             ApplyBleedSync,
+            ApplyIgniteSync,
             StartRoomGenerationSync,
+            MakeNPCPuppetSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

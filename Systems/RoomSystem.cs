@@ -1485,15 +1485,11 @@ namespace TerRoguelike.Systems
                 }
                 if (Main.dedServ)
                 {
-                    WorldGen.RefreshSections(0, 0, Main.maxTilesX, Main.maxTilesY);
-                    foreach (Player player in Main.ActivePlayers)
-                    {
-                        Netplay.Clients[player.whoAmI].TileSections = new bool[Main.maxTilesX / 200 + 1, Main.maxTilesY / 150 + 1];
-                        RemoteClient.CheckSection(player.whoAmI, player.Center);
-                    }
                     for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                     {
                         Room room = RoomSystem.RoomList[i];
+                        if (FloorID[room.AssociatedFloor].Stage != 0)
+                            break;
                         Rectangle sendRect = new Rectangle((int)room.RoomPosition.X, (int)room.RoomPosition.Y, (int)room.RoomDimensions.X, (int)room.RoomDimensions.Y);
                         for (int x = sendRect.X; x < sendRect.X + sendRect.Width; x += 145)
                         {
@@ -1521,20 +1517,27 @@ namespace TerRoguelike.Systems
 
             if (escape)
             {
-                int furthest = 100;
-                foreach (Player player in Main.ActivePlayers)
+                try
                 {
-                    var modPlayer = player.ModPlayer();
-                    if (modPlayer.currentFloor.Stage < furthest)
-                        furthest = modPlayer.currentFloor.Stage;
-                }
-                for (int i = 0; i < RoomManager.FloorIDsInPlay.Count; i++)
-                {
-                    Floor floor = FloorID[RoomManager.FloorIDsInPlay[i]];
-                    if (floor.Stage == furthest && floor.Stage >= 0 && floor.Stage <= 4)
+                    int furthest = 100;
+                    foreach (Player player in Main.ActivePlayers)
                     {
-                        floor.jstcUpdate();
+                        var modPlayer = player.ModPlayer();
+                        if (modPlayer.currentFloor.Stage < furthest)
+                            furthest = modPlayer.currentFloor.Stage;
                     }
+                    for (int i = 0; i < RoomManager.FloorIDsInPlay.Count; i++)
+                    {
+                        Floor floor = FloorID[RoomManager.FloorIDsInPlay[i]];
+                        if (floor.Stage == furthest && floor.Stage >= 0 && floor.Stage <= 4)
+                        {
+                            floor.jstcUpdate();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    TerRoguelike.Instance.Logger.Error(e);
                 }
             }
 
@@ -1792,6 +1795,7 @@ namespace TerRoguelike.Systems
 
             CutsceneSystem.cutsceneTimer = 0;
             CutsceneSystem.cutsceneDisableControl = false;
+            CreditsSystem.StopCredits();
             CutsceneSystem.cutsceneActive = false;
             Main.screenPosition = Main.Camera.UnscaledPosition;
             TerRoguelikeWorld.IsDebugWorld = false;
@@ -1863,7 +1867,7 @@ namespace TerRoguelike.Systems
             SetCombat(Silence);
             SetMusicMode(MusicStyle.Silent);
             regeneratingWorld = true;
-            WorldGen.gen = !Main.dedServ;
+            WorldGen.gen = true;
             ClearWorldTerRoguelike();
             Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
 
@@ -1886,12 +1890,7 @@ namespace TerRoguelike.Systems
                 floor.Reset();
             }
 
-            if (Main.dedServ)
-            {
-                TerRoguelikeWorldManagementSystem.RegenerateWorld();
-            }
-            else
-                ThreadPool.QueueUserWorkItem(_ => TerRoguelikeWorldManagementSystem.RegenerateWorld());
+            ThreadPool.QueueUserWorkItem(_ => TerRoguelikeWorldManagementSystem.RegenerateWorld());
         }
         public override void SetStaticDefaults()
         {
