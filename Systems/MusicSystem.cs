@@ -28,6 +28,8 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Diagnostics;
 using static TerRoguelike.Systems.MusicSystem;
 using TerRoguelike.Packets;
+using TerRoguelike.Floors;
+using TerRoguelike.Schematics;
 
 namespace TerRoguelike.Systems
 {
@@ -454,15 +456,30 @@ namespace TerRoguelike.Systems
             TerRoguelikePlayer modPlayer = Main.player[Main.myPlayer].GetModPlayer<TerRoguelikePlayer>();
             if (!Initialized && modPlayer != null && modPlayer.currentFloor != null)
             {
-                SetMusicMode(MusicStyle.Dynamic);
-                FloorSoundtrack soundtrack = modPlayer.currentFloor.Soundtrack;
+                if (!TerRoguelike.mpClient || true)
+                {
+                    FloorSoundtrack soundtrack = modPlayer.currentFloor.Soundtrack;
+                    SetMusicMode(modPlayer.currentFloor.ID == SchematicManager.FloorDict["Sanctuary"] ? MusicStyle.AllCalm : MusicStyle.Dynamic);
 
-                SetCalm(soundtrack.CalmTrack);
-                SetCombat(soundtrack.CombatTrack);
-                CalmVolumeInterpolant = 1;
-                CombatVolumeInterpolant = 0;
-                CalmVolumeLevel = soundtrack.Volume;
-                CombatVolumeLevel = soundtrack.Volume;
+                    SetCalm(soundtrack.CalmTrack);
+                    SetCombat(soundtrack.CombatTrack);
+                    CalmVolumeInterpolant = 1;
+                    CombatVolumeInterpolant = 0;
+                    CalmVolumeLevel = soundtrack.Volume;
+                    CombatVolumeLevel = soundtrack.Volume;
+                }
+                else
+                {
+                    var floor = SchematicManager.FloorID[SchematicManager.FloorDict["Sanctuary"]];
+                    SetCalm(floor.Soundtrack.CalmTrack);
+                    SetCombat(floor.Soundtrack.CombatTrack);
+                    SetMusicMode(MusicStyle.AllCalm);
+                    CombatVolumeInterpolant = 1;
+                    CalmVolumeInterpolant = 0;
+                    CalmVolumeLevel = floor.Soundtrack.Volume;
+                    CombatVolumeLevel = floor.Soundtrack.Volume;
+                }
+                
                 Initialized = true;
             }
             if (!Initialized)

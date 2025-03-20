@@ -62,6 +62,9 @@ namespace TerRoguelike.Systems
         public static bool regeneratingWorld = false;
         public static int regeneratingWorldTime = 0;
         public static bool activatedTeleport = false;
+        public static float runStartMeter = 0;
+        public static bool runStartTouched = false;
+        public static bool runStarted = false;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -244,6 +247,35 @@ namespace TerRoguelike.Systems
                     room.OnEnter();
                     RoomPacket.Send(room.ID);
                 }
+            }
+
+            if (!runStarted && runStartMeter > 0)
+            {
+                if (!runStartTouched)
+                {
+                    runStartMeter -= 1f / 360f;
+                    if (runStartMeter < 0)
+                        runStartMeter = 0;
+                }
+                else
+                {
+                    if (runStartMeter >= 1)
+                    {
+                        runStarted = true;
+                        if (Main.dedServ)
+                        {
+                            runStartMeter = 0;
+                            Main.spawnTileX = (Main.maxTilesX / 32) + 12;
+                            Main.spawnTileY = (Main.maxTilesY / 2) + 12;
+                            TeleportToPositionPacket.Send(new Point(Main.spawnTileX, Main.spawnTileY).ToWorldCoordinates(), TeleportToPositionPacket.TeleportContext.StartRun, 0);
+                        }
+                        else
+                        {
+                            runStartMeter = 1;
+                        }
+                    }
+                }
+                runStartTouched = false;
             }
         }
         public override void PostUpdateTime()
@@ -448,6 +480,8 @@ namespace TerRoguelike.Systems
             }
             else
                 currentLoop = 0;
+
+            runStarted = false;
         }
         #endregion
 
@@ -1791,6 +1825,8 @@ namespace TerRoguelike.Systems
         #endregion
         public static void ClearWorldTerRoguelike()
         {
+            runStartMeter = 0;
+            runStartTouched = false;
             TerRoguelikePlayer.allDeadTime = 0;
             difficultyReceivedByServer = false;
             if (Main.netMode == NetmodeID.MultiplayerClient)

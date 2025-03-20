@@ -82,6 +82,25 @@ namespace TerRoguelike.ILEditing
             On_Main.PrepareLoadedModsAndConfigsForSingleplayer += WeaponDisplayOnPlayerMenuEdit;
             On_UIAchievementsMenu.OnActivate += WeaponDisplayOnPlayerMenuEdit2;
             On_UIWorkshopHub.OnInitialize += WeaponDisplayOnPlayerMenuEdit3;
+            On_Player.TileInteractionsUse += On_Player_TileInteractionsUse;
+        }
+
+        private void On_Player_TileInteractionsUse(On_Player.orig_TileInteractionsUse orig, Player self, int myX, int myY)
+        {
+			if (!TerRoguelikeWorld.IsTerRoguelikeWorld || !self.noBuilding)
+			{
+				orig.Invoke(self, myX, myY);
+                return;
+            }
+				
+
+            Tile tile = Main.tile[myX, myY];
+			if (tile.HasTile && TileID.Sets.Torch[tile.TileType])
+			{
+				return;
+			}
+
+			orig.Invoke(self, myX, myY);
         }
 
         private void WeaponDisplayOnPlayerMenuEdit3(On_UIWorkshopHub.orig_OnInitialize orig, UIWorkshopHub self)

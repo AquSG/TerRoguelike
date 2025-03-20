@@ -51,11 +51,11 @@ namespace TerRoguelike.Systems
                     progress.Message = Language.GetOrRegister("Mods.TerRoguelike.MapBuildingMessage").Value;
                     Main.worldSurface = 200;
                     Main.rockLayer = 225;
+                    Main.spawnTileX = (Main.maxTilesX / 32) + 12;
+                    Main.spawnTileY = (Main.maxTilesY / 2) + 12;
                     if (!GenDebugWorld)
                         FillTheFuckingWorld(ref progress);
                     RoomManager.GenerateRoomStructure();
-                    Main.spawnTileX = (Main.maxTilesX / 32) + 12;
-                    Main.spawnTileY = (Main.maxTilesY / 2) + 12;
                     if (GenDebugWorld)
                     {
                         Main.spawnTileY = (Main.maxTilesY / 12) + 12;

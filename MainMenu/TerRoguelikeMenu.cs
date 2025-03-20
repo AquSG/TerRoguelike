@@ -27,6 +27,7 @@ using TerRoguelike.Systems;
 using Terraria.Localization;
 using static TerRoguelike.Managers.ItemManager;
 using System.Security.Cryptography.X509Certificates;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.MainMenu
 {
@@ -74,9 +75,12 @@ namespace TerRoguelike.MainMenu
         public static string DisplayName => "TerRoguelike";
         public static void TerRoguelikeMenuInteractionLogic()
         {
-            MusicSystem.ClearMusic();
+            RoomUnmovingDataPacket.firstReceive = true;
+            if (TerRoguelikeWorld.currentLoop == 0 && !TerRoguelikeWorld.promoteLoop)
+                RoomSystem.runStarted = false;
             if (Main.menuMode == 0)
             {
+                MusicSystem.ClearMusic();
                 weaponSelectInPlayerMenu = true;
                 if (ItemManager.loaded)
                     fullyLoaded = true;

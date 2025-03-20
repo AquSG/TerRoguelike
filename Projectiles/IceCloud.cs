@@ -50,9 +50,15 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = maxTimeLeft = (int)Projectile.ai[0];
             Projectile.rotation = Projectile.velocity.ToRotation() - (MathHelper.PiOver2 * direction * 0.16f);
             SpawnSmokeParticles();
+            Projectile.localAI[0] = 1;
         }
         public override void AI()
         {
+            if (Projectile.localAI[0] == 0)
+            {
+                Projectile.localAI[0] = 1;
+                MaxScale = Projectile.scale * 1f;
+            }
             var modProj = Projectile.ModProj();
             if (maxTimeLeft - Projectile.timeLeft >= 30 && Projectile.timeLeft > 120 && modProj != null && modProj.npcOwner >= 0 && Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID >= 0 && RoomSystem.RoomList[Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID].bossDead)
                 Projectile.timeLeft = 120;
