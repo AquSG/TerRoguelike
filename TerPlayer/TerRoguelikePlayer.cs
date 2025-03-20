@@ -179,7 +179,7 @@ namespace TerRoguelike.TerPlayer
         #endregion
 
         #region Misc Variables
-        public Floor currentFloor;
+        public Floor currentFloor = null;
         public bool escaped = false;
         public bool escapeFail = false;
         public int shotsToFire = 1;
@@ -436,7 +436,7 @@ namespace TerRoguelike.TerPlayer
                     Player.gravity *= 1.5f;
                 }
 
-                if (currentFloor != null && currentFloor.ID == SchematicManager.FloorDict["Sanctuary"] && Player.sitting.isSitting)
+                if (currentFloor != null && currentFloor.ID == SchematicManager.FloorDict["Sanctuary"] && Player.sitting.isSitting && currentRoom != SchematicManager.RoomID[SchematicManager.RoomDict["SanctuaryLobbyRoom1"]].myRoom)
                 {
                     bool allow = true;
                     for (int i = 0; i < Player.buffType.Length; i++)
@@ -2902,6 +2902,9 @@ namespace TerRoguelike.TerPlayer
         }
         public override void OnEnterWorld()
         {
+            if (TerRoguelike.mpClient)
+                weaponSelectInPlayerMenu = true;
+
             DifficultySetPacket.Send(TerRoguelikeMenu.difficulty);
             RequestRoomUmovingDataPacket.cooldown = 0;
             RequestRoomUmovingDataPacket.Send();
@@ -2912,7 +2915,7 @@ namespace TerRoguelike.TerPlayer
                 Main.SetCameraLerp(0, 0);
                 if (Player.armor[3].type == ItemID.CreativeWings)
                     Player.armor[3] = new Item();
-                if (RoomSystem.RoomList != null && ModContent.GetInstance<TerRoguelikeConfig>().LoadEntireWorldUponEnteringWorld)
+                if (RoomSystem.RoomList != null && Main.netMode == NetmodeID.SinglePlayer && ModContent.GetInstance<TerRoguelikeConfig>().LoadEntireWorldUponEnteringWorld)
                 {
                     for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                     {
@@ -2928,24 +2931,6 @@ namespace TerRoguelike.TerPlayer
                 {
                     TerRoguelikeWorld.worldTeleportTime = 1;
                     SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2] });
-                }
-                else if (TerRoguelike.mpClient)
-                {
-                    for (int i = 0; i < 59; i++)
-                        Player.inventory[i].TurnToAir();
-                    for (int i = 0; i < Player.armor.Length; i++)
-                        Player.armor[i].TurnToAir();
-                    for (int i = 0; i < Player.dye.Length; i++)
-                        Player.dye[i].TurnToAir();
-                    for (int i = 0; i < Player.miscEquips.Length; i++)
-                        Player.miscEquips[i].TurnToAir();
-                    for (int i = 0; i < Player.miscDyes.Length; i++)
-                        Player.miscDyes[i].TurnToAir();
-                    Player.trashItem.TurnToAir();
-
-                    IEnumerable<Item> vanillaItems = [];
-                    List<Item> startingItems = PlayerLoader.GetStartingItems(Main.LocalPlayer, vanillaItems);
-                    PlayerLoader.SetStartInventory(Main.LocalPlayer, startingItems);
                 }
             }
             soulOfLenaUses = 0;
@@ -2975,8 +2960,12 @@ namespace TerRoguelike.TerPlayer
         #region Edit Starting Items
         public override IEnumerable<Item> AddStartingItems(bool mediumCoreDeath)
         {
-            if (!prepareForRoguelikeGeneration)
+            if (!prepareForRoguelikeGeneration && !(TerRoguelike.mpClient && weaponSelectInPlayerMenu))
+            {
+                Main.NewText("returnearly");
                 return Enumerable.Empty<Item>();
+            }
+                
 
             static Item createItem(int type)
             {

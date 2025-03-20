@@ -121,9 +121,30 @@ namespace TerRoguelike.Managers
             finalFinalBossRoom.RoomPosition = (placementPoint).ToVector2();
             finalFinalBossRoom.RoomDimensions = schematicSize;
             RoomSystem.NewRoom(finalFinalBossRoom);
-            RoomGenPool.Remove(finalFinalBossRoom);
+            RoomGenPool.Remove(finalFinalBossRoom);            
 
             PlaceSchematic(finalFinalBossRoom.Key, finalFinalBossRoom.RoomPosition.ToPoint(), anchorType);
+
+            if (Main.menuServer && Main.menuMultiplayer)
+            {
+                var lobbyRoom = RoomID[RoomDict["SanctuaryLobbyRoom1"]];
+                schematic = TileMaps[lobbyRoom.Key];
+                schematicSize = new Vector2(schematic.GetLength(0), schematic.GetLength(1));
+
+                lobbyRoom.RoomPosition = sanctuaryRoom.RoomPosition + new Vector2(0, -100);
+                lobbyRoom.RoomDimensions = schematicSize;
+                RoomSystem.NewRoom(lobbyRoom);
+                RoomGenPool.Remove(lobbyRoom);
+
+                PlaceSchematic(lobbyRoom.Key, lobbyRoom.RoomPosition.ToPoint(), anchorType);
+
+                if (!RoomSystem.regeneratingWorld)
+                {
+                    Vector2 newSpawn = lobbyRoom.RoomDimensions * new Vector2(0.3f, 0.8f) + lobbyRoom.RoomPosition;
+                    Main.spawnTileX = (int)newSpawn.X;
+                    Main.spawnTileY = (int)newSpawn.Y;
+                }
+            }
         }
         public static string GetFloorKey()
         {

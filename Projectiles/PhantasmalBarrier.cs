@@ -48,9 +48,24 @@ namespace TerRoguelike.Projectiles
                     Projectile.Center + rot.ToRotationVector2() * 10, rot.ToRotationVector2() * 4,
                     30, color * 0.9f, new Vector2(0.13f, 0.27f) * Main.rand.NextFloat(0.4f, 1f) * 0.6f, rot, true, false));
             }
+            Projectile.localAI[1] = 1;
         }
         public override void AI()
         {
+            if (Projectile.localAI[1] == 0)
+            {
+                ParticleManager.AddParticle(new MoonExplosion(Projectile.Center, Main.rand.Next(14, 22), Color.White, new Vector2(1f), Main.rand.NextFloat(MathHelper.TwoPi)));
+                for (int i = 0; i < 12; i++)
+                {
+                    float completion = i / 12f;
+                    float rot = MathHelper.TwoPi * completion + Main.rand.NextFloat(-0.4f, 0.4f);
+                    Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.5f));
+                    ParticleManager.AddParticle(new ThinSpark(
+                        Projectile.Center + rot.ToRotationVector2() * 10, rot.ToRotationVector2() * 4,
+                        30, color * 0.9f, new Vector2(0.13f, 0.27f) * Main.rand.NextFloat(0.4f, 1f) * 0.6f, rot, true, false));
+                }
+                Projectile.localAI[1] = 1;
+            }
             var modProj = Projectile.ModProj();
             if (maxTimeLeft - Projectile.timeLeft >= 30 && Projectile.timeLeft > 120 && modProj != null && modProj.npcOwner >= 0 && Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID >= 0 && RoomSystem.RoomList[Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID].bossDead)
                 Projectile.timeLeft = 120;

@@ -56,6 +56,7 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            Projectile.netSpam = 0;
             int time = maxTimeLeft - Projectile.timeLeft;
 
             if (Projectile.ai[2] >= -20)
@@ -88,6 +89,11 @@ namespace TerRoguelike.Projectiles
             if (time >= 130)
             {
                 var modProj = Projectile.ModProj();
+                if (Projectile.ai[2] == -21 && time % 10 == 0)
+                {
+                    modProj.targetPlayer = -1;
+                    modProj.targetNPC = -1;
+                }
                 target = modProj.GetTarget(Projectile);
             }
             else

@@ -35,6 +35,7 @@ using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
 using static TerRoguelike.Systems.MusicSystem;
 using TerRoguelike.Floors;
 using TerRoguelike.TerPlayer;
+using TerRoguelike.MainMenu;
 
 namespace TerRoguelike.Packets
 {
@@ -48,6 +49,7 @@ namespace TerRoguelike.Packets
             NewFloor,
             Sanctuary,
             TrueBrain,
+            StartRun,
             Misc,
         }
         public static void Send(Vector2 position, TeleportContext context, int targetRoomID = -1, int toClient = -1, int ignoreClient = -1)
@@ -55,7 +57,7 @@ namespace TerRoguelike.Packets
             if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
-            if (Main.dedServ && (context == TeleportContext.NewFloor || context == TeleportContext.Sanctuary))
+            if (Main.dedServ && (context == TeleportContext.NewFloor || context == TeleportContext.Sanctuary || context == TeleportContext.StartRun))
             {
                 for (int i = 0; i < RoomSystem.RoomList.Count; i++)
                 {
@@ -81,6 +83,12 @@ namespace TerRoguelike.Packets
             packet.WriteVector2(position);
             packet.Write((byte)context);
             packet.Write(targetRoomID);
+
+            if (context == TeleportContext.StartRun)
+            {
+                packet.Write(Main.spawnTileX);
+                packet.Write(Main.spawnTileY);
+            }
 
             packet.Send(toClient, ignoreClient);
         }
@@ -201,6 +209,42 @@ namespace TerRoguelike.Packets
                     RoomSystem.NewFloorEffects(room, Main.LocalPlayer.ModPlayer());
                 RoomSystem.FloorTransitionEffects();
                 SetBossTrack(FinalBoss2Theme);
+            }
+            if (context == TeleportContext.StartRun)
+            {
+                Main.spawnTileX = packet.ReadInt32();
+                Main.spawnTileY = packet.ReadInt32();
+                Main.BlackFadeIn = 255;
+                var modPlayer = Main.LocalPlayer.ModPlayer();
+                if (modPlayer != null)
+                {
+                    modPlayer.playthroughTime.Restart();
+                }
+
+                Room room = RoomID[roomID];
+                RoomSystem.FloorTransitionEffects();
+
+                Floor nextFloor = FloorID[room.AssociatedFloor];
+
+                if (nextFloor.Name != "Lunar" && !TerRoguelikeWorld.escape)
+                {
+                    SetCalm(nextFloor.Soundtrack.CalmTrack);
+                    SetCombat(nextFloor.Soundtrack.CombatTrack);
+                    SetMusicMode(nextFloor.Name == "Sanctuary" ? MusicStyle.AllCalm : MusicStyle.Dynamic);
+                    CombatVolumeInterpolant = 0;
+                    CalmVolumeInterpolant = 0;
+                    CalmVolumeLevel = nextFloor.Soundtrack.Volume;
+                    CombatVolumeLevel = nextFloor.Soundtrack.Volume;
+                }
+
+                TerRoguelikeMenu.weaponSelectInPlayerMenu = true;
+                IEnumerable<Item> vanillaItems = [];
+                for (int i = 0; i < 58; i++)
+                    Main.LocalPlayer.inventory[i].type = Main.LocalPlayer.inventory[i].stack = 0;
+                List<Item> startingItems = PlayerLoader.GetStartingItems(Main.LocalPlayer, vanillaItems);
+                PlayerLoader.SetStartInventory(Main.LocalPlayer, startingItems);
+                Main.LocalPlayer.trashItem = new(ItemID.None, 0);
+                TerRoguelikeMenu.desiredPlayer = Main.ActivePlayerFileData;
             }
         }
     }

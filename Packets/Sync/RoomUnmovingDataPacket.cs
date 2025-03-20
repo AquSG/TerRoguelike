@@ -36,6 +36,7 @@ namespace TerRoguelike.Packets
 {
     public sealed class RoomUnmovingDataPacket : TerRoguelikePacket
     {
+        public static bool firstReceive = true;
         public override PacketType MessageType => PacketType.RoomUnmovingDataSync;
         public static void Send(int toClient = -1, int ignoreClient = -1)
         {
@@ -149,6 +150,31 @@ namespace TerRoguelike.Packets
             for (int i = 0; i < floorLength; i++)
             {
                 RoomManager.FloorIDsInPlay.Add(packet.ReadByte());
+            }
+
+            if (firstReceive)
+            {
+                if (TerRoguelike.mpClient)
+                {
+                    TerRoguelikeMenu.weaponSelectInPlayerMenu = true;
+                    Player player = Main.LocalPlayer;
+                    for (int i = 0; i < 58; i++)
+                        player.inventory[i].TurnToAir();
+                    for (int i = 0; i < player.armor.Length; i++)
+                        player.armor[i].TurnToAir();
+                    for (int i = 0; i < player.dye.Length; i++)
+                        player.dye[i].TurnToAir();
+                    for (int i = 0; i < player.miscEquips.Length; i++)
+                        player.miscEquips[i].TurnToAir();
+                    for (int i = 0; i < player.miscDyes.Length; i++)
+                        player.miscDyes[i].TurnToAir();
+                    player.trashItem.TurnToAir();
+
+                    IEnumerable<Item> vanillaItems = [];
+                    List<Item> startingItems = PlayerLoader.GetStartingItems(player, vanillaItems);
+                    PlayerLoader.SetStartInventory(player, startingItems);
+                }
+                firstReceive = false;
             }
         }
     }

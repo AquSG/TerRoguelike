@@ -74,6 +74,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.npcFrameCount[Type] = 2;
             NPCID.Sets.TrailCacheLength[Type] = 2;
             NPCID.Sets.TrailingMode[Type] = 3;
+            spawnRotation = MathHelper.PiOver4 * 0.5f;
         }
         public override void SetDefaults()
         {
