@@ -45,6 +45,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             modNPC.drawCenter = new Vector2(0, -18);
             NPC.immortal = true;
             modNPC.activatedPuppeteersHand = true;
+            modNPC.TerRoguelikeBoss = true;
         }
         public override void AI()
         {
@@ -53,6 +54,7 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
             {
                 if (RoomSystem.RoomList[modNPC.sourceRoomListID].awake)
                 {
+                    NPC.netUpdate = true;
                     NPC.immortal = false;
                     if (NPC.localAI[0] == 0)
                     {
@@ -60,10 +62,10 @@ namespace TerRoguelike.NPCs.Enemy.Pillar
                         NPC.localAI[0] = 1;
                     }
                 }
-                else
+                else if (!TerRoguelike.mpClient)
                     NPC.immortal = true;
             }
-            else
+            else if (!TerRoguelike.mpClient)
                 NPC.immortal = false;
 
             NPC.velocity.Y = MathHelper.Lerp(0, 0.1f, (float)Math.Cos(NPC.ai[0] / 60));

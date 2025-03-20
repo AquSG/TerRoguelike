@@ -48,12 +48,19 @@ namespace TerRoguelike.MainMenu
         public static ButtonState oldGamepadLeftStickState = ButtonState.Released;
         public static GamePadState oldGamepadState;
         public static List<Keys> oldPressedKeys = [];
-        public static bool weaponSelectInPlayerMenu = false;
+        public static bool weaponSelectInPlayerMenu = true;
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
         public static bool BloodMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.BloodMoon;
         public static bool SunnyDayActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.SunnyDay;
         public static bool RuinedMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.RuinedMoon;
+        public static bool fullyLoaded = false;
+        public static bool DrawSelections => fullyLoaded && (prepareForRoguelikeGeneration || weaponSelectInPlayerMenu) && (Main.menuMode == 888 || Main.menuMode == 882 || Main.menuMode == 31) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld;
+        public static Vector2 WeaponSelectionCenter(int direction)
+        {
+            int horizOff = weaponSelectInPlayerMenu ? 370 : 295;
+            return new Vector2(Main.screenWidth * 0.5f + horizOff * direction + 5, Main.screenHeight * 0.47f);
+        }
 
         public enum Difficulty
         {
@@ -67,9 +74,13 @@ namespace TerRoguelike.MainMenu
         public static string DisplayName => "TerRoguelike";
         public static void TerRoguelikeMenuInteractionLogic()
         {
+            MusicSystem.ClearMusic();
             if (Main.menuMode == 0)
             {
-                weaponSelectInPlayerMenu = false;
+                weaponSelectInPlayerMenu = true;
+                if (ItemManager.loaded)
+                    fullyLoaded = true;
+
                 if (wipeTempWorld)
                 {
                     bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
@@ -163,9 +174,11 @@ namespace TerRoguelike.MainMenu
                     Main.menuMode = 888;
                     Main.MenuUI.SetState(new UICharacterCreation(Main.PendingPlayer));
                     prepareForRoguelikeGeneration = true;
+
+                    weaponSelectInPlayerMenu = false;
                 }
             }
-            if ((prepareForRoguelikeGeneration || weaponSelectInPlayerMenu) && (Main.menuMode == 888 || Main.menuMode == 31) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
+            if (DrawSelections)
             {
                 if (PlayerInput.UsingGamepad && GamePad.GetState(PlayerIndex.One).Buttons.LeftStick == ButtonState.Pressed && oldGamepadLeftStickState == ButtonState.Released)
                 {
@@ -255,7 +268,7 @@ namespace TerRoguelike.MainMenu
                     {
                         for (int s = -1; s <= 1; s += 2)
                         {
-                            Vector2 centerPos = new Vector2(Main.screenWidth * 0.5f + 295 * s, Main.screenHeight * 0.47f);
+                            Vector2 centerPos = WeaponSelectionCenter(s);
                             Vector2 buttonDimensionsInflate = new Vector2(52);
                             int backgroundInflateAmt = 6;
 
@@ -452,7 +465,7 @@ namespace TerRoguelike.MainMenu
                 }
             }
 
-            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889 && Main.menuMode != 31)
+            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889 && Main.menuMode != 31 && Main.menuMode != 882)
                 prepareForRoguelikeGeneration = false;
             if (Main.menuMode != 888 && Main.menuMode != 0)
             {
@@ -512,7 +525,7 @@ namespace TerRoguelike.MainMenu
                 }
                     
             }
-            if ((prepareForRoguelikeGeneration || weaponSelectInPlayerMenu) && (Main.menuMode == 888 || Main.menuMode == 31) && !TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld)
+            if (DrawSelections)
             {
                 if (!weaponSelectInPlayerMenu)
                 {
@@ -650,138 +663,145 @@ namespace TerRoguelike.MainMenu
 
                 void StarterWeaponDrawing()
                 {
-                    for (int s = -1; s <= 1; s += 2)
+                    try
                     {
-                        Vector2 centerPos = new Vector2(Main.screenWidth * 0.5f + 295 * s, Main.screenHeight * 0.47f);
-                        Vector2 buttonDimensionsInflate = new Vector2(52);
-                        int backgroundInflateAmt = 6;
-
-                        List<StarterItem> itemList = s switch
+                        for (int s = -1; s <= 1; s += 2)
                         {
-                            1 => StarterMelee,
-                            _ => StarterRanged,
-                        };
+                            Vector2 centerPos = WeaponSelectionCenter(s);
+                            Vector2 buttonDimensionsInflate = new Vector2(52);
+                            int backgroundInflateAmt = 6;
 
-                        int buttonCount = itemList.Count;
-                        Vector2 totalDimensions = new Vector2(buttonDimensionsInflate.X, buttonDimensionsInflate.Y * buttonCount);
-                        Vector2 topLeft = centerPos - totalDimensions * 0.5f;
-                        Rectangle backgroundDrawRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)totalDimensions.X, (int)totalDimensions.Y);
-                        backgroundDrawRect.Inflate(backgroundInflateAmt, backgroundInflateAmt);
-
-                        int edgeWidth = 12; // do not touch unless the texture is changed.
-                        Rectangle cornerFrame = new Rectangle(0, 0, edgeWidth, edgeWidth);
-                        Rectangle edgeFrame = new Rectangle(edgeWidth, 0, 2, edgeWidth);
-                        Rectangle fillFrame = new Rectangle(edgeWidth, edgeWidth, 1, 1);
-
-                        var buttonTex = TexDict["BasinOptionBox"];
-                        var buttonHoverTex = TexDict["BasinOptionBoxHover"];
-                        var buttonBackgroundTex = TexDict["BasinOptionsBackground"];
-
-                        Vector2 drawStart = new Vector2(backgroundDrawRect.X, backgroundDrawRect.Y);
-                        Vector2 backgroundDrawStart = drawStart + new Vector2(-edgeWidth * 0.5f);
-                        Vector2 fillDrawPos = backgroundDrawStart + new Vector2(edgeWidth);
-                        Vector2 fillScale = new Vector2(backgroundDrawRect.Width - edgeWidth * 2, backgroundDrawRect.Height - edgeWidth * 2);
-                        Color backgroundColor = Color.Lerp(Color.DarkSlateBlue, Color.Blue, 0.6f);
-                        Main.EntitySpriteDraw(buttonBackgroundTex, (fillDrawPos).ToPoint().ToVector2(), fillFrame, backgroundColor, 0, Vector2.Zero, fillScale, SpriteEffects.None);
-
-                        for (int i = 0; i < 4; i++)
-                        {
-                            Vector2 cornerDrawStart = backgroundDrawStart;
-                            Vector2 edgeScale;
-                            if (i == 1 || i == 2)
+                            List<StarterItem> itemList = s switch
                             {
-                                cornerDrawStart.X += backgroundDrawRect.Width;
-                            }
-                            if (i == 2 || i == 3)
-                            {
-                                cornerDrawStart.Y += backgroundDrawRect.Height;
-                            }
-                            if (i % 2 == 0)
-                                edgeScale = new Vector2(fillScale.X * 0.5f, 1);
-                            else
-                                edgeScale = new Vector2(fillScale.Y * 0.5f, 1);
-
-                            float rot = i * MathHelper.PiOver2;
-
-                            Vector2 sideDrawStart = cornerDrawStart + new Vector2(edgeWidth, 0).RotatedBy(rot);
-
-                            Main.EntitySpriteDraw(buttonBackgroundTex, (sideDrawStart).ToPoint().ToVector2(), edgeFrame, backgroundColor, rot, Vector2.Zero, edgeScale, SpriteEffects.None);
-                            Main.EntitySpriteDraw(buttonBackgroundTex, (cornerDrawStart).ToPoint().ToVector2(), cornerFrame, backgroundColor, rot, Vector2.Zero, 1f, SpriteEffects.None);
-                        }
-
-                        Vector2 itemDisplayDimensions = new Vector2(36);
-                        for (int i = 0; i < buttonCount; i++)
-                        {
-                            var currentItem = itemList[i];
-                            var itemTex = TextureAssets.Item[currentItem.id].Value;
-                            bool hover = s switch
-                            {
-                                1 => i == meleeSelection,
-                                _ => i == rangedSelection,
+                                1 => StarterMelee,
+                                _ => StarterRanged,
                             };
-                            Vector2 myDrawPos = drawStart + new Vector2(0, buttonDimensionsInflate.Y * i);
 
-                            if (hover)
+                            int buttonCount = itemList.Count;
+                            Vector2 totalDimensions = new Vector2(buttonDimensionsInflate.X, buttonDimensionsInflate.Y * buttonCount);
+                            Vector2 topLeft = centerPos - totalDimensions * 0.5f;
+                            Rectangle backgroundDrawRect = new Rectangle((int)topLeft.X, (int)topLeft.Y, (int)totalDimensions.X, (int)totalDimensions.Y);
+                            backgroundDrawRect.Inflate(backgroundInflateAmt, backgroundInflateAmt);
+
+                            int edgeWidth = 12; // do not touch unless the texture is changed.
+                            Rectangle cornerFrame = new Rectangle(0, 0, edgeWidth, edgeWidth);
+                            Rectangle edgeFrame = new Rectangle(edgeWidth, 0, 2, edgeWidth);
+                            Rectangle fillFrame = new Rectangle(edgeWidth, edgeWidth, 1, 1);
+
+                            var buttonTex = TexDict["BasinOptionBox"];
+                            var buttonHoverTex = TexDict["BasinOptionBoxHover"];
+                            var buttonBackgroundTex = TexDict["BasinOptionsBackground"];
+
+                            Vector2 drawStart = new Vector2(backgroundDrawRect.X, backgroundDrawRect.Y);
+                            Vector2 backgroundDrawStart = drawStart + new Vector2(-edgeWidth * 0.5f);
+                            Vector2 fillDrawPos = backgroundDrawStart + new Vector2(edgeWidth);
+                            Vector2 fillScale = new Vector2(backgroundDrawRect.Width - edgeWidth * 2, backgroundDrawRect.Height - edgeWidth * 2);
+                            Color backgroundColor = Color.Lerp(Color.DarkSlateBlue, Color.Blue, 0.6f);
+                            Main.EntitySpriteDraw(buttonBackgroundTex, (fillDrawPos).ToPoint().ToVector2(), fillFrame, backgroundColor, 0, Vector2.Zero, fillScale, SpriteEffects.None);
+
+                            for (int i = 0; i < 4; i++)
                             {
-                                Color highlightColor = Color.Lerp(Color.Yellow, Color.White, 0.4f);
-                                Main.EntitySpriteDraw(buttonHoverTex, myDrawPos.ToPoint().ToVector2(), null, highlightColor, 0, Vector2.Zero, 1f, SpriteEffects.None);
-                            }
-                            Main.EntitySpriteDraw(buttonTex, myDrawPos.ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None);
+                                Vector2 cornerDrawStart = backgroundDrawStart;
+                                Vector2 edgeScale;
+                                if (i == 1 || i == 2)
+                                {
+                                    cornerDrawStart.X += backgroundDrawRect.Width;
+                                }
+                                if (i == 2 || i == 3)
+                                {
+                                    cornerDrawStart.Y += backgroundDrawRect.Height;
+                                }
+                                if (i % 2 == 0)
+                                    edgeScale = new Vector2(fillScale.X * 0.5f, 1);
+                                else
+                                    edgeScale = new Vector2(fillScale.Y * 0.5f, 1);
 
-                            float itemScale;
-                            if (itemTex.Width < itemTex.Height)
+                                float rot = i * MathHelper.PiOver2;
+
+                                Vector2 sideDrawStart = cornerDrawStart + new Vector2(edgeWidth, 0).RotatedBy(rot);
+
+                                Main.EntitySpriteDraw(buttonBackgroundTex, (sideDrawStart).ToPoint().ToVector2(), edgeFrame, backgroundColor, rot, Vector2.Zero, edgeScale, SpriteEffects.None);
+                                Main.EntitySpriteDraw(buttonBackgroundTex, (cornerDrawStart).ToPoint().ToVector2(), cornerFrame, backgroundColor, rot, Vector2.Zero, 1f, SpriteEffects.None);
+                            }
+
+                            Vector2 itemDisplayDimensions = new Vector2(36);
+                            for (int i = 0; i < buttonCount; i++)
                             {
-                                itemScale = 1f / (itemTex.Height / itemDisplayDimensions.Y);
+                                var currentItem = itemList[i];
+                                var itemTex = TextureAssets.Item[currentItem.id].Value;
+                                bool hover = s switch
+                                {
+                                    1 => i == meleeSelection,
+                                    _ => i == rangedSelection,
+                                };
+                                Vector2 myDrawPos = drawStart + new Vector2(0, buttonDimensionsInflate.Y * i);
+
+                                if (hover)
+                                {
+                                    Color highlightColor = Color.Lerp(Color.Yellow, Color.White, 0.4f);
+                                    Main.EntitySpriteDraw(buttonHoverTex, myDrawPos.ToPoint().ToVector2(), null, highlightColor, 0, Vector2.Zero, 1f, SpriteEffects.None);
+                                }
+                                Main.EntitySpriteDraw(buttonTex, myDrawPos.ToPoint().ToVector2(), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None);
+
+                                float itemScale;
+                                if (itemTex.Width < itemTex.Height)
+                                {
+                                    itemScale = 1f / (itemTex.Height / itemDisplayDimensions.Y);
+                                }
+                                else
+                                {
+                                    itemScale = 1f / (itemTex.Width / itemDisplayDimensions.X);
+                                }
+                                if (itemScale > 1f)
+                                    itemScale = 1f;
+
+                                Main.EntitySpriteDraw(itemTex, (myDrawPos + buttonDimensionsInflate * 0.5f).ToPoint().ToVector2(), null, Color.White, 0, itemTex.Size() * 0.5f, itemScale, SpriteEffects.None);
                             }
-                            else
+
+
+                            if (PlayerInput.UsingGamepad && ((uiControllerCycle == 1 && s == -1) || (uiControllerCycle == 2 && s == 1)))
                             {
-                                itemScale = 1f / (itemTex.Width / itemDisplayDimensions.X);
+                                Texture2D xButtonTex = TextureAssets.TextGlyph[0].Value;
+                                int framewidth = xButtonTex.Width / 25;
+                                Rectangle xRect = new Rectangle(framewidth * 2, 0, framewidth, xButtonTex.Height);
+                                var lClickRect = new Rectangle(framewidth * 10, 0, framewidth, xButtonTex.Height);
+                                Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX - 30 * Vector2.UnitY, xRect, Color.White, 0, xRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                                Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 70 * s * Vector2.UnitX - 30 * Vector2.UnitY, lClickRect, Color.White, 0, lClickRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                             }
-                            if (itemScale > 1f)
-                                itemScale = 1f;
+                            int selection = s switch
+                            {
+                                1 => meleeSelection,
+                                _ => rangedSelection,
+                            };
+                            var dummyItem = new Item(itemList[selection].id);
+                            string itemName = dummyItem.Name;
+                            Vector2 itemNameDimensions = font.MeasureString(itemName);
+                            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemName, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX, Color.White, 0, itemNameDimensions * new Vector2(0.5f + 0.5f * -s, 0), new Vector2(0.5f));
 
-                            Main.EntitySpriteDraw(itemTex, (myDrawPos + buttonDimensionsInflate * 0.5f).ToPoint().ToVector2(), null, Color.White, 0, itemTex.Size() * 0.5f, itemScale, SpriteEffects.None);
-                        }
+                            List<string> itemDesc = [];
+                            var itemTip = dummyItem.ToolTip;
+                            for (int i = 2; i < itemTip.Lines; i++)
+                            {
+                                itemDesc.Add(itemTip.GetLine(i));
+                            }
 
+                            float yPerLine = font.MeasureString("ypjiILkPMN").Y * 0.3f;
+                            float biggestDimension = 0;
+                            for (int i = 0; i < itemDesc.Count; i++)
+                            {
+                                biggestDimension = Math.Max(font.MeasureString(itemDesc[i]).X, biggestDimension);
+                            }
+                            for (int i = 0; i < itemDesc.Count; i++)
+                            {
+                                Vector2 itemDescDimensions = font.MeasureString(itemDesc[i]);
+                                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemDesc[i], drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX + Vector2.UnitY * (itemNameDimensions.Y * 0.5f + yPerLine * i), Color.White, 0, itemDescDimensions * new Vector2(0.5f + 0.5f * -s, 0), new Vector2(0.3f));
+                            }
 
-                        if (PlayerInput.UsingGamepad && ((uiControllerCycle == 1 && s == -1) || (uiControllerCycle == 2 && s == 1)))
-                        {
-                            Texture2D xButtonTex = TextureAssets.TextGlyph[0].Value;
-                            int framewidth = xButtonTex.Width / 25;
-                            Rectangle xRect = new Rectangle(framewidth * 2, 0, framewidth, xButtonTex.Height);
-                            var lClickRect = new Rectangle(framewidth * 10, 0, framewidth, xButtonTex.Height);
-                            Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX - 30 * Vector2.UnitY, xRect, Color.White, 0, xRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
-                            Main.spriteBatch.Draw(xButtonTex, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 70 * s * Vector2.UnitX - 30 * Vector2.UnitY, lClickRect, Color.White, 0, lClickRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                         }
-                        int selection = s switch
-                        {
-                            1 => meleeSelection,
-                            _ => rangedSelection,
-                        };
-                        var dummyItem = new Item(itemList[selection].id);
-                        string itemName = dummyItem.Name;
-                        Vector2 itemNameDimensions = font.MeasureString(itemName);
-                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemName, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX, Color.White, 0, itemNameDimensions * new Vector2(0.5f + 0.5f * -s, 0), new Vector2(0.5f));
-
-                        List<string> itemDesc = [];
-                        var itemTip = dummyItem.ToolTip;
-                        for (int i = 2; i < itemTip.Lines; i++)
-                        {
-                            itemDesc.Add(itemTip.GetLine(i));
-                        }
-
-                        float yPerLine = font.MeasureString("ypjiILkPMN").Y * 0.3f;
-                        float biggestDimension = 0;
-                        for (int i = 0; i < itemDesc.Count; i++)
-                        {
-                            biggestDimension = Math.Max(font.MeasureString(itemDesc[i]).X, biggestDimension);
-                        }
-                        for (int i = 0; i < itemDesc.Count; i++)
-                        {
-                            Vector2 itemDescDimensions = font.MeasureString(itemDesc[i]);
-                            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemDesc[i], drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX + Vector2.UnitY * (itemNameDimensions.Y * 0.5f + yPerLine * i), Color.White, 0, itemDescDimensions * new Vector2(0.5f + 0.5f * -s, 0), new Vector2(0.3f));
-                        }
-                        
+                    }
+                    catch (Exception e)
+                    {
+                        TerRoguelike.Instance.Logger.Error(e);
                     }
                 }
             }

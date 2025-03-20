@@ -25,6 +25,7 @@ namespace TerRoguelike.Managers
 {
     public class ItemManager
     {
+        public static bool loaded = false;
         public static List<StarterItem> StarterRanged = [];
         public static List<StarterItem> StarterMelee = [];
         public static void LoadStarterItems()
@@ -37,11 +38,13 @@ namespace TerRoguelike.Managers
                 new(ModContent.ItemType<AdaptiveBlade>()),
                 new(ModContent.ItemType<AdaptiveSpear>()),
                 new(ModContent.ItemType<AdaptiveDagger>())];
+            loaded = true;
         }
         public static void UnloadStarterItems()
         {
             StarterRanged = null;
             StarterMelee = null;
+            loaded = false;
         }
         public class StarterItem
         {

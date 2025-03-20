@@ -467,12 +467,20 @@ namespace TerRoguelike.Systems
             }
             if (!Initialized)
                 return;
+            float mute = 1;
             if (!Main.hasFocus || (PauseWhenIngamePaused && Main.gamePaused))
             {
-                if (CalmMusic.State == SoundState.Playing)
-                    CalmMusic.Pause();
-                if (CombatMusic.State == SoundState.Playing)
-                    CombatMusic.Pause();
+                if (TerRoguelike.mpClient && PauseWhenIngamePaused)
+                {
+                    mute = 0;
+                }
+                else
+                {
+                    if (CalmMusic.State == SoundState.Playing)
+                        CalmMusic.Pause();
+                    if (CombatMusic.State == SoundState.Playing)
+                        CombatMusic.Pause();
+                }
             }
             else
             {
@@ -661,8 +669,8 @@ namespace TerRoguelike.Systems
             }
 
             float musicFade = Main.musicFade[BlankMusicSlotId];
-            CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel * musicFade;
-            CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel * musicFade;
+            CalmMusic.Volume = CalmVolumeInterpolant * Main.musicVolume * CalmVolumeLevel * musicFade * mute;
+            CombatMusic.Volume = CombatVolumeInterpolant * Main.musicVolume * CombatVolumeLevel * musicFade * mute;
         }
         public override void PreSaveAndQuit()
         {

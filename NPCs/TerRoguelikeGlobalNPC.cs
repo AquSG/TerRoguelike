@@ -3832,8 +3832,7 @@ namespace TerRoguelike.NPCs
                                 displayedDamage += targetDamage;
                                 bleedingStacks[i].DamageToDeal -= targetDamage;
                             }
-                            if (i == bleedingStacks.Count - 1)
-                                owner = thisOwner;
+                            owner = thisOwner;
                         }
                         BleedingHit(hitDamage, displayedDamage, npc, owner);
                         bleedingStacks.RemoveAll(x => x.DamageToDeal <= 0);
@@ -3926,11 +3925,13 @@ namespace TerRoguelike.NPCs
         {
             bleedingHitCooldown = 20; // hits 3 times a second
 
-            if (npc.immortal || npc.dontTakeDamage)
+            if (npc.immortal || npc.dontTakeDamage || owner < 0 || owner >= Main.maxPlayers)
                 return;
 
             int origDamage = hitDamage;
             TerRoguelikePlayer modPlayer = Main.player[owner].ModPlayer();
+            if (modPlayer == null)
+                return;
 
             hitDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
             displayDamage = (int)(hitDamage * modPlayer.GetBonusDamageMulti(npc, npc.Center) * effectiveDamageTakenMulti);
