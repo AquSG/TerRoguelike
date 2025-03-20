@@ -51,16 +51,22 @@ namespace TerRoguelike.Packets
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
+            if (TerRoguelikeWorld.chainList == null)
+                TerRoguelikeWorld.chainList = [];
+            if (TerRoguelikeWorld.chainList.Count >= 4)
+                return;
+
             int vortex = ModContent.NPCType<VortexPillar>();
             int stardust = ModContent.NPCType<StardustPillar>();
             int nebula = ModContent.NPCType<NebulaPillar>();
             int solar = ModContent.NPCType<SolarPillar>();
+
+            Vector2 chainStart = (RoomID[RoomDict["LunarBossRoom1"]].RoomPosition + (RoomID[RoomDict["LunarBossRoom1"]].RoomDimensions * 0.5f)) * 16f;
+
             for (int i = 0; i < Main.maxNPCs; i++)
             {
                 var npc = Main.npc[i];
                 if (!npc.active) continue;
-
-                Vector2 chainStart = (RoomID[RoomDict["LunarBossRoom1"]].RoomPosition + (RoomID[RoomDict["LunarBossRoom1"]].RoomDimensions * 0.5f)) * 16f;
 
                 if (npc.type == vortex || npc.type == stardust || npc.type == nebula || npc.type == solar)
                 {

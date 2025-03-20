@@ -55,6 +55,27 @@ namespace TerRoguelike.Packets
             if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
 
+            if (Main.dedServ && (context == TeleportContext.NewFloor || context == TeleportContext.Sanctuary))
+            {
+                for (int i = 0; i < RoomSystem.RoomList.Count; i++)
+                {
+                    Room room = RoomSystem.RoomList[i];
+                    if ((room.IsStartRoom || room.IsSanctuary) && !room.IsBossRoom)
+                    {
+                        Rectangle sendRect = new Rectangle((int)room.RoomPosition.X, (int)room.RoomPosition.Y, (int)room.RoomDimensions.X, (int)room.RoomDimensions.Y);
+                        for (int x = sendRect.X; x < sendRect.X + sendRect.Width; x += 145)
+                        {
+                            for (int y = sendRect.Y; y < sendRect.Y + sendRect.Height; y += 145)
+                            {
+                                int width = Math.Min(145, sendRect.Width - (x - sendRect.X));
+                                int height = Math.Min(145, sendRect.Height - (y - sendRect.Y));
+                                NetMessage.SendTileSquare(-1, sendRect.X, sendRect.Y, width, height);
+                            }
+                        }
+                    }
+                }
+            }
+
             var packet = NewPacket(PacketType.TeleportToPosition);
 
             packet.WriteVector2(position);

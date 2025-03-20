@@ -79,12 +79,27 @@ namespace TerRoguelike.ILEditing
             On_NPC.SpawnNPC += MysteryBugfix2;
             On_Player.SavePlayer += On_Player_SavePlayer;
             On_Main.ExitServerPasswordMenu += On_Main_ExitServerPasswordMenu;
-            On_NetClientSocialModule.ConnectToLobby += WeaponSelectInjection;
+            On_Main.PrepareLoadedModsAndConfigsForSingleplayer += WeaponDisplayOnPlayerMenuEdit;
+            On_UIAchievementsMenu.OnActivate += WeaponDisplayOnPlayerMenuEdit2;
+            On_UIWorkshopHub.OnInitialize += WeaponDisplayOnPlayerMenuEdit3;
         }
 
-        private void WeaponSelectInjection(On_NetClientSocialModule.orig_ConnectToLobby orig, NetClientSocialModule self, ulong lobbyId)
+        private void WeaponDisplayOnPlayerMenuEdit3(On_UIWorkshopHub.orig_OnInitialize orig, UIWorkshopHub self)
         {
-			TerRoguelikeMenu.weaponSelectInPlayerMenu = true;
+			orig.Invoke(self);
+            TerRoguelikeMenu.weaponSelectInPlayerMenu = false;
+        }
+
+        private void WeaponDisplayOnPlayerMenuEdit2(On_UIAchievementsMenu.orig_OnActivate orig, UIAchievementsMenu self)
+        {
+			orig.Invoke(self);
+            TerRoguelikeMenu.weaponSelectInPlayerMenu = false;
+        }
+
+        private void WeaponDisplayOnPlayerMenuEdit(On_Main.orig_PrepareLoadedModsAndConfigsForSingleplayer orig)
+        {
+			orig.Invoke();
+			TerRoguelikeMenu.weaponSelectInPlayerMenu = false;
         }
 
         private void On_Main_ExitServerPasswordMenu(On_Main.orig_ExitServerPasswordMenu orig)
