@@ -41,6 +41,7 @@ EliteTainted: "染魔 "
 EliteSlugged: "滞钝 "
 EliteBurdened: "障蔽 "
 TrashDescription: 在周二的晚上10到11点，主射弹获得一次额外的弹跳次数
+// MultiplayerReady: Ready
 
 Projectiles: {
 	ClingyGrenade.DisplayName: 粘性手雷

@@ -41,6 +41,7 @@ EliteTainted: "Порченный "
 EliteSlugged: "Замедляющий "
 EliteBurdened: "Бренный "
 TrashDescription: По вторникам с 10 до 11 вечера, +1 отскок к основным снарядам
+// MultiplayerReady: Ready
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Цепкая граната
