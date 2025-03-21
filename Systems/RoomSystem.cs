@@ -267,7 +267,7 @@ namespace TerRoguelike.Systems
                             runStartMeter = 0;
                             Main.spawnTileX = (Main.maxTilesX / 32) + 12;
                             Main.spawnTileY = (Main.maxTilesY / 2) + 12;
-                            TeleportToPositionPacket.Send(new Point(Main.spawnTileX, Main.spawnTileY).ToWorldCoordinates(), TeleportToPositionPacket.TeleportContext.StartRun, 0);
+                            TeleportToPositionPacket.Send(new Point(Main.spawnTileX, Main.spawnTileY).ToWorldCoordinates(), TeleportToPositionPacket.TeleportContext.StartRun, RoomList[0].ID);
                         }
                         else
                         {

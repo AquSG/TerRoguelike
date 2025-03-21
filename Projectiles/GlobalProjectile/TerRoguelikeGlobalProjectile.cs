@@ -278,7 +278,7 @@ namespace TerRoguelike.Projectiles
         }
         public Entity GetTarget(Projectile proj)
         {
-            if (TerRoguelike.mpClient && proj.owner != Main.LocalPlayer.whoAmI)
+            if ((TerRoguelike.mpClient || Main.dedServ) && proj.owner != Main.myPlayer)
             {
                 if (targetPlayer >= 0)
                     return Main.player[targetPlayer];

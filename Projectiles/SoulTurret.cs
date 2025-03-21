@@ -182,11 +182,11 @@ namespace TerRoguelike.Projectiles
         }
         public override void SendExtraAI(BinaryWriter writer)
         {
-            writer.WriteVector2(aimingDirection);
+
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            aimingDirection = reader.ReadVector2();
+            
         }
     }
 }

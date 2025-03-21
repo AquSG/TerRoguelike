@@ -65,7 +65,8 @@ namespace TerRoguelike.Packets
             MakeNPCPuppetSync,
             StartLunarFloorSync,
             StartLoopPortalSync,
-            ActivateOnKillSync
+            ActivateOnKillSync,
+            ItemPotentiometerSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

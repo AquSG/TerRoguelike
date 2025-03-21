@@ -3468,6 +3468,7 @@ namespace TerRoguelike.NPCs
             writer.Write(puppetLifetime);
             writer.Write(ballAndChainSlow);
             writer.Write(sluggedTime);
+            writer.Write(npc.gfxOffY);
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3511,6 +3512,7 @@ namespace TerRoguelike.NPCs
             puppetLifetime = reader.ReadInt32();
             ballAndChainSlow = reader.ReadInt32();
             sluggedTime = reader.ReadInt32();
+            npc.gfxOffY = reader.ReadSingle();
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {

@@ -2342,6 +2342,7 @@ namespace TerRoguelike.TerPlayer
                 if (ChanceRollWithLuck(chance, procLuck))
                 {
                     SpawnRoguelikeItem(target.Center);
+                    ItemPotentiometerPacket.Send(target.Center);
                 }
                 modTarget.activatedItemPotentiometer = true;
             }
@@ -2962,7 +2963,6 @@ namespace TerRoguelike.TerPlayer
         {
             if (!prepareForRoguelikeGeneration && !(TerRoguelike.mpClient && weaponSelectInPlayerMenu))
             {
-                Main.NewText("returnearly");
                 return Enumerable.Empty<Item>();
             }
                 

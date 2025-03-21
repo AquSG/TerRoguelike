@@ -165,6 +165,8 @@ namespace TerRoguelike.Packets
             {
                 for (int i = 0; i < target.Length; i++)
                 {
+                    if (modPlayer.theFalseSunTime[i] <= 0)
+                        continue;
                     if (target[i] == -1 && modPlayer.theFalseSunTarget[i] != -1)
                     {
                         modPlayer.theFalseSunTime[i] = -10;
