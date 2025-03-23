@@ -1083,6 +1083,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write((int)NPC.localAI[1]);
             writer.Write(Main.myPlayer);
             writer.Write(BloodChargeDirection);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1120,6 +1121,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
 
             BloodChargeDirection = reader.ReadSingle();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
     public class TrackedSeer

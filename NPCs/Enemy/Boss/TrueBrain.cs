@@ -1638,6 +1638,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 writer.WriteVector2(phantomPositions[i]);
             }
             writer.WriteVector2(teleportTargetPos);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1650,6 +1651,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 phantomPositions.Add(reader.ReadVector2());
             }
             teleportTargetPos = reader.ReadVector2();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
 }

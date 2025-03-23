@@ -1103,12 +1103,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
             writer.Write(eyeParticleIntensity);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
             eyeParticleIntensity = reader.ReadInt32();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
 }

@@ -905,6 +905,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(summonDesiredEnemies[1]);
             writer.WriteVector2(summonSpawnPositions[0]);
             writer.WriteVector2(summonSpawnPositions[1]);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -914,6 +915,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             summonDesiredEnemies[1] = reader.ReadInt32();
             summonSpawnPositions[0] = reader.ReadVector2();
             summonSpawnPositions[1] = reader.ReadVector2();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
 }
