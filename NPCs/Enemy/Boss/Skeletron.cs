@@ -607,7 +607,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         randRot += Math.Sign(randRot) * MathHelper.PiOver2 * 0.25f;
                         Vector2 teleportPos = ((wantedPos - targetPos).ToRotation() + randRot).ToRotationVector2() * chargeStartDist + targetPos;
                         Vector2 teleportVect = NPC.Center - teleportPos;
-                        if (TerRoguelike.mpClient)
+                        if (!TerRoguelike.mpClient)
                             NPC.Center = teleportPos;
                         NPC.netUpdate = true;
                         if (target != null)
@@ -950,7 +950,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
-                NPC.StrikeInstantKill();
+                if (!TerRoguelike.mpClient)
+                    NPC.StrikeInstantKill();
                 if (RuinedMoonActive)
                 {
                     for (int i = 0; i < 40; i++)

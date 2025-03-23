@@ -690,7 +690,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
-                NPC.StrikeInstantKill();
+                if (!TerRoguelike.mpClient)
+                    NPC.StrikeInstantKill();
             }
 
             return deadTime >= cutsceneDuration;
@@ -698,7 +699,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void FindFrame(int frameHeight)
         {
             NPC.rotation = MathHelper.PiOver2 * NPC.ai[3];
-            modNPC.drawCenter = (NPC.Bottom - NPC.Center + new Vector2(0, (-frameHeight * 0.5f) + 2)).RotatedBy(NPC.rotation);
+            
+            modNPC.drawCenter = (NPC.Bottom - NPC.Center + new Vector2(0, (-188 * 0.5f) + 2)).RotatedBy(NPC.rotation);
 
             int frameCount = Main.npcFrameCount[Type];
             int frameWidth = NpcTexWidth(Type) / 3;

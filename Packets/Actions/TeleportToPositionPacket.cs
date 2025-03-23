@@ -88,9 +88,13 @@ namespace TerRoguelike.Packets
             {
                 packet.Write(Main.spawnTileX);
                 packet.Write(Main.spawnTileY);
+                packet.Write(RoomSystem.playerCount);
             }
 
             packet.Send(toClient, ignoreClient);
+
+            if (context == TeleportContext.NewFloor || context == TeleportContext.StartRun)
+                RoomUnmovingDataPacket.SendStartRoomTiles();
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
@@ -98,15 +102,23 @@ namespace TerRoguelike.Packets
             TeleportContext context = (TeleportContext)packet.ReadByte();
             int roomID = packet.ReadInt32();
 
+            if (context == TeleportContext.Room)
+            {
+                Room room = RoomID[roomID];
+                if (!room.GetRect().Intersects(Main.LocalPlayer.getRect()))
+                    Main.SetCameraLerp(0.25f, 10);
+            }
+
             foreach (Player player in Main.ActivePlayers)
             {
-                if (context != TeleportContext.Room && player.dead)
+                var modPlayer = player.ModPlayer();
+                if (modPlayer == null) continue;
+                if (context != TeleportContext.Room && player.dead && modPlayer.allowedToExist)
                     player.Spawn(PlayerSpawnContext.ReviveFromDeath);
                 player.Center = pos;
                 player.fallStart = (int)(player.position.Y / 16f);
             }
             
-
             if (context == TeleportContext.FloorTransition)
             {
                 RoomSystem.FloorTransitionEffects();
@@ -212,8 +224,10 @@ namespace TerRoguelike.Packets
             }
             if (context == TeleportContext.StartRun)
             {
+                RoomSystem.runStartMeter = 0;
                 Main.spawnTileX = packet.ReadInt32();
                 Main.spawnTileY = packet.ReadInt32();
+                RoomSystem.playerCount = packet.ReadInt32();
                 Main.BlackFadeIn = 255;
                 var modPlayer = Main.LocalPlayer.ModPlayer();
                 if (modPlayer != null)

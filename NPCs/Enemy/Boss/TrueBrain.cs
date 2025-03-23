@@ -1399,7 +1399,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
-                NPC.StrikeInstantKill();
+                if (!TerRoguelike.mpClient)
+                    NPC.StrikeInstantKill();
             }
 
             return deadTime >= cutsceneDuration - 30;

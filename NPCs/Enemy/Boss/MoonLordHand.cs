@@ -117,6 +117,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
             NPC parent = Main.npc[(int)NPC.ai[2]];
             if (!parent.active || parent.type != ModContent.NPCType<MoonLord>())
             {
@@ -175,15 +176,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
+
                     float spinSpeed = 10;
                     bool initiateSpin = parent.ai[1] == phantSpinWindup || NPC.velocity.Length() < 1f; // starts the spin either in sync with moon lord or if an eye pops out mid attack, which is the 1 case where this guy shouldn't have high velocity mid-attack
                     if (initiateSpin)
                     {
                         NPC.velocity = new Vector2(0, -spinSpeed);
+                        NPC.netUpdate = true;
                     }
                     if (parent.ai[1] == phantSpinWindup) // only play the sound if it started naturally though because a similar sound plays when the eye pops out
                     {
                         SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.3f, MaxInstances = 2 }, NPC.Center + new Vector2(80 * NPC.direction, 0));
+                        NPC.netUpdate = true;
                     }
                     NPC.velocity = NPC.velocity.RotatedBy(0.013f * NPC.direction * spinSpeed);
                     NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
@@ -195,20 +199,25 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 attackStartPos = new Vector2(NPC.localAI[0], NPC.localAI[1]);
                 if (parent.ai[1] == 0 || attackStartPos.X == 0)
                 {
-                    Vector2 randVect = Main.rand.NextVector2CircularEdge(quickMoveVel, quickMoveVel);
-                    randVect.Y = Math.Abs(randVect.Y);
-                    NPC.velocity = randVect;
-                    attackStartPos = NPC.Center;
-                    NPC.localAI[0] = attackStartPos.X;
-                    NPC.localAI[1] = attackStartPos.Y;
+                    if (!TerRoguelike.mpClient)
+                    {
+                        Vector2 randVect = Main.rand.NextVector2CircularEdge(quickMoveVel, quickMoveVel);
+                        randVect.Y = Math.Abs(randVect.Y);
+                        NPC.velocity = randVect;
+                        attackStartPos = NPC.Center;
+                        NPC.localAI[0] = attackStartPos.X;
+                        NPC.localAI[1] = attackStartPos.Y;
+                        NPC.netUpdate = true;
+                    }
                 }
                 else if (parent.ai[1] % 30 < 10)
                 {
-                    if (parent.ai[1] % 30 == 0)
+                    if (parent.ai[1] % 30 == 0 && !TerRoguelike.mpClient)
                     {
                         NPC.velocity *= 0.35f;
                         float randRot = Main.rand.NextFloat(-1.2f, 1.2f);
                         NPC.velocity += ((attackStartPos - NPC.Center).SafeNormalize(Vector2.UnitY) * quickMoveVel * 3).RotatedBy(randRot + Math.Sign(randRot) * 0.2f);
+                        NPC.netUpdate = true;
                     }
                     else
                     {
@@ -256,6 +265,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             NPC.velocity = rotToTarget.ToRotationVector2() * 16;
                             NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
                             trackedSlot = SoundEngine.PlaySound(SoundID.Zombie101 with { Volume = 0.15f, MaxInstances = 2, Pitch = -0.1f }, NPC.Center + new Vector2(80 * NPC.direction, 0));
+                            NPC.netUpdate = true;
                         }
                         Color particleColor = Color.Lerp(Color.Teal, Color.White, 0.2f);
                         float effectiveRot = NPC.rotation - MathHelper.PiOver2;
@@ -283,6 +293,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (deathray)
             {
+                if ((int)parent.ai[1] % 10 == 0)
+                    NPC.netUpdate = true;
+
                 NPC.velocity *= 0.98f;
                 if (parent.ai[1] >= deathrayWindup)
                 {
@@ -297,6 +310,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else
             {
+                if ((int)parent.ai[1] % 20 <= 1)
+                    NPC.netUpdate = true;
                 Vector2 wantedPos = targetPos + new Vector2(130 * NPC.direction, -230) + trueEyeVector * -7;
                 float wantedRadius = 90;
                 if (NPC.Center.Distance(wantedPos) <= wantedRadius)
@@ -489,10 +504,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.WriteVector2(spawnPos);
+            writer.Write(NPC.localAI[0]);
+            writer.Write(NPC.localAI[1]);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             spawnPos = reader.ReadVector2();
+            NPC.localAI[0] = reader.ReadSingle();
+            NPC.localAI[1] = reader.ReadSingle();
         }
     }
 }

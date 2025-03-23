@@ -16,6 +16,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Systems.TerRoguelikeWorldManagementSystem;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.ID;
+using TerRoguelike.World;
 
 namespace TerRoguelike.Managers
 {
@@ -125,7 +126,7 @@ namespace TerRoguelike.Managers
 
             PlaceSchematic(finalFinalBossRoom.Key, finalFinalBossRoom.RoomPosition.ToPoint(), anchorType);
 
-            if (Main.menuServer && Main.menuMultiplayer)
+            if ((Main.menuServer && Main.menuMultiplayer) || Main.dedServ)
             {
                 var lobbyRoom = RoomID[RoomDict["SanctuaryLobbyRoom1"]];
                 schematic = TileMaps[lobbyRoom.Key];
@@ -138,7 +139,7 @@ namespace TerRoguelike.Managers
 
                 PlaceSchematic(lobbyRoom.Key, lobbyRoom.RoomPosition.ToPoint(), anchorType);
 
-                if (!RoomSystem.regeneratingWorld)
+                if (!(TerRoguelikeWorld.promoteLoop || TerRoguelikeWorld.currentLoop > 0))
                 {
                     Vector2 newSpawn = lobbyRoom.RoomDimensions * new Vector2(0.3f, 0.8f) + lobbyRoom.RoomPosition;
                     Main.spawnTileX = (int)newSpawn.X;

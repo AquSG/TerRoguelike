@@ -342,6 +342,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
             if (NPC.localAI[3] == 0)
             {
                 if (modNPC.isRoomNPC)
@@ -540,6 +541,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         {
                             head.direction = Main.rand.NextBool() ? -1 : 1;
                         }
+                        NPC.netUpdate = true;
                     }
                     if (NPC.ai[1] % 2 == 0)
                     {
@@ -676,13 +678,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             if (effectiveTime == 0)
                             {
                                 SoundEngine.PlaySound(SoundID.Item13 with { Volume = comboAttack ? 0.66f : 1f, Pitch = 0.2f, MaxInstances = 3 }, npc.Center);
-                                if (n == 1)
+                                if (!TerRoguelike.mpClient)
                                 {
-                                    leftHandTargetPos = leftHandAnchor + (leftHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
-                                }
-                                else if (n == 2)
-                                {
-                                    rightHandTargetPos = rightHandAnchor + (rightHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
+                                    if (n == 1)
+                                    {
+                                        leftHandTargetPos = leftHandAnchor + (leftHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
+                                    }
+                                    else if (n == 2)
+                                    {
+                                        rightHandTargetPos = rightHandAnchor + (rightHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
+                                    }
+                                    npc.netUpdate = true;
                                 }
                             }
                             if (effectiveTime < phantBoltWindup && PhantBolt.Duration - NPC.ai[1] > 10)
@@ -776,15 +782,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (npc == null)
                             continue;
 
-                        if (i == 1)
+                        if (!TerRoguelike.mpClient)
                         {
-                            leftHandTargetPos = leftHandAnchor + new Vector2(-32, -64);
-                            leftHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
-                        }
-                        else
-                        {
-                            rightHandTargetPos = rightHandAnchor + new Vector2(32, -64);
-                            rightHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
+                            if (i == 1)
+                            {
+                                leftHandTargetPos = leftHandAnchor + new Vector2(-32, -64);
+                                leftHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
+                            }
+                            else
+                            {
+                                rightHandTargetPos = rightHandAnchor + new Vector2(32, -64);
+                                rightHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
+                            }
+                            npc.netUpdate = true;
                         }
 
                         SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 1f, MaxInstances = 10 }, npc.Center);
@@ -801,6 +811,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == TentacleCharge.Id)
             {
+                if ((int)NPC.ai[1] % 20 == 0)
+                    NPC.netUpdate = true;
+
                 Vector2 targetPos = target != null ? target.Center : NPC.Center + new Vector2(0, -80);
                 Vector2 projSpawnPos = headPos + new Vector2(0, 209);
                 float startSmoothing = 1f;

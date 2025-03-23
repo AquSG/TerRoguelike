@@ -120,23 +120,35 @@ namespace TerRoguelike.Systems
                 }
             }
             RoomManager.GenerateRoomStructure();
-            foreach (Room room in RoomSystem.RoomList)
-            {
-                int width = (int)room.RoomDimensions.X;
-                int height = (int)room.RoomDimensions.Y;
-                
-                for (int i = 0; i < width; i++)
-                {
-                    for (int j = 0; j < height; j++)
-                    {
-                        int x = i + (int)room.RoomPosition.X;
-                        int y = j + (int)room.RoomPosition.Y;
-                        var tile = Main.tile[x, y];
 
-                        if (tile.HasTile)
-                            WorldGen.TileFrame(x, y, true, true);
-                        if (tile.WallType > 0)
-                            Framing.WallFrame(i, j, true);
+            if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                Main.sectionManager = new WorldSections((Main.maxTilesX - 1) / 200 + 1, (Main.maxTilesY - 1) / 150 + 1);
+                if (ModContent.GetInstance<TerRoguelikeConfig>().LoadEntireWorldUponEnteringWorld)
+                {
+                    WorldGen.EveryTileFrame();
+                }
+                else
+                {
+                    foreach (Room room in RoomSystem.RoomList)
+                    {
+                        int width = (int)room.RoomDimensions.X;
+                        int height = (int)room.RoomDimensions.Y;
+
+                        for (int i = 0; i < width; i++)
+                        {
+                            for (int j = 0; j < height; j++)
+                            {
+                                int x = i + (int)room.RoomPosition.X;
+                                int y = j + (int)room.RoomPosition.Y;
+                                var tile = Main.tile[x, y];
+
+                                if (tile.HasTile)
+                                    WorldGen.SquareTileFrame(x, y);
+                                if (tile.WallType > 0)
+                                    WorldGen.SquareWallFrame(x, y);
+                            }
+                        }
                     }
                 }
             }

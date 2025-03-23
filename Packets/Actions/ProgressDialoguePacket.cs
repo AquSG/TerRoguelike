@@ -32,29 +32,28 @@ using System.Reflection;
 using TerRoguelike.World;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static TerRoguelike.NPCs.TerRoguelikeGlobalNPC;
+using static TerRoguelike.MainMenu.TerRoguelikeMenu;
+using TerRoguelike.NPCs.Enemy.Boss;
 
 namespace TerRoguelike.Packets
 {
-    public sealed class RequestRoomUmovingDataPacket : TerRoguelikePacket
+    public sealed class ProgressDialoguePacket : TerRoguelikePacket
     {
-        public static int cooldown = 0;
-        public override PacketType MessageType => PacketType.RequestUnmovingDataSync;
+        public override PacketType MessageType => PacketType.ProgressDialogueSync;
         public static void Send(int toClient = -1, int ignoreClient = -1)
         {
-            if (!TerRoguelike.mpClient || cooldown > 0)
+            if (Main.netMode == NetmodeID.SinglePlayer)
                 return;
-            cooldown = 10;
 
-            var packet = NewPacket(PacketType.RequestUnmovingDataSync);
+            var packet = NewPacket(PacketType.ProgressDialogueSync);
 
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
+            Being.forceTextControl = true;
             if (Main.dedServ)
-            {
-                RoomUnmovingDataPacket.Send();
-            }
+                Send();
         }
     }
 }

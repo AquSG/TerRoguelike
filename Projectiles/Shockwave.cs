@@ -26,6 +26,7 @@ namespace TerRoguelike.Projectiles
         public Vector2 spawnVelocity;
         public SlotId crumblingSoundSlot;
         public static readonly SoundStyle crumblingLoop = new SoundStyle("TerRoguelike/Sounds/Shockwave", 3);
+        public bool initialized = false;
         public override void SetDefaults()
         {
             Projectile.width = 24;
@@ -41,9 +42,15 @@ namespace TerRoguelike.Projectiles
             spawnVelocity = Projectile.velocity;
             Projectile.ai[1] = 1;
             crumblingSoundSlot = SoundEngine.PlaySound(crumblingLoop with { Volume = 0.25f, MaxInstances = 4 }, Projectile.Center);
+            initialized = true;
         }
         public override void AI()
         {
+            if (!initialized)
+            {
+                crumblingSoundSlot = SoundEngine.PlaySound(crumblingLoop with { Volume = 0.25f, MaxInstances = 4 }, Projectile.Center);
+                initialized = true;
+            }
             if (SoundEngine.TryGetActiveSound(crumblingSoundSlot, out var crumbleSound) && crumbleSound.IsPlaying)
             {
                 crumbleSound.Position = Projectile.Center;

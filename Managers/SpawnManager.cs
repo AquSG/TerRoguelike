@@ -27,6 +27,7 @@ using TerRoguelike.Packets;
 using log4net.Repository.Hierarchy;
 using Terraria.GameContent.Personalities;
 using rail;
+using TerRoguelike.Systems;
 
 namespace TerRoguelike.Managers
 {
@@ -161,7 +162,7 @@ namespace TerRoguelike.Managers
             }
             return npc;
         }
-        public static double healthScalingMultiplier(bool boss) => Math.Pow(1.2d, TerRoguelikeWorld.currentStageForScaling) * (1 + ((NPC.GetActivePlayerCount() - 1) * (boss ? 1 : 0.5d)));
+        public static double healthScalingMultiplier(bool boss) => Math.Pow(1.2d, TerRoguelikeWorld.currentStageForScaling) * (1 + ((RoomSystem.playerCount - 1) * (boss ? 1 : 0.5d)));
         public static double damageScalingMultiplier => Math.Pow(1.10d, TerRoguelikeWorld.currentStageForScaling);
         public static void ApplyNPCDifficultyScaling(NPC npc, TerRoguelikeGlobalNPC modNpc)
         {

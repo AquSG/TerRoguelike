@@ -365,7 +365,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (seer.active)
                         {
                             SoundEngine.PlaySound(CrimsonHeal with { Volume = 0.3f, MaxInstances = 2 }, NPC.Center);
-                            seer.StrikeInstantKill();
+                            if (!TerRoguelike.mpClient)
+                                seer.StrikeInstantKill();
                             SeerHeal();
                         }
                     }
@@ -539,7 +540,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 int currentCharge = time / (BloodTrailChargeTelegraph + BloodTrailChargeDuration);
 
                 Vector2 teleportPos = spawnPos;
-                if (target != null && NPC.ai[3] == teleportMoveTimestamp - 1)
+                if (target != null && NPC.ai[3] == teleportMoveTimestamp - 1 && !TerRoguelike.mpClient)
                 {
                     float teleportDistance = 330;
                     List<float> potentialRots = new List<float>() { MathHelper.PiOver4, MathHelper.PiOver4 * 3, MathHelper.PiOver4 * 5, MathHelper.PiOver4 * 7 };
@@ -569,6 +570,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (finalRot == BloodChargeDirection)
                             finalRot = chosenRot + (MathHelper.PiOver4 * -3);
                         BloodChargeDirection = finalRot;
+                        NPC.netUpdate = true;
                         break;
                     }
                 }
@@ -727,6 +729,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void SpawnSeers()
         {
+            if (TerRoguelike.mpClient)
+                return;
+
             int seerCount = RuinedMoonActive ? 16 : 8;
             int seerRate = seerSpawnTime / (seerCount - 1);
             if ((NPC.ai[1] - (Heal.Duration - seerSpawnTime)) % seerRate == 0)
@@ -742,6 +747,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     seer.localAI[2] += 180;
                 seer.ModNPC().isRoomNPC = modNPC.isRoomNPC;
                 seer.ModNPC().sourceRoomListID = modNPC.sourceRoomListID;
+                seer.netUpdate = true;
                 trackedSeers.Add(new TrackedSeer(currentSeer, whoAmI));
                 NPC.netUpdate = true;
             }
@@ -866,7 +872,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         TerRoguelikeGlobalNPC modChildNPC = childNPC.ModNPC();
                         if (modChildNPC == null)
                             continue;
-                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID)
+                        if (modChildNPC.isRoomNPC && modChildNPC.sourceRoomListID == modNPC.sourceRoomListID && !TerRoguelike.mpClient)
                         {
                             childNPC.StrikeInstantKill();
                             childNPC.active = false;
@@ -911,7 +917,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
-                NPC.StrikeInstantKill();
+                if (!TerRoguelike.mpClient)
+                    NPC.StrikeInstantKill();
 
                 if (!Main.dedServ)
                 {
@@ -1068,9 +1075,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 var seer = trackedSeers[i];
                 writer.Write(seer.seerId);
                 writer.Write(seer.whoAmI);
+                writer.Write(Main.npc[seer.whoAmI].rotation);
             }
             writer.Write((int)NPC.localAI[1]);
             writer.Write(Main.myPlayer);
+            writer.Write(BloodChargeDirection);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1082,8 +1091,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 int id = reader.ReadInt32();
                 int whoami = reader.ReadInt32();
+                Main.npc[whoami].rotation = reader.ReadSingle();
                 trackedSeers.Add(new(id, whoami));
             }
+
             int idCheck = reader.ReadInt32();
             int playerCheck = reader.ReadInt32();
             for (int i = 0; i < Main.maxProjectiles; i++)
@@ -1104,6 +1115,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
+
+            BloodChargeDirection = reader.ReadSingle();
         }
     }
     public class TrackedSeer

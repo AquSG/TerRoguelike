@@ -14,6 +14,7 @@ using TerRoguelike.Utilities;
 using Terraria.DataStructures;
 using TerRoguelike.Particles;
 using static TerRoguelike.Managers.TextureManager;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -25,6 +26,7 @@ namespace TerRoguelike.Projectiles
         public Texture2D glowTex;
         public int maxTimeLeft;
         public int direction;
+        public bool initialized = false;
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public override void SetDefaults()
         {
@@ -43,9 +45,10 @@ namespace TerRoguelike.Projectiles
         {
             behindNPCs.Add(index);
         }
-        public override void OnSpawn(IEntitySource source)
+        public void Initialize()
         {
-            direction = Main.rand.NextBool() ? -1 : 1;
+            initialized = true;
+
             Vector2 lineStart = Projectile.Center + new Vector2(Projectile.ai[0], Projectile.ai[1]);
             Vector2 lineVector = Projectile.Center - lineStart;
             float distance = lineVector.Length();
@@ -63,12 +66,6 @@ namespace TerRoguelike.Projectiles
                 ParticleManager.AddParticle(new ThinSpark(
                     pos, Vector2.Zero, 30, Color.Red, new Vector2(0.1f, 0.1f), rot, true, false));
             }
-            float startingRot = Main.rand.NextFloat(MathHelper.TwoPi);
-            for (int i = 0; i < 5; i++)
-            {
-                float completion = i / 5f;
-                spikes.Add(startingRot + (completion * MathHelper.TwoPi) + Main.rand.NextFloat(-0.4f, 0.4f));
-            }
             for (int t = 0; t < 20; t++)
             {
                 Rectangle rect = Projectile.getRect();
@@ -85,8 +82,21 @@ namespace TerRoguelike.Projectiles
                 }
             }
         }
+        public override void OnSpawn(IEntitySource source)
+        {
+            direction = Main.rand.NextBool() ? -1 : 1;
+            Initialize();
+            float startingRot = Main.rand.NextFloat(MathHelper.TwoPi);
+            for (int i = 0; i < 5; i++)
+            {
+                float completion = i / 5f;
+                spikes.Add(startingRot + (completion * MathHelper.TwoPi) + Main.rand.NextFloat(-0.4f, 0.4f));
+            }
+        }
         public override void AI()
         {
+            if (!initialized)
+                Initialize();
             Rectangle rect = Projectile.getRect();
             for (int i = 0; i < 6; i++)
             {
@@ -150,6 +160,26 @@ namespace TerRoguelike.Projectiles
 
             
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(direction);
+            writer.Write(spikes.Count);
+            for (int i = 0; i < spikes.Count; i++)
+            {
+                writer.Write(spikes[i]);
+            }
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            direction = reader.ReadInt32();
+            int count = reader.ReadInt32();
+            spikes.Clear();
+            for (int i = 0; i < count; i++)
+            {
+                spikes.Add(reader.ReadSingle());
+            }
         }
     }
 }

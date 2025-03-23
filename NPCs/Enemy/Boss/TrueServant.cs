@@ -106,6 +106,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 SoundEngine.PlaySound(SoundID.Zombie102 with { Volume = 0.16f, Pitch = 0.4f, MaxInstances = 10, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                 NPC.velocity = (NPC.rotation - MathHelper.PiOver2).ToRotationVector2() * 12f;
+                NPC.netUpdate = true;
             }
             else if (NPC.ai[1] <= 0 && !canHit) //default movement no LoS
             {

@@ -108,6 +108,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
             NPC parent = Main.npc[(int)NPC.ai[0]];
             if (!parent.active || parent.type != ModContent.NPCType<MoonLord>())
             {
