@@ -1096,6 +1096,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(deathrayTrackedProjId1);
             writer.Write(deathrayTrackedProjId2);
             writer.Write(Main.myPlayer);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1130,6 +1131,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     }
                 }
             }
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
     public class StoredDraw

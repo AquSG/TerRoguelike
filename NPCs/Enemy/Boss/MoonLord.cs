@@ -1881,6 +1881,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.WriteVector2(leftHandTargetPos);
             writer.WriteVector2(rightHandTargetPos);
             writer.Write(idleCounter);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1899,6 +1900,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             leftHandTargetPos = reader.ReadVector2();
             rightHandTargetPos = reader.ReadVector2();
             idleCounter = reader.ReadInt32();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
 }

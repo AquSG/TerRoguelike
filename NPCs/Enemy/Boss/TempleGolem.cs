@@ -908,12 +908,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(NPC.localAI[0]);
             writer.Write(NPC.localAI[2]);
             writer.WriteVector2(spawnPos);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             NPC.localAI[2] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
 }

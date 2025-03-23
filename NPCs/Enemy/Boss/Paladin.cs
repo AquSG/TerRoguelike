@@ -1097,6 +1097,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.WriteVector2(spawnPos);
             writer.WriteVector2(SummonSpawnPositions[0]);
             writer.WriteVector2(SummonSpawnPositions[1]);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1104,6 +1105,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = reader.ReadVector2();
             SummonSpawnPositions[0] = reader.ReadVector2();
             SummonSpawnPositions[1] = reader.ReadVector2();
+            int deadt = reader.ReadInt32();
+            if (deadTime == 0 && deadt > 0)
+                deadTime = 1;
         }
     }
     public class GodRay
