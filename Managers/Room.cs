@@ -344,7 +344,7 @@ namespace TerRoguelike.Managers
                 }
                 if (teleportTarget >= 0 && !RoomSystem.activatedTeleport)
                 {
-                    RoomSystem.activatedTeleport = true;
+                    RoomSystem.activatedTeleportCooldown = 180;
                     TeleportToPositionPacket.Send(Main.player[teleportTarget].Center, TeleportContext.Room, ID, -1, -1);
                     foreach (Player player in Main.ActivePlayers)
                     {

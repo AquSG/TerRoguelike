@@ -90,6 +90,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int BloodTrailChargeCount = 4;
         public int BloodTrailProjCount = 4;
         public float BloodChargeDirection = -1;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -268,6 +269,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (target != null)
                 {
                     if (target.Center.X > NPC.Center.X)
@@ -311,9 +313,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Heal.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
-                    RumbleSlot = RumbleSlot = SoundEngine.PlaySound(HellRumble with { Volume = 0.8f }, NPC.Center);
+                    attackInitialized = true;
+                    RumbleSlot = SoundEngine.PlaySound(HellRumble with { Volume = 0.8f }, NPC.Center);
                     if (SoundEngine.TryGetActiveSound(RumbleSlot, out var rumbleSound) && rumbleSound.IsPlaying)
                     {
                         rumbleSound.Volume = 0;

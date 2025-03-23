@@ -19,6 +19,7 @@ namespace TerRoguelike.Projectiles
 {
     public class Rock : ModProjectile, ILocalizedModType
     {
+        public bool initialized = false;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = 6;
@@ -37,9 +38,15 @@ namespace TerRoguelike.Projectiles
         public override void OnSpawn(IEntitySource source)
         {
             Projectile.frame = Main.rand.Next(Main.projFrames[Type]);
+            initialized = true;
         }
         public override void AI()
         {
+            if (!initialized)
+            {
+                Projectile.frame = Main.rand.Next(Main.projFrames[Type]);
+                initialized = true;
+            }
             Projectile.rotation += 0.4f * Projectile.direction;
             if (Projectile.velocity.Y < 9)
                 Projectile.velocity.Y += MathHelper.Clamp(MathHelper.Lerp(0, 0.24f, -(Projectile.timeLeft - 600) / 20f), 0, 0.24f);

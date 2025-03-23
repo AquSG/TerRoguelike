@@ -67,6 +67,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int teleportDashingDuration = 45;
         public int summonWindup = 40;
         public int summonCooldown = 40;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -228,6 +229,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 UpdateDirection();
                 DefaultRotation();
 
@@ -268,8 +270,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     float startupCompletion = NPC.ai[1] / chargeWindup;
                     NPC.velocity *= (float)Math.Pow(startupCompletion, 4);
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.9f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                     }
                 }

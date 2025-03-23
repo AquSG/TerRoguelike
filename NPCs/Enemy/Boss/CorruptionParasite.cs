@@ -89,6 +89,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int projChargeShootTelegraph = 88;
         public float projChargeSpeed = 20f;
         public int summonCount = 3;
+        public bool attackInitialized = false;
 
 
         public override void SetStaticDefaults()
@@ -262,6 +263,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 NPC.localAI[1] = 0;
                 if (target != null)
                 {
@@ -361,8 +363,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == WaveTunnel.Id)
             {
                 Room room = RoomList[modNPC.sourceRoomListID];
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     Vector2 targetPos = target == null ? NPC.Center : new Vector2(target.Center.X > NPC.Center.X ? room.RoomPosition16.X : room.RoomPosition16.X + room.RoomDimensions16.X, target.Center.Y);
                     float rotToRoom = (targetPos - (room.RoomPosition16 + room.RoomCenter16)).ToRotation();
                     int quadrant = (int)(rotToRoom / MathHelper.PiOver2);

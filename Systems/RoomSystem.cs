@@ -62,7 +62,8 @@ namespace TerRoguelike.Systems
         public static int loopingDrama = 0;
         public static bool regeneratingWorld = false;
         public static int regeneratingWorldTime = 0;
-        public static bool activatedTeleport = false;
+        public static bool activatedTeleport => activatedTeleportCooldown > 0;
+        public static int activatedTeleportCooldown = 0;
         public static float runStartMeter = 0;
         public static bool runStartTouched = false;
         public static bool runStarted = false;
@@ -219,14 +220,14 @@ namespace TerRoguelike.Systems
                         room.awake = true;
                         if (room.CanDescend(player, modPlayer) && !TerRoguelike.mpClient && !activatedTeleport) //New Floor Blue Wall Portal Teleport
                         {
-                            activatedTeleport = true;
+                            activatedTeleportCooldown = 180;
                             room.Descend(player);
                             player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
                         }
                         if (room.CanAscend(player, modPlayer) && !TerRoguelike.mpClient && !activatedTeleport)
                         {
-                            activatedTeleport = true;
+                            activatedTeleportCooldown = 180;
                             room.Ascend(player);
                             player.fallStart = (int)(player.position.Y / 16f);
                             FloorTransitionEffects();
@@ -1510,7 +1511,8 @@ namespace TerRoguelike.Systems
                     RequestRoomUmovingDataPacket.cooldown--;
             }
 
-            activatedTeleport = false;
+            if (activatedTeleportCooldown > 0)
+                activatedTeleportCooldown--;
 
             if (regeneratingWorld)
             {
