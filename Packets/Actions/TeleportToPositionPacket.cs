@@ -106,7 +106,7 @@ namespace TerRoguelike.Packets
             {
                 Room room = RoomID[roomID];
                 if (!room.GetRect().Intersects(Main.LocalPlayer.getRect()))
-                    Main.SetCameraLerp(0.25f, 10);
+                    Main.SetCameraLerp(0.17f, 10);
             }
 
             foreach (Player player in Main.ActivePlayers)

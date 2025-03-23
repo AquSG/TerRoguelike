@@ -107,6 +107,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static int tentacleWindup = 90;
         public static int deathrayWindup = 90;
         public static int summonWindup = 30;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -511,6 +512,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -531,13 +533,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.ai[1] < phantSpinWindup)
                 {
-                    bool beginning = NPC.ai[1] == 0;
+                    bool beginning = !attackInitialized;
                     if (beginning)
                     {
+                        attackInitialized = true;
                         leftHandTargetPos = leftHandAnchor + new Vector2(-32, 0);
                         rightHandTargetPos = rightHandAnchor + new Vector2(32, 0);
                         SoundEngine.PlaySound(SoundID.Zombie93 with { Volume = 0.9f }, NPC.Center + new Vector2(0, -100));
-                        if (head != null)
+                        if (head != null && !TerRoguelike.mpClient)
                         {
                             head.direction = Main.rand.NextBool() ? -1 : 1;
                         }
@@ -616,11 +619,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 Vector2 targetPos = target != null ? target.Center : spawnPos + new Vector2(0, -80);
 
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.Zombie94 with { Volume = 0.8f }, NPC.Center + new Vector2(0, -100));
                     float closest = 2000;
-                    if (head != null)
+                    if (head != null && !TerRoguelike.mpClient)
                         head.direction = Main.rand.NextBool() ? -1 : 1;
                     for (int i = 0; i < 3; i++)
                     {
@@ -765,8 +769,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == PhantSphere.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.Zombie96 with { Volume = 0.8f }, NPC.Center + new Vector2(0, -80));
                 }
                 float completion = NPC.ai[1] / PhantSphere.Duration;
@@ -820,8 +825,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] < tentacleWindup)
                 {
                     startSmoothing *= NPC.ai[1] / tentacleWindup;
-                    if (NPC.ai[1] == 10)
+                    if (NPC.ai[1] >= 10 && !attackInitialized && NPC.ai[1] < tentacleWindup - 30)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Zombie98 with { Volume = 0.9f, Pitch = -0.2f }, NPC.Center + new Vector2(0, -80));
                         SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.3f, Pitch = -0.3f }, NPC.Center + new Vector2(0, -80));
                     }
@@ -839,11 +845,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                                 30, outlineColor, fillColor, new Vector2(0.2f), 4, 0, 0.96f, 30));
                         }
                     }
+                    if (NPC.ai[1] >= tentacleWindup - 30)
+                        attackInitialized = false;
                 }
                 else
                 {
-                    if (NPC.ai[1] == tentacleWindup)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         ExtraSoundSystem.ExtraSounds.Add(new ExtraSound(SoundEngine.PlaySound(SoundID.DD2_BetsyDeath with { Volume = 1f, Pitch = -1f, Variants = [0] }, NPC.Center + new Vector2(0, -80)), 2.2f)); // shove it into extra sound system to amplify it beyond 1f
                         for (int i = -3; i <= 3; i += 2)
                         {
@@ -880,8 +889,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 deathrayConvergePos = new Vector2(NPC.localAI[1], NPC.localAI[2]);
                 if (NPC.ai[1] < deathrayWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(WallOfFlesh.HellBeamCharge with { Volume = 0.9f, Pitch = 0.32f }, NPC.Center + new Vector2(0, -80));
                         SoundEngine.PlaySound(SoundID.Zombie95 with { Volume = 0.45f }, NPC.Center + new Vector2(0, -80));
                     }
@@ -1007,9 +1017,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[1] < summonWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
-                        NPC.direction = Main.rand.NextBool() ? -1 : 1;
+                        attackInitialized = true;
+                        if (!TerRoguelike.mpClient)
+                            NPC.direction = Main.rand.NextBool() ? -1 : 1;
                         SoundEngine.PlaySound(SoundID.Zombie99 with { Volume = 0.6f, Pitch = -0.1f }, NPC.Center + new Vector2(0, -80));
                         SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 1f, Pitch = -0.4f }, NPC.Center + new Vector2(0, -80));
                     }

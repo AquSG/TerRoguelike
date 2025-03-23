@@ -22,6 +22,7 @@ using static TerRoguelike.Systems.EnemyHealthBarSystem;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using TerRoguelike.World;
 using System.IO;
+using Steamworks;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -52,6 +53,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Texture2D hammerTex;
         public Texture2D godRayTex;
         public int deadTime = 0;
+        public bool attackInitialized = false;
 
         public Attack None = new Attack(0, 0, 300);
         public Attack Charge = new Attack(1, 30, 210);
@@ -156,6 +158,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -406,8 +409,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] >= slamTelegraph)
                     NPC.velocity.X = 0;
 
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.DeerclopsStep with { Volume = 0.62f, Pitch = -0.2f }, NPC.Center);
                     SoundEngine.PlaySound(SoundID.NPCHit4 with { Volume = 0.08f, Pitch = -0.9f, PitchVariance = 0.08f }, NPC.Center);
                     for (int i = -1; i <= 1; i += 2)
@@ -474,8 +478,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == Summon.Id)
             {
                 NPC.velocity.X *= deceleration;
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
+                    NPC.netUpdate = true;
                     SoundEngine.PlaySound(HammerRaise with { Volume = 0.6f }, NPC.Center);
 
                     NPC dummyNPC = new NPC();
@@ -1089,11 +1095,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
+            writer.WriteVector2(SummonSpawnPositions[0]);
+            writer.WriteVector2(SummonSpawnPositions[1]);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            SummonSpawnPositions[0] = reader.ReadVector2();
+            SummonSpawnPositions[1] = reader.ReadVector2();
         }
     }
     public class GodRay

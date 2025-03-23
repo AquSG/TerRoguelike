@@ -19,6 +19,7 @@ namespace TerRoguelike.Projectiles
     public class GreenPetal : ModProjectile, ILocalizedModType
     {
         public float startingSpeed;
+        public bool initialized = false;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Type] = 2;
@@ -39,9 +40,15 @@ namespace TerRoguelike.Projectiles
             startingSpeed = Projectile.velocity.Length();
             SoundEngine.PlaySound(SoundID.Grass with { Volume = 0.85f, MaxInstances = 4 }, Projectile.Center);
             Projectile.ai[0] = -1;
+            initialized = true;
         }
         public override void AI()
         {
+            if (!initialized)
+            {
+                SoundEngine.PlaySound(SoundID.Grass with { Volume = 0.85f, MaxInstances = 4 }, Projectile.Center);
+                initialized = true;
+            }
             if (Projectile.timeLeft % 4 == 0 && Main.rand.NextBool())
             {
                 int d = Dust.NewDust(Projectile.position, Projectile.width, Projectile.height, Projectile.ModProj().hostileTurnedAlly ? DustID.Clentaminator_Cyan : DustID.Grass, 0, 0, 0, default(Color), 0.9f);

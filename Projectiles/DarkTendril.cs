@@ -30,6 +30,7 @@ namespace TerRoguelike.Projectiles
         public float startRot;
         public SlotId rumbleSlot;
         public Texture2D circleTex;
+        public bool initialized = false;
         public override string Texture => "TerRoguelike/Projectiles/InvisibleProj";
         public override void SetStaticDefaults()
         {
@@ -58,9 +59,15 @@ namespace TerRoguelike.Projectiles
             turnMultiplier = 4f;
             Projectile.ai[1] = Main.rand.NextFloat(MathHelper.TwoPi);
             startRot = Projectile.velocity.ToRotation();
+            initialized = true;
         }
         public override void AI()
         {
+            if (!initialized)
+            {
+                rumbleSlot = SoundEngine.PlaySound(SoundID.DD2_EtherianPortalIdleLoop with { Volume = 0.012f, PitchVariance = 0.4f, Pitch = 0.6f, MaxInstances = 10 }, Projectile.Center);
+                initialized = true;
+            }
             Projectile.netSpam = 0;
             var modProj = Projectile.ModProj();
             if (modProj.npcOwner >= 0)

@@ -96,6 +96,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int bouncyballWindup = 40;
         public int bloodBallFireRate = 11;
         public int summonCap = 10;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -326,7 +327,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
-
+                attackInitialized = false;
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -342,8 +343,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[1] < laserStartup)
                 {
-                    if (NPC.ai[1] == 0 || NPC.ai[1] == 24)
+                    if (NPC.ai[1] == 0 || NPC.ai[1] == 24 || !attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Item13 with { Volume = 0.7f, Pitch = 0 }, NPC.Center + hitboxes[1].offset);
                     }
                     for (int i = 0; i <= 1; i++)
@@ -416,8 +418,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Deathray.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (NPC.ai[1] < 30 && !attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(HellBeamCharge with { Volume = 0.45f, Pitch = 0.32f }, NPC.Center + hitboxes[1].offset);
                 }
                 if (NPC.ai[1] < 90)
@@ -442,9 +445,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             particleSpawnPos, particleVel,
                             20, outlineColor, fillColor, new Vector2(Main.rand.NextFloat(0.14f, 0.28f)), 4, 0, 0.99f, 10));
                     }
+                    if (NPC.ai[1] > 60)
+                        attackInitialized = false;
                 }
-                if (NPC.ai[1] == 90)
+                if (NPC.ai[1] >= 90 && !attackInitialized)
                 {
+                    attackInitialized = true;
                     DeathraySlot = SoundEngine.PlaySound(HellBeamSound with { Volume = 1f }, NPC.Center + hitboxes[1].offset);
                     if (!TerRoguelike.mpClient)
                     {
@@ -561,8 +567,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.NPCDeath10 with { Volume = 0.5f }, NPC.Center + hitboxes[1].offset);
                 }
                 if (NPC.ai[1] > 60)

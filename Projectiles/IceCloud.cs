@@ -59,6 +59,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.localAI[0] == 0)
             {
+                maxTimeLeft = (int)Projectile.ai[0];
                 Initialize();
             }
 

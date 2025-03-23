@@ -108,7 +108,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int SummonRate = 12;
         public int SummonTime = 47;
         public int SummonWindup = 40;
-
+        public bool attackInitialized = false;
         public override void SetStaticDefaults()
         {
             NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
@@ -292,8 +292,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.localAI[0] < 0)
             {
-                if (NPC.localAI[0] == -cutsceneDuration - 30)
+                if (NPC.localAI[0] < -cutsceneDuration && !attackInitialized)
                 {
+                    attackInitialized = true;
                     ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(QuakeCooking with { Volume = 0.12f, Pitch = -0.1f }, NPC.Center), 1, cutsceneLookRoarTime + 25, 40));
                     ExtraSoundSystem.ExtraSounds.Add(new(SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.12f, Pitch = -0.5f }, NPC.Center), 1, cutsceneLookRoarTime + 25, 40));
                 }
@@ -553,6 +554,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -688,8 +690,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (time < chargeStartTime)
                 {
-                    if (time == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         ChargeSlot = SoundEngine.PlaySound(SoundID.NPCHit57 with { Volume = 0.4f, Pitch = 0.45f, PitchVariance = 0.2f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                     }
                     if (RuinedMoonActive)
@@ -705,6 +708,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
+                    attackInitialized = false;
                     if (time == chargeStartTime)
                     {
                         NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 22;
@@ -943,11 +947,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2 targetPos = target != null ? target.Center : spawnPos;
                 if (NPC.ai[1] < SpinBeamWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
-                        int teleportDir = targetPos.X > spawnPos.X ? -1 : 1;
-                        teleportTargetPos = new Vector2(MathHelper.Clamp(targetPos.X - spawnPos.X, -1000, 1000) + Main.rand.NextFloat(280, 400) * teleportDir, Main.rand.NextFloat(200)) + spawnPos;
-
+                        attackInitialized = true;
+                        if (!TerRoguelike.mpClient)
+                        {
+                            int teleportDir = targetPos.X > spawnPos.X ? -1 : 1;
+                            teleportTargetPos = new Vector2(MathHelper.Clamp(targetPos.X - spawnPos.X, -1000, 1000) + Main.rand.NextFloat(280, 400) * teleportDir, Main.rand.NextFloat(200)) + spawnPos;
+                        }
                         SoundEngine.PlaySound(WallOfFlesh.HellBeamCharge with { Volume = 0.9f, Pitch = 0.08f, PitchVariance = 0 }, teleportTargetPos);
                         SoundEngine.PlaySound(SoundID.Zombie95 with { Volume = 0.45f }, teleportTargetPos);
                     }
@@ -1630,6 +1637,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 writer.WriteVector2(phantomPositions[i]);
             }
+            writer.WriteVector2(teleportTargetPos);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1641,6 +1649,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 phantomPositions.Add(reader.ReadVector2());
             }
+            teleportTargetPos = reader.ReadVector2();
         }
     }
 }

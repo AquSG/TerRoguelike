@@ -3469,6 +3469,9 @@ namespace TerRoguelike.NPCs
                 writer.Write(seg.OldRotation);
                 writer.Write(seg.Height);
             }
+            if (segCount > 0)
+                writer.Write(npc.rotation);
+
             writer.Write(npc.immortal);
             writer.Write(npc.dontTakeDamage);
             writer.Write(puppetOwner);
@@ -3476,6 +3479,10 @@ namespace TerRoguelike.NPCs
             writer.Write(ballAndChainSlow);
             writer.Write(sluggedTime);
             writer.Write(npc.gfxOffY);
+            writer.Write(AdaptiveArmorEnabled);
+            writer.Write(AdaptiveArmorAddRate);
+            writer.Write(AdaptiveArmorDecayRate);
+            writer.Write(AdaptiveArmorCap);
         }
         public override void ReceiveExtraAI(NPC npc, BitReader bitReader, BinaryReader reader)
         {
@@ -3513,6 +3520,9 @@ namespace TerRoguelike.NPCs
                 Segments[i].OldPosition = oldpos;
                 Segments[i].OldRotation = oldrot;
             }
+            if (segCount > 0)
+                npc.rotation = reader.ReadSingle();
+
             npc.immortal = reader.ReadBoolean();
             npc.dontTakeDamage = reader.ReadBoolean();
             puppetOwner = reader.ReadInt32();
@@ -3520,6 +3530,10 @@ namespace TerRoguelike.NPCs
             ballAndChainSlow = reader.ReadInt32();
             sluggedTime = reader.ReadInt32();
             npc.gfxOffY = reader.ReadSingle();
+            AdaptiveArmorEnabled = reader.ReadBoolean();
+            AdaptiveArmorAddRate = reader.ReadSingle();
+            AdaptiveArmorDecayRate = reader.ReadSingle();
+            AdaptiveArmorCap = reader.ReadSingle();
         }
         public override void EditSpawnRate(Player player, ref int spawnRate, ref int maxSpawns)
         {

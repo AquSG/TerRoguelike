@@ -70,6 +70,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public Vector2 summonPositionStartTelegraph = -Vector2.One;
         public Vector2 summonPosition = -Vector2.One;
         public List<int> summonTimes = new List<int> { 20, 60 };
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -243,6 +244,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 UpdateDirection();
 
                 if (NPC.ai[1] >= None.Duration)

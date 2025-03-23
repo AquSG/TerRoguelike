@@ -72,6 +72,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int[] summonDesiredEnemies = { 0, 0 };
         public int summonTelegraph = 60;
         public int summonStartup = 15;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -262,6 +263,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (target != null)
                 {
                     if (target.Center.X > NPC.Center.X)
@@ -339,8 +341,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         Room room = modNPC.isRoomNPC ? RoomList[modNPC.sourceRoomListID] : null;
                         Vector2 anchor = room != null ? room.RoomPosition16 + new Vector2(NPC.direction > 0 ? 0 : room.RoomDimensions16.X, room.RoomDimensions16.Y * 0.5f) : spawnPos + new Vector2(NPC.direction > 0 ? 1500 : -1500, 0);
-                        if (NPC.ai[1] == locustTelegraph)
+                        if (NPC.ai[1] >= locustTelegraph && !attackInitialized)
                         {
+                            attackInitialized = true;
                             LocustSlot = SoundEngine.PlaySound(LocustSwarm with { Volume = 0.4f }, anchor);
                             NPC.localAI[1] = 1;
                             soundMoveDirection = NPC.direction;
@@ -420,68 +423,73 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == Summon.Id)
             {
                 NPC.velocity *= 0.9f;
-                if (NPC.ai[1] == summonStartup)
+                if (NPC.ai[1] == summonStartup && !attackInitialized)
                 {
+                    NPC.netUpdate = true;
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.6f }, NPC.Center);
 
-                    for (int i = 0; i < summonSpawnPositions.Length; i++)
+                    if (!TerRoguelike.mpClient)
                     {
-                        summonDesiredEnemies[i] = Main.rand.NextBool() ? ModContent.NPCType<DesertSpirit>() : ModContent.NPCType<Lamia>();
-                        NPC dummyNPC = new NPC();
-                        dummyNPC.type = summonDesiredEnemies[i];
-                        dummyNPC.SetDefaults(summonDesiredEnemies[i]);
-                        Rectangle dummyRect = new Rectangle(0, 0, dummyNPC.width, dummyNPC.height);
-
-                        int direction = i == 0 ? -1 : 1;
-                        float distanceBeside = 112f * direction;
-                        Rectangle plannedRect = new Rectangle((int)(NPC.Center.X + distanceBeside - (dummyRect.Width * 0.5f)), (int)(NPC.Center.Y - (dummyRect.Height * 0.5f)), dummyRect.Width, dummyRect.Height);
-                        if (modNPC.isRoomNPC)
+                        for (int i = 0; i < summonSpawnPositions.Length; i++)
                         {
-                            plannedRect = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(plannedRect);
-                        }
-                        Vector2 position = plannedRect.Center.ToVector2();
+                            summonDesiredEnemies[i] = Main.rand.NextBool() ? ModContent.NPCType<DesertSpirit>() : ModContent.NPCType<Lamia>();
+                            NPC dummyNPC = new NPC();
+                            dummyNPC.type = summonDesiredEnemies[i];
+                            dummyNPC.SetDefaults(summonDesiredEnemies[i]);
+                            Rectangle dummyRect = new Rectangle(0, 0, dummyNPC.width, dummyNPC.height);
 
-                        Point tilePos = new Vector2(position.X, plannedRect.Bottom).ToTileCoordinates();
-
-                        if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
-                        {
-                            bool found = false;
-                            for (int y = 0; y < 25; y++)
+                            int direction = i == 0 ? -1 : 1;
+                            float distanceBeside = 112f * direction;
+                            Rectangle plannedRect = new Rectangle((int)(NPC.Center.X + distanceBeside - (dummyRect.Width * 0.5f)), (int)(NPC.Center.Y - (dummyRect.Height * 0.5f)), dummyRect.Width, dummyRect.Height);
+                            if (modNPC.isRoomNPC)
                             {
-                                for (int d = -1; d <= 1; d += 2)
-                                {
-                                    if (!ParanoidTileRetrieval(tilePos.X, tilePos.Y + (y * d)).IsTileSolidGround(true))
-                                    {
-                                        float offset = y * d * 16f;
-                                        if (modNPC.isRoomNPC)
-                                        {
-                                            Rectangle rectCheck = new Rectangle(plannedRect.X, (int)(plannedRect.Y + offset), plannedRect.Width, plannedRect.Height);
-                                            rectCheck = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(rectCheck);
-                                            Vector2 posCheck = new Vector2(rectCheck.Center.X, rectCheck.Bottom);
+                                plannedRect = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(plannedRect);
+                            }
+                            Vector2 position = plannedRect.Center.ToVector2();
 
-                                            Point tilePosCheck = posCheck.ToTileCoordinates();
-                                            if (!ParanoidTileRetrieval(tilePosCheck.X, tilePosCheck.Y).IsTileSolidGround(true))
+                            Point tilePos = new Vector2(position.X, plannedRect.Bottom).ToTileCoordinates();
+
+                            if (ParanoidTileRetrieval(tilePos.X, tilePos.Y).IsTileSolidGround(true))
+                            {
+                                bool found = false;
+                                for (int y = 0; y < 25; y++)
+                                {
+                                    for (int d = -1; d <= 1; d += 2)
+                                    {
+                                        if (!ParanoidTileRetrieval(tilePos.X, tilePos.Y + (y * d)).IsTileSolidGround(true))
+                                        {
+                                            float offset = y * d * 16f;
+                                            if (modNPC.isRoomNPC)
+                                            {
+                                                Rectangle rectCheck = new Rectangle(plannedRect.X, (int)(plannedRect.Y + offset), plannedRect.Width, plannedRect.Height);
+                                                rectCheck = RoomList[modNPC.sourceRoomListID].CheckRectWithWallCollision(rectCheck);
+                                                Vector2 posCheck = new Vector2(rectCheck.Center.X, rectCheck.Bottom);
+
+                                                Point tilePosCheck = posCheck.ToTileCoordinates();
+                                                if (!ParanoidTileRetrieval(tilePosCheck.X, tilePosCheck.Y).IsTileSolidGround(true))
+                                                {
+                                                    found = true;
+                                                    position.Y += rectCheck.Y - plannedRect.Y;
+                                                }
+                                            }
+                                            else
                                             {
                                                 found = true;
-                                                position.Y += rectCheck.Y - plannedRect.Y;
+                                                position.Y += offset;
                                             }
                                         }
-                                        else
-                                        {
-                                            found = true;
-                                            position.Y += offset;
-                                        }
                                     }
+                                    if (found)
+                                        break;
                                 }
                                 if (found)
-                                    break;
+                                    summonSpawnPositions[i] = position;
                             }
-                            if (found)
+                            else
+                            {
                                 summonSpawnPositions[i] = position;
-                        }
-                        else
-                        {
-                            summonSpawnPositions[i] = position;
+                            }
                         }
                     }
                 }
@@ -893,11 +901,19 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
+            writer.Write(summonDesiredEnemies[0]);
+            writer.Write(summonDesiredEnemies[1]);
+            writer.WriteVector2(summonSpawnPositions[0]);
+            writer.WriteVector2(summonSpawnPositions[1]);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            summonDesiredEnemies[0] = reader.ReadInt32();
+            summonDesiredEnemies[1] = reader.ReadInt32();
+            summonSpawnPositions[0] = reader.ReadVector2();
+            summonSpawnPositions[1] = reader.ReadVector2();
         }
     }
 }

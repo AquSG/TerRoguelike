@@ -251,6 +251,7 @@ namespace TerRoguelike.TerPlayer
         public Vector2 oldMouseWorld = Vector2.Zero;
         public bool syncMouseWorld = false;
         public bool allowedToExist = false;
+        public bool justRespawned = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -1727,6 +1728,11 @@ namespace TerRoguelike.TerPlayer
             }
             if (barrierHealth < 0)
                 barrierHealth = 0;
+            if (justRespawned)
+            {
+                justRespawned = false;
+                Player.statLife = Player.statLifeMax2;
+            }
         }
         public override void ProcessTriggers(TriggersSet triggersSet)
         {
@@ -3631,7 +3637,7 @@ namespace TerRoguelike.TerPlayer
                 }
             }
 
-            if (brainSucklerTime > 0)
+            if (brainSucklerTime > 0 && Player.whoAmI == Main.myPlayer)
             {
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
@@ -4068,6 +4074,7 @@ namespace TerRoguelike.TerPlayer
             deadTime = 0;
             creditsViewTime = 0;
             swingAnimCompletion = 0;
+            justRespawned = true;
         }
         #endregion
 

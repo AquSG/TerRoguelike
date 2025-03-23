@@ -66,6 +66,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int summonTelegraph = 60;
         public int vineWallCooldown = 0;
         public int desiredEnemy;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -171,6 +172,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (target != null)
                 {
                     if (target.Center.X > NPC.Center.X)
@@ -194,8 +196,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == Burrow.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(BurrowSound with { Volume = 0.1f, Pitch = 0.5f, MaxInstances = 2 }, NPC.Center);
                 }
                 if (NPC.ai[1] < 80 || NPC.ai[1] > (int)(Burrow.Duration * 0.5f) + 1)
@@ -280,8 +283,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             else if (NPC.ai[0] == VineWall.Id)
             {
                 float attackHorizSpeedMulti = (int)NPC.ai[3] % 2 == 0 ? 3f : 0.6f;
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     for (int i = 0; i < 10; i++)
                     {
                         Dust.NewDust(ballAttack1Pos, 1, 1, DustID.Grass);
@@ -309,8 +313,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == RootLift.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.DeerclopsScream with { Volume = 0.4f, Pitch = -0.7f }, NPC.Center);
                 }
                 if (NPC.ai[1] == rootAttack1 - 35 || NPC.ai[1] == rootAttack2 - 35)
@@ -396,8 +401,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             else if (NPC.ai[0] == Summon.Id)
             {
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     bool onWall = NPC.ai[3] % 2 != 0;
                     desiredEnemy = onWall ? ModContent.NPCType<Tumbletwig>() : ModContent.NPCType<SeedLobber>();
                     SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.5f, Pitch = -0.2f }, NPC.Center);

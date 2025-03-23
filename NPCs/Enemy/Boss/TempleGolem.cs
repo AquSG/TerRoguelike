@@ -74,6 +74,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int boulderWindup = 60;
         public int summonWindup = 80;
         public int summonChooseAttackCooldown = 600;
+        public bool attackInitialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -222,6 +223,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.ai[0] == None.Id)
             {
+                attackInitialized = false;
                 if (NPC.ai[1] >= None.Duration)
                 {
                     ChooseAttack();
@@ -239,8 +241,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Color particleColor = Color.Lerp(Color.Goldenrod, Color.White, 0.3f);
                 if (NPC.ai[1] < laserWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Item15 with { Volume = 1f, Pitch = -0.5f, PitchVariance = 0 }, NPC.Center);
                     }
                     if (NPC.ai[1] % 30 == 0)
@@ -295,11 +298,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float thirdWidth = boundWidth * 0.3333f;
                 if (NPC.ai[1] < spikeBallWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
-                        List<int> potentialThirds = [0, 1, 2];
-                        potentialThirds.RemoveAll(x => x == (int)NPC.localAI[2]);
-                        NPC.localAI[2] = potentialThirds[Main.rand.Next(potentialThirds.Count)];
+                        attackInitialized = true;
+                        if (!TerRoguelike.mpClient)
+                        {
+                            List<int> potentialThirds = [0, 1, 2];
+                            potentialThirds.RemoveAll(x => x == (int)NPC.localAI[2]);
+                            NPC.localAI[2] = potentialThirds[Main.rand.Next(potentialThirds.Count)];
+                        }
                         RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthTremor with { Volume = 1f }, new Vector2(leftBound.X + (thirdWidth * NPC.localAI[2]) + thirdWidth * 0.5f, NPC.position.Y));
                         NPC.netUpdate = true;
                     }
@@ -346,8 +353,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 currentFrame = 1;
                 if (NPC.ai[1] < flameWindup)
                 {
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         NPC.ai[3] = MathHelper.PiOver2;
                         int soundCount = 2; // play more so it's a higher volume lol
                         for (int i = 0; i < soundCount; i++)
@@ -419,8 +427,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (NPC.ai[1] < dartTrapWindup)
                 {
                     currentFrame = 1;
-                    if (NPC.ai[1] == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Item15 with { Volume = 1f, PitchVariance = 0, Pitch = -1 }, NPC.Center);
                         SoundEngine.PlaySound(SoundID.Item44 with { Volume = 0.4f, PitchVariance = 0, Pitch = -0.8f }, NPC.Center);
                     }
@@ -492,8 +501,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 bool spawnParticle = NPC.ai[1] < boulderWindup;
                 bool spawnDebris = NPC.ai[1] % 2 == 0;
 
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     RumbleSlot = SoundEngine.PlaySound(TerRoguelikeWorld.EarthPound with { Volume = 0.67f }, spawnPos);
                 }
 
@@ -564,8 +574,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 Vector2[] spawnPositions = [NPC.Center + new Vector2(-400, 0), NPC.Center + new Vector2(400, 0)];
 
                 currentFrame = 1;
-                if (NPC.ai[1] == 0)
+                if (!attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(SoundID.DD2_GhastlyGlaiveImpactGhost with { Volume = 1f, Pitch = -0.6f }, startPos);
                 }
                 if (NPC.ai[1] < 15)
