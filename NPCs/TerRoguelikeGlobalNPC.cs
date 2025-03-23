@@ -1759,8 +1759,12 @@ namespace TerRoguelike.NPCs
                     float targetAngle = target != null ? (target.Center - npc.Center).ToRotation() : (npc.ai[2] * -MathHelper.PiOver2) + MathHelper.PiOver2;
                     if (Math.Abs(AngleSizeBetween((ball.Center - npc.Center).ToRotation(), targetAngle - (MathHelper.PiOver2 * npc.ai[2]))) < MathHelper.Pi * 0.0625f)
                     {
-                        npc.ai[3] = Projectile.NewProjectile(npc.GetSource_FromThis(), ball.Center, (Vector2.UnitX * launchVelocity).RotatedBy(targetAngle + (MathHelper.PiOver4 * npc.ai[2] * 0.4f)), ModContent.ProjectileType<SpikedBall>(), damage, 0f, -1, ball.Rotation);
-                        Main.projectile[(int)npc.ai[3]].direction = (int)npc.ai[2];
+                        if (!TerRoguelike.mpClient)
+                        {
+                            npc.localAI[3] = Projectile.NewProjectile(npc.GetSource_FromThis(), ball.Center, (Vector2.UnitX * launchVelocity).RotatedBy(targetAngle + (MathHelper.PiOver4 * npc.ai[2] * 0.4f)), ModContent.ProjectileType<SpikedBall>(), damage, 0f, -1, ball.Rotation);
+                            Main.projectile[(int)npc.localAI[3]].direction = (int)npc.ai[2];
+                            npc.netUpdate = true;
+                        }
                         npc.ai[2] = 2;
                         if (target != null)
                         {
@@ -1783,7 +1787,7 @@ namespace TerRoguelike.NPCs
                 npc.velocity.X *= 0.9f;
                 if (npc.ai[1] >= attackWindUpTime + attackExhaustTime + attackCooldown)
                 {
-                    if ((Main.projectile[(int)npc.ai[3]].Center - npc.Center).Length() <= 12f || !Main.projectile[(int)npc.ai[3]].active)
+                    if ((Main.projectile[(int)npc.localAI[3]].Center - npc.Center).Length() <= 12f || !Main.projectile[(int)npc.localAI[3]].active && !TerRoguelike.mpClient)
                     {
                         npc.ai[2] = 0;
                         npc.ai[1] = 0;
@@ -1792,7 +1796,7 @@ namespace TerRoguelike.NPCs
                 else
                 {
                     npc.ai[1]++;
-                    if (npc.ai[1] >= attackWindUpTime + attackCooldown && !Main.projectile[(int)npc.ai[3]].active)
+                    if (npc.ai[1] >= attackWindUpTime + attackCooldown && !Main.projectile[(int)npc.localAI[3]].active && !TerRoguelike.mpClient)
                     {
                         npc.ai[1] = 0;
                         npc.ai[2] = 0;
@@ -2073,6 +2077,9 @@ namespace TerRoguelike.NPCs
         public void RogueSpiderAI(NPC npc, float speedCap, float acceleration, int passiveRoamCooldown, int passiveRoamTime, int boredomTime, float homeRadius)
         {
             Entity target = GetTarget(npc);
+            if (targetCooldown > 30 && target != null && !CanHitInLine(npc.Center, target.Center))
+                targetCooldown = 30;
+                
             npc.stairFall = true;
 
             Vector2 homePos = new Vector2(npc.ai[2], npc.ai[3]);
@@ -3581,10 +3588,14 @@ namespace TerRoguelike.NPCs
         {
             if (packetCooldown > 0)
                 packetCooldown--;
-            if (currentUpdate == 1 && Segments != null && Segments.Count > 0 && packetCooldown <= 0)
+            if (currentUpdate == 1 && Segments != null && Segments.Count > 0)
             {
-                npc.netUpdate = true;
-                packetCooldown = 15;
+                npc.netSpam = 0;
+                if (packetCooldown <= 0)
+                {
+                    npc.netUpdate = true;
+                    packetCooldown = 5;
+                }
             }
             if (TerRoguelikeWorld.IsTerRoguelikeWorld && !scalingApplied)
             {
@@ -4041,6 +4052,13 @@ namespace TerRoguelike.NPCs
                 AdaptiveArmor += AdaptiveArmorAddRate * 100 * (hit.Damage / (float)npc.lifeMax);
                 if (AdaptiveArmor > AdaptiveArmorCap)
                     AdaptiveArmor = AdaptiveArmorCap;
+            }
+            if (npc.life <= 0 && !activatedJstc && isRoomNPC && sourceRoomListID >= 0)
+            {
+                Floor targetFloor = SchematicManager.FloorID[RoomList[sourceRoomListID].AssociatedFloor];
+                if (targetFloor.jstcProgress == Floor.JstcProgress.Start)
+                    targetFloor.jstc++;
+                activatedJstc = true;
             }
         }
         public override void OnHitByProjectile(NPC npc, Projectile projectile, NPC.HitInfo hit, int damageDone)

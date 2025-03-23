@@ -19,6 +19,8 @@ using TerRoguelike.Projectiles;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
+using Mono.Cecil;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -188,6 +190,34 @@ namespace TerRoguelike.NPCs.Enemy
                 npcHitbox = new Rectangle(0, 0, Main.maxTilesX * 16, Main.maxTilesY * 16);
             }
             return CollisionPass;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write((int)NPC.localAI[3]);
+            writer.Write(Main.myPlayer);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            int idCheck = reader.ReadInt32();
+            int playerCheck = reader.ReadInt32();
+            for (int i = 0; i < Main.maxProjectiles; i++)
+            {
+                var proj = Main.projectile[i];
+                if (!proj.active || proj.type != ModContent.ProjectileType<SpikedBall>())
+                    continue;
+                var modProj = proj.ModProj();
+                if (modProj == null)
+                    continue;
+
+                if (modProj.multiplayerClientIdentifier == 255)
+                {
+                    if (modProj.multiplayerIdentifier == idCheck)
+                    {
+                        NPC.localAI[3] = i;
+                        break;
+                    }
+                }
+            }
         }
     }
 }

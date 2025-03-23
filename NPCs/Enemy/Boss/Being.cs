@@ -42,6 +42,7 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.IO;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.NPCs.Enemy.Boss
 {
@@ -202,9 +203,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             get {
                 var jp = PlayerInput.Triggers.JustPressed;
-                return jp.Jump || jp.MouseLeft || jp.MouseRight || jp.QuickMount || jp.Grapple;
+                bool value = jp.Jump || jp.MouseLeft || jp.MouseRight || jp.QuickMount || jp.Grapple;
+                return value;
             }
         }
+        public static bool forceTextControl = false;
         public int eventCounter = 0;
         public int eventTimer = 0;
         public int introTime = 0;
@@ -328,7 +331,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public void UpdateSpeech(List<StringBundle> jstcSpeech, bool allowControl = true, bool forceControl = false, bool keepBubbleThroughEvent = false)
         {
             var speech = jstcSpeech[(int)NPC.ai[3]];
-            bool control = allowControl && (forceControl || TextControl);
+            if (forceTextControl)
+                forceControl = true;
+            bool control = allowControl && (forceControl || (TextControl && !TerRoguelike.mpClient));
+            if (TerRoguelike.mpClient && TextControl)
+            {
+                ProgressDialoguePacket.Send();
+            }
 
             int speechLength = speech.TotalLength;
             if (textProgress < speechLength)
@@ -361,13 +370,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (control)
             {
-                textProgressPause = 0;
                 if (textProgress < speechLength)
                 {
-                    textProgress = speechLength;
+                    if (Main.netMode == NetmodeID.SinglePlayer)
+                    {
+                        textProgressPause = 0;
+                        textProgress = speechLength;
+                    }
                 }
                 else
                 {
+                    textProgressPause = 0;
                     textProgress = -0.5f;
                     if (jstcSpeech[(int)NPC.ai[3]].Event)
                     {
@@ -380,8 +393,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     {
                         NPC.ai[3] = 100;
                     }
+                    NPC.netUpdate = true;
                 }
             }
+        }
+        public override void PostAI()
+        {
+            forceTextControl = false;
         }
         public override void AI()
         {

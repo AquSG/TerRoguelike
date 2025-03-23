@@ -50,6 +50,7 @@ namespace TerRoguelike.MainMenu
         public static GamePadState oldGamepadState;
         public static List<Keys> oldPressedKeys = [];
         public static bool weaponSelectInPlayerMenu = true;
+        public static bool selectSingleplayer = true;
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
         public static bool BloodMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.BloodMoon;
@@ -77,7 +78,11 @@ namespace TerRoguelike.MainMenu
         {
             RoomUnmovingDataPacket.firstReceive = true;
             if (TerRoguelikeWorld.currentLoop == 0 && !TerRoguelikeWorld.promoteLoop)
+            {
                 RoomSystem.runStarted = false;
+                RoomSystem.playerCount = 1;
+            }
+                
             if (Main.menuMode == 0)
             {
                 MusicSystem.ClearMusic();
@@ -194,6 +199,8 @@ namespace TerRoguelike.MainMenu
                 if (!weaponSelectInPlayerMenu)
                 {
                     DifficultyInteraction();
+                    Main.menuMultiplayer = !selectSingleplayer;
+                    Main.menuServer = !selectSingleplayer;
                 }
                 else
                 {
@@ -243,6 +250,44 @@ namespace TerRoguelike.MainMenu
                                 SoundEngine.PlaySound(SoundID.MenuTick);
                             }
                         }
+                    }
+
+                    bool oldSelection = selectSingleplayer;
+                    if (PlayerInput.UsingGamepad)
+                    {
+                        Vector2 rightStickVect = GamePad.GetState(PlayerIndex.One).ThumbSticks.Right;
+                        if (rightStickVect.X > 0.5f)
+                            selectSingleplayer = false;
+                        else if (rightStickVect.X < 0.5f)
+                            selectSingleplayer = true;
+                    }
+                    else
+                    {
+                        float textScale = 0.75f;
+                        var font = FontAssets.DeathText.Value;
+                        string singleplayerText = Lang.menu[12].Value;
+                        string multiplayerText = Lang.menu[13].Value;
+                        for (int s = -1; s <= 1; s += 2)
+                        {
+                            string text = s == -1 ? singleplayerText : multiplayerText;
+                            Vector2 textDrawPos = centerPos + new Vector2(s * 160 - 8, 0);
+                            Vector2 textSize = font.MeasureString(text) * textScale;
+                            Vector2 topLeftTextPos = textDrawPos - (textSize * new Vector2(0.5f + -s * 0.5f, 0.5f));
+                            Rectangle interactRect = new((int)topLeftTextPos.X, (int)topLeftTextPos.Y, (int)textSize.X, (int)textSize.Y);
+                            if (interactRect.Contains(Main.MouseScreen.ToPoint()) && PlayerInput.Triggers.JustPressed.MouseLeft)
+                            {
+                                if (s == -1)
+                                {
+                                    selectSingleplayer = true;
+                                }
+                                else
+                                    selectSingleplayer = false;
+                            }
+                        }
+                    }
+                    if (oldSelection != selectSingleplayer)
+                    {
+                        SoundEngine.PlaySound(SoundID.MenuTick);
                     }
                 }
 
@@ -531,11 +576,6 @@ namespace TerRoguelike.MainMenu
             }
             if (DrawSelections)
             {
-                if (!weaponSelectInPlayerMenu)
-                {
-                    Main.menuMultiplayer = true;
-                    Main.menuServer = true;
-                }
                 var font = FontAssets.DeathText.Value;
 
                 if (!weaponSelectInPlayerMenu)
@@ -662,6 +702,19 @@ namespace TerRoguelike.MainMenu
                         float distanceLeft = -buttonDimensionsInflate.X * 0.5f * buttonCount - backgroundInflateAmt - 36;
                         Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft, -6), xRect, Color.White, 0, xRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                         Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft - 30, -6), lClickRect, Color.White, 0, lClickRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
+                    }
+
+                    string singleplayerText = Lang.menu[12].Value;
+                    string multiplayerText = Lang.menu[13].Value;
+                    float textScale = 0.75f;
+                    for (int s = -1; s <= 1; s += 2)
+                    {
+                        string text = s == -1 ? singleplayerText : multiplayerText;
+                        Vector2 textDrawPos = centerPos + new Vector2(s * 160 - 8, 0);
+                        Vector2 textSize = font.MeasureString(text);
+
+                        bool highlight = (s == -1 && selectSingleplayer) || (s == 1 && !selectSingleplayer);
+                        ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, textDrawPos, highlight ? Color.Gold : Color.Gray, 0, textSize * new Vector2(0.5f + -s * 0.5f, 0.5f), new Vector2(textScale));
                     }
                 }
 

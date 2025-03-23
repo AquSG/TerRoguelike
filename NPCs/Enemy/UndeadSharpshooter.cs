@@ -74,6 +74,10 @@ namespace TerRoguelike.NPCs.Enemy
             NPC.frameCounter += NPC.velocity.Length() * 0.2d;
             bulletPos = new Vector2(-36, 2 * NPC.direction).RotatedBy(gunRot);
             modNPC.RogueFighterShooterAI(NPC, 1.5f, -7.9f, 720f, attackTelegraph, attackCooldown, 0f, ModContent.ProjectileType<SniperBullet>(), 2f, bulletPos, NPC.damage * 3, true, false, gunRot + MathHelper.Pi);
+            if (NPC.ai[1] > 0 && NPC.ai[1] < attackTelegraph)
+            {
+                modNPC.DiscourageTargetting();
+            }
             if (NPC.ai[1] == -attackCooldown)
             {
                 SoundEngine.PlaySound(SoundID.Item40 with { Volume = 1f }, NPC.Center);

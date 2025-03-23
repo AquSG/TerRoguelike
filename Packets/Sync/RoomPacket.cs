@@ -58,7 +58,7 @@ namespace TerRoguelike.Packets
             packet.Write(room.currentWave);
             packet.Write(room.waveClearGraceTime);
             packet.Write(room.bossDead);
-            packet.Write(room.entered);
+            //packet.Write(room.entered);
             packet.Write(room.anyAlive);
             packet.Write(room.lastTelegraphDuration);
             packet.Write(room.wallActive);
@@ -84,7 +84,7 @@ namespace TerRoguelike.Packets
             room.currentWave = packet.ReadInt32();
             room.waveClearGraceTime = packet.ReadInt32();
             room.bossDead = packet.ReadBoolean();
-            room.entered = packet.ReadBoolean();
+            //room.entered = packet.ReadBoolean();
             room.anyAlive = packet.ReadBoolean();
             room.lastTelegraphDuration = packet.ReadInt32();
             room.wallActive = packet.ReadBoolean();

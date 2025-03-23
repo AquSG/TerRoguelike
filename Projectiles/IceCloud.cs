@@ -10,6 +10,7 @@ using static TerRoguelike.Managers.TextureManager;
 using TerRoguelike.Managers;
 using TerRoguelike.Particles;
 using TerRoguelike.Systems;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -35,30 +36,32 @@ namespace TerRoguelike.Projectiles
             Projectile.hostile = false;
             smokeTex = TexDict["Smoke"];
         }
-
+        public void Initialize()
+        {
+            MaxScale = Projectile.scale * 1f;
+            randomSmokeRotation = Main.rand.NextFloatDirection();
+            SpawnSmokeParticles();
+            direction = Math.Sign(Projectile.velocity.X);
+            Projectile.localAI[0] = 1;
+        }
         public override void OnSpawn(IEntitySource source)
         {
+            Initialize();
             //scale support
-            MaxScale = Projectile.scale * 1f;
             Projectile.position = Projectile.Center + new Vector2(-50 * MaxScale, -50 * MaxScale);
             Projectile.width = (int)(Projectile.width * MaxScale);
             Projectile.height = (int)(Projectile.height * MaxScale);
 
-            randomSmokeRotation = Main.rand.NextFloatDirection();
-
-            direction = Math.Sign(Projectile.velocity.X);
             Projectile.timeLeft = maxTimeLeft = (int)Projectile.ai[0];
             Projectile.rotation = Projectile.velocity.ToRotation() - (MathHelper.PiOver2 * direction * 0.16f);
-            SpawnSmokeParticles();
-            Projectile.localAI[0] = 1;
         }
         public override void AI()
         {
             if (Projectile.localAI[0] == 0)
             {
-                Projectile.localAI[0] = 1;
-                MaxScale = Projectile.scale * 1f;
+                Initialize();
             }
+
             var modProj = Projectile.ModProj();
             if (maxTimeLeft - Projectile.timeLeft >= 30 && Projectile.timeLeft > 120 && modProj != null && modProj.npcOwner >= 0 && Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID >= 0 && RoomSystem.RoomList[Main.npc[modProj.npcOwner].ModNPC().sourceRoomListID].bossDead)
                 Projectile.timeLeft = 120;
@@ -120,6 +123,14 @@ namespace TerRoguelike.Projectiles
             ParticleManager.AddParticle(new Smoke(
                     Projectile.Center, Main.rand.NextVector2CircularEdge(2f, 2f) * Main.rand.NextFloat(0.6f, 0.86f), lifetime, Color.Cyan * 0.8f, new Vector2(0.5f) * scaleMulti,
                     Main.rand.Next(15), Main.rand.NextFloat(MathHelper.TwoPi), Main.rand.NextBool() ? SpriteEffects.None : SpriteEffects.FlipHorizontally, 0.98f));
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(Projectile.timeLeft);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            Projectile.timeLeft = reader.ReadInt32();
         }
     }
 }

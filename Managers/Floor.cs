@@ -20,6 +20,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using TerRoguelike.Particles;
 using Terraria.Audio;
 using Steamworks;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Managers
 {
@@ -108,6 +109,8 @@ namespace TerRoguelike.Managers
                         int furthest = -1;
                         foreach (Player player in Main.ActivePlayers)
                         {
+                            if (player.dead)
+                                continue;
                             Rectangle pRect = player.getRect();
                             for (int i = boss; i >= SchematicManager.RoomID[StartRoomID].myRoom; i--)
                             {
@@ -214,6 +217,8 @@ namespace TerRoguelike.Managers
                                 TerRoguelikeWorld.jstcPortalTime = 1;
                                 jstcProgress = JstcProgress.Enemies;
                                 SoundEngine.PlaySound(TerRoguelikeWorld.JstcSpawn with { Volume = 1f, Pitch = -0.2f }, TerRoguelikeWorld.jstcPortalPos);
+
+                                JstcPacket.Send(this);
                             }
                         }
                     }
@@ -233,6 +238,8 @@ namespace TerRoguelike.Managers
 
                 foreach (Player player in Main.ActivePlayers)
                 {
+                    if (player.dead)
+                        continue;
                     if (player.getRect().Intersects(portalRect))
                     {
                         int boss = 0;
@@ -314,18 +321,24 @@ namespace TerRoguelike.Managers
                                 break;
                         }
 
+                        Vector2 teleportEnd = Vector2.Zero;
                         foreach (Player player2 in Main.ActivePlayers)
                         {
+                            if (player2.dead)
+                                continue;
+                            teleportEnd = finalTargetPos - (Vector2.UnitY * player2.height);
                             player2.velocity = Vector2.Zero;
                             var modPlayer = player2.ModPlayer();
                             modPlayer.jstcTeleportTime = 1;
                             modPlayer.jstcTeleportStart = player2.Center;
-                            modPlayer.jstcTeleportEnd = finalTargetPos - (Vector2.UnitY * player2.height);
+                            modPlayer.jstcTeleportEnd = teleportEnd;
                         }
                         jstcProgress = JstcProgress.EnemyPortal;
                         TerRoguelikeWorld.jstcPortalTime = -60;
                         CutsceneSystem.SetCutscene(player.Center, 180, 60, 30, 1.5f);
                         SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2], Pitch = -0.25f });
+
+                        JstcPacket.Send(this, teleportEnd);
                         break;
                     }
                 }
@@ -337,6 +350,7 @@ namespace TerRoguelike.Managers
                 Main.SetCameraLerp(0, 0);
                 foreach (Player player in Main.ActivePlayers)
                 {
+                    if (player.dead) continue;
                     var modPlayer = player.ModPlayer();
                     if (modPlayer == null) continue;
 
@@ -354,17 +368,22 @@ namespace TerRoguelike.Managers
                 }
                 if (end)
                 {
+                    Vector2 endPos = Vector2.Zero;
                     foreach (Player player in Main.ActivePlayers)
                     {
+                        if (player.dead)
+                            continue;
                         player.velocity = player.position - player.oldPosition;
 
                         var modPlayer = player.ModPlayer();
                         if (modPlayer == null) continue;
 
-                        player.Center = modPlayer.jstcTeleportEnd;
+                        endPos = modPlayer.jstcTeleportEnd;
+                        player.Center = endPos;
                         modPlayer.jstcTeleportTime = 0;
                     }
                     jstcProgress = JstcProgress.Boss;
+                    JstcPacket.Send(this, endPos);
                 }
             }
             if (jstcProgress == JstcProgress.Boss)
@@ -459,6 +478,7 @@ namespace TerRoguelike.Managers
                             }
                             if (allow)
                                 SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/weird") with { Volume = 0.25f });
+                            JstcPacket.Send(this);
                             break;
                         }
                     }
@@ -478,6 +498,8 @@ namespace TerRoguelike.Managers
 
                 foreach (Player player in Main.ActivePlayers)
                 {
+                    if (player.dead)
+                        continue;
                     if (player.getRect().Intersects(portalRect))
                     {
                         Room startRoom = RoomSystem.RoomList[SchematicManager.RoomID[StartRoomID].myRoom];
@@ -485,6 +507,8 @@ namespace TerRoguelike.Managers
 
                         foreach (Player player2 in Main.ActivePlayers)
                         {
+                            if (player2.dead)
+                                continue;
                             player2.velocity = Vector2.Zero;
                             var modPlayer = player2.ModPlayer();
                             modPlayer.jstcTeleportTime = 1;
@@ -495,6 +519,7 @@ namespace TerRoguelike.Managers
                         TerRoguelikeWorld.jstcPortalTime = -60;
                         CutsceneSystem.SetCutscene(player.Center, 180, 60, 30, 1.5f);
                         SoundEngine.PlaySound(TerRoguelikeWorld.WorldTeleport with { Volume = 0.2f, Variants = [2], Pitch = -0.25f });
+                        JstcPacket.Send(this, finalTargetPos);
                         break;
                     }
                 }
@@ -506,6 +531,7 @@ namespace TerRoguelike.Managers
                 Main.SetCameraLerp(0, 0);
                 foreach (Player player in Main.ActivePlayers)
                 {
+                    if (player.dead) continue;
                     var modPlayer = player.ModPlayer();
                     if (modPlayer == null) continue;
 
@@ -524,17 +550,21 @@ namespace TerRoguelike.Managers
                 }
                 if (end)
                 {
+                    Vector2 endPos = Vector2.Zero;
                     foreach (Player player in Main.ActivePlayers)
                     {
+                        if (player.dead) continue;
                         player.velocity = player.position - player.oldPosition;
 
                         var modPlayer = player.ModPlayer();
                         if (modPlayer == null) continue;
 
-                        player.Center = modPlayer.jstcTeleportEnd;
+                        endPos = modPlayer.jstcTeleportEnd;
+                        player.Center = endPos;
                         modPlayer.jstcTeleportTime = 0;
                     }
                     jstcProgress = JstcProgress.Jstc;
+                    JstcPacket.Send(this, endPos);
                 }
             }
             if (TerRoguelikeWorld.jstcPortalTime != 0)

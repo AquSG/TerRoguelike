@@ -250,6 +250,7 @@ namespace TerRoguelike.TerPlayer
         public Vector2 mouseWorld = Vector2.Zero;
         public Vector2 oldMouseWorld = Vector2.Zero;
         public bool syncMouseWorld = false;
+        public bool allowedToExist = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -264,6 +265,17 @@ namespace TerRoguelike.TerPlayer
                 {
                     oldMouseWorld = mouseWorld;
                     syncMouseWorld = true;
+                }
+                if (TerRoguelike.mpClient)
+                {
+                    if (RoomSystem.runStarted && !allowedToExist && !Player.dead)
+                    {
+                        Player.KillMe(PlayerDeathReason.LegacyDefault(), Main.rand.Next(10000, 25000), Main.rand.NextBool() ? -1 : 1);
+                    }
+                    else if (!RoomSystem.runStarted && Player.dead)
+                    {
+                        Player.Spawn(PlayerSpawnContext.ReviveFromDeath);
+                    }
                 }
             }
             startDirection = Player.direction;
@@ -701,7 +713,8 @@ namespace TerRoguelike.TerPlayer
                 if (storedDaggers > maxStocks)
                 {
                     storedDaggers = maxStocks;
-                    SoundEngine.PlaySound(SoundID.Item7, Player.Center);
+                    if (Player.whoAmI == Main.myPlayer)
+                        SoundEngine.PlaySound(SoundID.Item7, Player.Center);
                 }
 
                 oldStoredDaggers = storedDaggers;
@@ -719,7 +732,7 @@ namespace TerRoguelike.TerPlayer
                         visualRedThrow = true;
                     }
                         
-                    if ((int)storedDaggers != (int)oldStoredDaggers)
+                    if (Player.whoAmI == Main.myPlayer && (int)storedDaggers != (int)oldStoredDaggers)
                     {
                         if (storedDaggers == maxStocks)
                             SoundEngine.PlaySound(SoundID.Item63 with { Volume = 1f }, Player.Center);
@@ -2820,7 +2833,7 @@ namespace TerRoguelike.TerPlayer
                 itemTier = 2;
             }
 
-            SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f);
+            SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f, Player.whoAmI);
         }
         public void LunarCharmLogic(Vector2 position)
         {
@@ -2846,7 +2859,7 @@ namespace TerRoguelike.TerPlayer
                 itemTier = 2;
             }
 
-            SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f);
+            SpawnManager.SpawnItem(itemType, position, itemTier, 105, 0.5f, Player.whoAmI);
         }
         public void SpawnRoguelikeItem(Vector2 position)
         {
@@ -2905,6 +2918,8 @@ namespace TerRoguelike.TerPlayer
         {
             if (TerRoguelike.mpClient)
                 weaponSelectInPlayerMenu = true;
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                allowedToExist = true;
 
             DifficultySetPacket.Send(TerRoguelikeMenu.difficulty);
             RequestRoomUmovingDataPacket.cooldown = 0;

@@ -479,7 +479,7 @@ namespace TerRoguelike.Managers
             ClearGhosts();
             ClearSpecificProjectiles();
 
-            foreach (Player player in Main.ActivePlayers)
+            void RewardItemLogic(int owner = -1)
             {
                 // reward. boss rooms give higher tiers.
                 int chance = Main.rand.Next(1, 101);
@@ -498,8 +498,8 @@ namespace TerRoguelike.Managers
                         itemType = ItemManager.GiveRare(false);
                         itemTier = 2;
                     }
-                    SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, player.whoAmI);
-                    continue;
+                    SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, owner);
+                    return;
                 }
 
                 if (ItemManager.RoomRewardCooldown > 0)
@@ -523,7 +523,28 @@ namespace TerRoguelike.Managers
                     itemType = ItemManager.GiveRare();
                     itemTier = 2;
                 }
-                SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, player.whoAmI);
+                SpawnManager.SpawnItem(itemType, FindAirNearRoomCenter(), itemTier, 75, 0.5f, owner);
+            }
+
+            int itemCount = RoomSystem.playerCount;
+            int rewardedCount = 0;
+            foreach (Player player in Main.ActivePlayers)
+            {
+                if (rewardedCount >= itemCount)
+                    break;
+
+                int who = player.whoAmI;
+                var modPlayer = player.ModPlayer();
+                if (modPlayer != null && !modPlayer.allowedToExist)
+                    continue;
+
+                RewardItemLogic(who);
+                
+                rewardedCount++;
+            }
+            for (int i = rewardedCount; i < itemCount; i++)
+            {
+                RewardItemLogic();
             }
         }
         public virtual bool CanDescend(Player player, TerRoguelikePlayer modPlayer)

@@ -50,6 +50,7 @@ namespace TerRoguelike.Packets
             MouseWorldSync,
             RegenerateWorldSync,
             TerPlayerSync,
+            JstcSync,
 
             TeleportToPosition,
             RequestUnmovingDataSync,
@@ -67,6 +68,7 @@ namespace TerRoguelike.Packets
             StartLoopPortalSync,
             ActivateOnKillSync,
             ItemPotentiometerSync,
+            ProgressDialogueSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

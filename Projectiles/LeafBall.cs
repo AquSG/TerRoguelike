@@ -27,7 +27,7 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 300;
             Projectile.penetrate = 1;
         }
-        public override void OnSpawn(IEntitySource source)
+        public void Initialize()
         {
             SoundEngine.PlaySound(SoundID.DD2_GoblinBomberThrow with { Volume = 1f }, Projectile.Center);
             Projectile.localAI[0] = Math.Sign(Projectile.velocity.X);
@@ -40,9 +40,19 @@ namespace TerRoguelike.Projectiles
                 dust.noLightEmittence = true;
                 dust.noLight = true;
             }
+            Projectile.localAI[1] = 1;
+        }
+        public override void OnSpawn(IEntitySource source)
+        {
+            Initialize();
         }
         public override void AI()
         {
+            if (Projectile.localAI[1] == 0)
+            {
+                Initialize();
+            }
+
             if ((int)Projectile.ai[0] % 2 == 0)
                 Projectile.velocity.X *= 0.984f;
             else

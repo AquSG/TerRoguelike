@@ -56,8 +56,11 @@ namespace TerRoguelike.Packets
                 return;
             }
 
-            packet.Write(TerRoguelikeWorld.currentStage);
-            packet.Write(TerRoguelikeWorld.currentLoop);
+            packet.Write((byte)TerRoguelikeWorld.currentStage);
+            packet.Write((byte)TerRoguelikeWorld.currentLoop);
+            packet.Write(RoomSystem.runStarted);
+            packet.Write(Main.spawnTileX);
+            packet.Write(Main.spawnTileY);
 
             List<byte> packageRoomLisIDs = [];
             List<Vector2> roomPositionsList = [];
@@ -72,7 +75,7 @@ namespace TerRoguelike.Packets
             }
 
             int length = packageRoomLisIDs.Count;
-            packet.Write(length);
+            packet.Write((byte)length);
             for (int i = 0; i < length; i++)
             {
                 packet.Write(packageRoomLisIDs[i]);
@@ -91,8 +94,36 @@ namespace TerRoguelike.Packets
                 packet.Write((byte)RoomManager.FloorIDsInPlay[i]);
             }
 
+            List<byte> allowedPlayers = [];
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+                if (!player.active) continue;
+
+                var modPlayer = player.ModPlayer();
+                if (modPlayer == null) continue;
+
+                if (!RoomSystem.runStarted)
+                    modPlayer.allowedToExist = true;
+                if (modPlayer.allowedToExist)
+                    allowedPlayers.Add((byte)i);
+            }
+
+            packet.Write((byte)allowedPlayers.Count);
+            for (int i = 0; i < allowedPlayers.Count; i++)
+            {
+                packet.Write(allowedPlayers[i]);
+            }
+
+            packet.Write(RoomSystem.runStarted);
+            packet.Write(RoomSystem.playerCount);
+
             packet.Send(toClient, ignoreClient);
 
+            SendStartRoomTiles();
+        }
+        public static void SendStartRoomTiles()
+        {
             for (int i = 0; i < RoomSystem.RoomList.Count; i++)
             {
                 Room room = RoomSystem.RoomList[i];
@@ -123,12 +154,23 @@ namespace TerRoguelike.Packets
                 return;
             }
 
-            TerRoguelikeWorld.currentStage = packet.ReadInt32();
-            TerRoguelikeWorld.currentLoop = packet.ReadInt32();
+            bool amIAllowed = false;
+            if (Main.LocalPlayer.active)
+            {
+                var myModPlayer = Main.LocalPlayer.ModPlayer();
+                if (myModPlayer != null)
+                    amIAllowed = myModPlayer.allowedToExist;
+            }
+
+            TerRoguelikeWorld.currentStage = packet.ReadByte();
+            TerRoguelikeWorld.currentLoop = packet.ReadByte();
+            RoomSystem.runStarted = packet.ReadBoolean();
+            Main.spawnTileX = packet.ReadInt32();
+            Main.spawnTileY = packet.ReadInt32();
 
             RoomSystem.RoomList = [];
 
-            int length = packet.ReadInt32();
+            int length = packet.ReadByte();
             List<int> recievedRoomIDs = [];
             for (int i = 0; i < length; i++)
             {
@@ -151,6 +193,46 @@ namespace TerRoguelike.Packets
             {
                 RoomManager.FloorIDsInPlay.Add(packet.ReadByte());
             }
+
+            int playerCount = packet.ReadByte();
+            List<int> allowedPlayers = [];
+            for (int i = 0; i < playerCount; i++)
+                allowedPlayers.Add(packet.ReadByte());
+
+            for (int i = 0; i < Main.maxPlayers; i++)
+            {
+                Player player = Main.player[i];
+                if (!player.active) continue;
+                var modPlayer = player.ModPlayer();
+                if (modPlayer == null) continue;
+
+                if (allowedPlayers.Count == 0)
+                {
+                    modPlayer.allowedToExist = false;
+                    continue;
+                }
+                if (i != allowedPlayers[0])
+                {
+                    modPlayer.allowedToExist = false;
+                    continue;
+                }
+
+                allowedPlayers.RemoveAt(0);
+                modPlayer.allowedToExist = true;
+            }
+
+            if (Main.LocalPlayer.active)
+            {
+                var myModPlayer = Main.LocalPlayer.ModPlayer();
+                if (myModPlayer != null)
+                {
+                    if (!amIAllowed && myModPlayer.allowedToExist) // just got perms to exist
+                        Main.LocalPlayer.Spawn(PlayerSpawnContext.ReviveFromDeath);
+                }
+            }
+
+            RoomSystem.runStarted = packet.ReadBoolean();
+            RoomSystem.playerCount = packet.ReadInt32();
 
             if (firstReceive)
             {

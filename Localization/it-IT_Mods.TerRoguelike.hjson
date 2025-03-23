@@ -42,6 +42,7 @@ EliteSlugged: "Violento "
 EliteBurdened: "Gravato "
 TrashDescription: Nei martedì, tra le 10 e le 11 di sera, +1 rimbalzo ad i proiettili principali
 // MultiplayerReady: Ready
+// Loading: Loading
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Granata Appiccicosa

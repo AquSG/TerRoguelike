@@ -45,6 +45,7 @@ using Terraria.UI.Chat;
 using TerRoguelike.Utilities;
 using System.Threading;
 using TerRoguelike.Packets;
+using Terraria.Localization;
 
 namespace TerRoguelike.Systems
 {
@@ -65,6 +66,7 @@ namespace TerRoguelike.Systems
         public static float runStartMeter = 0;
         public static bool runStartTouched = false;
         public static bool runStarted = false;
+        public static int playerCount = 1;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -262,6 +264,7 @@ namespace TerRoguelike.Systems
                     if (runStartMeter >= 1)
                     {
                         runStarted = true;
+                        playerCount = NPC.GetActivePlayerCount();
                         if (Main.dedServ)
                         {
                             runStartMeter = 0;
@@ -482,6 +485,7 @@ namespace TerRoguelike.Systems
                 currentLoop = 0;
 
             runStarted = false;
+            RoomSystem.playerCount = 1;
         }
         #endregion
 
@@ -722,9 +726,26 @@ namespace TerRoguelike.Systems
 
                 Main.EntitySpriteDraw(TextureAssets.MagicPixel.Value, Main.Camera.ScaledPosition - Main.screenPosition, null, Color.Black, 0, Vector2.Zero, new Vector2(Main.screenWidth, Main.screenHeight * 0.0011f) / ZoomSystem.ScaleVector * 1.1f, SpriteEffects.None);
 
+                float thisZoom = 1f / ZoomSystem.zoomOverride;
                 var font = FontAssets.DeathText.Value;
-                string text = "Loading...";
-                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, Main.Camera.Center - Main.screenPosition, Color.White, RoomSystem.regeneratingWorldTime * 0.05f, font.MeasureString(text) * 0.5f, new Vector2(1));
+                string text = Language.GetOrRegister("Mods.TerRoguelike.Loading").Value;
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, Main.Camera.Center - Main.screenPosition, Color.White, 0, font.MeasureString(text) * 0.5f, new Vector2(thisZoom));
+
+                float baseRot = RoomSystem.regeneratingWorldTime * 0.15f;
+                Vector2 basePos = Main.Camera.Center - Main.screenPosition + new Vector2(0, 48) * thisZoom;
+                int count = 80;
+                var tex = TexDict["Circle"];
+                for (int i = 0; i < count; i++)
+                {
+                    float completion = i / (float)count;
+                    float opacity = (1 - completion) * 0.6f;
+                    opacity -= 0.2f;
+                    if (i == 0)
+                        opacity = 1;
+                    float rot = completion * -MathHelper.TwoPi + baseRot;
+                    Vector2 pos = basePos + rot.ToRotationVector2() * 16 * thisZoom;
+                    Main.EntitySpriteDraw(tex, pos, null, Color.White * opacity, 0, tex.Size() * 0.5f, 0.018f * thisZoom, SpriteEffects.None);
+                }
 
                 Main.spriteBatch.End();
             }
@@ -1495,20 +1516,38 @@ namespace TerRoguelike.Systems
             {
                 regeneratingWorldTime++;
                 loopingDrama = 0;
-                Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-                if (Main.LocalPlayer.dead)
-                    Main.LocalPlayer.Spawn(PlayerSpawnContext.ReviveFromDeath);
-                else
-                    Main.LocalPlayer.Spawn(PlayerSpawnContext.RecallFromItem);
+                Player player = Main.LocalPlayer;
+                player.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                if (player.active)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer != null && modPlayer.allowedToExist)
+                    {
+                        if (player.dead)
+                            player.Spawn(PlayerSpawnContext.ReviveFromDeath);
+                        else
+                            player.Spawn(PlayerSpawnContext.RecallFromItem);
+                    }
+                }
+                
                 RegenerateWorldPacket.Send();
             }
             else if (regeneratingWorldTime > 0)
             {
-                Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-                if (Main.LocalPlayer.dead)
-                    Main.LocalPlayer.Spawn(PlayerSpawnContext.ReviveFromDeath);
-                else
-                    Main.LocalPlayer.Spawn(PlayerSpawnContext.RecallFromItem);
+                Player player = Main.LocalPlayer;
+                player.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                if (player.active)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer != null && modPlayer.allowedToExist)
+                    {
+                        if (player.dead)
+                            player.Spawn(PlayerSpawnContext.ReviveFromDeath);
+                        else
+                            player.Spawn(PlayerSpawnContext.RecallFromItem);
+                    }
+                }
+
                 Main.LocalPlayer.gfxOffY = 0;
                 regeneratingWorldTime = 0;
                 loopingDrama = 0;
@@ -1542,6 +1581,7 @@ namespace TerRoguelike.Systems
                             RemoteClient.CheckSection(i, Main.player[i].position);
                         }
                     }
+                    RoomUnmovingDataPacket.SendStartRoomTiles();
                 }
                 Main.Map.Clear();
             }
@@ -1906,7 +1946,12 @@ namespace TerRoguelike.Systems
                 TerRoguelikeWorld.currentLoop++;
             }
             else
+            {
                 TerRoguelikeWorld.currentLoop = 0;
+                runStarted = false;
+                RoomSystem.playerCount = 1;
+            }
+                
             StageCountPacket.Send();
 
             TerRoguelikeMenu.prepareForRoguelikeGeneration = true;

@@ -34,8 +34,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         List<LightningDraw> lightningPath = new List<LightningDraw>();
         public override int CombatStyle => -1;
 
-        bool ableToHit = true;
+        bool ableToHit = false;
         bool canBeHit = true;
+        bool initialized = false;
 
         public override void SetStaticDefaults()
         {
@@ -91,6 +92,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             if (NPC.ai[0] == -1)
                 NPC.StrikeInstantKill();
+            initialized = true;
         }
         public void GenerateLightningPath()
         {
@@ -113,6 +115,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
+            if (!initialized)
+            {
+                SoundEngine.PlaySound(SeerSpawn with { Volume = 0.25f, MaxInstances = 3 }, NPC.Center);
+                initialized = true;
+            }
             if (modNPC.hostileTurnedAlly)
             {
                 modNPC.IgnoreRoomWallCollision = false;
@@ -144,7 +152,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 NPC.localAI[3]++;
             }
-            ableToHit = false;
+            ableToHit = modNPC.hostileTurnedAlly;
             NPC parent = Main.npc[(int)NPC.ai[0]];
             if (parent.ai[0] == 3 && parent.ai[1] == 130)
                 ableToHit = true;
@@ -394,6 +402,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(NPC.localAI[1]);
             writer.Write(NPC.localAI[2]);
             writer.Write(NPC.localAI[3]);
+            writer.Write(NPC.rotation);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -401,6 +410,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.localAI[1] = reader.ReadSingle();
             NPC.localAI[2] = reader.ReadSingle();
             NPC.localAI[3] = reader.ReadSingle();
+            NPC.rotation = reader.ReadSingle();
         }
     }
     public class LightningDraw

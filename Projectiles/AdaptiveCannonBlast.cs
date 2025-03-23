@@ -226,11 +226,13 @@ namespace TerRoguelike.Projectiles
         {
             writer.Write(Projectile.penetrate);
             writer.Write(Projectile.tileCollide);
+            writer.Write(Projectile.timeLeft);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             Projectile.penetrate = reader.ReadInt32();
             Projectile.tileCollide = reader.ReadBoolean();
+            Projectile.timeLeft = reader.ReadInt32();
         }
     }
 }
