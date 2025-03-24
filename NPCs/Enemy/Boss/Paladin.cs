@@ -821,6 +821,40 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return !NPC.immortal ? null : false;
         }
+        public override void HitEffect(NPC.HitInfo hit)
+        {
+            if (Main.dedServ)
+                return;
+
+            if (NPC.life <= 0 && deadTime > 0)
+            {
+                SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                SoundEngine.PlaySound(HammerLand with { Volume = 0.5f, MaxInstances = 10 }, NPC.Center);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(14 * NPC.direction, 0), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin1").Type);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(0, -14), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin2").Type);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-14 * NPC.direction, 14), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin3").Type);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(10 * NPC.direction, 14), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin4").Type);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, -8), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin5").Type);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(1 * NPC.direction, 0), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin6").Type);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, 0), (-Vector2.UnitX * NPC.direction * 3) + (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin7").Type);
+                for (int i = 0; i < 60; i++)
+                {
+                    Vector2 pos = NPC.Center + new Vector2(0, 16);
+                    Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                    velocity *= Main.rand.NextFloat(0.3f, 1f);
+                    if (Main.rand.NextBool(5))
+                        velocity *= 1.5f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f);
+                    int time = 110 + Main.rand.Next(70);
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
+                }
+            }
+        }
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             if (deadTime >= 150)
@@ -878,40 +912,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
+            if (TerRoguelike.mpClient && deadTime >= 120)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= 150)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
-                
-                if (!Main.dedServ)
-                {
-                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-                    SoundEngine.PlaySound(HammerLand with { Volume = 0.5f, MaxInstances = 10 }, NPC.Center);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(14 * NPC.direction, 0), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin1").Type);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(0, -14), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin2").Type);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-14 * NPC.direction, 14), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin3").Type);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(10 * NPC.direction, 14), (Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin4").Type);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, -8), (-Vector2.UnitX * NPC.direction * 3), Mod.Find<ModGore>("Paladin5").Type);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(1 * NPC.direction, 0), (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin6").Type);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.Center + new Vector2(-18 * NPC.direction, 0), (-Vector2.UnitX * NPC.direction * 3) + (-Vector2.UnitY * 3), Mod.Find<ModGore>("Paladin7").Type);
-                    for (int i = 0; i < 60; i++)
-                    {
-                        Vector2 pos = NPC.Center + new Vector2(0, 16);
-                        Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
-                        velocity *= Main.rand.NextFloat(0.3f, 1f);
-                        if (Main.rand.NextBool(5))
-                            velocity *= 1.5f;
-                        Vector2 scale = new Vector2(0.25f, 0.4f);
-                        int time = 110 + Main.rand.Next(70);
-                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
-                    }
-                }
-                
             }
-                
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
+
             return deadTime >= 150;
         }
         public override void FindFrame(int frameHeight)

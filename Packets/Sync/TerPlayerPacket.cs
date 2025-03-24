@@ -57,6 +57,7 @@ namespace TerRoguelike.Packets
 
             packet.Write(modPlayer.swingAnimCompletion);
             packet.Write(modPlayer.sluggedTime);
+            packet.Write(modPlayer.barrierHealth);
 
             bool falseSun = modPlayer.theFalseSun > 0;
             packet.Write(falseSun);
@@ -106,6 +107,7 @@ namespace TerRoguelike.Packets
             int who = (int)packet.ReadByte();
             float swingAnim = packet.ReadSingle();
             int sluggedTime = packet.ReadInt32();
+            float barrierHealth = packet.ReadSingle();
 
             bool falseSun = packet.ReadBoolean();
             int[] target = [-1, -1, -1];
@@ -160,6 +162,7 @@ namespace TerRoguelike.Packets
 
             modPlayer.swingAnimCompletion = swingAnim;
             modPlayer.sluggedTime = sluggedTime;
+            modPlayer.barrierHealth = barrierHealth;
 
             if (falseSun)
             {

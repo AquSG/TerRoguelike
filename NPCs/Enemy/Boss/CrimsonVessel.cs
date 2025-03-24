@@ -814,7 +814,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override bool? CanBeHitByProjectile(Projectile projectile) => canBeHit ? null : false;
         public override bool? CanBeHitByItem(Player player, Item item) => canBeHit ? null : false;
-
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             if (NPC.localAI[1] >= 0)
@@ -915,55 +918,65 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
                 }
             }
-            
+
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
-
-                if (!Main.dedServ)
-                {
-                    if (SoundEngine.TryGetActiveSound(TeleportSlot, out var sound) && sound.IsPlaying)
-                    {
-                        sound.Stop();
-                    }
-
-                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 396);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 397);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 398);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 399);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 400);
-                    Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 401);
-                    for (int i = 0; i < 90; i++)
-                    {
-                        Vector2 pos = NPC.Center + new Vector2(0, 16);
-                        int width = (int)(NPC.width * 0.25f);
-                        pos.X += Main.rand.Next(-width, width);
-                        Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
-                        velocity *= Main.rand.NextFloat(0.3f, 1f);
-                        if (Main.rand.NextBool(5))
-                            velocity *= 1.5f;
-                        Vector2 scale = new Vector2(0.25f, 0.4f);
-                        int time = 110 + Main.rand.Next(70);
-                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
-                    }
-                }
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration - 30;
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (Main.dedServ)
+                return;
+
             if (NPC.life > 0)
             {
                 for (int i = 0; (double)i < hit.Damage / (double)NPC.lifeMax * 2000.0; i++)
                 {
                     Dust.NewDust(NPC.position, NPC.width, NPC.height, 5, hit.HitDirection, -1f);
+                }
+            }
+            else if (deadTime > 0)
+            {
+                if (SoundEngine.TryGetActiveSound(TeleportSlot, out var sound) && sound.IsPlaying)
+                {
+                    sound.Stop();
+                }
+
+                SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 396);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 397);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 398);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 399);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 400);
+                Gore.NewGore(NPC.GetSource_Death(), NPC.position, new Vector2((float)Main.rand.Next(-30, 31) * 0.2f, (float)Main.rand.Next(-30, 31) * 0.2f), 401);
+                for (int i = 0; i < 90; i++)
+                {
+                    Vector2 pos = NPC.Center + new Vector2(0, 16);
+                    int width = (int)(NPC.width * 0.25f);
+                    pos.X += Main.rand.Next(-width, width);
+                    Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                    velocity *= Main.rand.NextFloat(0.3f, 1f);
+                    if (Main.rand.NextBool(5))
+                        velocity *= 1.5f;
+                    Vector2 scale = new Vector2(0.25f, 0.4f);
+                    int time = 110 + Main.rand.Next(70);
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                    ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Red * 0.65f, scale, velocity.ToRotation(), true));
                 }
             }
         }

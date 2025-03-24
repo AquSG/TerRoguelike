@@ -173,6 +173,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
+            if (modNPC.currentUpdate == 1)
+            {
+                if (modNPC.packetCooldown > 0)
+                    modNPC.packetCooldown--;
+                if (modNPC.packetCooldown <= 0)
+                {
+                    modNPC.packetCooldown = 5;
+                    NPC.netUpdate = true;
+                }
+            }
+
             if (deadTime > 0)
             {
                 CheckDead();
@@ -190,9 +202,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 target = modNPC.GetTarget(NPC);
 
-                if (NPC.localAI[0] == -cutsceneDuration)
+                if (NPC.localAI[0] >= -cutsceneDuration && NPC.localAI[0] < -60 && !attackInitialized)
                 {
                     IceWindSlot = SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.008f, PitchVariance = 0.05f }, NPC.Center);
+                }
+                if (NPC.localAI[0] == -cutsceneDuration)
+                {
                     if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
                     {
                         sound.Volume = 0;
@@ -873,7 +888,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             return false;
         }
-
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             if (deadTime >= deathCutsceneDuration - 30)
@@ -956,6 +974,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!ParanoidTileRetrieval(snowPos.ToTileCoordinates()).IsTileSolidGround(true))
                     ParticleManager.AddParticle(new Snow(snowPos, Vector2.UnitY * Main.rand.NextFloat(1f), 300, Color.White * 0.6f, new Vector2(Main.rand.NextFloat(0.018f, 0.024f)), 0, 0.96f, 0.05f, 30, 0, true));
             }
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -963,6 +986,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration - 30;
         }

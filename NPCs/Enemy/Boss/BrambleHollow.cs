@@ -692,6 +692,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 30)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration)
             {
                 NPC.immortal = false;
@@ -699,6 +704,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration;
         }
@@ -843,7 +851,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float halfTime = (Burrow.Duration * 0.5f);
                 scale = MathHelper.Clamp(MathHelper.SmoothStep(0, 1f, Math.Abs((NPC.ai[1] - halfTime) / (halfTime))), 0, 1f);
             }
-            return true;
+            return deadTime == 0;
         }
         public override bool PreDraw(SpriteBatch spriteBatch, Vector2 screenPos, Color drawColor)
         {

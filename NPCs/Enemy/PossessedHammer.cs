@@ -18,6 +18,7 @@ using Microsoft.Xna.Framework.Graphics.PackedVector;
 using static TerRoguelike.Schematics.SchematicManager;
 using Terraria.DataStructures;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -113,6 +114,14 @@ namespace TerRoguelike.NPCs.Enemy
         public override Color? GetAlpha(Color drawColor)
         {
             return Color.Lerp(Color.Purple, drawColor, 0.5f);
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.rotation);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.rotation = reader.ReadSingle();
         }
     }
 }

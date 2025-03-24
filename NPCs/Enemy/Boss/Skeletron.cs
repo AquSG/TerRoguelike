@@ -154,6 +154,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
+            if (modNPC.currentUpdate == 1)
+            {
+                if (modNPC.packetCooldown > 0)
+                    modNPC.packetCooldown--;
+                if (modNPC.packetCooldown <= 0)
+                {
+                    modNPC.packetCooldown = 5;
+                    NPC.netUpdate = true;
+                }
+            }
+
             if (deadTime > 0)
             {
                 CheckDead();
@@ -371,6 +383,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else if (NPC.ai[1] < SoulBurst.Duration - soulBurstWindDown)
                 {
+                    if ((int)NPC.ai[1] == soulBurstWindup)
+                        NPC.netUpdate = true;
+
                     if (SoundEngine.TryGetActiveSound(trackedSlot, out var sound) && sound.IsPlaying)
                         sound.Volume -= 0.03f;
 
@@ -810,7 +825,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return canBeHit ? null : false;
         }
-
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             if (deadTime >= deathCutsceneDuration - 30)
@@ -949,6 +967,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -964,6 +987,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration - 30;
         }
@@ -1104,6 +1130,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.WriteVector2(spawnPos);
             writer.Write(eyeParticleIntensity);
             writer.Write(deadTime);
+            bool syncRot = NPC.localAI[0] < 0;
+            writer.Write(syncRot);
+            if (syncRot)
+                writer.Write(NPC.rotation);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1113,6 +1143,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
                 deadTime = 1;
+            bool syncRot = reader.ReadBoolean();
+            if (syncRot)
+            {
+                NPC.rotation = reader.ReadSingle();
+            }
         }
     }
 }

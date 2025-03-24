@@ -680,7 +680,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return canBeHit ? null : false;
         }
-
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             if (deadTime >= deathCutsceneDuration - 30)
@@ -764,6 +767,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             CutsceneSystem.cameraTargetCenter += (NPC.Center - CutsceneSystem.cameraTargetCenter) * 0.05f;
 
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -771,6 +779,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration - 30;
         }

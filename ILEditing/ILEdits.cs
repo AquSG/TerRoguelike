@@ -48,6 +48,7 @@ namespace TerRoguelike.ILEditing
 		public int passInNPC = -1;
 		public int passInPlayer = -1;
 		public static int fakeHoverItem = 0;
+		public static bool switchFilePath = false;
         public override void OnModLoad()
         {
             On_Main.DamageVar_float_int_float += AdjustDamageVariance;
@@ -83,6 +84,28 @@ namespace TerRoguelike.ILEditing
             On_UIAchievementsMenu.OnActivate += WeaponDisplayOnPlayerMenuEdit2;
             On_UIWorkshopHub.OnInitialize += WeaponDisplayOnPlayerMenuEdit3;
             On_Player.TileInteractionsUse += On_Player_TileInteractionsUse;
+            On_Main.GetPlayerPathFromName += On_Main_GetPlayerPathFromName;
+            On_Main.GetWorldPathFromName += On_Main_GetWorldPathFromName;
+        }
+
+        private string On_Main_GetWorldPathFromName(On_Main.orig_GetWorldPathFromName orig, string worldName, bool cloudSave)
+        {
+			if (!switchFilePath)
+				return orig.Invoke(worldName, cloudSave);
+			string returnString = orig.Invoke(worldName, cloudSave);
+            int index = returnString.LastIndexOf('\\');
+            returnString = returnString.Insert(index + 1, "TerRoguelike\\");
+            return returnString;
+        }
+
+        private string On_Main_GetPlayerPathFromName(On_Main.orig_GetPlayerPathFromName orig, string playerName, bool cloudSave)
+        {
+			if (!switchFilePath)
+				return orig.Invoke(playerName, cloudSave);
+			string returnString = orig.Invoke(playerName, cloudSave);
+            int index = returnString.LastIndexOf('\\');
+            returnString = returnString.Insert(index + 1, "TerRoguelike\\");
+			return returnString;
         }
 
         private void On_Player_TileInteractionsUse(On_Player.orig_TileInteractionsUse orig, Player self, int myX, int myY)
@@ -858,7 +881,9 @@ namespace TerRoguelike.ILEditing
 												 select x.Clone();
 				List<Item> startingItems = PlayerLoader.GetStartingItems(_player, vanillaItems);
 				PlayerLoader.SetStartInventory(_player, startingItems);
+				switchFilePath = true;
 				TerRoguelikeMenu.desiredPlayer = PlayerFileData.CreateAndSave(_player);
+				switchFilePath = false;
 				Main.LoadPlayers();
 				Main.menuMode = 1;
 				return;

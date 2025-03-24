@@ -295,6 +295,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 if (chargeProgress <= 3)
                 {
+                    attackInitialized = false;
                     NPC.localAI[1]++;
                     Vector2 targetPos = chargeDesiredPos;
                     bool close = (NPC.Center - targetPos).Length() <= 160 + (NPC.localAI[1] * 0.34f);
@@ -334,8 +335,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     NPC.localAI[1] = 0;
                     Vector2 targetPos = target == null ? spawnPos : target.Center;
 
-                    if (chargeProgress == 3)
+                    if (chargeProgress < 10 && !attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
                         SoundEngine.PlaySound(SoundID.NPCDeath33 with { Volume = 0.35f, Pitch = -0.5f, PitchVariance = 0f, MaxInstances = 3 }, NPC.Center);
                     }
@@ -614,9 +616,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 float rotToTarget = (targetPos - NPC.Center).ToRotation();
                 if (NPC.ai[1] >= 3 && NPC.ai[1] < projChargeTelegraph + projChargingDuration)
                 {
-
-                    if (NPC.ai[1] == 3)
+                    if (NPC.ai[1] < 10 && !attackInitialized)
                     {
+                        attackInitialized = true;
                         SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -1f, PitchVariance = 0.11f, MaxInstances = 3 }, NPC.Center);
                         chargeSlot = SoundEngine.PlaySound(SoundID.DD2_BetsyScream with { Volume = 0.4f, Pitch = -0.6f, PitchVariance = 0f}, NPC.Center);
                     }
@@ -817,7 +819,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             return false;
         }
-
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             segmentRotationInterpolant = 0.975f;
@@ -937,58 +942,28 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 CutsceneSystem.cameraTargetCenter += (NPC.Center - CutsceneSystem.cameraTargetCenter) * 0.1f;
             }
 
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
-
-                if (!Main.dedServ)
-                {
-                    SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
-                    SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
-                    for (int s = 0; s < modNPC.Segments.Count; s++)
-                    {
-                        WormSegment segment = modNPC.Segments[s];
-                        for (int i = 0; i < 10; i++)
-                        {
-                            Vector2 pos = segment.Position + new Vector2(0, 16);
-                            int width = (int)(NPC.width * 0.25f);
-                            pos.X += Main.rand.Next(-width, width);
-                            Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
-                            velocity *= Main.rand.NextFloat(0.3f, 1f);
-                            if (Main.rand.NextBool(5))
-                                velocity *= 1.5f;
-                            Vector2 scale = new Vector2(0.25f, 0.4f) * 0.86f;
-                            int time = 110 + Main.rand.Next(70);
-                            Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
-                            ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
-                            ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
-                        }
-                        if (s == 0)
-                        {
-                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 24);
-                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 25);
-                        }
-                        else if (s == modNPC.Segments.Count - 1)
-                        {
-                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 28);
-                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 29);
-                        }
-                        else
-                        {
-                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 26);
-                            Gore.NewGore(NPC.GetSource_Death(), segment.Position + new Vector2(-segment.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 27);
-                        }
-                    }
-                }
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration - 30;
         }
         public override void HitEffect(NPC.HitInfo hit)
         {
+            if (Main.dedServ)
+                return;
             if (modNPC.Segments == null || modNPC.Segments.Count == 0)
                 return;
             WormSegment segment = modNPC.Segments[modNPC.hitSegment];
@@ -1000,9 +975,44 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     Dust.NewDust(segment.Position + new Vector2(-segment.Height * 0.5f), (int)segment.Height, (int)segment.Height, 5, hit.HitDirection, -1f);
                 }
             }
-            else
+            else if (deadTime > 0)
             {
-                
+                SoundEngine.PlaySound(SoundID.DD2_KoboldIgnite with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
+                SoundEngine.PlaySound(SoundID.NPCDeath12 with { Volume = 0.8f, Pitch = -0.5f }, NPC.Center);
+                for (int s = 0; s < modNPC.Segments.Count; s++)
+                {
+                    WormSegment seg = modNPC.Segments[s];
+                    for (int i = 0; i < 10; i++)
+                    {
+                        Vector2 pos = seg.Position + new Vector2(0, 16);
+                        int width = (int)(NPC.width * 0.25f);
+                        pos.X += Main.rand.Next(-width, width);
+                        Vector2 velocity = new Vector2(0, -4f).RotatedBy(Main.rand.NextFloat(-MathHelper.PiOver4 * 1.5f, MathHelper.PiOver4 * 1.5f));
+                        velocity *= Main.rand.NextFloat(0.3f, 1f);
+                        if (Main.rand.NextBool(5))
+                            velocity *= 1.5f;
+                        Vector2 scale = new Vector2(0.25f, 0.4f) * 0.86f;
+                        int time = 110 + Main.rand.Next(70);
+                        Color color = Color.Lerp(Color.Lerp(Color.Green, Color.Yellow, Main.rand.NextFloat(0.7f)), Color.Black, 0.48f);
+                        ParticleManager.AddParticle(new Blood(pos, velocity, time, Color.Black * 0.65f, scale, velocity.ToRotation(), false));
+                        ParticleManager.AddParticle(new Blood(pos, velocity, time, color * 0.65f, scale, velocity.ToRotation(), true));
+                    }
+                    if (s == 0)
+                    {
+                        Gore.NewGore(NPC.GetSource_Death(), seg.Position + new Vector2(-seg.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 24);
+                        Gore.NewGore(NPC.GetSource_Death(), seg.Position + new Vector2(-seg.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 25);
+                    }
+                    else if (s == modNPC.Segments.Count - 1)
+                    {
+                        Gore.NewGore(NPC.GetSource_Death(), seg.Position + new Vector2(-seg.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 28);
+                        Gore.NewGore(NPC.GetSource_Death(), seg.Position + new Vector2(-seg.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 29);
+                    }
+                    else
+                    {
+                        Gore.NewGore(NPC.GetSource_Death(), seg.Position + new Vector2(-seg.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 26);
+                        Gore.NewGore(NPC.GetSource_Death(), seg.Position + new Vector2(-seg.Height * 0.5f), Main.rand.NextVector2Circular(4, 4), 27);
+                    }
+                }
             }
         }
         public override void FindFrame(int frameHeight)
