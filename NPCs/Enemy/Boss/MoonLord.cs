@@ -682,18 +682,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             if (effectiveTime == 0)
                             {
                                 SoundEngine.PlaySound(SoundID.Item13 with { Volume = comboAttack ? 0.66f : 1f, Pitch = 0.2f, MaxInstances = 3 }, npc.Center);
-                                if (!TerRoguelike.mpClient)
+                                if (n == 1)
                                 {
-                                    if (n == 1)
-                                    {
-                                        leftHandTargetPos = leftHandAnchor + (leftHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
-                                    }
-                                    else if (n == 2)
-                                    {
-                                        rightHandTargetPos = rightHandAnchor + (rightHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
-                                    }
-                                    npc.netUpdate = true;
+                                    leftHandTargetPos = leftHandAnchor + (leftHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
                                 }
+                                else if (n == 2)
+                                {
+                                    rightHandTargetPos = rightHandAnchor + (rightHandAnchor - targetPos).SafeNormalize(Vector2.UnitY) * 80 + Main.rand.NextVector2Circular(80, 80);
+                                }
+                                npc.netUpdate = true;
                             }
                             if (effectiveTime < phantBoltWindup && PhantBolt.Duration - NPC.ai[1] > 10)
                             {
@@ -787,20 +784,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (npc == null)
                             continue;
 
-                        if (!TerRoguelike.mpClient)
+                        if (i == 1)
                         {
-                            if (i == 1)
-                            {
-                                leftHandTargetPos = leftHandAnchor + new Vector2(-32, -64);
-                                leftHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
-                            }
-                            else
-                            {
-                                rightHandTargetPos = rightHandAnchor + new Vector2(32, -64);
-                                rightHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
-                            }
-                            npc.netUpdate = true;
+                            leftHandTargetPos = leftHandAnchor + new Vector2(-32, -64);
+                            leftHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
                         }
+                        else
+                        {
+                            rightHandTargetPos = rightHandAnchor + new Vector2(32, -64);
+                            rightHandTargetPos += new Vector2(Main.rand.NextFloat(-96, 96), completion * 184);
+                        }
+                        npc.netUpdate = true;
 
                         SoundEngine.PlaySound(SoundID.DD2_DarkMageCastHeal with { Volume = 1f, MaxInstances = 10 }, npc.Center);
                         if (!TerRoguelike.mpClient)
@@ -1319,6 +1313,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.dontTakeDamage = false;
                 NPC.life = 0;
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration;
         }

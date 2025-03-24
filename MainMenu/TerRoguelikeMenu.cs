@@ -28,6 +28,9 @@ using Terraria.Localization;
 using static TerRoguelike.Managers.ItemManager;
 using System.Security.Cryptography.X509Certificates;
 using TerRoguelike.Packets;
+using log4net.Repository.Hierarchy;
+using TerRoguelike.ILEditing;
+using Microsoft.Build.Tasks;
 
 namespace TerRoguelike.MainMenu
 {
@@ -82,7 +85,9 @@ namespace TerRoguelike.MainMenu
                 RoomSystem.runStarted = false;
                 RoomSystem.playerCount = 1;
             }
-                
+
+            
+           
             if (Main.menuMode == 0)
             {
                 MusicSystem.ClearMusic();
@@ -93,26 +98,25 @@ namespace TerRoguelike.MainMenu
                 if (wipeTempWorld)
                 {
                     bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
+
                     WorldFileData activeWorldFileData = Main.ActiveWorldFileData;
-                    if (Main.netMode == NetmodeID.SinglePlayer)
+                    string path = activeWorldFileData.Path;
+                    int index = -1;
+                    if (path != null)
                     {
-                        bool isCloudSave = activeWorldFileData.IsCloudSave;
-                        if (FileUtilities.Exists(Main.worldPathName, isCloudSave))
+                        index = path.LastIndexOf("\\TerRoguelike\\");
+                    }
+
+                    if (index > -1)
+                    {
+                        index = path.LastIndexOf("\\");
+                        string directory = path.Substring(0, index + 1);
+                        string[] paths = Directory.GetFiles(directory);
+                        foreach (string filepath in paths)
                         {
-                            FileUtilities.Delete(Main.worldPathName, isCloudSave, fullyDelete);
-                        }
-                        if (FileUtilities.Exists(Main.worldPathName + ".bak", isCloudSave))
-                        {
-                            FileUtilities.Delete(Main.worldPathName + ".bak", isCloudSave, fullyDelete);
-                        }
-                        string moddedWorldPathName = Path.ChangeExtension(Main.worldPathName, ".twld");
-                        if (FileUtilities.Exists(moddedWorldPathName, isCloudSave))
-                        {
-                            FileUtilities.Delete(moddedWorldPathName, isCloudSave, fullyDelete);
-                        }
-                        if (FileUtilities.Exists(moddedWorldPathName + ".bak", isCloudSave))
-                        {
-                            FileUtilities.Delete(moddedWorldPathName + ".bak", isCloudSave, fullyDelete);
+                            string extension = Path.GetExtension(filepath);
+                            bool delete = extension == ".wld" || extension == ".twld" || extension == ".bak" || extension == ".bak2";
+                            FileUtilities.Delete(filepath, false, fullyDelete);
                         }
                         Main.ActiveWorldFileData = new WorldFileData();
                     }
@@ -125,32 +129,28 @@ namespace TerRoguelike.MainMenu
                 }
                 if (wipeTempPlayer)
                 {
-                    if (Main.LocalPlayer.ModPlayer() != null && Main.LocalPlayer.ModPlayer().isDeletableOnExit)
+                    bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
+
+                    PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
+                    string path = activePlayerFileData.Path;
+                    int index = -1;
+                    if (path != null)
                     {
-                        bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
-                        PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
-                        if (!activePlayerFileData.ServerSideCharacter)
+                        index = path.LastIndexOf("\\TerRoguelike\\");
+                    }
+
+                    if (index > -1)
+                    {
+                        index = path.LastIndexOf("\\");
+                        string directory = path.Substring(0, index + 1);
+                        string[] paths = Directory.GetFiles(directory);
+                        foreach (string filepath in paths)
                         {
-                            bool isCloudSave = activePlayerFileData.IsCloudSave;
-                            if (FileUtilities.Exists(Main.playerPathName, isCloudSave))
-                            {
-                                FileUtilities.Delete(Main.playerPathName, isCloudSave, fullyDelete);
-                            }
-                            if (FileUtilities.Exists(Main.playerPathName + ".bak", isCloudSave))
-                            {
-                                FileUtilities.Delete(Main.playerPathName + ".bak", isCloudSave, fullyDelete);
-                            }
-                            string moddedPlayerPathName = Path.ChangeExtension(Main.playerPathName, ".tplr");
-                            if (FileUtilities.Exists(moddedPlayerPathName, isCloudSave))
-                            {
-                                FileUtilities.Delete(moddedPlayerPathName, isCloudSave, fullyDelete);
-                            }
-                            if (FileUtilities.Exists(moddedPlayerPathName + ".bak", isCloudSave))
-                            {
-                                FileUtilities.Delete(moddedPlayerPathName + ".bak", isCloudSave, fullyDelete);
-                            }
-                            Main.ActivePlayerFileData = new PlayerFileData();
+                            string extension = Path.GetExtension(filepath);
+                            bool delete = extension == ".plr" || extension == ".tplr" || extension == ".bak" || extension == ".bak2" || extension == ".map" || extension == ".tmap";
+                            FileUtilities.Delete(filepath, false, fullyDelete);
                         }
+                        Main.ActivePlayerFileData = new PlayerFileData();
                     }
                     wipeTempPlayer = false;
                 }
@@ -514,8 +514,9 @@ namespace TerRoguelike.MainMenu
                 }
             }
 
-            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889 && Main.menuMode != 31 && Main.menuMode != 882)
+            if (Main.menuMode != 888 && Main.menuMode != 1 && Main.menuMode != 10 && Main.menuMode != 6 && Main.menuMode != 889 && Main.menuMode != 31 && Main.menuMode != 882 && Main.menuMode != 30 && Main.menuMode != 14)
                 prepareForRoguelikeGeneration = false;
+
             if (Main.menuMode != 888 && Main.menuMode != 0)
             {
                 TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = false;
@@ -872,7 +873,9 @@ namespace TerRoguelike.MainMenu
             Main.maxTilesY = 1800;
             Main.GameMode = 0;
             WorldGen.WorldGenParam_Evil = 0;
+            ILEdits.switchFilePath = true;
             Main.ActiveWorldFileData = WorldFile.CreateMetadata(Main.worldName = "The Dungeon", false, Main.GameMode);
+            ILEdits.switchFilePath = false;
             Main.ActiveWorldFileData.SetSeedToRandom();
             Main.menuMode = 10;
             WorldGen.CreateNewWorld();

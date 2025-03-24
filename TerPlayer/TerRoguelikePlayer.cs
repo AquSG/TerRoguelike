@@ -810,7 +810,7 @@ namespace TerRoguelike.TerPlayer
                 for (int i = 0; i < Main.maxNPCs; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly)
+                    if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly || CutsceneSystem.cutsceneDisableControl)
                         continue;
 
                     float requiredDistance = 128f;
@@ -845,7 +845,7 @@ namespace TerRoguelike.TerPlayer
                         if (Player.whoAmI == Main.myPlayer)
                         {
                             target.StrikeNPC(info);
-                            NetMessage.SendStrikeNPC(target, info);
+                            NetMessage.SendStrikeNPC(target, info, Main.myPlayer);
                         }
                         CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
                         if (target.life <= 0)
@@ -970,7 +970,7 @@ namespace TerRoguelike.TerPlayer
                 {
                     droneBuddyRotation = droneBuddyRotation % MathHelper.TwoPi;
                     NPC npc = Main.npc[droneTarget];
-                    if (!npc.CanBeChasedBy() || npc.life <= 0 || npc.Center.Distance(Player.Center) > 960f || !Collision.CanHit(droneBuddyVisualPosition, 1, 1, npc.Center, 1, 1))
+                    if (!npc.CanBeChasedBy() || npc.life <= 0 || npc.Center.Distance(Player.Center) > 960f || !Collision.CanHit(droneBuddyVisualPosition, 1, 1, npc.Center, 1, 1) || CutsceneSystem.cutsceneDisableControl)
                         droneTarget = -1;
                     else
                         droneBuddyAttackCooldown += 20f / (1f + ((droneBuddy - 1) * 0.5f));
@@ -981,7 +981,7 @@ namespace TerRoguelike.TerPlayer
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         NPC npc = Main.npc[i];
-                        if (npc.life <= 0 || !npc.CanBeChasedBy())
+                        if (npc.life <= 0 || !npc.CanBeChasedBy() || CutsceneSystem.cutsceneDisableControl)
                             continue;
 
                         if (!Collision.CanHit(droneBuddyVisualPosition, 1, 1, npc.Center, 1, 1))
@@ -1121,7 +1121,7 @@ namespace TerRoguelike.TerPlayer
                     wantedScreenRect.Inflate(200, 200);
 
                     NPC npc = Main.npc[allSeeingEyeTarget];
-                    if (npc.life <= 0 || !npc.CanBeChasedBy() || !wantedScreenRect.Contains(mouseWorld.ToPoint()))
+                    if (npc.life <= 0 || !npc.CanBeChasedBy() || !wantedScreenRect.Contains(mouseWorld.ToPoint()) || CutsceneSystem.cutsceneDisableControl)
                         allSeeingEyeTarget = -1;
                 }
 
@@ -1136,7 +1136,7 @@ namespace TerRoguelike.TerPlayer
                         for (int i = 0; i < Main.maxNPCs; i++)
                         {
                             NPC npc = Main.npc[i];
-                            if (npc.life <= 0 || !npc.CanBeChasedBy())
+                            if (npc.life <= 0 || !npc.CanBeChasedBy() || CutsceneSystem.cutsceneDisableControl)
                                 continue;
 
                             var modNPC = npc.ModNPC();
@@ -1168,7 +1168,7 @@ namespace TerRoguelike.TerPlayer
                     if (Player.whoAmI == Main.myPlayer)
                     {
                         target.StrikeNPC(info);
-                        NetMessage.SendStrikeNPC(target, info);
+                        NetMessage.SendStrikeNPC(target, info, Main.myPlayer);
                     }
                     CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
                     if (target.life <= 0)
@@ -1280,7 +1280,7 @@ namespace TerRoguelike.TerPlayer
                     for (int i = 0; i < Main.maxNPCs; i++)
                     {
                         NPC npc = Main.npc[i];
-                        if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly)
+                        if (!npc.active || npc.life <= 0 || npc.immortal || npc.dontTakeDamage || npc.friendly || CutsceneSystem.cutsceneDisableControl)
                             continue;
                         var modNPC = npc.ModNPC();
                         if (modNPC == null)
@@ -1420,7 +1420,7 @@ namespace TerRoguelike.TerPlayer
                         }
 
                         npc = Main.npc[target];
-                        if (npc.CanBeChasedBy())
+                        if (npc.CanBeChasedBy() && !CutsceneSystem.cutsceneDisableControl)
                         {
                             modNPC = npc.ModNPC();
                             Vector2 targetPos;
@@ -1470,7 +1470,7 @@ namespace TerRoguelike.TerPlayer
                     {
                         npc = Main.npc[n];
 
-                        if (!npc.CanBeChasedBy()) continue;
+                        if (!npc.CanBeChasedBy() || CutsceneSystem.cutsceneDisableControl) continue;
 
                         bool allow = true;
                         for (int i2 = 0; i2 < theFalseSunTarget.Length; i2++)
@@ -2270,7 +2270,7 @@ namespace TerRoguelike.TerPlayer
                         continue;
 
                     NPC npc = Main.npc[i];
-                    if (npc == null || !npc.active || npc.friendly || npc.immortal || npc.dontTakeDamage)
+                    if (npc == null || !npc.active || npc.friendly || npc.immortal || npc.dontTakeDamage || CutsceneSystem.cutsceneDisableControl)
                         continue;
 
                     var modNPC = npc.ModNPC();
@@ -2606,7 +2606,7 @@ namespace TerRoguelike.TerPlayer
                         break;
 
                     NPC npc = Main.npc[i];
-                    if (!npc.active || npc.life <= 0 || npc.friendly || npc.immortal || npc.dontTakeDamage)
+                    if (!npc.active || npc.life <= 0 || npc.friendly || npc.immortal || npc.dontTakeDamage || CutsceneSystem.cutsceneDisableControl)
                         continue;
 
                     Vector2 npcPos = npc.ModNPC().Segments.Count > 0 ? npc.ModNPC().ClosestSegment(Player.Center) : npc.getRect().ClosestPointInRect(Player.Center);

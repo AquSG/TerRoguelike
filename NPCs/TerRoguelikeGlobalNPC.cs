@@ -2901,6 +2901,7 @@ namespace TerRoguelike.NPCs
             {
                 npc.velocity = (npc.rotation - MathHelper.PiOver4 * 3).ToRotationVector2() * dashSpeed;
                 npc.ai[0]++;
+                npc.netUpdate = true;
             }
 
             if (npc.ai[0] <= attackTelegraph)
@@ -3913,7 +3914,7 @@ namespace TerRoguelike.NPCs
         {
             ignitedHitCooldown += 10; // hits 6 times a second
 
-            if (npc.immortal || npc.dontTakeDamage)
+            if (npc.immortal || npc.dontTakeDamage || CutsceneSystem.cutsceneDisableControl)
                 return;
 
             int origDamage = hitDamage;
@@ -3938,7 +3939,7 @@ namespace TerRoguelike.NPCs
             {
                 int preHitHP = npc.life;
                 npc.StrikeNPC(info);
-                NetMessage.SendStrikeNPC(npc, info);
+                NetMessage.SendStrikeNPC(npc, info, owner);
 
                 if (preHitHP - displayDamage <= 0)
                 {
@@ -3979,7 +3980,7 @@ namespace TerRoguelike.NPCs
             {
                 int prehitHP = npc.life;
                 npc.StrikeNPC(info);
-                NetMessage.SendStrikeNPC(npc, info);
+                NetMessage.SendStrikeNPC(npc, info, owner);
                 if (prehitHP - displayDamage <= 0)
                 {
                     modPlayer.OnKillEffects(npc);

@@ -117,6 +117,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = NPC.Center;
             NPC.ai[2] = None.Id;
             ableToHit = false;
+            attackInitialized = true;
         }
         public override void PostAI()
         {
@@ -170,6 +171,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             if (NPC.localAI[0] < 0)
             {
+                if (NPC.localAI[0] < -cutsceneDuration + 60 && !attackInitialized)
+                {
+                    rumbleSlot = SoundEngine.PlaySound(SoundID.DD2_EtherianPortalIdleLoop with { Volume = 0.03f, PitchVariance = 0f, Pitch = 0.8f }, NPC.Center);
+                    attackInitialized = true;
+                }
                 target = modNPC.GetTarget(NPC);
 
                 if (NPC.localAI[0] == -cutsceneDuration)
@@ -593,7 +599,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             return canBeHit ? null : false;
         }
-
+        public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
+        {
+            return deadTime == 0 ? null : false;
+        }
         public override bool CheckDead()
         {
             if (deadTime >= deathCutsceneDuration - 30)
@@ -704,6 +713,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     sound.Stop();
             }
 
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            {
+                NPC.immortal = false;
+                NPC.dontTakeDamage = false;
+            }
             if (deadTime >= deathCutsceneDuration - 30)
             {
                 NPC.immortal = false;
@@ -711,6 +725,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!TerRoguelike.mpClient)
                     NPC.StrikeInstantKill();
             }
+
+            if (deadTime == 1)
+                NPC.netUpdate = true;
 
             return deadTime >= cutsceneDuration - 30;
         }

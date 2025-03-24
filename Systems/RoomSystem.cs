@@ -1502,7 +1502,14 @@ namespace TerRoguelike.Systems
             }
             if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                PostUpdateWorld();
+                try
+                {
+                    PostUpdateWorld();
+                }
+                catch (Exception e)
+                {
+                    TerRoguelike.Instance.Logger.Error(e);
+                }
                 if (RequestBasinPacket.cooldown > 0)
                     RequestBasinPacket.cooldown--;
                 if (TerPlayerPacket.cooldown > 0)

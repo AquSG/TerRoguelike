@@ -1447,7 +1447,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public override bool? DrawHealthBar(byte hbPosition, ref float scale, ref Vector2 position)
         {
             position = NPC.Center + new Vector2(0, 116);
-            return !(NPC.ai[0] == FakeCharge.Id && NPC.ai[1] < FakeChargeWindup + 15);
+            return !(NPC.ai[0] == FakeCharge.Id && NPC.ai[1] < FakeChargeWindup + 15) && deadTime == 0;
         }
         public override void FindFrame(int frameHeight)
         {
