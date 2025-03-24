@@ -212,7 +212,7 @@ namespace TerRoguelike.Managers
                                     }
                                     break;
                             }
-                            if (allow)
+                            if (allow && !TerRoguelike.mpClient)
                             {
                                 TerRoguelikeWorld.jstcPortalTime = 1;
                                 jstcProgress = JstcProgress.Enemies;
@@ -224,7 +224,7 @@ namespace TerRoguelike.Managers
                     }
                 }
             }
-            if (jstcProgress == JstcProgress.Enemies)
+            if (jstcProgress == JstcProgress.Enemies && !TerRoguelike.mpClient)
             {
                 Vector2 portalScale = TerRoguelikeWorld.jstcPortalScale;
                 bool portalRot = portalScale.X > portalScale.Y;
@@ -466,7 +466,7 @@ namespace TerRoguelike.Managers
                                 break;
                         }
 
-                        if (allow)
+                        if (allow && !TerRoguelike.mpClient)
                         {
                             TerRoguelikeWorld.jstcPortalTime = 1;
                             jstcProgress = JstcProgress.BossDeath;
@@ -484,7 +484,7 @@ namespace TerRoguelike.Managers
                     }
                 }
             }
-            if (jstcProgress == JstcProgress.BossDeath)
+            if (jstcProgress == JstcProgress.BossDeath && !TerRoguelike.mpClient)
             {
                 Vector2 portalScale = TerRoguelikeWorld.jstcPortalScale;
                 bool portalRot = portalScale.X > portalScale.Y;

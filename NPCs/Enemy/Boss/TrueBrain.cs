@@ -1385,12 +1385,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        if (FloorID[FloorIDsInPlay[i]].jstcProgress != Floor.JstcProgress.Jstc)
+                        if (FloorID[FloorIDsInPlay[i]].jstcProgress < Floor.JstcProgress.BossDeath)
                             break;
 
                         if (i == 4)
                         {
-                            NPC n = SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Being>(), modNPC.sourceRoomListID);
+                            if (!TerRoguelike.mpClient)
+                                SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Being>(), modNPC.sourceRoomListID);
                             foreach (Projectile proj in Main.ActiveProjectiles)
                             {
                                 proj.Kill();
@@ -1653,7 +1654,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             teleportTargetPos = reader.ReadVector2();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
 }

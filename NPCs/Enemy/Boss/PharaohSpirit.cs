@@ -713,7 +713,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     sound.Stop();
             }
 
-            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -934,7 +934,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             summonSpawnPositions[1] = reader.ReadVector2();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
 }

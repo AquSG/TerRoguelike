@@ -1874,6 +1874,10 @@ namespace TerRoguelike.Systems
         #endregion
         public static void ClearWorldTerRoguelike()
         {
+            foreach (var floor in FloorID)
+            {
+                floor.Reset();
+            }
             runStartMeter = 0;
             runStartTouched = false;
             TerRoguelikePlayer.allDeadTime = 0;
@@ -1974,6 +1978,8 @@ namespace TerRoguelike.Systems
                 Main.gore[i].active = false;
             for (int i = 0; i < Main.maxCombatText; i++)
                 Main.combatText[i].active = false;
+            for (int i = 0; i < Main.maxItems; i++)
+                Main.item[i].active = false;
 
             SetCalm(Silence);
             SetCombat(Silence);

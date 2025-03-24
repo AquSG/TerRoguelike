@@ -204,14 +204,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (NPC.localAI[0] >= -cutsceneDuration && NPC.localAI[0] < -60 && !attackInitialized)
                 {
+                    attackInitialized = true;
                     IceWindSlot = SoundEngine.PlaySound(SoundID.DD2_BookStaffTwisterLoop with { Volume = 0.008f, PitchVariance = 0.05f }, NPC.Center);
-                }
-                if (NPC.localAI[0] == -cutsceneDuration)
-                {
                     if (SoundEngine.TryGetActiveSound(IceWindSlot, out var sound) && sound.IsPlaying)
                     {
                         sound.Volume = 0;
                     }
+                }
+                if (NPC.localAI[0] == -cutsceneDuration)
+                {
                     CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 30, 30, 2.5f, CutsceneSystem.CutsceneSource.Boss);
                 }
                 NPC.localAI[0]++;
@@ -974,7 +975,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!ParanoidTileRetrieval(snowPos.ToTileCoordinates()).IsTileSolidGround(true))
                     ParticleManager.AddParticle(new Snow(snowPos, Vector2.UnitY * Main.rand.NextFloat(1f), 300, Color.White * 0.6f, new Vector2(Main.rand.NextFloat(0.018f, 0.024f)), 0, 0.96f, 0.05f, 30, 0, true));
             }
-            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -1098,7 +1099,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.Opacity = reader.ReadSingle();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
     public class ExtraHitbox

@@ -1033,6 +1033,7 @@ namespace TerRoguelike.NPCs
                 npc.ai[1] = -jumpTime - dashTime;
             }
 
+            bool dashing = false;
             if (npc.ai[1] >= 0 && npc.ai[1] < attackCooldown - attackTelegraph)
             {
                 if (npc.velocity.X < -xCap || npc.velocity.X > xCap)
@@ -1055,6 +1056,7 @@ namespace TerRoguelike.NPCs
             }
             else
             {
+                dashing = true;
                 if (npc.ai[1] >= -dashTime)
                 {
                     npc.stairFall = true;
@@ -1102,6 +1104,8 @@ namespace TerRoguelike.NPCs
             if (npc.collideX)
             {
                 npc.ai[0]++;
+                if (!dashing && npc.collideY && npc.oldVelocity.Y >= 0 && npc.collideX)
+                    npc.velocity.Y = -4.4f;
             }
             else if (npc.ai[0] > 0)
                 npc.ai[0] = 0f;

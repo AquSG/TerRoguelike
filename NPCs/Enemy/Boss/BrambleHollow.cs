@@ -692,7 +692,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
             }
 
-            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 30)
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 30 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -942,7 +942,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = reader.ReadVector2();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
     public class TallFireDraw

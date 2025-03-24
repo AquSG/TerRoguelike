@@ -213,6 +213,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public int introTime = 0;
         public int fadeBlackTime = 60;
         public int moveDownTime = 240;
+        public bool speechInitialized = false;
+        public bool cutsceneInitialized = false;
 
         public static DynamicSpriteFont DotumChePixel = null;
         public static bool TalkFont
@@ -275,13 +277,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.immortal = true;
             NPC.dontTakeDamage = true;
             NPC.localAI[0] = -(cutsceneDuration);
-
-            SetMusicMode(MusicStyle.Silent);
             
             NPC.direction = -1;
             NPC.spriteDirection = -1;
             spawnPos = NPC.Center;
 
+            InitializeSpeech();
+        }
+        public void InitializeSpeech()
+        {
+            speechInitialized = true;
+
+            SetMusicMode(MusicStyle.Silent);
             string dialogueString = Language.GetOrRegister("Mods.TerRoguelike.DialogueKillAll").Value;
             string username = Environment.UserName;
 
@@ -330,7 +337,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public void UpdateSpeech(List<StringBundle> jstcSpeech, bool allowControl = true, bool forceControl = false, bool keepBubbleThroughEvent = false)
         {
-            var speech = jstcSpeech[(int)NPC.ai[3]];
+            var speech = jstcSpeech[(int)NPC.localAI[3]];
             if (forceTextControl)
                 forceControl = true;
             bool control = allowControl && (forceControl || (TextControl && !TerRoguelike.mpClient));
@@ -382,16 +389,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     textProgressPause = 0;
                     textProgress = -0.5f;
-                    if (jstcSpeech[(int)NPC.ai[3]].Event)
+                    if (jstcSpeech[(int)NPC.localAI[3]].Event)
                     {
                         DrawTalkBubble = keepBubbleThroughEvent;
                         eventCounter++;
                         eventTimer = 0;
                     }
-                    NPC.ai[3]++;
-                    if (NPC.ai[3] >= jstcSpeech.Count)
+                    NPC.localAI[3]++;
+                    if (NPC.localAI[3] >= jstcSpeech.Count)
                     {
-                        NPC.ai[3] = 100;
+                        NPC.localAI[3] = 100;
                     }
                     NPC.netUpdate = true;
                 }
@@ -403,6 +410,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            if (!speechInitialized)
+            {
+                InitializeSpeech();
+            }
+            NPC.netSpam = 0;
             if (textProgressPause > 0)
                 textProgressPause--;
             eventTimer++;
@@ -416,15 +428,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     text.active = false;
                 }
 
-                if (NPC.localAI[0] == -cutsceneDuration)
+                if (!cutsceneInitialized)
                 {
-                    CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 60, 30, 1.25f, CutsceneSystem.CutsceneSource.Boss);
+                    cutsceneInitialized = true;
+                    CutsceneSystem.SetCutscene(spawnPos, cutsceneDuration, 60, 30, 1.25f);
                     NPC.localAI[0]++;
                     CutsceneSystem.cutsceneDuration = cutsceneDuration + 120;
                     CutsceneSystem.cutsceneTimer = CutsceneSystem.cutsceneDuration - 61;
                 }
 
-                bool intro = NPC.ai[3] < 200;
+                bool intro = NPC.localAI[3] < 200;
                 if (intro)
                 {
                     if (CutsceneSystem.cutsceneTimer < CutsceneSystem.cutsceneDuration - 62)
@@ -457,10 +470,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         if (eventCounter == 0 || eventTimer > 180)
                             UpdateSpeech(DialogueKillAll);
 
-                        if (NPC.ai[3] == 100)
+                        if (NPC.localAI[3] == 100)
                         {
-                            NPC.ai[3] = 200;
+                            NPC.localAI[3] = 200;
                             DrawTalkBubble = false;
+                            NPC.netUpdate = true;
                         }       
                     }
                 }
@@ -542,22 +556,22 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             Main.EntitySpriteDraw(squareTex, Main.Camera.Center - Main.screenPosition, null, squareColor * blackOpacity, 0, squareTex.Size() * 0.5f, new Vector2(500, 300), SpriteEffects.None);
 
 
-            if (DrawTalkBubble)
+            if (DrawTalkBubble && speechInitialized)
             {
                 void DrawDialogue(List<StringBundle> list, Vector2? offset = null)
                 {
                     Vector2 vector = offset ?? Vector2.Zero;
                     Main.EntitySpriteDraw(TalkBubble, drawPos + new Vector2(55, -90) + vector - Main.screenPosition, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None);
 
-                    if ((int)NPC.ai[3] < 0 || (int)NPC.ai[3] >= list.Count)
+                    if ((int)NPC.localAI[3] < 0 || (int)NPC.localAI[3] >= list.Count)
                         return;
 
-                    var strings = list[(int)NPC.ai[3]].StringDisplay(textProgress < 0 ? -1 : (int)textProgress);
+                    var strings = list[(int)NPC.localAI[3]].StringDisplay(textProgress < 0 ? -1 : (int)textProgress);
                     int verticalStep = TalkFont ? 15 : 18;
                     for (int i = 0; i < strings.Count; i++)
                     {
                         Vector2 textScale = TalkFont ? new Vector2(0.081f) : new Vector2(0.38f);
-                        float stringSize = (font.MeasureString(list[(int)NPC.ai[3]].strings[i]) * textScale).X;
+                        float stringSize = (font.MeasureString(list[(int)NPC.localAI[3]].strings[i]) * textScale).X;
                         float shrinkThreshold = 195;
                         if (stringSize > shrinkThreshold)
                         {
@@ -575,11 +589,23 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
+            bool writelocal3 = NPC.localAI[3] >= 200;
+            writer.Write(writelocal3);
+            if (writelocal3)
+                writer.Write(NPC.localAI[3]);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             NPC.localAI[0] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            bool readlocal3 = reader.ReadBoolean();
+            if (readlocal3)
+            {
+                float local3 = reader.ReadSingle();
+                if (local3 >= 200 && NPC.localAI[3] < 200)
+                    DrawTalkBubble = false;
+                NPC.localAI[3] = local3;
+            }
         }
     }
 }
