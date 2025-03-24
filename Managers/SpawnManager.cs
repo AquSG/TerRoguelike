@@ -187,6 +187,8 @@ namespace TerRoguelike.Managers
                 return;
             if (TerRoguelikeMenu.RuinedMoonActive && Main.rand.NextFloat() < 0.15f)
                 itemType = trashList[Main.rand.Next(trashList.Count)];
+            if (playerCount == 1)
+                toPlayer = -1;
 
             var item = new PendingItem(itemType, position, itemTier, telegraphDuration, telegraphSize, toPlayer);
             pendingItems.Add(item);

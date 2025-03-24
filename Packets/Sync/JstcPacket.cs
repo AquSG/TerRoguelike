@@ -121,6 +121,7 @@ namespace TerRoguelike.Packets
             {
                 if (floor.jstcProgress == JstcProgress.Boss)
                 {
+                    floor.jstcProgress = context;
                     bool allow = true;
                     TerRoguelikeWorld.jstcPortalTime = 1;
                     SoundEngine.PlaySound(TerRoguelikeWorld.JstcSpawn with { Volume = 1f, Pitch = -0.2f }, TerRoguelikeWorld.jstcPortalPos);

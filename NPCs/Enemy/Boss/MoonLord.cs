@@ -1899,7 +1899,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             idleCounter = reader.ReadInt32();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
 }

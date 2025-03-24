@@ -942,7 +942,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 CutsceneSystem.cameraTargetCenter += (NPC.Center - CutsceneSystem.cameraTargetCenter) * 0.1f;
             }
 
-            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -1145,7 +1145,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             waveTunnelDesiredPos = reader.ReadVector2();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
 }

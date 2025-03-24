@@ -72,6 +72,8 @@ namespace TerRoguelike.Packets
                     Main.gore[i].active = false;
                 for (int i = 0; i < Main.maxCombatText; i++)
                     Main.combatText[i].active = false;
+                for (int i = 0; i < Main.maxItems; i++)
+                    Main.item[i].active = false;
 
                 SetCalm(Silence);
                 SetCombat(Silence);

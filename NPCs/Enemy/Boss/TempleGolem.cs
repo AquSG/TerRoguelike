@@ -182,8 +182,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 {
                     SoundEngine.PlaySound(GolemAwaken with { Volume = 0.5f, Pitch = -0.4f }, NPC.Center);
                 }
-                if (NPC.localAI[0] == -85)
+                if (NPC.localAI[0] >= -85 && !attackInitialized)
                 {
+                    attackInitialized = true;
                     SoundEngine.PlaySound(DingSound with { Volume = 0.07f, Pitch = -1f, MaxInstances = 2 }, NPC.Center);
                     SoundEngine.PlaySound(DingSound with { Volume = 0.07f, Pitch = -0.8f, MaxInstances = 2 }, NPC.Center);
                     for (int i = 0; i < eyePositions.Count; i++)
@@ -767,7 +768,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
             CutsceneSystem.cameraTargetCenter += (NPC.Center - CutsceneSystem.cameraTargetCenter) * 0.05f;
 
-            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60)
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -928,7 +929,14 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             spawnPos = reader.ReadVector2();
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
+            {
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+            }
         }
     }
 }
