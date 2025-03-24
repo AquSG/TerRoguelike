@@ -147,7 +147,7 @@ namespace TerRoguelike.MainMenu
                         foreach (string filepath in paths)
                         {
                             string extension = Path.GetExtension(filepath);
-                            bool delete = extension == ".plr" || extension == ".tplr" || extension == ".bak" || extension == ".bak2" || extension == ".map" || extension == ".tmap";
+                            bool delete = extension == ".plr" || extension == ".tplr" || extension == ".bak" || extension == ".bak2";
                             FileUtilities.Delete(filepath, false, fullyDelete);
                         }
                         Main.ActivePlayerFileData = new PlayerFileData();

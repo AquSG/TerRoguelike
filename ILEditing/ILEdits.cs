@@ -40,6 +40,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.Social;
 using Terraria.Social.Steam;
 using TerRoguelike.NPCs;
+using Terraria.Map;
 
 namespace TerRoguelike.ILEditing
 {
@@ -86,6 +87,14 @@ namespace TerRoguelike.ILEditing
             On_Player.TileInteractionsUse += On_Player_TileInteractionsUse;
             On_Main.GetPlayerPathFromName += On_Main_GetPlayerPathFromName;
             On_Main.GetWorldPathFromName += On_Main_GetWorldPathFromName;
+            On_MapHelper.SaveMap += On_MapHelper_SaveMap;
+        }
+
+        private void On_MapHelper_SaveMap(On_MapHelper.orig_SaveMap orig)
+        {
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+				return;
+			orig.Invoke();
         }
 
         private string On_Main_GetWorldPathFromName(On_Main.orig_GetWorldPathFromName orig, string worldName, bool cloudSave)
