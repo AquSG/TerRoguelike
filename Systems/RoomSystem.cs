@@ -1208,7 +1208,7 @@ namespace TerRoguelike.Systems
         }
         public class RemedialHealingOrb
         {
-            public Texture2D texture => TextureAssets.Projectile[ModContent.ProjectileType<Projectiles.RemedialHealingOrb>()].Value;
+            public Texture2D texture => Main.dedServ ? null : TextureAssets.Projectile[ModContent.ProjectileType<Projectiles.RemedialHealingOrb>()].Value;
             public bool active = true;
             public int timeLeft;
             public int timeAlive = 0;
@@ -1222,13 +1222,15 @@ namespace TerRoguelike.Systems
             public List<Vector2> oldPos = [];
             public int oldPosCap = 5;
             public Rectangle hitbox => new Rectangle((int)(position.X - (width * 0.5f)), (int)(position.Y - (height * 0.5f)), width, height);
-            public RemedialHealingOrb(Vector2 Position, Vector2 Velocity, int TimeLeft, int Owner, int MaxUpdates = 1)
+            public RemedialHealingOrb(Vector2 Position, Vector2 Velocity, int TimeLeft, int Owner, int MaxUpdates = 1, bool netSend = true)
             {
                 position = Position;
                 velocity = Velocity;
                 maxUpdates = MaxUpdates;
                 timeLeft = TimeLeft * maxUpdates;
                 owner = Owner;
+                if (netSend)
+                    RemedialOrbPacket.Send(this);
             }
             public void Update()
             {

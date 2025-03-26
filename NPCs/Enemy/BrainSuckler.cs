@@ -19,6 +19,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using static TerRoguelike.Managers.TextureManager;
 using Terraria.DataStructures;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.NPCs.Enemy
 {
@@ -31,6 +32,7 @@ namespace TerRoguelike.NPCs.Enemy
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 6;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -59,18 +61,20 @@ namespace TerRoguelike.NPCs.Enemy
             float xCap = 4f;
 
             NPC.frameCounter += 0.25d;
-            NPC.rotation = NPC.rotation.AngleLerp(0.3f * Math.Sign(NPC.velocity.X) * (Math.Abs(NPC.velocity.X) / 4f), 0.1f);
             if (NPC.ai[2] < -1)
             {
+                NPC.rotation = NPC.rotation.AngleLerp(0.3f * Math.Sign(NPC.velocity.X) * (Math.Abs(NPC.velocity.X) / 4f), 0.1f);
                 NPC.ai[2] = (int)NPC.ai[2] + 1;
                 NPC.velocity *= 0.9f;
             }
             else if (NPC.ai[2] == -1)
             {
+                NPC.rotation = NPC.rotation.AngleLerp(0.3f * Math.Sign(NPC.velocity.X) * (Math.Abs(NPC.velocity.X) / 4f), 0.1f);
                 modNPC.RogueFlierAI(NPC, xCap, 4f, 0.17f, true);
             }
             else
             {
+                NPC.rotation = NPC.rotation.AngleLerp(0, 0.1f);
                 if (NPC.ai[0] == 0)
                 {
                     Player p = Main.player[(int)NPC.ai[1]];
@@ -126,6 +130,7 @@ namespace TerRoguelike.NPCs.Enemy
                     NPC.ai[2] = 0;
             }
             NPC.ai[0] = player ? 0 : 1;
+            NpcStickPacket.Send(NPC);
             NPC.netUpdate = true;
         }
         public override bool CanHitPlayer(Player target, ref int cooldownSlot) => NPC.ai[2] >= -1;

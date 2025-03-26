@@ -12,6 +12,8 @@ using Microsoft.Xna.Framework.Graphics;
 using TerRoguelike.Items.Common;
 using TerRoguelike.Utilities;
 using Terraria.DataStructures;
+using System.IO;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Projectiles
 {
@@ -76,6 +78,7 @@ namespace TerRoguelike.Projectiles
         {
             if (Projectile.localAI[0] >= 1)
                 return false;
+
             Projectile.localAI[0] = 1;
             return false;
         }
@@ -84,12 +87,16 @@ namespace TerRoguelike.Projectiles
             if (Projectile.localAI[0] >= 1)
                 return;
 
+            OnHitServerProj.Send(Projectile, target.whoAmI, false);
+
             Projectile.localAI[0] = 1;
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
             if (Projectile.localAI[0] >= 1)
                 return;
+
+            OnHitServerProj.Send(Projectile, target.whoAmI, false);
 
             Projectile.localAI[0] = 1;
         }

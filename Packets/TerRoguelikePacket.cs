@@ -69,6 +69,9 @@ namespace TerRoguelike.Packets
             ActivateOnKillSync,
             ItemPotentiometerSync,
             ProgressDialogueSync,
+            OnHitServerProjSync,
+            NpcStickSync,
+            RemedialOrbSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 
