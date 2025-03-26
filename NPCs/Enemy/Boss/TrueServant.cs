@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
@@ -76,6 +77,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (NPC.ai[1] == 0 && NPC.Center.Distance(target.Center) < 500 && canHit) // start dash
                 {
+                    NPC.netUpdate = true;
                     NPC.ai[1] = 1;
                     SoundEngine.PlaySound(SoundID.NPCHit45 with { Volume = 0.25f, Pitch = 0.5f, MaxInstances = 3, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);
                     for (int i = 0; i < 32; i++)
@@ -133,6 +135,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 NPC.velocity *= 0.8f;
                 if (NPC.ai[1] > 60) // bonk while dashing
                 {
+                    NPC.netUpdate = true;
                     NPC.ai[1] = -90;
                     NPC.rotation = NPC.velocity.ToRotation() + MathHelper.PiOver2;
                     NPC.velocity *= 0.6f;
@@ -226,6 +229,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             Main.EntitySpriteDraw(tex, NPC.Center - Main.screenPosition, NPC.frame, Color.White * opacity, NPC.rotation, NPC.frame.Size() * new Vector2(0.5f, 0.35f), NPC.scale, SpriteEffects.None);
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(NPC.rotation);
+            writer.Write(NPC.localAI[0]);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            NPC.rotation = reader.ReadSingle();
+            NPC.localAI[0] = reader.ReadSingle();
         }
     }
 }

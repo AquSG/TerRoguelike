@@ -132,6 +132,7 @@ namespace TerRoguelike.TerPlayer
         public int puppeteersHand;
 
         public int trash;
+        public bool enableTrash = false;
 
         public List<int> evilEyeStacks = new List<int>();
         public List<int> thrillOfTheHuntStacks = new List<int>();
@@ -361,6 +362,18 @@ namespace TerRoguelike.TerPlayer
             puppeteersHand = 0;
 
             trash = 0;
+            if (Player.whoAmI == Main.myPlayer)
+            {
+                enableTrash = false;
+                if (RuinedMoonActive)
+                {
+                    var dateTime = DateTime.Now;
+                    if (dateTime.DayOfWeek == DayOfWeek.Tuesday && dateTime.Hour == 22)
+                    {
+                        enableTrash = true;
+                    }
+                }
+            }
 
             lunarGambit = 0;
 

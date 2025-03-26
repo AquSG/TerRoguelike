@@ -167,6 +167,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         }
         public override void AI()
         {
+            NPC.netSpam = 0;
             NPC.localAI[3] = 0;
             if (modNPC.isRoomNPC)
             {
@@ -646,6 +647,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             summonPosition = position;
                         }
                         summonPositionStartTelegraph = NPC.Center + new Vector2(8 * NPC.direction, 26).RotatedBy(NPC.rotation) + NPC.velocity * 5;
+                        NPC.netUpdate = true;
 
                     }
                     if (NPC.ai[1] - summonTime >= 0 && NPC.ai[1] - summonTime <= 20)
@@ -1012,6 +1014,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(NPC.localAI[0]);
             writer.WriteVector2(spawnPos);
             writer.Write(deadTime);
+            writer.WriteVector2(summonPosition);
+            writer.WriteVector2(summonPositionStartTelegraph);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -1027,6 +1031,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                         ActiveBossTheme.endFlag = true;
                 }
             }
+            summonPosition = reader.ReadVector2();
+            summonPositionStartTelegraph = reader.ReadVector2();
         }
     }
 }

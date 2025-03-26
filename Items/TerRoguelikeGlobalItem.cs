@@ -58,13 +58,9 @@ namespace TerRoguelike.Items
         }
         public override void UpdateInventory(Item item, Player player)
         {
-            if (item.rare == ItemRarityID.Gray && TerRoguelikeMenu.RuinedMoonActive)
+            if (item.rare == ItemRarityID.Gray && player.ModPlayer().enableTrash)
             {
-                var dateTime = DateTime.Now;
-                if (dateTime.DayOfWeek == DayOfWeek.Tuesday && dateTime.Hour == 22)
-                {
-                    player.ModPlayer().trash += item.stack;
-                }
+                player.ModPlayer().trash += item.stack;
             }
         }
     }

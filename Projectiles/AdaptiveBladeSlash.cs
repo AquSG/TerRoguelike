@@ -25,6 +25,7 @@ namespace TerRoguelike.Projectiles
         public Player player;
         public Vector2 stuckPosition = Vector2.Zero;
         public Texture2D squareTex;
+        public bool firstUpdate = true;
         public override void SetStaticDefaults()
         {
             Main.projFrames[Projectile.type] = 5;
@@ -61,6 +62,11 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            if (firstUpdate)
+            {
+                Projectile.netUpdate = true;
+                firstUpdate = false;
+            }
             player ??= Main.player[Projectile.owner];
             modPlayer ??= player.ModPlayer();
 

@@ -16,6 +16,7 @@ using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
 using static TerRoguelike.Managers.TextureManager;
 using System.IO;
+using TerRoguelike.Packets;
 
 namespace TerRoguelike.Projectiles
 {
@@ -109,10 +110,12 @@ namespace TerRoguelike.Projectiles
         }
         public override void OnHitPlayer(Player target, Player.HurtInfo info)
         {
+            OnHitServerProj.Send(Projectile, target.whoAmI, true);
             Projectile.Kill();
         }
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            OnHitServerProj.Send(Projectile, target.whoAmI, false);
             Projectile.Kill();
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
