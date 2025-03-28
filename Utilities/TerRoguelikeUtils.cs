@@ -674,6 +674,12 @@ namespace TerRoguelike.Utilities
 
             return TextureAssets.Npc[Type].Width();
         }
+
+        public static Point GetSection(Vector2 position)
+        {
+            var tilePos = position.ToTileCoordinates();
+            return new Point(Netplay.GetSectionX(tilePos.X), Netplay.GetSectionY(tilePos.Y));
+        }
         public static Vector2 MouseWorldAfterZoom => ((Main.MouseWorld - Main.Camera.Center) / ZoomSystem.zoomOverride) + Main.Camera.Center;
     }
 }
