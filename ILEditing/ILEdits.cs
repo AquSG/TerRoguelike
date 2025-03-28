@@ -41,6 +41,9 @@ using Terraria.Social;
 using Terraria.Social.Steam;
 using TerRoguelike.NPCs;
 using Terraria.Map;
+using Terraria.Localization;
+using Terraria.Utilities;
+using Terraria.ModLoader.IO;
 
 namespace TerRoguelike.ILEditing
 {
@@ -88,6 +91,27 @@ namespace TerRoguelike.ILEditing
             On_Main.GetPlayerPathFromName += On_Main_GetPlayerPathFromName;
             On_Main.GetWorldPathFromName += On_Main_GetWorldPathFromName;
             On_MapHelper.SaveMap += On_MapHelper_SaveMap;
+            On_Player.SavePlayerFile_Write += MysteryGameCrashFix1;
+            On_FileUtilities.Write += MysteryGameCrashFix2;
+        }
+
+        private void MysteryGameCrashFix2(On_FileUtilities.orig_Write orig, string path, byte[] data, int length, bool cloud)
+        {
+			if (path == null) return;
+			orig.Invoke(path, data, length, cloud);
+        }
+
+        private void MysteryGameCrashFix1(On_Player.orig_SavePlayerFile_Write orig, PlayerFileData playerFile, byte[] plrData, Terraria.ModLoader.IO.TagCompound tplrData)
+        {
+            string path = playerFile.Path;
+            bool isCloudSave = playerFile.IsCloudSave;
+            if (!string.IsNullOrEmpty(path))
+            {
+				if (!path.Contains("\\Players\\TerRoguelike\\"))
+				{
+					orig.Invoke(playerFile, plrData, tplrData);
+                }
+            }
         }
 
         private void On_MapHelper_SaveMap(On_MapHelper.orig_SaveMap orig)
