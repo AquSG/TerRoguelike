@@ -154,6 +154,13 @@ namespace TerRoguelike.Packets
                 return;
             }
 
+            if (firstReceive)
+            {
+                for (int i = 0; i < RoomID.Count; i++)
+                    RoomSystem.ResetRoomID(i);
+                for (int i = 0; i < FloorID.Count; i++)
+                    FloorID[i].Reset();
+            }
             bool amIAllowed = false;
             if (Main.LocalPlayer.active)
             {

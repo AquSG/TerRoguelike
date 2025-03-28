@@ -72,6 +72,7 @@ namespace TerRoguelike.Packets
             OnHitServerProjSync,
             NpcStickSync,
             RemedialOrbSync,
+            ResetSectionManagerSync,
         }
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 

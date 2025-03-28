@@ -20,6 +20,7 @@ namespace TerRoguelike
 		internal static TerRoguelike Instance;
         public static bool lowDetail => Main.qaStyle > 1;
         public static bool mpClient => Main.netMode == NetmodeID.MultiplayerClient;
+        public static bool singleplayer => Main.netMode == NetmodeID.SinglePlayer;
         public override void Load()
         {
             Instance = this;

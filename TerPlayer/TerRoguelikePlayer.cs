@@ -1922,6 +1922,12 @@ namespace TerRoguelike.TerPlayer
 
             if (RoomSystem.regeneratingWorld)
                 Player.velocity = new Vector2(0, -0.0000000001f);
+            if (TerRoguelike.mpClient && Player.whoAmI == Main.myPlayer)
+            {
+                Point sectionPos = TerRoguelikeUtils.GetSection(Player.Center);
+                if (!Main.sectionManager.SectionLoaded(sectionPos.X, sectionPos.Y))
+                    Player.velocity = new Vector2(0, -0.0000000001f);
+            }
         }
         public override void PreUpdateBuffs()
         {

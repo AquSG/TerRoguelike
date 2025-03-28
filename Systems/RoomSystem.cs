@@ -1569,20 +1569,22 @@ namespace TerRoguelike.Systems
                 Main.BlackFadeIn = 255;
                 TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
 
-                for (int i = 0; i < 10; i++)
+                if (TerRoguelike.singleplayer)
                 {
-                    Point position = Main.LocalPlayer.Bottom.ToTileCoordinates();
-                    position.Y += i;
-                    if (TerRoguelikeUtils.IsTileSolidGround(Main.tile[position]))
+                    for (int i = 0; i < 10; i++)
                     {
-                        Main.LocalPlayer.Bottom = position.ToVector2() * 16 + Vector2.UnitY * -1;
-                        break;
+                        Point position = Main.LocalPlayer.Bottom.ToTileCoordinates();
+                        position.Y += i;
+                        if (TerRoguelikeUtils.IsTileSolidGround(Main.tile[position]))
+                        {
+                            Main.LocalPlayer.Bottom = position.ToVector2() * 16 + Vector2.UnitY * -1;
+                            break;
+                        }
                     }
                 }
                 if (Main.dedServ)
                 {
-                    RegenerateWorldPacket.Send();
-                    RoomUnmovingDataPacket.Send();
+                    ResetSectionManagerPacket.Send();
                     for (int i = 0; i < Netplay.Clients.Length; i++)
                     {
                         var client = Netplay.Clients[i];
@@ -1592,7 +1594,8 @@ namespace TerRoguelike.Systems
                             RemoteClient.CheckSection(i, Main.player[i].position);
                         }
                     }
-                    RoomUnmovingDataPacket.SendStartRoomTiles();
+                    RegenerateWorldPacket.Send();
+                    RoomUnmovingDataPacket.Send();
                 }
                 Main.Map.Clear();
             }
