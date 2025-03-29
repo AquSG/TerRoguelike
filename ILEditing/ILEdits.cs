@@ -93,6 +93,15 @@ namespace TerRoguelike.ILEditing
             On_MapHelper.SaveMap += On_MapHelper_SaveMap;
             On_Player.SavePlayerFile_Write += MysteryGameCrashFix1;
             On_FileUtilities.Write += MysteryGameCrashFix2;
+            On_NPC.SpawnNPC += On_NPC_SpawnNPC;
+        }
+
+        private void On_NPC_SpawnNPC(On_NPC.orig_SpawnNPC orig)
+        {
+			if (RoomSystem.regeneratingWorld)
+				return;
+
+			orig.Invoke();
         }
 
         private void MysteryGameCrashFix2(On_FileUtilities.orig_Write orig, string path, byte[] data, int length, bool cloud)
