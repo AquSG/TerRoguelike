@@ -1527,10 +1527,11 @@ namespace TerRoguelike.Systems
             {
                 regeneratingWorldTime++;
                 loopingDrama = 0;
-                Player player = Main.LocalPlayer;
-                player.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-                if (player.active)
+
+                Vector2 spawnPos = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                foreach (Player player in Main.ActivePlayers)
                 {
+                    player.Center = spawnPos;
                     var modPlayer = player.ModPlayer();
                     if (modPlayer != null && modPlayer.allowedToExist)
                     {
@@ -1545,10 +1546,10 @@ namespace TerRoguelike.Systems
             }
             else if (regeneratingWorldTime > 0)
             {
-                Player player = Main.LocalPlayer;
-                player.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
-                if (player.active)
+                Vector2 spawnPos = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                foreach (Player player in Main.ActivePlayers)
                 {
+                    player.Center = spawnPos;
                     var modPlayer = player.ModPlayer();
                     if (modPlayer != null && modPlayer.allowedToExist)
                     {

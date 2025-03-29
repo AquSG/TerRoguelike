@@ -1965,7 +1965,7 @@ namespace TerRoguelike.TerPlayer
                     break;
                 }
             }
-            if (TerRoguelike.mpClient)
+            if (TerRoguelike.mpClient && Player.whoAmI == Main.myPlayer)
             {
                 bool allow = true;
                 foreach (Player player in Main.ActivePlayers)

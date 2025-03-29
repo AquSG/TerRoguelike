@@ -79,7 +79,13 @@ namespace TerRoguelike.Packets
                 SetCombat(Silence);
                 SetMusicMode(MusicStyle.Silent);
                 RoomSystem.ClearWorldTerRoguelike();
-                Main.LocalPlayer.Center = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+
+                Vector2 spawnPos = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    player.Center = spawnPos;
+                }
+                
 
                 if (!loop)
                 {
