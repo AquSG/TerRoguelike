@@ -912,7 +912,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             }
             deadTime++;
 
-            if (TerRoguelike.mpClient && deadTime >= 120 && !TerRoguelikeWorld.escape)
+            if (TerRoguelike.mpClient && deadTime >= 149 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -1124,12 +1124,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
             {
-                deadTime = 1;
-                if (modNPC.isRoomNPC)
-                {
-                    if (ActiveBossTheme != null)
-                        ActiveBossTheme.endFlag = true;
-                }
+                CheckDead();
             }
         }
     }
