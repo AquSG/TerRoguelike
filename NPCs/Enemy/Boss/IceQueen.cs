@@ -975,7 +975,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 if (!ParanoidTileRetrieval(snowPos.ToTileCoordinates()).IsTileSolidGround(true))
                     ParticleManager.AddParticle(new Snow(snowPos, Vector2.UnitY * Main.rand.NextFloat(1f), 300, Color.White * 0.6f, new Vector2(Main.rand.NextFloat(0.018f, 0.024f)), 0, 0.96f, 0.05f, 30, 0, true));
             }
-            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 60 && !TerRoguelikeWorld.escape)
+            if (TerRoguelike.mpClient && deadTime >= deathCutsceneDuration - 31 && !TerRoguelikeWorld.escape)
             {
                 NPC.immortal = false;
                 NPC.dontTakeDamage = false;
@@ -1100,12 +1100,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
             {
-                deadTime = 1;
-                if (modNPC.isRoomNPC)
-                {
-                    if (ActiveBossTheme != null)
-                        ActiveBossTheme.endFlag = true;
-                }
+                CheckDead();
             }
         }
     }
