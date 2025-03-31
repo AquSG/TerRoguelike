@@ -101,7 +101,19 @@ namespace TerRoguelike.Packets
             {
                 packet.Write(modPlayer.steamEngineStacks.Count);
             }
-            
+
+            bool jetLeg = modPlayer.jetLeg > 0;
+            packet.Write(jetLeg);
+            if (jetLeg)
+            {
+                packet.Write(modPlayer.DashDir);
+                packet.Write(modPlayer.DashDirCache);
+                packet.Write(modPlayer.DashTime);
+                packet.Write(modPlayer.DashDelay);
+                if (modPlayer.DashTime == 20)
+                    packet.WriteVector2(modPlayer.Player.velocity);
+            }
+
             packet.Send(toClient, ignoreClient);
         }
         public override void HandlePacket(in BinaryReader packet, int sender)
@@ -156,6 +168,22 @@ namespace TerRoguelike.Packets
             if (steamEngine)
             {
                 steamEngineStackCount = packet.ReadInt32();
+            }
+
+            bool jetLeg = packet.ReadBoolean();
+            int dashDir = 0;
+            int dashDirCache = 0;
+            int dashTime = 0;
+            int dashDelay = 0;
+            Vector2 dashVelocity = Vector2.Zero;
+            if (jetLeg)
+            {
+                dashDir = packet.ReadInt32();
+                dashDirCache = packet.ReadInt32();
+                dashTime = packet.ReadInt32();
+                dashDelay = packet.ReadInt32();
+                if (dashTime == 20)
+                    dashVelocity = packet.ReadVector2();
             }
 
             Player player = Main.player[who];
@@ -220,6 +248,20 @@ namespace TerRoguelike.Packets
                 modPlayer.steamEngineStacks.Clear();
                 for (int i = 0; i < steamEngineStackCount; i++)
                     modPlayer.steamEngineStacks.Add(7200);
+            }
+
+            if (jetLeg)
+            {
+                if (modPlayer.DashTime == 0 && dashTime > 0)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot with { Volume = 1f }, player.Center);
+                }
+                modPlayer.DashDir = dashDir;
+                modPlayer.DashDirCache = dashDirCache;
+                modPlayer.DashTime = dashTime;
+                modPlayer.DashDelay = dashDelay;
+                if (dashTime == 20)
+                    player.velocity = dashVelocity;
             }
 
             if (Main.dedServ)

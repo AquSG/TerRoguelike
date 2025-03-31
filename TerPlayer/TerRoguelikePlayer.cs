@@ -1859,8 +1859,10 @@ namespace TerRoguelike.TerPlayer
 
             if (jetLeg > 0)
             {
-                if (DashDir != 0 && DashDelay == 0)
+                if (DashDir != 0 && DashDelay == 0 && Player.whoAmI == Main.myPlayer)
                 {
+                    TerPlayerPacket.cooldown = 0;
+
                     DashDirCache = DashDir;
                     SoundEngine.PlaySound(SoundID.DD2_FlameburstTowerShot with { Volume = 1f });
                     for (int i = -1; i < 5; i++)

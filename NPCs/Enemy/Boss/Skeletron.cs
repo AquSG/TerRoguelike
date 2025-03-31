@@ -1143,8 +1143,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
             {
-                CheckDead();
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+                enemyHealthBar.ForceEnd(0);
             }
             bool syncRot = reader.ReadBoolean();
             if (syncRot)

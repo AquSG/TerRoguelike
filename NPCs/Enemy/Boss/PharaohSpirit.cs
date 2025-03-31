@@ -78,6 +78,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         {
             Main.npcFrameCount[Type] = 13;
             SoundEngine.PlaySound(LocustSwarm with { Volume = 0 });
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -935,8 +936,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
             {
-                CheckDead();
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+                enemyHealthBar.ForceEnd(0);
             }
         }
     }
