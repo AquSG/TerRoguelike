@@ -17,6 +17,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.UI.Chat;
 using TerRoguelike.ILEditing;
 using TerRoguelike.Items.Rare;
 using TerRoguelike.Items.Weapons;
@@ -253,6 +254,7 @@ namespace TerRoguelike.TerPlayer
         public bool syncMouseWorld = false;
         public bool allowedToExist = false;
         public bool justRespawned = false;
+        public int stuckTime = 0;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -481,6 +483,41 @@ namespace TerRoguelike.TerPlayer
                 else
                 {
                     darkSanctuaryTime = -90;
+                }
+
+                if (Player.whoAmI == Main.myPlayer)
+                {
+                    int blockedCount = 0;
+                    Point playerTilePos = Player.position.ToTileCoordinates();
+                    for (int i = 0; i < 2; i++)
+                    {
+                        for (int x = 0; x < 2; x++)
+                        {
+                            Point topBottomCheckPos = playerTilePos + new Point(x, i == 0 ? -1 : 3);
+                            if (ParanoidTileRetrieval(topBottomCheckPos).IsTileSolidGround(true))
+                            {
+                                blockedCount++;
+                                break;
+                            }
+                        }
+                        for (int y = 0; y < 3; y++)
+                        {
+                            Point leftRightCheckPos = playerTilePos + new Point(i == 0 ? -1 : 2, y);
+                            if (ParanoidTileRetrieval(leftRightCheckPos).IsTileSolidGround(true))
+                            {
+                                blockedCount++;
+                                break;
+                            }
+                        }
+                    }
+                    if (blockedCount >= 4 && jstcTeleportTime == 0)
+                    {
+                        stuckTime++;
+                    }
+                    else
+                    {
+                        stuckTime = 0;
+                    }
                 }
             }
             outOfDangerTime++;
@@ -1953,6 +1990,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void UpdateDead()
         {
+            stuckTime = 0;
             moonLordSkyEffect = false;
             moonLordVisualEffect = false;
             if (Main.myPlayer == Player.whoAmI && deadTime > 120)
@@ -3717,6 +3755,14 @@ namespace TerRoguelike.TerPlayer
                 Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowColor * opacity * 0.7f, arrowRot, origin, scale, SpriteEffects.None);
                 arrowFrame.Y += frameHeight;
                 Main.EntitySpriteDraw(escapeArrow, Player.Center + arrowOffset - Main.screenPosition, arrowFrame, arrowOutlineColor * opacity * 0.9f, arrowRot, origin, scale, SpriteEffects.None);
+            }
+
+            if (stuckTime > 120)
+            {
+                float opacity = MathHelper.SmoothStep(0, 1, (stuckTime - 120) / 180f);
+                var font = FontAssets.MouseText.Value;
+                string text = "/unstuck";
+                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, Player.Top + new Vector2(0, -32) - Main.screenPosition, Main.DiscoColor * opacity, 0, font.MeasureString(text) * 0.5f, new Vector2(1f));
             }
 
             return;

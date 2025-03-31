@@ -170,6 +170,10 @@ namespace TerRoguelike.Managers
             PlayerItemsUpdate(); // update items from all players
 
             roomTime++; //time room is active
+            if (TerRoguelike.mpClient && !TerRoguelikeWorld.escape && roomTime % 180 == 179)
+            {
+                RoomPacket.Send(ID);
+            }
 
             if (!haltSpawns)
             {
@@ -275,7 +279,8 @@ namespace TerRoguelike.Managers
                 currentWave++;
                 waveStartTime = roomTime;
                 waveClearGraceTime = roomTime;
-                RoomPacket.Send(ID);
+                if (Main.dedServ)
+                    RoomPacket.Send(ID);
             }
             if (cancontinue && !TerRoguelike.mpClient)
             {
@@ -312,7 +317,8 @@ namespace TerRoguelike.Managers
             {
                 active = false;
                 RoomClearReward();
-                RoomPacket.Send(ID);
+                if (Main.dedServ)
+                    RoomPacket.Send(ID);
             }
         }
         public virtual void InitializeRoom()
@@ -1078,6 +1084,39 @@ namespace TerRoguelike.Managers
 
                     return new Vector2(centerTile.X + ((i / 4) * direction), centerTile.Y) * 16f + new Vector2(8, 8);
                 }
+            }
+
+            return RoomPosition16 + RoomCenter16;
+        }
+        public Vector2 FindPlayerAirNearRoomCenter()
+        {
+            Point centerTile = new Point((int)(RoomPosition.X + (RoomDimensions.X * 0.5f)), (int)(RoomPosition.Y + (RoomDimensions.Y * 0.5f)));
+
+            for (int i = 3; i < 200; i++)
+            {
+                int magnitude = (i / 4);
+                bool xCheck = i % 2 == 0;
+                int direction = i % 4 < 2 ? 1 : -1;
+                Point checkTile = centerTile + new Point(xCheck ? direction * magnitude : 0, !xCheck ? direction * magnitude : 0);
+
+                bool allow = true;
+                for (int x = 0; x < 2; x++)
+                {
+                    for (int y = 0; y < 3; y++)
+                    {
+                        if (ParanoidTileRetrieval(checkTile + new Point(x, y)).IsTileSolidGround(true))
+                        {
+                            allow = false;
+                            break;
+                        }
+                    }
+                    if (!allow)
+                        break;
+                }
+                if (!allow)
+                    continue;
+
+                return checkTile.ToWorldCoordinates(16, 24);
             }
 
             return RoomPosition16 + RoomCenter16;
