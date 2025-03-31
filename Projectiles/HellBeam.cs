@@ -269,10 +269,14 @@ namespace TerRoguelike.Projectiles
             maskEffect.Parameters["stretch"].SetValue(new Vector2(1, 1));
             maskEffect.Parameters["replacementTexture"].SetValue(waveTex);
             maskEffect.Parameters["tint"].SetValue(tint.ToVector4());
+            Rectangle screenRect = new Rectangle((int)Main.Camera.ScaledPosition.X, (int)Main.Camera.ScaledPosition.Y, (int)Main.Camera.ScaledSize.X, (int)Main.Camera.ScaledSize.Y);
             for (int i = 0; i < draws.Count; i++)
             {
                 var draw = draws[i];
-                draw.Draw(-Main.screenPosition);
+                Rectangle checkRect = new Rectangle((int)draw.position.X, (int)draw.position.Y, 1, 1);
+                checkRect.Inflate(100, 100);
+                if (checkRect.Intersects(screenRect))
+                    draw.Draw(-Main.screenPosition);
             }
             StartVanillaSpritebatch();
             if (false)
