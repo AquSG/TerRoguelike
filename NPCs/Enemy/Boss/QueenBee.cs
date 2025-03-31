@@ -1025,6 +1025,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (deadTime == 0 && deadt > 0)
             {
                 CheckDead();
+                deadTime = 1;
             }
             summonPosition = reader.ReadVector2();
             summonPositionStartTelegraph = reader.ReadVector2();

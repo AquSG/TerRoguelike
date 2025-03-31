@@ -1147,6 +1147,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             if (deadTime == 0 && deadt > 0)
             {
                 CheckDead();
+                deadTime = 1;
             }
         }
     }
