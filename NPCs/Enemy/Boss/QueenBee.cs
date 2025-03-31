@@ -1024,8 +1024,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
             {
-                CheckDead();
                 deadTime = 1;
+                if (modNPC.isRoomNPC)
+                {
+                    if (ActiveBossTheme != null)
+                        ActiveBossTheme.endFlag = true;
+                }
+                enemyHealthBar.ForceEnd(0);
             }
             summonPosition = reader.ReadVector2();
             summonPositionStartTelegraph = reader.ReadVector2();
