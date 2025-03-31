@@ -162,6 +162,7 @@ namespace TerRoguelike.Systems
                 return;
 
             int loopCount = -1;
+            bool otherPillarAwake = false;
             foreach (Room room in RoomList)
             {
                 loopCount++;
@@ -195,8 +196,8 @@ namespace TerRoguelike.Systems
                         if (room.AllowSettingPlayerCurrentRoom)
                         {
                             modPlayer.currentRoom = room.myRoom;
-                            modPlayer.lastKnownRoom = room.myRoom;
                         }
+                        modPlayer.lastKnownRoom = room.myRoom;
 
                         if (modPlayer.currentFloor.ID == 10 && !lunarFloorInitialized)
                         {
@@ -212,12 +213,22 @@ namespace TerRoguelike.Systems
                                 {
                                     jumpstartRoom.awake = true;
                                     jumpstartRoom.InitializeRoom();
-                                    RoomPacket.Send(jumpstartRoom.ID);
+                                    if (Main.dedServ)
+                                        RoomPacket.Send(jumpstartRoom.ID);
                                 }
                             }
                         }
 
-                        room.awake = true;
+                        bool allowAwake = true;
+                        if (!TerRoguelike.singleplayer && room.IsPillarRoom && otherPillarAwake)
+                            allowAwake = false;
+                        
+                        if (allowAwake)
+                            room.awake = true;
+
+                        if (!escape && room.IsPillarRoom && room.active && room.awake)
+                            otherPillarAwake = true;
+
                         if (room.CanDescend(player, modPlayer) && !TerRoguelike.mpClient && !activatedTeleport) //New Floor Blue Wall Portal Teleport
                         {
                             activatedTeleportCooldown = 180;
@@ -248,7 +259,8 @@ namespace TerRoguelike.Systems
                 {
                     room.entered = true;
                     room.OnEnter();
-                    RoomPacket.Send(room.ID);
+                    if (Main.dedServ)
+                        RoomPacket.Send(room.ID);
                 }
             }
 

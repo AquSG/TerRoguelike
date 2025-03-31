@@ -188,4 +188,18 @@ namespace TerRoguelike.UI
             RoomSystem.RegenerateWorld();
         }
     }
+
+    public class UnstuckCommand : ModCommand
+    {
+        public override CommandType Type => CommandType.Chat;
+        public override string Command => "unstuck";
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            var modPlayer = Main.LocalPlayer.ModPlayer();
+            if (!TerRoguelikeWorld.IsTerRoguelikeWorld || modPlayer == null || modPlayer.stuckTime == 0 || RoomSystem.RoomList == null || RoomSystem.RoomList.Count == 0 || modPlayer.lastKnownRoom == -1) return;
+
+            Room room = RoomSystem.RoomList[modPlayer.lastKnownRoom];
+            Main.LocalPlayer.Center = room.FindPlayerAirNearRoomCenter();
+        }
+    }
 }

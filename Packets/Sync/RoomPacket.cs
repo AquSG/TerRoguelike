@@ -39,13 +39,18 @@ namespace TerRoguelike.Packets
         public override PacketType MessageType => PacketType.RoomSync;
         public static void Send(int roomID, int toClient = -1, int ignoreClient = -1)
         {
-            if (Main.netMode != NetmodeID.Server)
+            if (TerRoguelike.singleplayer)
                 return;
             Room room = RoomID[roomID];
 
             var packet = NewPacket(PacketType.RoomSync);
 
             packet.Write(roomID);
+            if (TerRoguelike.mpClient)
+            {
+                packet.Send();
+                return;
+            }
             packet.Write(room.initialized);
             packet.Write(room.escapeInitialized);
             packet.Write(room.awake);
@@ -58,7 +63,6 @@ namespace TerRoguelike.Packets
             packet.Write(room.currentWave);
             packet.Write(room.waveClearGraceTime);
             packet.Write(room.bossDead);
-            //packet.Write(room.entered);
             packet.Write(room.anyAlive);
             packet.Write(room.lastTelegraphDuration);
             packet.Write(room.wallActive);
@@ -71,6 +75,11 @@ namespace TerRoguelike.Packets
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
             int id = packet.ReadInt32();
+            if (Main.dedServ)
+            {
+                Send(id, sender);
+                return;
+            }
             Room room = RoomID[id];
             room.initialized = packet.ReadBoolean();
             room.escapeInitialized = packet.ReadBoolean();
@@ -84,7 +93,6 @@ namespace TerRoguelike.Packets
             room.currentWave = packet.ReadInt32();
             room.waveClearGraceTime = packet.ReadInt32();
             room.bossDead = packet.ReadBoolean();
-            //room.entered = packet.ReadBoolean();
             room.anyAlive = packet.ReadBoolean();
             room.lastTelegraphDuration = packet.ReadInt32();
             room.wallActive = packet.ReadBoolean();

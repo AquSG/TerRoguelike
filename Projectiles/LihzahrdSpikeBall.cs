@@ -15,6 +15,7 @@ using Terraria.GameContent;
 using Terraria.Graphics.Shaders;
 using Terraria.DataStructures;
 using TerRoguelike.MainMenu;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -103,6 +104,15 @@ namespace TerRoguelike.Projectiles
             TerRoguelikeUtils.StartVanillaSpritebatch();
             Main.EntitySpriteDraw(tex, Projectile.Center - Main.screenPosition, null, (Color)GetAlpha(Lighting.GetColor(Projectile.Center.ToTileCoordinates())), Projectile.rotation, tex.Size() * 0.5f, Projectile.scale, SpriteEffects.None);
             return false;
+        }
+
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(direction);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            direction = reader.ReadInt32();
         }
     }
 }

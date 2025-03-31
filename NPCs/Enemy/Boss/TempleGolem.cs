@@ -920,6 +920,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             writer.Write(NPC.localAI[0]);
             writer.Write(NPC.localAI[2]);
             writer.WriteVector2(spawnPos);
+            writer.Write(eyePositions.Count);
+            for (int i = 0; i < eyePositions.Count; i++)
+                writer.WriteVector2(eyePositions[i]);
             writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
@@ -927,6 +930,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             NPC.localAI[0] = reader.ReadSingle();
             NPC.localAI[2] = reader.ReadSingle();
             spawnPos = reader.ReadVector2();
+            eyePositions.Clear();
+            int eyeCount = reader.ReadInt32();
+            for (int i = 0; i < eyeCount; i++)
+                eyePositions.Add(reader.ReadVector2());
             int deadt = reader.ReadInt32();
             if (deadTime == 0 && deadt > 0)
             {
