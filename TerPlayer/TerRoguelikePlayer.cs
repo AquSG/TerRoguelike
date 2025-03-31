@@ -1894,7 +1894,8 @@ namespace TerRoguelike.TerPlayer
                         Dust.NewDustDirect(Player.Center + new Vector2(-8, -16), 16, 32, DustID.Torch, randVel.X, randVel.Y, 0, default, 1.3f);
                     }
                     
-                    SoundEngine.PlaySound(JetLegCooldown with { Volume = 0.9f });
+                    if (Player.whoAmI == Main.myPlayer)
+                        SoundEngine.PlaySound(JetLegCooldown with { Volume = 0.9f });
                 }
             }
 
