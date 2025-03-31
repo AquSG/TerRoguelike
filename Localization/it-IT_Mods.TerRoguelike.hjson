@@ -41,8 +41,8 @@ EliteTainted: "Corrotto "
 EliteSlugged: "Violento "
 EliteBurdened: "Gravato "
 TrashDescription: Nei martedì, tra le 10 e le 11 di sera, +1 rimbalzo ad i proiettili principali
-// MultiplayerReady: Ready
-// Loading: Loading
+// MultiplayerReady: Pronto
+// Loading: Caricamento
 
 Projectiles: {
 	ClingyGrenade.DisplayName: Granata Appiccicosa
@@ -116,7 +116,7 @@ Projectiles: {
 	ShiningSand.DisplayName: Sabbia Splendente
 	DarkTendril.DisplayName: Viticcio Oscuro
 	Bee.DisplayName: Ape
-	HoneyGlob.DisplayName: Gocchia di Miele
+	HoneyGlob.DisplayName: Goccia di Miele
 	CutsceneBee.DisplayName: Api della Animazione
 	HellBeam.DisplayName: Fascio Infernale
 	DemonLaser.DisplayName: Laser Demoniaco
