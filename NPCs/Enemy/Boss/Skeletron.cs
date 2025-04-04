@@ -617,8 +617,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                 if (time < teleportDashWindup)
                 {
-                    if (time == 0)
+                    if (!attackInitialized)
                     {
+                        attackInitialized = true;
                         trackedSlot = default;
                         eyeParticleIntensity = 0;
                         float randRot = Main.rand.NextFloat(-MathHelper.PiOver2 * 0.75f, MathHelper.PiOver2 * 0.75f);
@@ -662,6 +663,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 }
                 else
                 {
+                    attackInitialized = false;
                     if (time == teleportDashWindup)
                     {
                         trackedSlot = SoundEngine.PlaySound(SoundID.Roar with { Volume = 0.9f, SoundLimitBehavior = SoundLimitBehavior.ReplaceOldest }, NPC.Center);

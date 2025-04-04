@@ -65,21 +65,12 @@ namespace TerRoguelike.Projectiles
             {
                 aimingDirection = (target.Center - Projectile.Center).SafeNormalize(Vector2.UnitY);
 
-                if (time >= 160 && Projectile.timeLeft > 60 && Projectile.ai[2] == -21 && Projectile.Center.Distance(target.Center) < 320 && TerRoguelikeUtils.CanHitInLine(Projectile.Center, target.Center))
+                if (!TerRoguelike.mpClient && time >= 160 && Projectile.timeLeft > 60 && Projectile.ai[2] == -21 && Projectile.Center.Distance(target.Center) < 320 && TerRoguelikeUtils.CanHitInLine(Projectile.Center, target.Center))
                 {
                     Projectile.ai[2] = -20;
                     Projectile.timeLeft = 120;
-                    SoundEngine.PlaySound(SoundID.Item176 with { Volume = 0.5f, MaxInstances = 1, Pitch = 0.5f }, Projectile.Center);
-                    SoundEngine.PlaySound(SoundID.Item82 with { Volume = 0.8f, MaxInstances = 1, Pitch = 0.7f, PitchVariance = 0, }, Projectile.Center);
-                    for (int i = 0; i < 32; i++)
-                    {
-                        float completion = i / 32f;
-                        float rot = MathHelper.TwoPi * completion + Main.rand.NextFloat(-0.04f, 0.04f);
-                        Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.5f));
-                        ParticleManager.AddParticle(new ThinSpark(
-                            Projectile.Center + rot.ToRotationVector2() * 10, rot.ToRotationVector2() * 5 + Projectile.velocity,
-                            20, color, new Vector2(0.25f, 0.4f) * Main.rand.NextFloat(0.7f, 1f) * 0.6f, rot, true, false));
-                    }
+                    ActivateEffect();
+                    Projectile.netUpdate = true;
                 }
             }
                 
@@ -132,6 +123,7 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.ai[2] >= 0 && Projectile.timeLeft >= 60 && Projectile.ai[2] % 8 == 0)
             {
+                Projectile.netUpdate = true;
                 SoundEngine.PlaySound(SoundID.Item91 with { Volume = 0.2f, Pitch = 0.5f, PitchVariance = 0.08f }, Projectile.Center);
                 Projectile.localAI[0] = 5;
 
@@ -140,6 +132,20 @@ namespace TerRoguelike.Projectiles
                     int proj = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + aimingDirection * 10, aimingDirection * 5, ModContent.ProjectileType<SoulBlast>(), Projectile.damage, 0, -1, 0.65f);
                     Main.projectile[proj].tileCollide = true;
                 }
+            }
+        }
+        public void ActivateEffect()
+        {
+            SoundEngine.PlaySound(SoundID.Item176 with { Volume = 0.5f, MaxInstances = 1, Pitch = 0.5f }, Projectile.Center);
+            SoundEngine.PlaySound(SoundID.Item82 with { Volume = 0.8f, MaxInstances = 1, Pitch = 0.7f, PitchVariance = 0, }, Projectile.Center);
+            for (int i = 0; i < 32; i++)
+            {
+                float completion = i / 32f;
+                float rot = MathHelper.TwoPi * completion + Main.rand.NextFloat(-0.04f, 0.04f);
+                Color color = Color.Lerp(Color.Cyan, Color.White, Main.rand.NextFloat(0.5f));
+                ParticleManager.AddParticle(new ThinSpark(
+                    Projectile.Center + rot.ToRotationVector2() * 10, rot.ToRotationVector2() * 5 + Projectile.velocity,
+                    20, color, new Vector2(0.25f, 0.4f) * Main.rand.NextFloat(0.7f, 1f) * 0.6f, rot, true, false));
             }
         }
         public override bool? CanDamage() => (maxTimeLeft - Projectile.timeLeft) >= startup + 20 ? null : false;
@@ -182,11 +188,17 @@ namespace TerRoguelike.Projectiles
         }
         public override void SendExtraAI(BinaryWriter writer)
         {
-
+            writer.Write(Projectile.timeLeft);
+            writer.WriteVector2(aimingDirection);
+            writer.Write(Projectile.ai[2] == -20);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
-            
+            Projectile.timeLeft = reader.ReadInt32();
+            aimingDirection = reader.ReadVector2();
+            bool actiavte = reader.ReadBoolean();
+            if (actiavte)
+                ActivateEffect();
         }
     }
 }

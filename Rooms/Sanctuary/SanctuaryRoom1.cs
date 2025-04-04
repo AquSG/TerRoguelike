@@ -163,8 +163,10 @@ namespace TerRoguelike.Rooms
                 player.Center = finalRoom.RoomPosition16 + finalRoom.RoomDimensions16 * new Vector2(0.5f, 0.66f);
                 TeleportToPositionPacket.Send(player.Center, TeleportContext.TrueBrain, ID);
                 finalRoom.AddBoss(finalRoom.bossSpawnPos, ModContent.NPCType<TrueBrain>());
-
                 SetBossTrack(FinalBoss2Theme);
+                CombatVolumeInterpolant = 0;
+                CalmVolumeInterpolant = 0;
+
                 ResetRoomID(finalRoom.ID);
                 RoomPacket.Send(finalRoom.ID);
 
