@@ -54,6 +54,7 @@ namespace TerRoguelike.MainMenu
         public static List<Keys> oldPressedKeys = [];
         public static bool weaponSelectInPlayerMenu = true;
         public static bool selectSingleplayer = true;
+        public static int oldMenuMode = 0;
         public static bool NewMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.NewMoon;
         public static bool FullMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.FullMoon;
         public static bool BloodMoonActive => TerRoguelikeWorld.IsTerRoguelikeWorld && difficulty == Difficulty.BloodMoon;
@@ -85,6 +86,8 @@ namespace TerRoguelike.MainMenu
                 RoomSystem.runStarted = false;
                 RoomSystem.playerCount = 1;
             }
+            if (oldMenuMode == 889 && Main.menuMode == 6)
+                Main.menuMode = 0;
             
            
             if (Main.menuMode == 0)
@@ -551,6 +554,7 @@ namespace TerRoguelike.MainMenu
                 
             }
             oldPressedKeys = [.. Keyboard.GetState().GetPressedKeys()];
+            oldMenuMode = Main.menuMode;
         }
         public static void DrawTerRoguelikeMenu()
         {

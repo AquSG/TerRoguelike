@@ -160,7 +160,7 @@ namespace TerRoguelike.Systems
         {
             PlayCreditsTheme();
 
-            currentViewStageDuration = 1323;
+            currentViewStageDuration = 2145;
             currentViewStage = -1;
             creditsActive = true;
             creditsTime = 0;
@@ -197,20 +197,20 @@ namespace TerRoguelike.Systems
             }
             if (currentViewStage == -2)
             {
-                currentViewStageDuration = 960;
+                currentViewStageDuration = 950;
                 Room targetRoom = RoomID[FloorID[FloorDict["Sanctuary"]].StartRoomID];
                 creditsPath = [targetRoom.RoomPosition16 + targetRoom.RoomCenter16];
             }
             else if (currentViewStage == -1)
             {
-                currentViewStageDuration = 1323;
+                currentViewStageDuration = 2145;
                 creditsPath = [Main.LocalPlayer.Center];
                 if (!weird)
                     PlayCreditsTheme();
             }
             else
             {
-                currentViewStageDuration = currentViewStage != 3 ? (currentViewStage != 5 ? 2618 : 4291) : 2946;
+                currentViewStageDuration = currentViewStage < 4 ? 1015 : (currentViewStage != 4 ? 3120 : 2145);
                 creditsPath = [];
                 int startRoom = RoomID[FloorID[FloorIDsInPlay[currentViewStage]].StartRoomID].myRoom;
                 for (int i = 0; i < 100; i++)

@@ -221,6 +221,8 @@ namespace TerRoguelike.Packets
                     RoomSystem.NewFloorEffects(room, Main.LocalPlayer.ModPlayer());
                 RoomSystem.FloorTransitionEffects();
                 SetBossTrack(FinalBoss2Theme);
+                CombatVolumeInterpolant = 0;
+                CalmVolumeInterpolant = 0;
             }
             if (context == TeleportContext.StartRun)
             {
