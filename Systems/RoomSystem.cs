@@ -306,7 +306,7 @@ namespace TerRoguelike.Systems
         {
             SetMusicMode(MusicStyle.AllCalm);
             SetCalm(FinalStage);
-            CalmVolumeLevel = 0.35f;
+            CalmVolumeLevel = 0.32f;
             CalmVolumeInterpolant = 0;
             CombatVolumeInterpolant = 0;
 
