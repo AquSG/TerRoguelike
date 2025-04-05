@@ -118,9 +118,9 @@ namespace TerRoguelike.Systems
 
         public static BossTheme PaladinTheme = new(
             "TerRoguelike/Tracks/PaladinTheme",
-            null,
+            "TerRoguelike/Tracks/PaladinThemeStart",
             "TerRoguelike/Tracks/PaladinThemeEnd",
-            0.3f,
+            0.32f,
             BossThemeSyncType.Paladin);
 
         public static BossTheme BrambleHollowTheme = new(
@@ -134,7 +134,7 @@ namespace TerRoguelike.Systems
             "TerRoguelike/Tracks/CrimsonVesselTheme",
             "TerRoguelike/Tracks/CrimsonVesselThemeStart",
             "TerRoguelike/Tracks/CrimsonVesselThemeEnd",
-            0.3f,
+            0.35f,
             BossThemeSyncType.CrimsonVessel);
 
         public static BossTheme CorruptionParasiteTheme = new(
