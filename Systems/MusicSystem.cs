@@ -147,15 +147,15 @@ namespace TerRoguelike.Systems
         public static BossTheme IceQueenTheme = new(
             "TerRoguelike/Tracks/IceQueenTheme",
             null,
-            "TerRoguelike/Tracks/IceQueenThemeEnd",
+            null,
             0.265f,
             BossThemeSyncType.IceQueen);
 
         public static BossTheme PharaohSpiritTheme = new(
             "TerRoguelike/Tracks/PharaohSpiritTheme",
             null,
-            "TerRoguelike/Tracks/PharaohSpiritThemeEnd",
-            0.24f,
+            null,
+            0.22f,
             BossThemeSyncType.PharaohSpirit);
 
         public static BossTheme QueenBeeTheme = new(
@@ -662,6 +662,7 @@ namespace TerRoguelike.Systems
                             ActiveBossTheme.endFlag = false;
                             ActiveBossTheme.startFlag = false;
                             SetMusicMode(MusicStyle.Silent);
+                            fadeRateMultiplier = 2;
                         }
                         else
                         {
