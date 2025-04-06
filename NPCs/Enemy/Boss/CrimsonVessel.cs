@@ -501,14 +501,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                     int chargeTime = time % (chargeTelegraph + chargingDuration);
                     if (chargeTime < chargeTelegraph)
                     {
+                        attackInitialized = false;
                         NPC.velocity = -targetVect.SafeNormalize(Vector2.UnitY) * 3 * (1f - ((float)chargeTime / chargeTelegraph));
                         if (time > teleportTime && chargeTime <= teleportTime - teleportMoveTimestamp)
                         {
                             TeleportAI();
                         }
                     }
-                    else if (chargeTime == chargeTelegraph)
+                    else if (chargeTime >= chargeTelegraph && !attackInitialized)
                     {
+                        attackInitialized = true;
                         ChargeSlot1 = SoundEngine.PlaySound(SoundID.Zombie38 with { Volume = 0.26f, Pitch = -0.8f, PitchVariance = 0.1f,  MaxInstances = 3 }, NPC.Center);
                         ChargeSlot2 = SoundEngine.PlaySound(SoundID.NPCDeath33 with { Volume = 0.33f, Pitch = -0.27f, PitchVariance = 0f,  MaxInstances = 3 }, NPC.Center);
                         NPC.velocity = targetVect.SafeNormalize(Vector2.UnitY) * 11;
