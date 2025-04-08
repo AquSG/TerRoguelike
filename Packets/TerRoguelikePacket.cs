@@ -77,23 +77,6 @@ namespace TerRoguelike.Packets
         public abstract void HandlePacket(in BinaryReader packet, int sender);
 
         internal PropertyInfo _Prop_Static_Instance;
-
-        public static void CloneAndBroadcast(in BinaryReader packet, PacketType type, long startIndex, int length, int ignoreClient = -1)
-        {
-            if (!Main.dedServ || startIndex < 0)
-                return;
-
-            packet.BaseStream.Position = startIndex;
-
-            //limit stack size to 256 bytes
-            Span<byte> buffer = length <= 256 ? stackalloc byte[length] : new byte[length];
-            packet.BaseStream.Read(buffer);
-
-            var newPacket = NewPacket(type);
-            newPacket.Write(buffer);
-            newPacket.Send(ignoreClient);
-        }
-
         public static ModPacket NewPacket(PacketType type)
         {
             var packet = TerRoguelike.Instance.GetPacket();
