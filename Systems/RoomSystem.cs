@@ -1575,7 +1575,6 @@ namespace TerRoguelike.Systems
                 }
 
                 Main.LocalPlayer.gfxOffY = 0;
-                regeneratingWorldTime = 0;
                 loopingDrama = 0;
                 Main.LocalPlayer.ModPlayer().OnEnterWorld();
                 Main.LocalPlayer.ModPlayer().OnRespawn();
@@ -1583,6 +1582,7 @@ namespace TerRoguelike.Systems
                 MusicSystem.Initialized = false;
                 Main.BlackFadeIn = 255;
                 TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
+                regeneratingWorldTime = 0;
 
                 if (TerRoguelike.singleplayer)
                 {
@@ -1609,8 +1609,8 @@ namespace TerRoguelike.Systems
                             RemoteClient.CheckSection(i, Main.player[i].position);
                         }
                     }
-                    RegenerateWorldPacket.Send();
                     RoomUnmovingDataPacket.Send();
+                    RegenerateWorldPacket.Send();
                 }
                 Main.Map.Clear();
             }

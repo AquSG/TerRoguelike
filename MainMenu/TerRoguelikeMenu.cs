@@ -85,6 +85,8 @@ namespace TerRoguelike.MainMenu
             {
                 RoomSystem.runStarted = false;
                 RoomSystem.playerCount = 1;
+                RoomSystem.regeneratingWorldTime = 0;
+                RoomSystem.regeneratingWorld = false;
             }
             if (oldMenuMode == 889 && Main.menuMode == 6)
                 Main.menuMode = 0;

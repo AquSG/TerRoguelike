@@ -29,7 +29,7 @@ namespace TerRoguelike.Systems
     public class SceneEffect : ModSceneEffect
     {
         public override int Music => MusicLoader.GetMusicSlot(TerRoguelike.Instance, "Tracks/Blank");
-        public override SceneEffectPriority Priority => SceneEffectPriority.BossHigh;
+        public override SceneEffectPriority Priority => SceneEffectPriority.BossMedium;
         public override bool IsSceneEffectActive(Player player)
         {
             return TerRoguelikeWorld.IsTerRoguelikeWorld;

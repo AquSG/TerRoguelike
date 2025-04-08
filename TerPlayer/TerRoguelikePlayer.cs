@@ -2988,8 +2988,11 @@ namespace TerRoguelike.TerPlayer
                 allowedToExist = true;
 
             DifficultySetPacket.Send(TerRoguelikeMenu.difficulty);
-            RequestRoomUmovingDataPacket.cooldown = 0;
-            RequestRoomUmovingDataPacket.Send();
+            if (RoomSystem.regeneratingWorldTime <= 0)
+            {
+                RequestRoomUmovingDataPacket.cooldown = 0;
+                RequestRoomUmovingDataPacket.Send();
+            }
 
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {

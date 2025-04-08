@@ -110,6 +110,13 @@ namespace TerRoguelike.Systems
                     {
                         SetNextViewStage();
                     }
+                    int timeCheck = creditsTime;
+                    if (creditsTime > 4000)
+                        timeCheck -= 15;
+                    if (timeCheck % 252 == 251 && !(currentViewStageDuration - creditsTime < 180))
+                    {
+                        CycleViewStage();
+                    }
                 }
             }
         }
@@ -189,6 +196,8 @@ namespace TerRoguelike.Systems
             }
             else
             {
+                if (currentViewStage >= 0 && currentViewStage < 4)
+                    currentViewStage = 3;
                 currentViewStage = currentViewStage + 1;
                 if (FloorID[FloorIDsInPlay[currentViewStage]].ID == FloorDict["Lunar"])
                 {
@@ -210,7 +219,7 @@ namespace TerRoguelike.Systems
             }
             else
             {
-                currentViewStageDuration = currentViewStage < 4 ? 1015 : (currentViewStage != 4 ? 3120 : 2145);
+                currentViewStageDuration = currentViewStage < 5 ? 6205 : 3120;
                 creditsPath = [];
                 int startRoom = RoomID[FloorID[FloorIDsInPlay[currentViewStage]].StartRoomID].myRoom;
                 for (int i = 0; i < 100; i++)
@@ -227,6 +236,43 @@ namespace TerRoguelike.Systems
                 if (creditsPath.Count == 0)
                     creditsPath = [Main.LocalPlayer.Center];
             }
+        }
+        public static void CycleViewStage()
+        {
+            if (currentViewStage < 0 || currentViewStage >= 5)
+                return;
+
+            currentViewStageDuration = 6205;
+            List<int> randList = [];
+            for (int i = 0; i < 5; i++)
+            {
+                if (i != currentViewStage)
+                    randList.Add(i);
+            }
+            if (creditsTime > 5500)
+                currentViewStage = 4;
+            else
+            {
+                currentViewStage = randList[Main.rand.Next(randList.Count)];
+                Main.BlackFadeIn = 255;
+            }
+            
+
+            creditsPath = [];
+            int startRoom = RoomID[FloorID[FloorIDsInPlay[currentViewStage]].StartRoomID].myRoom;
+            for (int i = 0; i < 100; i++)
+            {
+                int roomListCheck = startRoom + i;
+                if (RoomList.Count <= roomListCheck)
+                    break;
+
+                Room room = RoomList[roomListCheck];
+                creditsPath.Add(room.RoomPosition16 + room.RoomCenter16);
+                if (room.IsBossRoom)
+                    break;
+            }
+            if (creditsPath.Count == 0)
+                creditsPath = [Main.LocalPlayer.Center];
         }
         public override void ClearWorld()
         {
