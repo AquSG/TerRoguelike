@@ -31,6 +31,7 @@ namespace TerRoguelike.Managers
 {
     public class Room
     {
+        public static int forceLoopCalculation = -1; //if greater than -1, elite spawning logic is done with this interger instead of TerRoguelikeWorld.currentLoop
         private static Texture2D wallTex = null;
 
         // base room class used by all rooms
@@ -185,9 +186,10 @@ namespace TerRoguelike.Managers
                     if (TimeUntilSpawn[i] - roomTime + waveStartTime <= 0) //spawn pending enemy that has reached it's time
                     {
                         var eliteVars = new TerRoguelikeGlobalNPC.EliteVars();
-                        if (TerRoguelikeWorld.currentLoop > 0)
+                        int currentLoop = forceLoopCalculation >= 0 ? forceLoopCalculation : TerRoguelikeWorld.currentLoop;
+                        if (currentLoop > 0)
                         {
-                            EliteCredits += 0.34f + 0.66f * TerRoguelikeWorld.currentLoop;
+                            EliteCredits += 0.34f + 0.66f * currentLoop;
                             float eliteRoll = (float)Math.Pow(EliteCredits, 2) / (EliteCredits + 15);
                             if (Main.rand.NextFloat(15) < eliteRoll)
                             {
