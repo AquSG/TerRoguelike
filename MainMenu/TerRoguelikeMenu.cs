@@ -103,28 +103,37 @@ namespace TerRoguelike.MainMenu
                 {
                     bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
 
-                    WorldFileData activeWorldFileData = Main.ActiveWorldFileData;
-                    string path = activeWorldFileData.Path;
-                    int index = -1;
-                    if (path != null)
+                    try
                     {
-                        index = path.LastIndexOf("\\TerRoguelike\\");
+                        WorldFileData activeWorldFileData = Main.ActiveWorldFileData;
+                        string path = activeWorldFileData.Path;
+                        int index = -1;
+                        if (path != null)
+                        {
+                            index = path.LastIndexOf("\\TerRoguelike\\");
+                        }
+
+                        if (index > -1)
+                        {
+                            index = path.LastIndexOf("\\");
+                            string directory = path.Substring(0, index + 1);
+                            string[] paths = Directory.GetFiles(directory);
+                            foreach (string filepath in paths)
+                            {
+                                string extension = Path.GetExtension(filepath);
+                                bool delete = extension == ".wld" || extension == ".twld" || extension == ".bak" || extension == ".bak2";
+                                FileUtilities.Delete(filepath, false, fullyDelete);
+                            }
+                            Main.ActiveWorldFileData = new WorldFileData();
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        TerRoguelike.Instance.Logger.Error(e);
                     }
 
-                    if (index > -1)
-                    {
-                        index = path.LastIndexOf("\\");
-                        string directory = path.Substring(0, index + 1);
-                        string[] paths = Directory.GetFiles(directory);
-                        foreach (string filepath in paths)
-                        {
-                            string extension = Path.GetExtension(filepath);
-                            bool delete = extension == ".wld" || extension == ".twld" || extension == ".bak" || extension == ".bak2";
-                            FileUtilities.Delete(filepath, false, fullyDelete);
-                        }
-                        Main.ActiveWorldFileData = new WorldFileData();
-                    }
                     wipeTempWorld = false;
+
                     if (!wipeTempPlayer)
                     {
                         TerRoguelikeWorldManagementSystem.currentlyGeneratingTerRoguelikeWorld = true;
@@ -135,27 +144,35 @@ namespace TerRoguelike.MainMenu
                 {
                     bool fullyDelete = ModContent.GetInstance<TerRoguelikeConfig>().FullyDeletePlayerAndWorldFiles;
 
-                    PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
-                    string path = activePlayerFileData.Path;
-                    int index = -1;
-                    if (path != null)
+                    try
                     {
-                        index = path.LastIndexOf("\\TerRoguelike\\");
-                    }
-
-                    if (index > -1)
-                    {
-                        index = path.LastIndexOf("\\");
-                        string directory = path.Substring(0, index + 1);
-                        string[] paths = Directory.GetFiles(directory);
-                        foreach (string filepath in paths)
+                        PlayerFileData activePlayerFileData = Main.ActivePlayerFileData;
+                        string path = activePlayerFileData.Path;
+                        int index = -1;
+                        if (path != null)
                         {
-                            string extension = Path.GetExtension(filepath);
-                            bool delete = extension == ".plr" || extension == ".tplr" || extension == ".bak" || extension == ".bak2";
-                            FileUtilities.Delete(filepath, false, fullyDelete);
+                            index = path.LastIndexOf("\\TerRoguelike\\");
                         }
-                        Main.ActivePlayerFileData = new PlayerFileData();
+
+                        if (index > -1)
+                        {
+                            index = path.LastIndexOf("\\");
+                            string directory = path.Substring(0, index + 1);
+                            string[] paths = Directory.GetFiles(directory);
+                            foreach (string filepath in paths)
+                            {
+                                string extension = Path.GetExtension(filepath);
+                                bool delete = extension == ".plr" || extension == ".tplr" || extension == ".bak" || extension == ".bak2";
+                                FileUtilities.Delete(filepath, false, fullyDelete);
+                            }
+                            Main.ActivePlayerFileData = new PlayerFileData();
+                        }
                     }
+                    catch (Exception e)
+                    {
+                        TerRoguelike.Instance.Logger.Error(e);
+                    }
+                    
                     wipeTempPlayer = false;
                 }
 
