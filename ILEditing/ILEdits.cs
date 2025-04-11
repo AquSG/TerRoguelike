@@ -867,7 +867,8 @@ namespace TerRoguelike.ILEditing
 			//tmod gonna kill me for this
 			if (TerRoguelikeMenu.prepareForRoguelikeGeneration)
 			{
-				Player _player = Main.PendingPlayer;
+                switchFilePath = true;
+                Player _player = Main.PendingPlayer;
 				if (_player.ModPlayer() != null)
 				{
 					_player.ModPlayer().isDeletableOnExit = true;
@@ -923,12 +924,11 @@ namespace TerRoguelike.ILEditing
 												 select x.Clone();
 				List<Item> startingItems = PlayerLoader.GetStartingItems(_player, vanillaItems);
 				PlayerLoader.SetStartInventory(_player, startingItems);
-				switchFilePath = true;
 				TerRoguelikeMenu.desiredPlayer = PlayerFileData.CreateAndSave(_player);
-				switchFilePath = false;
 				Main.LoadPlayers();
 				Main.menuMode = 1;
-				return;
+                switchFilePath = false;
+                return;
 			}
 			else
 				orig.Invoke(self);
