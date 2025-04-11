@@ -1947,6 +1947,7 @@ namespace TerRoguelike.Systems
             ParticleManager.ActiveParticlesAfterEverything.Clear();
             ParticleManager.ActiveParticlesAfterProjectiles.Clear();
             ParticleManager.ActiveParticlesBehindTiles.Clear();
+            Room.forceLoopCalculation = -1;
             if (RoomList != null)
             {
                 for (int i = 0; i < RoomList.Count; i++)
