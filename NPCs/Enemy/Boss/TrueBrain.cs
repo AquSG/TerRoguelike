@@ -1383,6 +1383,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (modNPC.isRoomNPC)
                 {
+                    if (!TerRoguelike.mpClient && calamityMod != null)
+                    {
+                        int yharharType = calamityMod.Find<ModNPC>("Yharon").Type;
+                        var parentRoom = modNPC.GetParentRoom();
+                        parentRoom.AddBoss(parentRoom.RoomCenter16, yharharType);
+                    }
                     for (int i = 0; i < 5; i++)
                     {
                         if (FloorID[FloorIDsInPlay[i]].jstcProgress < Floor.JstcProgress.BossDeath)

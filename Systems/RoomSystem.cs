@@ -68,6 +68,7 @@ namespace TerRoguelike.Systems
         public static bool runStartTouched = false;
         public static bool runStarted = false;
         public static int playerCount = 1;
+        internal static Mod calamityMod = null;
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -2038,6 +2039,15 @@ namespace TerRoguelike.Systems
         public override void PostSetupContent()
         {
             ItemManager.LoadStarterItems();
+        }
+        public override void Load()
+        {
+            calamityMod = null;
+            ModLoader.TryGetMod("CalamityMod", out calamityMod);
+        }
+        public override void Unload()
+        {
+            calamityMod = null;
         }
     }
     public class HealingPulse

@@ -3548,6 +3548,14 @@ namespace TerRoguelike.NPCs
                 maxSpawns = 0;
             }
         }
+        public override void SetDefaults(NPC entity)
+        {
+            if (calamityMod is not null)
+            {
+                if (entity.type == calamityMod.Find<ModNPC>("Yharon").Type)
+                    OverrideIgniteVisual = true;
+            }
+        }
 
         public override void OnSpawn(NPC npc, IEntitySource source)
         {
