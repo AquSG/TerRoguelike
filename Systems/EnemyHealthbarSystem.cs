@@ -28,8 +28,8 @@ namespace TerRoguelike.Systems
         {
             public List<int> TrackedEnemies;
             public List<int> TrackedEnemyTypes;
-            public int CurrentHealth;
-            public int MaxHealth;
+            public long CurrentHealth;
+            public long MaxHealth;
             public float MainBar;
             public float ExtraBar;
             public string Name;
@@ -69,7 +69,7 @@ namespace TerRoguelike.Systems
                 if (TrackedEnemies.Count > 0)
                 {
                     CurrentHealth = 0;
-                    int storedHealth = MaxHealth;
+                    long storedHealth = MaxHealth;
                     MaxHealth = 0;
                     Opacity += 0.016f;
                     for (int i = 0; i < TrackedEnemies.Count; i++)
