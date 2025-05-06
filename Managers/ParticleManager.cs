@@ -132,6 +132,57 @@ namespace TerRoguelike.Managers
             });
             ActiveParticlesAfterEverything.RemoveAll(x => x.timeLeft <= 0);
         }
+        public static List<Particle> UpdateParticleList(List<Particle> list)
+        {
+            if (list == null)
+                return list;
+            if (list.Count == 0)
+                return list;
+
+            FastParallel.For(0, list.Count, delegate (int start, int end, object context)
+            {
+                for (int i = start; i < end; i++)
+                {
+                    Particle particle = list[i];
+                    particle.Update();
+                }
+            });
+            list.RemoveAll(x => x.timeLeft <= 0);
+            return list;
+        }
+        public static void DrawParticleList(List<Particle> list, bool culling = true)
+        {
+            if (list == null)
+                return;
+            if (list.Count == 0)
+                return;
+            Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
+            Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
+            Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
+            StartAlphaBlendSpritebatch(false);
+            for (int i = 0; i < list.Count; i++)
+            {
+                Particle particle = list[i];
+                if (particle.additive)
+                    continue;
+                if (culling && !DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
+                particle.Draw();
+            }
+            StartAdditiveSpritebatch();
+            for (int i = 0; i < list.Count; i++)
+            {
+                Particle particle = list[i];
+                if (!particle.additive)
+                    continue;
+                if (culling && !DrawScreenCheckWithFluff(particle.position, (int)((particle.frame.Width > particle.frame.Height ? particle.frame.Width : particle.frame.Height) * (particle.scale.X > particle.scale.Y ? particle.scale.X : particle.scale.Y)), ScreenRect))
+                    continue;
+
+                particle.Draw();
+            }
+            Main.spriteBatch.End();
+        }
         public static void DrawParticles_Default()
         {
             if (ActiveParticles == null)

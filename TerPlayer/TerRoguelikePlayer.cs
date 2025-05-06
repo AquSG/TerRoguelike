@@ -3009,7 +3009,7 @@ namespace TerRoguelike.TerPlayer
                         Point dimensions = room.RoomDimensions.ToPoint();
                         Rectangle frameRect = new Rectangle(topLeft.X, topLeft.Y, dimensions.X, dimensions.Y);
                         frameRect.Inflate(2000, 2000);
-                        WorldGen.SectionTileFrameWithCheck(frameRect.X, frameRect.Y, frameRect.Width, frameRect.Height);
+                        WorldGen.SectionTileFrameWithCheck(frameRect.X, frameRect.Y, frameRect.X + frameRect.Width, frameRect.Y + frameRect.Height);
                     }
                 }
                 if (TerRoguelikeWorld.currentLoop > 0)

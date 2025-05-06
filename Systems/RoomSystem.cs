@@ -88,6 +88,8 @@ namespace TerRoguelike.Systems
                     Main.time = 34920;
                     Main.dayTime = true;
                 }
+                if (Main.netMode == NetmodeID.SinglePlayer)
+                    runStarted = true;
             }
 
             postDrawAllBlack = false;
@@ -222,6 +224,8 @@ namespace TerRoguelike.Systems
 
                         bool allowAwake = true;
                         if (!TerRoguelike.singleplayer && room.IsPillarRoom && otherPillarAwake)
+                            allowAwake = false;
+                        if (!runStarted)
                             allowAwake = false;
                         
                         if (allowAwake)
@@ -1542,6 +1546,7 @@ namespace TerRoguelike.Systems
             {
                 regeneratingWorldTime++;
                 loopingDrama = 0;
+                runStarted = false;
 
                 Vector2 spawnPos = new Vector2(Main.spawnTileX, Main.spawnTileY) * 16;
                 foreach (Player player in Main.ActivePlayers)
