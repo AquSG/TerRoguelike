@@ -1589,6 +1589,8 @@ namespace TerRoguelike.Systems
                 Main.BlackFadeIn = 255;
                 TerRoguelikeMenu.prepareForRoguelikeGeneration = false;
                 regeneratingWorldTime = 0;
+                if (TerRoguelikeWorld.currentLoop > 0)
+                    runStarted = true;
 
                 if (TerRoguelike.singleplayer)
                 {
