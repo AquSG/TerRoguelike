@@ -1427,7 +1427,7 @@ namespace TerRoguelike.NPCs
 
             npc.velocity += Vector2.UnitY * acceleration * magnitude * (float)Math.Cos(npc.ai[1] / 20f * MathHelper.TwoPi);
 
-            if (npc.collideX)
+            if (npc.collideX && Math.Abs(npc.velocity.X) > 0.5f)
             {
                 npc.velocity.X *= -0.75f;
             }
@@ -2325,7 +2325,7 @@ namespace TerRoguelike.NPCs
                 if (Math.Abs(npc.velocity.X) > speedCap * speedMulti)
                     npc.velocity.X = speedCap * npc.direction * speedMulti;
 
-                Point targetBlock = (npc.Bottom + Vector2.UnitY).ToTileCoordinates();
+                Point targetBlock = (npc.Bottom + Vector2.UnitY + Vector2.UnitX * Math.Sign(npc.velocity.X)).ToTileCoordinates();
 
                 if (npc.collideX && npc.ai[2] >= 0)
                 {

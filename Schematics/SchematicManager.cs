@@ -250,6 +250,19 @@ namespace TerRoguelike.Schematics
             RoomID.Add(new TempleEnemyRoom8Down());
             RoomID.Add(new TempleEnemyRoom8Up());
             RoomID.Add(new SanctuaryLobbyRoom1());
+            RoomID.Add(new CorruptEnemyRoom13());
+            RoomID.Add(new CrimsonEnemyRoom10());
+            RoomID.Add(new CrimsonEnemyRoom10Down());
+            RoomID.Add(new DesertEnemyRoom11Down());
+            RoomID.Add(new DesertEnemyRoom11Up());
+            RoomID.Add(new DungeonEnemyRoom7());
+            RoomID.Add(new DungeonEnemyRoom7Up());
+            RoomID.Add(new ForestEnemyRoom9());
+            RoomID.Add(new HellEnemyRoom12());
+            RoomID.Add(new JungleEnemyRoom6());
+            RoomID.Add(new SnowEnemyRoom11());
+            RoomID.Add(new TempleEnemyRoom9Down());
+            RoomID.Add(new TempleEnemyRoom9Up());
 
             for (int i = 0; i < RoomID.Count; i++)
             {
