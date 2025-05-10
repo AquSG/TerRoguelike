@@ -251,7 +251,7 @@ namespace TerRoguelike.NPCs
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);
                     int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                     {
                         if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                         {
@@ -441,7 +441,7 @@ namespace TerRoguelike.NPCs
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);
                     int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                     {
                         if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                         {
@@ -1057,7 +1057,7 @@ namespace TerRoguelike.NPCs
             else
             {
                 dashing = true;
-                if (npc.ai[1] >= -dashTime)
+                if (npc.ai[1] >= -dashTime && npc.ai[1] < 0)
                 {
                     npc.stairFall = true;
                 }
@@ -1078,7 +1078,8 @@ namespace TerRoguelike.NPCs
                 }
                 if (npc.ai[1] > -dashTime)
                 {
-                    npc.stairFall = true;
+                    if (npc.ai[1] < 0)
+                        npc.stairFall = true;
                     if (npc.collideX)
                     {
                         npc.direction *= -1;
@@ -1117,7 +1118,7 @@ namespace TerRoguelike.NPCs
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);
                     int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                     {
                         if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                         {
@@ -1244,7 +1245,7 @@ namespace TerRoguelike.NPCs
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);
                     int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                     {
                         if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                         {
@@ -1701,7 +1702,7 @@ namespace TerRoguelike.NPCs
                             int fluff = 6;
                             int bottomtilepointx = (int)(npc.Center.X / 16f);
                             int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                            for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                            for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                             {
                                 if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                                 {
@@ -2021,7 +2022,7 @@ namespace TerRoguelike.NPCs
                         int fluff = 6;
                         int bottomtilepointx = (int)(npc.Center.X / 16f);
                         int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                        for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                        for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                         {
                             if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                             {
@@ -2720,7 +2721,7 @@ namespace TerRoguelike.NPCs
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);
                     int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                     {
                         if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                         {
@@ -3357,7 +3358,7 @@ namespace TerRoguelike.NPCs
                     int fluff = 6;
                     int bottomtilepointx = (int)(npc.Center.X / 16f);
                     int bottomtilepointY = (int)(npc.Bottom.Y / 16f);
-                    for (int i = bottomtilepointY; i > bottomtilepointY - fluff - 1; i--)
+                    for (int i = bottomtilepointY; i < bottomtilepointY + fluff; i++)
                     {
                         if (Main.tile[bottomtilepointx, i].HasUnactuatedTile && TileID.Sets.Platforms[Main.tile[bottomtilepointx, i].TileType])
                         {
