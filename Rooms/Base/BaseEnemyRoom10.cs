@@ -10,6 +10,8 @@ using Terraria;
 using Terraria.ID;
 using static TerRoguelike.Managers.NPCManager;
 using static TerRoguelike.Schematics.SchematicManager;
+using Terraria.ModLoader;
+using TerRoguelike.NPCs.Enemy;
 
 namespace TerRoguelike.Rooms
 {
@@ -30,7 +32,7 @@ namespace TerRoguelike.Rooms
             AddRoomNPC(MakeEnemySpawnPos(Center, -13, 3, 0), ChooseEnemy(AssociatedFloor, 0), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(Bottom, -15, -2, 0), ChooseEnemy(AssociatedFloor, 1), 60, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(TopLeft, 12, 9, 0), ChooseEnemy(AssociatedFloor, 1), 240, 120, 0.45f, 0);
-            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 4, 9, 0), ChooseEnemy(AssociatedFloor, 0), 240, 120, 0.45f, 0);
+            AddRoomNPC(MakeEnemySpawnPos(TopLeft, 4, 9, 0), ModContent.NPCType<UndeadGuard>(), 240, 120, 0.45f, 0);
             AddRoomNPC(MakeEnemySpawnPos(Right, -11, 3, 8, 0), ChooseEnemy(AssociatedFloor, 2), 240, 120, 0.45f, 0);
         }
     }
