@@ -1582,8 +1582,15 @@ namespace TerRoguelike.Systems
 
                 Main.LocalPlayer.gfxOffY = 0;
                 loopingDrama = 0;
-                Main.LocalPlayer.ModPlayer().OnEnterWorld();
-                Main.LocalPlayer.ModPlayer().OnRespawn();
+                foreach (Player player in Main.ActivePlayers)
+                {
+                    var modPlayer = player.ModPlayer();
+                    if (modPlayer == null)
+                        return;
+                    modPlayer.OnEnterWorld();
+                    modPlayer.OnRespawn();
+                }
+                
                 WorldGen.gen = false;
                 MusicSystem.Initialized = false;
                 Main.BlackFadeIn = 255;
