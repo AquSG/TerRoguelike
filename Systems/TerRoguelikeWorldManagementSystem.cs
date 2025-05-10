@@ -27,7 +27,6 @@ namespace TerRoguelike.Systems
     {
         public static bool currentlyGeneratingTerRoguelikeWorld = false;
         public static bool GenDebugWorld = false;
-        //int taskCounter = 0;
         public override void PreWorldGen()
         {
             if (WorldGen.currentWorldSeed == "TerRoguelikeMakeRoomDebugWorldPleaseTY")
