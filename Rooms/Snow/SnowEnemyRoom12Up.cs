@@ -13,11 +13,11 @@ using static TerRoguelike.Schematics.SchematicManager;
 
 namespace TerRoguelike.Rooms
 {
-    public class SnowEnemyRoom12 : Room
+    public class SnowEnemyRoom12Up : Room
     {
         public override int AssociatedFloor => FloorDict["Snow"];
-        public override string Key => "SnowEnemyRoom12";
-        public override string Filename => "Schematics/RoomSchematics/SnowEnemyRoom12.csch";
+        public override string Key => "SnowEnemyRoom12Up";
+        public override string Filename => "Schematics/RoomSchematics/SnowEnemyRoom12Up.csch";
         public override bool CanExitRight => true;
         public override bool CanExitDown => false;
         public override bool CanExitUp => false;
