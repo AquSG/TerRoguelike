@@ -69,6 +69,22 @@ namespace TerRoguelike.Systems
         public static bool runStarted = false;
         public static int playerCount = 1;
         internal static Mod calamityMod = null;
+        internal static Mod japaneseTranslation = null;
+        internal static Mod spanishTranslation = null;
+        internal static Mod koreanTranslation = null;
+        public static List<Mod> translationMods = [];
+        public static bool translationModEnabled
+        {
+            get
+            {
+                foreach (Mod mod in translationMods)
+                {
+                    if (mod != null)
+                        return true;
+                }
+                return false;
+            }
+        }
         public static void NewRoom(Room room)
         {
             RoomList.Add(room);
@@ -2057,11 +2073,27 @@ namespace TerRoguelike.Systems
         public override void Load()
         {
             calamityMod = null;
+            japaneseTranslation = null;
+            spanishTranslation = null;
+            koreanTranslation = null;
             ModLoader.TryGetMod("CalamityMod", out calamityMod);
+            ModLoader.TryGetMod("TerRoguelikeJapanese", out japaneseTranslation);
+            ModLoader.TryGetMod("TerRoguelikeES", out spanishTranslation);
+            ModLoader.TryGetMod("TerRoguelikeKR", out koreanTranslation);
+            translationMods =
+            [
+                japaneseTranslation,
+                spanishTranslation,
+                koreanTranslation
+            ];
         }
         public override void Unload()
         {
+            translationMods = null;
             calamityMod = null;
+            japaneseTranslation = null;
+            spanishTranslation = null;
+            koreanTranslation = null;
         }
     }
     public class HealingPulse

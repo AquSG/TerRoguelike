@@ -220,7 +220,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public static bool TalkFont
         {
             get {
-                return !(DotumChePixel == null || Environment.OSVersion.Platform != PlatformID.Win32NT || !GameCulture.FromCultureName(GameCulture.CultureName.English).IsActive);
+                return !(DotumChePixel == null || Environment.OSVersion.Platform != PlatformID.Win32NT || !GameCulture.FromCultureName(GameCulture.CultureName.English).IsActive || translationModEnabled);
             }
         }
 
