@@ -240,6 +240,7 @@ namespace TerRoguelike.TerPlayer
         public int creditsViewTime = 0;
         public bool isDeletableOnExit = false;
         public bool enableCampfire = false;
+        public bool negateCampfireRegen = false;
         public int lunarGambit = 0;
         public int darkSanctuaryTime = -90;
         public int jstcTeleportTime = 0;
@@ -1981,12 +1982,20 @@ namespace TerRoguelike.TerPlayer
                         if (Player.buffType[i] == BuffID.Campfire)
                         {
                             Player.buffType[i] = 0;
-                            Player.lifeRegen -= 1;
+                            negateCampfireRegen = true;
                         }
                     }
                 }
             }
             enableCampfire = false;
+        }
+        public override void UpdateLifeRegen()
+        {
+            if (negateCampfireRegen)
+            {
+                negateCampfireRegen = false;
+                Player.lifeRegen -= 1;
+            }
         }
         public override void UpdateDead()
         {
