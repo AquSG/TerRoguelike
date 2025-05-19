@@ -76,7 +76,6 @@ namespace TerRoguelike.Projectiles
 
             if (Projectile.timeLeft <= 2 * Projectile.MaxUpdates)
             {
-                
                 ableToHit = false;
                 Projectile.velocity = Vector2.Zero;
                 return;
