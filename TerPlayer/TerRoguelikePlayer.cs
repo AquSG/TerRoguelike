@@ -33,7 +33,6 @@ using TerRoguelike.Systems;
 using TerRoguelike.UI;
 using TerRoguelike.Utilities;
 using TerRoguelike.World;
-using static System.Net.Mime.MediaTypeNames;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using static TerRoguelike.Managers.TextureManager;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;

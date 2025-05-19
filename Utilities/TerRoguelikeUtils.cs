@@ -176,7 +176,7 @@ namespace TerRoguelike.Utilities
             return Color.Lerp(currentColor, nextColor, increment * colors.Length % 1f);
         }
 
-        public static bool TopSlope (Tile tile)
+        public static bool TopSlope(Tile tile)
         {
             byte b = (byte)tile.Slope;
             if (b != 1)
@@ -204,7 +204,7 @@ namespace TerRoguelike.Utilities
                     continue;
 
                 TerRoguelikeGlobalNPC modNPC = npc.ModNPC();
-                
+
                 if (modNPC.CanBeChased(false, chaseFriendly))
                 {
                     float distance = (origin - npc.getRect().ClosestPointInRect(origin)).Length();
@@ -251,7 +251,7 @@ namespace TerRoguelike.Utilities
         /// <returns>The radians present between the 2 angles, positive or negative based on the closest direction</returns>
         public static float AngleSizeBetween(float angle1, float angle2)
         {
-            
+
             float rad1 = angle1 % MathHelper.TwoPi;
             float rad2 = angle2 % MathHelper.TwoPi;
 
@@ -279,7 +279,7 @@ namespace TerRoguelike.Utilities
         /// <returns>True if there is a tile in the way of the line</returns> 
         public static bool CanHitInLine(Vector2 start, Vector2 end, float lengthCap = 2000f)
         {
-            
+
             float length = (start - end).Length();
             Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
 
@@ -681,5 +681,122 @@ namespace TerRoguelike.Utilities
             return new Point(Netplay.GetSectionX(tilePos.X), Netplay.GetSectionY(tilePos.Y));
         }
         public static Vector2 MouseWorldAfterZoom => ((Main.MouseWorld - Main.Camera.Center) / ZoomSystem.zoomOverride) + Main.Camera.Center;
+
+        public class RotatableRectangle
+        {
+            public Rectangle rect;
+            public float rot;
+            public Vector2 origin;
+            public RotatableRectangle(Rectangle rect, float rot, Vector2 origin)
+            {
+                this.rect = rect;
+                this.rot = rot;
+                this.origin = origin;
+            }
+            public RotatableRectangle(RotatableRectangle rotrect)
+            {
+                rect = rotrect.rect;
+                rot = rotrect.rot;
+                origin = rotrect.origin;
+            }
+            public RotatableRectangle()
+            {
+                rect = new Rectangle();
+                origin = Vector2.Zero;
+            }
+            public RotatableRectangle(Vector2 position, Vector2 dimensions, float rot, Vector2 origin)
+            {
+                float halfWidth = dimensions.X * 0.5f;
+                float halfHeight = dimensions.Y * 0.5f;
+                rect = new Rectangle((int)(position.X - halfWidth), (int)(position.Y - halfHeight), (int)dimensions.X, (int)dimensions.Y);
+                this.rot = rot;
+                this.origin = origin;
+            }
+        }
+        /// <summary>
+        /// Whether or not 2 rotated rectangles intersect with eachother. Origin is based on world position, so if you are rotating a rectangle based on a projectile, you'd probably want to use Projectile.Center as the origin. rect.Center() is effectively no origin.
+        /// </summary>
+        /// <param name="rectA"></param>
+        /// <param name="rotA"></param>
+        /// <param name="originA"></param>
+        /// <param name="rectB"></param>
+        /// <param name="rotB"></param>
+        /// <param name="originB"></param>
+        /// <returns>True if the rotated rectangles intersect. false if otherwise.</returns>
+        public static bool RotatedRectanglesIntersect(this Rectangle rectA, float rotA, Vector2 originA, Rectangle rectB, float rotB, Vector2 originB)
+        {
+            Vector2[] cornersA = GetRotatedCorners(rectA, rotA, originA);
+            Vector2[] cornersB = GetRotatedCorners(rectB, rotB, originB);
+
+            return !PolygonsSeparatedCheck(cornersA, cornersB);
+        }
+        public static Vector2[] GetRotatedCorners(Rectangle rect, float rotation, Vector2 origin)
+        {
+            float cos = MathF.Cos(rotation);
+            float sin = MathF.Sin(rotation);
+            float halfWidth = rect.Width * 0.5f;
+            float halfHeight = rect.Height * 0.5f;
+            Vector2 center = rect.Center();
+            Vector2 offset = center - origin;
+
+            Vector2[] corners =
+            [
+                new Vector2(-halfWidth, -halfHeight) + offset,
+                new Vector2(halfWidth, -halfHeight) + offset,
+                new Vector2(halfWidth, halfHeight) + offset,
+                new Vector2(-halfWidth, halfHeight) + offset,
+            ];
+            for (int i = 0; i < 4; i++)
+            {
+                float rotatedX = corners[i].X * cos - corners[i].Y * sin;
+                float rotatedY = corners[i].X * sin + corners[i].Y * cos;
+                corners[i] = center + new Vector2(rotatedX, rotatedY) - offset;
+            }
+
+            return corners;
+        }
+        /// <summary>
+        /// Checks for intersection based on the separating axis theorem
+        /// </summary>
+        /// <param name="polygonA"></param>
+        /// <param name="polygonB"></param>
+        /// <returns>True if polygons are considered separated, false if they overlap</returns>
+        public static bool PolygonsSeparatedCheck(Vector2[] polygonA, Vector2[] polygonB)
+        {
+            int totalEdges = polygonA.Length + polygonB.Length;
+
+            for (int i = 0; i < totalEdges; i++)
+            {
+                Vector2[] polygon = i < polygonA.Length ? polygonA : polygonB;
+                int index = i % polygon.Length;
+
+                Vector2 edge = polygon[(index + 1) % polygon.Length] - polygon[index];
+                Vector2 axis = Vector2.Normalize(new Vector2(-edge.Y, edge.X));
+
+                (float minA, float maxA) = ProjectPolygon(polygonA, axis);
+                (float minB, float maxB) = ProjectPolygon(polygonB, axis);
+
+                if (maxA < minB || maxB < minA)
+                    return true;
+            }
+
+            return false;
+        }
+        public static (float min, float max) ProjectPolygon(Vector2[] polygon, Vector2 axis)
+        {
+            float min = Vector2.Dot(polygon[0], axis);
+            float max = min;
+
+            for (int i = 1; i < polygon.Length; i++)
+            {
+                float projection = Vector2.Dot(polygon[i], axis);
+                if (projection < min)
+                    min = projection;
+                else if (projection > max)
+                    max = projection;
+            }
+
+            return (min, max);
+        }
     }
 }
