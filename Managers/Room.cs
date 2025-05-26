@@ -68,7 +68,7 @@ namespace TerRoguelike.Managers
         public Vector2 RoomPosition; //position of the room
         public bool bossDead;
         public bool entered = false;
-        public virtual Point WallInflateModifier => new Point(0, 0);
+        public virtual Point WallInflateModifier => new Point(0, 0); // amount to expand a room's wall collision by, in tiles. can shrink with negative.
         public virtual bool AllowWallDrawing => true;
         public Rectangle GetRect()
         {

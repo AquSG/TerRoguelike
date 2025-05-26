@@ -125,7 +125,7 @@ namespace TerRoguelike.ILEditing
 
         private void On_MapHelper_SaveMap(On_MapHelper.orig_SaveMap orig)
         {
-			if (TerRoguelikeWorld.IsTerRoguelikeWorld)
+			if (TerRoguelikeWorld.IsTerRoguelikeWorld && !TerRoguelikeWorld.IsDebugWorld)
 				return;
 			orig.Invoke();
         }

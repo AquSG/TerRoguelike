@@ -100,11 +100,13 @@ namespace TerRoguelike.Projectiles
                 for (int j = 0; j < 8; j++)
                 {
                     int progress = (i * 8) + j;
+                    /*
                     if (Projectile.timeLeft <= deathTime)
                     {
                         if (Projectile.timeLeft > progress + 5)
                             continue;
                     }
+                    */
                     float jCompletion = j / 8f;
                     float completion = (float)(progress) / 64;
                     Color color = Color.Lerp(Color.Yellow, Color.White, (completion * 2));

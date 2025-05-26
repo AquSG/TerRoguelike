@@ -255,6 +255,7 @@ namespace TerRoguelike.TerPlayer
         public bool allowedToExist = false;
         public bool justRespawned = false;
         public int stuckTime = 0;
+        public bool majorGravity = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -433,6 +434,7 @@ namespace TerRoguelike.TerPlayer
         #region Always Active Effects
         public override void UpdateEquips()
         {
+            float gravMulti = 1f;
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
             {
                 Player.noBuilding = !DebugUI.allowBuilding;
@@ -461,7 +463,7 @@ namespace TerRoguelike.TerPlayer
                 Player.lifeRegenTime = 0;
                 if (Player.controlDown)
                 {
-                    Player.gravity *= 1.5f;
+                    gravMulti *= 1.5f;
                 }
 
                 if (currentFloor != null && currentFloor.ID == SchematicManager.FloorDict["Sanctuary"] && Player.sitting.isSitting && currentRoom != SchematicManager.RoomID[SchematicManager.RoomDict["SanctuaryLobbyRoom1"]].myRoom)
@@ -522,6 +524,14 @@ namespace TerRoguelike.TerPlayer
             }
             outOfDangerTime++;
 
+            if (majorGravity)
+            {
+                float gravValue = MathHelper.Lerp(1, 1.7f, MathHelper.Clamp(1 - (Player.velocity.Y / -4f), 0, 1));
+                if (gravValue > gravMulti)
+                    gravMulti = gravValue;
+            }
+            Player.gravity *= gravMulti;
+
             if (Player.itemAnimation > 0 && Player.HeldItem.damage > 0)
             {
                 if (timeAttacking < 0)
@@ -547,6 +557,7 @@ namespace TerRoguelike.TerPlayer
                         
                 }
             }
+                
 
             if (!brainSucked)
             {
@@ -898,7 +909,7 @@ namespace TerRoguelike.TerPlayer
                             NetMessage.SendStrikeNPC(target, info, Main.myPlayer);
                         }
                         CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
-                        if (target.life <= 0)
+                        if (target.life <= 0 || target.ModNPC()?.shouldHaveDied == true)
                         {
                             OnKillEffects(target);
                         }
@@ -1221,7 +1232,7 @@ namespace TerRoguelike.TerPlayer
                         NetMessage.SendStrikeNPC(target, info, Main.myPlayer);
                     }
                     CombatText.NewText(target.getRect(), Color.DarkGreen, actualHitDamage);
-                    if (target.life <= 0)
+                    if (target.life <= 0 || target.ModNPC()?.shouldHaveDied == true)
                     {
                         OnKillEffects(target);
                     }
@@ -2036,6 +2047,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void PostUpdate()
         {
+            majorGravity = false;
             moonLordVisualEffect = false;
             moonLordSkyEffect = false;
             if (TerRoguelikeWorld.IsTerRoguelikeWorld)
@@ -2103,7 +2115,7 @@ namespace TerRoguelike.TerPlayer
             TerRoguelikeGlobalNPC modNPC = target.ModNPC();
             if (modProj.npcOwner >= 0)
             {
-                if (target.life <= 0 && modProj.hostileTurnedAlly)
+                if ((target.life <= 0 || modNPC.shouldHaveDied) && modProj.hostileTurnedAlly)
                 {
                     if (modProj.npcOwnerPuppetOwner == Main.myPlayer)
                         OnKillEffects(target);
@@ -2277,7 +2289,7 @@ namespace TerRoguelike.TerPlayer
                     modNPC.AddBleedingStackWithRefresh(new BleedingStack(bleedDamage, Player.whoAmI), target.whoAmI);
             }
 
-            if (target.life <= 0)
+            if (target.life <= 0 || modNPC.shouldHaveDied)
                 OnKillEffects(target);
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)

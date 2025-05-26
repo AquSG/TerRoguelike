@@ -107,6 +107,7 @@ namespace TerRoguelike.NPCs
         public bool activatedPuppeteersHand = false;
 
         public bool activatedJstc = false;
+        public bool shouldHaveDied = false;
 
         //debuffs
         public List<IgnitedStack> ignitedStacks = [];
@@ -3748,17 +3749,21 @@ namespace TerRoguelike.NPCs
                     float multienemy = 1;
                     Rectangle hitbox = npc.Hitbox;
                     Rectangle enemyHitbox = target.Hitbox;
+                    NPCLoader.CanHitNPC(target, npc);
+                    NPCLoader.ModifyCollisionData(target, hitbox, ref cdslot, ref multienemy, ref enemyHitbox);
                     if (NPCLoader.CanHitNPC(npc, target) && NPCLoader.ModifyCollisionData(npc, enemyHitbox, ref cdslot, ref multi, ref hitbox) &&
-                        (NPCLoader.CanHitNPC(target, npc) || true) && NPCLoader.ModifyCollisionData(target, hitbox, ref cdslot, ref multienemy, ref enemyHitbox) &&
                         hitbox.Intersects(enemyHitbox))
                     {
-                        int hitDamage = (int)(npc.damage * multi * effectiveDamageTakenMulti);
+                        var modTarget = target.ModNPC();
+                        int hitDamage = (int)(npc.damage * multi * (modTarget != null ? modTarget.effectiveDamageTakenMulti : 1));
+                        if (hitDamage < 1)
+                            hitDamage = 1;
                         var modifiers = new NPC.HitModifiers();
                         NPCLoader.ModifyHitNPC(npc, target, ref modifiers);
 
                         NPC.HitInfo info = new NPC.HitInfo();
                         info.HideCombatText = true;
-                        info.Damage = npc.damage;
+                        info.Damage = hitDamage;
                         info.InstantKill = false;
                         info.HitDirection = 1;
                         info.Knockback = 0f;
@@ -3767,8 +3772,8 @@ namespace TerRoguelike.NPCs
                         target.StrikeNPC(info);
                         NetMessage.SendStrikeNPC(target, info);
                         NPCLoader.OnHitNPC(npc, target, info);
-                        CombatText.NewText(target.getRect(), Color.Orange, npc.damage);
-                        if (target.life <= 0)
+                        CombatText.NewText(target.getRect(), Color.Orange, hitDamage);
+                        if (target.life <= 0 || modTarget.shouldHaveDied)
                         {
                             if (puppetOwner >= 0)
                             {
@@ -3954,7 +3959,7 @@ namespace TerRoguelike.NPCs
                 npc.StrikeNPC(info);
                 NetMessage.SendStrikeNPC(npc, info, owner);
 
-                if (preHitHP - displayDamage <= 0)
+                if (preHitHP - displayDamage <= 0 || shouldHaveDied)
                 {
                     modPlayer.OnKillEffects(npc);
                 }
@@ -3994,7 +3999,7 @@ namespace TerRoguelike.NPCs
                 int prehitHP = npc.life;
                 npc.StrikeNPC(info);
                 NetMessage.SendStrikeNPC(npc, info, owner);
-                if (prehitHP - displayDamage <= 0)
+                if (prehitHP - displayDamage <= 0 || shouldHaveDied)
                 {
                     modPlayer.OnKillEffects(npc);
                 }
