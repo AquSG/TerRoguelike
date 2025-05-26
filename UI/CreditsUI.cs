@@ -479,7 +479,6 @@ namespace TerRoguelike.UI
                         "Sagittariod",
                         "Xyk",
                         "Eddie Spaghetti",
-                        "Fabsol",
                         "Kirn",
                         "Memes",
                         "Spider Mod",
