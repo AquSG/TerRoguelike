@@ -33,11 +33,13 @@ namespace TerRoguelike.Managers
             StarterRanged = [
                 new(ModContent.ItemType<AdaptiveGun>()),
                 new(ModContent.ItemType<AdaptiveCannon>()),
-                new(ModContent.ItemType<AdaptiveRifle>())];
+                new(ModContent.ItemType<AdaptiveRifle>()),
+                new(ModContent.ItemType<AdaptiveSpaceGun>())];
             StarterMelee = [
                 new(ModContent.ItemType<AdaptiveBlade>()),
                 new(ModContent.ItemType<AdaptiveSpear>()),
-                new(ModContent.ItemType<AdaptiveDagger>())];
+                new(ModContent.ItemType<AdaptiveDagger>()),
+                new(ModContent.ItemType<AdaptiveSaber>())];
             loaded = true;
         }
         public static void UnloadStarterItems()

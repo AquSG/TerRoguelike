@@ -56,6 +56,11 @@ namespace TerRoguelike.Projectiles
             extraBounces = 0; // set bounces in projectile ai.
             return true;
         }
+        public override bool CanHitPlayer(Projectile projectile, Player target)
+        {
+            ultimateCollideOverride = false;
+            return true;
+        }
         public override bool? Colliding(Projectile projectile, Rectangle projHitbox, Rectangle targetHitbox)
         {
             if (ultimateCollideOverride)

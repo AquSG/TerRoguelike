@@ -154,6 +154,11 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: 来福枪握持
 	FalseSunBeam.DisplayName: 虚伪之阳射线
 	ResidualBurden.DisplayName: 障蔽毒雾
+	// AdaptiveSpaceGunHoldout.DisplayName: Adaptive Space Gun Holdout
+	// AdaptiveSpaceGunLaser.DisplayName: Adaptive Space Gun Laser
+	// AdaptiveSaberHoldout.DisplayName: Adaptive Saber Holdout
+	// AdaptiveSaberSlash.DisplayName: Adaptive Saber Slash
+	// AdaptiveSaberThrow.DisplayName: Adaptive Saber Throw
 }
 
 Items: {
@@ -1000,6 +1005,30 @@ Items: {
 			鬼魂造成3倍基础伤害，至多存在2分钟
 			每额外拥有一件会翻倍鬼魂的最大生命值和伤害
 			'''
+	}
+
+	AdaptiveSpaceGun: {
+		// DisplayName: Adaptive Space Gun
+		/* Tooltip:
+			'''
+			Your trusty space gun for this journey
+			Can be messed with in countless ways by the items you may find
+			Shoot hitscan lasers at a swift rate
+			''' */
+	}
+
+	AdaptiveSaber: {
+		// DisplayName: Adaptive Saber
+		/* Tooltip:
+			'''
+			Your trusty saber for this journey
+			Can be messed with in countless ways by the items you may find
+			Swing the saber at a fast rate
+			Release attack to throw the saber
+			Low power, but hitting enemies increases damage and attack speed
+			Throwing the saber consumes built up power for up to 9x damage
+			Always has auto-swing capabilities
+			''' */
 	}
 }
 

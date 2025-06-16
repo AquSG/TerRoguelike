@@ -177,6 +177,7 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/ExtraTextures/PortalNoise",
                 "TerRoguelike/NPCs/Enemy/Boss/TalkBubble2",
                 "TerRoguelike/ExtraTextures/CornerFade",
+                "TerRoguelike/Particles/Beam",
             };
             foreach (string path in pathList)
             {

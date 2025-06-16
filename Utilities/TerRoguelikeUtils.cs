@@ -350,7 +350,7 @@ namespace TerRoguelike.Utilities
         /// <param name="end"></param>
         /// <param name="lengthCap">The max amount of units that will be checked before returning the end vector</param>
         /// <returns>The position in the world where the line collided with a tile. Returns the end vector if nothing was in the way.</returns> 
-        public static Vector2 TileCollidePositionInLine(Vector2 start, Vector2 end, float lengthCap = 2000f)
+        public static Vector2 TileCollidePositionInLine(Vector2 start, Vector2 end, float lengthCap = 2000f, float step = 1)
         {
             float length = (start - end).Length();
             Vector2 unitVect = (end - start).SafeNormalize(Vector2.UnitY);
@@ -367,9 +367,9 @@ namespace TerRoguelike.Utilities
 
             Vector2 currentPos = start;
             Point lastAirPos = new Point(-1, -1);
-            for (int i = 0; i < (int)length; i++)
+            for (float i = 0; i < (int)length; i += step)
             {
-                currentPos += unitVect;
+                currentPos += unitVect * step;
 
                 Point tilePos = currentPos.ToTileCoordinates();
 
@@ -797,6 +797,26 @@ namespace TerRoguelike.Utilities
             }
 
             return (min, max);
+        }
+        
+        public static Vector2? TilePointOfIntersection(Vector2 start1, Vector2 end1, Vector2 start2, Vector2 end2)
+        {
+            float denom = (start1.X - end1.X) * (start2.Y - end2.Y) - (start1.Y - end1.Y) * (start2.X - end2.X);
+
+            if (Math.Abs(denom) < float.Epsilon)
+                return null; // Lines are parallel
+
+            float det1 = start1.X * end1.Y - start1.Y * end1.X;
+            float det2 = start2.X * end2.Y - start2.Y * end2.X;
+
+            float x = (det1 * (start2.X - end2.X) - (start1.X - end1.X) * det2) / denom;
+            float y = (det1 * (start2.Y - end2.Y) - (start1.Y - end1.Y) * det2) / denom;
+
+            Vector2 potentialPos = new Vector2(x, y);
+            if (potentialPos.X >= 0 && potentialPos.X <= 16 && potentialPos.Y >= 0 && potentialPos.Y <= 16)
+                return potentialPos;
+
+            return null;
         }
     }
 }

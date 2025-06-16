@@ -93,9 +93,9 @@ namespace TerRoguelike.Projectiles
             for (int i = -1; i <= 1; i++)
             {
                 int pullIn = -Math.Abs(i);
-                float radius = Projectile.height * (0.36f + (0.066f * pullIn)) * 1.2f;
+                float radius = Projectile.height * (0.36f + (0.066f * pullIn)) * 1.2f * Projectile.scale;
                 Vector2 offset = Vector2.Zero;
-                offset.Y += Projectile.height * 0.25f * i;
+                offset.Y += Projectile.height * 0.25f * i * Projectile.scale;
                 offset.X += radius * (0.2f + 0.1f * pullIn);
 
                 Vector2 pos = Projectile.Center + offset.RotatedBy(Projectile.rotation);
@@ -126,9 +126,9 @@ namespace TerRoguelike.Projectiles
                 for (int i = -1; i <= 1; i++)
                 {
                     int pullIn = -Math.Abs(i);
-                    float radius = Projectile.height * (0.36f + (0.066f * pullIn)) * 1.2f;
+                    float radius = Projectile.height * (0.36f + (0.066f * pullIn)) * 1.2f * Projectile.scale;
                     Vector2 offset = Vector2.Zero;
-                    offset.Y += Projectile.height * 0.25f * i;
+                    offset.Y += Projectile.height * 0.25f * i * Projectile.scale;
                     offset.X += radius * (0.2f + 0.1f * pullIn);
 
                     Vector2 pos = Projectile.Center + offset.RotatedBy(Projectile.rotation);

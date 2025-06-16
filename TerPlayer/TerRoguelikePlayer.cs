@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading;
 using Terraria;
 using Terraria.Audio;
@@ -35,6 +36,7 @@ using TerRoguelike.Utilities;
 using TerRoguelike.World;
 using static TerRoguelike.MainMenu.TerRoguelikeMenu;
 using static TerRoguelike.Managers.TextureManager;
+using static TerRoguelike.Projectiles.AdaptiveSaberHoldout;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 
 namespace TerRoguelike.TerPlayer
@@ -1753,6 +1755,19 @@ namespace TerRoguelike.TerPlayer
                 Player.GetAttackSpeed(DamageClass.Generic) *= finalAttackSpeedMultiplier;
                 Player.GetDamage(DamageClass.Generic) *= finalDamageMultiplier;
             }
+            int checkType = ModContent.ProjectileType<AdaptiveSaberHoldout>();
+            foreach (Projectile proj in Main.ActiveProjectiles)
+            {
+                if (proj.owner == Player.whoAmI && proj.type == checkType)
+                {
+                    float multi = 1f + Math.Min((int)proj.ai[1], 5) * 0.025f;
+                    if ((SwordColor)proj.ai[1] == SwordColor.Rainbow)
+                        multi += 0.10f;
+                    Player.GetAttackSpeed(DamageClass.Generic) *= multi;
+                    break;
+                }
+            }
+
             if (cornucopia > 0 || RuinedMoonActive)
             {
                 Player.lifeRegen = (int)(healMultiplier * Player.lifeRegen);
