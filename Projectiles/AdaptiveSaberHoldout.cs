@@ -67,6 +67,11 @@ namespace TerRoguelike.Projectiles
         public override void AI()
         {
             Projectile.netSpam = 0;
+            if (Owner.dead || Owner.ModPlayer().deadTime > 0 || Owner.ModPlayer().deathEffectTimer > 0)
+            {
+                Projectile.Kill();
+                return;
+            }
             if (Projectile.localAI[1] != Projectile.ai[1] && Projectile.owner == Main.myPlayer)
             {
                 if (swordLevel == SwordColor.Rainbow)
@@ -79,8 +84,7 @@ namespace TerRoguelike.Projectiles
             Projectile.localAI[1] = Projectile.ai[1];
             if (swordLevel == SwordColor.Rainbow)
                 rainbowProg += 0.0154936875f;
-            if (modPlayer == null)
-                modPlayer = Owner.ModPlayer();
+            modPlayer ??= Owner.ModPlayer();
 
             float pointingRotation = (modPlayer.mouseWorld - Owner.MountedCenter).ToRotation();
             Projectile.Center = Owner.MountedCenter + pointingRotation.ToRotationVector2() * 16f;
@@ -140,6 +144,8 @@ namespace TerRoguelike.Projectiles
             {
                 Owner.ChangeDir(-1);
             }
+            modPlayer.changedDir = true;
+            modPlayer.lockDirection = true;
             modPlayer.playerToCursor = (modPlayer.mouseWorld - Owner.Center).SafeNormalize(Vector2.UnitX);
             float anim = modPlayer.swingAnimCompletion;
             anim = MathHelper.SmoothStep(0, 1, anim);
@@ -178,8 +184,9 @@ namespace TerRoguelike.Projectiles
                     int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), direction, ModContent.ProjectileType<AdaptiveSaberSlash>(), damage, 1f, Owner.whoAmI, (int)swordLevel, rainbowProg);
                     Projectile spawnedProj = Main.projectile[spawnedProjectile];
                     spawnedProj.scale = modPlayer.scaleMultiplier;
-                    spawnedProj.ModProj().swingDirection = Owner.direction;
+                    spawnedProj.ModProj().swingDirection = swingDirection;
                     spawnedProj.ModProj().notedBoostedDamage = damageBoost;
+                    spawnedProj.direction = Owner.direction;
                 }
             }
             Charge -= 20f;

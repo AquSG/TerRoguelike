@@ -56,16 +56,19 @@ namespace TerRoguelike.Items.Weapons
                 swingDirection = 1;
             }
 
-            if (modPlayer.mouseWorld.X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+            if (!modPlayer.changedDir)
             {
-                player.ChangeDir(1);
-            }
-            else if (modPlayer.mouseWorld.X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
-            {
-                player.ChangeDir(-1);
+                if (modPlayer.mouseWorld.X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
+                {
+                    player.ChangeDir(1);
+                }
+                else if (modPlayer.mouseWorld.X <= player.Center.X && modPlayer.swingAnimCompletion <= 0)
+                {
+                    player.ChangeDir(-1);
+                }
             }
             modPlayer.lockDirection = true;
-                
+
 
             //Calculate the dirction in which the players arms should be pointing at.
             if (modPlayer.swingAnimCompletion <= 0 || modPlayer.playerToCursor == Vector2.Zero)
@@ -84,9 +87,9 @@ namespace TerRoguelike.Items.Weapons
                     modPlayer.swingAnimCompletion = 0;
                     modPlayer.playerToCursor = Vector2.Zero;
                     modPlayer.lockDirection = false;
-                    
+
                 }
-                    
+
             }
             if (player.itemTime == 1)
             {
@@ -98,10 +101,18 @@ namespace TerRoguelike.Items.Weapons
             //CleanHoldStyle(player, player.compositeFrontArm.rotation + MathHelper.PiOver2, player.GetFrontHandPosition(player.compositeFrontArm.stretch, player.compositeFrontArm.rotation).Floor(), new Vector2(56, 56), new Vector2(-14, 14));
             player.itemLocation = new Vector2(Main.maxTilesX * 16, Main.maxTilesY * 16); // begone;
         }
-
+        public static float GetArmRotation(float baseRot, float anim, int upDownDir, int direction)
+        {
+            float armPointingDirection = baseRot - (MathHelper.Pi * direction / 3f);
+            anim = MathHelper.SmoothStep(0, 1, anim);
+            armPointingDirection += MathHelper.Lerp(0f, MathHelper.TwoPi * 9f / 16f, upDownDir == 1 ? anim : 1 - anim) * direction;
+            return armPointingDirection - MathHelper.PiOver2;
+        }
         public override void UseStyle(Player player, Rectangle heldItemFrame)
         {
             TerRoguelikePlayer modPlayer = player.ModPlayer();
+            if (modPlayer.changedDir)
+                return;
 
             if (modPlayer.mouseWorld.X > player.Center.X && modPlayer.swingAnimCompletion <= 0)
             {

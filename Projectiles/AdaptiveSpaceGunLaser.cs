@@ -16,6 +16,7 @@ using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using Terraria.DataStructures;
 using TerRoguelike.Utilities;
 using static TerRoguelike.Projectiles.TileLineSegment;
+using System.IO;
 
 namespace TerRoguelike.Projectiles
 {
@@ -28,6 +29,7 @@ namespace TerRoguelike.Projectiles
         public List<Vector2> oldPos = [];
         public List<float> oldRot = [];
         public List<bool> oldBounce = [];
+        public int capPos = 100000;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 10000;
@@ -69,9 +71,11 @@ namespace TerRoguelike.Projectiles
 
             modPlayer = Main.player[Projectile.owner].ModPlayer();
             Projectile.rotation = Projectile.velocity.ToRotation();
+            AI();
         }
         public override void AI()
         {
+            Projectile.scale = Projectile.ai[0];
             modPlayer ??= Main.player[Projectile.owner].ModPlayer();
             if (modPlayer.heatSeekingChip > 0)
                 modProj.HomingAI(Projectile, (float)Math.Log(modPlayer.heatSeekingChip + 1, 1.2d) / (4000 * Projectile.MaxUpdates));
@@ -79,7 +83,7 @@ namespace TerRoguelike.Projectiles
             if (modPlayer.bouncyBall > 0 || modPlayer.trash > 0)
                 modProj.extraBounces = modPlayer.bouncyBall + modPlayer.trash;
 
-            if (Projectile.timeLeft <= 20 || Projectile.localAI[0] == 1)
+            if (Projectile.timeLeft <= 20 || Projectile.localAI[0] == 1 || (Projectile.owner != Main.myPlayer && oldPos.Count > capPos))
             {
                 Projectile.MaxUpdates = 1;
                 Projectile.localAI[0] = 1;
@@ -211,7 +215,7 @@ namespace TerRoguelike.Projectiles
                     Projectile.penetrate = 1;
                 }
             }
-            if (Projectile.localAI[0] == 0)
+            if (Projectile.localAI[0] == 0 && Projectile.owner == Main.myPlayer)
                 Projectile.Damage();
             Projectile.timeLeft--;
             AI();
@@ -284,6 +288,14 @@ namespace TerRoguelike.Projectiles
         {
 
             return false;
+        }
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(oldPos.Count);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            capPos = reader.ReadInt32();
         }
     }
     public class TileLineSegment

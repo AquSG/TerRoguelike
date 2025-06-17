@@ -258,6 +258,7 @@ namespace TerRoguelike.TerPlayer
         public bool justRespawned = false;
         public int stuckTime = 0;
         public bool majorGravity = false;
+        public bool changedDir = false;
         public float PlayerBaseDamageMultiplier { get { return Player.GetTotalDamage(DamageClass.Generic).ApplyTo(1f); } }
         #endregion
 
@@ -2062,6 +2063,7 @@ namespace TerRoguelike.TerPlayer
         }
         public override void PostUpdate()
         {
+            changedDir = false;
             majorGravity = false;
             moonLordVisualEffect = false;
             moonLordSkyEffect = false;
