@@ -134,7 +134,6 @@ namespace TerRoguelike.Projectiles
             Projectile.timeLeft = 2 * Projectile.MaxUpdates;
             ableToHit = false;
             Projectile.velocity = Vector2.Zero;
-            Projectile.penetrate = 1;
             Projectile.netUpdate = true;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)
