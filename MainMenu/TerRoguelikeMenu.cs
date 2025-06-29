@@ -279,7 +279,7 @@ namespace TerRoguelike.MainMenu
                         Vector2 rightStickVect = GamePad.GetState(PlayerIndex.One).ThumbSticks.Right;
                         if (rightStickVect.X > 0.5f)
                             selectSingleplayer = false;
-                        else if (rightStickVect.X < 0.5f)
+                        else if (rightStickVect.X < -0.5f)
                             selectSingleplayer = true;
                     }
                     else
@@ -383,155 +383,161 @@ namespace TerRoguelike.MainMenu
                     }
                 }
 
-                void SecretCodeInteraction()
+                
+            }
+            else if (PlayerInput.UsingGamepad)
+            {
+                SecretCodeInteraction();
+            }
+
+            void SecretCodeInteraction()
+            {
+                if (allowDisgustingGameDesign)
+                    return;
+
+                if (PlayerInput.UsingGamepad)
                 {
-                    if (allowDisgustingGameDesign)
-                        return;
-
-                    if (PlayerInput.UsingGamepad)
+                    var gp = GamePad.GetState(PlayerIndex.One);
+                    if (gp.DPad.Up == ButtonState.Pressed && oldGamepadState.DPad.Up == ButtonState.Released)
                     {
-                        var gp = GamePad.GetState(PlayerIndex.One);
-                        if (gp.DPad.Up == ButtonState.Pressed && oldGamepadState.DPad.Up == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction <= 0)
-                                secretCodeInteraction++;
-                            else
-                                secretCodeInteraction = 0;
-                        }
-                        else if (gp.DPad.Down == ButtonState.Pressed && oldGamepadState.DPad.Down == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction == 1 || secretCodeInteraction == 2)
-                                secretCodeInteraction++;
-                            else
-                                secretCodeInteraction = -1;
-                        }
-                        else if (gp.DPad.Left == ButtonState.Pressed && oldGamepadState.DPad.Left == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction == 3 || secretCodeInteraction == 5)
-                                secretCodeInteraction++;
-                            else
-                                secretCodeInteraction = -1;
-                        }
-                        else if (gp.DPad.Right == ButtonState.Pressed && oldGamepadState.DPad.Right == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction == 4 || secretCodeInteraction == 6)
-                                secretCodeInteraction++;
-                            else
-                                secretCodeInteraction = -1;
-                        }
-                        else if (gp.Buttons.B == ButtonState.Pressed && oldGamepadState.Buttons.B == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction == 7)
-                                secretCodeInteraction++;
-                            else
-                                secretCodeInteraction = -1;
-                        }
-                        else if (gp.Buttons.A == ButtonState.Pressed && oldGamepadState.Buttons.A == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction == 8)
-                                secretCodeInteraction++;
-                            else
-                                secretCodeInteraction = -1;
-                        }
-                        else if (gp.Buttons.Start == ButtonState.Pressed && oldGamepadState.Buttons.Start == ButtonState.Released)
-                        {
-                            if (secretCodeInteraction == 9)
-                            {
-                                secretCodeInteraction++;
-                                allowDisgustingGameDesign = true;
-                            }
-                            else
-                                secretCodeInteraction = -1;
-                        }
-                        else if (gp.ThumbSticks.Right.Length() > 0.5f || gp.ThumbSticks.Left.Length() > 0.5f || gp.Buttons.X == ButtonState.Pressed || gp.Buttons.Y == ButtonState.Pressed || gp.Buttons.RightShoulder == ButtonState.Pressed || gp.Buttons.LeftShoulder == ButtonState.Pressed || gp.Triggers.Right > 0.5f || gp.Triggers.Left > 0.5f || gp.Buttons.Back == ButtonState.Pressed || gp.Buttons.BigButton == ButtonState.Pressed || gp.Buttons.LeftStick == ButtonState.Pressed || gp.Buttons.RightStick == ButtonState.Pressed)
+                        if (secretCodeInteraction <= 0)
+                            secretCodeInteraction++;
+                        else
+                            secretCodeInteraction = 0;
+                    }
+                    else if (gp.DPad.Down == ButtonState.Pressed && oldGamepadState.DPad.Down == ButtonState.Released)
+                    {
+                        if (secretCodeInteraction == 1 || secretCodeInteraction == 2)
+                            secretCodeInteraction++;
+                        else
                             secretCodeInteraction = -1;
                     }
-                    else
+                    else if (gp.DPad.Left == ButtonState.Pressed && oldGamepadState.DPad.Left == ButtonState.Released)
                     {
-                        List<Keys> wantedKeys = [Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.B, Keys.A, Keys.Enter];
-                        var kb = Keyboard.GetState();
-                        var pressedKeys = kb.GetPressedKeys();
-                        bool found = pressedKeys.Length == 0;
-                        for (int i = 0; i < pressedKeys.Length; i++)
+                        if (secretCodeInteraction == 3 || secretCodeInteraction == 5)
+                            secretCodeInteraction++;
+                        else
+                            secretCodeInteraction = -1;
+                    }
+                    else if (gp.DPad.Right == ButtonState.Pressed && oldGamepadState.DPad.Right == ButtonState.Released)
+                    {
+                        if (secretCodeInteraction == 4 || secretCodeInteraction == 6)
+                            secretCodeInteraction++;
+                        else
+                            secretCodeInteraction = -1;
+                    }
+                    else if (gp.Buttons.B == ButtonState.Pressed && oldGamepadState.Buttons.B == ButtonState.Released)
+                    {
+                        if (secretCodeInteraction == 7)
+                            secretCodeInteraction++;
+                        else
+                            secretCodeInteraction = -1;
+                    }
+                    else if (gp.Buttons.A == ButtonState.Pressed && oldGamepadState.Buttons.A == ButtonState.Released)
+                    {
+                        if (secretCodeInteraction == 8)
+                            secretCodeInteraction++;
+                        else
+                            secretCodeInteraction = -1;
+                    }
+                    else if (gp.Buttons.Start == ButtonState.Pressed && oldGamepadState.Buttons.Start == ButtonState.Released)
+                    {
+                        if (secretCodeInteraction == 9)
                         {
-                            var key = pressedKeys[i];
-                            for (int j = 0; j < wantedKeys.Count; j++)
+                            secretCodeInteraction++;
+                            allowDisgustingGameDesign = true;
+                        }
+                        else
+                            secretCodeInteraction = -1;
+                    }
+                    else if (gp.ThumbSticks.Right.Length() > 0.5f || gp.ThumbSticks.Left.Length() > 0.5f || gp.Buttons.X == ButtonState.Pressed || gp.Buttons.Y == ButtonState.Pressed || gp.Buttons.RightShoulder == ButtonState.Pressed || gp.Buttons.LeftShoulder == ButtonState.Pressed || gp.Triggers.Right > 0.5f || gp.Triggers.Left > 0.5f || gp.Buttons.Back == ButtonState.Pressed || gp.Buttons.BigButton == ButtonState.Pressed || gp.Buttons.LeftStick == ButtonState.Pressed || gp.Buttons.RightStick == ButtonState.Pressed)
+                        secretCodeInteraction = -1;
+                }
+                else
+                {
+                    List<Keys> wantedKeys = [Keys.Up, Keys.Down, Keys.Left, Keys.Right, Keys.B, Keys.A, Keys.Enter];
+                    var kb = Keyboard.GetState();
+                    var pressedKeys = kb.GetPressedKeys();
+                    bool found = pressedKeys.Length == 0;
+                    for (int i = 0; i < pressedKeys.Length; i++)
+                    {
+                        var key = pressedKeys[i];
+                        for (int j = 0; j < wantedKeys.Count; j++)
+                        {
+                            if (key == wantedKeys[j])
                             {
-                                if (key == wantedKeys[j])
+                                found = true;
+                                bool progress = true;
+                                for (int k = 0; k < oldPressedKeys.Count; k++)
                                 {
-                                    found = true;
-                                    bool progress = true;
-                                    for (int k = 0; k < oldPressedKeys.Count; k++)
+                                    if (oldPressedKeys[k] == key)
                                     {
-                                        if (oldPressedKeys[k] == key)
-                                        {
-                                            progress = false;
-                                            break;
-                                        }
-                                    }
-                                    if (!progress)
+                                        progress = false;
                                         break;
-
-                                    if (key == Keys.Up)
-                                    {
-                                        if (secretCodeInteraction <= 0)
-                                            secretCodeInteraction++;
-                                        else
-                                            secretCodeInteraction = 0;
                                     }
-                                    else if (key == Keys.Down)
-                                    {
-                                        if (secretCodeInteraction == 1 || secretCodeInteraction == 2)
-                                            secretCodeInteraction++;
-                                        else
-                                            secretCodeInteraction = -1;
-                                    }
-                                    else if (key == Keys.Left)
-                                    {
-                                        if (secretCodeInteraction == 3 || secretCodeInteraction == 5)
-                                            secretCodeInteraction++;
-                                        else
-                                            secretCodeInteraction = -1;
-                                    }
-                                    else if (key == Keys.Right)
-                                    {
-                                        if (secretCodeInteraction == 4 || secretCodeInteraction == 6)
-                                            secretCodeInteraction++;
-                                        else
-                                            secretCodeInteraction = -1;
-                                    }
-                                    else if (key == Keys.B)
-                                    {
-                                        if (secretCodeInteraction == 7)
-                                            secretCodeInteraction++;
-                                        else
-                                            secretCodeInteraction = -1;
-                                    }
-                                    else if (key == Keys.A)
-                                    {
-                                        if (secretCodeInteraction == 8)
-                                            secretCodeInteraction++;
-                                        else
-                                            secretCodeInteraction = -1;
-                                    }
-                                    else if (key == Keys.Enter)
-                                    {
-                                        if (secretCodeInteraction == 9)
-                                        {
-                                            secretCodeInteraction++;
-                                            allowDisgustingGameDesign = true;
-                                        }   
-                                        else
-                                            secretCodeInteraction = -1;
-                                    }
-
-                                    break;
                                 }
+                                if (!progress)
+                                    break;
+
+                                if (key == Keys.Up)
+                                {
+                                    if (secretCodeInteraction <= 0)
+                                        secretCodeInteraction++;
+                                    else
+                                        secretCodeInteraction = 0;
+                                }
+                                else if (key == Keys.Down)
+                                {
+                                    if (secretCodeInteraction == 1 || secretCodeInteraction == 2)
+                                        secretCodeInteraction++;
+                                    else
+                                        secretCodeInteraction = -1;
+                                }
+                                else if (key == Keys.Left)
+                                {
+                                    if (secretCodeInteraction == 3 || secretCodeInteraction == 5)
+                                        secretCodeInteraction++;
+                                    else
+                                        secretCodeInteraction = -1;
+                                }
+                                else if (key == Keys.Right)
+                                {
+                                    if (secretCodeInteraction == 4 || secretCodeInteraction == 6)
+                                        secretCodeInteraction++;
+                                    else
+                                        secretCodeInteraction = -1;
+                                }
+                                else if (key == Keys.B)
+                                {
+                                    if (secretCodeInteraction == 7)
+                                        secretCodeInteraction++;
+                                    else
+                                        secretCodeInteraction = -1;
+                                }
+                                else if (key == Keys.A)
+                                {
+                                    if (secretCodeInteraction == 8)
+                                        secretCodeInteraction++;
+                                    else
+                                        secretCodeInteraction = -1;
+                                }
+                                else if (key == Keys.Enter)
+                                {
+                                    if (secretCodeInteraction == 9)
+                                    {
+                                        secretCodeInteraction++;
+                                        allowDisgustingGameDesign = true;
+                                    }
+                                    else
+                                        secretCodeInteraction = -1;
+                                }
+
+                                break;
                             }
                         }
-                        if (!found)
-                            secretCodeInteraction = -1;
                     }
+                    if (!found)
+                        secretCodeInteraction = -1;
                 }
             }
 
@@ -716,13 +722,14 @@ namespace TerRoguelike.MainMenu
                     ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, difficultyDescription1, centerPos + new Vector2(-6, 58), Color.White, 0f, font.MeasureString(difficultyDescription1) * new Vector2(0.5f, 0), new Vector2(0.4f));
                     ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, difficultyDescription2, centerPos + new Vector2(-6, 83), Color.White, 0f, font.MeasureString(difficultyDescription2) * new Vector2(0.5f, 0), new Vector2(0.4f));
 
-                    if (PlayerInput.UsingGamepadUI && uiControllerCycle == 0)
+                    bool gamePad = PlayerInput.UsingGamepadUI;
+                    if (gamePad && uiControllerCycle == 0)
                     {
                         Texture2D xButtonTex = TextureAssets.TextGlyph[0].Value;
                         int framewidth = xButtonTex.Width / 25;
                         Rectangle xRect = new Rectangle(framewidth * 2, 0, framewidth, xButtonTex.Height);
                         var lClickRect = new Rectangle(framewidth * 10, 0, framewidth, xButtonTex.Height);
-                        float distanceLeft = -buttonDimensionsInflate.X * 0.5f * buttonCount - backgroundInflateAmt - 36;
+                        float distanceLeft = -buttonDimensionsInflate.X * 0.5f * buttonCount - backgroundInflateAmt - 24;
                         Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft, -6), xRect, Color.White, 0, xRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                         Main.spriteBatch.Draw(xButtonTex, centerPos + new Vector2(distanceLeft - 30, -6), lClickRect, Color.White, 0, lClickRect.Size() * 0.5f, 1f, SpriteEffects.None, 0);
                     }
@@ -730,14 +737,22 @@ namespace TerRoguelike.MainMenu
                     string singleplayerText = Lang.menu[12].Value;
                     string multiplayerText = Lang.menu[13].Value;
                     float textScale = 0.75f;
+                    
                     for (int s = -1; s <= 1; s += 2)
                     {
                         string text = s == -1 ? singleplayerText : multiplayerText;
-                        Vector2 textDrawPos = centerPos + new Vector2(s * 160 - 8, 0);
+                        Vector2 textDrawPos = centerPos + new Vector2(s * (gamePad ? 240 : 160) - 8, 0);
                         Vector2 textSize = font.MeasureString(text);
 
                         bool highlight = (s == -1 && selectSingleplayer) || (s == 1 && !selectSingleplayer);
                         ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, text, textDrawPos, highlight ? Color.Gold : Color.Gray, 0, textSize * new Vector2(0.5f + -s * 0.5f, 0.5f), new Vector2(textScale));
+                        if (highlight && gamePad)
+                        {
+                            var stickTex = TextureAssets.TextGlyph[0].Value;
+                            int framewidth = stickTex.Width / 25;
+                            Rectangle stickRect = new Rectangle(framewidth * (s == -1 ? 22 : 21), 0, framewidth, stickTex.Height);
+                            Main.spriteBatch.Draw(stickTex, textDrawPos + new Vector2(s * textSize.X * 0.35f, 32), stickRect, Color.White, 0, stickRect.Size() * 0.5f, Vector2.One, SpriteEffects.None, 0);
+                        }
                     }
                 }
 
@@ -856,7 +871,15 @@ namespace TerRoguelike.MainMenu
                             var dummyItem = new Item(itemList[selection].id);
                             string itemName = dummyItem.Name;
                             Vector2 itemNameDimensions = font.MeasureString(itemName);
-                            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemName, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX, Color.White, 0, itemNameDimensions * new Vector2(0.5f + 0.5f * -s, 0), new Vector2(0.5f));
+                            Vector2 nameScale = new Vector2(0.5f);
+                            float target = (Main.screenWidth * 0.5f) - 350;
+                            if (itemNameDimensions.X * nameScale.X > target)
+                            {
+                                nameScale.X *= target / (itemNameDimensions.X * nameScale.X);
+                                if (nameScale.X < 0.25f)
+                                    nameScale.X = 0.25f;
+                            }
+                            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemName, drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX, Color.White, 0, itemNameDimensions * new Vector2(0.5f + 0.5f * -s, 0), nameScale);
 
                             List<string> itemDesc = [];
                             var itemTip = dummyItem.ToolTip;
@@ -874,7 +897,15 @@ namespace TerRoguelike.MainMenu
                             for (int i = 0; i < itemDesc.Count; i++)
                             {
                                 Vector2 itemDescDimensions = font.MeasureString(itemDesc[i]);
-                                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemDesc[i], drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX + Vector2.UnitY * (itemNameDimensions.Y * 0.5f + yPerLine * i), Color.White, 0, itemDescDimensions * new Vector2(0.5f + 0.5f * -s, 0), new Vector2(0.3f));
+                                Vector2 textscale = new Vector2(0.3f);
+                                
+                                if (itemDescDimensions.X * textscale.X > target)
+                                {
+                                    textscale.X *= target / (itemDescDimensions.X * textscale.X);
+                                    if (textscale.X < 0.15f)
+                                        textscale.X = 0.15f;
+                                }
+                                ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, font, itemDesc[i], drawStart + buttonDimensionsInflate.X * 0.5f * Vector2.UnitX + 40 * s * Vector2.UnitX + Vector2.UnitY * (itemNameDimensions.Y * 0.5f + yPerLine * i), Color.White, 0, itemDescDimensions * new Vector2(0.5f + 0.5f * -s, 0), textscale);
                             }
 
                         }

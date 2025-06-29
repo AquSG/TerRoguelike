@@ -2280,7 +2280,7 @@ namespace TerRoguelike.TerPlayer
             }
             if (amberRing > 0 && proj.DamageType == DamageClass.Melee)
             {
-                int barrierGainAmt = (int)(2 * amberRing * modProj.notedBoostedDamage);
+                int barrierGainAmt = (int)((1 + amberRing) * modProj.notedBoostedDamage);
                 AddBarrierHealth(barrierGainAmt);
             }
             if (ancientTwig > 0)

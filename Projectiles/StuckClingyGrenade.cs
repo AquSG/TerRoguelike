@@ -23,6 +23,7 @@ namespace TerRoguelike.Projectiles
         public Vector2 stuckPosition = Vector2.Zero;
         public int stuckSegment = -1;
         public float origStuckRot = 0;
+        public static int soundCooldown = 0;
         public override void SetDefaults()
         {
             Projectile.width = 26;
@@ -156,7 +157,11 @@ namespace TerRoguelike.Projectiles
             Main.projectile[spawnedProjectile].scale = 1f;
             Main.projectile[spawnedProjectile].ModProj().procChainBools = Projectile.ModProj().procChainBools;
 
-            SoundEngine.PlaySound(SoundID.Item110, Projectile.Center);
+            if (soundCooldown <= 60)
+            {
+                SoundEngine.PlaySound(SoundID.Item110, Projectile.Center);
+                soundCooldown += 10;
+            }
             return true;
         }
         public override bool OnTileCollide(Vector2 oldVelocity)

@@ -207,6 +207,20 @@ namespace TerRoguelike.Systems
             0.32f,
             BossThemeSyncType.FinalBoss2);
 
+        public static BossTheme JstcTheme = new(
+            "TerRoguelike/Tracks/JstcTheme",
+            "TerRoguelike/Tracks/JstcThemeStart",
+            Silence,
+            0.52f,
+            BossThemeSyncType.Jstc);
+
+        public static BossTheme Jstc2Theme = new(
+            "TerRoguelike/Tracks/Jstc2Theme",
+            "TerRoguelike/Tracks/Jstc2ThemeStart",
+            Silence,
+            0.52f,
+            BossThemeSyncType.Jstc2);
+
         public enum BossThemeSyncType
         {
             Paladin,
@@ -221,7 +235,9 @@ namespace TerRoguelike.Systems
             TempleGolem,
             FinalBoss1,
             FinalBoss2Prelude,
-            FinalBoss2
+            FinalBoss2,
+            Jstc,
+            Jstc2
         }
         public static BossTheme BossThemeFromEnum(BossThemeSyncType type)
         {
@@ -254,6 +270,10 @@ namespace TerRoguelike.Systems
                     return FinalBoss2PreludeTheme;
                 case BossThemeSyncType.FinalBoss2:
                     return FinalBoss2Theme;
+                case BossThemeSyncType.Jstc:
+                    return JstcTheme;
+                case BossThemeSyncType.Jstc2:
+                    return Jstc2Theme;
             }
         }
 
@@ -330,6 +350,10 @@ namespace TerRoguelike.Systems
                 FinalBoss2Theme.BattleTrack,
                 FinalBoss2Theme.StartTrack,
                 FinalBoss2Theme.EndTrack,
+                JstcTheme.StartTrack,
+                JstcTheme.BattleTrack,
+                Jstc2Theme.StartTrack,
+                Jstc2Theme.BattleTrack
             };
             foreach (string path in pathList)
             {

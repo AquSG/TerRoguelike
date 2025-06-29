@@ -23,6 +23,7 @@ namespace TerRoguelike.Rooms
         public override bool CanExitRight => true;
         public override bool CanExitDown => true;
         public override bool CanExitUp => true;
+        public override int[] CantExitInto => [RoomDict["CrimsonEnemyRoom10Down"]];
         public override void InitializeRoom()
         {
             base.InitializeRoom();

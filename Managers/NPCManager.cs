@@ -22,6 +22,7 @@ using TerRoguelike.NPCs.Enemy.Pillar;
 using TerRoguelike.NPCs;
 using static TerRoguelike.Schematics.SchematicManager;
 using TerRoguelike.NPCs.Enemy.Boss;
+using TerRoguelike.NPCs.Enemy.Boss.Mallet;
 
 namespace TerRoguelike.Managers
 {
@@ -125,6 +126,7 @@ namespace TerRoguelike.Managers
                 new MoonLordHead(),
                 new TrueBrain(),
                 new Being(),
+                new Mallet(),
             };
         }
         internal static void Unload()

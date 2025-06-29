@@ -24,6 +24,7 @@ using static TerRoguelike.Schematics.SchematicManager;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.Audio;
+using TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles;
 
 namespace TerRoguelike.Managers
 {
@@ -178,7 +179,54 @@ namespace TerRoguelike.Managers
                 "TerRoguelike/NPCs/Enemy/Boss/TalkBubble2",
                 "TerRoguelike/ExtraTextures/CornerFade",
                 "TerRoguelike/Particles/Beam",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/CircleInner",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/CircleOuter",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/CircleSpread",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/FeatherExplosion",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/FeatherSize1",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/FeatherSize2",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/FeatherSize3",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/FeatherSize4",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/FeatherSize5",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/MeteorBig",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/MeteorSmall",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/StarBig",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/StarExplosionMedium",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/StarExplosionSmall",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/StarMedium",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/StarSmall",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/Talon",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/TalonGiant",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/TalonScratch",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/YellowWing",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/LightClone",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/BGStars",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/BGBack",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/BGFront",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/GlassShard",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletIntroTalk",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/TransformEffect",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/TalkBubble",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Syringe",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/BlueTemporaryBlock",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/Chest",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/FlyAway",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/Hair",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/Head",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/KnockedDown",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/LeftLeg",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/LeftTalon",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/RightLeg",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/RightTalon",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/Screaming",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/WingAttack",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/Wings",
+                "TerRoguelike/NPCs/Enemy/Boss/Mallet/Zenith/BackgroundFly",
             };
+            for (int i = 0; i <= (int)Junk.JunkType.Thingy; i++)
+            {
+                pathList.Add("TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletProjectiles/Junk" + ((Junk.JunkType)i).ToString());
+            }
             foreach (string path in pathList)
             {
                 AddTex(path);
@@ -190,6 +238,10 @@ namespace TerRoguelike.Managers
             foreach (var asset in TexAssetDict)
             {
                 TexDict.Add(asset.Key, asset.Value.Value);
+            }
+            for (int i = 0; i <= (int)Junk.JunkType.Thingy; i++)
+            {
+                Junk.junkTex[i] = TexDict["Junk" + ((Junk.JunkType)i).ToString()];
             }
             TexAssetDict = null;
             TexturesLoaded = true;

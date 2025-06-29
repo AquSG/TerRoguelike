@@ -2,20 +2,96 @@
 using ReLogic.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Graphics;
 using Terraria.Graphics.CameraModifiers;
 using Terraria.ModLoader;
 using TerRoguelike.TerPlayer;
+using System.Threading.Tasks;
+using Microsoft.Xna.Framework.Audio;
+using TerRoguelike.Projectiles;
 
 namespace TerRoguelike.Systems
 {
     public class ExtraSoundSystem : ModSystem
     {
         public static List<ExtraSound> ExtraSounds = [];
+        public static List<SoundEffectInstance> SpecialSoundReplace = []; //all sounds but the final sound are faded out at a fast rate instead of instantly cancelling, causing a pop in the audio.
+        public static Stopwatch lastSpecialSoundUpdate = new Stopwatch();
+        private static CancellationTokenSource _cts;
         public override void PostUpdateEverything()
+        {
+            UpdateExtraSounds();
+            if (StuckClingyGrenade.soundCooldown > 0)
+                StuckClingyGrenade.soundCooldown--;
+        }
+        public override void Load()
+        {
+            _cts = new CancellationTokenSource();
+            Task.Run(() => SpecialSoundReplaceUpdateLoop(_cts.Token));
+        }
+        public override void Unload()
+        {
+            _cts.Cancel();
+        }
+        private static async Task SpecialSoundReplaceUpdateLoop(CancellationToken token)
+        {
+            while (!token.IsCancellationRequested)
+            {
+                UpdateSpecialSounds();
+
+                await Task.Delay(1, token);
+            }
+        }
+        public static void UpdateSpecialSounds()
+        {
+            if (SpecialSoundReplace == null || SpecialSoundReplace.Count == 0)
+            {
+                lastSpecialSoundUpdate.Restart();
+                return;
+            }
+
+            try
+            {
+                int final = SpecialSoundReplace.Count - 1;
+                for (int i = 0; i <= final; i++)
+                {
+                    var sound = SpecialSoundReplace[i];
+                    if (sound.IsDisposed || sound.Volume < 0 || Main.gamePaused || !Main.hasFocus || sound.State != SoundState.Playing)
+                    {
+                        if (!sound.IsDisposed)
+                            sound.Dispose();
+                        SpecialSoundReplace.RemoveAt(i);
+                        i--;
+                        final--;
+                        continue;
+                    }
+                    if (i < final)
+                        sound.Volume -= (float)lastSpecialSoundUpdate.Elapsed.TotalSeconds * 15 * Main.soundVolume;
+
+                    if (sound.Volume < 0 || sound.Volume > 1)
+                    {
+                        if (!sound.IsDisposed)
+                            sound.Dispose();
+                        SpecialSoundReplace.RemoveAt(i);
+                        i--;
+                        final--;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                TerRoguelike.Instance.Logger.Warn(e);
+            }
+
+
+            lastSpecialSoundUpdate.Restart();
+        }
+        public static void UpdateExtraSounds()
         {
             if (ExtraSounds == null)
                 return;

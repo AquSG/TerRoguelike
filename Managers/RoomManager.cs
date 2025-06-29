@@ -285,7 +285,7 @@ namespace TerRoguelike.Managers
                 bool anyDown = false;
                 bool anyUp = false;
 
-                CheckDirAvailability(ref anyRight, ref anyDown, ref anyUp);
+                CheckDirAvailability(previousRoom, ref anyRight, ref anyDown, ref anyUp);
 
                 List<int> directionsAvailable = new List<int>();
                 if ((previousRoom.CanExitRight || GenDebugWorld) && anyRight)
@@ -349,7 +349,7 @@ namespace TerRoguelike.Managers
         }
         public static Room PlaceRight(Room previousRoom)
         {
-            Room selectedRoom = SelectRoom(0);
+            Room selectedRoom = SelectRoom(0, previousRoom);
             if (selectedRoom == RoomID[0])
             {
                 return selectedRoom;
@@ -380,7 +380,7 @@ namespace TerRoguelike.Managers
         }
         public static Room PlaceDown(Room previousRoom)
         {
-            Room selectedRoom = SelectRoom(1);
+            Room selectedRoom = SelectRoom(1, previousRoom);
 
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -450,7 +450,7 @@ namespace TerRoguelike.Managers
         }
         public static Room PlaceUp(Room previousRoom)
         {
-            Room selectedRoom = SelectRoom(2);
+            Room selectedRoom = SelectRoom(2, previousRoom);
 
             string mapKey = selectedRoom.Key;
             var schematic = TileMaps[mapKey];
@@ -701,7 +701,7 @@ namespace TerRoguelike.Managers
                 currentFloorGen = -1;
             }
         }
-        public static Room SelectRoom(int direction)
+        public static Room SelectRoom(int direction, Room previousRoom)
         {
             if (RoomGenPool.Count == 0)
                 return RoomID[0];
@@ -709,6 +709,7 @@ namespace TerRoguelike.Managers
             string floorKey = GetFloorKey();
 
             List<Room> roomSelection = new List<Room>();
+            int[] blockID = previousRoom.CantExitInto;
             
             for (int i = 0; i < RoomGenPool.Count; i++)
             {
@@ -720,6 +721,18 @@ namespace TerRoguelike.Managers
                 if (room.Key.Contains("Start"))
                     continue;
                 if (room.Key.Contains("Transition"))
+                    continue;
+
+                bool allow = true;
+                for (int j = 0; j < blockID.Length; j++)
+                {
+                    if (room.ID == blockID[j])
+                    {
+                        allow = GenDebugWorld;
+                        break;
+                    }
+                }
+                if (!allow)
                     continue;
 
                 bool containsDir = GenDebugWorld;
@@ -749,9 +762,10 @@ namespace TerRoguelike.Managers
 
             return RoomID[0];
         }
-        public static void CheckDirAvailability(ref bool anyRight, ref bool anyDown, ref bool anyUp)
+        public static void CheckDirAvailability(Room previousRoom, ref bool anyRight, ref bool anyDown, ref bool anyUp)
         {
             string floorKey = GetFloorKey();
+            int[] blockID = previousRoom.CantExitInto;
             for (int i = 0; i < RoomGenPool.Count; i++)
             {
                 Room room = RoomGenPool[i];
@@ -764,16 +778,49 @@ namespace TerRoguelike.Managers
                 if (room.Key.Contains("Transition"))
                     continue;
 
-                if (room.Key.Contains("Down"))
+                if (!anyDown && room.Key.Contains("Down"))
                 {
-                    anyDown = true;
+                    bool allow = true;
+                    for (int j = 0; j < blockID.Length; j++)
+                    {
+                        if (room.ID == blockID[j])
+                        {
+                            allow = GenDebugWorld;
+                            break;
+                        }
+                    }
+                    if (allow)
+                        anyDown = true;
                 }
-                else if (room.Key.Contains("Up"))
+                else if (!anyUp && room.Key.Contains("Up"))
                 {
-                    anyUp = true;
+                    bool allow = true;
+                    for (int j = 0; j < blockID.Length; j++)
+                    {
+                        if (room.ID == blockID[j])
+                        {
+                            allow = GenDebugWorld;
+                            break;
+                        }
+                    }
+                    if (allow)
+                        anyUp = true;
                 }
-                else
-                    anyRight = true;
+                else if (!anyRight)
+                {
+                    bool allow = true;
+                    for (int j = 0; j < blockID.Length; j++)
+                    {
+                        if (room.ID == blockID[j])
+                        {
+                            allow = GenDebugWorld;
+                            break;
+                        }
+                    }
+                    if (allow)
+                        anyRight = true;
+                }
+                    
             }
         }
     }

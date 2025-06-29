@@ -46,6 +46,8 @@ namespace TerRoguelike.Items
                 case ItemID.GrassSeeds:
                 case ItemID.NaturesGift:
                 case ItemID.Pumpkin:
+                case ItemID.Blinkroot:
+                case ItemID.BlinkrootSeeds:
                     return true;
             }
         }

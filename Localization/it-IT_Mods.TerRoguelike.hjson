@@ -159,6 +159,14 @@ Projectiles: {
 	AdaptiveSaberHoldout.DisplayName: Impugnare Spada Laser Adattiva
 	AdaptiveSaberSlash.DisplayName: Taglio Spada Laser Adattiva
 	AdaptiveSaberThrow.DisplayName: Lancio Spada Laser Adattiva
+	// DashingFeather.DisplayName: Dashing Feather
+	// Junk.DisplayName: Junk
+	// LightClone.DisplayName: Light Clone
+	// SpeedingFeather.DisplayName: Speeding Feather
+	// SplitFeather.DisplayName: Split Feather
+	// SplittingFeather.DisplayName: Splitting Feather
+	// Talon.DisplayName: Talon
+	// YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -566,7 +574,7 @@ Items: {
 			'''
 			Ottieni 2 di barriera quando colpisci un nemico con un'arma di mischia
 			La quantità di barriera ottenuta è influenzata dal moltiplicatore di carica dell'arma 
-			Ogni copie extra dell'oggetto aumentano la barriera ottenuta di 2
+			Ogni copie extra dell'oggetto aumentano la barriera ottenuta di 1
 			'''
 	}
 
@@ -1130,6 +1138,9 @@ NPCs: {
 	TrueServant.DisplayName: Vero Servo di Cthulhu
 	TrueBrain.DisplayName: Vero Cervello di Cthulhu
 	Being.DisplayName: Essere
+	// Mallet.DisplayName: Judgement Martlet
+	// Meteor.DisplayName: Meteor
+	// SplittingStar.DisplayName: Splitting Star
 }
 
 ItemBasin.DisplayName: Fontana degli Oggetti
@@ -1255,3 +1266,237 @@ DialogueKillAll:
 	Ci rincontreremo,
 	@.
 	'''
+/* JstcIntro:
+	'''
+	...
+
+	So you found me...
+
+	Must not have been
+	easy, given what you
+	had to do.
+
+	Are you surprised?
+	Or is this exactly
+	what you expected?
+
+	...
+
+	You know...
+
+	This whole time...
+
+	This whole time,
+	I have been watching
+	every one of your
+	actions.
+
+	Watching you fight
+	through the lunar
+	dungeon, attempting
+	to save the surface
+	from the Moon Lord.
+
+	Or so I thought...
+
+	The truth stared right
+	at me, but I chose
+	to look away.
+
+	I tried to see the
+	good - I wanted to
+	believe that your
+	actions were for the
+	greater good.
+
+	But you...
+
+	Any ounce of "good"
+	you ever had is
+	six feet under.
+
+	...
+
+	Your sole objective
+	was to escape.
+
+	And yet you went
+	out of your way to
+	kill them all, risking
+	your own life in the
+	pursuit of murder.
+
+	I don't care what
+	your motivations were.
+
+	Nothing can justify
+	the needless suffering
+	you have caused.
+
+
+	I understand now,
+	why you entered the
+	lunar dungeon.
+
+	It wasn't to save
+	the surface.
+
+	It was a pursuit
+	of overwhelming power,
+	to wipe living beings
+	from existence for
+	your own pleasure.
+
+	By now, you are a
+	much greater
+	threat to the surface
+	than the Moon Lord
+	ever was.
+
+	It's only a matter of
+	time before you
+	test your power on
+	the people around us.
+
+	And that's why
+	I'm here.
+
+	To stop you,
+	@.
+
+
+	What I have here will
+	not last forever...
+
+	But I believe it will
+	be just enough
+	to stop you.
+
+
+	@...
+
+	Your terror...
+
+
+	Ends NOW!!!
+	''' */
+/* JstcMiddle:
+	'''
+	Why...
+
+	Why do you hit so
+	hard?
+
+	...
+
+	I-is this power I
+	have... not enough?
+
+
+	No.
+
+	I bet you feel r-real
+	accomplished right
+	now.
+
+	But the only thing
+	you managed to
+	accomplish...
+
+	...is pissing me off
+	even more.
+
+
+	There's only one
+	way this ends.
+
+	And I didn't go past
+	the point of no
+	return for nothing.
+
+	I will use everything
+	within my power to 
+	put an end to you...
+
+	...for every last
+	second I have in
+	this life!
+	''' */
+/* JstcEnd:
+	'''
+	Is this... t-the
+	end for me?
+
+	No...
+
+	I have to get back
+	up. I-I have to 
+	keep fighting!
+
+
+	... for every... 
+	last... second.
+
+
+	W-What's going on?
+
+	The s-serum,
+	it...
+
+
+	Why is it wearing
+	off!?
+
+	Is it... time?
+
+	No... NO!
+
+	I DON'T WANT
+	TO DIE!
+
+	I NEED MORE TIME!
+
+
+	...I need more
+	time...
+
+	...
+
+
+	You.
+
+	You're just going to
+	move along and find
+	someone else to test
+	your power on,
+	right?
+
+	What was I to you,
+	just another medal
+	to add to your belt?
+
+	You sicken me.
+
+
+	I hope you
+
+
+	n-NO!
+
+	PLEASE!!
+
+
+	WHAT DO I DO!?
+
+	JUST A BIT MORE
+	TIME!!
+
+
+	STOP!!!
+
+
+	SOMEONE!
+
+
+	H E L P  M E . . .
+	''' */

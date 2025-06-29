@@ -50,6 +50,7 @@ namespace TerRoguelike.Managers
         public virtual int TransitionDirection => -1; // -1 if not a transition room. 0: right, 1: Down, 2: Up
         public virtual bool ActivateNewFloorEffects => true;
         public virtual bool IsSanctuary => false;
+        public virtual int[] CantExitInto => []; // for exempting very specific rooms from being chosen as the connector to this one to avoid softlocks.
         public int myRoom; // index in RoomList
         public bool initialized = false; // whether initialize has run yet
         public bool escapeInitialized = false; // whether initialize has been run yet in the escape sequence

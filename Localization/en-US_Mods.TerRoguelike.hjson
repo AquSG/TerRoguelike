@@ -159,6 +159,14 @@ Projectiles: {
 	AdaptiveSaberHoldout.DisplayName: Adaptive Saber Holdout
 	AdaptiveSaberSlash.DisplayName: Adaptive Saber Slash
 	AdaptiveSaberThrow.DisplayName: Adaptive Saber Throw
+	DashingFeather.DisplayName: Dashing Feather
+	Junk.DisplayName: Junk
+	LightClone.DisplayName: Light Clone
+	SpeedingFeather.DisplayName: Speeding Feather
+	SplitFeather.DisplayName: Split Feather
+	SplittingFeather.DisplayName: Splitting Feather
+	Talon.DisplayName: Talon
+	YellowWing.DisplayName: Yellow Wing
 }
 
 Items: {
@@ -182,10 +190,10 @@ Items: {
 	}
 
 	AdaptiveGun: {
-		DisplayName: Adaptive Gun
+		DisplayName: Gunsmith's Pistol
 		Tooltip:
 			'''
-			Your trusty gun for this journey
+			Your trusty pistol for this journey
 			Can be messed with in countless ways by the items you may find
 			Shoot bullets at a fast rate
 			'''
@@ -318,7 +326,7 @@ Items: {
 	}
 
 	AdaptiveBlade: {
-		DisplayName: Adaptive Blade
+		DisplayName: Blacksmith's Blade
 		Tooltip:
 			'''
 			Your trusty blade for this journey
@@ -566,7 +574,7 @@ Items: {
 			'''
 			Gain 2 barrier upon hitting enemies with melee damage
 			The barrier gain amount is affected by melee weapon charge multipliers 
-			Extra copies of this item increase the barrier gain by 2
+			Extra copies of this item increase the barrier gain by 1
 			'''
 	}
 
@@ -926,7 +934,7 @@ Items: {
 	}
 
 	AdaptiveSpear: {
-		DisplayName: Adaptive Spear
+		DisplayName: Impaling Spear
 		Tooltip:
 			'''
 			Your trusty spear for this journey
@@ -941,7 +949,7 @@ Items: {
 	}
 
 	AdaptiveCannon: {
-		DisplayName: Adaptive Cannon
+		DisplayName: Doom Cannon
 		Tooltip:
 			'''
 			Your trusty cannon for this journey
@@ -951,7 +959,7 @@ Items: {
 	}
 
 	AdaptiveDagger: {
-		DisplayName: Adaptive Dagger
+		DisplayName: Hunter's Dagger
 		Tooltip:
 			'''
 			Your trusty dagger for this journey
@@ -962,7 +970,7 @@ Items: {
 	}
 
 	AdaptiveRifle: {
-		DisplayName: Adaptive Rifle
+		DisplayName: Hunting Rifle
 		Tooltip:
 			'''
 			Your trusty rifle for this journey
@@ -1008,7 +1016,7 @@ Items: {
 	}
 
 	AdaptiveSpaceGun: {
-		DisplayName: Adaptive Space Gun
+		DisplayName: Space Blaster
 		Tooltip:
 			'''
 			Your trusty space gun for this journey
@@ -1018,7 +1026,7 @@ Items: {
 	}
 
 	AdaptiveSaber: {
-		DisplayName: Adaptive Saber
+		DisplayName: Energy Saber
 		Tooltip:
 			'''
 			Your trusty saber for this journey
@@ -1130,6 +1138,9 @@ NPCs: {
 	TrueServant.DisplayName: True Servant of Cthulhu
 	TrueBrain.DisplayName: True Brain of Cthulhu
 	Being.DisplayName: Being
+	Mallet.DisplayName: Judgement Martlet
+	Meteor.DisplayName: Meteor
+	SplittingStar.DisplayName: Splitting Star
 }
 
 ItemBasin.DisplayName: Item Basin
@@ -1254,4 +1265,238 @@ DialogueKillAll:
 
 	We'll meet again,
 	@.
+	'''
+JstcIntro:
+	'''
+	...
+
+	So you found me...
+
+	Must not have been
+	easy, given what you
+	had to do.
+
+	Are you surprised?
+	Or is this exactly
+	what you expected?
+
+	...
+
+	You know...
+
+	This whole time...
+
+	This whole time,
+	I have been watching
+	every one of your
+	actions.
+
+	Watching you fight
+	through the lunar
+	dungeon, attempting
+	to save the surface
+	from the Moon Lord.
+
+	Or so I thought...
+
+	The truth stared right
+	at me, but I chose
+	to look away.
+
+	I tried to see the
+	good - I wanted to
+	believe that your
+	actions were for the
+	greater good.
+
+	But you...
+
+	Any ounce of "good"
+	you ever had is
+	six feet under.
+
+	...
+
+	Your sole objective
+	was to escape.
+
+	And yet you went
+	out of your way to
+	kill them all, risking
+	your own life in the
+	pursuit of murder.
+
+	I don't care what
+	your motivations were.
+
+	Nothing can justify
+	the needless suffering
+	you have caused.
+
+
+	I understand now,
+	why you entered the
+	lunar dungeon.
+
+	It wasn't to save
+	the surface.
+
+	It was a pursuit
+	of overwhelming power,
+	to wipe living beings
+	from existence for
+	your own pleasure.
+
+	By now, you are a
+	much greater
+	threat to the surface
+	than the Moon Lord
+	ever was.
+
+	It's only a matter of
+	time before you
+	test your power on
+	the people around us.
+
+	And that's why
+	I'm here.
+
+	To stop you,
+	@.
+
+
+	What I have here will
+	not last forever...
+
+	But I believe it will
+	be just enough
+	to stop you.
+
+
+	@...
+
+	Your terror...
+
+
+	Ends NOW!!!
+	'''
+JstcMiddle:
+	'''
+	Why...
+
+	Why do you hit so
+	hard?
+
+	...
+
+	I-is this power I
+	have... not enough?
+
+
+	No.
+
+	I bet you feel r-real
+	accomplished right
+	now.
+
+	But the only thing
+	you managed to
+	accomplish...
+
+	...is pissing me off
+	even more.
+
+
+	There's only one
+	way this ends.
+
+	And I didn't go past
+	the point of no
+	return for nothing.
+
+	I will use everything
+	within my power to 
+	put an end to you...
+
+	...for every last
+	second I have in
+	this life!
+	'''
+JstcEnd:
+	'''
+	Is this... t-the
+	end for me?
+
+	No...
+
+	I have to get back
+	up. I-I have to 
+	keep fighting!
+
+
+	... for every... 
+	last... second.
+
+
+	W-What's going on?
+
+	The s-serum,
+	it...
+
+
+	Why is it wearing
+	off!?
+
+	Is it... time?
+
+	No... NO!
+
+	I DON'T WANT
+	TO DIE!
+
+	I NEED MORE TIME!
+
+
+	...I need more
+	time...
+
+	...
+
+
+	You.
+
+	You're just going to
+	move along and find
+	someone else to test
+	your power on,
+	right?
+
+	What was I to you,
+	just another medal
+	to add to your belt?
+
+	You sicken me.
+
+
+	I hope you
+
+
+	n-NO!
+
+	PLEASE!!
+
+
+	WHAT DO I DO!?
+
+	JUST A BIT MORE
+	TIME!!
+
+
+	STOP!!!
+
+
+	SOMEONE!
+
+
+	H E L P  M E . . .
 	'''

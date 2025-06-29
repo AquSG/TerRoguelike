@@ -216,21 +216,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss
         public bool speechInitialized = false;
         public bool cutsceneInitialized = false;
 
-        public static DynamicSpriteFont DotumChePixel = null;
         public static bool TalkFont
         {
             get {
-                return !(DotumChePixel == null || Environment.OSVersion.Platform != PlatformID.Win32NT || !GameCulture.FromCultureName(GameCulture.CultureName.English).IsActive || translationModEnabled);
+                return !(Mallet.Mallet.DotumChePixel == null || Environment.OSVersion.Platform != PlatformID.Win32NT || !GameCulture.FromCultureName(GameCulture.CultureName.English).IsActive || translationModEnabled);
             }
         }
 
         public override void SetStaticDefaults()
         {
-            if (DotumChePixel is null && Environment.OSVersion.Platform == PlatformID.Win32NT)
-            {
-                DotumChePixel = ModContent.Request<DynamicSpriteFont>("TerRoguelike/Fonts/DotumChePixel", AssetRequestMode.ImmediateLoad).Value;
-
-            }
             Main.npcFrameCount[Type] = 1;
             NPCID.Sets.MustAlwaysDraw[Type] = true;
         }
@@ -531,7 +525,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                 return false;
 
             var tex = TextureAssets.Npc[Type].Value;
-            var font = TalkFont ? DotumChePixel : FontAssets.DeathText.Value;
+            var font = TalkFont ? Mallet.Mallet.DotumChePixel : FontAssets.DeathText.Value;
             Color npcColor = Color.White;
             float scale = NPC.scale;
             Vector2 drawPos = NPC.Center;

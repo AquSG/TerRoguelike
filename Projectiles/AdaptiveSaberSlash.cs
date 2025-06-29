@@ -86,7 +86,7 @@ namespace TerRoguelike.Projectiles
             float effectiveAnim = Math.Abs(modPlayer.swingAnimCompletion);
             if (myanim > effectiveAnim || myanim == effectiveAnim || effectiveAnim >= 1)
             {
-                if (myanim == 0.00001f)
+                if (myanim < 0.25f)
                 {
                     myanim = 0.5f;
                 }
@@ -107,7 +107,6 @@ namespace TerRoguelike.Projectiles
                 else
                     myanim = effectiveAnim;
             }
-               
 
             int ownerdir = Owner.direction;
             Owner.direction = Projectile.direction;

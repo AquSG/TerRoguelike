@@ -254,6 +254,51 @@ namespace TerRoguelike.Managers
                 chosenItem = GetItemFromListWithWeights(utilityItemList);
             return chosenItem.modItemID;
         }
+        public static void QuickSpawnRoomItem(Vector2 position, bool boss = false)
+        {
+            int chance = Main.rand.Next(1, 101);
+            int itemType;
+            int itemTier;
+
+            if (boss)
+            {
+                if (chance <= 80)
+                {
+                    itemType = GiveUncommon(false);
+                    itemTier = 1;
+                }
+                else
+                {
+                    itemType = GiveRare(false);
+                    itemTier = 2;
+                }
+                SpawnManager.SpawnItem(itemType, position, itemTier, 75, 0.5f, -1);
+                return;
+            }
+
+            if (RoomRewardCooldown > 0)
+            {
+                RoomRewardCooldown--;
+                return;
+            }
+
+            if (chance <= 80)
+            {
+                itemType = GiveCommon();
+                itemTier = 0;
+            }
+            else if (chance <= 98)
+            {
+                itemType = GiveUncommon();
+                itemTier = 1;
+            }
+            else
+            {
+                itemType = GiveRare();
+                itemTier = 2;
+            }
+            SpawnManager.SpawnItem(itemType, position, itemTier, 75, 0.5f, -1);
+        }
         internal static void Load()
         {
             AllItems = new List<BaseRoguelikeItem>()

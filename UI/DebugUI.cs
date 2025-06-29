@@ -37,9 +37,11 @@ namespace TerRoguelike.UI
         private static Vector2 PendingButtonOffset = new Vector2(0, 0);
         private static Vector2 ResetButtonOffset = new Vector2(0, 60);
         private static Vector2 BuildingButtonOffset = new Vector2(0, -60);
+        private static Vector2 QuickBuildButtonOffset = new Vector2(0, -120);
         public static bool pendingEnemyHover = false;
         public static bool resetHover = false;
         public static bool buildingHover = false;
+        public static bool quickBuildHover = false;
         public static bool allowBuilding = false;
         public static bool DebugUIActive = false;
         public static ButtonState oldButtonState = ButtonState.Released;
@@ -79,6 +81,7 @@ namespace TerRoguelike.UI
             Rectangle pendingEnemyBar = Utils.CenteredRectangle(UIScreenPos + PendingButtonOffset, ButtonTex.Size() * buttonScale);
             Rectangle resetBar = Utils.CenteredRectangle(UIScreenPos + ResetButtonOffset, ButtonTex.Size() * buttonScale);
             Rectangle buildBar = Utils.CenteredRectangle(UIScreenPos + BuildingButtonOffset, ButtonTex.Size() * buttonScale);
+            Rectangle quickBuildBar = Utils.CenteredRectangle(UIScreenPos + QuickBuildButtonOffset, ButtonTex.Size() * buttonScale);
 
             
 
@@ -88,6 +91,7 @@ namespace TerRoguelike.UI
             pendingEnemyHover = mouseHitbox.Intersects(pendingEnemyBar);
             resetHover = mouseHitbox.Intersects(resetBar);
             buildingHover = mouseHitbox.Intersects(buildBar);
+            quickBuildHover = mouseHitbox.Intersects(quickBuildBar);
 
             bool pressed = ms.LeftButton == ButtonState.Released && oldButtonState == ButtonState.Pressed;
 
@@ -138,12 +142,37 @@ namespace TerRoguelike.UI
             {
                 allowBuilding = !allowBuilding;
             }
+            else if (pressed && quickBuildHover)
+            {
+                ItemManager.PastRoomRewardCategories.Clear();
+                var modPlayer = Main.LocalPlayer.ModPlayer();
+                if (modPlayer != null)
+                {
+                    modPlayer.escaped = true;
+                }
+                TerRoguelikeWorld.currentStage = 6;
+                TerRoguelikeWorld.currentLoop = 0;
+                if (RoomSystem.RoomList != null && RoomSystem.RoomList.Count > 0)
+                {
+                    Room room = SchematicManager.RoomID[SchematicManager.RoomDict["SanctuaryRoom1"]];
+                    Main.LocalPlayer.Center = room.RoomCenter16 + room.RoomPosition16;
+                    for (int i = 0; i < 5; i++)
+                    {
+                        SchematicManager.FloorID[RoomManager.FloorIDsInPlay[i]].jstcProgress = Floor.JstcProgress.Jstc;
+                    }
+                }
+                for (int i = 0; i < 45; i++)
+                {
+                    bool boss = (i + 1) % 8 == 0 || i == 44;
+                    ItemManager.QuickSpawnRoomItem(Main.LocalPlayer.Center, boss);
+                }
+            }
 
-            DrawDebugUI(spriteBatch, UIScreenPos, pendingEnemyHover, resetHover, buildingHover);   
+            DrawDebugUI(spriteBatch, UIScreenPos, pendingEnemyHover, resetHover, buildingHover, quickBuildHover);   
         }
 
         #region Draw Debug UI
-        private static void DrawDebugUI(SpriteBatch spriteBatch, Vector2 screenPos, bool mainMenuHover, bool restartHover, bool buildingHover)
+        private static void DrawDebugUI(SpriteBatch spriteBatch, Vector2 screenPos, bool mainMenuHover, bool restartHover, bool buildingHover, bool quickBuildHover)
         {
 
             float opacity = 0.5f;
@@ -154,12 +183,15 @@ namespace TerRoguelike.UI
             Texture2D finalMainMenuButtonTex = mainMenuHover ? ButtonHoverTex : ButtonTex;
             Texture2D finalRestartButtonTex = restartHover ? ButtonHoverTex : ButtonTex;
             Texture2D finalBuildingButtonTex = buildingHover ? ButtonHoverTex : ButtonTex;
+            Texture2D finalQuickBuildButtonTex = quickBuildHover ? ButtonHoverTex : ButtonTex;
             spriteBatch.Draw(finalMainMenuButtonTex, screenPos + PendingButtonOffset, null, Color.White * opacity, 0f, ButtonTex.Size() * 0.5f, buttonScale, SpriteEffects.None, 0);
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Display Enemy Spawn Positions", screenPos + PendingButtonOffset, (mainMenuHover ? Color.White : Color.LightGoldenrodYellow) * opacity * 1.5f, 0f, textOrigin, new Vector2(mainMenuHover ? 1f : 0.9f) * 0.5f);
             spriteBatch.Draw(finalRestartButtonTex, screenPos + ResetButtonOffset, null, Color.White * opacity, 0f, ButtonTex.Size() * 0.5f, buttonScale, SpriteEffects.None, 0);
             ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Reset All Rooms In Play", screenPos + ResetButtonOffset, (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity * 1.5f, 0f, textOrigin, new Vector2(restartHover ? 1f : 0.9f) * 0.5f);
             spriteBatch.Draw(finalBuildingButtonTex, screenPos + BuildingButtonOffset, null, Color.White * opacity, 0f, ButtonTex.Size() * 0.5f, buttonScale, SpriteEffects.None, 0);
-            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Toggle Building", screenPos + BuildingButtonOffset, (restartHover ? Color.White : Color.LightGoldenrodYellow) * opacity * 1.5f, 0f, textOrigin, new Vector2(buildingHover ? 1f : 0.9f) * 0.5f);
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Toggle Building", screenPos + BuildingButtonOffset, (buildingHover ? Color.White : Color.LightGoldenrodYellow) * opacity * 1.5f, 0f, textOrigin, new Vector2(buildingHover ? 1f : 0.9f) * 0.5f);
+            spriteBatch.Draw(finalBuildingButtonTex, screenPos + QuickBuildButtonOffset, null, Color.White * opacity, 0f, ButtonTex.Size() * 0.5f, buttonScale, SpriteEffects.None, 0);
+            ChatManager.DrawColorCodedStringWithShadow(spriteBatch, FontAssets.DeathText.Value, "Quick Item Build", screenPos + QuickBuildButtonOffset, (quickBuildHover ? Color.White : Color.LightGoldenrodYellow) * opacity * 1.5f, 0f, textOrigin, new Vector2(quickBuildHover ? 1f : 0.9f) * 0.5f);
         }
         #endregion
     }

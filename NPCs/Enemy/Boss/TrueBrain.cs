@@ -1383,12 +1383,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss
             {
                 if (modNPC.isRoomNPC)
                 {
-                    if (!TerRoguelike.mpClient && calamityMod != null)
-                    {
-                        int yharharType = calamityMod.Find<ModNPC>("Yharon").Type;
-                        var parentRoom = modNPC.GetParentRoom();
-                        parentRoom.AddBoss(parentRoom.RoomCenter16, yharharType);
-                    }
+                    bool secretBoss = false;
                     for (int i = 0; i < 5; i++)
                     {
                         if (FloorID[FloorIDsInPlay[i]].jstcProgress < Floor.JstcProgress.BossDeath)
@@ -1396,8 +1391,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss
 
                         if (i == 4)
                         {
+                            secretBoss = true;
                             if (!TerRoguelike.mpClient)
-                                SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Being>(), modNPC.sourceRoomListID);
+                                SpawnManager.SpawnNPCTerRoguelike(NPC.GetSource_FromThis(), CutsceneSystem.cameraTargetCenter, ModContent.NPCType<Mallet.Mallet>(), modNPC.sourceRoomListID);
                             foreach (Projectile proj in Main.ActiveProjectiles)
                             {
                                 proj.Kill();
@@ -1406,6 +1402,12 @@ namespace TerRoguelike.NPCs.Enemy.Boss
                             attackPlanRocketBundles.Clear();
                             break;
                         }
+                    }
+                    if (!secretBoss && !TerRoguelike.mpClient && calamityMod != null)
+                    {
+                        int yharharType = calamityMod.Find<ModNPC>("Yharon").Type;
+                        var parentRoom = modNPC.GetParentRoom();
+                        parentRoom.AddBoss(parentRoom.RoomCenter16, yharharType);
                     }
                 }
             }
