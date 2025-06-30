@@ -182,7 +182,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
                 DashSlot = SoundEngine.PlaySound(Mallet.BackgroundDash with { Volume = 1f, Variants = [2] }, (fakePos - Main.Camera.Center) * zDepth + Main.Camera.Center);
                 for (int i = 0; i < 2; i++)
                 {
-                    ParticleManager.AddParticle(new ThinSpark(targetPos, Vector2.Zero, 30, Color.Yellow, new Vector2(0.35f, 0.5f) * 10, MathHelper.PiOver2 * i, true, false));
+                    ParticleManager.AddParticle(new ThinSpark(targetPos, Vector2.Zero, 30, Color.Yellow, new Vector2(0.35f, 0.5f) * (TerRoguelike.mpClient ? 1 : 10), MathHelper.PiOver2 * i, true, false));
                 }
                 
             }

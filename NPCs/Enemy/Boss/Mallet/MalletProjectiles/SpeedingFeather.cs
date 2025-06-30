@@ -16,6 +16,7 @@ using TerRoguelike.Particles;
 using static TerRoguelike.Managers.TextureManager;
 using Steamworks;
 using ReLogic.Utilities;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
 {
@@ -81,5 +82,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
         {
             Mallet.InflictRetribution(target);
         }
+
     }
 }

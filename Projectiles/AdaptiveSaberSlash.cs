@@ -83,6 +83,8 @@ namespace TerRoguelike.Projectiles
         }
         public override void AI()
         {
+            player ??= Main.player[Projectile.owner];
+            modPlayer ??= player.ModPlayer();
             float effectiveAnim = Math.Abs(modPlayer.swingAnimCompletion);
             if (myanim > effectiveAnim || myanim == effectiveAnim || effectiveAnim >= 1)
             {
@@ -132,8 +134,6 @@ namespace TerRoguelike.Projectiles
                 if (swordLevel == SwordColor.Rainbow)
                     rainbowProg += 0.0154936875f;
             }
-            player ??= Main.player[Projectile.owner];
-            modPlayer ??= player.ModPlayer();
 
 
             for (int i = 0; i < particleCount; i++)

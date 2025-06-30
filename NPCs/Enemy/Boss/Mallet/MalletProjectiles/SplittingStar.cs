@@ -50,6 +50,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
         public override void SetStaticDefaults()
         {
             Main.npcFrameCount[Type] = 2;
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -172,10 +173,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
                 NPC.active = true;
                 NPC.life = 1;
                 modNPC.shouldHaveDied = !modNPC.hostileTurnedAlly;
-            }
-
-            if (!deathInitialized && !CutsceneSystem.cutsceneActive)
-            {
                 if (!TerRoguelike.mpClient && myStarType != StarType.Small)
                 {
                     var target = modNPC.GetTarget(NPC);
@@ -185,6 +182,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
                         NPC.NewNPCDirect(NPC.GetSource_FromThis(), NPC.Center, Type, 0, NPC.ai[0] + 1, shootRot + MathHelper.PiOver2 * i, NPC.ai[2] * 1.2f);
                     }
                 }
+            }
+
+            if (!deathInitialized && !CutsceneSystem.cutsceneActive)
+            {
+                
                 SoundEngine.PlaySound(Mallet.MeteorBoom with { Volume = 0.6f, MaxInstances = 3, Pitch = myStarType == StarType.Small ? 0.4f : 0 }, NPC.Center);
                 NPC.netUpdate = true;
                 deathInitialized = true;

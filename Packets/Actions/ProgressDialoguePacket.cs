@@ -52,8 +52,8 @@ namespace TerRoguelike.Packets
         public override void HandlePacket(in BinaryReader packet, int sender)
         {
             Being.forceTextControl = true;
-            if (Main.dedServ)
-                Send();
+            //if (Main.dedServ)
+                //Send();
         }
     }
 }

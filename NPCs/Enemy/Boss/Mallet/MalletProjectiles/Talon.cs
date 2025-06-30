@@ -224,7 +224,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
         {
             Mallet.InflictRetribution(target);
         }
-        public override bool? CanDamage() => Projectile.timeLeft > 14 && Projectile.timeLeft < swipeTime - 14 ? null : false;
+        public override bool? CanDamage() => Projectile.timeLeft > 21 && Projectile.timeLeft < swipeTime - 14 ? null : false;
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(targetNPC);

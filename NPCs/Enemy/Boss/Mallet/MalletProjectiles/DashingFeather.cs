@@ -178,7 +178,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
                 if (time == setupTime + 1)
                 {
                     Projectile.rotation = (reticlePos - Projectile.Center).ToRotation();
-                    Projectile.netUpdate = true;
+                    //Projectile.netUpdate = true;
                 }
                 if (time < launchTime)
                     Projectile.velocity += Projectile.rotation.ToRotationVector2() * -0.06f;

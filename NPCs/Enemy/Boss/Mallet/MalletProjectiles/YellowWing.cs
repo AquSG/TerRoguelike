@@ -17,6 +17,7 @@ using static TerRoguelike.Managers.TextureManager;
 using Steamworks;
 using ReLogic.Utilities;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
+using System.IO;
 
 namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
 {
@@ -65,17 +66,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
             {
                 SoundEngine.PlaySound(Mallet.TalonSwipe with { Volume = 0.7f }, Projectile.Center);
 
-                int projCount = (int)Projectile.ai[1];
-                float startAngle = MathHelper.PiOver2 * 0.08f;
-                float spreadAngle = MathHelper.PiOver2 * 0.4f;
-                float radius = 300;
-                Vector2 basePos = Projectile.Center + new Vector2(0 * Projectile.direction, -radius + 48);
-                for (int i = 0; i < projCount; i++)
+                if (!TerRoguelike.mpClient)
                 {
-                    float completion = (float)i / Math.Max(projCount - 1, 1);
-                    float thisAngle = (startAngle + spreadAngle * completion) * Projectile.direction + MathHelper.PiOver2;
-                    Vector2 projPos = basePos + thisAngle.ToRotationVector2() * radius;
-                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), projPos, thisAngle.ToRotationVector2() * startVel * 1.2f, ModContent.ProjectileType<SpeedingFeather>(), Projectile.damage, 0);
+                    int projCount = (int)Projectile.ai[1];
+                    float startAngle = MathHelper.PiOver2 * 0.08f;
+                    float spreadAngle = MathHelper.PiOver2 * 0.4f;
+                    float radius = 300;
+                    Vector2 basePos = Projectile.Center + new Vector2(0 * Projectile.direction, -radius + 48);
+                    for (int i = 0; i < projCount; i++)
+                    {
+                        float completion = (float)i / Math.Max(projCount - 1, 1);
+                        float thisAngle = (startAngle + spreadAngle * completion) * Projectile.direction + MathHelper.PiOver2;
+                        Vector2 projPos = basePos + thisAngle.ToRotationVector2() * radius;
+                        Projectile.NewProjectile(Projectile.GetSource_FromThis(), projPos, thisAngle.ToRotationVector2() * startVel * 1.2f, ModContent.ProjectileType<SpeedingFeather>(), Projectile.damage, 0);
+                    }
                 }
             }
 
@@ -141,5 +145,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
             Mallet.InflictRetribution(target);
         }
         public override bool? CanDamage() => Projectile.frame >= 2 ? null : false;
+        public override void SendExtraAI(BinaryWriter writer)
+        {
+            writer.Write(startVel);
+            writer.Write(Projectile.direction);
+        }
+        public override void ReceiveExtraAI(BinaryReader reader)
+        {
+            startVel = reader.ReadSingle();
+            Projectile.direction = reader.ReadInt32();
+        }
     }
 }

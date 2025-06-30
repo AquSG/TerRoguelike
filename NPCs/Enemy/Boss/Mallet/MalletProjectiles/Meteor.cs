@@ -39,6 +39,10 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
         public bool ableToHit => NPC.ai[1] == 0 && (NPC.Opacity >= 0.8f || deadTime > 0);
         public int deadTime = 0;
         public bool deathInitialized = false;
+        public override void SetStaticDefaults()
+        {
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
+        }
         public override void SetDefaults()
         {
             NPC.width = NPC.height = 90;

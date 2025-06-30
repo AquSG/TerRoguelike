@@ -252,8 +252,11 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 return strList;
             }
         }
-        public void PlayTalkSound(bool loop = false)
+        public void PlayTalkSound()
         {
+            if (Main.dedServ)
+                return;
+
             var instance = talkSound.CreateInstance();
             instance.Volume = Main.soundVolume * 0.67f;
             instance.Pitch = Main.rand.NextFloat(-0.001f, 0.001f);
@@ -320,7 +323,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
 
         public override void SetStaticDefaults()
         {
-            talkSound = ModContent.Request<SoundEffect>("TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletTalk", AssetRequestMode.ImmediateLoad).Value;
+            if (!Main.dedServ)
+                talkSound = ModContent.Request<SoundEffect>("TerRoguelike/NPCs/Enemy/Boss/Mallet/MalletTalk", AssetRequestMode.ImmediateLoad).Value;
 
             if (DotumChePixel is null && Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
@@ -328,8 +332,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             }
             Main.npcFrameCount[Type] = 1;
             NPCID.Sets.MustAlwaysDraw[Type] = true;
-
-
+            NPCID.Sets.NoMultiplayerSmoothingByType[Type] = true;
         }
         public override void SetDefaults()
         {
@@ -383,7 +386,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
         }
         public override void OnSpawn(IEntitySource source)
         {
-            bool allow = false;
+            bool allow = true;
             if (source is EntitySource_Parent parentSource)
             {
                 if (parentSource.Entity is NPC)
@@ -408,7 +411,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             if (SkipCutscene)
             {
                 NPC.localAI[0] = -31;
-                NPC.ai[3] = 200;
+                NPC.localAI[1] = 200;
                 eventCounter = 4;
                 SetBossTrack(JstcTheme, 0.8f);
                 CombatVolumeInterpolant = 1;
@@ -446,6 +449,16 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 }
             }
             */
+            string nameCheck = "";
+            for (int i = 0; i < username.Length; i++)
+            {
+                if (username[i] == ' ')
+                {
+                    break;
+                }
+                nameCheck += username[i];
+            }
+            username = nameCheck;
 
             StringToBundleList(introString, ref JstcIntro);
             StringToBundleList(middleString, ref JstcMiddle);
@@ -917,16 +930,18 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
         }
         public void UpdateSpeech(List<StringBundle> jstcSpeech, bool allowControl = true, bool forceControl = false, bool keepBubbleThroughEvent = false)
         {
-            var speech = jstcSpeech[(int)NPC.ai[3]];
+            var speech = jstcSpeech[(int)NPC.localAI[1]];
             if (Being.forceTextControl)
                 forceControl = true;
             bool control = allowControl && (forceControl || (TextControl && !TerRoguelike.mpClient));
-            if (TerRoguelike.mpClient && TextControl)
+
+            int speechLength = speech.TotalLength;
+            if (TerRoguelike.mpClient && TextControl && textProgress >= speechLength)
             {
                 ProgressDialoguePacket.Send();
             }
 
-            int speechLength = speech.TotalLength;
+            
             if (textProgress < speechLength)
             {
                 if (textProgressPause == 0)
@@ -963,7 +978,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
 
             if (control)
             {
-                if (textProgress < speechLength)
+                if (textProgress < speechLength && !TerRoguelike.mpClient)
                 {
                     if (Main.netMode == NetmodeID.SinglePlayer)
                     {
@@ -973,18 +988,20 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 }
                 else
                 {
+                    if (Main.dedServ)
+                        ProgressDialoguePacket.Send();
                     textProgressPause = 0;
                     textProgress = -0.5f;
-                    if (jstcSpeech[(int)NPC.ai[3]].Event)
+                    if (jstcSpeech[(int)NPC.localAI[1]].Event)
                     {
                         DrawTalkBubble = keepBubbleThroughEvent;
                         eventCounter++;
                         eventTimer = 0;
                     }
-                    NPC.ai[3]++;
-                    if (NPC.ai[3] >= jstcSpeech.Count)
+                    NPC.localAI[1]++;
+                    if (NPC.localAI[1] >= jstcSpeech.Count)
                     {
-                        NPC.ai[3] = 100;
+                        NPC.localAI[1] = 100;
                         if (deadTime == 0)
                         {
                             if (middleCutsceneStarted)
@@ -1058,7 +1075,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                             room.bossDead = false;
                     }
 
-                    bool intro = NPC.ai[3] < 200;
+                    bool intro = NPC.localAI[1] < 200;
                     if (intro)
                     {
                         if (CutsceneSystem.cutsceneTimer < cutsceneDuration - 62)
@@ -1135,7 +1152,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                             }
                             else if (eventCounter >= 3)
                             {
-                                if (NPC.ai[3] < 100)
+                                if (NPC.localAI[1] < 100)
                                 {
                                     if (eventCounter == 3)
                                     {
@@ -1218,13 +1235,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
 
                                 if (NPC.frameCounter == 77 || NPC.frameCounter == 83)
                                     UpdateSpeech(JstcIntro);
-                                if (NPC.frameCounter == 83 && NPC.ai[3] == 100)
+                                if (NPC.frameCounter == 83 && NPC.localAI[1] == 100)
                                 {
                                     SoundEngine.PlaySound(Transformation with { Volume = 1f });
                                 }
                                 if (NPC.frameCounter >= 168)
                                 {
-                                    NPC.ai[3] = 200;
+                                    NPC.localAI[1] = 200;
                                     NPC.frameCounter = 168;
                                     animationCounter = 168;
                                     eventCounter = 0;
@@ -1264,7 +1281,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     }
 
 
-                    bool middle = NPC.ai[3] < 100;
+                    bool middle = NPC.localAI[1] < 100;
                     if (middle)
                     {
                         if (NPC.localAI[0] + middleCutsceneDuration <= 60)
@@ -1469,14 +1486,17 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 }
                 DefaultMovement();
 
+                Vector2 pos1 = (-Vector2.UnitY).RotatedBy(MathHelper.Pi / 3f * NPC.direction) * 300;
+                Vector2 pos2 = (-Vector2.UnitY).RotatedBy(MathHelper.Pi / -3f * NPC.direction) * 300;
+                Vector2 targetVel = target == null ? Vector2.Zero : target.velocity;
                 var projectiles = new List<PatternProjectile>()
                 {
-                    new SplittingFeatherProj(NPC, 0, NPC.Center, Vector2.UnitY * -300, ReticleType.Spread, Vector2.Zero),
-                    new SplittingFeatherProj(NPC, 40, NPC.Center, Vector2.UnitX * -300 * NPC.direction, ReticleType.Circle),
-                    new SplittingFeatherProj(NPC, 60, NPC.Center, Vector2.UnitX * 300 * NPC.direction, ReticleType.Circle),
-                    new SplittingFeatherProj(NPC, 120, NPC.Center, (-Vector2.UnitY).RotatedBy(MathHelper.Pi / 3f * NPC.direction) * 300, ReticleType.Spread),
-                    new SplittingFeatherProj(NPC, 135, NPC.Center, (-Vector2.UnitY).RotatedBy(MathHelper.Pi / -3f * NPC.direction) * 300, ReticleType.Spread),
-                    new SplittingFeatherProj(NPC, 150, NPC.Center, Vector2.UnitY * 300, ReticleType.Circle),
+                    new SplittingFeatherProj(NPC, 0, NPC.Center, Vector2.UnitY * -300, ReticleType.Spread, target.velocity.SafeNormalize(Vector2.Zero) * -60),
+                    new SplittingFeatherProj(NPC, 40, NPC.Center, Vector2.UnitX * -300 * NPC.direction, ReticleType.Circle, Vector2.UnitX * -400 * NPC.direction),
+                    new SplittingFeatherProj(NPC, 60, NPC.Center, Vector2.UnitX * 300 * NPC.direction, ReticleType.Circle, Vector2.UnitX * 400 * NPC.direction),
+                    new SplittingFeatherProj(NPC, 120, NPC.Center, pos1, ReticleType.Circle, pos1 * 1.4f),
+                    new SplittingFeatherProj(NPC, 135, NPC.Center, pos2, ReticleType.Circle, pos2 * 1.4f),
+                    new SplittingFeatherProj(NPC, 150, NPC.Center, Vector2.UnitY * 300, ReticleType.Spread, Vector2.UnitY * 400),
                 };
 
                 int thisTime = (int)NPC.ai[1];
@@ -1663,8 +1683,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     new TalonProj(NPC, 150, targetPos, 100, -NPC.direction),
                     new SplittingFeatherProj(NPC, 250, NPC.Center, new Vector2(0, -300), ReticleType.Circle),
                     new SplittingFeatherProj(NPC, 250, NPC.Center, new Vector2(0, 300), ReticleType.Circle),
-                    new SplittingFeatherProj(NPC, 270, NPC.Center, new Vector2(300, 0), ReticleType.Spread, new Vector2(500, 0)),
-                    new SplittingFeatherProj(NPC, 270, NPC.Center, new Vector2(-300, 0), ReticleType.Spread, new Vector2(-500, 0)),
+                    new SplittingFeatherProj(NPC, 270, NPC.Center, new Vector2(300 * NPC.direction, 0), ReticleType.Spread, new Vector2(800 * NPC.direction, 0)),
+                    new SplittingFeatherProj(NPC, 270, NPC.Center, new Vector2(-300 * NPC.direction, 0), ReticleType.Spread, new Vector2(-300 * NPC.direction, 0)),
                 };
 
                 int thisTime = (int)NPC.ai[1];
@@ -1969,7 +1989,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                             if (star)
                             {
                                 Vector2 rawTargetPos = target == null ? spawnPos : target.Center;
-                                NPC.NewNPC(NPC.GetSource_FromThis(), (int)projPos.X, (int)projPos.Y, ModContent.NPCType<SplittingStar>(), 0, 0, (rawTargetPos - projPos).ToRotation(), 12);
+                                NPC.NewNPC(NPC.GetSource_FromThis(), (int)projPos.X, (int)projPos.Y, ModContent.NPCType<SplittingStar>(), 0, 0, (rawTargetPos - projPos).ToRotation(), 10);
                             }
                             else
                             {
@@ -2049,7 +2069,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     {
                         Vector2 targetPos = target == null ? spawnPos : target.Center;
                         var room = modNPC.GetParentRoom();
-                        Vector2 basePos = NPC.Center + new Vector2(0, -1000);
+                        Vector2 basePos = NPC.Center + new Vector2(0, -833);
                         Vector2 anchor = NPC.Center;
                         if (room != null)
                         {
@@ -2067,7 +2087,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                         {
                             float myRot = baseRot + (incrementRot * i) + Main.rand.NextFloat(padding, incrementRot - padding);
                             Vector2 npcPos = anchor + (basePos - anchor).RotatedBy(myRot);
-                            NPC.NewNPC(NPC.GetSource_FromThis(), (int)npcPos.X, (int)npcPos.Y, ModContent.NPCType<SplittingStar>(), 0, 0, (targetPos - npcPos).ToRotation(), 12);
+                            NPC.NewNPC(NPC.GetSource_FromThis(), (int)npcPos.X, (int)npcPos.Y, ModContent.NPCType<SplittingStar>(), 0, 0, (targetPos - npcPos).ToRotation(), 10);
                         }
                     }
                 }
@@ -2435,13 +2455,13 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 SetMusicMode(MusicStyle.Silent);
 
                 eventCounter = 0;
-                NPC.ai[3] = 0;
+                NPC.localAI[1] = 0;
                 NPC.localAI[0] = -middleCutsceneDuration;
                 SoundEngine.PlaySound(Knockdown with { Volume = 0.7f });
                 NPC.netUpdate = true;
                 return false;
             }
-            bool kill = NPC.ai[3] == 200;
+            bool kill = NPC.localAI[1] == 200;
             if (kill)
             {
                 return true;
@@ -2466,7 +2486,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 NPC.frameCounter = 0;
                 SetMusicMode(MusicStyle.Silent);
                 fadeRateMultiplier = 1;
-                NPC.ai[3] = 1;
+                NPC.localAI[1] = 1;
                 enemyHealthBar.ForceEnd(0);
                 NPC.velocity = Vector2.Zero;
                 NPC.rotation = 0;
@@ -2515,7 +2535,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             }
             deadTime++;
 
-            bool end = NPC.ai[3] < 100;
+            bool end = NPC.localAI[1] < 100;
             if (end)
             {
                 if (CutsceneSystem.cutsceneDuration - CutsceneSystem.cutsceneTimer > 60)
@@ -2631,8 +2651,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             if (!(eventCounter >= 12 && eventTimer >= 160))
                 NPC.localAI[0] = -deathCutsceneDuration + 60;
             if (NPC.localAI[0] > -30)
-                NPC.ai[3] = 200;
-            kill = NPC.ai[3] == 200;
+                NPC.localAI[1] = 200;
+            kill = NPC.localAI[1] == 200;
 
             if (kill)
             {
@@ -2651,6 +2671,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
 
             }
 
+            NPC.rotation = 0;
             for (int i = 0; i < Main.combatText.Length; i++)
             {
                 var text = Main.combatText[i];
@@ -2815,6 +2836,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     }
                 }
             }
+            else
+                return false;
 
 
             void OverlayDraw(Vector2 texSize, Vector2 frameSize, Vector2 framePos, Action action)
@@ -3212,15 +3235,15 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     Vector2 vector = offset ?? Vector2.Zero;
                     Main.EntitySpriteDraw(TalkBubble, drawPos + new Vector2(55, -90) + vector - Main.screenPosition, null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None);
 
-                    if ((int)NPC.ai[3] < 0 || (int)NPC.ai[3] >= list.Count)
+                    if ((int)NPC.localAI[1] < 0 || (int)NPC.localAI[1] >= list.Count)
                         return;
 
-                    var strings = list[(int)NPC.ai[3]].StringDisplay(textProgress < 0 ? -1 : (int)textProgress);
+                    var strings = list[(int)NPC.localAI[1]].StringDisplay(textProgress < 0 ? -1 : (int)textProgress);
                     int verticalStep = TalkFont ? 15 : 18;
                     for (int i = 0; i < strings.Count; i++)
                     {
                         Vector2 textScale = TalkFont ? new Vector2(0.081f) : new Vector2(0.38f);
-                        float stringSize = (font.MeasureString(list[(int)NPC.ai[3]].strings[i]) * textScale).X;
+                        float stringSize = (font.MeasureString(list[(int)NPC.localAI[1]].strings[i]) * textScale).X;
                         float shrinkThreshold = 195;
                         if (stringSize > shrinkThreshold)
                         {
@@ -3608,6 +3631,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             writer.WriteVector2(starPosition);
             writer.Write(NPC.direction);
             writer.Write(phase2);
+            writer.Write(animationCounter);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -3617,6 +3641,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             starPosition = reader.ReadVector2();
             NPC.direction = reader.ReadInt32();
             phase2 = reader.ReadBoolean();
+            animationCounter = reader.ReadDouble();
         }
         public class PatternProjectile
         {

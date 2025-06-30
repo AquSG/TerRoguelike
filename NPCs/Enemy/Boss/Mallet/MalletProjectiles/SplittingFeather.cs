@@ -159,6 +159,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
         {
             Projectile.netSpam = 0;
             Vector2 targetPos;
+            var type = (ReticleType)(int)Projectile.ai[2];
 
             int time = maxTimeLeft - Projectile.timeLeft;
             if (time <= setupTime)
@@ -184,8 +185,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
             }
             else
             {
-                if (time == setupTime + 1)
-                    Projectile.netUpdate = true;
+                //if (time == setupTime + 1)
+                    //Projectile.netUpdate = true;
 
                 targetPos = reticlePos + offsetVector;
                 if (time < launchTime)
@@ -194,8 +195,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
                 }
                 else if (time <= hitTime)
                 {
-                    if (time == launchTime)
-                        Projectile.netUpdate = true;
+                    //if (time == launchTime)
+                        //Projectile.netUpdate = true;
 
                     Projectile.frameCounter = 0;
                     int movingTime = time - launchTime;
@@ -205,31 +206,33 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
                     {
                         SoundEngine.PlaySound(Mallet.FeatherBoom with { Variants = [2], Volume = 0.4f, MaxInstances = 10 }, Projectile.Center);
 
-                        var type = (ReticleType)(int)Projectile.ai[2];
-                        if (type == ReticleType.Spread)
+                        if (!TerRoguelike.mpClient)
                         {
-                            int count = 7;
-                            float angleIncr = MathHelper.PiOver2 / 9;
-                            for (int i = 0; i < count; i++)
+                            if (type == ReticleType.Spread)
                             {
-                                float rot = reticleRot;
-                                if (i % 2 == 0)
-                                    rot += (i / 2) * angleIncr;
-                                else
-                                    rot -= ((i + 1) / 2) * angleIncr;
+                                int count = 7;
+                                float angleIncr = MathHelper.PiOver2 / 9;
+                                for (int i = 0; i < count; i++)
+                                {
+                                    float rot = reticleRot;
+                                    if (i % 2 == 0)
+                                        rot += (i / 2) * angleIncr;
+                                    else
+                                        rot -= ((i + 1) / 2) * angleIncr;
 
-                                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + rot.ToRotationVector2() * 20, rot.ToRotationVector2() * 12, ModContent.ProjectileType<SplitFeather>(), Projectile.damage, 0);
+                                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + rot.ToRotationVector2() * 20, rot.ToRotationVector2() * 12, ModContent.ProjectileType<SplitFeather>(), Projectile.damage, 0);
+                                }
                             }
-                        }
-                        else if (type == ReticleType.Circle)
-                        {
-                            int count = 11;
-                            float angleIncr = MathHelper.TwoPi / count;
-                            for (int i = 0; i < count; i++)
+                            else if (type == ReticleType.Circle)
                             {
-                                float rot = reticleRot + angleIncr * i;
+                                int count = 11;
+                                float angleIncr = MathHelper.TwoPi / count;
+                                for (int i = 0; i < count; i++)
+                                {
+                                    float rot = reticleRot + angleIncr * i;
 
-                                Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + rot.ToRotationVector2() * 20, rot.ToRotationVector2() * 12, ModContent.ProjectileType<SplitFeather>(), Projectile.damage, 0);
+                                    Projectile.NewProjectile(Projectile.GetSource_FromThis(), Projectile.Center + rot.ToRotationVector2() * 20, rot.ToRotationVector2() * 12, ModContent.ProjectileType<SplitFeather>(), Projectile.damage, 0);
+                                }
                             }
                         }
                     }
@@ -239,7 +242,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet.MalletProjectiles
             }
             Projectile.frame = Projectile.frameCounter / 4 % 4;
 
-            reticleRot = reticleRot.AngleTowards((targetCenter - reticlePos).ToRotation(), 0.025f);
+            reticleRot = reticleRot.AngleTowards((targetCenter - reticlePos).ToRotation(), type == ReticleType.Circle ? 10 : 0.025f);
 
             if (time < launchTime && SoundEngine.TryGetActiveSound(FeatherSlot, out var sound) && sound.IsPlaying)
             {
