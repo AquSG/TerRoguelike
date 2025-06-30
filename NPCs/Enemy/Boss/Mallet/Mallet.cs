@@ -386,7 +386,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
         }
         public override void OnSpawn(IEntitySource source)
         {
-            bool allow = true;
+            bool allow = false;
             if (source is EntitySource_Parent parentSource)
             {
                 if (parentSource.Entity is NPC)
@@ -1386,6 +1386,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
 
             if (NPC.ai[0] == None.Id)
             {
+                zDepth = 1;
                 if (target == null || despawnTime > 0)
                 {
                     NPC.immortal = true;
@@ -1429,7 +1430,6 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     NPC.localAI[2] = 0;
                     attackInitialized = false;
                     NPC.direction = NPC.spriteDirection = -1;
-                    zDepth = 1;
                     DefaultMovement();
 
                     if (hardMode)
