@@ -2311,7 +2311,6 @@ namespace TerRoguelike.TerPlayer
         }
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref NPC.HitModifiers modifiers)
         {
-
             modifiers.FinalDamage *= GetBonusDamageMulti(target, proj.getRect().ClosestPointInRect(target.Center), proj);
         }
         public float GetBonusDamageMulti(NPC npc, Vector2 hitPosition, Projectile? projectile = null)

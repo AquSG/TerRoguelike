@@ -13,6 +13,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System.Linq;
 using static TerRoguelike.Utilities.TerRoguelikeUtils;
 using rail;
+using System.IO;
 
 namespace TerRoguelike.Items.Weapons
 {

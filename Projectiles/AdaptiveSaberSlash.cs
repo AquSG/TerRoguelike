@@ -135,15 +135,6 @@ namespace TerRoguelike.Projectiles
                     rainbowProg += 0.0154936875f;
             }
 
-
-            for (int i = 0; i < particleCount; i++)
-            {
-                float completion = i / (float)particleCount;
-                Vector2 thisPos = Vector2.Lerp(oldEffectivePos, effectivePos, completion);
-                float thisRot = (Projectile.localAI[2] - MathHelper.PiOver4 * Projectile.direction).AngleLerp(effectiveRot - MathHelper.PiOver4 * Projectile.direction, completion);
-                ParticleManager.AddParticle(new Beam(thisPos, Vector2.Zero, 5, GetSwordColor(swordLevel, rainbowProg), new Vector2(0.1f * Projectile.scale), thisRot, 0, 5, true));
-            }
-
             if (stuckPosition == Vector2.Zero)
             {
                 //keep this shit stuck to the player
@@ -152,6 +143,17 @@ namespace TerRoguelike.Projectiles
             Projectile.position = player.position - stuckPosition + (Vector2.UnitY * player.gfxOffY);
             Projectile.frame = (int)(Projectile.localAI[0] / 4);
             Projectile.localAI[0] += 1 * player.GetAttackSpeed(DamageClass.Generic); // animation speed scales with attack speed
+
+            if (!(Projectile.position.Distance(Projectile.oldPosition) > 50 && Owner.velocity.Length() <= 50))
+            {
+                for (int i = 0; i < particleCount; i++)
+                {
+                    float completion = i / (float)particleCount;
+                    Vector2 thisPos = Vector2.Lerp(oldEffectivePos, effectivePos, completion);
+                    float thisRot = (Projectile.localAI[2] - MathHelper.PiOver4 * Projectile.direction).AngleLerp(effectiveRot - MathHelper.PiOver4 * Projectile.direction, completion);
+                    ParticleManager.AddParticle(new Beam(thisPos, Vector2.Zero, 5, GetSwordColor(swordLevel, rainbowProg), new Vector2(0.1f * Projectile.scale), thisRot, 0, 5, true));
+                }
+            }
         }
         //rotating rectangle hitbox collision
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

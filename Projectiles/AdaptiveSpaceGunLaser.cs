@@ -17,6 +17,7 @@ using Terraria.DataStructures;
 using TerRoguelike.Utilities;
 using static TerRoguelike.Projectiles.TileLineSegment;
 using System.IO;
+using Terraria.GameContent.UI.States;
 
 namespace TerRoguelike.Projectiles
 {
@@ -30,6 +31,8 @@ namespace TerRoguelike.Projectiles
         public List<float> oldRot = [];
         public List<bool> oldBounce = [];
         public int capPos = 100000;
+        public bool firstReceive = true;
+        public Vector2 startVel = Vector2.Zero;
         public override void SetStaticDefaults()
         {
             ProjectileID.Sets.DrawScreenCheckFluff[Type] = 10000;
@@ -71,6 +74,7 @@ namespace TerRoguelike.Projectiles
 
             modPlayer = Main.player[Projectile.owner].ModPlayer();
             Projectile.rotation = Projectile.velocity.ToRotation();
+            startVel = Projectile.velocity;
             AI();
         }
         public override void AI()
@@ -237,12 +241,16 @@ namespace TerRoguelike.Projectiles
             Point ScreenPos = Main.Camera.ScaledPosition.ToPoint();
             Point ScreenDimensions = (new Vector2(Main.screenWidth, Main.screenHeight) / ZoomSystem.ScaleVector * 1.1f).ToPoint();
             Rectangle ScreenRect = new Rectangle(ScreenPos.X, ScreenPos.Y, ScreenDimensions.X, ScreenDimensions.Y);
+            int increment = TerRoguelike.lowDetail ? 2 : 1;
+            scale.X *= increment;
             for (int i = 0; i < oldPos.Count - 1; i++)
             {
                 if (!ParticleManager.DrawScreenCheckWithFluff(oldPos[i], 100, ScreenRect))
                     continue;
                 bool final = i == oldPos.Count - 1;
                 int count = final ? 1 : (int)((oldPos[i] - oldPos[i + 1]).Length() * 0.7111f);
+                if (count > 1)
+                    count /= increment;
                 for (int j = 0; j < count; j++)
                 {
                     float completion = j / (float)count;
@@ -292,10 +300,30 @@ namespace TerRoguelike.Projectiles
         public override void SendExtraAI(BinaryWriter writer)
         {
             writer.Write(oldPos.Count);
+            if (oldPos.Count > 0)
+            {
+                writer.WriteVector2(oldPos[0]);
+                writer.Write(oldRot[0]);
+                writer.WriteVector2(startVel);
+            }
+                
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             capPos = reader.ReadInt32();
+            if (capPos > 0)
+            {
+                Vector2 pos = reader.ReadVector2();
+                float rot = reader.ReadSingle();
+                Vector2 vel = reader.ReadVector2();
+                if (firstReceive)
+                {
+                    firstReceive = false;
+                    Projectile.Center = pos;
+                    Projectile.rotation = rot;
+                    Projectile.velocity = vel;
+                }
+            }
         }
     }
     public class TileLineSegment
