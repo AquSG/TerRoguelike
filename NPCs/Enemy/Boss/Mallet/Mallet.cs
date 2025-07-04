@@ -2213,6 +2213,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     if (thisTime == 0)
                     {
                         dashStart = NPC.Center;
+                        NPC.netUpdate = true;
                     }
                     if (thisTime < 90)
                     {
@@ -2243,6 +2244,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     NPC.ai[0] = None.Id;
                     NPC.ai[1] = 0;
                     oldAttacks.Add(Dash.Id);
+                    NPC.netUpdate = true;
                 }
             }
 
@@ -3632,6 +3634,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             writer.Write(NPC.direction);
             writer.Write(phase2);
             writer.Write(animationCounter);
+            writer.WriteVector2(dashStart);
+            writer.Write(zDepth);
+            writer.Write(starZDepth);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -3642,6 +3647,9 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             NPC.direction = reader.ReadInt32();
             phase2 = reader.ReadBoolean();
             animationCounter = reader.ReadDouble();
+            dashStart = reader.ReadVector2();
+            zDepth = reader.ReadSingle();
+            starZDepth = reader.ReadSingle();
         }
         public class PatternProjectile
         {

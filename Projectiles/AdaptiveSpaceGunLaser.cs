@@ -93,6 +93,8 @@ namespace TerRoguelike.Projectiles
                 Projectile.localAI[0] = 1;
                 ableToHit = false;
                 Projectile.velocity = Vector2.Zero;
+                if (Projectile.timeLeft > 20)
+                    Projectile.timeLeft = 20;
                 return;
             }
 
@@ -325,8 +327,10 @@ namespace TerRoguelike.Projectiles
                 firstReceive = false;
                 Projectile.Center = pos;
                 Projectile.rotation = rot;
-                Projectile.velocity = vel;
+                Projectile.velocity = startVel = vel;
                 Projectile.timeLeft = setTimeLeft;
+                Projectile.penetrate = 2;
+                AI();
             }
         }
     }

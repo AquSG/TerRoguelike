@@ -19,7 +19,6 @@ namespace TerRoguelike.Items.Weapons
 {
     public class AdaptiveSaber : ModItem, ILocalizedModType
     {
-        public int swingDirection = 1;
         public override void SetDefaults()
         {
             Item.damage = 70;
@@ -49,12 +48,12 @@ namespace TerRoguelike.Items.Weapons
 
             if (modPlayer.swingAnimCompletion == -0.00001f)
             {
-                swingDirection = -1;
+                modPlayer.verticalSwingDirection = -1;
                 modPlayer.swingAnimCompletion = 0.00001f;
             }
-            else if (swingDirection == -1 && modPlayer.swingAnimCompletion == 0.00001f)
+            else if (modPlayer.verticalSwingDirection == -1 && modPlayer.swingAnimCompletion == 0.00001f)
             {
-                swingDirection = 1;
+                modPlayer.verticalSwingDirection = 1;
             }
 
             if (!modPlayer.changedDir)
@@ -82,7 +81,7 @@ namespace TerRoguelike.Items.Weapons
                     modPlayer.swingAnimCompletion = 1f;
                 float anim = modPlayer.swingAnimCompletion;
                 anim = MathHelper.SmoothStep(0, 1, anim);
-                armPointingDirection += MathHelper.Lerp(0f, MathHelper.TwoPi * 9f / 16f, swingDirection == 1 ? anim : 1 - anim) * player.direction;
+                armPointingDirection += MathHelper.Lerp(0f, MathHelper.TwoPi * 9f / 16f, modPlayer.verticalSwingDirection == 1 ? anim : 1 - anim) * player.direction;
                 if (modPlayer.swingAnimCompletion >= 1f && !player.channel)
                 {
                     modPlayer.swingAnimCompletion = 0;

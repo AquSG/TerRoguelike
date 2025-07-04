@@ -872,7 +872,7 @@ namespace TerRoguelike.MainMenu
                             string itemName = dummyItem.Name;
                             Vector2 itemNameDimensions = font.MeasureString(itemName);
                             Vector2 nameScale = new Vector2(0.5f);
-                            float target = (Main.screenWidth * 0.5f) - 350;
+                            float target = (Main.screenWidth * 0.5f) - 350 - (weaponSelectInPlayerMenu ? 75 : 0);
                             if (itemNameDimensions.X * nameScale.X > target)
                             {
                                 nameScale.X *= target / (itemNameDimensions.X * nameScale.X);

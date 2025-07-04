@@ -56,6 +56,7 @@ namespace TerRoguelike.Packets
             packet.Write((byte)modPlayer.Player.whoAmI);
 
             packet.Write(modPlayer.swingAnimCompletion);
+            packet.Write(modPlayer.verticalSwingDirection);
             packet.Write(modPlayer.sluggedTime);
             packet.Write(modPlayer.barrierHealth);
 
@@ -121,6 +122,7 @@ namespace TerRoguelike.Packets
             int who = (int)packet.ReadByte();
 
             float swingAnim = packet.ReadSingle();
+            int verticalSwingDir = packet.ReadInt32();
             int sluggedTime = packet.ReadInt32();
             float barrierHealth = packet.ReadSingle();
 
@@ -194,6 +196,7 @@ namespace TerRoguelike.Packets
                 return;
 
             modPlayer.swingAnimCompletion = swingAnim;
+            modPlayer.verticalSwingDirection = verticalSwingDir;
             modPlayer.sluggedTime = sluggedTime;
             modPlayer.barrierHealth = barrierHealth;
 

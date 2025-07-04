@@ -192,6 +192,7 @@ namespace TerRoguelike.TerPlayer
         public float scaleMultiplier;
         public int procLuck = 0;
         public float swingAnimCompletion = 0;
+        public int verticalSwingDirection = 1;
         public bool lockDirection = false;
         public int bladeFlashTime = 0;
         public Vector2 playerToCursor = Vector2.Zero;
@@ -3339,14 +3340,17 @@ namespace TerRoguelike.TerPlayer
 
                 if (npc == null || !npc.active || npc.friendly)
                     continue;
+                var modNPC = npc.ModNPC();
+                if (modNPC == null)
+                    continue;
 
                 if (closestNPCDistance == -1f)
                 {
-                    closestNPCDistance = Vector2.Distance(Player.Center, npc.ModNPC().ClosestPosition(npc.Center, Player.Center, npc));
+                    closestNPCDistance = Vector2.Distance(Player.Center, modNPC.ClosestPosition(npc.Center, Player.Center, npc));
                 }
                 else if (Vector2.Distance(Player.Center, npc.Center) < closestNPCDistance)
                 {
-                    closestNPCDistance = Vector2.Distance(Player.Center, npc.ModNPC().ClosestPosition(npc.Center, Player.Center, npc));
+                    closestNPCDistance = Vector2.Distance(Player.Center, modNPC.ClosestPosition(npc.Center, Player.Center, npc));
                 }
             }
             if (closestNPCDistance == -1)

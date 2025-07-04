@@ -43,6 +43,7 @@ namespace TerRoguelike.Projectiles
             get { return (SwordColor)Projectile.ai[0]; }
             set { Projectile.ai[0] = (int)value; }
         }
+        public ref float speed => ref Projectile.ai[2];
 
         public ref float rainbowProg => ref Projectile.ai[1];
         public override void SetStaticDefaults()
@@ -79,20 +80,28 @@ namespace TerRoguelike.Projectiles
             stuckPosition = player.position - Projectile.position;
             Projectile.rotation = Projectile.velocity.ToRotation();
             Projectile.velocity = Vector2.Zero;
+            Projectile.direction = (int)Projectile.ai[2];
+            Projectile.ai[2] = 0;
             anchorRot = modPlayer.playerToCursor.ToRotation();
+            speed = player.GetAttackSpeed(DamageClass.Generic);
         }
         public override void AI()
         {
             player ??= Main.player[Projectile.owner];
             modPlayer ??= player.ModPlayer();
+
             float effectiveAnim = Math.Abs(modPlayer.swingAnimCompletion);
+            if (Projectile.owner == Main.myPlayer)
+                speed = player.GetAttackSpeed(DamageClass.Generic);
+            else
+                effectiveAnim = myanim + (1 / (20f / speed));
             if (myanim > effectiveAnim || myanim == effectiveAnim || effectiveAnim >= 1)
             {
                 if (myanim < 0.25f)
                 {
                     myanim = 0.5f;
                 }
-                else if (myanim < 1 && Owner.GetAttackSpeed(DamageClass.Generic) >= 4)
+                else if (myanim < 1 && speed >= 4)
                 {
                     myanim = 1;
                 }
@@ -254,12 +263,14 @@ namespace TerRoguelike.Projectiles
             writer.Write(modProj.swingDirection);
             writer.WriteVector2(stuckPosition);
             writer.Write(anchorRot);
+            writer.Write(Projectile.direction);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             modProj.swingDirection = reader.ReadInt32();
             stuckPosition = reader.ReadVector2();
             anchorRot = reader.ReadSingle();
+            Projectile.direction = reader.ReadInt32();
         }
     }
 }

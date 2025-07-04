@@ -181,12 +181,11 @@ namespace TerRoguelike.Projectiles
                 if (Projectile.owner == Main.myPlayer)
                 {
                     Vector2 direction = (mainAngle).ToRotationVector2();
-                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), direction, ModContent.ProjectileType<AdaptiveSaberSlash>(), damage, 1f, Owner.whoAmI, (int)swordLevel, rainbowProg);
+                    int spawnedProjectile = Projectile.NewProjectile(Projectile.GetSource_FromThis(), Owner.MountedCenter + (direction * 16f), direction, ModContent.ProjectileType<AdaptiveSaberSlash>(), damage, 1f, Owner.whoAmI, (int)swordLevel, rainbowProg, Owner.direction);
                     Projectile spawnedProj = Main.projectile[spawnedProjectile];
                     spawnedProj.scale = modPlayer.scaleMultiplier;
                     spawnedProj.ModProj().swingDirection = swingDirection;
                     spawnedProj.ModProj().notedBoostedDamage = 1;
-                    spawnedProj.direction = Owner.direction;
                 }
             }
             Charge -= 20f;
