@@ -306,23 +306,27 @@ namespace TerRoguelike.Projectiles
                 writer.Write(oldRot[0]);
                 writer.WriteVector2(startVel);
             }
+            else
+            {
+                writer.WriteVector2(Projectile.Center);
+                writer.Write(Projectile.rotation);
+                writer.WriteVector2(startVel);
+            }
                 
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
             capPos = reader.ReadInt32();
-            if (capPos > 0)
+            Vector2 pos = reader.ReadVector2();
+            float rot = reader.ReadSingle();
+            Vector2 vel = reader.ReadVector2();
+            if (firstReceive)
             {
-                Vector2 pos = reader.ReadVector2();
-                float rot = reader.ReadSingle();
-                Vector2 vel = reader.ReadVector2();
-                if (firstReceive)
-                {
-                    firstReceive = false;
-                    Projectile.Center = pos;
-                    Projectile.rotation = rot;
-                    Projectile.velocity = vel;
-                }
+                firstReceive = false;
+                Projectile.Center = pos;
+                Projectile.rotation = rot;
+                Projectile.velocity = vel;
+                Projectile.timeLeft = setTimeLeft;
             }
         }
     }
