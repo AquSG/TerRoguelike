@@ -4,7 +4,7 @@ DeathItems: Предметы:
 DeathMainMenu: Главное меню
 DeathQuickRestart: Быстрый перезапуск
 DeathLoop: Циклов:
-BlockedAlert: блокировано!
+BlockedAlert: заблокирован!
 HealthUpAlert: Плюс здоровье!
 BarrierName: Барьер
 CreditsVictory: Победа!
@@ -25,7 +25,7 @@ MenuPlayTerRoguelike: Играть в TerRoguelike
 MenuDifficulty: Сложность:
 NewMoonName: Новолунье
 NewMoonDescription1: Значительно облегчает игру
-NewMoonDescription2: Больше кадров неуязвимости, меньше получаемого урон, увеличена естественная регенерация здоровья
+NewMoonDescription2: Больше кадров неуязвимости, меньше получаемого урон, ускорена естественная регенерация здоровья
 FullMoonName: Полнолунье
 FullMoonDescription: Стандартный опыт прохождения TerRoguelike
 BloodMoonName: Кровавая луна
@@ -33,7 +33,7 @@ BloodMoonDescription1: Значительно усложняет игру
 BloodMoonDescription2: Меньше кадров неуязвимости, боссы атакуют чаще
 SunnyDayName: Солнечный денёк
 SunnyDayDescription1: Когда он правда нужен
-SunnyDayDescription2: Увеличенные эффекты «Новолунья», здоровье боссов уменьшено, скорость передвижения увеличена в правильное время
+SunnyDayDescription2: Улучшенные эффекты «Новолунья», уменьшенное здоровье боссов, увеличенная скорость передвижения в подходящее время
 RuinedMoonName: Павшая луна
 RuinedMoonDescription1: Мы похороним ваше веселье
 RuinedMoonDescription2: Серьёзно, не играйте с этим режимом
@@ -154,19 +154,19 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: Адаптивная винтовка в руке
 	FalseSunBeam.DisplayName: Луч ложного солнца
 	ResidualBurden.DisplayName: Остаточное бремя
-	// AdaptiveSpaceGunHoldout.DisplayName: Adaptive Space Gun Holdout
-	// AdaptiveSpaceGunLaser.DisplayName: Adaptive Space Gun Laser
-	// AdaptiveSaberHoldout.DisplayName: Adaptive Saber Holdout
-	// AdaptiveSaberSlash.DisplayName: Adaptive Saber Slash
-	// AdaptiveSaberThrow.DisplayName: Adaptive Saber Throw
-	// DashingFeather.DisplayName: Dashing Feather
-	// Junk.DisplayName: Junk
-	// LightClone.DisplayName: Light Clone
-	// SpeedingFeather.DisplayName: Speeding Feather
-	// SplitFeather.DisplayName: Split Feather
-	// SplittingFeather.DisplayName: Splitting Feather
-	// Talon.DisplayName: Talon
-	// YellowWing.DisplayName: Yellow Wing
+	AdaptiveSpaceGunHoldout.DisplayName: Адаптивная космопушка в руке
+	AdaptiveSpaceGunLaser.DisplayName: Лазер адаптивной космопушки
+	AdaptiveSaberHoldout.DisplayName: Адаптивный светомеч в руке
+	AdaptiveSaberSlash.DisplayName: Разрез адаптивного светомеча
+	AdaptiveSaberThrow.DisplayName: Кинутый адаптивный светомеч
+	DashingFeather.DisplayName: Быстрое перо
+	Junk.DisplayName: Мусор
+	LightClone.DisplayName: Световой клон
+	SpeedingFeather.DisplayName: Ускоряющееся перо
+	SplitFeather.DisplayName: Разделённое перо
+	SplittingFeather.DisplayName: Разделяющееся перо
+	Talon.DisplayName: Коготь
+	YellowWing.DisplayName: Жёлтое крыло
 }
 
 Items: {
@@ -190,7 +190,7 @@ Items: {
 	}
 
 	AdaptiveGun: {
-		DisplayName: Адаптивный пистолет
+		DisplayName: Пистолет оружейника
 		Tooltip:
 			'''
 			Ваш верный пистолет в этом приключении
@@ -227,7 +227,7 @@ Items: {
 			'''
 			+1 основная атака при использовании оружия
 			Скорость атаки уменьшена на множитель для некой компенсации
-			Доп. копии этого предмета также дают +1 основную атаку при использовании оружия и ещё больше уменьшают скорость атаки
+			Доп. копии этого предмета дают ещё +1 основную атаку и ещё больше уменьшают скорость атаки
 			'''
 	}
 
@@ -253,8 +253,8 @@ Items: {
 		DisplayName: Живой кристалл
 		Tooltip:
 			'''
-			+1 ед. здоровья в секунду
-			Доп. копии этого предмета дают ещё +1 ед. здоровья в секунду
+			+1 ОЗ/сек к регенерации здоровья
+			Доп. копии этого предмета дают ещё +1 ОЗ/сек
 			'''
 	}
 
@@ -282,9 +282,9 @@ Items: {
 		Tooltip:
 			'''
 			Увеличивает шанс критического удара на 5%
-			+3 ед. здоровья за каждый критический удар по врагу
+			+3 ОЗ за каждый критический удар по врагу
 			Лечение зависит от дополнительного урона и множителя урона основного оружия
-			Доп. копии этого предмета увеличивают лечение на 2 ед. здоровья
+			Доп. копии этого предмета увеличивают лечение на 2 ОЗ
 			'''
 	}
 
@@ -326,7 +326,7 @@ Items: {
 	}
 
 	AdaptiveBlade: {
-		DisplayName: Адаптивный клинок
+		DisplayName: Клинок кузнеца
 		Tooltip:
 			'''
 			Ваш верный клинок в этом приключении
@@ -391,9 +391,9 @@ Items: {
 		DisplayName: Кровяной сифон
 		Tooltip:
 			'''
-			Шанс 25%, что попадание по врагу вылечит вас на 1 ед. здоровья
+			Шанс 25%, что попадание по врагу вылечит вас на 1 ОЗ
 			Лечение зависит от дополнительного урона и множителя урона основного оружия
-			Доп. копии этого предмета увеличивают лечение на 1 ед. здоровья
+			Доп. копии этого предмета увеличивают лечение на 1 ОЗ
 			'''
 	}
 
@@ -401,8 +401,8 @@ Items: {
 		DisplayName: Рог изобилия
 		Tooltip:
 			'''
-			+50% эффективости лечения
-			Доп. копии этого предмета также дают +50% эффективости лечения
+			+50% эффективности лечения
+			Доп. копии этого предмета также дают +50% эффективности лечения
 			'''
 	}
 
@@ -429,8 +429,8 @@ Items: {
 		Tooltip:
 			'''
 			Пока вы двигаетесь, на земле растут лечащие грибы
-			+1 ед. здоровья при касании с грибами
-			Доп. копии этого предмета увеличивают лечение на 1 ед. здоровья
+			+1 ОЗ при касании с грибами
+			Доп. копии этого предмета увеличивают лечение на 1 ОЗ
 			'''
 	}
 
@@ -446,7 +446,7 @@ Items: {
 	}
 
 	AutomaticDefibrillator: {
-		DisplayName: Автоматический дефибрилятор
+		DisplayName: Автоматический дефибриллятор
 		Tooltip:
 			'''
 			Каждые 20 секунд в активной комнате, призывает пульс, который лечит вам 30% от вашего макс. здоровья
@@ -458,8 +458,8 @@ Items: {
 		DisplayName: Разумная шпаклёвка
 		Tooltip:
 			'''
-			+5 ед. здоровья через 2 секунды после получения урона, если вы не получали урон в этот отрезок времени
-			Доп. копии этого предмета увеличивают лечение на 5 ед. здоровья
+			+5 ОЗ через 2 секунды после получения урона, если вы не получали урон в этот отрезок времени
+			Доп. копии этого предмета увеличивают лечение на 5 ОЗ
 			'''
 	}
 
@@ -467,8 +467,8 @@ Items: {
 		DisplayName: Пена с памятью
 		Tooltip:
 			'''
-			+3 ед. здоровья в секунду, если вы не получали урон 7 секунд
-			Доп. копии этого предмета увеличивают регенерацию на +2 ед. здоровья в секунду
+			+3 ОЗ/сек, если вы не получали урон 7 секунд
+			Доп. копии этого предмета увеличивают регенерацию на +2 ОЗ/сек
 			'''
 	}
 
@@ -526,7 +526,7 @@ Items: {
 			'''
 			Пока вы атакуете, в ваш «запас» накапливаются кинжалы, макс. 4
 			Прекратите атаковать, чтобы выпустить поток из накопленных кинжалов
-			Кинжалы самонаводятся на врагов, сколзят по стенам, наносят 100 базового урона и накладывают кровотечение
+			Кинжалы самонаводятся на врагов, скользят по стенам, наносят 100 базового урона и накладывают кровотечение
 			Кровотечение наносит 120 базового урона за всю свою длительность, которая может быть увеличена, если снова наложить кровотечение
 			Доп. копии этого предмета ускоряют накопление кинжалов и увеличивают максимальное кол-во кинжалов на 1
 			'''
@@ -604,8 +604,8 @@ Items: {
 		DisplayName: Стимпак
 		Tooltip:
 			'''
-			+8 ед. здоровья в секунду на 10 секунд при входе в комнату
-			Доп. копии этого предмета дают ещё +8 ед. здоровья в секунду
+			+8 ОЗ/сек на 10 секунд при входе в комнату
+			Доп. копии этого предмета дают ещё +8 ОЗ/сек
 			'''
 	}
 
@@ -625,7 +625,7 @@ Items: {
 		Tooltip:
 			'''
 			+2 максимального здоровья на 2 минуты за убийство врага
-			Количество получаемого здоровья неограничено
+			Количество получаемого здоровья неограниченно
 			Доп. копии этого предмета увеличивают количество максимального здоровья за убийство на 2
 			'''
 	}
@@ -685,8 +685,8 @@ Items: {
 			'''
 			Даёт дрона-помощника, который сражается за вас
 			Автоматически стреляет пулями с 100 базового урона в ближайших врагов
-			Периодически лечит вам 8 ед. здоровья в секунду, если поблизости нет врагов
-			Доп. копии этого предмета увеличивают скорость атаки дрона и лечение на 8 ед. здоровья в секунду
+			Периодически лечит вам 8 ОЗ/сек, если поблизости нет врагов
+			Доп. копии этого предмета увеличивают скорость атаки дрона и лечение на 8 ОЗ/сек
 			'''
 	}
 
@@ -741,11 +741,11 @@ Items: {
 	}
 
 	ForgottenBioWeapon: {
-		DisplayName: Забытое био-оружие
+		DisplayName: Забытое биооружие
 		Tooltip:
 			'''
 			Дебаффы на врагах длятся на 100% дольше
-			Доп. копии этого предмета заставляют дебаффы длиться ещё на 100% дольше
+			Доп. копии этого предмета увеличивают длительность дебаффов ещё на 100% дольше
 			'''
 	}
 
@@ -763,7 +763,7 @@ Items: {
 		DisplayName: Набор для сборки дробовика
 		Tooltip:
 			'''
-			4x основных атаки при использовании оружий
+			Увеличивает кол-во основных атак в 4 раза
 			Скорость атаки уменьшена на множитель для некой компенсации
 			Пули получают небольшой разброс
 			Доп. копии этого предмета увеличивают множитель основной атаки на 4 и ещё больше уменьшают скорость атаки
@@ -774,7 +774,7 @@ Items: {
 		DisplayName: Набор снайпера
 		Tooltip:
 			'''
-			6x урон
+			Увеличивает урон в 6 раз
 			Скорость атаки уменьшена на огромный множитель
 			Доп. копии этого предмета увеличивают множитель урона на 6 и ещё больше уменьшают скорость атаки
 			'''
@@ -784,9 +784,9 @@ Items: {
 		DisplayName: Пересобранный миниган
 		Tooltip:
 			'''
-			3.5x скорости атаки
-			0.4x урона
-			Пули получают разброс
+			Увеличивает скорость атаки в 3,5 раза
+			Уменьшает урон в 0,4 раза
+			Снаряды получают разброс
 			Доп. копии этого предмета увеличивают множитель скорости атаки на 2
 			'''
 	}
@@ -877,7 +877,7 @@ Items: {
 		Tooltip:
 			'''
 			При попадании по врагу, из него вылетает маленькая лечащая сфера
-			+1 ед. здоровья при касании сферы
+			+1 ОЗ при касании сферы
 			Сферы пропадают через 4 секунды
 			Доп. копии этого предмета увеличивают лечение на 1
 			'''
@@ -905,10 +905,10 @@ Items: {
 	}
 
 	WayfarersWaistcloth: {
-		DisplayName: Напоясник путника
+		DisplayName: Накидка путника
 		Tooltip:
 			'''
-			Увеличивает скорость передвижения на 20%, если вы бежите в одном направлении 1.5 секунды и более
+			Увеличивает скорость передвижения на 20%, если вы бежите в одном направлении 1,5 секунды и более
 			Доп. копии этого предмета увеличивают бонус к скорости передвижения на 20%
 			'''
 	}
@@ -917,8 +917,8 @@ Items: {
 		DisplayName: Чистосердечные соты
 		Tooltip:
 			'''
-			+1 ед. здоровья в секунду за каждые 5% отсутствующего здоровья
-			Доп. копии этого предмета дают ещё +0.5 ед. здоровья в секунду за каждые 5% отсутствующего здоровья
+			+1 ОЗ/сек за каждые 5% отсутствующего здоровья
+			Доп. копии этого предмета дают ещё +0,5 ОЗ/сек за каждые 5% отсутствующего здоровья
 			'''
 	}
 
@@ -927,16 +927,16 @@ Items: {
 		Tooltip:
 			'''
 			Даёт накладывающийся бонус к скорости передвижения и уменьшающемуся сопротивлению урона
-			за каждые 10 сразу восстановленных ед. здоровья или барьера
+			за каждые 10 сразу восстановленных ОЗ или барьера
 			Каждый бонус длится 9 секунд и даёт 8% к скорости передвижения и 10 уменьшающегося сопротивления урону
-			Однако, одновременно можно иметь тольно 5 бонусов
+			Однако, одновременно можно иметь только 5 бонусов
 			Когда бонусы достигнут максимума, враги будут получать 15% доп. урона за каждый бонус
 			Доп. копии этого предмета увеличивают ограничение бонусов на 3
 			'''
 	}
 
 	AdaptiveSpear: {
-		DisplayName: Адаптивное копьё
+		DisplayName: Пронзающее копьё
 		Tooltip:
 			'''
 			Ваше верное копьё в этом приключении
@@ -944,14 +944,14 @@ Items: {
 			Бьёт с большой точностью на расстоянии
 			Удерживайте атаку, чтобы зарядить клинок для большего урона
 			Удары с полным зарядом наносят максимальный урон
-			Множитель урона до полного заряда: 1x - 4x
+			Множитель урона до полного заряда: 1x-4x
 			Множитель урона при полном заряде: 5x
 			Получает способность автоатаки при 3x скорости атаки или больше
 			'''
 	}
 
 	AdaptiveCannon: {
-		DisplayName: Адаптивная пушка
+		DisplayName: Роковая пушка
 		Tooltip:
 			'''
 			Ваша верная пушка в этом приключении
@@ -961,7 +961,7 @@ Items: {
 	}
 
 	AdaptiveDagger: {
-		DisplayName: Адаптивный кинжал
+		DisplayName: Кинжал охотника
 		Tooltip:
 			'''
 			Ваш верный кинжал в этом приключении
@@ -972,7 +972,7 @@ Items: {
 	}
 
 	AdaptiveRifle: {
-		DisplayName: Адаптивная винтовка
+		DisplayName: Охотничья винтовка
 		Tooltip:
 			'''
 			Ваша верная винтовка в этом приключении
@@ -1018,34 +1018,34 @@ Items: {
 	}
 
 	AdaptiveSpaceGun: {
-		// DisplayName: Space Blaster
-		/* Tooltip:
+		DisplayName: Космический бластер
+		Tooltip:
 			'''
-			Your trusty space gun for this journey
-			Can be messed with in countless ways by the items you may find
-			Shoot hitscan lasers at a swift rate
-			''' */
+			Ваш верный бластер в этом приключении
+			Может быть изменён различными предметами, что вы можете найти
+			Стреляет лучами света со средней скоростью
+			'''
 	}
 
 	AdaptiveSaber: {
-		// DisplayName: Energy Saber
-		/* Tooltip:
+		DisplayName: Энергетический меч
+		Tooltip:
 			'''
-			Your trusty saber for this journey
-			Can be messed with in countless ways by the items you may find
-			Swing the saber at a fast rate
-			Release attack to throw the saber
-			Low power, but hitting enemies increases damage and attack speed
-			Throwing the saber consumes built up power for up to 9x damage
-			Always has auto-swing capabilities
-			''' */
+			Ваш верный световой меч в этом приключении
+			Может быть изменён различными предметами, что вы можете найти
+			Быстрые взмахи мечом
+			Перестаньте атаковать, чтобы бросить меч
+			Слабое оружие, улучшающее свои урон и скорость атаки от ударов по врагам
+			Бросок меча тратит всю накопленную силу, превращая её в бонус к урону броска
+			Имеет способность автоатаки
+			'''
 	}
 }
 
 NPCs: {
 	Splinter.DisplayName: Заноза
 	Spookrow.DisplayName: Пугало
-	UndeadGuard.DisplayName: Мёртвый охранник
+	UndeadGuard.DisplayName: охранник
 	SandWorm.DisplayName: Песчаный червь
 	NebulaPillar.DisplayName: Башня туманности
 	SolarPillar.DisplayName: Башня солнца
@@ -1063,7 +1063,7 @@ NPCs: {
 	Lamia.DisplayName: Ламия
 	AntlionSwarmer.DisplayName: Гигантский муравьиный лев
 	Hornet.DisplayName: Шершень
-	SpectreMaster.DisplayName: Спектральный мастер
+	SpectreMaster.DisplayName: Призрачный мастер
 	Diabolist.DisplayName: Сатанист
 	UndeadSharpshooter.DisplayName: Мёртвый снайпер
 	DungeonSpirit.DisplayName: Дух темницы
@@ -1071,7 +1071,7 @@ NPCs: {
 	UndeadBrute.DisplayName: Мёртвый дикарь
 	CrimsonDreg.DisplayName: Багряное отребье
 	Ballista.DisplayName: Баллиста
-	WrathfulRoot.DisplayName: Яростный корень
+	WrathfulRoot.DisplayName: Злобный корень
 	IchorSticker.DisplayName: Ихорный плеватель
 	BloodCrawler.DisplayName: Кровавый ползун
 	BlackRecluse.DisplayName: Чёрный отшельник
@@ -1092,8 +1092,8 @@ NPCs: {
 	Crimator.DisplayName: Расчленитель
 	Clinger.DisplayName: Хвататель
 	BloodthirstyAxe.DisplayName: Кровожадный топор
-	IceSpirit.DisplayName: Дух льда
-	LavaBat.DisplayName: Лавовая Летучая мышь
+	IceSpirit.DisplayName: Ледяной дух
+	LavaBat.DisplayName: Лавовая летучая мышь
 	BoneSerpent.DisplayName: Костяной змей
 	FireImp.DisplayName: Огненный бес
 	Demon.DisplayName: Демон
@@ -1140,9 +1140,9 @@ NPCs: {
 	TrueServant.DisplayName: Истинный прислужник Ктулху
 	TrueBrain.DisplayName: Истинный мозг Ктулху
 	Being.DisplayName: Существо
-	// Mallet.DisplayName: Judgement Martlet
-	// Meteor.DisplayName: Meteor
-	// SplittingStar.DisplayName: Splitting Star
+	Mallet.DisplayName: Судная Мартлет
+	Meteor.DisplayName: Метеор
+	SplittingStar.DisplayName: Расщепляющаяся звезда
 }
 
 ItemBasin.DisplayName: Раковина для предметов
@@ -1185,7 +1185,7 @@ Configs: {
 			Tooltip:
 				'''
 				Если конфигурация включена, все файлы персонажей и миров, используемые во время игры в режим TerRoguelike, будут полностью удаляться автоматически.
-				Если конфигурация выключена, все файлы персонажей и миров, используемые во время игры в режим TerRoguelike, будут перемещены в корзину.
+				Если конфигурация выключена, все файлы персонажей и миров, используемые во время игры в режим TerRoguelike, будут перемещаться в корзину.
 				'''
 		}
 
@@ -1193,8 +1193,8 @@ Configs: {
 			Label: Загружать весь мир при заходе
 			Tooltip:
 				'''
-				Если конфигурация включена, при заходе в мир TerRoguelike, игра остановится и попытается прогрузить бОльшую часть блоков в мире.
-				С этой конфигурацией почти, если не все лаги, что появляются из-за загрузки блоков, будут происходить при заходе в мир, а непосредственно во время игры.
+				Если конфигурация включена, при заходе в мир TerRoguelike, игра остановится и попытается прогрузить большинство блоков в мире.
+				С этой конфигурацией почти, если не все лаги, что появляются из-за загрузки блоков, будут происходить при заходе в мир, а не непосредственно во время игры.
 				'''
 		}
 	}
@@ -1268,237 +1268,247 @@ DialogueKillAll:
 	До встречи,
 	@.
 	'''
-/* JstcIntro:
+JstcIntro:
 	'''
 	...
 
-	So you found me...
+	Итак, ты нашёл
+	меня...
 
-	Must not have been
-	easy, given what you
-	had to do.
+	Довольно сложно,
+	когда на пути так
+	много врагов.
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
-
-	...
-
-	You know...
-
-	This whole time...
-
-	This whole time,
-	I have been watching
-	every one of your
-	actions.
-
-	Watching you fight
-	through the lunar
-	dungeon, attempting
-	to save the surface
-	from the Moon Lord.
-
-	Or so I thought...
-
-	The truth stared right
-	at me, but I chose
-	to look away.
-
-	I tried to see the
-	good - I wanted to
-	believe that your
-	actions were for the
-	greater good.
-
-	But you...
-
-	Any ounce of "good"
-	you ever had is
-	six feet under.
+	Хоть капля удивления?
+	Или всё происходит
+	так, как ожидалось?
 
 	...
 
-	Your sole objective
-	was to escape.
+	Знаешь...
 
-	And yet you went
-	out of your way to
-	kill them all, risking
-	your own life in the
-	pursuit of murder.
+	Всё это время...
 
-	I don't care what
-	your motivations were.
+	Всё это время
+	я наблюдала за
+	каждым твоим
+	действием.
 
-	Nothing can justify
-	the needless suffering
-	you have caused.
+	Смотрела, как ты
+	пробираешься через
+	лунное подземелье,
+	чтобы одолеть
+	Лунного лорда.
+
+	Точнее, я так
+	думала...
+
+	Истина была у меня
+	прямо перед клювом,
+	но я решила не
+	замечать её.
+
+	Я старалась увидеть
+	хорошее - хотела
+	поверить, что твои
+	действия были
+	благими.
+
+	Но ты...
+
+	Любая капля "благого"
+	в тебе погребена
+	глубоко под землёй.
+
+	...
+
+	Твоей единственной
+	задачей было
+	выбраться.
+
+	Но тебе захотелось
+	убить их всех вновь,
+	рискуя собственной
+	жизнью ради
+	чужой смерти.
+
+	Мне плевать на
+	твою мотивацию.
+
+	Ничто не оправдывает
+	бессмысленные
+	страдания,
+	оставленные тобой.
 
 
-	I understand now,
-	why you entered the
-	lunar dungeon.
+	Теперь я понимаю,
+	почему ты здесь,
+	в лунном подземелье.
 
-	It wasn't to save
-	the surface.
+	Не для того, чтобы
+	спасти поверхность.
 
-	It was a pursuit
-	of overwhelming power,
-	to wipe living beings
-	from existence for
-	your own pleasure.
+	Ты здесь лишь за
+	неодержимой силой,
+	что способна убить
+	любое живое существо
+	ради твоей прихоти.
 
-	By now, you are a
-	much greater
-	threat to the surface
-	than the Moon Lord
-	ever was.
+	И я вижу, что теперь
+	ты гораздо большая
+	угроза для поверхности,
+	чем Лунный лорд
+	когда-либо был.
 
-	It's only a matter of
-	time before you
-	test your power on
-	the people around us.
+	Остались секунды
+	до того, как ты
+	опробуешь свою силу
+	на нас.
 
-	And that's why
-	I'm here.
+	Потому я и тут.
 
-	To stop you,
-	@.
+	Чтобы остановить
+	тебя, @.
 
 
-	What I have here will
-	not last forever...
+	Этого не хватит
+	надолго...
 
-	But I believe it will
-	be just enough
-	to stop you.
+	Но этого будет
+	достаточно, чтобы
+	остановить тебя.
 
 
 	@...
 
-	Your terror...
+	Твоему террору...
 
 
-	Ends NOW!!!
-	''' */
-/* JstcMiddle:
+	Настал КОНЕЦ!!!
 	'''
-	Why...
+JstcMiddle:
+	'''
+	Почему...
 
-	Why do you hit so
-	hard?
+	Почему твои удары
+	так сильны?
 
 	...
 
-	I-is this power I
-	have... not enough?
+	Неужели моей силы...
+	и вправду
+	недостаточно?
 
 
-	No.
+	Нет.
 
-	I bet you feel r-real
-	accomplished right
-	now.
+	Ставлю на то, ч-что
+	ты по-настоящему
+	гордишься собой.
 
-	But the only thing
-	you managed to
-	accomplish...
+	Но всё, чего
+	тебе удалось
+	добиться...
 
-	...is pissing me off
-	even more.
+	...это разозлить меня
+	ещё сильнее.
 
 
-	There's only one
-	way this ends.
+	Есть только один
+	способ покончить
+	с этим.
 
-	And I didn't go past
-	the point of no
-	return for nothing.
+	Я не просто так
+	прошла точку
+	невозврата.
 
-	I will use everything
-	within my power to 
-	put an end to you...
+	Я использую всю
+	свою силу, чтобы
+	остановить тебя...
 
-	...for every last
-	second I have in
-	this life!
-	''' */
-/* JstcEnd:
+	...и не остановлюсь
+	даже перед лицом
+	самой смерти!
 	'''
-	Is this... t-the
-	end for me?
+JstcEnd:
+	'''
+	И... вот так...
+	я и умру?
 
-	No...
+	Нет...
 
-	I have to get back
-	up. I-I have to 
-	keep fighting!
-
-
-	... for every... 
-	last... second.
+	Я должна встать.
+	Д-должна сражаться
+	дальше!
 
 
-	W-What's going on?
-
-	The s-serum,
-	it...
+	... даже перед... 
+	лицом... смерти.
 
 
-	Why is it wearing
-	off!?
+	Что происходит?
 
-	Is it... time?
-
-	No... NO!
-
-	I DON'T WANT
-	TO DIE!
-
-	I NEED MORE TIME!
+	Сыворотка,
+	она...
 
 
-	...I need more
-	time...
+	Почему она уже
+	перестаёт
+	работать!?
+
+	Неужели... это
+	всё?
+
+	Нет... НЕТ!
+
+	Я НЕ ХОЧУ
+	УМИРАТЬ!
+
+	МНЕ НУЖНО
+	БОЛЬШЕ ВРЕМЕНИ!
+
+
+	...больше
+	времени...
 
 	...
 
 
-	You.
+	Ты.
 
-	You're just going to
-	move along and find
-	someone else to test
-	your power on,
-	right?
+	Ты просто пойдёшь
+	дальше и найдёшь
+	кого-то другого,
+	чтобы испытать
+	себя, не так ли?
 
-	What was I to you,
-	just another medal
-	to add to your belt?
+	А что я для тебя,
+	лишь очередное
+	достижение?
 
-	You sicken me.
-
-
-	I hope you
+	Меня тошнит от
+	тебя.
 
 
-	n-NO!
-
-	PLEASE!!
+	Я надеюсь, ты
 
 
-	WHAT DO I DO!?
+	н-НЕТ!
 
-	JUST A BIT MORE
-	TIME!!
-
-
-	STOP!!!
+	ПРОШУ!!
 
 
-	SOMEONE!
+	ЧТО МНЕ ДЕЛАТЬ!?
+
+	ЛИШЬ НЕМНОГО
+	ВРЕМЕНИ!!
 
 
-	H E L P  M E . . .
-	''' */
+	ХВАТИТ!!!
+
+
+	КТО-НИБУДЬ!
+
+
+	П О М О Г И Т Е . . .
+	'''
