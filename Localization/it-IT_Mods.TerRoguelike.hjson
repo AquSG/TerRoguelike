@@ -159,14 +159,14 @@ Projectiles: {
 	AdaptiveSaberHoldout.DisplayName: Impugnare Spada Laser Adattiva
 	AdaptiveSaberSlash.DisplayName: Taglio Spada Laser Adattiva
 	AdaptiveSaberThrow.DisplayName: Lancio Spada Laser Adattiva
-	// DashingFeather.DisplayName: Dashing Feather
-	// Junk.DisplayName: Junk
-	// LightClone.DisplayName: Light Clone
-	// SpeedingFeather.DisplayName: Speeding Feather
-	// SplitFeather.DisplayName: Split Feather
-	// SplittingFeather.DisplayName: Splitting Feather
-	// Talon.DisplayName: Talon
-	// YellowWing.DisplayName: Yellow Wing
+	DashingFeather.DisplayName: Piuma dello Scatto
+	Junk.DisplayName: Spazzatura
+	LightClone.DisplayName: Clone di Luce
+	SpeedingFeather.DisplayName: Piuma della Velocità
+	SplitFeather.DisplayName: Piuma Divisa
+	SplittingFeather.DisplayName: Piuma della Scissione
+	Talon.DisplayName: Artiglio
+	YellowWing.DisplayName: Ala Gialla
 }
 
 Items: {
@@ -1138,9 +1138,9 @@ NPCs: {
 	TrueServant.DisplayName: Vero Servo di Cthulhu
 	TrueBrain.DisplayName: Vero Cervello di Cthulhu
 	Being.DisplayName: Essere
-	// Mallet.DisplayName: Judgement Martlet
-	// Meteor.DisplayName: Meteor
-	// SplittingStar.DisplayName: Splitting Star
+	Mallet.DisplayName: Merla del Giudizio
+	Meteor.DisplayName: Meteora
+	SplittingStar.DisplayName: Stella Scissa
 }
 
 ItemBasin.DisplayName: Fontana degli Oggetti
@@ -1266,237 +1266,231 @@ DialogueKillAll:
 	Ci rincontreremo,
 	@.
 	'''
-/* JstcIntro:
+JstcIntro:
 	'''
 	...
 
-	So you found me...
+	Quindi mi hai trovato...
 
-	Must not have been
-	easy, given what you
-	had to do.
+	Non dev'essere stato facile,
+	visto quello che
+	hai dovuto fare.
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
-
-	...
-
-	You know...
-
-	This whole time...
-
-	This whole time,
-	I have been watching
-	every one of your
-	actions.
-
-	Watching you fight
-	through the lunar
-	dungeon, attempting
-	to save the surface
-	from the Moon Lord.
-
-	Or so I thought...
-
-	The truth stared right
-	at me, but I chose
-	to look away.
-
-	I tried to see the
-	good - I wanted to
-	believe that your
-	actions were for the
-	greater good.
-
-	But you...
-
-	Any ounce of "good"
-	you ever had is
-	six feet under.
+	Sei sorpreso?
+	O è esattamente quello
+	che ti aspettavi?
 
 	...
 
-	Your sole objective
-	was to escape.
+	Sai...
 
-	And yet you went
-	out of your way to
-	kill them all, risking
-	your own life in the
-	pursuit of murder.
+	Per tutto questo tempo...
 
-	I don't care what
-	your motivations were.
+	Per tutto questo tempo,
+	ho guardato
+	tutte le tue azioni.
 
-	Nothing can justify
-	the needless suffering
-	you have caused.
+	Guardarti combattere
+	nel dungeon lunare,
+	nel tuo tentativo di 
+	salvare la superficie 
+	dal Signore della Luna.
+
+	O così credevo...
+
+	La verità mi guardava
+	dritta negli occhi,
+	ma avevo deciso di voltarmi.
+
+	Ho provato a vedere il bene
+	 - Volevo credere che
+	le tue azioni erano 
+	per il bene comune.
+
+	Ma tu...
+
+	Ogni briciola di "bene"
+	che tu abbia mai avuto
+	è morta e sepolta.
+
+	...
+
+	Il tuo unico obbiettivo
+	era fuggire.
+
+	Ma ciò nonostante
+	ti sei preso la libertà 
+	di ucciderli tutti,
+	rischiando la tua vita
+	per la tua brama di sangue.
+
+	Non mi importa quali erano
+	le tue motivazioni
+
+	Nulla può giustificare
+	la innecessaria sofferenza
+	che hai causato.
 
 
-	I understand now,
-	why you entered the
-	lunar dungeon.
+	Ora capisco
+	perché sei entrato
+	nel dungeon lunare
 
-	It wasn't to save
-	the surface.
+	Non era per 
+	salvare la superficie.
 
-	It was a pursuit
-	of overwhelming power,
-	to wipe living beings
-	from existence for
-	your own pleasure.
+	Era una ricerca di potere immenso,
+	per sterminare gli esseri viventi
+	dalla esistenza per tuo
+	puro piacere.
 
-	By now, you are a
-	much greater
-	threat to the surface
-	than the Moon Lord
-	ever was.
+	A questo punto
+	tu sei un pericolo alla superficie
+	molto maggiore di quanto
+	lo sia mai stato
+	il Signore della Luna.
 
-	It's only a matter of
-	time before you
-	test your power on
-	the people around us.
+	Ė solamente una questione di tempo
+	prima che tu provi
+	il tuo potere 
+	sulle persone attorno a noi.
 
-	And that's why
-	I'm here.
+	E ciò è il motivo
+	per cui sono qui.
 
-	To stop you,
+	Per fermarti,
 	@.
 
 
-	What I have here will
-	not last forever...
+	Cosa ho qui
+	non durerà per sempre...
 
-	But I believe it will
-	be just enough
-	to stop you.
+	Ma credo sia 
+	giusto abbastanza
+	per fermarti.
 
 
 	@...
 
-	Your terror...
+	Il tuo terrore...
 
 
-	Ends NOW!!!
-	''' */
-/* JstcMiddle:
+	Finisce ORA!!!
+
+JstcMiddle:
 	'''
-	Why...
+	Perché...
 
-	Why do you hit so
-	hard?
+	Perché fai così
+	male?
 
 	...
 
-	I-is this power I
-	have... not enough?
+	Q-questo potere che ho 
+	non è ...abbastanza?
 
 
 	No.
 
-	I bet you feel r-real
-	accomplished right
-	now.
+	Scommetto che ti senti 
+	v-veramente realizzato
+	al momento.
 
-	But the only thing
-	you managed to
-	accomplish...
+	Ma l'unica cosa
+	che sei riuscito
+	a fare...
 
-	...is pissing me off
-	even more.
+	...è darmi fastidio
+	ancora di più.
 
 
-	There's only one
-	way this ends.
+	C'è solo un modo 
+	in cui questo finirrà.
 
-	And I didn't go past
-	the point of no
-	return for nothing.
+	E non ho oltrepassato
+	il punto di non ritorno
+	per nulla.
 
-	I will use everything
-	within my power to 
-	put an end to you...
+	Userò tutto ciò
+	che è in mio potere
+	per fermarti...
 
-	...for every last
-	second I have in
-	this life!
-	''' */
-/* JstcEnd:
+	...per ogni secondo
+	che mi è rimasto
+	in questa vita!
+
+JstcEnd:
 	'''
-	Is this... t-the
-	end for me?
+	Questa è... 
+	l-la mia fine?
 
 	No...
 
-	I have to get back
-	up. I-I have to 
-	keep fighting!
+	Devo rialzarmi.
+	D-devo continuare
+	a combattere!
 
 
-	... for every... 
-	last... second.
+	... per ogni... 
+	secondo... rimanente.
 
 
-	W-What's going on?
+	C-cosa sta succedendo?
 
-	The s-serum,
-	it...
+	Il s-siero,
+	sta...
 
 
-	Why is it wearing
-	off!?
+	Sta finendo
+	l'effetto!?
 
-	Is it... time?
+	È finto il ...tempo?
 
 	No... NO!
 
-	I DON'T WANT
-	TO DIE!
+	NON VOGLIO
+	MORIRE!
 
-	I NEED MORE TIME!
+	MI SERVE PIÙ TEMPO!
 
 
-	...I need more
-	time...
+	...Mi serve più
+	tempo...
 
 	...
 
 
-	You.
+	Tu.
 
-	You're just going to
-	move along and find
-	someone else to test
-	your power on,
-	right?
+	Tu semplicemente andrai avanti
+	e cercherai qualcun altro
+	su cui provare il tuo potere,
+	non è vero?
 
-	What was I to you,
-	just another medal
-	to add to your belt?
+	Cos'ero io per te,
+	solamente un'altra medaglia
+	da aggiungere alla tua cintura?
 
-	You sicken me.
+	Mi disgusti.
 
-
-	I hope you
+	Spero che tu
 
 
 	n-NO!
 
-	PLEASE!!
+	PERFAVORE!!
 
 
-	WHAT DO I DO!?
+	COSA FACCIO!?
 
-	JUST A BIT MORE
-	TIME!!
-
-
-	STOP!!!
+	SOLAMENTE UN PO PIÙ
+	DI TEMPO!!
 
 
-	SOMEONE!
+	FERMATI!!!
 
 
-	H E L P  M E . . .
-	''' */
+	QUALCUNO!
+
+
+	A I U T A T E M I . . .
