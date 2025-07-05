@@ -1,4 +1,4 @@
-Version 1.3 out now, introducing Multiplayer!
+Version 1.4 out now, the Anniversary Update!
 
 To play Multiplayer, the host must start a lobby by pressing the "Play TerRoguelike" button and selecting multiplayer, while the other players just have to join through the Terraria Multiplayer menu or Steam.
 
