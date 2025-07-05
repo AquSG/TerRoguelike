@@ -1376,7 +1376,7 @@ JstcIntro:
 
 
 	Finisce ORA!!!
-
+	'''
 JstcMiddle:
 	'''
 	Perché...
@@ -1418,7 +1418,7 @@ JstcMiddle:
 	...per ogni secondo
 	che mi è rimasto
 	in questa vita!
-
+	'''
 JstcEnd:
 	'''
 	Questa è... 
@@ -1494,3 +1494,4 @@ JstcEnd:
 
 
 	A I U T A T E M I . . .
+	'''

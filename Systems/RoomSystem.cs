@@ -792,6 +792,8 @@ namespace TerRoguelike.Systems
         {
             if (RoomList == null)
                 return;
+            if (regeneratingWorld)
+                return;
 
             spriteBatch.End();
             Texture2D lightTexture = TexDict["TemporaryBlock"];
