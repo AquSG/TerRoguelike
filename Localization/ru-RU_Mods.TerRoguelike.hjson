@@ -1045,7 +1045,7 @@ Items: {
 NPCs: {
 	Splinter.DisplayName: Заноза
 	Spookrow.DisplayName: Пугало
-	UndeadGuard.DisplayName: охранник
+	UndeadGuard.DisplayName: Скелет-охранник
 	SandWorm.DisplayName: Песчаный червь
 	NebulaPillar.DisplayName: Башня туманности
 	SolarPillar.DisplayName: Башня солнца
@@ -1055,7 +1055,7 @@ NPCs: {
 	IcyMerman.DisplayName: Ледяной тритон
 	IceTortoise.DisplayName: Ледяная черепаха
 	Frostbiter.DisplayName: Обмороженец
-	UndeadViking.DisplayName: Мёртвый викинг
+	UndeadViking.DisplayName: Скелет-викинг
 	DesertSpirit.DisplayName: Дух пустыни
 	AntlionCharger.DisplayName: Муравьиный лев-воин
 	Antlion.DisplayName: Муравьиный лев
@@ -1065,10 +1065,10 @@ NPCs: {
 	Hornet.DisplayName: Шершень
 	SpectreMaster.DisplayName: Призрачный мастер
 	Diabolist.DisplayName: Сатанист
-	UndeadSharpshooter.DisplayName: Мёртвый снайпер
+	UndeadSharpshooter.DisplayName: Скелет-снайпер
 	DungeonSpirit.DisplayName: Дух темницы
-	UndeadAssasin.DisplayName: Мёртвый ассасин
-	UndeadBrute.DisplayName: Мёртвый дикарь
+	UndeadAssasin.DisplayName: Скелет-ассасин
+	UndeadBrute.DisplayName: Скелет-дикарь
 	CrimsonDreg.DisplayName: Багряное отребье
 	Ballista.DisplayName: Баллиста
 	WrathfulRoot.DisplayName: Злобный корень
@@ -1078,9 +1078,9 @@ NPCs: {
 	GiantSpider.DisplayName: Гигантский паук
 	JungleCreeper.DisplayName: Ползун джунглей
 	CrawlingSludge.DisplayName: Ползучая слякоть
-	UndeadPrisoner.DisplayName: Мёртвый заключённый
+	UndeadPrisoner.DisplayName: Скелет-заключённый
 	StoneDrone.DisplayName: Каменный дрон
-	UndeadEnforcer.DisplayName: Мёртвый силовик
+	UndeadEnforcer.DisplayName: Скелет-силовик
 	Tumbletwig.DisplayName: Перекати-поляну
 	RockGolem.DisplayName: Каменный голем
 	SeedLobber.DisplayName: Метатель семян
@@ -1100,7 +1100,7 @@ NPCs: {
 	EliteDemon.DisplayName: Высший демон
 	GiantMoth.DisplayName: Гигантский мотылёк
 	OvergrownBat.DisplayName: Летучая мышь-переросток
-	UndeadHunter.DisplayName: Мёртвый охотник
+	UndeadHunter.DisplayName: Скелет-охотник
 	FlyingSnake.DisplayName: Летающая змея
 	Lihzahrd.DisplayName: Ящщер
 	DomesticatedHornet.DisplayName: Одомашненный шершень
