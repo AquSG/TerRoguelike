@@ -154,19 +154,19 @@ Projectiles: {
 	AdaptiveRifleHoldout.DisplayName: 来福枪握持
 	FalseSunBeam.DisplayName: 虚伪之阳射线
 	ResidualBurden.DisplayName: 障蔽毒雾
-	// AdaptiveSpaceGunHoldout.DisplayName: Adaptive Space Gun Holdout
-	// AdaptiveSpaceGunLaser.DisplayName: Adaptive Space Gun Laser
-	// AdaptiveSaberHoldout.DisplayName: Adaptive Saber Holdout
-	// AdaptiveSaberSlash.DisplayName: Adaptive Saber Slash
-	// AdaptiveSaberThrow.DisplayName: Adaptive Saber Throw
-	// DashingFeather.DisplayName: Dashing Feather
-	// Junk.DisplayName: Junk
-	// LightClone.DisplayName: Light Clone
-	// SpeedingFeather.DisplayName: Speeding Feather
-	// SplitFeather.DisplayName: Split Feather
-	// SplittingFeather.DisplayName: Splitting Feather
-	// Talon.DisplayName: Talon
-	// YellowWing.DisplayName: Yellow Wing
+	AdaptiveSpaceGunHoldout.DisplayName: 太空冲击强握持
+	AdaptiveSpaceGunLaser.DisplayName: 太空冲击强镭射激光
+	AdaptiveSaberHoldout.DisplayName: 能量光剑我吃
+	AdaptiveSaberSlash.DisplayName: 光剑挥砍
+	AdaptiveSaberThrow.DisplayName: 光剑投掷
+	DashingFeather.DisplayName: 翩羽
+	Junk.DisplayName: 垃圾
+	LightClone.DisplayName: 复制之光
+	SpeedingFeather.DisplayName: 速羽
+	SplitFeather.DisplayName: 列羽
+	SplittingFeather.DisplayName: 裂羽
+	Talon.DisplayName: 爪
+	YellowWing.DisplayName: 黄翼
 }
 
 Items: {
@@ -965,7 +965,7 @@ Items: {
 			此次旅程中最可靠的匕首
 			通过你找到的各种物品，它可以千变万化
 			匕首可快速且范围有限地刺击
-			始终有用自动挥舞能力
+			始终拥有自动挥舞能力
 			'''
 	}
 
@@ -1016,27 +1016,27 @@ Items: {
 	}
 
 	AdaptiveSpaceGun: {
-		// DisplayName: Space Blaster
-		/* Tooltip:
+		DisplayName: 太空冲击枪
+		Tooltip:
 			'''
-			Your trusty space gun for this journey
-			Can be messed with in countless ways by the items you may find
-			Shoot hitscan lasers at a swift rate
-			''' */
+			此次旅程中最可靠的冲击枪
+			通过你找到的各种物品，它可以千变万化
+			以极快速度发射瞬时命中激光
+			'''
 	}
 
 	AdaptiveSaber: {
-		// DisplayName: Energy Saber
-		/* Tooltip:
+		DisplayName: 能量光剑
+		Tooltip:
 			'''
-			Your trusty saber for this journey
-			Can be messed with in countless ways by the items you may find
-			Swing the saber at a fast rate
-			Release attack to throw the saber
-			Low power, but hitting enemies increases damage and attack speed
-			Throwing the saber consumes built up power for up to 9x damage
-			Always has auto-swing capabilities
-			''' */
+			此次旅程中最可靠的佩剑
+			通过你找到的各种物品，它可以千变万化
+			以高速挥舞光剑
+			松开攻击键以扔出光剑
+			基础威力较低，但命中敌人会提升伤害与攻击速度
+			投掷时将消耗积蓄的能量，最高可造成9倍伤害
+			始终拥有自动挥舞能力
+			'''
 	}
 }
 
@@ -1138,9 +1138,9 @@ NPCs: {
 	TrueServant.DisplayName: 真·克苏鲁之仆
 	TrueBrain.DisplayName: 真·克苏鲁之脑
 	Being.DisplayName: 存在
-	// Mallet.DisplayName: Judgement Martlet
-	// Meteor.DisplayName: Meteor
-	// SplittingStar.DisplayName: Splitting Star
+	Mallet.DisplayName: 审判者马尔莱特
+	Meteor.DisplayName: 陨星
+	SplittingStar.DisplayName: 裂星
 }
 
 ItemBasin.DisplayName: 物品火盆
@@ -1266,237 +1266,237 @@ DialogueKillAll:
 	我们再相会吧，
 	@.
 	'''
-/* JstcIntro:
+JstcIntro:
 	'''
 	...
 
-	So you found me...
+	看来你找到我了……
 
-	Must not have been
-	easy, given what you
-	had to do.
+	这一定很不容易，
+	毕竟你付出了
+	那样的代价。
 
-	Are you surprised?
-	Or is this exactly
-	what you expected?
-
-	...
-
-	You know...
-
-	This whole time...
-
-	This whole time,
-	I have been watching
-	every one of your
-	actions.
-
-	Watching you fight
-	through the lunar
-	dungeon, attempting
-	to save the surface
-	from the Moon Lord.
-
-	Or so I thought...
-
-	The truth stared right
-	at me, but I chose
-	to look away.
-
-	I tried to see the
-	good - I wanted to
-	believe that your
-	actions were for the
-	greater good.
-
-	But you...
-
-	Any ounce of "good"
-	you ever had is
-	six feet under.
+	你很意外吗？
+	还是这一切
+	尽在你预料之中？
 
 	...
 
-	Your sole objective
-	was to escape.
+	知道吗……
 
-	And yet you went
-	out of your way to
-	kill them all, risking
-	your own life in the
-	pursuit of murder.
+	自始至终……
 
-	I don't care what
-	your motivations were.
+	自始至终，
+	我都注视着
+	你的每一个
+	举动。
 
-	Nothing can justify
-	the needless suffering
-	you have caused.
+	看着你从月神殿堂
+	中脱颖而出，
+	拼尽全力
+	妄图从月亮领主手中
+	拯救地表世界。
+
+	至少我曾如此以为……
+
+	真相早已摆在眼前
+	而我选择
+	视而不见
+
+	我试图寻找善意--
+	我多么希望
+	你的行动
+	真是为了
+	更崇高的目标。
+
+	但你……
+
+	你曾有过的
+	哪怕一丝良知
+	早已深埋地底。
+
+	...
+
+	你唯一的目的
+	只是逃离。
+
+	可你却偏要
+	赶尽杀绝，
+	甚至不惜
+	赌上性命
+	来追求这场屠杀。
+
+	我不在乎
+	你有何动机。
+
+	任何理由
+	都无法为你造成的苦难
+	所开脱。
 
 
-	I understand now,
-	why you entered the
-	lunar dungeon.
+	现在我理解了
+	你闯入月神殿堂的
+	真正原因。
 
-	It wasn't to save
-	the surface.
+	不是为了拯救
+	地表世界。
 
-	It was a pursuit
-	of overwhelming power,
-	to wipe living beings
-	from existence for
-	your own pleasure.
+	而是为了追逐
+	绝对的力量，
+	只为享受
+	抹杀生灵
+	所带来的快感。
 
-	By now, you are a
-	much greater
-	threat to the surface
-	than the Moon Lord
-	ever was.
+	如今的你
+	所拥有的力量，
+	对地表世界的威胁
+	早已远超
+	月亮领主。
 
-	It's only a matter of
-	time before you
-	test your power on
-	the people around us.
+	你向周围人
+	“试验”实力的
+	那一刻，
+	迟早都会到来。
 
-	And that's why
-	I'm here.
+	正因如此，
+	我才会在这里。
 
-	To stop you,
+	只为了阻止你，
 	@.
 
 
-	What I have here will
-	not last forever...
+	我手中的力量
+	并不是永久的……
 
-	But I believe it will
-	be just enough
-	to stop you.
+	但我相信，
+	这足以
+	将你终结。
 
 
 	@...
 
-	Your terror...
+	你的恐怖统治……
 
 
-	Ends NOW!!!
-	''' */
-/* JstcMiddle:
+	就在此刻终结！！！
 	'''
-	Why...
+JstcMiddle:
+	'''
+	为什么……
 
-	Why do you hit so
-	hard?
+	为什么你的攻击
+	如此致命？
 
 	...
 
-	I-is this power I
-	have... not enough?
+	难、难道我拥有的
+	力量……还不够吗？
 
 
-	No.
+	不。
 
-	I bet you feel r-real
-	accomplished right
-	now.
+	我想
+	你现在一定
+	很得意吧。
 
-	But the only thing
-	you managed to
-	accomplish...
+	但你唯一
+	能够
+	做到的……
 
-	...is pissing me off
-	even more.
+	……只有让我
+	更加愤怒。
 
 
-	There's only one
-	way this ends.
+	这场对决
+	只有一个结局。
 
-	And I didn't go past
-	the point of no
-	return for nothing.
+	我跨越这
+	不归的道路，
+	绝非徒劳。
 
-	I will use everything
-	within my power to 
-	put an end to you...
+	我将耗尽
+	我每一分力量 
+	来消灭你……
 
-	...for every last
-	second I have in
-	this life!
-	''' */
-/* JstcEnd:
+	……直到
+	生命的
+	最后一息！
 	'''
-	Is this... t-the
-	end for me?
+JstcEnd:
+	'''
+	难道……我就要
+	到此为止了吗？
 
-	No...
+	不……
 
-	I have to get back
-	up. I-I have to 
-	keep fighting!
-
-
-	... for every... 
-	last... second.
+	我必须站起来
+	我必须……
+	继续战斗！
 
 
-	W-What's going on?
-
-	The s-serum,
-	it...
+	...直到...
+	最后一秒。
 
 
-	Why is it wearing
-	off!?
+	发、发生了什么？
 
-	Is it... time?
-
-	No... NO!
-
-	I DON'T WANT
-	TO DIE!
-
-	I NEED MORE TIME!
+	血清的……
+	效果……
 
 
-	...I need more
-	time...
+	为什么在
+	不断的消退!?
+
+	难道时间到了?
+
+	不、不要！
+
+	我还不想死！
+	不要!
+
+	再给我点时间
+
+
+	……我需要
+	更多时间……
 
 	...
 
 
-	You.
+	而你
 
-	You're just going to
-	move along and find
-	someone else to test
-	your power on,
-	right?
+	而你
+	会若无其事地
+	寻找下一个
+	试验力量的猎物，
+	对吧？
 
-	What was I to you,
-	just another medal
-	to add to your belt?
+	我对你而言，
+	不过是又一个
+	战利品罢了？
 
-	You sicken me.
-
-
-	I hope you
+	令人作呕。
 
 
-	n-NO!
-
-	PLEASE!!
+	我诅咒你--
 
 
-	WHAT DO I DO!?
+	不、不要！
 
-	JUST A BIT MORE
-	TIME!!
-
-
-	STOP!!!
+	求求你！！
 
 
-	SOMEONE!
+	我该怎么办！？
+
+	只要
+	只要再一小会就够了！
 
 
-	H E L P  M E . . .
-	''' */
+	停下啊！！！
+
+
+	谁来！
+
+
+	救 救 我. . . 
+	'''
