@@ -2496,6 +2496,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                 modNPC.CleanseDebuffs();
                 Room.ClearSpecificProjectiles();
                 SoundEngine.PlaySound(Knockdown with { Volume = 0.7f });
+                NPC.netUpdate = true;
 
                 if (modNPC.isRoomNPC)
                 {
@@ -3499,8 +3500,8 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
                     Main.EntitySpriteDraw(BGStars, starPos, frame, Color.White, 0, frame.Size() * 0.5f, starScale, i % 2 == 0 ? SpriteEffects.None : SpriteEffects.FlipHorizontally);
                 }
 
-                Main.EntitySpriteDraw(BGBack, backPos + basePos - Main.screenPosition, null, new Color(17, 80, 207) * 0.45f, 0, BGBack.Size() * 0.5f, bgScale, SpriteEffects.None);
-                Main.EntitySpriteDraw(BGFront, frontPos + basePos - Main.screenPosition, null, new Color(66, 187, 255) * 0.43f, 0, BGFront.Size() * 0.5f, bgScale, SpriteEffects.None);
+                Main.EntitySpriteDraw(BGBack, backPos + basePos - Main.screenPosition, null, new Color(17, 80, 207) * 0.3f, 0, BGBack.Size() * 0.5f, bgScale, SpriteEffects.None);
+                Main.EntitySpriteDraw(BGFront, frontPos + basePos - Main.screenPosition, null, new Color(66, 187, 255) * 0.286f, 0, BGFront.Size() * 0.5f, bgScale, SpriteEffects.None);
 
 
                 if (modNPC.isRoomNPC && modNPC.sourceRoomListID >= 0)
@@ -3637,6 +3638,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             writer.WriteVector2(dashStart);
             writer.Write(zDepth);
             writer.Write(starZDepth);
+            writer.Write(deadTime);
         }
         public override void ReceiveExtraAI(BinaryReader reader)
         {
@@ -3650,6 +3652,7 @@ namespace TerRoguelike.NPCs.Enemy.Boss.Mallet
             dashStart = reader.ReadVector2();
             zDepth = reader.ReadSingle();
             starZDepth = reader.ReadSingle();
+            deadTime = reader.ReadInt32();
         }
         public class PatternProjectile
         {
