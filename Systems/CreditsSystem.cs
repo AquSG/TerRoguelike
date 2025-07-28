@@ -174,6 +174,7 @@ namespace TerRoguelike.Systems
             cameraTargetCenter = Main.LocalPlayer.Center;
             creditsPath = [Main.LocalPlayer.Center];
             fadeIn = false;
+            Main.playerInventory = false;
         }
         public static void StopCredits()
         {

@@ -2843,6 +2843,10 @@ namespace TerRoguelike.TerPlayer
             SoundEngine.PlaySound(new SoundStyle("TerRoguelike/Sounds/Loss"));
             if (!CutsceneSystem.cutsceneActive && Player.whoAmI == Main.myPlayer && !TerRoguelike.mpClient)
                 ZoomSystem.SetZoomAnimation(2.5f, 60);
+            if (Main.playerInventory && Player.whoAmI == Main.myPlayer)
+            {
+                Main.playerInventory = false;
+            }
             deathEffectTimer += 120;
             return true;
         }
