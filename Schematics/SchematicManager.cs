@@ -1,17 +1,19 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Terraria.ID;
 using Terraria;
-using Microsoft.Xna.Framework;
-using TerRoguelike.Rooms;
-using TerRoguelike.Managers;
-using TerRoguelike.Floors;
+using Terraria.ID;
 using Terraria.ModLoader;
-using TerRoguelike.Tiles;
+using TerRoguelike.Floors;
 using TerRoguelike.Items;
+using TerRoguelike.Managers;
+using TerRoguelike.Rooms;
+using TerRoguelike.Tiles;
+using TerRoguelike.World;
+using static TerRoguelike.Managers.ItemManager;
 
 namespace TerRoguelike.Schematics
 {
@@ -424,7 +426,8 @@ namespace TerRoguelike.Schematics
 
             if (t.TileType == ModContent.TileType<Tiles.ItemBasin>())
             {
-                TileLoader.PlaceInWorld(x + 1, y + 1, new Item(ModContent.ItemType<Items.ItemBasin>()));
+                //TileLoader.PlaceInWorld(x + 1, y + 1, new Item(ModContent.ItemType<Items.ItemBasin>()));
+                TerRoguelikeWorld.itemBasins.Add(new ItemBasinEntity(new Point(x, y), (ItemTier)(TerRoguelikeWorld.itemBasins.Count % 3)));
             }
         }
         #endregion
